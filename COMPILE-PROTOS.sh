@@ -19,5 +19,5 @@ go get github.com/golang/protobuf/protoc-gen-go
 
 protoc \
 --go_out=:$GOPATH/src \
-proto/jsonschema.proto 
+jsonschema/jsonschema.proto 
 
