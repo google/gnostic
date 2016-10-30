@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"sort"
 	"strings"
 )
 
@@ -686,6 +687,236 @@ func reduceOneOfs(schema *jsonschema.Schema, root *jsonschema.Schema) {
 
 var schemas map[string]*jsonschema.Schema
 
+type SchemaClassRequest struct {
+	Path   string
+	Name   string
+	Schema *jsonschema.Schema
+}
+
+func NewSchemaClassRequest(path string, name string, schema *jsonschema.Schema) *SchemaClassRequest {
+	return &SchemaClassRequest{Path: path, Name: name, Schema: schema}
+}
+
+type ClassProperty struct {
+	Name     string
+	Type     string
+	Repeated bool
+}
+
+func (classProperty *ClassProperty) dump() {
+	if classProperty.Repeated {
+		fmt.Printf("\t%s %s repeated\n", classProperty.Name, classProperty.Type)
+	} else {
+		fmt.Printf("\t%s %s\n", classProperty.Name, classProperty.Type)
+	}
+}
+
+func NewClassProperty() *ClassProperty {
+	return &ClassProperty{}
+}
+
+func NewClassPropertyWithNameAndType(name string, typeName string) *ClassProperty {
+	return &ClassProperty{Name: name, Type: typeName}
+}
+
+type ClassModel struct {
+	Name       string
+	Properties map[string]*ClassProperty
+	Required   []string
+}
+
+func (classModel *ClassModel) dump() {
+	fmt.Printf("%+s\n", classModel.Name)
+
+	keys := make([]string, 0)
+	for k, _ := range classModel.Properties {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		classModel.Properties[k].dump()
+	}
+}
+
+func NewClassModel() *ClassModel {
+	cm := &ClassModel{}
+	cm.Properties = make(map[string]*ClassProperty, 0)
+	return cm
+}
+
+type ClassCollection struct {
+	ClassModels         map[string]*ClassModel
+	Prefix              string
+	Schema              *jsonschema.Schema
+	PatternNames        map[string]string
+	ClassNames          []string
+	ObjectClassRequests map[string]*SchemaClassRequest
+}
+
+func NewClassCollection() *ClassCollection {
+	cc := &ClassCollection{}
+	cc.ClassModels = make(map[string]*ClassModel, 0)
+	cc.PatternNames = make(map[string]string, 0)
+	cc.ClassNames = make([]string, 0)
+	cc.ObjectClassRequests = make(map[string]*SchemaClassRequest, 0)
+	return cc
+}
+
+func (classes *ClassCollection) classNameForStub(stub string) string {
+	return classes.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
+}
+
+func (classes *ClassCollection) classNameForReference(reference string) string {
+	parts := strings.Split(reference, "/")
+	first := parts[0]
+	last := parts[len(parts)-1]
+	if first == "#" {
+		return classes.classNameForStub(last)
+	} else {
+		panic("no class name")
+		return ""
+	}
+}
+
+func (classes *ClassCollection) arrayTypeForSchema(schema *jsonschema.Schema) string {
+	// what is the array type?
+	itemTypeName := "google.protobuf.Any"
+	ref := schema.Items[0].Ref
+	if ref != "" {
+		itemTypeName = classes.classNameForReference(ref)
+	} else {
+		types := schema.Items[0].Type
+		if len(types) == 1 {
+			itemTypeName = types[0]
+		} else if len(types) > 1 {
+			itemTypeName = fmt.Sprintf("%+v", types)
+		} else {
+			itemTypeName = "UNKNOWN"
+		}
+	}
+	return itemTypeName
+}
+
+func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *jsonschema.Schema, path string) {
+	for key, value := range schema.Properties {
+		if value.Ref != "" {
+			className := classes.classNameForReference(value.Ref)
+			cp := NewClassProperty()
+			cp.Name = key
+			cp.Type = className
+			classModel.Properties[key] = cp
+		} else {
+			if len(value.Type) > 0 {
+				propertyType := value.Type[0]
+				switch propertyType {
+				case "string":
+					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "string")
+				case "boolean":
+					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "bool")
+				case "number":
+					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "float")
+				case "integer":
+					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "int")
+				case "object":
+					className := classes.classNameForStub(key)
+					classes.ObjectClassRequests[className] = NewSchemaClassRequest(path, className, value)
+					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
+				case "array":
+					className := classes.arrayTypeForSchema(value)
+					p := NewClassPropertyWithNameAndType(key, className)
+					p.Repeated = true
+					classModel.Properties[key] = p
+				case "default":
+					log.Printf("%+v:%+v has unsupported property type %+v", path, key, propertyType)
+				}
+			} else {
+				/*
+				   if value.isEmpty() {
+				     // write accessor for generic object
+				     let className = "google.protobuf.Any"
+				     classModel.properties[key] = ClassProperty(name:key, type:className)
+				   } else if value.anyOf != nil {
+				     //self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
+				   } else if value.oneOf != nil {
+				     //self.writeOneOfAccessors(schema: value, path: path)
+				   } else {
+				     //print("\(path):\(key) has unspecified property type. Schema is below.\n\(value.description)")
+				   }
+				*/
+			}
+		}
+	}
+}
+
+func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, schema *jsonschema.Schema, path string) {
+	if len(schema.Required) > 0 {
+		classModel.Required = schema.Required
+	}
+}
+
+func (classes *ClassCollection) buildClassForDefinition(className string, schema *jsonschema.Schema) *ClassModel {
+	classModel := NewClassModel()
+	classModel.Name = className
+	classes.buildClassProperties(classModel, classes.Schema, "")
+	classes.buildClassRequirements(classModel, classes.Schema, "")
+	return classModel
+}
+
+func (classes *ClassCollection) buildClassForDefinitionObject(className string, schema *jsonschema.Schema) *ClassModel {
+	classModel := NewClassModel()
+	classModel.Name = className
+	classes.buildClassProperties(classModel, classes.Schema, "")
+	classes.buildClassRequirements(classModel, classes.Schema, "")
+	return classModel
+}
+
+func (classes *ClassCollection) build() {
+	// create a class for the top-level schema
+	className := classes.Prefix + "Document"
+	classModel := NewClassModel()
+	classModel.Name = className
+	classes.buildClassProperties(classModel, classes.Schema, "")
+	classes.buildClassRequirements(classModel, classes.Schema, "")
+
+	classes.ClassModels[className] = classModel
+
+	// create a class for each object defined in the schema
+	for key, value := range classes.Schema.Definitions {
+		className := classes.classNameForStub(key)
+		classes.ClassModels[className] = classes.buildClassForDefinition(className, value)
+	}
+
+	// iterate over anonymous object classes to be instantiated and generate a class for each
+	for className, classRequest := range classes.ObjectClassRequests {
+		classes.ClassModels[classRequest.Name] =
+			classes.buildClassForDefinitionObject(className, classRequest.Schema)
+	}
+
+	// add a class for string arrays
+	stringArrayClass := NewClassModel()
+	stringArrayClass.Name = "OpenAPIStringArray"
+	stringProperty := NewClassProperty()
+	stringProperty.Name = "string"
+	stringProperty.Type = "string"
+	stringProperty.Repeated = true
+	stringArrayClass.Properties[stringProperty.Name] = stringProperty
+	classes.ClassModels[stringArrayClass.Name] = stringArrayClass
+}
+
+func (classes *ClassCollection) dump() {
+	log.Printf("\n\n")
+	keys := make([]string, 0)
+	for k, _ := range classes.ClassModels {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		classes.ClassModels[k].dump()
+	}
+}
+
 func main() {
 	schemas = make(map[string]*jsonschema.Schema, 0)
 
@@ -707,4 +938,9 @@ func main() {
 	resolveRefs(s, s, classNames)
 	resolveAllOfs(s, s)
 	reduceOneOfs(s, s)
+
+	cc := NewClassCollection()
+	cc.Schema = s
+	cc.build()
+	cc.dump()
 }
