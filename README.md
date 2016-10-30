@@ -18,15 +18,15 @@ and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
 
 1. Get this package by downloading it with `go get` or manually cloning it into `go/src`.
 
-	`go get github.com/google/openapi-compiler`
+	`go get github.com/googleapis/openapi-compiler`
 
 2. Generate protocol buffer support code.
 
-	`go generate github.com/google/openapi-compiler`
+	`go generate github.com/googleapis/openapi-compiler`
 
 3. Build and install the OpenAPI compiler.
 
-	`go install github.com/google/openapi-compiler`
+	`go install github.com/googleapis/openapi-compiler`
 
 ## Copyright
 
