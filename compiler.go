@@ -13,7 +13,8 @@ import (
 	"strings"
 )
 
-// global map of all known schemas
+// global map of all known Schemas.
+// initialized when the first Schema is created and inserted.
 var schemas map[string]*Schema
 
 type Schema struct {
@@ -24,10 +25,10 @@ type Schema struct {
 
 	// http://json-schema.org/latest/json-schema-validation.html
 	// 5.1.  Validation keywords for numeric instances (number and integer)
-	MultipleOf       *Number
-	Maximum          *Number
+	MultipleOf       *SchemaNumber
+	Maximum          *SchemaNumber
 	ExclusiveMaximum *bool
-	Minimum          *Number
+	Minimum          *SchemaNumber
 	ExclusiveMinimum *bool
 
 	// 5.2.  Validation keywords for strings
@@ -52,7 +53,7 @@ type Schema struct {
 	Dependencies         *map[string]*SchemaOrStringArray
 
 	// 5.5.  Validation keywords for any instance type
-	Enumeration *[]Value
+	Enumeration *[]SchemaEnumValue
 	Type        *[]string
 	AllOf       *[]*Schema
 	AnyOf       *[]*Schema
@@ -71,7 +72,7 @@ type Schema struct {
 
 // Helpers
 
-type Number struct {
+type SchemaNumber struct {
 	Integer *int64
 	Float   *float64
 }
@@ -86,12 +87,28 @@ type SchemaOrStringArray struct {
 	Array  *[]string
 }
 
-type Value struct {
+type SchemaEnumValue struct {
 	String *string
 	Bool   *bool
 }
 
-func NewSchema(jsonData interface{}) *Schema {
+func NewSchemaFromFile(filename string) *Schema {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	schemasDir := usr.HomeDir + "/go/src/github.com/googleapis/openapi-compiler/schemas"
+	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
+	if e != nil {
+		fmt.Printf("File error: %v\n", e)
+		os.Exit(1)
+	}
+	var info interface{}
+	json.Unmarshal(file, &info)
+	return NewSchemaFromObject(info)
+}
+
+func NewSchemaFromObject(jsonData interface{}) *Schema {
 	switch t := jsonData.(type) {
 	default:
 		fmt.Printf("schemaValue: unexpected type %T\n", t)
@@ -162,7 +179,7 @@ func NewSchema(jsonData interface{}) *Schema {
 			case "oneOf":
 				schema.OneOf = schema.arrayOfSchemasValue(v)
 			case "not":
-				schema.Not = NewSchema(v)
+				schema.Not = NewSchemaFromObject(v)
 			case "definitions":
 				schema.Definitions = schema.dictionaryOfSchemasValue(v)
 
@@ -185,6 +202,9 @@ func NewSchema(jsonData interface{}) *Schema {
 
 		// insert schema in global map
 		if schema.Id != nil {
+			if schemas == nil {
+				schemas = make(map[string]*Schema, 0)
+			}
 			schemas[*(schema.Id)] = schema
 		}
 		return schema
@@ -202,8 +222,8 @@ func (schema *Schema) stringValue(v interface{}) *string {
 	return nil
 }
 
-func (schema *Schema) numberValue(v interface{}) *Number {
-	number := &Number{}
+func (schema *Schema) numberValue(v interface{}) *SchemaNumber {
+	number := &SchemaNumber{}
 	switch v := v.(type) {
 	default:
 		fmt.Printf("numberValue: unexpected type %T\n", v)
@@ -249,7 +269,7 @@ func (schema *Schema) dictionaryOfSchemasValue(v interface{}) *map[string]*Schem
 	case map[string]interface{}:
 		m := make(map[string]*Schema)
 		for k2, v2 := range v {
-			m[k2] = NewSchema(v2)
+			m[k2] = NewSchemaFromObject(v2)
 		}
 		return &m
 	}
@@ -267,14 +287,14 @@ func (schema *Schema) arrayOfSchemasValue(v interface{}) *[]*Schema {
 			default:
 				fmt.Printf("arrayOfSchemasValue: unexpected type %T\n", v2)
 			case map[string]interface{}:
-				s := NewSchema(v2)
+				s := NewSchemaFromObject(v2)
 				m = append(m, s)
 			}
 		}
 		return &m
 	case map[string]interface{}:
 		m := make([]*Schema, 0)
-		s := NewSchema(v)
+		s := NewSchemaFromObject(v)
 		m = append(m, s)
 		return &m
 	}
@@ -305,8 +325,8 @@ func (schema *Schema) arrayOfStringsValue(v interface{}) *[]string {
 	return nil
 }
 
-func (schema *Schema) arrayOfValuesValue(v interface{}) *[]Value {
-	a := make([]*Value, 0)
+func (schema *Schema) arrayOfValuesValue(v interface{}) *[]SchemaEnumValue {
+	a := make([]*SchemaEnumValue, 0)
 	switch v := v.(type) {
 	default:
 		fmt.Printf("arrayOfValuesValue: unexpected type %T\n", v)
@@ -316,11 +336,9 @@ func (schema *Schema) arrayOfValuesValue(v interface{}) *[]Value {
 			default:
 				fmt.Printf("arrayOfValuesValue: unexpected type %T\n", v2)
 			case string:
-				vv := &Value{String: &v2}
-				a = append(a, vv)
+				a = append(a, &SchemaEnumValue{String: &v2})
 			case bool:
-				vv := &Value{Bool: &v2}
-				a = append(a, vv)
+				a = append(a, &SchemaEnumValue{Bool: &v2})
 			}
 		}
 	}
@@ -362,7 +380,7 @@ func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
 	case bool:
 		schemaOrBoolean.Boolean = &v
 	case map[string]interface{}:
-		schemaOrBoolean.Schema = NewSchema(v)
+		schemaOrBoolean.Schema = NewSchemaFromObject(v)
 	default:
 		fmt.Printf("schemaOrBooleanValue: unexpected type %T\n", v)
 	case []map[string]interface{}:
@@ -756,45 +774,31 @@ func (schema *Schema) reduceOneOfs() {
 		})
 }
 
-/////////
+/// Class Modeling
 
-func loadSchema(filename string) *Schema {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	schemasDir := usr.HomeDir + "/go/src/github.com/googleapis/openapi-compiler/schemas"
-	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
-	}
-	var info interface{}
-	json.Unmarshal(file, &info)
-	return NewSchema(info)
-}
-
-type SchemaClassRequest struct {
+// models classes that we encounter during traversal that have no named schema
+type ClassRequest struct {
 	Path   string
 	Name   string
 	Schema *Schema
 }
 
-func NewSchemaClassRequest(path string, name string, schema *Schema) *SchemaClassRequest {
-	return &SchemaClassRequest{Path: path, Name: name, Schema: schema}
+func NewClassRequest(path string, name string, schema *Schema) *ClassRequest {
+	return &ClassRequest{Path: path, Name: name, Schema: schema}
 }
 
+// models class properties, eg. fields
 type ClassProperty struct {
 	Name     string
 	Type     string
 	Repeated bool
 }
 
-func (classProperty *ClassProperty) dump() {
+func (classProperty *ClassProperty) display() string {
 	if classProperty.Repeated {
-		fmt.Printf("\t%s %s repeated\n", classProperty.Name, classProperty.Type)
+		return fmt.Sprintf("\t%s %s repeated\n", classProperty.Name, classProperty.Type)
 	} else {
-		fmt.Printf("\t%s %s\n", classProperty.Name, classProperty.Type)
+		return fmt.Sprintf("\t%s %s\n", classProperty.Name, classProperty.Type)
 	}
 }
 
@@ -806,14 +810,15 @@ func NewClassPropertyWithNameAndType(name string, typeName string) *ClassPropert
 	return &ClassProperty{Name: name, Type: typeName}
 }
 
+// models classes
 type ClassModel struct {
 	Name       string
 	Properties map[string]*ClassProperty
 	Required   []string
 }
 
-func (classModel *ClassModel) dump() {
-	fmt.Printf("%+s\n", classModel.Name)
+func (classModel *ClassModel) display() string {
+	result := fmt.Sprintf("%+s\n", classModel.Name)
 
 	keys := make([]string, 0)
 	for k, _ := range classModel.Properties {
@@ -822,8 +827,9 @@ func (classModel *ClassModel) dump() {
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		classModel.Properties[k].dump()
+		result += classModel.Properties[k].display()
 	}
+	return result
 }
 
 func NewClassModel() *ClassModel {
@@ -832,21 +838,24 @@ func NewClassModel() *ClassModel {
 	return cm
 }
 
+// models a collection of classes that is defined by a schema
+
 type ClassCollection struct {
 	ClassModels         map[string]*ClassModel
 	Prefix              string
 	Schema              *Schema
 	PatternNames        map[string]string
 	ClassNames          []string
-	ObjectClassRequests map[string]*SchemaClassRequest
+	ObjectClassRequests map[string]*ClassRequest
 }
 
-func NewClassCollection() *ClassCollection {
+func NewClassCollection(schema *Schema) *ClassCollection {
 	cc := &ClassCollection{}
 	cc.ClassModels = make(map[string]*ClassModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
 	cc.ClassNames = make([]string, 0)
-	cc.ObjectClassRequests = make(map[string]*SchemaClassRequest, 0)
+	cc.ObjectClassRequests = make(map[string]*ClassRequest, 0)
+	cc.Schema = schema
 	return cc
 }
 
@@ -907,7 +916,7 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "int")
 				case "object":
 					className := classes.classNameForStub(key)
-					classes.ObjectClassRequests[className] = NewSchemaClassRequest(path, className, value)
+					classes.ObjectClassRequests[className] = NewClassRequest(path, className, value)
 					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
 				case "array":
 					className := classes.arrayTypeForSchema(value)
@@ -991,39 +1000,42 @@ func (classes *ClassCollection) build() {
 	classes.ClassModels[stringArrayClass.Name] = stringArrayClass
 }
 
-func (classes *ClassCollection) dump() {
+func (classes *ClassCollection) display() string {
 	keys := make([]string, 0)
 	for k, _ := range classes.ClassModels {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
+	result := ""
 	for _, k := range keys {
-		classes.ClassModels[k].dump()
+		result += classes.ClassModels[k].display()
 	}
+	return result
 }
 
-func main() {
-	schemas = make(map[string]*Schema, 0)
+/// main program
 
-	base_schema := loadSchema("schema.json")
+func main() {
+	base_schema := NewSchemaFromFile("schema.json")
 	base_schema.resolveRefs(nil)
 
-	openapi_schema := loadSchema("openapi-2.0.json")
+	openapi_schema := NewSchemaFromFile("openapi-2.0.json")
+	// these non-object definitions are marked for handling as if they were objects
+	// in the future, these could be automatically identified by their presence in a oneOf
 	classNames := []string{
 		"#/definitions/headerParameterSubSchema",
 		"#/definitions/formDataParameterSubSchema",
 		"#/definitions/queryParameterSubSchema",
 		"#/definitions/pathParameterSubSchema"}
 	openapi_schema.resolveRefs(classNames)
-
 	openapi_schema.resolveAllOfs()
 	openapi_schema.reduceOneOfs()
 
 	fmt.Printf("%s\n", openapi_schema.display())
 
-	cc := NewClassCollection()
-	cc.Schema = openapi_schema
+	// build a simplified model of the classes described by the schema
+	cc := NewClassCollection(openapi_schema)
 	cc.build()
-	cc.dump()
+	fmt.Printf("%s\n", cc.display())
 }
