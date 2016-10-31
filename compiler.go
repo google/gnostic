@@ -817,15 +817,18 @@ type ClassModel struct {
 	Required   []string
 }
 
-func (classModel *ClassModel) display() string {
-	result := fmt.Sprintf("%+s\n", classModel.Name)
-
+func (classModel *ClassModel) sortedPropertyNames() []string {
 	keys := make([]string, 0)
 	for k, _ := range classModel.Properties {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+	return keys
+}
 
+func (classModel *ClassModel) display() string {
+	result := fmt.Sprintf("%+s\n", classModel.Name)
+	keys := classModel.sortedPropertyNames()
 	for _, k := range keys {
 		result += classModel.Properties[k].display()
 	}
@@ -1000,18 +1003,82 @@ func (classes *ClassCollection) build() {
 	classes.ClassModels[stringArrayClass.Name] = stringArrayClass
 }
 
-func (classes *ClassCollection) display() string {
+func (classes *ClassCollection) sortedClassNames() []string {
 	keys := make([]string, 0)
 	for k, _ := range classes.ClassModels {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+	return keys
+}
 
+func (classes *ClassCollection) display() string {
+	keys := classes.sortedClassNames()
 	result := ""
 	for _, k := range keys {
 		result += classes.ClassModels[k].display()
 	}
 	return result
+}
+
+func (classes *ClassCollection) generateProto() string {
+	code := ""
+	code += fmt.Sprintf("syntax = \"proto3\";")
+	code += "\n"
+	code += "package OpenAPI;\n"
+	code += "\n"
+	code += "import \"google/protobuf/any.proto\";\n"
+	code += "\n"
+
+	classNames := classes.sortedClassNames()
+	for _, className := range classNames {
+		code += fmt.Sprintf("message %s {\n", className)
+		classModel := classes.ClassModels[className]
+		propertyNames := classModel.sortedPropertyNames()
+		var fieldNumber = 0
+		for _, propertyName := range propertyNames {
+			propertyModel := classModel.Properties[propertyName]
+			fieldNumber += 1
+			propertyType := propertyModel.Type
+			if propertyType == "int" {
+				propertyType = "int64"
+			}
+			var displayName = propertyName
+			if displayName == "$ref" {
+				displayName = "_ref"
+			}
+			if displayName == "$schema" {
+				displayName = "_schema"
+			}
+			displayName = camelCaseToSnakeCase(displayName)
+
+			var line = fmt.Sprintf("%s %s = %d", propertyType, displayName, fieldNumber)
+			if propertyModel.Repeated {
+				line = "repeated " + line
+			}
+			code += "  " + line + "\n"
+		}
+		code += "}\n\n"
+	}
+	return code
+}
+
+func camelCaseToSnakeCase(input string) string {
+	var out = ""
+
+	for index, runeValue := range input {
+		//fmt.Printf("%#U starts at byte position %d\n", runeValue, index)
+		if runeValue >= 'A' && runeValue <= 'Z' {
+			if index > 0 {
+				out += "_"
+			}
+			out += string(runeValue - 'A' + 'a')
+		} else {
+			out += string(runeValue)
+		}
+
+	}
+	return out
 }
 
 /// main program
@@ -1031,11 +1098,14 @@ func main() {
 	openapi_schema.resolveRefs(classNames)
 	openapi_schema.resolveAllOfs()
 	openapi_schema.reduceOneOfs()
-
-	fmt.Printf("%s\n", openapi_schema.display())
+	//fmt.Printf("%s\n", openapi_schema.display())
 
 	// build a simplified model of the classes described by the schema
 	cc := NewClassCollection(openapi_schema)
 	cc.build()
-	fmt.Printf("%s\n", cc.display())
+	//fmt.Printf("%s\n", cc.display())
+
+	// generate the protocol buffer description
+	proto := cc.generateProto()
+	fmt.Printf("%s\n", proto)
 }
