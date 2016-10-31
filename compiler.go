@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"jsonschema"
 	"log"
 	"os"
 	"os/user"
@@ -14,100 +13,283 @@ import (
 	"strings"
 )
 
-func stringValue(v interface{}) string {
+// global map of all known schemas
+var schemas map[string]*Schema
+
+type Schema struct {
+	Schema      *string // $schema
+	Id          *string // id keyword used for $ref resolution scope
+	Ref         *string // $ref, i.e. JSON Pointers
+	ResolvedRef *Schema // the resolved pointer reference
+
+	// http://json-schema.org/latest/json-schema-validation.html
+	// 5.1.  Validation keywords for numeric instances (number and integer)
+	MultipleOf       *Number
+	Maximum          *Number
+	ExclusiveMaximum *bool
+	Minimum          *Number
+	ExclusiveMinimum *bool
+
+	// 5.2.  Validation keywords for strings
+	MaxLength *int64
+	MinLength *int64
+	Pattern   *string
+
+	// 5.3.  Validation keywords for arrays
+	AdditionalItems *SchemaOrBoolean
+	Items           *[]*Schema
+	MaxItems        *int64
+	MinItems        *int64
+	UniqueItems     *bool
+
+	// 5.4.  Validation keywords for objects
+	MaxProperties        *int64
+	MinProperties        *int64
+	Required             *[]string
+	AdditionalProperties *SchemaOrBoolean
+	Properties           *map[string]*Schema
+	PatternProperties    *map[string]*Schema
+	Dependencies         *map[string]*SchemaOrStringArray
+
+	// 5.5.  Validation keywords for any instance type
+	Enumeration *[]Value
+	Type        *[]string
+	AllOf       *[]*Schema
+	AnyOf       *[]*Schema
+	OneOf       *[]*Schema
+	Not         *Schema
+	Definitions *map[string]*Schema
+
+	// 6.  Metadata keywords
+	Title       *string
+	Description *string
+	Default     *interface{}
+
+	// 7.  Semantic validation with "format"
+	Format *string
+}
+
+// Helpers
+
+type Number struct {
+	Integer *int64
+	Float   *float64
+}
+
+type SchemaOrBoolean struct {
+	Schema  *Schema
+	Boolean *bool
+}
+
+type SchemaOrStringArray struct {
+	Schema *Schema
+	Array  *[]string
+}
+
+type Value struct {
+	String *string
+	Bool   *bool
+}
+
+func NewSchema(jsonData interface{}) *Schema {
+	switch t := jsonData.(type) {
+	default:
+		fmt.Printf("schemaValue: unexpected type %T\n", t)
+		return nil
+	case map[string]interface{}:
+		schema := &Schema{}
+		for k, v := range t {
+
+			switch k {
+			case "$schema":
+				schema.Schema = schema.stringValue(v)
+			case "id":
+				schema.Id = schema.stringValue(v)
+
+			case "multipleOf":
+				schema.MultipleOf = schema.numberValue(v)
+			case "maximum":
+				schema.Maximum = schema.numberValue(v)
+			case "exclusiveMaximum":
+				schema.ExclusiveMaximum = schema.boolValue(v)
+			case "minimum":
+				schema.Minimum = schema.numberValue(v)
+			case "exclusiveMinimum":
+				schema.ExclusiveMinimum = schema.boolValue(v)
+
+			case "maxLength":
+				schema.MaxLength = schema.intValue(v)
+			case "minLength":
+				schema.MinLength = schema.intValue(v)
+			case "pattern":
+				schema.Pattern = schema.stringValue(v)
+
+			case "additionalItems":
+				schema.AdditionalItems = schema.schemaOrBooleanValue(v)
+			case "items":
+				schema.Items = schema.arrayOfSchemasValue(v)
+			case "maxItems":
+				schema.MaxItems = schema.intValue(v)
+			case "minItems":
+				schema.MinItems = schema.intValue(v)
+			case "uniqueItems":
+				schema.UniqueItems = schema.boolValue(v)
+
+			case "maxProperties":
+				schema.MaxProperties = schema.intValue(v)
+			case "minProperties":
+				schema.MinProperties = schema.intValue(v)
+			case "required":
+				schema.Required = schema.arrayOfStringsValue(v)
+			case "additionalProperties":
+				schema.AdditionalProperties = schema.schemaOrBooleanValue(v)
+			case "properties":
+				schema.Properties = schema.dictionaryOfSchemasValue(v)
+			case "patternProperties":
+				schema.PatternProperties = schema.dictionaryOfSchemasValue(v)
+			case "dependencies":
+				schema.Dependencies = schema.dictionaryOfSchemasOrStringArraysValue(v)
+
+			case "enum":
+				schema.Enumeration = schema.arrayOfValuesValue(v)
+
+			case "type":
+				schema.Type = schema.arrayOfStringsValue(v)
+			case "allOf":
+				schema.AllOf = schema.arrayOfSchemasValue(v)
+			case "anyOf":
+				schema.AnyOf = schema.arrayOfSchemasValue(v)
+			case "oneOf":
+				schema.OneOf = schema.arrayOfSchemasValue(v)
+			case "not":
+				schema.Not = NewSchema(v)
+			case "definitions":
+				schema.Definitions = schema.dictionaryOfSchemasValue(v)
+
+			case "title":
+				schema.Title = schema.stringValue(v)
+			case "description":
+				schema.Description = schema.stringValue(v)
+
+			case "default":
+				schema.Default = &v
+
+			case "format":
+				schema.Format = schema.stringValue(v)
+			case "$ref":
+				schema.Ref = schema.stringValue(v)
+			default:
+				fmt.Printf("UNSUPPORTED (%s)\n", k)
+			}
+		}
+
+		// insert schema in global map
+		if schema.Id != nil {
+			schemas[*(schema.Id)] = schema
+		}
+		return schema
+	}
+	return nil
+}
+
+func (schema *Schema) stringValue(v interface{}) *string {
 	switch v := v.(type) {
 	default:
 		fmt.Printf("stringValue: unexpected type %T\n", v)
 	case string:
-		return v
+		return &v
 	}
-	return ""
+	return nil
 }
 
-func numberValue(v interface{}) *jsonschema.Number {
-	number := &jsonschema.Number{}
+func (schema *Schema) numberValue(v interface{}) *Number {
+	number := &Number{}
 	switch v := v.(type) {
 	default:
 		fmt.Printf("numberValue: unexpected type %T\n", v)
 	case float64:
-		number.Value = &jsonschema.Number_Float{float32(v)}
+		v2 := float64(v)
+		number.Float = &v2
 		return number
 	case float32:
-		number.Value = &jsonschema.Number_Float{float32(v)}
+		v2 := float64(v)
+		number.Float = &v2
 		return number
 	}
 	return nil
 }
 
-func intValue(v interface{}) int64 {
+func (schema *Schema) intValue(v interface{}) *int64 {
 	switch v := v.(type) {
 	default:
 		fmt.Printf("intValue: unexpected type %T\n", v)
 	case float64:
-		return int64(v)
+		v2 := int64(v)
+		return &v2
 	case int64:
-		return v
-	}
-	return 0
-}
-
-func boolValue(v interface{}) bool {
-	switch v := v.(type) {
-	default:
-		fmt.Printf("boolValue: unexpected type %T\n", v)
-	case bool:
-		return v
-	}
-	return false
-}
-
-func dictionaryOfSchemasValue(v interface{}) map[string]*jsonschema.Schema {
-	switch v := v.(type) {
-	default:
-		fmt.Printf("dictionaryOfSchemasValue: unexpected type %T\n", v)
-	case map[string]interface{}:
-		m := make(map[string]*jsonschema.Schema)
-		for k2, v2 := range v {
-			m[k2] = schemaValue(v2)
-		}
-		return m
+		return &v
 	}
 	return nil
 }
 
-func arrayOfSchemasValue(v interface{}) []*jsonschema.Schema {
+func (schema *Schema) boolValue(v interface{}) *bool {
+	switch v := v.(type) {
+	default:
+		fmt.Printf("boolValue: unexpected type %T\n", v)
+	case bool:
+		return &v
+	}
+	return nil
+}
+
+func (schema *Schema) dictionaryOfSchemasValue(v interface{}) *map[string]*Schema {
+	switch v := v.(type) {
+	default:
+		fmt.Printf("dictionaryOfSchemasValue: unexpected type %T\n", v)
+	case map[string]interface{}:
+		m := make(map[string]*Schema)
+		for k2, v2 := range v {
+			m[k2] = NewSchema(v2)
+		}
+		return &m
+	}
+	return nil
+}
+
+func (schema *Schema) arrayOfSchemasValue(v interface{}) *[]*Schema {
 	switch v := v.(type) {
 	default:
 		fmt.Printf("arrayOfSchemasValue: unexpected type %T\n", v)
 	case []interface{}:
-		m := make([]*jsonschema.Schema, 0)
+		m := make([]*Schema, 0)
 		for _, v2 := range v {
 			switch v2 := v2.(type) {
 			default:
 				fmt.Printf("arrayOfSchemasValue: unexpected type %T\n", v2)
 			case map[string]interface{}:
-				s := schemaValue(v2)
+				s := NewSchema(v2)
 				m = append(m, s)
 			}
 		}
-		return m
+		return &m
 	case map[string]interface{}:
-		m := make([]*jsonschema.Schema, 0)
-		s := schemaValue(v)
+		m := make([]*Schema, 0)
+		s := NewSchema(v)
 		m = append(m, s)
-		return m
+		return &m
 	}
 	return nil
 }
 
-func arrayOfStringsValue(v interface{}) []string {
+func (schema *Schema) arrayOfStringsValue(v interface{}) *[]string {
 	switch v := v.(type) {
 	default:
 		fmt.Printf("arrayOfStringsValue: unexpected type %T\n", v)
 	case []string:
-		return v
+		return &v
 	case string:
-		return []string{v}
+		a := []string{v}
+		return &a
 	case []interface{}:
 		a := make([]string, 0)
 		for _, v2 := range v {
@@ -118,13 +300,13 @@ func arrayOfStringsValue(v interface{}) []string {
 				a = append(a, v2)
 			}
 		}
-		return a
+		return &a
 	}
-	return []string{}
+	return nil
 }
 
-func arrayOfValuesValue(v interface{}) []*jsonschema.Value {
-	a := make([]*jsonschema.Value, 0)
+func (schema *Schema) arrayOfValuesValue(v interface{}) *[]Value {
+	a := make([]*Value, 0)
 	switch v := v.(type) {
 	default:
 		fmt.Printf("arrayOfValuesValue: unexpected type %T\n", v)
@@ -134,19 +316,19 @@ func arrayOfValuesValue(v interface{}) []*jsonschema.Value {
 			default:
 				fmt.Printf("arrayOfValuesValue: unexpected type %T\n", v2)
 			case string:
-				vv := &jsonschema.Value{String_: v2}
+				vv := &Value{String: &v2}
 				a = append(a, vv)
 			case bool:
-				vv := &jsonschema.Value{Bool: v2}
+				vv := &Value{Bool: &v2}
 				a = append(a, vv)
 			}
 		}
 	}
-	return a
+	return nil
 }
 
-func dictionaryOfSchemasOrStringArraysValue(v interface{}) map[string]*jsonschema.SchemaOrStringArray {
-	m := make(map[string]*jsonschema.SchemaOrStringArray, 0)
+func (schema *Schema) dictionaryOfSchemasOrStringArraysValue(v interface{}) *map[string]*SchemaOrStringArray {
+	m := make(map[string]*SchemaOrStringArray, 0)
 	switch v := v.(type) {
 	default:
 		fmt.Printf("dictionaryOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v, v)
@@ -165,22 +347,22 @@ func dictionaryOfSchemasOrStringArraysValue(v interface{}) map[string]*jsonschem
 						a = append(a, v3)
 					}
 				}
-				s := &jsonschema.SchemaOrStringArray{}
-				s.Value = &jsonschema.SchemaOrStringArray_Array{Array: &jsonschema.StringArray{String_: a}}
+				s := &SchemaOrStringArray{}
+				s.Array = &a
 				m[k2] = s
 			}
 		}
 	}
-	return m
+	return &m
 }
 
-func schemaOrBooleanValue(v interface{}) *jsonschema.SchemaOrBoolean {
-	schemaOrBoolean := &jsonschema.SchemaOrBoolean{}
+func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
+	schemaOrBoolean := &SchemaOrBoolean{}
 	switch v := v.(type) {
 	case bool:
-		schemaOrBoolean.Value = &jsonschema.SchemaOrBoolean_Boolean{Boolean: v}
+		schemaOrBoolean.Boolean = &v
 	case map[string]interface{}:
-		schemaOrBoolean.Value = &jsonschema.SchemaOrBoolean_Schema{Schema: schemaValue(v)}
+		schemaOrBoolean.Schema = NewSchema(v)
 	default:
 		fmt.Printf("schemaOrBooleanValue: unexpected type %T\n", v)
 	case []map[string]interface{}:
@@ -189,221 +371,113 @@ func schemaOrBooleanValue(v interface{}) *jsonschema.SchemaOrBoolean {
 	return schemaOrBoolean
 }
 
-func schemaValue(jsonData interface{}) *jsonschema.Schema {
-	switch t := jsonData.(type) {
-	default:
-		fmt.Printf("schemaValue: unexpected type %T\n", t)
-	case map[string]interface{}:
-		schema := &jsonschema.Schema{}
-		for k, v := range t {
-
-			switch k {
-			case "$schema":
-				schema.Schema = stringValue(v)
-			case "id":
-				schema.Id = stringValue(v)
-
-			case "multipleOf":
-				schema.MultipleOf = numberValue(v)
-			case "maximum":
-				schema.Maximum = numberValue(v)
-			case "exclusiveMaximum":
-				schema.ExclusiveMaximum = boolValue(v)
-			case "minimum":
-				schema.Minimum = numberValue(v)
-			case "exclusiveMinimum":
-				schema.ExclusiveMinimum = boolValue(v)
-
-			case "maxLength":
-				schema.MaxLength = intValue(v)
-			case "minLength":
-				schema.MinLength = intValue(v)
-			case "pattern":
-				schema.Pattern = stringValue(v)
-
-			case "additionalItems":
-				schema.AdditionalItems = schemaOrBooleanValue(v)
-			case "items":
-				schema.Items = arrayOfSchemasValue(v)
-			case "maxItems":
-				schema.MaxItems = intValue(v)
-			case "minItems":
-				schema.MinItems = intValue(v)
-			case "uniqueItems":
-				schema.UniqueItems = boolValue(v)
-
-			case "maxProperties":
-				schema.MaxProperties = intValue(v)
-			case "minProperties":
-				schema.MinProperties = intValue(v)
-			case "required":
-				schema.Required = arrayOfStringsValue(v)
-			case "additionalProperties":
-				schema.AdditionalProperties = schemaOrBooleanValue(v)
-			case "properties":
-				schema.Properties = dictionaryOfSchemasValue(v)
-			case "patternProperties":
-				schema.PatternProperties = dictionaryOfSchemasValue(v)
-			case "dependencies":
-				schema.Dependencies = dictionaryOfSchemasOrStringArraysValue(v)
-
-			case "enum":
-				schema.Enumeration = arrayOfValuesValue(v)
-
-			case "type":
-				schema.Type = arrayOfStringsValue(v)
-			case "allOf":
-				schema.AllOf = arrayOfSchemasValue(v)
-			case "anyOf":
-				schema.AnyOf = arrayOfSchemasValue(v)
-			case "oneOf":
-				schema.OneOf = arrayOfSchemasValue(v)
-			case "not":
-				schema.Not = schemaValue(v)
-			case "definitions":
-				schema.Definitions = dictionaryOfSchemasValue(v)
-
-			case "title":
-				schema.Title = stringValue(v)
-			case "description":
-				schema.Description = stringValue(v)
-
-			case "default":
-				//schema.DefaultValue = v
-
-			case "format":
-				schema.Format = stringValue(v)
-			case "$ref":
-				schema.Ref = stringValue(v)
-			default:
-				fmt.Printf("UNSUPPORTED (%s)\n", k)
-			}
-		}
-		return schema
-
-	}
-	return nil
+func (schema *Schema) display() string {
+	return schema.displaySchema("")
 }
 
-func loadSchema(filename string) *jsonschema.Schema {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	schemasDir := usr.HomeDir + "/go/src/github.com/googleapis/openapi-compiler/schemas"
-	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
-	}
-	var info interface{}
-	json.Unmarshal(file, &info)
-	return schemaValue(info)
-}
-
-func displaySchema(schema *jsonschema.Schema, indent string) string {
+func (schema *Schema) displaySchema(indent string) string {
 	result := ""
-	if schema.Schema != "" {
-		result += indent + "$schema: " + schema.Schema + "\n"
+	if schema.Schema != nil {
+		result += indent + "$schema: " + *(schema.Schema) + "\n"
 	}
-	if schema.Id != "" {
-		result += indent + "id: " + schema.Id + "\n"
+	if schema.Id != nil {
+		result += indent + "id: " + *(schema.Id) + "\n"
 	}
-	if floatForNumber(schema.MultipleOf) != 0.0 {
-		result += indent + fmt.Sprintf("multipleOf: %+v\n", schema.MultipleOf)
+	if schema.MultipleOf != nil {
+		result += indent + fmt.Sprintf("multipleOf: %+v\n", *(schema.MultipleOf))
 	}
-	if floatForNumber(schema.Maximum) != 0.0 {
-		result += indent + fmt.Sprintf("maximum: %+v\n", schema.Maximum)
+	if schema.Maximum != nil {
+		result += indent + fmt.Sprintf("maximum: %+v\n", *(schema.Maximum))
 	}
-	if schema.ExclusiveMaximum {
-		result += indent + fmt.Sprintf("exclusiveMaximum: %+v\n", schema.ExclusiveMaximum)
+	if schema.ExclusiveMaximum != nil {
+		result += indent + fmt.Sprintf("exclusiveMaximum: %+v\n", *(schema.ExclusiveMaximum))
 	}
-	if floatForNumber(schema.Minimum) != 0.0 {
-		result += indent + fmt.Sprintf("minimum: %+v\n", schema.Minimum)
+	if schema.Minimum != nil {
+		result += indent + fmt.Sprintf("minimum: %+v\n", *(schema.Minimum))
 	}
-	if schema.ExclusiveMinimum {
-		result += indent + fmt.Sprintf("exclusiveMinimum: %+v\n", schema.ExclusiveMinimum)
+	if schema.ExclusiveMinimum != nil {
+		result += indent + fmt.Sprintf("exclusiveMinimum: %+v\n", *(schema.ExclusiveMinimum))
 	}
-	if schema.MaxLength != 0 {
-		result += indent + fmt.Sprintf("maxLength: %+v\n", schema.MaxLength)
+	if schema.MaxLength != nil {
+		result += indent + fmt.Sprintf("maxLength: %+v\n", *(schema.MaxLength))
 	}
-	if schema.MinLength != 0 {
-		result += indent + fmt.Sprintf("minLength: %+v\n", schema.MinLength)
+	if schema.MinLength != nil {
+		result += indent + fmt.Sprintf("minLength: %+v\n", *(schema.MinLength))
 	}
-	if schema.Pattern != "" {
-		result += indent + fmt.Sprintf("pattern: %+v\n", schema.Pattern)
+	if schema.Pattern != nil {
+		result += indent + fmt.Sprintf("pattern: %+v\n", *(schema.Pattern))
 	}
 	if schema.AdditionalItems != nil {
-		s := schema.AdditionalItems.GetSchema()
+		s := schema.AdditionalItems.Schema
 		if s != nil {
 			result += indent + "additionalItems:\n"
-			result += displaySchema(s, indent+"  ")
+			result += s.displaySchema(indent + "  ")
 		} else {
-			b := schema.AdditionalItems.GetBoolean()
+			b := *(schema.AdditionalItems.Boolean)
 			result += indent + fmt.Sprintf("additionalItems: %+v\n", b)
 		}
 	}
-	if len(schema.Items) > 0 {
+	if schema.Items != nil {
 		result += indent + "items:\n"
-		for i, schema := range schema.Items {
+		for i, s := range *(schema.Items) {
 			result += indent + "  " + fmt.Sprintf("%d", i) + ":\n"
-			result += displaySchema(schema, indent+"  "+"  ")
+			result += s.displaySchema(indent + "  " + "  ")
 		}
 	}
-	if schema.MaxItems != 0 {
-		result += indent + fmt.Sprintf("maxItems: %+v\n", schema.MaxItems)
+	if schema.MaxItems != nil {
+		result += indent + fmt.Sprintf("maxItems: %+v\n", *(schema.MaxItems))
 	}
-	if schema.MinItems != 0 {
-		result += indent + fmt.Sprintf("minItems: %+v\n", schema.MinItems)
+	if schema.MinItems != nil {
+		result += indent + fmt.Sprintf("minItems: %+v\n", *(schema.MinItems))
 	}
-	if schema.UniqueItems {
-		result += indent + fmt.Sprintf("uniqueItems: %+v\n", schema.UniqueItems)
+	if schema.UniqueItems != nil {
+		result += indent + fmt.Sprintf("uniqueItems: %+v\n", *(schema.UniqueItems))
 	}
-	if schema.MaxProperties != 0 {
-		result += indent + fmt.Sprintf("maxProperties: %+v\n", schema.MaxProperties)
+	if schema.MaxProperties != nil {
+		result += indent + fmt.Sprintf("maxProperties: %+v\n", *(schema.MaxProperties))
 	}
-	if schema.MinProperties != 0 {
-		result += indent + fmt.Sprintf("minProperties: %+v\n", schema.MinProperties)
+	if schema.MinProperties != nil {
+		result += indent + fmt.Sprintf("minProperties: %+v\n", *(schema.MinProperties))
 	}
-	if len(schema.Required) > 0 {
-		result += indent + fmt.Sprintf("required: %+v\n", schema.Required)
+	if schema.Required != nil {
+		result += indent + fmt.Sprintf("required: %+v\n", *(schema.Required))
 	}
 	if schema.AdditionalProperties != nil {
-		s := schema.AdditionalProperties.GetSchema()
+		s := schema.AdditionalProperties.Schema
 		if s != nil {
 			result += indent + "additionalProperties:\n"
-			result += displaySchema(s, indent+"  ")
+			result += s.displaySchema(indent + "  ")
 		} else {
-			b := schema.AdditionalProperties.GetBoolean()
+			b := *(schema.AdditionalProperties.Boolean)
 			result += indent + fmt.Sprintf("additionalProperties: %+v\n", b)
 		}
 	}
-	if len(schema.Properties) > 0 {
+	if schema.Properties != nil {
 		result += indent + "properties:\n"
-		for name, schema := range schema.Properties {
+		for name, s := range *(schema.Properties) {
 			result += indent + "  " + name + ":\n"
-			result += displaySchema(schema, indent+"  "+"  ")
+			result += s.displaySchema(indent + "  " + "  ")
 		}
 	}
-	if len(schema.PatternProperties) > 0 {
+	if schema.PatternProperties != nil {
 		result += indent + "patternProperties:\n"
-		for name, schema := range schema.PatternProperties {
+		for name, s := range *(schema.PatternProperties) {
 			result += indent + "  " + name + ":\n"
-			result += displaySchema(schema, indent+"  "+"  ")
+			result += s.displaySchema(indent + "  " + "  ")
 		}
 	}
-	if len(schema.Dependencies) > 0 {
+	if schema.Dependencies != nil {
 		result += indent + "dependencies:\n"
-		for name, schemaOrStringArray := range schema.Dependencies {
-			s := schemaOrStringArray.GetSchema()
+		for name, schemaOrStringArray := range *(schema.Dependencies) {
+			s := schemaOrStringArray.Schema
 			if s != nil {
 				result += indent + "  " + name + ":\n"
-				result += displaySchema(s, indent+"  "+"  ")
+				result += s.displaySchema(indent + "  " + "  ")
 			} else {
-				a := schemaOrStringArray.GetArray()
+				a := schemaOrStringArray.Array
 				if a != nil {
 					result += indent + "  " + name + ":\n"
-					for _, s2 := range a.String_ {
+					for _, s2 := range *a {
 						result += indent + "  " + "  " + s2 + "\n"
 					}
 				}
@@ -411,158 +485,143 @@ func displaySchema(schema *jsonschema.Schema, indent string) string {
 
 		}
 	}
-	if len(schema.Enumeration) > 0 {
+	if schema.Enumeration != nil {
 		result += indent + "enumeration:\n"
-		for _, value := range schema.Enumeration {
-			if value.String_ != "" {
-				result += indent + "  " + fmt.Sprintf("%+v\n", value.String_)
+		for _, value := range *(schema.Enumeration) {
+			if value.String != nil {
+				result += indent + "  " + fmt.Sprintf("%+v\n", value.String)
 			} else {
 				result += indent + "  " + fmt.Sprintf("%+v\n", value.Bool)
 			}
 		}
 	}
-	if len(schema.Type) > 0 {
-		result += indent + fmt.Sprintf("type: %+v\n", schema.Type)
+	if schema.Type != nil {
+		result += indent + fmt.Sprintf("type: %+v\n", *(schema.Type))
 	}
-	if len(schema.AllOf) > 0 {
+	if schema.AllOf != nil {
 		result += indent + "allOf:\n"
-		for _, schema := range schema.AllOf {
-			result += displaySchema(schema, indent+"  ")
+		for _, s := range *(schema.AllOf) {
+			result += s.displaySchema(indent + "  ")
 			result += indent + "-\n"
 		}
 	}
-	if len(schema.AnyOf) > 0 {
+	if schema.AnyOf != nil {
 		result += indent + "anyOf:\n"
-		for _, schema := range schema.AnyOf {
-			result += displaySchema(schema, indent+"  ")
+		for _, s := range *(schema.AnyOf) {
+			result += s.displaySchema(indent + "  ")
 			result += indent + "-\n"
 		}
 	}
-	if len(schema.OneOf) > 0 {
+	if schema.OneOf != nil {
 		result += indent + "oneOf:\n"
-		for _, schema := range schema.OneOf {
-			result += displaySchema(schema, indent+"  ")
+		for _, s := range *(schema.OneOf) {
+			result += s.displaySchema(indent + "  ")
 			result += indent + "-\n"
 		}
 	}
 	if schema.Not != nil {
 		result += indent + "not:\n"
-		result += displaySchema(schema.Not, indent+"  ")
+		result += schema.Not.displaySchema(indent + "  ")
 	}
-	if len(schema.Definitions) > 0 {
+	if schema.Definitions != nil {
 		result += indent + "definitions:\n"
-		for name, schema := range schema.Definitions {
+		for name, s := range *(schema.Definitions) {
 			result += indent + "  " + name + ":\n"
-			result += displaySchema(schema, indent+"  "+"  ")
+			result += s.displaySchema(indent + "  " + "  ")
 		}
 	}
-	if schema.Title != "" {
-		result += indent + "title: " + schema.Title + "\n"
+	if schema.Title != nil {
+		result += indent + "title: " + *(schema.Title) + "\n"
 	}
-	if schema.Description != "" {
-		result += indent + "description: " + schema.Description + "\n"
+	if schema.Description != nil {
+		result += indent + "description: " + *(schema.Description) + "\n"
 	}
-	/*
-	   if let defaultValue = defaultValue {
-	     result += indent + "default:\n"
-	     result += indent + "  \(defaultValue)\n"
-	   }
-	*/
-	if schema.Format != "" {
-		result += indent + "format: " + schema.Format + "\n"
+	if schema.Default != nil {
+		result += indent + "default:\n"
+		result += indent + fmt.Sprintf("  %+v\n", *(schema.Default))
 	}
-	if schema.Ref != "" {
-		result += indent + "$ref: " + schema.Ref + "\n"
+	if schema.Format != nil {
+		result += indent + "format: " + *(schema.Format) + "\n"
+	}
+	if schema.Ref != nil {
+		result += indent + "$ref: " + *(schema.Ref) + "\n"
 	}
 	return result
 }
 
-func floatForNumber(n *jsonschema.Number) float64 {
-	return 0
-}
+type operation func(schema *Schema)
 
-type operation func(schema *jsonschema.Schema)
-
-func applyToSchemas(schema *jsonschema.Schema, operation operation) {
+func (schema *Schema) applyToSchemas(operation operation) {
 
 	if schema.AdditionalItems != nil {
-		s := schema.AdditionalItems.GetSchema()
+		s := schema.AdditionalItems.Schema
 		if s != nil {
-			operation(s)
+			s.applyToSchemas(operation)
 		}
 	}
 
-	if len(schema.Items) > 0 {
-		for _, schema := range schema.Items {
-			operation(schema)
+	if schema.Items != nil {
+		for _, s := range *(schema.Items) {
+			s.applyToSchemas(operation)
 		}
 	}
 
 	if schema.AdditionalProperties != nil {
-		s := schema.AdditionalProperties.GetSchema()
+		s := schema.AdditionalProperties.Schema
 		if s != nil {
-			operation(s)
+			s.applyToSchemas(operation)
 		}
 	}
 
-	if len(schema.Properties) > 0 {
-		for _, s := range schema.Properties {
-			operation(s)
+	if schema.Properties != nil {
+		for _, s := range *(schema.Properties) {
+			s.applyToSchemas(operation)
 		}
 	}
-	if len(schema.PatternProperties) > 0 {
-		for _, s := range schema.PatternProperties {
-			operation(s)
+	if schema.PatternProperties != nil {
+		for _, s := range *(schema.PatternProperties) {
+			s.applyToSchemas(operation)
 		}
 	}
 
-	if len(schema.Dependencies) > 0 {
-		for _, schemaOrStringArray := range schema.Dependencies {
-			s := schemaOrStringArray.GetSchema()
+	if schema.Dependencies != nil {
+		for _, schemaOrStringArray := range *(schema.Dependencies) {
+			s := schemaOrStringArray.Schema
 			if s != nil {
-				operation(s)
+				s.applyToSchemas(operation)
 			}
 		}
 	}
 
-	if len(schema.AllOf) > 0 {
-		for _, schema := range schema.AllOf {
-			operation(schema)
+	if schema.AllOf != nil {
+		for _, s := range *(schema.AllOf) {
+			s.applyToSchemas(operation)
 		}
 	}
-	if len(schema.AnyOf) > 0 {
-		for _, schema := range schema.AnyOf {
-			operation(schema)
+	if schema.AnyOf != nil {
+		for _, s := range *(schema.AnyOf) {
+			s.applyToSchemas(operation)
 		}
 	}
-	if len(schema.OneOf) > 0 {
-		for _, schema := range schema.OneOf {
-			operation(schema)
+	if schema.OneOf != nil {
+		for _, s := range *(schema.OneOf) {
+			s.applyToSchemas(operation)
 		}
 	}
 	if schema.Not != nil {
-		operation(schema.Not)
+		schema.Not.applyToSchemas(operation)
 	}
 
-	if len(schema.Definitions) > 0 {
-		for _, s := range schema.Definitions {
-			operation(s)
+	if schema.Definitions != nil {
+		for _, s := range *(schema.Definitions) {
+			s.applyToSchemas(operation)
 		}
 	}
 
 	operation(schema)
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-func copyProperties(destination *jsonschema.Schema, source *jsonschema.Schema) {
+func (destination *Schema) copyProperties(source *Schema) {
 	destination.Schema = source.Schema
 	destination.Id = source.Id
 	destination.MultipleOf = source.MultipleOf
@@ -594,106 +653,134 @@ func copyProperties(destination *jsonschema.Schema, source *jsonschema.Schema) {
 	destination.Definitions = source.Definitions
 	destination.Title = source.Title
 	destination.Description = source.Description
-	destination.DefaultValue = source.DefaultValue
+	destination.Default = source.Default
 	destination.Format = source.Format
 	destination.Ref = source.Ref
 }
 
-func resolveRefs(schema *jsonschema.Schema, rootSchema *jsonschema.Schema, classNames []string) {
-	applyToSchemas(schema,
-		func(schema *jsonschema.Schema) {
-			if schema.Ref != "" {
-				log.Printf("REF %+v\n", schema.Ref)
-				resolvedRef := resolveJSONPointer(schema.Ref, rootSchema)
-				if (len(resolvedRef.Type) > 0) && (resolvedRef.Type[0] == "object") {
-					// don't substitute, we'll model the referenced item with a class
-				} else if contains(classNames, schema.Ref) {
-					// don't substitute, we'll model the referenced item with a class
-				} else {
-					schema.Ref = ""
-					copyProperties(schema, resolvedRef)
-				}
+func (schema *Schema) resolveRefs(classNames []string) {
+	rootSchema := schema
+	contains := func(stringArray []string, element string) bool {
+		for _, item := range stringArray {
+			if item == element {
+				return true
 			}
-		})
+		}
+		return false
+	}
+	count := 1
+	for count > 0 {
+		count = 0
+		schema.applyToSchemas(
+			func(schema *Schema) {
+				if schema.Ref != nil {
+					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
+					if (resolvedRef.Type != nil) && ((*(resolvedRef.Type))[0] == "object") {
+						// don't substitute, we'll model the referenced item with a class
+					} else if contains(classNames, *(schema.Ref)) {
+						// don't substitute, we'll model the referenced item with a class
+					} else {
+						schema.Ref = nil
+						schema.copyProperties(resolvedRef)
+						count += 1
+					}
+				}
+			})
+	}
 }
 
-func resolveJSONPointer(ref string, root *jsonschema.Schema) *jsonschema.Schema {
-	var result *jsonschema.Schema
-	result = nil
+func (root *Schema) resolveJSONPointer(ref string) *Schema {
+	var result *Schema
 
 	parts := strings.Split(ref, "#")
 	if len(parts) == 2 {
 		documentName := parts[0] + "#"
 		if documentName == "#" {
-			documentName = root.Id
+			documentName = *(root.Id)
 		}
 		path := parts[1]
 		document := schemas[documentName]
 		pathParts := strings.Split(path, "/")
 
+		// we currently do a very limited (hard-coded) resolution of certain paths and log errors for missed cases
 		if len(pathParts) == 1 {
 			return document
 		} else if len(pathParts) == 3 {
 			switch pathParts[1] {
 			case "definitions":
 				dictionary := document.Definitions
-				result = dictionary[pathParts[2]]
-
+				result = (*dictionary)[pathParts[2]]
 			case "properties":
 				dictionary := document.Properties
-				result = dictionary[pathParts[2]]
-
+				result = (*dictionary)[pathParts[2]]
 			default:
 				break
 			}
 		}
 	}
 	if result == nil {
-		print("UNRESOLVED REF: " + ref)
+		panic(fmt.Sprintf("UNRESOLVED POINTER: %+v", ref))
 	}
 	return result
 }
 
-func resolveAllOfs(schema *jsonschema.Schema, root *jsonschema.Schema) {
-	applyToSchemas(schema,
-		func(schema *jsonschema.Schema) {
-
-			for _, allOf := range schema.AllOf {
-				copyProperties(schema, allOf)
+func (schema *Schema) resolveAllOfs() {
+	schema.applyToSchemas(
+		func(schema *Schema) {
+			if schema.AllOf != nil {
+				for _, allOf := range *(schema.AllOf) {
+					schema.copyProperties(allOf)
+				}
+				schema.AllOf = nil
 			}
-			schema.AllOf = []*jsonschema.Schema{}
 		})
 }
 
-func reduceOneOfs(schema *jsonschema.Schema, root *jsonschema.Schema) {
-	applyToSchemas(schema,
-		func(schema *jsonschema.Schema) {
-			if len(schema.OneOf) > 0 {
-				newOneOfs := make([]*jsonschema.Schema, 0)
-				for _, oneOf := range schema.OneOf {
+func (schema *Schema) reduceOneOfs() {
+	schema.applyToSchemas(
+		func(schema *Schema) {
+			if schema.OneOf != nil {
+				newOneOfs := make([]*Schema, 0)
+				for _, oneOf := range *(schema.OneOf) {
 					innerOneOfs := oneOf.OneOf
-					if len(innerOneOfs) > 0 {
-						for _, innerOneOf := range innerOneOfs {
+					if innerOneOfs != nil {
+						for _, innerOneOf := range *innerOneOfs {
 							newOneOfs = append(newOneOfs, innerOneOf)
 						}
 					} else {
 						newOneOfs = append(newOneOfs, oneOf)
 					}
 				}
-				schema.OneOf = newOneOfs
+				schema.OneOf = &newOneOfs
 			}
 		})
 }
 
-var schemas map[string]*jsonschema.Schema
+/////////
+
+func loadSchema(filename string) *Schema {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	schemasDir := usr.HomeDir + "/go/src/github.com/googleapis/openapi-compiler/schemas"
+	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
+	if e != nil {
+		fmt.Printf("File error: %v\n", e)
+		os.Exit(1)
+	}
+	var info interface{}
+	json.Unmarshal(file, &info)
+	return NewSchema(info)
+}
 
 type SchemaClassRequest struct {
 	Path   string
 	Name   string
-	Schema *jsonschema.Schema
+	Schema *Schema
 }
 
-func NewSchemaClassRequest(path string, name string, schema *jsonschema.Schema) *SchemaClassRequest {
+func NewSchemaClassRequest(path string, name string, schema *Schema) *SchemaClassRequest {
 	return &SchemaClassRequest{Path: path, Name: name, Schema: schema}
 }
 
@@ -748,7 +835,7 @@ func NewClassModel() *ClassModel {
 type ClassCollection struct {
 	ClassModels         map[string]*ClassModel
 	Prefix              string
-	Schema              *jsonschema.Schema
+	Schema              *Schema
 	PatternNames        map[string]string
 	ClassNames          []string
 	ObjectClassRequests map[string]*SchemaClassRequest
@@ -779,17 +866,17 @@ func (classes *ClassCollection) classNameForReference(reference string) string {
 	}
 }
 
-func (classes *ClassCollection) arrayTypeForSchema(schema *jsonschema.Schema) string {
+func (classes *ClassCollection) arrayTypeForSchema(schema *Schema) string {
 	// what is the array type?
 	itemTypeName := "google.protobuf.Any"
-	ref := schema.Items[0].Ref
-	if ref != "" {
-		itemTypeName = classes.classNameForReference(ref)
+	ref := (*schema.Items)[0].Ref
+	if ref != nil {
+		itemTypeName = classes.classNameForReference(*ref)
 	} else {
-		types := schema.Items[0].Type
-		if len(types) == 1 {
-			itemTypeName = types[0]
-		} else if len(types) > 1 {
+		types := (*schema.Items)[0].Type
+		if len(*types) == 1 {
+			itemTypeName = (*types)[0]
+		} else if len(*types) > 1 {
 			itemTypeName = fmt.Sprintf("%+v", types)
 		} else {
 			itemTypeName = "UNKNOWN"
@@ -798,17 +885,17 @@ func (classes *ClassCollection) arrayTypeForSchema(schema *jsonschema.Schema) st
 	return itemTypeName
 }
 
-func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *jsonschema.Schema, path string) {
-	for key, value := range schema.Properties {
-		if value.Ref != "" {
-			className := classes.classNameForReference(value.Ref)
+func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *Schema, path string) {
+	for key, value := range *(schema.Properties) {
+		if value.Ref != nil {
+			className := classes.classNameForReference(*(value.Ref))
 			cp := NewClassProperty()
 			cp.Name = key
 			cp.Type = className
 			classModel.Properties[key] = cp
 		} else {
-			if len(value.Type) > 0 {
-				propertyType := value.Type[0]
+			if value.Type != nil {
+				propertyType := (*value.Type)[0]
 				switch propertyType {
 				case "string":
 					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "string")
@@ -849,13 +936,13 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 	}
 }
 
-func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, schema *jsonschema.Schema, path string) {
-	if len(schema.Required) > 0 {
-		classModel.Required = schema.Required
+func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, schema *Schema, path string) {
+	if schema.Required != nil {
+		classModel.Required = (*schema.Required)
 	}
 }
 
-func (classes *ClassCollection) buildClassForDefinition(className string, schema *jsonschema.Schema) *ClassModel {
+func (classes *ClassCollection) buildClassForDefinition(className string, schema *Schema) *ClassModel {
 	classModel := NewClassModel()
 	classModel.Name = className
 	classes.buildClassProperties(classModel, classes.Schema, "")
@@ -863,7 +950,7 @@ func (classes *ClassCollection) buildClassForDefinition(className string, schema
 	return classModel
 }
 
-func (classes *ClassCollection) buildClassForDefinitionObject(className string, schema *jsonschema.Schema) *ClassModel {
+func (classes *ClassCollection) buildClassForDefinitionObject(className string, schema *Schema) *ClassModel {
 	classModel := NewClassModel()
 	classModel.Name = className
 	classes.buildClassProperties(classModel, classes.Schema, "")
@@ -882,7 +969,7 @@ func (classes *ClassCollection) build() {
 	classes.ClassModels[className] = classModel
 
 	// create a class for each object defined in the schema
-	for key, value := range classes.Schema.Definitions {
+	for key, value := range *(classes.Schema.Definitions) {
 		className := classes.classNameForStub(key)
 		classes.ClassModels[className] = classes.buildClassForDefinition(className, value)
 	}
@@ -905,7 +992,6 @@ func (classes *ClassCollection) build() {
 }
 
 func (classes *ClassCollection) dump() {
-	log.Printf("\n\n")
 	keys := make([]string, 0)
 	for k, _ := range classes.ClassModels {
 		keys = append(keys, k)
@@ -918,29 +1004,26 @@ func (classes *ClassCollection) dump() {
 }
 
 func main() {
-	schemas = make(map[string]*jsonschema.Schema, 0)
+	schemas = make(map[string]*Schema, 0)
 
-	var s *jsonschema.Schema
-	s = loadSchema("schema.json")
-	schemas[s.Id] = s
+	base_schema := loadSchema("schema.json")
+	base_schema.resolveRefs(nil)
 
-	s = loadSchema("openapi-2.0.json")
-	schemas[s.Id] = s
-
-	fmt.Printf("%s\n", displaySchema(s, ""))
-
+	openapi_schema := loadSchema("openapi-2.0.json")
 	classNames := []string{
 		"#/definitions/headerParameterSubSchema",
 		"#/definitions/formDataParameterSubSchema",
 		"#/definitions/queryParameterSubSchema",
 		"#/definitions/pathParameterSubSchema"}
-	resolveRefs(s, s, classNames)
-	resolveRefs(s, s, classNames)
-	resolveAllOfs(s, s)
-	reduceOneOfs(s, s)
+	openapi_schema.resolveRefs(classNames)
+
+	openapi_schema.resolveAllOfs()
+	openapi_schema.reduceOneOfs()
+
+	fmt.Printf("%s\n", openapi_schema.display())
 
 	cc := NewClassCollection()
-	cc.Schema = s
+	cc.Schema = openapi_schema
 	cc.build()
 	cc.dump()
 }
