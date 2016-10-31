@@ -898,51 +898,53 @@ func (classes *ClassCollection) arrayTypeForSchema(schema *Schema) string {
 }
 
 func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *Schema, path string) {
-	for key, value := range *(schema.Properties) {
-		if value.Ref != nil {
-			className := classes.classNameForReference(*(value.Ref))
-			cp := NewClassProperty()
-			cp.Name = key
-			cp.Type = className
-			classModel.Properties[key] = cp
-		} else {
-			if value.Type != nil {
-				propertyType := (*value.Type)[0]
-				switch propertyType {
-				case "string":
-					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "string")
-				case "boolean":
-					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "bool")
-				case "number":
-					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "float")
-				case "integer":
-					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "int")
-				case "object":
-					className := classes.classNameForStub(key)
-					classes.ObjectClassRequests[className] = NewClassRequest(path, className, value)
-					classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
-				case "array":
-					className := classes.arrayTypeForSchema(value)
-					p := NewClassPropertyWithNameAndType(key, className)
-					p.Repeated = true
-					classModel.Properties[key] = p
-				case "default":
-					log.Printf("%+v:%+v has unsupported property type %+v", path, key, propertyType)
-				}
+	if schema.Properties != nil {
+		for key, value := range *(schema.Properties) {
+			if value.Ref != nil {
+				className := classes.classNameForReference(*(value.Ref))
+				cp := NewClassProperty()
+				cp.Name = key
+				cp.Type = className
+				classModel.Properties[key] = cp
 			} else {
-				/*
-				   if value.isEmpty() {
-				     // write accessor for generic object
-				     let className = "google.protobuf.Any"
-				     classModel.properties[key] = ClassProperty(name:key, type:className)
-				   } else if value.anyOf != nil {
-				     //self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
-				   } else if value.oneOf != nil {
-				     //self.writeOneOfAccessors(schema: value, path: path)
-				   } else {
-				     //print("\(path):\(key) has unspecified property type. Schema is below.\n\(value.description)")
-				   }
-				*/
+				if value.Type != nil {
+					propertyType := (*value.Type)[0]
+					switch propertyType {
+					case "string":
+						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "string")
+					case "boolean":
+						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "bool")
+					case "number":
+						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "float")
+					case "integer":
+						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "int")
+					case "object":
+						className := classes.classNameForStub(key)
+						classes.ObjectClassRequests[className] = NewClassRequest(path, className, value)
+						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
+					case "array":
+						className := classes.arrayTypeForSchema(value)
+						p := NewClassPropertyWithNameAndType(key, className)
+						p.Repeated = true
+						classModel.Properties[key] = p
+					case "default":
+						log.Printf("%+v:%+v has unsupported property type %+v", path, key, propertyType)
+					}
+				} else {
+					/*
+					   if value.isEmpty() {
+					     // write accessor for generic object
+					     let className = "google.protobuf.Any"
+					     classModel.properties[key] = ClassProperty(name:key, type:className)
+					   } else if value.anyOf != nil {
+					     //self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
+					   } else if value.oneOf != nil {
+					     //self.writeOneOfAccessors(schema: value, path: path)
+					   } else {
+					     //print("\(path):\(key) has unspecified property type. Schema is below.\n\(value.description)")
+					   }
+					*/
+				}
 			}
 		}
 	}
@@ -957,16 +959,16 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 func (classes *ClassCollection) buildClassForDefinition(className string, schema *Schema) *ClassModel {
 	classModel := NewClassModel()
 	classModel.Name = className
-	classes.buildClassProperties(classModel, classes.Schema, "")
-	classes.buildClassRequirements(classModel, classes.Schema, "")
+	classes.buildClassProperties(classModel, schema, "")
+	classes.buildClassRequirements(classModel, schema, "")
 	return classModel
 }
 
 func (classes *ClassCollection) buildClassForDefinitionObject(className string, schema *Schema) *ClassModel {
 	classModel := NewClassModel()
 	classModel.Name = className
-	classes.buildClassProperties(classModel, classes.Schema, "")
-	classes.buildClassRequirements(classModel, classes.Schema, "")
+	classes.buildClassProperties(classModel, schema, "")
+	classes.buildClassRequirements(classModel, schema, "")
 	return classModel
 }
 
@@ -1023,7 +1025,7 @@ func (classes *ClassCollection) display() string {
 
 func (classes *ClassCollection) generateProto() string {
 	code := ""
-	code += fmt.Sprintf("syntax = \"proto3\";")
+	code += fmt.Sprintf("syntax = \"proto3\";\n")
 	code += "\n"
 	code += "package OpenAPI;\n"
 	code += "\n"
@@ -1052,7 +1054,7 @@ func (classes *ClassCollection) generateProto() string {
 			}
 			displayName = camelCaseToSnakeCase(displayName)
 
-			var line = fmt.Sprintf("%s %s = %d", propertyType, displayName, fieldNumber)
+			var line = fmt.Sprintf("%s %s = %d;", propertyType, displayName, fieldNumber)
 			if propertyModel.Repeated {
 				line = "repeated " + line
 			}
@@ -1107,5 +1109,11 @@ func main() {
 
 	// generate the protocol buffer description
 	proto := cc.generateProto()
-	fmt.Printf("%s\n", proto)
+	// fmt.Printf("%s\n", proto)
+
+	d1 := []byte(proto)
+	err := ioutil.WriteFile("/tmp/openapi.proto", d1, 0644)
+	if err != nil {
+		panic(err)
+	}
 }
