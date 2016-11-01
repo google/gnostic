@@ -1,5 +1,3 @@
-//go:generate ./COMPILE-PROTOS.sh
-
 package main
 
 import (
@@ -38,7 +36,7 @@ type Schema struct {
 
 	// 5.3.  Validation keywords for arrays
 	AdditionalItems *SchemaOrBoolean
-	Items           *[]*Schema
+	Items           *SchemaOrSchemaArray
 	MaxItems        *int64
 	MinItems        *int64
 	UniqueItems     *bool
@@ -54,7 +52,7 @@ type Schema struct {
 
 	// 5.5.  Validation keywords for any instance type
 	Enumeration *[]SchemaEnumValue
-	Type        *[]string
+	Type        *StringOrStringArray
 	AllOf       *[]*Schema
 	AnyOf       *[]*Schema
 	OneOf       *[]*Schema
@@ -82,9 +80,19 @@ type SchemaOrBoolean struct {
 	Boolean *bool
 }
 
+type StringOrStringArray struct {
+	String *string
+	Array  *[]string
+}
+
 type SchemaOrStringArray struct {
 	Schema *Schema
 	Array  *[]string
+}
+
+type SchemaOrSchemaArray struct {
+	Schema *Schema
+	Array  *[]*Schema
 }
 
 type SchemaEnumValue struct {
@@ -144,7 +152,7 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 			case "additionalItems":
 				schema.AdditionalItems = schema.schemaOrBooleanValue(v)
 			case "items":
-				schema.Items = schema.arrayOfSchemasValue(v)
+				schema.Items = schema.schemaOrSchemaArrayValue(v)
 			case "maxItems":
 				schema.MaxItems = schema.intValue(v)
 			case "minItems":
@@ -171,7 +179,7 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 				schema.Enumeration = schema.arrayOfValuesValue(v)
 
 			case "type":
-				schema.Type = schema.arrayOfStringsValue(v)
+				schema.Type = schema.stringOrStringArrayValue(v)
 			case "allOf":
 				schema.AllOf = schema.arrayOfSchemasValue(v)
 			case "anyOf":
@@ -210,6 +218,43 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 		return schema
 	}
 	return nil
+}
+
+func (schema *Schema) isEmpty() bool {
+	return (schema.Schema == nil) &&
+		(schema.Id == nil) &&
+		(schema.MultipleOf == nil) &&
+		(schema.Maximum == nil) &&
+		(schema.ExclusiveMaximum == nil) &&
+		(schema.Minimum == nil) &&
+		(schema.ExclusiveMinimum == nil) &&
+		(schema.MaxLength == nil) &&
+		(schema.MinLength == nil) &&
+		(schema.Pattern == nil) &&
+		(schema.AdditionalItems == nil) &&
+		(schema.Items == nil) &&
+		(schema.MaxItems == nil) &&
+		(schema.MinItems == nil) &&
+		(schema.UniqueItems == nil) &&
+		(schema.MaxProperties == nil) &&
+		(schema.MinProperties == nil) &&
+		(schema.Required == nil) &&
+		(schema.AdditionalProperties == nil) &&
+		(schema.Properties == nil) &&
+		(schema.PatternProperties == nil) &&
+		(schema.Dependencies == nil) &&
+		(schema.Enumeration == nil) &&
+		(schema.Type == nil) &&
+		(schema.AllOf == nil) &&
+		(schema.AnyOf == nil) &&
+		(schema.OneOf == nil) &&
+		(schema.Not == nil) &&
+		(schema.Definitions == nil) &&
+		(schema.Title == nil) &&
+		(schema.Description == nil) &&
+		(schema.Default == nil) &&
+		(schema.Format == nil) &&
+		(schema.Ref == nil)
 }
 
 func (schema *Schema) stringValue(v interface{}) *string {
@@ -301,6 +346,29 @@ func (schema *Schema) arrayOfSchemasValue(v interface{}) *[]*Schema {
 	return nil
 }
 
+func (schema *Schema) schemaOrSchemaArrayValue(v interface{}) *SchemaOrSchemaArray {
+	switch v := v.(type) {
+	default:
+		fmt.Printf("schemaOrSchemaArrayValue: unexpected type %T\n", v)
+	case []interface{}:
+		m := make([]*Schema, 0)
+		for _, v2 := range v {
+			switch v2 := v2.(type) {
+			default:
+				fmt.Printf("schemaOrSchemaArrayValue: unexpected type %T\n", v2)
+			case map[string]interface{}:
+				s := NewSchemaFromObject(v2)
+				m = append(m, s)
+			}
+		}
+		return &SchemaOrSchemaArray{Array: &m}
+	case map[string]interface{}:
+		s := NewSchemaFromObject(v)
+		return &SchemaOrSchemaArray{Schema: s}
+	}
+	return nil
+}
+
 func (schema *Schema) arrayOfStringsValue(v interface{}) *[]string {
 	switch v := v.(type) {
 	default:
@@ -321,6 +389,35 @@ func (schema *Schema) arrayOfStringsValue(v interface{}) *[]string {
 			}
 		}
 		return &a
+	}
+	return nil
+}
+
+func (schema *Schema) stringOrStringArrayValue(v interface{}) *StringOrStringArray {
+	switch v := v.(type) {
+	default:
+		fmt.Printf("arrayOfStringsValue: unexpected type %T\n", v)
+	case []string:
+		s := &StringOrStringArray{}
+		s.Array = &v
+		return s
+	case string:
+		s := &StringOrStringArray{}
+		s.String = &v
+		return s
+	case []interface{}:
+		a := make([]string, 0)
+		for _, v2 := range v {
+			switch v2 := v2.(type) {
+			default:
+				fmt.Printf("arrayOfStringsValue: unexpected type %T\n", v2)
+			case string:
+				a = append(a, v2)
+			}
+		}
+		s := &StringOrStringArray{}
+		s.Array = &a
+		return s
 	}
 	return nil
 }
@@ -437,9 +534,14 @@ func (schema *Schema) displaySchema(indent string) string {
 	}
 	if schema.Items != nil {
 		result += indent + "items:\n"
-		for i, s := range *(schema.Items) {
-			result += indent + "  " + fmt.Sprintf("%d", i) + ":\n"
-			result += s.displaySchema(indent + "  " + "  ")
+		items := schema.Items
+		if items.Array != nil {
+			for i, s := range *(items.Array) {
+				result += indent + "  " + fmt.Sprintf("%d", i) + ":\n"
+				result += s.displaySchema(indent + "  " + "  ")
+			}
+		} else if items.Schema != nil {
+			result += items.Schema.displaySchema(indent + "  " + "  ")
 		}
 	}
 	if schema.MaxItems != nil {
@@ -579,8 +681,12 @@ func (schema *Schema) applyToSchemas(operation operation) {
 	}
 
 	if schema.Items != nil {
-		for _, s := range *(schema.Items) {
-			s.applyToSchemas(operation)
+		if schema.Items.Array != nil {
+			for _, s := range *(schema.Items.Array) {
+				s.applyToSchemas(operation)
+			}
+		} else if schema.Items.Schema != nil {
+			schema.Items.Schema.applyToSchemas(operation)
 		}
 	}
 
@@ -676,6 +782,21 @@ func (destination *Schema) copyProperties(source *Schema) {
 	destination.Ref = source.Ref
 }
 
+func (schema *Schema) typeIs(typeName string) bool {
+	if schema.Type != nil {
+		if schema.Type.String != nil {
+			return (*(schema.Type.String) == typeName)
+		} else if schema.Type.Array != nil {
+			for _, n := range *(schema.Type.Array) {
+				if n == typeName {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 func (schema *Schema) resolveRefs(classNames []string) {
 	rootSchema := schema
 	contains := func(stringArray []string, element string) bool {
@@ -693,7 +814,7 @@ func (schema *Schema) resolveRefs(classNames []string) {
 			func(schema *Schema) {
 				if schema.Ref != nil {
 					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
-					if (resolvedRef.Type != nil) && ((*(resolvedRef.Type))[0] == "object") {
+					if resolvedRef.typeIs("object") {
 						// don't substitute, we'll model the referenced item with a class
 					} else if contains(classNames, *(schema.Ref)) {
 						// don't substitute, we'll model the referenced item with a class
@@ -878,21 +999,67 @@ func (classes *ClassCollection) classNameForReference(reference string) string {
 	}
 }
 
+func (classes *ClassCollection) propertyNameForReference(reference string) *string {
+	parts := strings.Split(reference, "/")
+	first := parts[0]
+	last := parts[len(parts)-1]
+	if first == "#" {
+		return &last
+	} else {
+		return nil
+	}
+	return nil
+}
+
 func (classes *ClassCollection) arrayTypeForSchema(schema *Schema) string {
 	// what is the array type?
 	itemTypeName := "google.protobuf.Any"
-	ref := (*schema.Items)[0].Ref
-	if ref != nil {
-		itemTypeName = classes.classNameForReference(*ref)
-	} else {
-		types := (*schema.Items)[0].Type
-		if len(*types) == 1 {
-			itemTypeName = (*types)[0]
-		} else if len(*types) > 1 {
-			itemTypeName = fmt.Sprintf("%+v", types)
-		} else {
-			itemTypeName = "UNKNOWN"
+	if schema.Items != nil {
+
+		if schema.Items.Array != nil {
+
+			if len(*(schema.Items.Array)) > 0 {
+				ref := (*schema.Items.Array)[0].Ref
+				if ref != nil {
+					itemTypeName = classes.classNameForReference(*ref)
+				} else {
+					types := (*schema.Items.Array)[0].Type
+					if types == nil {
+						// do nothing
+					} else if (types.Array != nil) && len(*(types.Array)) == 1 {
+						itemTypeName = (*types.Array)[0]
+					} else if (types.Array != nil) && len(*(types.Array)) > 1 {
+						itemTypeName = fmt.Sprintf("%+v", types.Array)
+					} else if types.String != nil {
+						itemTypeName = *(types.String)
+					} else {
+						itemTypeName = "UNKNOWN"
+					}
+				}
+			}
+
+		} else if schema.Items.Schema != nil {
+
+			var ref *string
+			ref = schema.Items.Schema.Ref
+			if ref != nil {
+				itemTypeName = classes.classNameForReference(*ref)
+			} else {
+				types := schema.Items.Schema.Type
+				if types == nil {
+					// do nothing
+				} else if (types.Array != nil) && len(*(types.Array)) == 1 {
+					itemTypeName = (*types.Array)[0]
+				} else if (types.Array != nil) && len(*(types.Array)) > 1 {
+					itemTypeName = fmt.Sprintf("%+v", types.Array)
+				} else if types.String != nil {
+					itemTypeName = *(types.String)
+				} else {
+					itemTypeName = "UNKNOWN"
+				}
+			}
 		}
+
 	}
 	return itemTypeName
 }
@@ -908,42 +1075,38 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 				classModel.Properties[key] = cp
 			} else {
 				if value.Type != nil {
-					propertyType := (*value.Type)[0]
-					switch propertyType {
-					case "string":
+					if value.typeIs("string") {
 						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "string")
-					case "boolean":
+					} else if value.typeIs("boolean") {
 						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "bool")
-					case "number":
+					} else if value.typeIs("number") {
 						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "float")
-					case "integer":
+					} else if value.typeIs("integer") {
 						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, "int")
-					case "object":
+					} else if value.typeIs("object") {
 						className := classes.classNameForStub(key)
 						classes.ObjectClassRequests[className] = NewClassRequest(path, className, value)
 						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
-					case "array":
+					} else if value.typeIs("array") {
 						className := classes.arrayTypeForSchema(value)
 						p := NewClassPropertyWithNameAndType(key, className)
 						p.Repeated = true
 						classModel.Properties[key] = p
-					case "default":
-						log.Printf("%+v:%+v has unsupported property type %+v", path, key, propertyType)
+					} else {
+						log.Printf("%+v:%+v has unsupported property type %+v", path, key, value.Type)
 					}
 				} else {
-					/*
-					   if value.isEmpty() {
-					     // write accessor for generic object
-					     let className = "google.protobuf.Any"
-					     classModel.properties[key] = ClassProperty(name:key, type:className)
-					   } else if value.anyOf != nil {
-					     //self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
-					   } else if value.oneOf != nil {
-					     //self.writeOneOfAccessors(schema: value, path: path)
-					   } else {
-					     //print("\(path):\(key) has unspecified property type. Schema is below.\n\(value.description)")
-					   }
-					*/
+					if value.isEmpty() {
+						// write accessor for generic object
+						className := "google.protobuf.Any"
+						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
+					} else if value.AnyOf != nil {
+						//self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
+					} else if value.OneOf != nil {
+						//self.writeOneOfAccessors(schema: value, path: path)
+					} else {
+						//print("\(path):\(key) has unspecified property type. Schema is below.\n\(value.description)")
+					}
 				}
 			}
 		}
@@ -956,19 +1119,112 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 	}
 }
 
+func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *Schema, path string) {
+	if schema.PatternProperties != nil {
+		for key, propertySchema := range *(schema.PatternProperties) {
+			className := "google.protobuf.Any"
+			propertyName := classes.PatternNames[key]
+			if propertySchema.Ref != nil {
+				className = classes.classNameForReference(*propertySchema.Ref)
+			}
+			typeName := fmt.Sprintf("map<string, %s>", className)
+			classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, typeName)
+		}
+	}
+}
+
+func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *ClassModel, schema *Schema, path string) {
+
+	if schema.AdditionalProperties != nil {
+		if schema.AdditionalProperties.Boolean != nil {
+			if *schema.AdditionalProperties.Boolean == true {
+				propertyName := "additionalProperties"
+				className := "map<string, google.protobuf.Any>"
+				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+				return
+			}
+		} else if schema.AdditionalProperties.Schema != nil {
+			schema := schema.AdditionalProperties.Schema
+			if schema.Ref != nil {
+				propertyName := "additionalProperties"
+				className := fmt.Sprintf("map<string, %s>", classes.classNameForReference(*schema.Ref))
+				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+				return
+			} else if schema.Type != nil {
+
+				typeName := *schema.Type.String
+				if typeName == "string" {
+					propertyName := "additionalProperties"
+					className := "map<string, string>"
+					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+					return
+				} else if typeName == "array" {
+					if schema.Items != nil {
+						itemType := *schema.Items.Schema.Type.String
+						if itemType == "string" {
+							propertyName := "additionalProperties"
+							className := "map<string, OpenAPIStringArray>"
+							classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+							return
+						}
+					}
+				}
+			}
+			// print("UNSUPPORTED TYPE \(type)")
+		} else if schema.OneOf != nil {
+			classes.buildOneOfAccessorsHelper(classModel, schema.OneOf)
+		}
+	}
+}
+
+func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, schema *Schema, path string) {
+	if schema.OneOf != nil {
+		classes.buildOneOfAccessorsHelper(classModel, schema.OneOf)
+	}
+}
+
+func (classes *ClassCollection) buildOneOfAccessorsHelper(classModel *ClassModel, oneOfs *[]*Schema) {
+	for _, oneOf := range *oneOfs {
+		if oneOf.Ref != nil {
+			ref := *oneOf.Ref
+			className := classes.classNameForReference(ref)
+			propertyName := classes.propertyNameForReference(ref)
+			if propertyName != nil {
+				classModel.Properties[*propertyName] = NewClassPropertyWithNameAndType(*propertyName, className)
+			}
+		}
+	}
+}
+
+func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, schema *Schema, path string) {
+	key := "additionalProperties"
+	className := "map<string, google.protobuf.Any>"
+	classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
+}
+
 func (classes *ClassCollection) buildClassForDefinition(className string, schema *Schema) *ClassModel {
-	classModel := NewClassModel()
-	classModel.Name = className
-	classes.buildClassProperties(classModel, schema, "")
-	classes.buildClassRequirements(classModel, schema, "")
-	return classModel
+	if schema.Type == nil {
+		return classes.buildClassForDefinitionObject(className, schema)
+	}
+	typeString := *schema.Type.String
+	if typeString == "object" {
+		return classes.buildClassForDefinitionObject(className, schema)
+	} else {
+		return nil
+	}
 }
 
 func (classes *ClassCollection) buildClassForDefinitionObject(className string, schema *Schema) *ClassModel {
 	classModel := NewClassModel()
 	classModel.Name = className
+	if schema.isEmpty() {
+		classes.buildDefaultAccessors(classModel, schema, "")
+	}
 	classes.buildClassProperties(classModel, schema, "")
 	classes.buildClassRequirements(classModel, schema, "")
+	classes.buildPatternPropertyAccessors(classModel, schema, "")
+	classes.buildAdditionalPropertyAccessors(classModel, schema, "")
+	classes.buildOneOfAccessors(classModel, schema, "")
 	return classModel
 }
 
@@ -985,7 +1241,10 @@ func (classes *ClassCollection) build() {
 	// create a class for each object defined in the schema
 	for key, value := range *(classes.Schema.Definitions) {
 		className := classes.classNameForStub(key)
-		classes.ClassModels[className] = classes.buildClassForDefinition(className, value)
+		model := classes.buildClassForDefinition(className, value)
+		if model != nil {
+			classes.ClassModels[className] = model
+		}
 	}
 
 	// iterate over anonymous object classes to be instantiated and generate a class for each
@@ -1104,8 +1363,14 @@ func main() {
 
 	// build a simplified model of the classes described by the schema
 	cc := NewClassCollection(openapi_schema)
+	cc.PatternNames = map[string]string{
+		"^x-": "vendorExtension",
+		"^/":  "path",
+		"^([0-9]{3})$|^(default)$": "responseCode",
+	}
 	cc.build()
-	//fmt.Printf("%s\n", cc.display())
+
+	fmt.Printf("%s\n", cc.display())
 
 	// generate the protocol buffer description
 	proto := cc.generateProto()
