@@ -746,40 +746,108 @@ func (schema *Schema) applyToSchemas(operation operation) {
 }
 
 func (destination *Schema) copyProperties(source *Schema) {
-	destination.Schema = source.Schema
-	destination.Id = source.Id
-	destination.MultipleOf = source.MultipleOf
-	destination.Maximum = source.Maximum
-	destination.ExclusiveMaximum = source.ExclusiveMaximum
-	destination.Minimum = source.Minimum
-	destination.ExclusiveMinimum = source.ExclusiveMinimum
-	destination.MaxLength = source.MaxLength
-	destination.MinLength = source.MinLength
-	destination.Pattern = source.Pattern
-	destination.AdditionalItems = source.AdditionalItems
-	destination.Items = source.Items
-	destination.MaxItems = source.MaxItems
-	destination.MinItems = source.MinItems
-	destination.UniqueItems = source.UniqueItems
-	destination.MaxProperties = source.MaxProperties
-	destination.MinProperties = source.MinProperties
-	destination.Required = source.Required
-	destination.AdditionalProperties = source.AdditionalProperties
-	destination.Properties = source.Properties
-	destination.PatternProperties = source.PatternProperties
-	destination.Dependencies = source.Dependencies
-	destination.Enumeration = source.Enumeration
-	destination.Type = source.Type
-	destination.AllOf = source.AllOf
-	destination.AnyOf = source.AnyOf
-	destination.OneOf = source.OneOf
-	destination.Not = source.Not
-	destination.Definitions = source.Definitions
-	destination.Title = source.Title
-	destination.Description = source.Description
-	destination.Default = source.Default
-	destination.Format = source.Format
-	destination.Ref = source.Ref
+	if source.Schema != nil {
+		destination.Schema = source.Schema
+	}
+	if source.Id != nil {
+		destination.Id = source.Id
+	}
+	if source.MultipleOf != nil {
+		destination.MultipleOf = source.MultipleOf
+	}
+	if source.Maximum != nil {
+		destination.Maximum = source.Maximum
+	}
+	if source.ExclusiveMaximum != nil {
+		destination.ExclusiveMaximum = source.ExclusiveMaximum
+	}
+	if source.Minimum != nil {
+		destination.Minimum = source.Minimum
+	}
+	if source.ExclusiveMinimum != nil {
+		destination.ExclusiveMinimum = source.ExclusiveMinimum
+	}
+	if source.MaxLength != nil {
+		destination.MaxLength = source.MaxLength
+	}
+	if source.MinLength != nil {
+		destination.MinLength = source.MinLength
+	}
+	if source.Pattern != nil {
+		destination.Pattern = source.Pattern
+	}
+	if source.AdditionalItems != nil {
+		destination.AdditionalItems = source.AdditionalItems
+	}
+	if source.Items != nil {
+		destination.Items = source.Items
+	}
+	if source.MaxItems != nil {
+		destination.MaxItems = source.MaxItems
+	}
+	if source.MinItems != nil {
+		destination.MinItems = source.MinItems
+	}
+	if source.UniqueItems != nil {
+		destination.UniqueItems = source.UniqueItems
+	}
+	if source.MaxProperties != nil {
+		destination.MaxProperties = source.MaxProperties
+	}
+	if source.MinProperties != nil {
+		destination.MinProperties = source.MinProperties
+	}
+	if source.Required != nil {
+		destination.Required = source.Required
+	}
+	if source.AdditionalProperties != nil {
+		destination.AdditionalProperties = source.AdditionalProperties
+	}
+	if source.Properties != nil {
+		destination.Properties = source.Properties
+	}
+	if source.PatternProperties != nil {
+		destination.PatternProperties = source.PatternProperties
+	}
+	if source.Dependencies != nil {
+		destination.Dependencies = source.Dependencies
+	}
+	if source.Enumeration != nil {
+		destination.Enumeration = source.Enumeration
+	}
+	if source.Type != nil {
+		destination.Type = source.Type
+	}
+	if source.AllOf != nil {
+		destination.AllOf = source.AllOf
+	}
+	if source.AnyOf != nil {
+		destination.AnyOf = source.AnyOf
+	}
+	if source.OneOf != nil {
+		destination.OneOf = source.OneOf
+	}
+	if source.Not != nil {
+		destination.Not = source.Not
+	}
+	if source.Definitions != nil {
+		destination.Definitions = source.Definitions
+	}
+	if source.Title != nil {
+		destination.Title = source.Title
+	}
+	if source.Description != nil {
+		destination.Description = source.Description
+	}
+	if source.Default != nil {
+		destination.Default = source.Default
+	}
+	if source.Format != nil {
+		destination.Format = source.Format
+	}
+	if source.Ref != nil {
+		destination.Ref = source.Ref
+	}
 }
 
 func (schema *Schema) typeIs(typeName string) bool {
@@ -1169,10 +1237,9 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 						}
 					}
 				}
+			} else if schema.OneOf != nil {
+				classes.buildOneOfAccessorsHelper(classModel, schema.OneOf)
 			}
-			// print("UNSUPPORTED TYPE \(type)")
-		} else if schema.OneOf != nil {
-			classes.buildOneOfAccessorsHelper(classModel, schema.OneOf)
 		}
 	}
 }
@@ -1347,6 +1414,8 @@ func camelCaseToSnakeCase(input string) string {
 func main() {
 	base_schema := NewSchemaFromFile("schema.json")
 	base_schema.resolveRefs(nil)
+	base_schema.resolveAllOfs()
+	//fmt.Printf("%s\n", base_schema.display())
 
 	openapi_schema := NewSchemaFromFile("openapi-2.0.json")
 	// these non-object definitions are marked for handling as if they were objects
@@ -1370,7 +1439,7 @@ func main() {
 	}
 	cc.build()
 
-	fmt.Printf("%s\n", cc.display())
+	//fmt.Printf("%s\n", cc.display())
 
 	// generate the protocol buffer description
 	proto := cc.generateProto()
