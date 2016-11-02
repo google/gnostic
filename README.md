@@ -1,7 +1,10 @@
 # OpenAPI Compiler
 
-This repository contains a Go program that reads an OpenAPI JSON
-description and writes an equivalent Protocol Buffer representation.
+This repository contains an experimental project whose goal is to 
+read OpenAPI JSON descriptions and write equivalent Protocol Buffer
+representations. These Protocol Buffer representations would be 
+preprocessed, checked for errors, and available for use in any
+language that is supported by the Protocol Buffer tools.
 
 ## Disclaimer
 
