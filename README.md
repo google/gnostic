@@ -1,15 +1,15 @@
 # OpenAPI Compiler
 
-This repository contains an experimental project whose goal is to 
+This repository contains an experimental project whose goal is to
 read OpenAPI JSON descriptions and write equivalent Protocol Buffer
-representations. These Protocol Buffer representations would be 
-preprocessed, checked for errors, and available for use in any
+representations. These Protocol Buffer representations are to be
+preprocessed, checked for errors, and made available for use in any
 language that is supported by the Protocol Buffer tools.
 
 ## Disclaimer
 
 This is prerelease software and work in progress. Feedback and
-contributions are welcome, but we currently make no guarantees of 
+contributions are welcome, but we currently make no guarantees of
 function or stability.
 
 ## Requirements
@@ -21,15 +21,26 @@ and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
 
 1. Get this package by downloading it with `go get` or manually cloning it into `go/src`.
 
-	`go get github.com/googleapis/openapi-compiler`
+        go get github.com/googleapis/openapi-compiler
+	
+2. Build and run the compiler generator. This uses the OpenAPI JSON schema to
+generate a Protocol Buffer language file that describes an OpenAPI specification
+and a Go-language file of generated code.
 
-2. Generate protocol buffer support code.
+        cd $GOPATH/src/github.com/googleapis/openapi-compiler/generator
+        go build generator.go
+        cd ..
+        ./generator/generator
 
-	`go generate github.com/googleapis/openapi-compiler`
+3. Generate protocol buffer support code. You'll find the generated code at
+`$GOPATH/src/openapi`.
 
-3. Build and install the OpenAPI compiler.
+	    go generate github.com/googleapis/openapi-compiler
 
-	`go install github.com/googleapis/openapi-compiler`
+4. Build and install the OpenAPI compiler. Currently it is hard-coded to compile
+an example OpenAPI description.
+
+	    go install github.com/googleapis/openapi-compiler
 
 ## Copyright
 
@@ -38,4 +49,3 @@ Copyright 2016, Google Inc.
 ## License
 
 Released under the Apache 2.0 license.
-

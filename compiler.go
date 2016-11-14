@@ -17,12 +17,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	pb "openapi"
 )
 
-func main() {
-	fmt.Printf("Hello, world.\n")
+func ReadDocumentFromFile(filename string) *pb.Document {
+	examplesDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/openapi-compiler/examples"
+	file, e := ioutil.ReadFile(examplesDir + "/" + filename)
+	if e != nil {
+		fmt.Printf("File error: %v\n", e)
+		os.Exit(1)
+	}
+	var raw interface{}
+	json.Unmarshal(file, &raw)
+
+	fmt.Printf("%+v\n", raw)
 
 	document := &pb.Document{}
 	document.Swagger = "2.0"
@@ -34,5 +47,11 @@ func main() {
 	info.Version = "v1.0"
 	document.Info = info
 
+	return document
+}
+
+func main() {
+	fmt.Printf("Version: %s\n", version())
+	document := ReadDocumentFromFile("petstore.json")
 	fmt.Printf("doc: %+v\n", document)
 }
