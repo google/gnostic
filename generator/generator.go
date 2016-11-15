@@ -1442,12 +1442,56 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 	code += fmt.Sprintf("package main\n\n")
 	code += fmt.Sprintf("import (\n")
 	// code += fmt.Sprintf("\"fmt\"\n")
-	// code += fmt.Sprintf("pb \"openapi\"\n")
+	code += fmt.Sprintf("pb \"openapi\"\n")
 	code += fmt.Sprintf(")\n\n")
 
 	code += fmt.Sprintf("func version() string {\n")
 	code += fmt.Sprintf("  return \"OpenAPIv2\"\n")
-	code += fmt.Sprintf("}")
+	code += fmt.Sprintf("}\n\n")
+
+	classNames := classes.sortedClassNames()
+	for _, className := range classNames {
+		code += fmt.Sprintf("func build%sForMap(m interface{}) *pb.%s {\n", className, className)
+		code += fmt.Sprintf("  x := &pb.%s{}\n", className)
+
+		classModel := classes.ClassModels[className]
+		propertyNames := classModel.sortedPropertyNames()
+		var fieldNumber = 0
+		for _, propertyName := range propertyNames {
+			propertyModel := classModel.Properties[propertyName]
+			fieldNumber += 1
+			propertyType := propertyModel.Type
+			if propertyType == "int" {
+				propertyType = "int64"
+			}
+			var displayName = propertyName
+			if displayName == "$ref" {
+				displayName = "_ref"
+			}
+			if displayName == "$schema" {
+				displayName = "_schema"
+			}
+			displayName = camelCaseToSnakeCase(displayName)
+
+			var line = fmt.Sprintf("%s %s = %d;", propertyType, displayName, fieldNumber)
+			if propertyModel.Repeated {
+				line = "repeated " + line
+			}
+			code += "//  " + line + "\n"
+		}
+
+		code += fmt.Sprintf("  return x\n")
+		code += fmt.Sprintf("}\n\n")
+	}
+
+	//document.Swagger = "2.0"
+	//document.BasePath = "example.com"
+
+	//info := &pb.Info{}
+	//info.Title = "Sample API"
+	//info.Description = "My great new API"
+	//info.Version = "v1.0"
+	//document.Info = info
 
 	return code
 }

@@ -37,16 +37,8 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 
 	fmt.Printf("%+v\n", raw)
 
-	document := &pb.Document{}
-	document.Swagger = "2.0"
-	document.BasePath = "example.com"
-
-	info := &pb.Info{}
-	info.Title = "Sample API"
-	info.Description = "My great new API"
-	info.Version = "v1.0"
-	document.Info = info
-
+	// to be automatically generated
+	document := buildDocumentForMap(raw)
 	return document
 }
 
