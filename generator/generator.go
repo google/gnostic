@@ -1446,7 +1446,7 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 
 	code += fmt.Sprintf("package main\n\n")
 	code += fmt.Sprintf("import (\n")
-	// code += fmt.Sprintf("\"fmt\"\n")
+	code += fmt.Sprintf("\"fmt\"\n")
 	code += fmt.Sprintf("pb \"openapi\"\n")
 	code += fmt.Sprintf(")\n\n")
 
@@ -1456,7 +1456,13 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 
 	classNames := classes.sortedClassNames()
 	for _, className := range classNames {
-		code += fmt.Sprintf("func build%sForMap(m interface{}) *pb.%s {\n", className, className)
+		code += fmt.Sprintf("func build%sForMap(in interface{}) *pb.%s {\n", className, className)
+		code += fmt.Sprintf("m, keys, ok := unpackMap(in)\n")
+		code += fmt.Sprintf("if (!ok) {\n")
+		code += fmt.Sprintf("return nil\n")
+		code += fmt.Sprintf("}\n")
+		code += fmt.Sprintf("fmt.Printf(\"%%d\\n\", len(m))\n")
+		code += fmt.Sprintf("fmt.Printf(\"%%+v\\n\", keys)\n")
 		code += fmt.Sprintf("  x := &pb.%s{}\n", className)
 
 		classModel := classes.ClassModels[className]
@@ -1483,6 +1489,14 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 				line = "repeated " + line
 			}
 			code += "//  " + line + "\n"
+
+			if propertyType == "string" && !propertyModel.Repeated {
+				fieldName := strings.Title(propertyName)
+				if propertyName == "$ref" {
+					fieldName = "XRef"
+				}
+				code += fmt.Sprintf("x.%s = m[\"%v\"].(string)\n", fieldName, propertyName)
+			}
 		}
 
 		code += fmt.Sprintf("  return x\n")

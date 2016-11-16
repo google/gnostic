@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 
 	pb "openapi"
 )
@@ -35,7 +36,7 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 	var raw interface{}
 	json.Unmarshal(file, &raw)
 
-	fmt.Printf("%+v\n", raw)
+	//fmt.Printf("%+v\n", raw)
 
 	document := buildDocumentForMap(raw)
 	return document
@@ -45,4 +46,18 @@ func main() {
 	fmt.Printf("Version: %s\n", version())
 	document := ReadDocumentFromFile("petstore.json")
 	fmt.Printf("doc: %+v\n", document)
+}
+
+// helper function for compiler
+func unpackMap(in interface{}) (map[string]interface{}, []string, bool) {
+	m, ok := in.(map[string]interface{})
+	if !ok {
+		return nil, nil, ok
+	}
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return m, keys, ok
 }
