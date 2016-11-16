@@ -39,6 +39,11 @@ const LICENSE = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n\n"
 
+// todo: build into code printer
+func MyPrint(format string, args ...interface{}) {
+	fmt.Printf("[MY PREFIX] "+format, args...)
+}
+
 // global map of all known Schemas.
 // initialized when the first Schema is created and inserted.
 var schemas map[string]*Schema

@@ -37,7 +37,6 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 
 	fmt.Printf("%+v\n", raw)
 
-	// to be automatically generated
 	document := buildDocumentForMap(raw)
 	return document
 }
