@@ -20,6 +20,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
+	"runtime"
 	"sort"
 	"strings"
 )
@@ -1548,15 +1550,19 @@ func main() {
 
 	// generate the protocol buffer description
 	proto := cc.generateProto("OpenAPIv2")
-	err = ioutil.WriteFile("openapi-v2.proto", []byte(proto), 0644)
+	proto_filename := "openapi-v2.proto"
+	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
 		panic(err)
 	}
 
 	// generate the compiler
 	compiler := cc.generateCompiler("OpenAPIv2")
-	err = ioutil.WriteFile("openapi-v2.go", []byte(compiler), 0644)
+	go_filename := "openapi-v2.go"
+	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {
 		panic(err)
 	}
+	// autoformat the compiler
+	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
 }
