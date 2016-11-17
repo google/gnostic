@@ -1448,7 +1448,6 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 	code.AddLine("package main")
 	code.AddLine()
 	code.AddLine("import (")
-	code.AddLine("\"fmt\"")
 	code.AddLine("\"log\"")
 	code.AddLine("pb \"openapi\"")
 	code.AddLine(")")
@@ -1463,10 +1462,10 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 		code.AddLine("func build%sForMap(in interface{}) *pb.%s {", className, className)
 		code.AddLine("m, keys, ok := unpackMap(in)")
 		code.AddLine("if (!ok) {")
+		code.AddLine("log.Printf(\"%%d\\n\", len(m))")
+		code.AddLine("log.Printf(\"%%+v\\n\", keys)")
 		code.AddLine("return nil")
 		code.AddLine("}")
-		code.AddLine("fmt.Printf(\"%%d\\n\", len(m))")
-		code.AddLine("fmt.Printf(\"%%+v\\n\", keys)")
 		code.AddLine("  x := &pb.%s{}", className)
 
 		classModel := classes.ClassModels[className]
@@ -1501,7 +1500,15 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 
 			code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 
-			if propertyType == "string" {
+			classModel, classFound := classes.ClassModels[propertyType]
+			if classFound {
+				code.AddLine("// CLASS: %s", classModel.Name)
+				if propertyModel.Repeated {
+					code.AddLine("// TODO: repeated class %s", classModel.Name)
+				} else {
+					code.AddLine("x.%s = build%sForMap(m[\"%v\"])", fieldName, classModel.Name, propertyName)
+				}
+			} else if propertyType == "string" {
 				if propertyModel.Repeated {
 					code.AddLine("v, ok := m[\"%v\"].([]interface{})", propertyName)
 					code.AddLine("if ok {")
@@ -1512,6 +1519,8 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 				} else {
 					code.AddLine("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
 				}
+			} else {
+				code.AddLine("// TODO: %s", propertyType)
 			}
 
 			code.AddLine("}")

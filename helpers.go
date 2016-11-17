@@ -17,32 +17,35 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"os"
-
-	pb "openapi"
+	"sort"
 )
 
-func ReadDocumentFromFile(filename string) *pb.Document {
-	examplesDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/openapi-compiler/examples"
-	file, e := ioutil.ReadFile(examplesDir + "/" + filename)
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
+// helper function for compiler
+func unpackMap(in interface{}) (map[string]interface{}, []string, bool) {
+	m, ok := in.(map[string]interface{})
+	if !ok {
+		return nil, nil, ok
 	}
-	var raw interface{}
-	json.Unmarshal(file, &raw)
-
-	//fmt.Printf("%+v\n", raw)
-
-	document := buildDocumentForMap(raw)
-	return document
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return m, keys, ok
 }
 
-func main() {
-	fmt.Printf("Version: %s\n", version())
-	document := ReadDocumentFromFile("petstore.json")
-	fmt.Printf("document: %+v\n", document)
+func mapHasKey(m map[string]interface{}, key string) bool {
+	_, ok := m[key]
+	return ok
+}
+
+func convertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
+	stringArray := make([]string, 0)
+	for _, item := range interfaceArray {
+		v, ok := item.(string)
+		if ok {
+			stringArray = append(stringArray, v)
+		}
+	}
+	return stringArray
 }
