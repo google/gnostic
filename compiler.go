@@ -61,3 +61,19 @@ func unpackMap(in interface{}) (map[string]interface{}, []string, bool) {
 	sort.Strings(keys)
 	return m, keys, ok
 }
+
+func mapHasKey(m map[string]interface{}, key string) bool {
+	_, ok := m[key]
+	return ok
+}
+
+func convertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
+	stringArray := make([]string, 0)
+	for _, item := range interfaceArray {
+		v, ok := item.(string)
+		if ok {
+			stringArray = append(stringArray, v)
+		}
+	}
+	return stringArray
+}

@@ -1350,7 +1350,7 @@ func (classes *ClassCollection) build() {
 	stringArrayClass := NewClassModel()
 	stringArrayClass.Name = "StringArray"
 	stringProperty := NewClassProperty()
-	stringProperty.Name = "string"
+	stringProperty.Name = "value"
 	stringProperty.Type = "string"
 	stringProperty.Repeated = true
 	stringArrayClass.Properties[stringProperty.Name] = stringProperty
@@ -1449,6 +1449,7 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 	code.AddLine()
 	code.AddLine("import (")
 	code.AddLine("\"fmt\"")
+	code.AddLine("\"log\"")
 	code.AddLine("pb \"openapi\"")
 	code.AddLine(")")
 	code.AddLine()
@@ -1493,13 +1494,27 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 			}
 			code.AddLine("//  " + line)
 
-			if propertyType == "string" && !propertyModel.Repeated {
-				fieldName := strings.Title(propertyName)
-				if propertyName == "$ref" {
-					fieldName = "XRef"
-				}
-				code.AddLine("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
+			fieldName := strings.Title(propertyName)
+			if propertyName == "$ref" {
+				fieldName = "XRef"
 			}
+
+			code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
+
+			if propertyType == "string" {
+				if propertyModel.Repeated {
+					code.AddLine("v, ok := m[\"%v\"].([]interface{})", propertyName)
+					code.AddLine("if ok {")
+					code.AddLine("x.%s = convertInterfaceArrayToStringArray(v)", fieldName)
+					code.AddLine("} else {")
+					code.AddLine(" log.Printf(\"unexpected: %%+v\", m[\"%v\"])", propertyName)
+					code.AddLine("}")
+				} else {
+					code.AddLine("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
+				}
+			}
+
+			code.AddLine("}")
 		}
 
 		code.AddLine("  return x")
