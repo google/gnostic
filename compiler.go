@@ -19,6 +19,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"os"
 
@@ -44,5 +45,5 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 func main() {
 	fmt.Printf("Version: %s\n", version())
 	document := ReadDocumentFromFile("petstore.json")
-	fmt.Printf("document: %+v\n", document)
+	fmt.Printf("document: %+v\n", proto.MarshalTextString(document))
 }

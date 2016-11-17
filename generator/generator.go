@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -1007,6 +1008,7 @@ type ClassProperty struct {
 	Name     string
 	Type     string
 	Repeated bool
+	Pattern  string
 }
 
 func (classProperty *ClassProperty) display() string {
@@ -1023,6 +1025,10 @@ func NewClassProperty() *ClassProperty {
 
 func NewClassPropertyWithNameAndType(name string, typeName string) *ClassProperty {
 	return &ClassProperty{Name: name, Type: typeName}
+}
+
+func NewClassPropertyWithNameTypeAndPattern(name string, typeName string, pattern string) *ClassProperty {
+	return &ClassProperty{Name: name, Type: typeName, Pattern: pattern}
 }
 
 // models classes
@@ -1107,7 +1113,7 @@ func (classes *ClassCollection) propertyNameForReference(reference string) *stri
 
 func (classes *ClassCollection) arrayTypeForSchema(schema *Schema) string {
 	// what is the array type?
-	itemTypeName := "google.protobuf.Any"
+	itemTypeName := "Any"
 	if schema.Items != nil {
 
 		if schema.Items.Array != nil {
@@ -1192,7 +1198,7 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 				} else {
 					if value.isEmpty() {
 						// write accessor for generic object
-						className := "google.protobuf.Any"
+						className := "Any"
 						classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
 					} else if value.AnyOf != nil {
 						//self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
@@ -1216,13 +1222,13 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *Schema, path string) {
 	if schema.PatternProperties != nil {
 		for key, propertySchema := range *(schema.PatternProperties) {
-			className := "google.protobuf.Any"
+			className := "Any"
 			propertyName := classes.PatternNames[key]
 			if propertySchema.Ref != nil {
 				className = classes.classNameForReference(*propertySchema.Ref)
 			}
 			typeName := fmt.Sprintf("map<string, %s>", className)
-			classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, typeName)
+			classModel.Properties[propertyName] = NewClassPropertyWithNameTypeAndPattern(propertyName, typeName, key)
 		}
 	}
 }
@@ -1233,7 +1239,7 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 		if schema.AdditionalProperties.Boolean != nil {
 			if *schema.AdditionalProperties.Boolean == true {
 				propertyName := "additionalProperties"
-				className := "map<string, google.protobuf.Any>"
+				className := "map<string, Any>"
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
 				return
 			}
@@ -1291,7 +1297,7 @@ func (classes *ClassCollection) buildOneOfAccessorsHelper(classModel *ClassModel
 
 func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, schema *Schema, path string) {
 	key := "additionalProperties"
-	className := "map<string, google.protobuf.Any>"
+	className := "map<string, Any>"
 	classModel.Properties[key] = NewClassPropertyWithNameAndType(key, className)
 }
 
@@ -1355,6 +1361,16 @@ func (classes *ClassCollection) build() {
 	stringProperty.Repeated = true
 	stringArrayClass.Properties[stringProperty.Name] = stringProperty
 	classes.ClassModels[stringArrayClass.Name] = stringArrayClass
+
+	// add a class for "Any"
+	anyClass := NewClassModel()
+	anyClass.Name = "Any"
+	valueProperty := NewClassProperty()
+	valueProperty.Name = "value"
+	valueProperty.Type = "google.protobuf.Any"
+	valueProperty.Repeated = true
+	anyClass.Properties[valueProperty.Name] = valueProperty
+	classes.ClassModels[anyClass.Name] = anyClass
 }
 
 func (classes *ClassCollection) sortedClassNames() []string {
@@ -1440,6 +1456,21 @@ func camelCaseToSnakeCase(input string) string {
 	return out
 }
 
+func mapTypeInfo(typeName string) (isMap bool, valueTypeName string) {
+	r, err := regexp.Compile("^map<string, (.*)>$")
+	if err != nil {
+		panic(err)
+	}
+	match := r.FindStringSubmatch(typeName)
+	if len(match) != 2 {
+		isMap = false
+	} else {
+		isMap = true
+		valueTypeName = match[1]
+	}
+	return
+}
+
 func (classes *ClassCollection) generateCompiler(packageName string) string {
 	code := CodeBuilder{}
 	code.AddLine(LICENSE)
@@ -1491,18 +1522,19 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 			if propertyModel.Repeated {
 				line = "repeated " + line
 			}
-			code.AddLine("//  " + line)
+			code.AddLine("// " + line)
 
 			fieldName := strings.Title(propertyName)
 			if propertyName == "$ref" {
 				fieldName = "XRef"
 			}
 
-			code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
+			if propertyModel.Pattern == "" {
+				code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
+			}
 
 			classModel, classFound := classes.ClassModels[propertyType]
 			if classFound {
-				code.AddLine("// CLASS: %s", classModel.Name)
 				if propertyModel.Repeated {
 					code.AddLine("// TODO: repeated class %s", classModel.Name)
 				} else {
@@ -1519,11 +1551,44 @@ func (classes *ClassCollection) generateCompiler(packageName string) string {
 				} else {
 					code.AddLine("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
 				}
+			} else if propertyType == "float" {
+				code.AddLine("x.%s = m[\"%v\"].(float32)", fieldName, propertyName)
+
+			} else if propertyType == "int64" {
+				code.AddLine("x.%s = m[\"%v\"].(int64)", fieldName, propertyName)
+
+			} else if propertyType == "bool" {
+				code.AddLine("x.%s = m[\"%v\"].(bool)", fieldName, propertyName)
+
 			} else {
-				code.AddLine("// TODO: %s", propertyType)
+				isMap, mapTypeName := mapTypeInfo(propertyType)
+				if isMap {
+					code.AddLine("// MAP: %s %s", mapTypeName, propertyModel.Pattern)
+
+					// GENERATE THIS:
+					if mapTypeName == "string" {
+						code.AddLine("x.%s = make(map[string]string, 0)", fieldName)
+					} else {
+						code.AddLine("x.%s = make(map[string]*pb.%s, 0)", fieldName, mapTypeName)
+					}
+					code.AddLine("for k, v := range m {")
+					code.AddLine("if patternMatches(\"%s\", k) {", propertyModel.Pattern)
+					if mapTypeName == "string" {
+						code.AddLine("x.%s[k] = v.(string)", fieldName)
+					} else {
+						code.AddLine("x.%s[k] = build%vForMap(v)", fieldName, mapTypeName)
+					}
+					code.AddLine("}")
+					code.AddLine("}")
+
+				} else {
+					code.AddLine("// TODO: %s", propertyType)
+				}
 			}
 
-			code.AddLine("}")
+			if propertyModel.Pattern == "" {
+				code.AddLine("}")
+			}
 		}
 
 		code.AddLine("  return x")

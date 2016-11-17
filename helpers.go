@@ -17,10 +17,12 @@
 package main
 
 import (
+	"regexp"
 	"sort"
 )
 
-// helper function for compiler
+// compiler helper functions, usually called from generated code
+
 func unpackMap(in interface{}) (map[string]interface{}, []string, bool) {
 	m, ok := in.(map[string]interface{})
 	if !ok {
@@ -48,4 +50,12 @@ func convertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
 		}
 	}
 	return stringArray
+}
+
+func patternMatches(pattern string, value string) bool {
+	matched, err := regexp.Match(pattern, []byte(value))
+	if err != nil {
+		panic(err)
+	}
+	return matched
 }
