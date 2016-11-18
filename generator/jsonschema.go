@@ -22,15 +22,18 @@ import (
 	"strings"
 )
 
-// global map of all known Schemas.
-// initialized when the first Schema is created and inserted.
+// This is a global map of all known Schemas.
+// It is initialized when the first Schema is created and inserted.
 var schemas map[string]*Schema
 
+// This struct models a JSON Schema and, because schemas are defined
+// hierarchically, contains many references to itself.
+// All fields are pointers and are nil if the associated values
+// are not specified.
 type Schema struct {
-	Schema      *string // $schema
-	Id          *string // id keyword used for $ref resolution scope
-	Ref         *string // $ref, i.e. JSON Pointers
-	ResolvedRef *Schema // the resolved pointer reference
+	Schema *string // $schema
+	Id     *string // id keyword used for $ref resolution scope
+	Ref    *string // $ref, i.e. JSON Pointers
 
 	// http://json-schema.org/latest/json-schema-validation.html
 	// 5.1.  Validation keywords for numeric instances (number and integer)
@@ -79,7 +82,9 @@ type Schema struct {
 	Format *string
 }
 
-// Helpers
+// These helper structs model "combination" types that generally can
+// have values of one type or another. All are used to represent parts
+// of Schemas.
 
 type SchemaNumber struct {
 	Integer *int64
@@ -111,6 +116,8 @@ type SchemaEnumValue struct {
 	Bool   *bool
 }
 
+// Reads a schema from a file.
+// Currently this assumes that schemas are stored in the source distribution of this project.
 func NewSchemaFromFile(filename string) *Schema {
 	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/openapi-compiler/schemas"
 	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
@@ -123,6 +130,9 @@ func NewSchemaFromFile(filename string) *Schema {
 	return NewSchemaFromObject(info)
 }
 
+// Constructs a schema from a parsed JSON object.
+// Due to the complexity of the schema representation, this is a
+// custom reader and not the standard Go JSON reader (encoding/json).
 func NewSchemaFromObject(jsonData interface{}) *Schema {
 	switch t := jsonData.(type) {
 	default:
@@ -176,14 +186,14 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 			case "additionalProperties":
 				schema.AdditionalProperties = schema.schemaOrBooleanValue(v)
 			case "properties":
-				schema.Properties = schema.dictionaryOfSchemasValue(v)
+				schema.Properties = schema.mapOfSchemasValue(v)
 			case "patternProperties":
-				schema.PatternProperties = schema.dictionaryOfSchemasValue(v)
+				schema.PatternProperties = schema.mapOfSchemasValue(v)
 			case "dependencies":
-				schema.Dependencies = schema.dictionaryOfSchemasOrStringArraysValue(v)
+				schema.Dependencies = schema.mapOfSchemasOrStringArraysValue(v)
 
 			case "enum":
-				schema.Enumeration = schema.arrayOfValuesValue(v)
+				schema.Enumeration = schema.arrayOfEnumValuesValue(v)
 
 			case "type":
 				schema.Type = schema.stringOrStringArrayValue(v)
@@ -196,7 +206,7 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 			case "not":
 				schema.Not = NewSchemaFromObject(v)
 			case "definitions":
-				schema.Definitions = schema.dictionaryOfSchemasValue(v)
+				schema.Definitions = schema.mapOfSchemasValue(v)
 
 			case "title":
 				schema.Title = schema.stringValue(v)
@@ -227,6 +237,7 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 	return nil
 }
 
+// Returns true if no members of the Schema are specified.
 func (schema *Schema) isEmpty() bool {
 	return (schema.Schema == nil) &&
 		(schema.Id == nil) &&
@@ -264,6 +275,13 @@ func (schema *Schema) isEmpty() bool {
 		(schema.Ref == nil)
 }
 
+//
+// BUILDERS
+// The following methods build elements of Schemas from interface{} values.
+// Each returns nil if it is unable to build the desired element.
+//
+
+// Gets the string value of an interface{} value if possible.
 func (schema *Schema) stringValue(v interface{}) *string {
 	switch v := v.(type) {
 	default:
@@ -274,6 +292,7 @@ func (schema *Schema) stringValue(v interface{}) *string {
 	return nil
 }
 
+// Gets the numeric value of an interface{} value if possible.
 func (schema *Schema) numberValue(v interface{}) *SchemaNumber {
 	number := &SchemaNumber{}
 	switch v := v.(type) {
@@ -291,6 +310,7 @@ func (schema *Schema) numberValue(v interface{}) *SchemaNumber {
 	return nil
 }
 
+// Gets the integer value of an interface{} value if possible.
 func (schema *Schema) intValue(v interface{}) *int64 {
 	switch v := v.(type) {
 	default:
@@ -304,6 +324,7 @@ func (schema *Schema) intValue(v interface{}) *int64 {
 	return nil
 }
 
+// Gets the bool value of an interface{} value if possible.
 func (schema *Schema) boolValue(v interface{}) *bool {
 	switch v := v.(type) {
 	default:
@@ -314,10 +335,11 @@ func (schema *Schema) boolValue(v interface{}) *bool {
 	return nil
 }
 
-func (schema *Schema) dictionaryOfSchemasValue(v interface{}) *map[string]*Schema {
+// Gets a map of Schemas from an interface{} value if possible.
+func (schema *Schema) mapOfSchemasValue(v interface{}) *map[string]*Schema {
 	switch v := v.(type) {
 	default:
-		fmt.Printf("dictionaryOfSchemasValue: unexpected type %T\n", v)
+		fmt.Printf("mapOfSchemasValue: unexpected type %T\n", v)
 	case map[string]interface{}:
 		m := make(map[string]*Schema)
 		for k2, v2 := range v {
@@ -328,6 +350,7 @@ func (schema *Schema) dictionaryOfSchemasValue(v interface{}) *map[string]*Schem
 	return nil
 }
 
+// Gets an array of Schemas from an interface{} value if possible.
 func (schema *Schema) arrayOfSchemasValue(v interface{}) *[]*Schema {
 	switch v := v.(type) {
 	default:
@@ -353,6 +376,7 @@ func (schema *Schema) arrayOfSchemasValue(v interface{}) *[]*Schema {
 	return nil
 }
 
+// Gets a Schema or an array of Schemas from an interface{} value if possible.
 func (schema *Schema) schemaOrSchemaArrayValue(v interface{}) *SchemaOrSchemaArray {
 	switch v := v.(type) {
 	default:
@@ -376,6 +400,7 @@ func (schema *Schema) schemaOrSchemaArrayValue(v interface{}) *SchemaOrSchemaArr
 	return nil
 }
 
+// Gets an array of strings from an interface{} value if possible.
 func (schema *Schema) arrayOfStringsValue(v interface{}) *[]string {
 	switch v := v.(type) {
 	default:
@@ -400,6 +425,7 @@ func (schema *Schema) arrayOfStringsValue(v interface{}) *[]string {
 	return nil
 }
 
+// Gets a string or an array of strings from an interface{} value if possible.
 func (schema *Schema) stringOrStringArrayValue(v interface{}) *StringOrStringArray {
 	switch v := v.(type) {
 	default:
@@ -429,16 +455,17 @@ func (schema *Schema) stringOrStringArrayValue(v interface{}) *StringOrStringArr
 	return nil
 }
 
-func (schema *Schema) arrayOfValuesValue(v interface{}) *[]SchemaEnumValue {
+// Gets an array of enum values from an interface{} value if possible.
+func (schema *Schema) arrayOfEnumValuesValue(v interface{}) *[]SchemaEnumValue {
 	a := make([]*SchemaEnumValue, 0)
 	switch v := v.(type) {
 	default:
-		fmt.Printf("arrayOfValuesValue: unexpected type %T\n", v)
+		fmt.Printf("arrayOfEnumValuesValue: unexpected type %T\n", v)
 	case []interface{}:
 		for _, v2 := range v {
 			switch v2 := v2.(type) {
 			default:
-				fmt.Printf("arrayOfValuesValue: unexpected type %T\n", v2)
+				fmt.Printf("arrayOfEnumValuesValue: unexpected type %T\n", v2)
 			case string:
 				a = append(a, &SchemaEnumValue{String: &v2})
 			case bool:
@@ -449,22 +476,23 @@ func (schema *Schema) arrayOfValuesValue(v interface{}) *[]SchemaEnumValue {
 	return nil
 }
 
-func (schema *Schema) dictionaryOfSchemasOrStringArraysValue(v interface{}) *map[string]*SchemaOrStringArray {
+// Gets a map of schemas or string arrays from an interface{} value if possible.
+func (schema *Schema) mapOfSchemasOrStringArraysValue(v interface{}) *map[string]*SchemaOrStringArray {
 	m := make(map[string]*SchemaOrStringArray, 0)
 	switch v := v.(type) {
 	default:
-		fmt.Printf("dictionaryOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v, v)
+		fmt.Printf("mapOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v, v)
 	case map[string]interface{}:
 		for k2, v2 := range v {
 			switch v2 := v2.(type) {
 			default:
-				fmt.Printf("dictionaryOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v2, v2)
+				fmt.Printf("mapOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v2, v2)
 			case []interface{}:
 				a := make([]string, 0)
 				for _, v3 := range v2 {
 					switch v3 := v3.(type) {
 					default:
-						fmt.Printf("dictionaryOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v3, v3)
+						fmt.Printf("mapOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v3, v3)
 					case string:
 						a = append(a, v3)
 					}
@@ -478,6 +506,7 @@ func (schema *Schema) dictionaryOfSchemasOrStringArraysValue(v interface{}) *map
 	return &m
 }
 
+// Gets a schema or a boolean value from an interface{} value if possible.
 func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
 	schemaOrBoolean := &SchemaOrBoolean{}
 	switch v := v.(type) {
@@ -493,10 +522,17 @@ func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
 	return schemaOrBoolean
 }
 
+//
+// DISPLAY
+// The following methods display Schemas.
+//
+
+// Returns a string representation of a Schema.
 func (schema *Schema) display() string {
 	return schema.displaySchema("")
 }
 
+// Helper: Returns a string representation of a Schema indented by a specified string.
 func (schema *Schema) displaySchema(indent string) string {
 	result := ""
 	if schema.Schema != nil {
@@ -676,9 +712,16 @@ func (schema *Schema) displaySchema(indent string) string {
 	return result
 }
 
-type operation func(schema *Schema)
+//
+// OPERATIONS
+// The following methods perform operations on Schemas.
+//
 
-func (schema *Schema) applyToSchemas(operation operation) {
+// A type that represents a function that can be applied to a Schema.
+type SchemaOperation func(schema *Schema)
+
+// Applies a specified function to a Schema and all of the Schemas that it contains.
+func (schema *Schema) applyToSchemas(operation SchemaOperation) {
 
 	if schema.AdditionalItems != nil {
 		s := schema.AdditionalItems.Schema
@@ -752,6 +795,7 @@ func (schema *Schema) applyToSchemas(operation operation) {
 	operation(schema)
 }
 
+// Copies all non-nil properties from the source Schema to the destination Schema.
 func (destination *Schema) copyProperties(source *Schema) {
 	if source.Schema != nil {
 		destination.Schema = source.Schema
@@ -857,6 +901,7 @@ func (destination *Schema) copyProperties(source *Schema) {
 	}
 }
 
+// Returns the "type" of a Schema (object, array, etc.)
 func (schema *Schema) typeIs(typeName string) bool {
 	if schema.Type != nil {
 		if schema.Type.String != nil {
@@ -872,6 +917,10 @@ func (schema *Schema) typeIs(typeName string) bool {
 	return false
 }
 
+// Resolves "$ref" elements in a Schema and its children.
+// But if a reference refers to an object type or one of an array of user-specified schemas,
+// the reference is kept and we expect downstream tools to separately model these
+// referenced schemas.
 func (schema *Schema) resolveRefs(classNames []string) {
 	rootSchema := schema
 	contains := func(stringArray []string, element string) bool {
@@ -903,6 +952,9 @@ func (schema *Schema) resolveRefs(classNames []string) {
 	}
 }
 
+// Resolves JSON pointers.
+// This current implementation is very crude and custom for OpenAPI 2.0 schemas.
+// It panics for any pointer that it is unable to resolve.
 func (root *Schema) resolveJSONPointer(ref string) *Schema {
 	var result *Schema
 
@@ -938,6 +990,7 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 	return result
 }
 
+// Resolves all "allOf" elements by merging their properties into the parent Schema.
 func (schema *Schema) resolveAllOfs() {
 	schema.applyToSchemas(
 		func(schema *Schema) {
@@ -950,7 +1003,8 @@ func (schema *Schema) resolveAllOfs() {
 		})
 }
 
-func (schema *Schema) reduceOneOfs() {
+// Flattens any "oneOf" elements that contain other "oneOf" elements.
+func (schema *Schema) flattenOneOfs() {
 	schema.applyToSchemas(
 		func(schema *Schema) {
 			if schema.OneOf != nil {

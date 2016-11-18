@@ -35,8 +35,6 @@ const LICENSE = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
 
-/// main program
-
 func main() {
 	base_schema := NewSchemaFromFile("schema.json")
 	base_schema.resolveRefs(nil)
@@ -52,10 +50,11 @@ func main() {
 		"#/definitions/pathParameterSubSchema"}
 	openapi_schema.resolveRefs(classNames)
 	openapi_schema.resolveAllOfs()
-	openapi_schema.reduceOneOfs()
+	openapi_schema.flattenOneOfs()
 
 	// build a simplified model of the classes described by the schema
 	cc := NewClassCollection(openapi_schema)
+	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 	cc.PatternNames = map[string]string{
 		"^x-": "vendorExtension",
@@ -64,6 +63,7 @@ func main() {
 	}
 	cc.build()
 	//log.Printf("%s\n", cc.display())
+
 	if true {
 		var err error
 
@@ -82,7 +82,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		// autoformat the compiler
+		// format the compiler
 		err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
 	}
 }
