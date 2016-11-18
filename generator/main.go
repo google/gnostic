@@ -68,7 +68,7 @@ func main() {
 		var err error
 
 		// generate the protocol buffer description
-		proto := cc.generateProto("OpenAPIv2")
+		proto := cc.generateProto("OpenAPIv2", LICENSE)
 		proto_filename := "openapi-v2.proto"
 		err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 		if err != nil {
@@ -76,7 +76,7 @@ func main() {
 		}
 
 		// generate the compiler
-		compiler := cc.generateCompiler("OpenAPIv2")
+		compiler := cc.generateCompiler("OpenAPIv2", LICENSE)
 		go_filename := "openapi-v2.go"
 		err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 		if err != nil {
