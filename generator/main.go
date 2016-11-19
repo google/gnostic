@@ -16,6 +16,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os/exec"
 	"runtime"
 )
@@ -37,20 +38,14 @@ const LICENSE = "" +
 
 func main() {
 	base_schema := NewSchemaFromFile("schema.json")
-	base_schema.resolveRefs(nil)
+	base_schema.resolveRefs()
 	base_schema.resolveAllOfs()
 
 	openapi_schema := NewSchemaFromFile("openapi-2.0.json")
-	// these non-object definitions are marked for handling as if they were objects
-	// in the future, these could be automatically identified by their presence in a oneOf
-	classNames := []string{
-		"#/definitions/headerParameterSubSchema",
-		"#/definitions/formDataParameterSubSchema",
-		"#/definitions/queryParameterSubSchema",
-		"#/definitions/pathParameterSubSchema"}
-	openapi_schema.resolveRefs(classNames)
+	openapi_schema.resolveRefs()
 	openapi_schema.resolveAllOfs()
-	openapi_schema.flattenOneOfs()
+	openapi_schema.resolveAnyOfs()
+	//openapi_schema.flattenOneOfs()
 
 	// build a simplified model of the classes described by the schema
 	cc := NewClassCollection(openapi_schema)
@@ -62,7 +57,7 @@ func main() {
 		"^([0-9]{3})$|^(default)$": "responseCode",
 	}
 	cc.build()
-	//log.Printf("%s\n", cc.display())
+	log.Printf("%s\n", cc.display())
 
 	if true {
 		var err error

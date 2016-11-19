@@ -718,43 +718,43 @@ func (schema *Schema) displaySchema(indent string) string {
 //
 
 // A type that represents a function that can be applied to a Schema.
-type SchemaOperation func(schema *Schema)
+type SchemaOperation func(schema *Schema, context string)
 
 // Applies a specified function to a Schema and all of the Schemas that it contains.
-func (schema *Schema) applyToSchemas(operation SchemaOperation) {
+func (schema *Schema) applyToSchemas(operation SchemaOperation, context string) {
 
 	if schema.AdditionalItems != nil {
 		s := schema.AdditionalItems.Schema
 		if s != nil {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "AdditionalItems")
 		}
 	}
 
 	if schema.Items != nil {
 		if schema.Items.Array != nil {
 			for _, s := range *(schema.Items.Array) {
-				s.applyToSchemas(operation)
+				s.applyToSchemas(operation, "Items.Array")
 			}
 		} else if schema.Items.Schema != nil {
-			schema.Items.Schema.applyToSchemas(operation)
+			schema.Items.Schema.applyToSchemas(operation, "Items.Schema")
 		}
 	}
 
 	if schema.AdditionalProperties != nil {
 		s := schema.AdditionalProperties.Schema
 		if s != nil {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "AdditionalProperties")
 		}
 	}
 
 	if schema.Properties != nil {
 		for _, s := range *(schema.Properties) {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "Properties")
 		}
 	}
 	if schema.PatternProperties != nil {
 		for _, s := range *(schema.PatternProperties) {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "PatternProperties")
 		}
 	}
 
@@ -762,37 +762,37 @@ func (schema *Schema) applyToSchemas(operation SchemaOperation) {
 		for _, schemaOrStringArray := range *(schema.Dependencies) {
 			s := schemaOrStringArray.Schema
 			if s != nil {
-				s.applyToSchemas(operation)
+				s.applyToSchemas(operation, "Dependencies")
 			}
 		}
 	}
 
 	if schema.AllOf != nil {
 		for _, s := range *(schema.AllOf) {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "AllOf")
 		}
 	}
 	if schema.AnyOf != nil {
 		for _, s := range *(schema.AnyOf) {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "AnyOf")
 		}
 	}
 	if schema.OneOf != nil {
 		for _, s := range *(schema.OneOf) {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "OneOf")
 		}
 	}
 	if schema.Not != nil {
-		schema.Not.applyToSchemas(operation)
+		schema.Not.applyToSchemas(operation, "Not")
 	}
 
 	if schema.Definitions != nil {
 		for _, s := range *(schema.Definitions) {
-			s.applyToSchemas(operation)
+			s.applyToSchemas(operation, "Definitions")
 		}
 	}
 
-	operation(schema)
+	operation(schema, context)
 }
 
 // Copies all non-nil properties from the source Schema to the destination Schema.
@@ -901,9 +901,10 @@ func (destination *Schema) copyProperties(source *Schema) {
 	}
 }
 
-// Returns the "type" of a Schema (object, array, etc.)
+// Returns true if the "type" of a Schema includes the specified type
 func (schema *Schema) typeIs(typeName string) bool {
 	if schema.Type != nil {
+		// the type is either a string or an array of strings
 		if schema.Type.String != nil {
 			return (*(schema.Type.String) == typeName)
 		} else if schema.Type.Array != nil {
@@ -918,29 +919,21 @@ func (schema *Schema) typeIs(typeName string) bool {
 }
 
 // Resolves "$ref" elements in a Schema and its children.
-// But if a reference refers to an object type or one of an array of user-specified schemas,
+// But if a reference refers to an object type or is inside a oneOf,
 // the reference is kept and we expect downstream tools to separately model these
 // referenced schemas.
-func (schema *Schema) resolveRefs(classNames []string) {
+func (schema *Schema) resolveRefs() {
 	rootSchema := schema
-	contains := func(stringArray []string, element string) bool {
-		for _, item := range stringArray {
-			if item == element {
-				return true
-			}
-		}
-		return false
-	}
 	count := 1
 	for count > 0 {
 		count = 0
 		schema.applyToSchemas(
-			func(schema *Schema) {
+			func(schema *Schema, context string) {
 				if schema.Ref != nil {
 					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
 					if resolvedRef.typeIs("object") {
 						// don't substitute, we'll model the referenced item with a class
-					} else if contains(classNames, *(schema.Ref)) {
+					} else if context == "OneOf" {
 						// don't substitute, we'll model the referenced item with a class
 					} else {
 						schema.Ref = nil
@@ -948,7 +941,7 @@ func (schema *Schema) resolveRefs(classNames []string) {
 						count += 1
 					}
 				}
-			})
+			}, "")
 	}
 }
 
@@ -990,23 +983,36 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 	return result
 }
 
-// Resolves all "allOf" elements by merging their properties into the parent Schema.
+// Replaces "allOf" elements by merging their properties into the parent Schema.
 func (schema *Schema) resolveAllOfs() {
 	schema.applyToSchemas(
-		func(schema *Schema) {
+		func(schema *Schema, context string) {
 			if schema.AllOf != nil {
 				for _, allOf := range *(schema.AllOf) {
 					schema.copyProperties(allOf)
 				}
 				schema.AllOf = nil
 			}
-		})
+		}, "")
+}
+
+// Replaces all "anyOf" elements by merging their properties into the parent Schema.
+func (schema *Schema) resolveAnyOfs() {
+	schema.applyToSchemas(
+		func(schema *Schema, context string) {
+			if schema.AnyOf != nil {
+				for _, anyOf := range *(schema.AnyOf) {
+					schema.copyProperties(anyOf)
+				}
+				schema.AnyOf = nil
+			}
+		}, "")
 }
 
 // Flattens any "oneOf" elements that contain other "oneOf" elements.
 func (schema *Schema) flattenOneOfs() {
 	schema.applyToSchemas(
-		func(schema *Schema) {
+		func(schema *Schema, context string) {
 			if schema.OneOf != nil {
 				newOneOfs := make([]*Schema, 0)
 				for _, oneOf := range *(schema.OneOf) {
@@ -1021,5 +1027,5 @@ func (schema *Schema) flattenOneOfs() {
 				}
 				schema.OneOf = &newOneOfs
 			}
-		})
+		}, "")
 }
