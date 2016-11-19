@@ -97,18 +97,18 @@ type SchemaOrBoolean struct {
 }
 
 type StringOrStringArray struct {
-	String *string
-	Array  *[]string
+	String      *string
+	StringArray *[]string
 }
 
 type SchemaOrStringArray struct {
-	Schema *Schema
-	Array  *[]string
+	Schema      *Schema
+	StringArray *[]string
 }
 
 type SchemaOrSchemaArray struct {
-	Schema *Schema
-	Array  *[]*Schema
+	Schema      *Schema
+	SchemaArray *[]*Schema
 }
 
 type SchemaEnumValue struct {
@@ -392,7 +392,7 @@ func (schema *Schema) schemaOrSchemaArrayValue(v interface{}) *SchemaOrSchemaArr
 				m = append(m, s)
 			}
 		}
-		return &SchemaOrSchemaArray{Array: &m}
+		return &SchemaOrSchemaArray{SchemaArray: &m}
 	case map[string]interface{}:
 		s := NewSchemaFromObject(v)
 		return &SchemaOrSchemaArray{Schema: s}
@@ -432,7 +432,7 @@ func (schema *Schema) stringOrStringArrayValue(v interface{}) *StringOrStringArr
 		fmt.Printf("arrayOfStringsValue: unexpected type %T\n", v)
 	case []string:
 		s := &StringOrStringArray{}
-		s.Array = &v
+		s.StringArray = &v
 		return s
 	case string:
 		s := &StringOrStringArray{}
@@ -449,7 +449,7 @@ func (schema *Schema) stringOrStringArrayValue(v interface{}) *StringOrStringArr
 			}
 		}
 		s := &StringOrStringArray{}
-		s.Array = &a
+		s.StringArray = &a
 		return s
 	}
 	return nil
@@ -498,7 +498,7 @@ func (schema *Schema) mapOfSchemasOrStringArraysValue(v interface{}) *map[string
 					}
 				}
 				s := &SchemaOrStringArray{}
-				s.Array = &a
+				s.StringArray = &a
 				m[k2] = s
 			}
 		}
@@ -578,8 +578,8 @@ func (schema *Schema) displaySchema(indent string) string {
 	if schema.Items != nil {
 		result += indent + "items:\n"
 		items := schema.Items
-		if items.Array != nil {
-			for i, s := range *(items.Array) {
+		if items.SchemaArray != nil {
+			for i, s := range *(items.SchemaArray) {
 				result += indent + "  " + fmt.Sprintf("%d", i) + ":\n"
 				result += s.displaySchema(indent + "  " + "  ")
 			}
@@ -637,7 +637,7 @@ func (schema *Schema) displaySchema(indent string) string {
 				result += indent + "  " + name + ":\n"
 				result += s.displaySchema(indent + "  " + "  ")
 			} else {
-				a := schemaOrStringArray.Array
+				a := schemaOrStringArray.StringArray
 				if a != nil {
 					result += indent + "  " + name + ":\n"
 					for _, s2 := range *a {
@@ -731,9 +731,9 @@ func (schema *Schema) applyToSchemas(operation SchemaOperation, context string) 
 	}
 
 	if schema.Items != nil {
-		if schema.Items.Array != nil {
-			for _, s := range *(schema.Items.Array) {
-				s.applyToSchemas(operation, "Items.Array")
+		if schema.Items.SchemaArray != nil {
+			for _, s := range *(schema.Items.SchemaArray) {
+				s.applyToSchemas(operation, "Items.SchemaArray")
 			}
 		} else if schema.Items.Schema != nil {
 			schema.Items.Schema.applyToSchemas(operation, "Items.Schema")
@@ -901,14 +901,14 @@ func (destination *Schema) copyProperties(source *Schema) {
 	}
 }
 
-// Returns true if the "type" of a Schema includes the specified type
+// Returns true if the Type of a Schema includes the specified type
 func (schema *Schema) typeIs(typeName string) bool {
 	if schema.Type != nil {
-		// the type is either a string or an array of strings
+		// the schema Type is either a string or an array of strings
 		if schema.Type.String != nil {
 			return (*(schema.Type.String) == typeName)
-		} else if schema.Type.Array != nil {
-			for _, n := range *(schema.Type.Array) {
+		} else if schema.Type.StringArray != nil {
+			for _, n := range *(schema.Type.StringArray) {
 				if n == typeName {
 					return true
 				}
@@ -919,7 +919,7 @@ func (schema *Schema) typeIs(typeName string) bool {
 }
 
 // Resolves "$ref" elements in a Schema and its children.
-// But if a reference refers to an object type or is inside a oneOf,
+// But if a reference refers to an object type, is inside a oneOf, or contains a oneOf,
 // the reference is kept and we expect downstream tools to separately model these
 // referenced schemas.
 func (schema *Schema) resolveRefs() {
@@ -932,7 +932,7 @@ func (schema *Schema) resolveRefs() {
 				if schema.Ref != nil {
 					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
 					if resolvedRef.typeIs("object") {
-						// don't substitute, we'll model the referenced item with a class
+						// don't substitute for objects, we'll model the referenced schema with a class
 					} else if context == "OneOf" {
 						// don't substitute for references inside oneOf declarations
 					} else if resolvedRef.OneOf != nil {
@@ -995,7 +995,7 @@ func (schema *Schema) resolveAllOfs() {
 				}
 				schema.AllOf = nil
 			}
-		}, "")
+		}, "resolveAllOfs")
 }
 
 // Replaces all "anyOf" elements by merging their properties into the parent Schema.
@@ -1008,26 +1008,5 @@ func (schema *Schema) resolveAnyOfs() {
 				}
 				schema.AnyOf = nil
 			}
-		}, "")
-}
-
-// Flattens any "oneOf" elements that contain other "oneOf" elements.
-func (schema *Schema) flattenOneOfs() {
-	schema.applyToSchemas(
-		func(schema *Schema, context string) {
-			if schema.OneOf != nil {
-				newOneOfs := make([]*Schema, 0)
-				for _, oneOf := range *(schema.OneOf) {
-					innerOneOfs := oneOf.OneOf
-					if innerOneOfs != nil {
-						for _, innerOneOf := range *innerOneOfs {
-							newOneOfs = append(newOneOfs, innerOneOf)
-						}
-					} else {
-						newOneOfs = append(newOneOfs, oneOf)
-					}
-				}
-				schema.OneOf = &newOneOfs
-			}
-		}, "")
+		}, "resolveAnyOfs")
 }

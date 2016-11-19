@@ -113,10 +113,12 @@ func NewClassCollection(schema *Schema) *ClassCollection {
 	return cc
 }
 
+// Returns a capitalized name to use for a generated class
 func (classes *ClassCollection) classNameForStub(stub string) string {
 	return classes.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
 }
 
+// Returns a capitalized name to use for a generated class based on a JSON reference
 func (classes *ClassCollection) classNameForReference(reference string) string {
 	parts := strings.Split(reference, "/")
 	first := parts[0]
@@ -129,6 +131,7 @@ func (classes *ClassCollection) classNameForReference(reference string) string {
 	}
 }
 
+// Returns a property name to use for a JSON reference
 func (classes *ClassCollection) propertyNameForReference(reference string) *string {
 	parts := strings.Split(reference, "/")
 	first := parts[0]
@@ -141,28 +144,27 @@ func (classes *ClassCollection) propertyNameForReference(reference string) *stri
 	return nil
 }
 
-func (classes *ClassCollection) arrayTypeForSchema(propertyName string, schema *Schema) string {
-	// what is the array type?
-	log.Printf("Array type for %s\n%s", propertyName, schema.display())
-
+// Determines the item type for arrays defined by a schema
+func (classes *ClassCollection) arrayItemTypeForSchema(propertyName string, schema *Schema) string {
+	// default
 	itemTypeName := "Any"
 
 	if schema.Items != nil {
 
-		if schema.Items.Array != nil {
+		if schema.Items.SchemaArray != nil {
 
-			if len(*(schema.Items.Array)) > 0 {
-				ref := (*schema.Items.Array)[0].Ref
+			if len(*(schema.Items.SchemaArray)) > 0 {
+				ref := (*schema.Items.SchemaArray)[0].Ref
 				if ref != nil {
 					itemTypeName = classes.classNameForReference(*ref)
 				} else {
-					types := (*schema.Items.Array)[0].Type
+					types := (*schema.Items.SchemaArray)[0].Type
 					if types == nil {
 						// do nothing
-					} else if (types.Array != nil) && len(*(types.Array)) == 1 {
-						itemTypeName = (*types.Array)[0]
-					} else if (types.Array != nil) && len(*(types.Array)) > 1 {
-						itemTypeName = fmt.Sprintf("%+v", types.Array)
+					} else if (types.StringArray != nil) && len(*(types.StringArray)) == 1 {
+						itemTypeName = (*types.StringArray)[0]
+					} else if (types.StringArray != nil) && len(*(types.StringArray)) > 1 {
+						itemTypeName = fmt.Sprintf("%+v", types.StringArray)
 					} else if types.String != nil {
 						itemTypeName = *(types.String)
 					} else {
@@ -177,19 +179,16 @@ func (classes *ClassCollection) arrayTypeForSchema(propertyName string, schema *
 			if schema.Items.Schema.Ref != nil {
 				itemTypeName = classes.classNameForReference(*schema.Items.Schema.Ref)
 			} else if schema.Items.Schema.OneOf != nil {
-
+				// this type is implied by the "oneOf"
 				itemTypeName = classes.classNameForStub(propertyName + "Item")
-				log.Printf("IMPLIED ONEOF TYPE %s", itemTypeName)
-
 				classes.ObjectClassRequests[itemTypeName] =
 					NewClassRequest(itemTypeName, propertyName, schema.Items.Schema)
-
 			} else if types == nil {
 				// do nothing
-			} else if (types.Array != nil) && len(*(types.Array)) == 1 {
-				itemTypeName = (*types.Array)[0]
-			} else if (types.Array != nil) && len(*(types.Array)) > 1 {
-				itemTypeName = fmt.Sprintf("%+v", types.Array)
+			} else if (types.StringArray != nil) && len(*(types.StringArray)) == 1 {
+				itemTypeName = (*types.StringArray)[0]
+			} else if (types.StringArray != nil) && len(*(types.StringArray)) > 1 {
+				itemTypeName = fmt.Sprintf("%+v", types.StringArray)
 			} else if types.String != nil {
 				itemTypeName = *(types.String)
 			} else {
@@ -231,7 +230,7 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
 				} else if propertySchema.typeIs("array") {
 					// the property has an array type, so define it as a a repeated property of the specified type
-					propertyClassName := classes.arrayTypeForSchema(propertyName, propertySchema)
+					propertyClassName := classes.arrayItemTypeForSchema(propertyName, propertySchema)
 					classProperty := NewClassPropertyWithNameAndType(propertyName, propertyClassName)
 					classProperty.Repeated = true
 					classModel.Properties[propertyName] = classProperty
@@ -242,12 +241,11 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 				// an empty schema can contain anything, so add an accessor for a generic object
 				className := "Any"
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
-			} else if propertySchema.AnyOf != nil {
-				//self.writeAnyOfAccessors(schema: value, path: path, accessorName:accessorName)
-				log.Printf("ignoring %s.%s, which has an anyOf property in schema:\n%+v", classModel.Name, propertyName, propertySchema.display())
 			} else if propertySchema.OneOf != nil {
-				//self.writeOneOfAccessors(schema: value, path: path)
-				log.Printf("ignoring %s.%s, which has a oneOf property in schema:\n%+v", classModel.Name, propertyName, propertySchema.display())
+				anonymousObjectClassName := classes.classNameForStub(propertyName + "Item")
+				classes.ObjectClassRequests[anonymousObjectClassName] =
+					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
+				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
 			} else {
 				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.display())
 			}
