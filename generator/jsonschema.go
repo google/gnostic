@@ -934,7 +934,9 @@ func (schema *Schema) resolveRefs() {
 					if resolvedRef.typeIs("object") {
 						// don't substitute, we'll model the referenced item with a class
 					} else if context == "OneOf" {
-						// don't substitute, we'll model the referenced item with a class
+						// don't substitute for references inside oneOf declarations
+					} else if resolvedRef.OneOf != nil {
+						// don't substitute for references that contain oneOf declarations
 					} else {
 						schema.Ref = nil
 						schema.copyProperties(resolvedRef)

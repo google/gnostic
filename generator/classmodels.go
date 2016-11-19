@@ -141,11 +141,12 @@ func (classes *ClassCollection) propertyNameForReference(reference string) *stri
 	return nil
 }
 
-func (classes *ClassCollection) arrayTypeForSchema(schema *Schema) string {
+func (classes *ClassCollection) arrayTypeForSchema(propertyName string, schema *Schema) string {
 	// what is the array type?
-	log.Printf("Array type for\n%s", schema.display())
+	log.Printf("Array type for %s\n%s", propertyName, schema.display())
 
 	itemTypeName := "Any"
+
 	if schema.Items != nil {
 
 		if schema.Items.Array != nil {
@@ -171,24 +172,28 @@ func (classes *ClassCollection) arrayTypeForSchema(schema *Schema) string {
 			}
 
 		} else if schema.Items.Schema != nil {
+			types := schema.Items.Schema.Type
 
-			var ref *string
-			ref = schema.Items.Schema.Ref
-			if ref != nil {
-				itemTypeName = classes.classNameForReference(*ref)
+			if schema.Items.Schema.Ref != nil {
+				itemTypeName = classes.classNameForReference(*schema.Items.Schema.Ref)
+			} else if schema.Items.Schema.OneOf != nil {
+
+				itemTypeName = classes.classNameForStub(propertyName + "Item")
+				log.Printf("IMPLIED ONEOF TYPE %s", itemTypeName)
+
+				classes.ObjectClassRequests[itemTypeName] =
+					NewClassRequest(itemTypeName, propertyName, schema.Items.Schema)
+
+			} else if types == nil {
+				// do nothing
+			} else if (types.Array != nil) && len(*(types.Array)) == 1 {
+				itemTypeName = (*types.Array)[0]
+			} else if (types.Array != nil) && len(*(types.Array)) > 1 {
+				itemTypeName = fmt.Sprintf("%+v", types.Array)
+			} else if types.String != nil {
+				itemTypeName = *(types.String)
 			} else {
-				types := schema.Items.Schema.Type
-				if types == nil {
-					// do nothing
-				} else if (types.Array != nil) && len(*(types.Array)) == 1 {
-					itemTypeName = (*types.Array)[0]
-				} else if (types.Array != nil) && len(*(types.Array)) > 1 {
-					itemTypeName = fmt.Sprintf("%+v", types.Array)
-				} else if types.String != nil {
-					itemTypeName = *(types.String)
-				} else {
-					itemTypeName = "UNKNOWN"
-				}
+				itemTypeName = "UNKNOWN"
 			}
 		}
 
@@ -226,7 +231,7 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
 				} else if propertySchema.typeIs("array") {
 					// the property has an array type, so define it as a a repeated property of the specified type
-					propertyClassName := classes.arrayTypeForSchema(propertySchema)
+					propertyClassName := classes.arrayTypeForSchema(propertyName, propertySchema)
 					classProperty := NewClassPropertyWithNameAndType(propertyName, propertyClassName)
 					classProperty.Repeated = true
 					classModel.Properties[propertyName] = classProperty
@@ -259,6 +264,8 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *Schema) {
 	if schema.PatternProperties != nil {
 		for propertyPattern, propertySchema := range *(schema.PatternProperties) {
+
+			log.Printf("BUILDING %+v\n%+v", propertyPattern, propertySchema.display())
 			className := "Any"
 			propertyName := classes.PatternNames[propertyPattern]
 			if propertySchema.Ref != nil {
@@ -318,6 +325,7 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	}
 	log.Printf("buildOneOfAccessors(%+v, %+v)", classModel, oneOfs)
 	for _, oneOf := range *oneOfs {
+		log.Printf("%+v", oneOf.display())
 		if oneOf.Ref != nil {
 			ref := *oneOf.Ref
 			className := classes.classNameForReference(ref)
@@ -341,11 +349,7 @@ func (classes *ClassCollection) buildClassForDefinition(
 	className string,
 	propertyName string,
 	schema *Schema) *ClassModel {
-	if schema.Type == nil {
-		return classes.buildClassForDefinitionObject(className, propertyName, schema)
-	}
-	typeString := *schema.Type.String
-	if typeString == "object" {
+	if (schema.Type == nil) || (*schema.Type.String == "object") {
 		return classes.buildClassForDefinitionObject(className, propertyName, schema)
 	} else {
 		return nil
