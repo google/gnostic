@@ -17,7 +17,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"regexp"
 	"sort"
 	"strings"
 )
@@ -435,37 +434,4 @@ func (classes *ClassCollection) display() string {
 		result += classes.ClassModels[k].display()
 	}
 	return result
-}
-
-func camelCaseToSnakeCase(input string) string {
-	var out = ""
-
-	for index, runeValue := range input {
-		//fmt.Printf("%#U starts at byte position %d\n", runeValue, index)
-		if runeValue >= 'A' && runeValue <= 'Z' {
-			if index > 0 {
-				out += "_"
-			}
-			out += string(runeValue - 'A' + 'a')
-		} else {
-			out += string(runeValue)
-		}
-
-	}
-	return out
-}
-
-func mapTypeInfo(typeName string) (isMap bool, valueTypeName string) {
-	r, err := regexp.Compile("^map<string, (.*)>$")
-	if err != nil {
-		panic(err)
-	}
-	match := r.FindStringSubmatch(typeName)
-	if len(match) != 2 {
-		isMap = false
-	} else {
-		isMap = true
-		valueTypeName = match[1]
-	}
-	return
 }
