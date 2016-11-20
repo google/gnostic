@@ -28,6 +28,7 @@ type ClassRequest struct {
 	Name         string
 	PropertyName string // name of a property that refers to this class
 	Schema       *Schema
+	OneOfWrapper bool
 }
 
 func NewClassRequest(name string, propertyName string, schema *Schema) *ClassRequest {
@@ -64,9 +65,10 @@ func NewClassPropertyWithNameTypeAndPattern(name string, typeName string, patter
 
 // models classes
 type ClassModel struct {
-	Name       string
-	Properties map[string]*ClassProperty
-	Required   []string
+	Name         string
+	Properties   map[string]*ClassProperty
+	Required     []string
+	OneOfWrapper bool
 }
 
 func (classModel *ClassModel) sortedPropertyNames() []string {
@@ -322,6 +324,7 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 		return
 	}
 	log.Printf("buildOneOfAccessors(%+v, %+v)", classModel, oneOfs)
+	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
 		log.Printf("%+v", oneOf.display())
 		if oneOf.Ref != nil {

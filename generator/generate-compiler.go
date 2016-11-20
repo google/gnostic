@@ -41,6 +41,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.AddLine("func build%sForMap(in interface{}) *pb.%s {", className, className)
 		code.AddLine("m, keys, ok := unpackMap(in)")
 		code.AddLine("if (!ok) {")
+		code.AddLine("log.Printf(\"unexpected argument to build%sForMap: %%+v\", in)", className)
 		code.AddLine("log.Printf(\"%%d\\n\", len(m))")
 		code.AddLine("log.Printf(\"%%+v\\n\", keys)")
 		code.AddLine("return nil")
@@ -48,6 +49,10 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.AddLine("  x := &pb.%s{}", className)
 
 		classModel := classes.ClassModels[className]
+		parentClassName := className
+
+		oneOfWrapper := classModel.OneOfWrapper
+
 		propertyNames := classModel.sortedPropertyNames()
 		var fieldNumber = 0
 		for _, propertyName := range propertyNames {
@@ -77,16 +82,28 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				fieldName = "XRef"
 			}
 
-			if propertyModel.Pattern == "" {
+			if propertyModel.Pattern == "" && !oneOfWrapper {
 				code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 			}
 
 			classModel, classFound := classes.ClassModels[propertyType]
 			if classFound {
 				if propertyModel.Repeated {
-					code.AddLine("// TODO: repeated class %s", classModel.Name)
+					code.AddLine("// repeated class %s", classModel.Name)
+					code.AddLine("x.%s = make([]*pb.%s, 0)", fieldName, classModel.Name)
+					code.AddLine("a, ok := m[\"%s\"].([]interface{})", propertyName)
+					code.AddLine("if ok {")
+					code.AddLine("for _, item := range a {")
+					code.AddLine("x.%s = append(x.%s, build%sForMap(item))", fieldName, fieldName, classModel.Name)
+					code.AddLine("}")
+					code.AddLine("}")
 				} else {
-					code.AddLine("x.%s = build%sForMap(m[\"%v\"])", fieldName, classModel.Name, propertyName)
+					if oneOfWrapper {
+						code.AddLine("x.Oneof = &pb.%s_%s{%s: build%sForMap(m)}",
+							parentClassName, classModel.Name, classModel.Name, classModel.Name)
+					} else {
+						code.AddLine("x.%s = build%sForMap(m[\"%v\"])", fieldName, classModel.Name, propertyName)
+					}
 				}
 			} else if propertyType == "string" {
 				if propertyModel.Repeated {
@@ -100,7 +117,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.AddLine("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
 				}
 			} else if propertyType == "float" {
-				code.AddLine("x.%s = m[\"%v\"].(float32)", fieldName, propertyName)
+				code.AddLine("x.%s = m[\"%v\"].(float64)", fieldName, propertyName)
 
 			} else if propertyType == "int64" {
 				code.AddLine("x.%s = m[\"%v\"].(int64)", fieldName, propertyName)
@@ -132,7 +149,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				}
 			}
 
-			if propertyModel.Pattern == "" {
+			if propertyModel.Pattern == "" && !oneOfWrapper {
 				code.AddLine("}")
 			}
 		}
@@ -140,15 +157,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.AddLine("  return x")
 		code.AddLine("}\n")
 	}
-
-	//document.Swagger = "2.0"
-	//document.BasePath = "example.com"
-
-	//info := &pb.Info{}
-	//info.Title = "Sample API"
-	//info.Description = "My great new API"
-	//info.Version = "v1.0"
-	//document.Info = info
 
 	return code.Text()
 }

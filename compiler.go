@@ -22,9 +22,37 @@ import (
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"os"
+	"sort"
 
 	pb "openapi"
 )
+
+func PrintMap(in interface{}, indent string) {
+	m, ok := in.(map[string]interface{})
+	if ok {
+		keys := make([]string, 0)
+		for k, _ := range m {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			v := m[k]
+			fmt.Printf("%s%s:\n", indent, k)
+			PrintMap(v, indent+"  ")
+		}
+		return
+	}
+	a, ok := in.([]interface{})
+	if ok {
+		for i, v := range a {
+			fmt.Printf("%s%d:\n", indent, i)
+			PrintMap(v, indent+"  ")
+		}
+		return
+	}
+	fmt.Printf("%s%+v\n", indent, in)
+
+}
 
 func ReadDocumentFromFile(filename string) *pb.Document {
 	examplesDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/openapi-compiler/examples"
@@ -36,7 +64,7 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 	var raw interface{}
 	json.Unmarshal(file, &raw)
 
-	//fmt.Printf("%+v\n", raw)
+	PrintMap(raw, "")
 
 	document := buildDocumentForMap(raw)
 	return document

@@ -35,6 +35,9 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 	for _, className := range classNames {
 		code.AddLine("message %s {", className)
 		classModel := classes.ClassModels[className]
+		if classModel.OneOfWrapper {
+			code.AddLine(" oneof oneof {")
+		}
 		propertyNames := classModel.sortedPropertyNames()
 		var fieldNumber = 0
 		for _, propertyName := range propertyNames {
@@ -43,6 +46,9 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 			propertyType := propertyModel.Type
 			if propertyType == "int" {
 				propertyType = "int64"
+			}
+			if propertyType == "float" {
+				propertyType = "double"
 			}
 			var displayName = propertyName
 			if displayName == "$ref" {
@@ -58,6 +64,9 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 				line = "repeated " + line
 			}
 			code.AddLine("  " + line)
+		}
+		if classModel.OneOfWrapper {
+			code.AddLine(" }")
 		}
 		code.AddLine("}")
 		code.AddLine()
