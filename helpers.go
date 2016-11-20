@@ -17,6 +17,7 @@
 package main
 
 import (
+	"log"
 	"regexp"
 	"sort"
 )
@@ -58,4 +59,32 @@ func patternMatches(pattern string, value string) bool {
 		panic(err)
 	}
 	return matched
+}
+
+func mapContainsAllKeys(m map[string]interface{}, keys []string) bool {
+	for _, k := range keys {
+		_, found := m[k]
+		if !found {
+			log.Printf("ERROR: map does not contain required key %s (%+v)", k, m)
+			return false
+		}
+	}
+	return true
+}
+
+func mapContainsOnlyKeys(m map[string]interface{}, keys []string) bool {
+	for k, _ := range m {
+		found := false
+		for _, k2 := range keys {
+			if k == k2 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			//log.Printf("ERROR: map contains unhandled key %s (allowed=%+v) (%+v)", k, keys, m)
+			//return false
+		}
+	}
+	return true
 }

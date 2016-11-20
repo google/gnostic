@@ -69,6 +69,7 @@ type ClassModel struct {
 	Properties   map[string]*ClassProperty
 	Required     []string
 	OneOfWrapper bool
+	Open         bool // open classes can have keys outside the specified set (pattern properties, etc)
 }
 
 func (classModel *ClassModel) sortedPropertyNames() []string {
@@ -263,8 +264,8 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 
 func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *Schema) {
 	if schema.PatternProperties != nil {
+		classModel.Open = true
 		for propertyPattern, propertySchema := range *(schema.PatternProperties) {
-
 			log.Printf("BUILDING %+v\n%+v", propertyPattern, propertySchema.display())
 			className := "Any"
 			propertyName := classes.PatternNames[propertyPattern]
@@ -279,6 +280,7 @@ func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassM
 
 func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *ClassModel, schema *Schema) {
 	if schema.AdditionalProperties != nil {
+		classModel.Open = true
 		if schema.AdditionalProperties.Boolean != nil {
 			if *schema.AdditionalProperties.Boolean == true {
 				propertyName := "additionalProperties"
@@ -341,6 +343,7 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 }
 
 func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, schema *Schema) {
+	classModel.Open = true
 	propertyName := "additionalProperties"
 	className := "map<string, Any>"
 	classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
@@ -414,7 +417,7 @@ func (classes *ClassCollection) build() {
 	anyClass.Name = "Any"
 	valueProperty := NewClassProperty()
 	valueProperty.Name = "value"
-	valueProperty.Type = "google.protobuf.Any"
+	valueProperty.Type = "string"
 	anyClass.Properties[valueProperty.Name] = valueProperty
 	classes.ClassModels[anyClass.Name] = anyClass
 }

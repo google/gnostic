@@ -27,7 +27,8 @@ import (
 	pb "openapi"
 )
 
-func PrintMap(in interface{}, indent string) {
+func DescribeMap(in interface{}, indent string) string {
+	description := ""
 	m, ok := in.(map[string]interface{})
 	if ok {
 		keys := make([]string, 0)
@@ -37,21 +38,21 @@ func PrintMap(in interface{}, indent string) {
 		sort.Strings(keys)
 		for _, k := range keys {
 			v := m[k]
-			fmt.Printf("%s%s:\n", indent, k)
-			PrintMap(v, indent+"  ")
+			description += fmt.Sprintf("%s%s:\n", indent, k)
+			description += DescribeMap(v, indent+"  ")
 		}
-		return
+		return description
 	}
 	a, ok := in.([]interface{})
 	if ok {
 		for i, v := range a {
-			fmt.Printf("%s%d:\n", indent, i)
-			PrintMap(v, indent+"  ")
+			description += fmt.Sprintf("%s%d:\n", indent, i)
+			description += DescribeMap(v, indent+"  ")
 		}
-		return
+		return description
 	}
-	fmt.Printf("%s%+v\n", indent, in)
-
+	description += fmt.Sprintf("%s%+v\n", indent, in)
+	return description
 }
 
 func ReadDocumentFromFile(filename string) *pb.Document {
@@ -64,7 +65,8 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 	var raw interface{}
 	json.Unmarshal(file, &raw)
 
-	PrintMap(raw, "")
+	rawDescription := DescribeMap(raw, "")
+	ioutil.WriteFile("petstore.txt", []byte(rawDescription), 0644)
 
 	document := buildDocumentForMap(raw)
 	return document
@@ -73,5 +75,5 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 func main() {
 	fmt.Printf("Version: %s\n", version())
 	document := ReadDocumentFromFile("petstore.json")
-	fmt.Printf("document: %+v\n", proto.MarshalTextString(document))
+	ioutil.WriteFile("petstore.pb", []byte(proto.MarshalTextString(document)), 0644)
 }

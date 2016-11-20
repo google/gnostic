@@ -46,7 +46,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.AddLine("log.Printf(\"%%+v\\n\", keys)")
 		code.AddLine("return nil")
 		code.AddLine("}")
-		code.AddLine("  x := &pb.%s{}", className)
 
 		classModel := classes.ClassModels[className]
 		parentClassName := className
@@ -54,6 +53,43 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		oneOfWrapper := classModel.OneOfWrapper
 
 		propertyNames := classModel.sortedPropertyNames()
+		if len(classModel.Required) > 0 {
+			// verify that map includes all required keys
+			keyString := ""
+			for _, k := range classModel.Required {
+				if keyString != "" {
+					keyString += ","
+				}
+				keyString += "\""
+				keyString += k
+				keyString += "\""
+			}
+			code.AddLine("requiredKeys := []string{%s}", keyString)
+			code.AddLine("if !mapContainsAllKeys(m, requiredKeys) {")
+			code.AddLine("return nil")
+			code.AddLine("}")
+		}
+
+		if !classModel.Open {
+			// verify that map has no unspecified keys
+			keyString := ""
+			for _, property := range classModel.Properties {
+				if keyString != "" {
+					keyString += ","
+				}
+				keyString += "\""
+				keyString += property.Name
+				keyString += "\""
+			}
+			// verify that map includes all required keys
+			code.AddLine("allowedKeys := []string{%s}", keyString)
+			code.AddLine("if !mapContainsOnlyKeys(m, allowedKeys) {")
+			code.AddLine("return nil")
+			code.AddLine("}")
+		}
+
+		code.AddLine("  x := &pb.%s{}", className)
+
 		var fieldNumber = 0
 		for _, propertyName := range propertyNames {
 			propertyModel := classModel.Properties[propertyName]
@@ -82,13 +118,10 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				fieldName = "XRef"
 			}
 
-			if propertyModel.Pattern == "" && !oneOfWrapper {
-				code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
-			}
-
 			classModel, classFound := classes.ClassModels[propertyType]
 			if classFound {
 				if propertyModel.Repeated {
+					code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 					code.AddLine("// repeated class %s", classModel.Name)
 					code.AddLine("x.%s = make([]*pb.%s, 0)", fieldName, classModel.Name)
 					code.AddLine("a, ok := m[\"%s\"].([]interface{})", propertyName)
@@ -97,34 +130,48 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.AddLine("x.%s = append(x.%s, build%sForMap(item))", fieldName, fieldName, classModel.Name)
 					code.AddLine("}")
 					code.AddLine("}")
+					code.AddLine("}")
 				} else {
 					if oneOfWrapper {
-						code.AddLine("x.Oneof = &pb.%s_%s{%s: build%sForMap(m)}",
-							parentClassName, classModel.Name, classModel.Name, classModel.Name)
+						code.AddLine("{")
+						code.AddLine("t := build%sForMap(m)", classModel.Name)
+						code.AddLine("if t != nil {")
+						code.AddLine("x.Oneof = &pb.%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
+						code.AddLine("}")
+						code.AddLine("}")
 					} else {
+						code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 						code.AddLine("x.%s = build%sForMap(m[\"%v\"])", fieldName, classModel.Name, propertyName)
+						code.AddLine("}")
 					}
 				}
 			} else if propertyType == "string" {
 				if propertyModel.Repeated {
+					code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 					code.AddLine("v, ok := m[\"%v\"].([]interface{})", propertyName)
 					code.AddLine("if ok {")
 					code.AddLine("x.%s = convertInterfaceArrayToStringArray(v)", fieldName)
 					code.AddLine("} else {")
 					code.AddLine(" log.Printf(\"unexpected: %%+v\", m[\"%v\"])", propertyName)
 					code.AddLine("}")
+					code.AddLine("}")
 				} else {
+					code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 					code.AddLine("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
+					code.AddLine("}")
 				}
 			} else if propertyType == "float" {
+				code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 				code.AddLine("x.%s = m[\"%v\"].(float64)", fieldName, propertyName)
-
+				code.AddLine("}")
 			} else if propertyType == "int64" {
+				code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 				code.AddLine("x.%s = m[\"%v\"].(int64)", fieldName, propertyName)
-
+				code.AddLine("}")
 			} else if propertyType == "bool" {
+				code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
 				code.AddLine("x.%s = m[\"%v\"].(bool)", fieldName, propertyName)
-
+				code.AddLine("}")
 			} else {
 				isMap, mapTypeName := mapTypeInfo(propertyType)
 				if isMap {
@@ -143,20 +190,13 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					}
 					code.AddLine("}")
 					code.AddLine("}")
-
 				} else {
 					code.AddLine("// TODO: %s", propertyType)
 				}
 			}
-
-			if propertyModel.Pattern == "" && !oneOfWrapper {
-				code.AddLine("}")
-			}
 		}
-
 		code.AddLine("  return x")
 		code.AddLine("}\n")
 	}
-
 	return code.Text()
 }
