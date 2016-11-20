@@ -44,8 +44,6 @@ func main() {
 	openapi_schema := NewSchemaFromFile("openapi-2.0.json")
 	openapi_schema.resolveRefs()
 	openapi_schema.resolveAllOfs()
-	openapi_schema.resolveAnyOfs()
-	//openapi_schema.flattenOneOfs()
 
 	// build a simplified model of the classes described by the schema
 	cc := NewClassCollection(openapi_schema)

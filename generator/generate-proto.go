@@ -28,8 +28,8 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 	code.AddLine()
 	code.AddLine("package " + packageName + ";")
 	code.AddLine()
-	code.AddLine("import \"google/protobuf/any.proto\";")
-	code.AddLine()
+	//code.AddLine("import \"google/protobuf/any.proto\";")
+	//code.AddLine()
 
 	classNames := classes.sortedClassNames()
 	for _, className := range classNames {
@@ -49,6 +49,9 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 			}
 			if propertyType == "float" {
 				propertyType = "double"
+			}
+			if propertyType == "blob" {
+				propertyType = "string"
 			}
 			var displayName = propertyName
 			if displayName == "$ref" {

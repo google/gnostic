@@ -101,6 +101,16 @@ type StringOrStringArray struct {
 	StringArray *[]string
 }
 
+func (s *StringOrStringArray) display() string {
+	if s.String != nil {
+		return *s.String
+	}
+	if s.StringArray != nil {
+		return strings.Join(*s.StringArray, ", ")
+	}
+	return ""
+}
+
 type SchemaOrStringArray struct {
 	Schema      *Schema
 	StringArray *[]string
@@ -457,7 +467,7 @@ func (schema *Schema) stringOrStringArrayValue(v interface{}) *StringOrStringArr
 
 // Gets an array of enum values from an interface{} value if possible.
 func (schema *Schema) arrayOfEnumValuesValue(v interface{}) *[]SchemaEnumValue {
-	a := make([]*SchemaEnumValue, 0)
+	a := make([]SchemaEnumValue, 0)
 	switch v := v.(type) {
 	default:
 		fmt.Printf("arrayOfEnumValuesValue: unexpected type %T\n", v)
@@ -467,13 +477,13 @@ func (schema *Schema) arrayOfEnumValuesValue(v interface{}) *[]SchemaEnumValue {
 			default:
 				fmt.Printf("arrayOfEnumValuesValue: unexpected type %T\n", v2)
 			case string:
-				a = append(a, &SchemaEnumValue{String: &v2})
+				a = append(a, SchemaEnumValue{String: &v2})
 			case bool:
-				a = append(a, &SchemaEnumValue{Bool: &v2})
+				a = append(a, SchemaEnumValue{Bool: &v2})
 			}
 		}
 	}
-	return nil
+	return &a
 }
 
 // Gets a map of schemas or string arrays from an interface{} value if possible.
@@ -652,14 +662,14 @@ func (schema *Schema) displaySchema(indent string) string {
 		result += indent + "enumeration:\n"
 		for _, value := range *(schema.Enumeration) {
 			if value.String != nil {
-				result += indent + "  " + fmt.Sprintf("%+v\n", value.String)
+				result += indent + "  " + fmt.Sprintf("%+v\n", *value.String)
 			} else {
-				result += indent + "  " + fmt.Sprintf("%+v\n", value.Bool)
+				result += indent + "  " + fmt.Sprintf("%+v\n", *value.Bool)
 			}
 		}
 	}
 	if schema.Type != nil {
-		result += indent + fmt.Sprintf("type: %+v\n", *(schema.Type))
+		result += indent + fmt.Sprintf("type: %+v\n", schema.Type.display())
 	}
 	if schema.AllOf != nil {
 		result += indent + "allOf:\n"
@@ -998,14 +1008,12 @@ func (schema *Schema) resolveAllOfs() {
 		}, "resolveAllOfs")
 }
 
-// Replaces all "anyOf" elements by merging their properties into the parent Schema.
+// Replaces all "anyOf" elements with "oneOf".
 func (schema *Schema) resolveAnyOfs() {
 	schema.applyToSchemas(
 		func(schema *Schema, context string) {
 			if schema.AnyOf != nil {
-				for _, anyOf := range *(schema.AnyOf) {
-					schema.copyProperties(anyOf)
-				}
+				schema.OneOf = schema.AnyOf
 				schema.AnyOf = nil
 			}
 		}, "resolveAnyOfs")

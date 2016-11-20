@@ -129,8 +129,7 @@ func (classes *ClassCollection) classNameForReference(reference string) string {
 	if first == "#" {
 		return classes.classNameForStub(last)
 	} else {
-		panic("no class name")
-		return ""
+		return "Schema"
 	}
 }
 
@@ -200,7 +199,6 @@ func (classes *ClassCollection) arrayItemTypeForSchema(propertyName string, sche
 		}
 
 	}
-	log.Printf("is %s\n", itemTypeName)
 	return itemTypeName
 }
 
@@ -266,7 +264,6 @@ func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassM
 	if schema.PatternProperties != nil {
 		classModel.Open = true
 		for propertyPattern, propertySchema := range *(schema.PatternProperties) {
-			log.Printf("BUILDING %+v\n%+v", propertyPattern, propertySchema.display())
 			className := "Any"
 			propertyName := classes.PatternNames[propertyPattern]
 			if propertySchema.Ref != nil {
@@ -325,7 +322,6 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	if oneOfs == nil {
 		return
 	}
-	log.Printf("buildOneOfAccessors(%+v, %+v)", classModel, oneOfs)
 	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
 		log.Printf("%+v", oneOf.display())
@@ -335,7 +331,6 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 			propertyName := classes.propertyNameForReference(ref)
 
 			if propertyName != nil {
-				log.Printf("property %s class %s", *propertyName, className)
 				classModel.Properties[*propertyName] = NewClassPropertyWithNameAndType(*propertyName, className)
 			}
 		}
@@ -415,9 +410,10 @@ func (classes *ClassCollection) build() {
 	// add a class for "Any"
 	anyClass := NewClassModel()
 	anyClass.Name = "Any"
+	anyClass.Open = true
 	valueProperty := NewClassProperty()
 	valueProperty.Name = "value"
-	valueProperty.Type = "string"
+	valueProperty.Type = "blob"
 	anyClass.Properties[valueProperty.Name] = valueProperty
 	classes.ClassModels[anyClass.Name] = anyClass
 }

@@ -182,13 +182,17 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.AddLine("x.%s = make(map[string]*pb.%s, 0)", fieldName, mapTypeName)
 					}
 					code.AddLine("for k, v := range m {")
-					code.AddLine("if patternMatches(\"%s\", k) {", propertyModel.Pattern)
+					if propertyModel.Pattern != "" {
+						code.AddLine("if patternMatches(\"%s\", k) {", propertyModel.Pattern)
+					}
 					if mapTypeName == "string" {
 						code.AddLine("x.%s[k] = v.(string)", fieldName)
 					} else {
 						code.AddLine("x.%s[k] = build%vForMap(v)", fieldName, mapTypeName)
 					}
-					code.AddLine("}")
+					if propertyModel.Pattern != "" {
+						code.AddLine("}")
+					}
 					code.AddLine("}")
 				} else {
 					code.AddLine("// TODO: %s", propertyType)
