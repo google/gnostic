@@ -66,6 +66,21 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			continue
 		}
 
+		if classModel.Name == "StringArray" {
+			code.AddLine("a, ok := in.([]interface{})")
+			code.AddLine("if ok {")
+			code.AddLine("x := &pb.StringArray{}")
+			code.AddLine("x.Value = make([]string, 0)")
+			code.AddLine("for _, s := range a {")
+			code.AddLine("x.Value = append(x.Value, s.(string))")
+			code.AddLine("}")
+			code.AddLine("return x")
+			code.AddLine("} else {")
+			code.AddLine("return nil")
+			code.AddLine("}")
+			code.AddLine("}")
+			continue
+		}
 		code.AddLine("m, keys, ok := unpackMap(in)")
 		code.AddLine("if (!ok) {")
 		code.AddLine("log.Printf(\"unexpected argument to build%s: %%+v\", in)", className)
