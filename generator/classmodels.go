@@ -318,7 +318,13 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 					}
 				}
 			} else if schema.OneOf != nil {
-				classes.buildOneOfAccessors(classModel, schema)
+				propertyClassName := classes.classNameForStub(classModel.Name + "Item")
+				propertyName := "additionalProperties"
+				className := fmt.Sprintf("map<string, %s>", propertyClassName)
+				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+
+				classes.ObjectClassRequests[propertyClassName] =
+					NewClassRequest(propertyClassName, propertyName, schema)
 			}
 		}
 	}
@@ -329,6 +335,7 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	if oneOfs == nil {
 		return
 	}
+	classModel.Open = true
 	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
 		//log.Printf("ONEOF\n%+v", oneOf.display())
