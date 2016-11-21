@@ -27,6 +27,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.AddLine("package main")
 	code.AddLine()
 	code.AddLine("import (")
+	code.AddLine("\"fmt\"")
 	code.AddLine("\"log\"")
 	code.AddLine("pb \"openapi\"")
 	code.AddLine(")")
@@ -38,7 +39,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 	classNames := classes.sortedClassNames()
 	for _, className := range classNames {
-		code.AddLine("func build%sForMap(in interface{}) *pb.%s {", className, className)
+		code.AddLine("func build%s(in interface{}) *pb.%s {", className, className)
 
 		classModel := classes.ClassModels[className]
 		parentClassName := className
@@ -57,9 +58,17 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			continue
 		}
 
+		if classModel.IsBlob {
+			code.AddLine("x := &pb.Any{}")
+			code.AddLine("x.Value = fmt.Sprintf(\"%%+v\", in)")
+			code.AddLine("return x")
+			code.AddLine("}")
+			continue
+		}
+
 		code.AddLine("m, keys, ok := unpackMap(in)")
 		code.AddLine("if (!ok) {")
-		code.AddLine("log.Printf(\"unexpected argument to build%sForMap: %%+v\", in)", className)
+		code.AddLine("log.Printf(\"unexpected argument to build%s: %%+v\", in)", className)
 		code.AddLine("log.Printf(\"%%d\\n\", len(m))")
 		code.AddLine("log.Printf(\"%%+v\\n\", keys)")
 		code.AddLine("return nil")
@@ -141,21 +150,21 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.AddLine("a, ok := m[\"%s\"].([]interface{})", propertyName)
 					code.AddLine("if ok {")
 					code.AddLine("for _, item := range a {")
-					code.AddLine("x.%s = append(x.%s, build%sForMap(item))", fieldName, fieldName, classModel.Name)
+					code.AddLine("x.%s = append(x.%s, build%s(item))", fieldName, fieldName, classModel.Name)
 					code.AddLine("}")
 					code.AddLine("}")
 					code.AddLine("}")
 				} else {
 					if oneOfWrapper {
 						code.AddLine("{")
-						code.AddLine("t := build%sForMap(m)", classModel.Name)
+						code.AddLine("t := build%s(m)", classModel.Name)
 						code.AddLine("if t != nil {")
 						code.AddLine("x.Oneof = &pb.%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
 						code.AddLine("}")
 						code.AddLine("}")
 					} else {
 						code.AddLine("if mapHasKey(m, \"%s\") {", propertyName)
-						code.AddLine("x.%s = build%sForMap(m[\"%v\"])", fieldName, classModel.Name, propertyName)
+						code.AddLine("x.%s = build%s(m[\"%v\"])", fieldName, classModel.Name, propertyName)
 						code.AddLine("}")
 					}
 				}
@@ -202,7 +211,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					if mapTypeName == "string" {
 						code.AddLine("x.%s[k] = v.(string)", fieldName)
 					} else {
-						code.AddLine("x.%s[k] = build%vForMap(v)", fieldName, mapTypeName)
+						code.AddLine("x.%s[k] = build%v(v)", fieldName, mapTypeName)
 					}
 					if propertyModel.Pattern != "" {
 						code.AddLine("}")

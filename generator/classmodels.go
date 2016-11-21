@@ -71,6 +71,7 @@ type ClassModel struct {
 	OneOfWrapper  bool
 	Open          bool // open classes can have keys outside the specified set (pattern properties, etc)
 	IsStringArray bool // ugly override
+	IsBlob        bool
 }
 
 func (classModel *ClassModel) sortedPropertyNames() []string {
@@ -494,6 +495,7 @@ func (classes *ClassCollection) build() {
 	anyClass := NewClassModel()
 	anyClass.Name = "Any"
 	anyClass.Open = true
+	anyClass.IsBlob = true
 	valueProperty := NewClassProperty()
 	valueProperty.Name = "value"
 	valueProperty.Type = "blob"

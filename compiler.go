@@ -68,7 +68,7 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 	rawDescription := DescribeMap(raw, "")
 	ioutil.WriteFile("petstore.txt", []byte(rawDescription), 0644)
 
-	document := buildDocumentForMap(raw)
+	document := buildDocument(raw)
 	return document
 }
 
