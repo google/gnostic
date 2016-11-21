@@ -65,11 +65,12 @@ func NewClassPropertyWithNameTypeAndPattern(name string, typeName string, patter
 
 // models classes
 type ClassModel struct {
-	Name         string
-	Properties   map[string]*ClassProperty
-	Required     []string
-	OneOfWrapper bool
-	Open         bool // open classes can have keys outside the specified set (pattern properties, etc)
+	Name          string
+	Properties    map[string]*ClassProperty
+	Required      []string
+	OneOfWrapper  bool
+	Open          bool // open classes can have keys outside the specified set (pattern properties, etc)
+	IsStringArray bool // ugly override
 }
 
 func (classModel *ClassModel) sortedPropertyNames() []string {
@@ -247,6 +248,11 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 				classes.ObjectClassRequests[anonymousObjectClassName] =
 					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
+			} else if propertySchema.AnyOf != nil {
+				anonymousObjectClassName := classes.classNameForStub(propertyName + "Item")
+				classes.ObjectClassRequests[anonymousObjectClassName] =
+					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
+				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
 			} else {
 				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.display())
 			}
@@ -324,7 +330,7 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	}
 	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
-		log.Printf("%+v", oneOf.display())
+		//log.Printf("ONEOF\n%+v", oneOf.display())
 		if oneOf.Ref != nil {
 			ref := *oneOf.Ref
 			className := classes.classNameForReference(ref)
@@ -334,6 +340,82 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 				classModel.Properties[*propertyName] = NewClassPropertyWithNameAndType(*propertyName, className)
 			}
 		}
+	}
+}
+
+func schemaIsContainedInArray(s1 *Schema, s2 *Schema) bool {
+	if s2.typeIs("array") {
+		if s2.Items.Schema != nil {
+			if s1.isEqual(s2.Items.Schema) {
+				return true
+			} else {
+				return false
+			}
+		} else {
+			return false
+		}
+	} else {
+		return false
+	}
+}
+
+func (classes *ClassCollection) addAnonymousAccessorForSchema(
+	classModel *ClassModel,
+	schema *Schema,
+	repeated bool) {
+	ref := schema.Ref
+	if ref != nil {
+		className := classes.classNameForReference(*ref)
+		propertyName := classes.propertyNameForReference(*ref)
+		if propertyName != nil {
+			property := NewClassPropertyWithNameAndType(*propertyName, className)
+			property.Repeated = true
+			classModel.Properties[*propertyName] = property
+		}
+	} else {
+		className := "string"
+		propertyName := "value"
+		property := NewClassPropertyWithNameAndType(propertyName, className)
+		property.Repeated = true
+		classModel.Properties[propertyName] = property
+		classModel.IsStringArray = true
+	}
+}
+
+func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, schema *Schema) {
+	anyOfs := schema.AnyOf
+	if anyOfs == nil {
+		return
+	}
+	if len(*anyOfs) == 2 {
+		if schemaIsContainedInArray((*anyOfs)[0], (*anyOfs)[1]) {
+			log.Printf("ARRAY OF %+v", (*anyOfs)[0].display())
+			schema := (*anyOfs)[0]
+			classes.addAnonymousAccessorForSchema(classModel, schema, true)
+		} else if schemaIsContainedInArray((*anyOfs)[1], (*anyOfs)[0]) {
+			log.Printf("ARRAY OF %+v", (*anyOfs)[1].display())
+			schema := (*anyOfs)[1]
+			classes.addAnonymousAccessorForSchema(classModel, schema, true)
+		} else {
+			for _, anyOf := range *anyOfs {
+				ref := anyOf.Ref
+				if ref != nil {
+					className := classes.classNameForReference(*ref)
+					propertyName := classes.propertyNameForReference(*ref)
+					if propertyName != nil {
+						property := NewClassPropertyWithNameAndType(*propertyName, className)
+						classModel.Properties[*propertyName] = property
+					}
+				} else {
+					className := "bool"
+					propertyName := "boolean"
+					property := NewClassPropertyWithNameAndType(propertyName, className)
+					classModel.Properties[propertyName] = property
+				}
+			}
+		}
+	} else {
+		log.Printf("Unhandled anyOfs:\n%s", schema.display())
 	}
 }
 
@@ -369,6 +451,7 @@ func (classes *ClassCollection) buildClassForDefinitionObject(
 		classes.buildPatternPropertyAccessors(classModel, schema)
 		classes.buildAdditionalPropertyAccessors(classModel, schema)
 		classes.buildOneOfAccessors(classModel, schema)
+		classes.buildAnyOfAccessors(classModel, schema)
 	}
 	return classModel
 }

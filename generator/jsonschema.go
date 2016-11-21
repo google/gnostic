@@ -285,6 +285,10 @@ func (schema *Schema) isEmpty() bool {
 		(schema.Ref == nil)
 }
 
+func (schema *Schema) isEqual(schema2 *Schema) bool {
+	return schema.display() == schema2.display()
+}
+
 //
 // BUILDERS
 // The following methods build elements of Schemas from interface{} values.

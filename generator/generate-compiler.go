@@ -39,6 +39,24 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	classNames := classes.sortedClassNames()
 	for _, className := range classNames {
 		code.AddLine("func build%sForMap(in interface{}) *pb.%s {", className, className)
+
+		classModel := classes.ClassModels[className]
+		parentClassName := className
+
+		if classModel.IsStringArray {
+			code.AddLine("value, ok := in.(string)")
+			code.AddLine("x := &pb.TypeItem{}")
+			code.AddLine("if ok {")
+			code.AddLine("x.Value = make([]string, 0)")
+			code.AddLine("x.Value = append(x.Value, value)")
+			code.AddLine("} else {")
+			code.AddLine("log.Printf(\"unexpected: %+v\", in)")
+			code.AddLine("}")
+			code.AddLine("return x")
+			code.AddLine("}")
+			continue
+		}
+
 		code.AddLine("m, keys, ok := unpackMap(in)")
 		code.AddLine("if (!ok) {")
 		code.AddLine("log.Printf(\"unexpected argument to build%sForMap: %%+v\", in)", className)
@@ -46,10 +64,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.AddLine("log.Printf(\"%%+v\\n\", keys)")
 		code.AddLine("return nil")
 		code.AddLine("}")
-
-		classModel := classes.ClassModels[className]
-		parentClassName := className
-
 		oneOfWrapper := classModel.OneOfWrapper
 
 		propertyNames := classModel.sortedPropertyNames()
