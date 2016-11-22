@@ -18,16 +18,18 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"os"
+	"path"
 	"sort"
+	"strings"
 
-	pb "openapi"
+	"github.com/golang/protobuf/proto"
 )
 
-func DescribeMap(in interface{}, indent string) string {
+func describeMap(in interface{}, indent string) string {
 	description := ""
 	m, ok := in.(map[string]interface{})
 	if ok {
@@ -39,7 +41,7 @@ func DescribeMap(in interface{}, indent string) string {
 		for _, k := range keys {
 			v := m[k]
 			description += fmt.Sprintf("%s%s:\n", indent, k)
-			description += DescribeMap(v, indent+"  ")
+			description += describeMap(v, indent+"  ")
 		}
 		return description
 	}
@@ -47,7 +49,7 @@ func DescribeMap(in interface{}, indent string) string {
 	if ok {
 		for i, v := range a {
 			description += fmt.Sprintf("%s%d:\n", indent, i)
-			description += DescribeMap(v, indent+"  ")
+			description += describeMap(v, indent+"  ")
 		}
 		return description
 	}
@@ -55,25 +57,41 @@ func DescribeMap(in interface{}, indent string) string {
 	return description
 }
 
-func ReadDocumentFromFile(filename string) *pb.Document {
-	examplesDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/openapi-compiler/examples"
-	file, e := ioutil.ReadFile(examplesDir + "/" + filename)
+func readFile(filename string) interface{} {
+	file, e := ioutil.ReadFile(filename)
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)
 		os.Exit(1)
 	}
 	var raw interface{}
 	json.Unmarshal(file, &raw)
-
-	rawDescription := DescribeMap(raw, "")
-	ioutil.WriteFile("petstore.txt", []byte(rawDescription), 0644)
-
-	document := buildDocument(raw)
-	return document
+	return raw
 }
 
 func main() {
-	fmt.Printf("Compiling %s\n", version())
-	document := ReadDocumentFromFile("petstore.json")
-	ioutil.WriteFile("petstore.pb", []byte(proto.MarshalTextString(document)), 0644)
+	var input = flag.String("input", "", "OpenAPI source file to read")
+	var rawInput = flag.Bool("raw", false, "Output the raw json input")
+	var textProtobuf = flag.Bool("text", false, "Output a text protobuf representation")
+	flag.Parse()
+
+	if *input == "" {
+		flag.PrintDefaults()
+		return
+	}
+
+	fmt.Printf("Compiling %s (%s)\n", *input, version())
+
+	raw := readFile(*input)
+	if *rawInput {
+		rawDescription := describeMap(raw, "")
+		rawFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".raw"
+		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
+	}
+
+	document := buildDocument(raw)
+
+	if *textProtobuf {
+		textProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".text"
+		ioutil.WriteFile(textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
+	}
 }
