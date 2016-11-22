@@ -35,7 +35,7 @@ func (c *Code) Print(args ...interface{}) {
 	c.text += "\n"
 }
 
-func (c *Code) Text() string {
+func (c *Code) String() string {
 	return c.text
 }
 

@@ -80,5 +80,5 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 		code.Print("}")
 		code.Print()
 	}
-	return code.Text()
+	return code.String()
 }

@@ -254,5 +254,5 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("  return x")
 		code.Print("}\n")
 	}
-	return code.Text()
+	return code.String()
 }
