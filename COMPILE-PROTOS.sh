@@ -17,8 +17,6 @@
 
 go get github.com/golang/protobuf/protoc-gen-go
 
-# mkdir -p $GOPATH/src/openapi
-
 protoc \
 --go_out=:. \
 OpenAPIv2/OpenAPIv2.proto 
