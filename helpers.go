@@ -65,16 +65,17 @@ func mapContainsAllKeys(m map[string]interface{}, keys []string) bool {
 	for _, k := range keys {
 		_, found := m[k]
 		if !found {
-			log.Printf("ERROR: map does not contain required key %s (%+v)", k, m)
+			//log.Printf("ERROR: map does not contain required key %s (%+v)", k, m)
 			return false
 		}
 	}
 	return true
 }
 
-func mapContainsOnlyKeys(m map[string]interface{}, keys []string) bool {
+func mapContainsOnlyKeysAndPatterns(m map[string]interface{}, keys []string, patterns []string) bool {
 	for k, _ := range m {
 		found := false
+		// does the key match an allowed key
 		for _, k2 := range keys {
 			if k == k2 {
 				found = true
@@ -82,8 +83,18 @@ func mapContainsOnlyKeys(m map[string]interface{}, keys []string) bool {
 			}
 		}
 		if !found {
-			//log.Printf("ERROR: map contains unhandled key %s (allowed=%+v) (%+v)", k, keys, m)
-			//return false
+			// does the key match an allowed pattern?
+			for _, pattern := range patterns {
+				if patternMatches(pattern, k) {
+					log.Printf("pattern %s matched %s", pattern, k)
+					found = true
+					break
+				}
+			}
+			if !found {
+				//log.Printf("ERROR: map contains unhandled key %s (allowed=%+v) (%+v)", k, keys, m)
+				return false
+			}
 		}
 	}
 	return true

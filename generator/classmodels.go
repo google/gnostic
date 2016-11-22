@@ -69,8 +69,9 @@ type ClassModel struct {
 	Properties    map[string]*ClassProperty
 	Required      []string
 	OneOfWrapper  bool
-	Open          bool // open classes can have keys outside the specified set (pattern properties, etc)
-	IsStringArray bool // ugly override
+	Open          bool     // open classes can have keys outside the specified set (pattern properties, etc)
+	OpenPatterns  []string // patterns for properties that we allow
+	IsStringArray bool     // ugly override
 	IsBlob        bool
 }
 
@@ -269,8 +270,9 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 
 func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *Schema) {
 	if schema.PatternProperties != nil {
-		classModel.Open = true
+		classModel.OpenPatterns = make([]string, 0)
 		for propertyPattern, propertySchema := range *(schema.PatternProperties) {
+			classModel.OpenPatterns = append(classModel.OpenPatterns, propertyPattern)
 			className := "Any"
 			propertyName := classes.PatternNames[propertyPattern]
 			if propertySchema.Ref != nil {
@@ -284,15 +286,16 @@ func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassM
 
 func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *ClassModel, schema *Schema) {
 	if schema.AdditionalProperties != nil {
-		classModel.Open = true
 		if schema.AdditionalProperties.Boolean != nil {
 			if *schema.AdditionalProperties.Boolean == true {
+				classModel.Open = true
 				propertyName := "additionalProperties"
 				className := "map<string, Any>"
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
 				return
 			}
 		} else if schema.AdditionalProperties.Schema != nil {
+			classModel.Open = true
 			schema := schema.AdditionalProperties.Schema
 			if schema.Ref != nil {
 				propertyName := "additionalProperties"

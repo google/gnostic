@@ -110,18 +110,30 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 		if !classModel.Open {
 			// verify that map has no unspecified keys
-			keyString := ""
+			allowedKeyString := ""
 			for _, property := range classModel.Properties {
-				if keyString != "" {
-					keyString += ","
+				if allowedKeyString != "" {
+					allowedKeyString += ","
 				}
-				keyString += "\""
-				keyString += property.Name
-				keyString += "\""
+				allowedKeyString += "\""
+				allowedKeyString += property.Name
+				allowedKeyString += "\""
 			}
-			// verify that map includes all required keys
-			code.AddLine("allowedKeys := []string{%s}", keyString)
-			code.AddLine("if !mapContainsOnlyKeys(m, allowedKeys) {")
+			allowedPatternString := ""
+			if classModel.OpenPatterns != nil {
+				for _, pattern := range classModel.OpenPatterns {
+					if allowedPatternString != "" {
+						allowedPatternString += ","
+					}
+					allowedPatternString += "\""
+					allowedPatternString += pattern
+					allowedPatternString += "\""
+				}
+			}
+			// verify that map includes only allowed keys and patterns
+			code.AddLine("allowedKeys := []string{%s}", allowedKeyString)
+			code.AddLine("allowedPatterns := []string{%s}", allowedPatternString)
+			code.AddLine("if !mapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
 			code.AddLine("return nil")
 			code.AddLine("}")
 		}
