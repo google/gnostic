@@ -39,6 +39,16 @@ func readFile(filename string) *pb.Document {
 	return document
 }
 
+func describeSchema(schema *pb.Schema, indent string) string {
+	result := ""
+	result += fmt.Sprintf(indent + "Properties\n")
+	for k, v := range schema.Properties.AdditionalProperties {
+		indent2 := indent + "  "
+		result += fmt.Sprintf(indent2+"%s %s\n", k, v)
+	}
+	return result
+}
+
 func main() {
 	var input = flag.String("input", "", "OpenAPI source file to read")
 	flag.Parse()
@@ -48,22 +58,29 @@ func main() {
 		return
 	}
 
+	indent := "-"
+
 	document := readFile(*input)
 
-	fmt.Printf("\n")
-	fmt.Printf("Info\n")
-	fmt.Printf("  Title %s\n", document.Info.Title)
-	fmt.Printf("  Description %s\n", document.Info.Description)
-	fmt.Printf("  Version %s\n", document.Info.Version)
-	fmt.Printf("  TermsOfService %s\n", document.Info.TermsOfService)
-	fmt.Printf("  Contact Email %s\n", document.Info.Contact.Email)
-	fmt.Printf("  License Name %s\n", document.Info.License.Name)
-	fmt.Printf("  License URL %s\n", document.Info.License.Url)
-	fmt.Printf("\n")
-	fmt.Printf("BasePath %+v\n", document.BasePath)
-	fmt.Printf("\n")
-
-	fmt.Printf("Paths\n")
+	fmt.Printf(indent+"BasePath %+v\n", document.BasePath)
+	fmt.Printf(indent+"Consumes %+v\n", document.Consumes)
+	fmt.Printf(indent + "Definitions\n")
+	for k, v := range document.Definitions.AdditionalProperties {
+		fmt.Printf(indent+"%s\n", k)
+		fmt.Printf(indent+"%s\n", describeSchema(v, indent+"  "))
+	}
+	fmt.Printf(indent+"ExternalDocs %+v\n", document.ExternalDocs)
+	fmt.Printf(indent+"Host %+v\n", document.Host)
+	fmt.Printf(indent + "Info\n")
+	fmt.Printf(indent+"Title %s\n", document.Info.Title)
+	fmt.Printf(indent+"Description %s\n", document.Info.Description)
+	fmt.Printf(indent+"Version %s\n", document.Info.Version)
+	fmt.Printf(indent+"TermsOfService %s\n", document.Info.TermsOfService)
+	fmt.Printf(indent+"Contact Email %s\n", document.Info.Contact.Email)
+	fmt.Printf(indent+"License Name %s\n", document.Info.License.Name)
+	fmt.Printf(indent+"License URL %s\n", document.Info.License.Url)
+	fmt.Printf(indent+"Parameters %+v\n", document.Parameters)
+	fmt.Printf(indent + "Paths\n")
 	for k, v := range document.Paths.Path {
 		fmt.Printf("  %+v\n", k)
 		if v.Get != nil {
@@ -80,4 +97,14 @@ func main() {
 		}
 		fmt.Printf("\n")
 	}
+	fmt.Printf("Produces %+v\n", document.Produces)
+	fmt.Printf("Responses %+v\n", document.Responses)
+	fmt.Printf("Schemes %+v\n", document.Schemes)
+	fmt.Printf("Security %+v\n", document.Security)
+	fmt.Printf("SecurityDefinitions %+v\n", document.SecurityDefinitions)
+	fmt.Printf("Swagger %+v\n", document.Swagger)
+	fmt.Printf("Tags %+v\n", document.Tags)
+
+	fmt.Printf("\n")
+
 }

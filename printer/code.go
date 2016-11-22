@@ -12,23 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package printer
 
 import (
 	"fmt"
 )
 
-type CodeBuilder struct {
-	text string
+const INDENT = "  "
+
+type Code struct {
+	text   string
+	indent int
 }
 
-func (c *CodeBuilder) AddLine(args ...interface{}) {
+func (c *Code) AddLine(args ...interface{}) {
 	if len(args) > 0 {
+		for i := 0; i < c.indent; i++ {
+			c.text += INDENT
+		}
 		c.text += fmt.Sprintf(args[0].(string), args[1:]...)
 	}
 	c.text += "\n"
 }
 
-func (c *CodeBuilder) Text() string {
+func (c *Code) Text() string {
 	return c.text
+}
+
+func (c *Code) Indent() {
+	c.indent += 1
+}
+
+func (c *Code) Unindent() {
+	c.indent -= 1
+	if c.indent < 0 {
+		c.indent = 0
+	}
 }
