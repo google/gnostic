@@ -25,7 +25,7 @@ type Code struct {
 	indent int
 }
 
-func (c *Code) AddLine(args ...interface{}) {
+func (c *Code) Print(args ...interface{}) {
 	if len(args) > 0 {
 		for i := 0; i < c.indent; i++ {
 			c.text += INDENT
@@ -43,7 +43,7 @@ func (c *Code) Indent() {
 	c.indent += 1
 }
 
-func (c *Code) Unindent() {
+func (c *Code) Outdent() {
 	c.indent -= 1
 	if c.indent < 0 {
 		c.indent = 0

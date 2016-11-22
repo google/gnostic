@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/googleapis/openapi-compiler/printer"
 
 	pb "openapi"
 )
@@ -39,14 +40,13 @@ func readFile(filename string) *pb.Document {
 	return document
 }
 
-func describeSchema(schema *pb.Schema, indent string) string {
-	result := ""
-	result += fmt.Sprintf(indent + "Properties\n")
+func printSchema(code *printer.Code, schema *pb.Schema) {
+	code.Print("Properties")
+	code.Indent()
 	for k, v := range schema.Properties.AdditionalProperties {
-		indent2 := indent + "  "
-		result += fmt.Sprintf(indent2+"%s %s\n", k, v)
+		code.Print("%s %s", k, v)
 	}
-	return result
+	code.Outdent()
 }
 
 func main() {
@@ -58,53 +58,59 @@ func main() {
 		return
 	}
 
-	indent := "-"
-
 	document := readFile(*input)
 
-	fmt.Printf(indent+"BasePath %+v\n", document.BasePath)
-	fmt.Printf(indent+"Consumes %+v\n", document.Consumes)
-	fmt.Printf(indent + "Definitions\n")
+	code := &printer.Code{}
+	code.Print("API REPORT")
+	code.Print("----------")
+	code.Print("BasePath %+v", document.BasePath)
+	code.Print("Consumes %+v", document.Consumes)
+	code.Print("Definitions")
+	code.Indent()
 	for k, v := range document.Definitions.AdditionalProperties {
-		fmt.Printf(indent+"%s\n", k)
-		fmt.Printf(indent+"%s\n", describeSchema(v, indent+"  "))
+		code.Print("%s", k)
+		code.Indent()
+		printSchema(code, v)
+		code.Outdent()
 	}
-	fmt.Printf(indent+"ExternalDocs %+v\n", document.ExternalDocs)
-	fmt.Printf(indent+"Host %+v\n", document.Host)
-	fmt.Printf(indent + "Info\n")
-	fmt.Printf(indent+"Title %s\n", document.Info.Title)
-	fmt.Printf(indent+"Description %s\n", document.Info.Description)
-	fmt.Printf(indent+"Version %s\n", document.Info.Version)
-	fmt.Printf(indent+"TermsOfService %s\n", document.Info.TermsOfService)
-	fmt.Printf(indent+"Contact Email %s\n", document.Info.Contact.Email)
-	fmt.Printf(indent+"License Name %s\n", document.Info.License.Name)
-	fmt.Printf(indent+"License URL %s\n", document.Info.License.Url)
-	fmt.Printf(indent+"Parameters %+v\n", document.Parameters)
-	fmt.Printf(indent + "Paths\n")
+	code.Outdent()
+	code.Print("ExternalDocs %+v", document.ExternalDocs)
+	code.Print("Host %+v", document.Host)
+	code.Print("Info")
+	code.Print("Title %s", document.Info.Title)
+	code.Print("Description %s", document.Info.Description)
+	code.Print("Version %s", document.Info.Version)
+	code.Print("TermsOfService %s", document.Info.TermsOfService)
+	code.Print("Contact Email %s", document.Info.Contact.Email)
+	code.Print("License Name %s", document.Info.License.Name)
+	code.Print("License URL %s", document.Info.License.Url)
+	code.Print("Parameters %+v", document.Parameters)
+	code.Print("Paths")
 	for k, v := range document.Paths.Path {
-		fmt.Printf("  %+v\n", k)
+		code.Print("%+v", k)
 		if v.Get != nil {
-			fmt.Printf("    GET %+v\n", v.Get.OperationId)
+			code.Print("GET %+v", v.Get.OperationId)
 			if v.Get.Description != "" {
-				fmt.Printf("      %s\n", v.Get.Description)
+				code.Print("%s", v.Get.Description)
 			}
 		}
 		if v.Post != nil {
-			fmt.Printf("    POST %+v\n", v.Post.OperationId)
+			code.Print("POST %+v", v.Post.OperationId)
 			if v.Post.Description != "" {
-				fmt.Printf("      %s\n", v.Post.Description)
+				code.Print("%s", v.Post.Description)
 			}
 		}
-		fmt.Printf("\n")
 	}
-	fmt.Printf("Produces %+v\n", document.Produces)
-	fmt.Printf("Responses %+v\n", document.Responses)
-	fmt.Printf("Schemes %+v\n", document.Schemes)
-	fmt.Printf("Security %+v\n", document.Security)
-	fmt.Printf("SecurityDefinitions %+v\n", document.SecurityDefinitions)
-	fmt.Printf("Swagger %+v\n", document.Swagger)
-	fmt.Printf("Tags %+v\n", document.Tags)
+	code.Print("Produces %+v", document.Produces)
+	code.Print("Responses %+v", document.Responses)
+	code.Print("Schemes %+v", document.Schemes)
+	code.Print("Security %+v", document.Security)
+	code.Print("SecurityDefinitions %+v", document.SecurityDefinitions)
+	code.Print("Swagger %+v", document.Swagger)
+	code.Print("Tags %+v", document.Tags)
 
-	fmt.Printf("\n")
+	code.Print("")
+
+	fmt.Printf("%s", code.Text())
 
 }
