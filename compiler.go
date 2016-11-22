@@ -72,6 +72,8 @@ func main() {
 	var input = flag.String("input", "", "OpenAPI source file to read")
 	var rawInput = flag.Bool("raw", false, "Output the raw json input")
 	var textProtobuf = flag.Bool("text", false, "Output a text protobuf representation")
+	var jsonProtobuf = flag.Bool("json", false, "Output a json protobuf representation")
+	var binaryProtobuf = flag.Bool("pb", false, "Output a binary protobuf representation")
 	flag.Parse()
 
 	if *input == "" {
@@ -93,5 +95,17 @@ func main() {
 	if *textProtobuf {
 		textProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".text"
 		ioutil.WriteFile(textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
+	}
+
+	if *jsonProtobuf {
+		jsonProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".json"
+		jsonBytes, _ := json.Marshal(document)
+		ioutil.WriteFile(jsonProtoFileName, jsonBytes, 0644)
+	}
+
+	if *binaryProtobuf {
+		binaryProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".pb"
+		protoBytes, _ := proto.Marshal(document)
+		ioutil.WriteFile(binaryProtoFileName, protoBytes, 0644)
 	}
 }
