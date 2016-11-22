@@ -17,7 +17,7 @@
 package main
 
 import (
-	"log"
+	// "log"
 	"regexp"
 	"sort"
 )
@@ -86,7 +86,7 @@ func mapContainsOnlyKeysAndPatterns(m map[string]interface{}, keys []string, pat
 			// does the key match an allowed pattern?
 			for _, pattern := range patterns {
 				if patternMatches(pattern, k) {
-					log.Printf("pattern %s matched %s", pattern, k)
+					//log.Printf("pattern %s matched %s", pattern, k)
 					found = true
 					break
 				}

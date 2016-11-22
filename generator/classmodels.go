@@ -25,10 +25,10 @@ import (
 
 // models classes that we encounter during traversal that have no named schema
 type ClassRequest struct {
-	Name         string
-	PropertyName string // name of a property that refers to this class
-	Schema       *Schema
-	OneOfWrapper bool
+	Name         string  // name of class to be created
+	PropertyName string  // name of a property that refers to this class
+	Schema       *Schema // schema for class
+	OneOfWrapper bool    // true if the class wraps "oneOfs"
 }
 
 func NewClassRequest(name string, propertyName string, schema *Schema) *ClassRequest {
@@ -37,10 +37,10 @@ func NewClassRequest(name string, propertyName string, schema *Schema) *ClassReq
 
 // models class properties, eg. fields
 type ClassProperty struct {
-	Name     string
-	Type     string
-	Repeated bool
-	Pattern  string
+	Name     string // name of property
+	Type     string // type for property (scalar or message type)
+	Repeated bool   // true if this property is repeated (an array)
+	Pattern  string // if the property is a pattern property, names must match this pattern.
 }
 
 func (classProperty *ClassProperty) display() string {
@@ -65,14 +65,14 @@ func NewClassPropertyWithNameTypeAndPattern(name string, typeName string, patter
 
 // models classes
 type ClassModel struct {
-	Name          string
-	Properties    map[string]*ClassProperty
-	Required      []string
-	OneOfWrapper  bool
-	Open          bool     // open classes can have keys outside the specified set (pattern properties, etc)
-	OpenPatterns  []string // patterns for properties that we allow
-	IsStringArray bool     // ugly override
-	IsBlob        bool
+	Name          string                    // class name
+	Properties    map[string]*ClassProperty // map of properties
+	Required      []string                  // required property names
+	OneOfWrapper  bool                      // true if this class wraps "oneof" properties
+	Open          bool                      // open classes can have keys outside the specified set
+	OpenPatterns  []string                  // patterns for properties that we allow
+	IsStringArray bool                      // ugly override
+	IsBlob        bool                      // ugly override
 }
 
 func (classModel *ClassModel) sortedPropertyNames() []string {
@@ -101,19 +101,17 @@ func NewClassModel() *ClassModel {
 
 // models a collection of classes that is defined by a schema
 type ClassCollection struct {
-	ClassModels         map[string]*ClassModel
-	Prefix              string
-	Schema              *Schema
-	PatternNames        map[string]string
-	ClassNames          []string
-	ObjectClassRequests map[string]*ClassRequest
+	ClassModels         map[string]*ClassModel   // models of the classes in the collection
+	Prefix              string                   // class prefix to use
+	Schema              *Schema                  // top-level schema
+	PatternNames        map[string]string        // a configured mapping from patterns to property names
+	ObjectClassRequests map[string]*ClassRequest // anonymous classes implied by class instantiation
 }
 
 func NewClassCollection(schema *Schema) *ClassCollection {
 	cc := &ClassCollection{}
 	cc.ClassModels = make(map[string]*ClassModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
-	cc.ClassNames = make([]string, 0)
 	cc.ObjectClassRequests = make(map[string]*ClassRequest, 0)
 	cc.Schema = schema
 	return cc

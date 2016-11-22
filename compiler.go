@@ -73,7 +73,7 @@ func ReadDocumentFromFile(filename string) *pb.Document {
 }
 
 func main() {
-	fmt.Printf("Version: %s\n", version())
+	fmt.Printf("Compiling %s\n", version())
 	document := ReadDocumentFromFile("petstore.json")
 	ioutil.WriteFile("petstore.pb", []byte(proto.MarshalTextString(document)), 0644)
 }
