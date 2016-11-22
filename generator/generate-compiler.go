@@ -32,6 +32,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print("\"fmt\"")
 	code.Print("\"log\"")
 	code.Print("pb \"openapi\"")
+	code.Print("\"github.com/googleapis/openapi-compiler/helpers\"")
 	code.Print(")")
 	code.Print()
 	code.Print("func version() string {")
@@ -83,7 +84,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("}")
 			continue
 		}
-		code.Print("m, keys, ok := unpackMap(in)")
+		code.Print("m, keys, ok := helpers.UnpackMap(in)")
 		code.Print("if (!ok) {")
 		code.Print("log.Printf(\"unexpected argument to build%s: %%+v\", in)", className)
 		code.Print("log.Printf(\"%%d\\n\", len(m))")
@@ -105,7 +106,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				keyString += "\""
 			}
 			code.Print("requiredKeys := []string{%s}", keyString)
-			code.Print("if !mapContainsAllKeys(m, requiredKeys) {")
+			code.Print("if !helpers.MapContainsAllKeys(m, requiredKeys) {")
 			code.Print("return nil")
 			code.Print("}")
 		}
@@ -135,7 +136,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			// verify that map includes only allowed keys and patterns
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
 			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
-			code.Print("if !mapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
+			code.Print("if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
 			code.Print("return nil")
 			code.Print("}")
 		}
@@ -173,7 +174,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			classModel, classFound := classes.ClassModels[propertyType]
 			if classFound {
 				if propertyModel.Repeated {
-					code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 					code.Print("// repeated class %s", classModel.Name)
 					code.Print("x.%s = make([]*pb.%s, 0)", fieldName, classModel.Name)
 					code.Print("a, ok := m[\"%s\"].([]interface{})", propertyName)
@@ -192,36 +193,36 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("}")
 						code.Print("}")
 					} else {
-						code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+						code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 						code.Print("x.%s = build%s(m[\"%v\"])", fieldName, classModel.Name, propertyName)
 						code.Print("}")
 					}
 				}
 			} else if propertyType == "string" {
 				if propertyModel.Repeated {
-					code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 					code.Print("v, ok := m[\"%v\"].([]interface{})", propertyName)
 					code.Print("if ok {")
-					code.Print("x.%s = convertInterfaceArrayToStringArray(v)", fieldName)
+					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
 					code.Print(" log.Printf(\"unexpected: %%+v\", m[\"%v\"])", propertyName)
 					code.Print("}")
 					code.Print("}")
 				} else {
-					code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 					code.Print("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
-				code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 				code.Print("x.%s = m[\"%v\"].(float64)", fieldName, propertyName)
 				code.Print("}")
 			} else if propertyType == "int64" {
-				code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 				code.Print("x.%s = m[\"%v\"].(int64)", fieldName, propertyName)
 				code.Print("}")
 			} else if propertyType == "bool" {
-				code.Print("if mapHasKey(m, \"%s\") {", propertyName)
+				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 				code.Print("x.%s = m[\"%v\"].(bool)", fieldName, propertyName)
 				code.Print("}")
 			} else {
@@ -235,7 +236,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					}
 					code.Print("for k, v := range m {")
 					if propertyModel.Pattern != "" {
-						code.Print("if patternMatches(\"%s\", k) {", propertyModel.Pattern)
+						code.Print("if helpers.PatternMatches(\"%s\", k) {", propertyModel.Pattern)
 					}
 					if mapTypeName == "string" {
 						code.Print("x.%s[k] = v.(string)", fieldName)

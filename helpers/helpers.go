@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate ./COMPILE-PROTOS.sh
-
-package main
+package helpers
 
 import (
 	// "log"
@@ -24,7 +22,7 @@ import (
 
 // compiler helper functions, usually called from generated code
 
-func unpackMap(in interface{}) (map[string]interface{}, []string, bool) {
+func UnpackMap(in interface{}) (map[string]interface{}, []string, bool) {
 	m, ok := in.(map[string]interface{})
 	if !ok {
 		return nil, nil, ok
@@ -37,12 +35,12 @@ func unpackMap(in interface{}) (map[string]interface{}, []string, bool) {
 	return m, keys, ok
 }
 
-func mapHasKey(m map[string]interface{}, key string) bool {
+func MapHasKey(m map[string]interface{}, key string) bool {
 	_, ok := m[key]
 	return ok
 }
 
-func convertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
+func ConvertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
 	stringArray := make([]string, 0)
 	for _, item := range interfaceArray {
 		v, ok := item.(string)
@@ -53,7 +51,7 @@ func convertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
 	return stringArray
 }
 
-func patternMatches(pattern string, value string) bool {
+func PatternMatches(pattern string, value string) bool {
 	matched, err := regexp.Match(pattern, []byte(value))
 	if err != nil {
 		panic(err)
@@ -61,7 +59,7 @@ func patternMatches(pattern string, value string) bool {
 	return matched
 }
 
-func mapContainsAllKeys(m map[string]interface{}, keys []string) bool {
+func MapContainsAllKeys(m map[string]interface{}, keys []string) bool {
 	for _, k := range keys {
 		_, found := m[k]
 		if !found {
@@ -72,7 +70,7 @@ func mapContainsAllKeys(m map[string]interface{}, keys []string) bool {
 	return true
 }
 
-func mapContainsOnlyKeysAndPatterns(m map[string]interface{}, keys []string, patterns []string) bool {
+func MapContainsOnlyKeysAndPatterns(m map[string]interface{}, keys []string, patterns []string) bool {
 	for k, _ := range m {
 		found := false
 		// does the key match an allowed key
@@ -85,7 +83,7 @@ func mapContainsOnlyKeysAndPatterns(m map[string]interface{}, keys []string, pat
 		if !found {
 			// does the key match an allowed pattern?
 			for _, pattern := range patterns {
-				if patternMatches(pattern, k) {
+				if PatternMatches(pattern, k) {
 					//log.Printf("pattern %s matched %s", pattern, k)
 					found = true
 					break
