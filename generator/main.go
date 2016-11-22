@@ -19,6 +19,8 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+
+	"github.com/googleapis/openapi-compiler/jsonschema"
 )
 
 const LICENSE = "" +
@@ -37,13 +39,13 @@ const LICENSE = "" +
 	"// limitations under the License.\n"
 
 func main() {
-	base_schema := NewSchemaFromFile("schema.json")
-	base_schema.resolveRefs()
-	base_schema.resolveAllOfs()
+	base_schema := jsonschema.NewSchemaFromFile("schema.json")
+	base_schema.ResolveRefs()
+	base_schema.ResolveAllOfs()
 
-	openapi_schema := NewSchemaFromFile("openapi-2.0.json")
-	openapi_schema.resolveRefs()
-	openapi_schema.resolveAllOfs()
+	openapi_schema := jsonschema.NewSchemaFromFile("openapi-2.0.json")
+	openapi_schema.ResolveRefs()
+	openapi_schema.ResolveAllOfs()
 
 	// build a simplified model of the classes described by the schema
 	cc := NewClassCollection(openapi_schema)

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package jsonschema
 
 import (
 	"encoding/json"
@@ -248,7 +248,7 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 }
 
 // Returns true if no members of the Schema are specified.
-func (schema *Schema) isEmpty() bool {
+func (schema *Schema) IsEmpty() bool {
 	return (schema.Schema == nil) &&
 		(schema.Id == nil) &&
 		(schema.MultipleOf == nil) &&
@@ -285,8 +285,8 @@ func (schema *Schema) isEmpty() bool {
 		(schema.Ref == nil)
 }
 
-func (schema *Schema) isEqual(schema2 *Schema) bool {
-	return schema.description() == schema2.description()
+func (schema *Schema) IsEqual(schema2 *Schema) bool {
+	return schema.String() == schema2.String()
 }
 
 //
@@ -542,7 +542,7 @@ func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
 //
 
 // Returns a string representation of a Schema.
-func (schema *Schema) description() string {
+func (schema *Schema) String() string {
 	return schema.describeSchema("")
 }
 
@@ -916,7 +916,7 @@ func (destination *Schema) copyProperties(source *Schema) {
 }
 
 // Returns true if the Type of a Schema includes the specified type
-func (schema *Schema) typeIs(typeName string) bool {
+func (schema *Schema) TypeIs(typeName string) bool {
 	if schema.Type != nil {
 		// the schema Type is either a string or an array of strings
 		if schema.Type.String != nil {
@@ -936,7 +936,7 @@ func (schema *Schema) typeIs(typeName string) bool {
 // But if a reference refers to an object type, is inside a oneOf, or contains a oneOf,
 // the reference is kept and we expect downstream tools to separately model these
 // referenced schemas.
-func (schema *Schema) resolveRefs() {
+func (schema *Schema) ResolveRefs() {
 	rootSchema := schema
 	count := 1
 	for count > 0 {
@@ -945,7 +945,7 @@ func (schema *Schema) resolveRefs() {
 			func(schema *Schema, context string) {
 				if schema.Ref != nil {
 					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
-					if resolvedRef.typeIs("object") {
+					if resolvedRef.TypeIs("object") {
 						// don't substitute for objects, we'll model the referenced schema with a class
 					} else if context == "OneOf" {
 						// don't substitute for references inside oneOf declarations
@@ -1000,7 +1000,7 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 }
 
 // Replaces "allOf" elements by merging their properties into the parent Schema.
-func (schema *Schema) resolveAllOfs() {
+func (schema *Schema) ResolveAllOfs() {
 	schema.applyToSchemas(
 		func(schema *Schema, context string) {
 			if schema.AllOf != nil {
@@ -1013,7 +1013,7 @@ func (schema *Schema) resolveAllOfs() {
 }
 
 // Replaces all "anyOf" elements with "oneOf".
-func (schema *Schema) resolveAnyOfs() {
+func (schema *Schema) ResolveAnyOfs() {
 	schema.applyToSchemas(
 		func(schema *Schema, context string) {
 			if schema.AnyOf != nil {

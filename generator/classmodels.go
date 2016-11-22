@@ -19,19 +19,21 @@ import (
 	"log"
 	"sort"
 	"strings"
+
+	"github.com/googleapis/openapi-compiler/jsonschema"
 )
 
 /// Class Modeling
 
 // models classes that we encounter during traversal that have no named schema
 type ClassRequest struct {
-	Name         string  // name of class to be created
-	PropertyName string  // name of a property that refers to this class
-	Schema       *Schema // schema for class
-	OneOfWrapper bool    // true if the class wraps "oneOfs"
+	Name         string             // name of class to be created
+	PropertyName string             // name of a property that refers to this class
+	Schema       *jsonschema.Schema // schema for class
+	OneOfWrapper bool               // true if the class wraps "oneOfs"
 }
 
-func NewClassRequest(name string, propertyName string, schema *Schema) *ClassRequest {
+func NewClassRequest(name string, propertyName string, schema *jsonschema.Schema) *ClassRequest {
 	return &ClassRequest{Name: name, PropertyName: propertyName, Schema: schema}
 }
 
@@ -103,12 +105,12 @@ func NewClassModel() *ClassModel {
 type ClassCollection struct {
 	ClassModels         map[string]*ClassModel   // models of the classes in the collection
 	Prefix              string                   // class prefix to use
-	Schema              *Schema                  // top-level schema
+	Schema              *jsonschema.Schema       // top-level schema
 	PatternNames        map[string]string        // a configured mapping from patterns to property names
 	ObjectClassRequests map[string]*ClassRequest // anonymous classes implied by class instantiation
 }
 
-func NewClassCollection(schema *Schema) *ClassCollection {
+func NewClassCollection(schema *jsonschema.Schema) *ClassCollection {
 	cc := &ClassCollection{}
 	cc.ClassModels = make(map[string]*ClassModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
@@ -148,7 +150,7 @@ func (classes *ClassCollection) propertyNameForReference(reference string) *stri
 }
 
 // Determines the item type for arrays defined by a schema
-func (classes *ClassCollection) arrayItemTypeForSchema(propertyName string, schema *Schema) string {
+func (classes *ClassCollection) arrayItemTypeForSchema(propertyName string, schema *jsonschema.Schema) string {
 	// default
 	itemTypeName := "Any"
 
@@ -203,7 +205,7 @@ func (classes *ClassCollection) arrayItemTypeForSchema(propertyName string, sche
 	return itemTypeName
 }
 
-func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *jsonschema.Schema) {
 	if schema.Properties != nil {
 		for propertyName, propertySchema := range *(schema.Properties) {
 			if propertySchema.Ref != nil {
@@ -215,22 +217,22 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 				classModel.Properties[propertyName] = classProperty
 			} else if propertySchema.Type != nil {
 				// the property schema specifies a type, so add a property with the specified type
-				if propertySchema.typeIs("string") {
+				if propertySchema.TypeIs("string") {
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, "string")
-				} else if propertySchema.typeIs("boolean") {
+				} else if propertySchema.TypeIs("boolean") {
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, "bool")
-				} else if propertySchema.typeIs("number") {
+				} else if propertySchema.TypeIs("number") {
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, "float")
-				} else if propertySchema.typeIs("integer") {
+				} else if propertySchema.TypeIs("integer") {
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, "int")
-				} else if propertySchema.typeIs("object") {
+				} else if propertySchema.TypeIs("object") {
 					// the property has an "anonymous" object schema, so define a new class for it and request its creation
 					anonymousObjectClassName := classes.classNameForStub(propertyName)
 					classes.ObjectClassRequests[anonymousObjectClassName] =
 						NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
 					// add a property with the type of the requested class
 					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
-				} else if propertySchema.typeIs("array") {
+				} else if propertySchema.TypeIs("array") {
 					// the property has an array type, so define it as a a repeated property of the specified type
 					propertyClassName := classes.arrayItemTypeForSchema(propertyName, propertySchema)
 					classProperty := NewClassPropertyWithNameAndType(propertyName, propertyClassName)
@@ -239,7 +241,7 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 				} else {
 					log.Printf("ignoring %+v, which has an unsupported property type '%+v'", propertyName, propertySchema.Type)
 				}
-			} else if propertySchema.isEmpty() {
+			} else if propertySchema.IsEmpty() {
 				// an empty schema can contain anything, so add an accessor for a generic object
 				className := "Any"
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
@@ -254,19 +256,19 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
 			} else {
-				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.description())
+				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.String())
 			}
 		}
 	}
 }
 
-func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, schema *jsonschema.Schema) {
 	if schema.Required != nil {
 		classModel.Required = (*schema.Required)
 	}
 }
 
-func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	if schema.PatternProperties != nil {
 		classModel.OpenPatterns = make([]string, 0)
 		for propertyPattern, propertySchema := range *(schema.PatternProperties) {
@@ -282,7 +284,7 @@ func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassM
 	}
 }
 
-func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	if schema.AdditionalProperties != nil {
 		if schema.AdditionalProperties.Boolean != nil {
 			if *schema.AdditionalProperties.Boolean == true {
@@ -331,7 +333,7 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 	}
 }
 
-func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	oneOfs := schema.OneOf
 	if oneOfs == nil {
 		return
@@ -352,10 +354,10 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	}
 }
 
-func schemaIsContainedInArray(s1 *Schema, s2 *Schema) bool {
-	if s2.typeIs("array") {
+func schemaIsContainedInArray(s1 *jsonschema.Schema, s2 *jsonschema.Schema) bool {
+	if s2.TypeIs("array") {
 		if s2.Items.Schema != nil {
-			if s1.isEqual(s2.Items.Schema) {
+			if s1.IsEqual(s2.Items.Schema) {
 				return true
 			} else {
 				return false
@@ -370,7 +372,7 @@ func schemaIsContainedInArray(s1 *Schema, s2 *Schema) bool {
 
 func (classes *ClassCollection) addAnonymousAccessorForSchema(
 	classModel *ClassModel,
-	schema *Schema,
+	schema *jsonschema.Schema,
 	repeated bool) {
 	ref := schema.Ref
 	if ref != nil {
@@ -391,18 +393,18 @@ func (classes *ClassCollection) addAnonymousAccessorForSchema(
 	}
 }
 
-func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	anyOfs := schema.AnyOf
 	if anyOfs == nil {
 		return
 	}
 	if len(*anyOfs) == 2 {
 		if schemaIsContainedInArray((*anyOfs)[0], (*anyOfs)[1]) {
-			log.Printf("ARRAY OF %+v", (*anyOfs)[0].description())
+			log.Printf("ARRAY OF %+v", (*anyOfs)[0].String())
 			schema := (*anyOfs)[0]
 			classes.addAnonymousAccessorForSchema(classModel, schema, true)
 		} else if schemaIsContainedInArray((*anyOfs)[1], (*anyOfs)[0]) {
-			log.Printf("ARRAY OF %+v", (*anyOfs)[1].description())
+			log.Printf("ARRAY OF %+v", (*anyOfs)[1].String())
 			schema := (*anyOfs)[1]
 			classes.addAnonymousAccessorForSchema(classModel, schema, true)
 		} else {
@@ -424,11 +426,11 @@ func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, sche
 			}
 		}
 	} else {
-		log.Printf("Unhandled anyOfs:\n%s", schema.description())
+		log.Printf("Unhandled anyOfs:\n%s", schema.String())
 	}
 }
 
-func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, schema *Schema) {
+func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	classModel.Open = true
 	propertyName := "additionalProperties"
 	className := "map<string, Any>"
@@ -438,7 +440,7 @@ func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, sc
 func (classes *ClassCollection) buildClassForDefinition(
 	className string,
 	propertyName string,
-	schema *Schema) *ClassModel {
+	schema *jsonschema.Schema) *ClassModel {
 	if (schema.Type == nil) || (*schema.Type.String == "object") {
 		return classes.buildClassForDefinitionObject(className, propertyName, schema)
 	} else {
@@ -449,10 +451,10 @@ func (classes *ClassCollection) buildClassForDefinition(
 func (classes *ClassCollection) buildClassForDefinitionObject(
 	className string,
 	propertyName string,
-	schema *Schema) *ClassModel {
+	schema *jsonschema.Schema) *ClassModel {
 	classModel := NewClassModel()
 	classModel.Name = className
-	if schema.isEmpty() {
+	if schema.IsEmpty() {
 		classes.buildDefaultAccessors(classModel, schema)
 	} else {
 		classes.buildClassProperties(classModel, schema)
