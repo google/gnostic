@@ -43,7 +43,7 @@ type ClassProperty struct {
 	Pattern  string // if the property is a pattern property, names must match this pattern.
 }
 
-func (classProperty *ClassProperty) display() string {
+func (classProperty *ClassProperty) description() string {
 	if classProperty.Repeated {
 		return fmt.Sprintf("\t%s %s repeated %s\n", classProperty.Name, classProperty.Type, classProperty.Pattern)
 	} else {
@@ -84,11 +84,11 @@ func (classModel *ClassModel) sortedPropertyNames() []string {
 	return keys
 }
 
-func (classModel *ClassModel) display() string {
+func (classModel *ClassModel) description() string {
 	result := fmt.Sprintf("%+s\n", classModel.Name)
 	keys := classModel.sortedPropertyNames()
 	for _, k := range keys {
-		result += classModel.Properties[k].display()
+		result += classModel.Properties[k].description()
 	}
 	return result
 }
@@ -254,7 +254,7 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
 				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
 			} else {
-				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.display())
+				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.description())
 			}
 		}
 	}
@@ -339,7 +339,7 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	classModel.Open = true
 	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
-		//log.Printf("ONEOF\n%+v", oneOf.display())
+		//log.Printf("ONEOF\n%+v", oneOf.description())
 		if oneOf.Ref != nil {
 			ref := *oneOf.Ref
 			className := classes.classNameForReference(ref)
@@ -398,11 +398,11 @@ func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, sche
 	}
 	if len(*anyOfs) == 2 {
 		if schemaIsContainedInArray((*anyOfs)[0], (*anyOfs)[1]) {
-			log.Printf("ARRAY OF %+v", (*anyOfs)[0].display())
+			log.Printf("ARRAY OF %+v", (*anyOfs)[0].description())
 			schema := (*anyOfs)[0]
 			classes.addAnonymousAccessorForSchema(classModel, schema, true)
 		} else if schemaIsContainedInArray((*anyOfs)[1], (*anyOfs)[0]) {
-			log.Printf("ARRAY OF %+v", (*anyOfs)[1].display())
+			log.Printf("ARRAY OF %+v", (*anyOfs)[1].description())
 			schema := (*anyOfs)[1]
 			classes.addAnonymousAccessorForSchema(classModel, schema, true)
 		} else {
@@ -424,7 +424,7 @@ func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, sche
 			}
 		}
 	} else {
-		log.Printf("Unhandled anyOfs:\n%s", schema.display())
+		log.Printf("Unhandled anyOfs:\n%s", schema.description())
 	}
 }
 
@@ -520,11 +520,11 @@ func (classes *ClassCollection) sortedClassNames() []string {
 	return classNames
 }
 
-func (classes *ClassCollection) display() string {
+func (classes *ClassCollection) description() string {
 	classNames := classes.sortedClassNames()
 	result := ""
 	for _, className := range classNames {
-		result += classes.ClassModels[className].display()
+		result += classes.ClassModels[className].description()
 	}
 	return result
 }

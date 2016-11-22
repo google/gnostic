@@ -101,7 +101,7 @@ type StringOrStringArray struct {
 	StringArray *[]string
 }
 
-func (s *StringOrStringArray) display() string {
+func (s *StringOrStringArray) description() string {
 	if s.String != nil {
 		return *s.String
 	}
@@ -286,7 +286,7 @@ func (schema *Schema) isEmpty() bool {
 }
 
 func (schema *Schema) isEqual(schema2 *Schema) bool {
-	return schema.display() == schema2.display()
+	return schema.description() == schema2.description()
 }
 
 //
@@ -542,12 +542,12 @@ func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
 //
 
 // Returns a string representation of a Schema.
-func (schema *Schema) display() string {
-	return schema.displaySchema("")
+func (schema *Schema) description() string {
+	return schema.describeSchema("")
 }
 
 // Helper: Returns a string representation of a Schema indented by a specified string.
-func (schema *Schema) displaySchema(indent string) string {
+func (schema *Schema) describeSchema(indent string) string {
 	result := ""
 	if schema.Schema != nil {
 		result += indent + "$schema: " + *(schema.Schema) + "\n"
@@ -583,7 +583,7 @@ func (schema *Schema) displaySchema(indent string) string {
 		s := schema.AdditionalItems.Schema
 		if s != nil {
 			result += indent + "additionalItems:\n"
-			result += s.displaySchema(indent + "  ")
+			result += s.describeSchema(indent + "  ")
 		} else {
 			b := *(schema.AdditionalItems.Boolean)
 			result += indent + fmt.Sprintf("additionalItems: %+v\n", b)
@@ -595,10 +595,10 @@ func (schema *Schema) displaySchema(indent string) string {
 		if items.SchemaArray != nil {
 			for i, s := range *(items.SchemaArray) {
 				result += indent + "  " + fmt.Sprintf("%d", i) + ":\n"
-				result += s.displaySchema(indent + "  " + "  ")
+				result += s.describeSchema(indent + "  " + "  ")
 			}
 		} else if items.Schema != nil {
-			result += items.Schema.displaySchema(indent + "  " + "  ")
+			result += items.Schema.describeSchema(indent + "  " + "  ")
 		}
 	}
 	if schema.MaxItems != nil {
@@ -623,7 +623,7 @@ func (schema *Schema) displaySchema(indent string) string {
 		s := schema.AdditionalProperties.Schema
 		if s != nil {
 			result += indent + "additionalProperties:\n"
-			result += s.displaySchema(indent + "  ")
+			result += s.describeSchema(indent + "  ")
 		} else {
 			b := *(schema.AdditionalProperties.Boolean)
 			result += indent + fmt.Sprintf("additionalProperties: %+v\n", b)
@@ -633,14 +633,14 @@ func (schema *Schema) displaySchema(indent string) string {
 		result += indent + "properties:\n"
 		for name, s := range *(schema.Properties) {
 			result += indent + "  " + name + ":\n"
-			result += s.displaySchema(indent + "  " + "  ")
+			result += s.describeSchema(indent + "  " + "  ")
 		}
 	}
 	if schema.PatternProperties != nil {
 		result += indent + "patternProperties:\n"
 		for name, s := range *(schema.PatternProperties) {
 			result += indent + "  " + name + ":\n"
-			result += s.displaySchema(indent + "  " + "  ")
+			result += s.describeSchema(indent + "  " + "  ")
 		}
 	}
 	if schema.Dependencies != nil {
@@ -649,7 +649,7 @@ func (schema *Schema) displaySchema(indent string) string {
 			s := schemaOrStringArray.Schema
 			if s != nil {
 				result += indent + "  " + name + ":\n"
-				result += s.displaySchema(indent + "  " + "  ")
+				result += s.describeSchema(indent + "  " + "  ")
 			} else {
 				a := schemaOrStringArray.StringArray
 				if a != nil {
@@ -673,38 +673,38 @@ func (schema *Schema) displaySchema(indent string) string {
 		}
 	}
 	if schema.Type != nil {
-		result += indent + fmt.Sprintf("type: %+v\n", schema.Type.display())
+		result += indent + fmt.Sprintf("type: %+v\n", schema.Type.description())
 	}
 	if schema.AllOf != nil {
 		result += indent + "allOf:\n"
 		for _, s := range *(schema.AllOf) {
-			result += s.displaySchema(indent + "  ")
+			result += s.describeSchema(indent + "  ")
 			result += indent + "-\n"
 		}
 	}
 	if schema.AnyOf != nil {
 		result += indent + "anyOf:\n"
 		for _, s := range *(schema.AnyOf) {
-			result += s.displaySchema(indent + "  ")
+			result += s.describeSchema(indent + "  ")
 			result += indent + "-\n"
 		}
 	}
 	if schema.OneOf != nil {
 		result += indent + "oneOf:\n"
 		for _, s := range *(schema.OneOf) {
-			result += s.displaySchema(indent + "  ")
+			result += s.describeSchema(indent + "  ")
 			result += indent + "-\n"
 		}
 	}
 	if schema.Not != nil {
 		result += indent + "not:\n"
-		result += schema.Not.displaySchema(indent + "  ")
+		result += schema.Not.describeSchema(indent + "  ")
 	}
 	if schema.Definitions != nil {
 		result += indent + "definitions:\n"
 		for name, s := range *(schema.Definitions) {
 			result += indent + "  " + name + ":\n"
-			result += s.displaySchema(indent + "  " + "  ")
+			result += s.describeSchema(indent + "  " + "  ")
 		}
 	}
 	if schema.Title != nil {

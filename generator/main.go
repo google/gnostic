@@ -55,7 +55,7 @@ func main() {
 		"^([0-9]{3})$|^(default)$": "responseCode",
 	}
 	cc.build()
-	log.Printf("Class Model:\n%s", cc.display())
+	log.Printf("Class Model:\n%s", cc.description())
 
 	if true {
 		var err error
