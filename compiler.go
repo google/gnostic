@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/googleapis/openapi-compiler/OpenAPIv2"
 )
 
 func describeMap(in interface{}, indent string) string {
@@ -81,7 +82,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Compiling %s (%s)\n", *input, version())
+	fmt.Printf("Compiling %s (%s)\n", *input, OpenAPIv2.Version())
 
 	raw := readFile(*input)
 	if *rawInput {
@@ -90,7 +91,7 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	document := buildDocument(raw)
+	document := OpenAPIv2.BuildDocument(raw)
 
 	if *textProtobuf {
 		textProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".text"

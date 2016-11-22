@@ -39,11 +39,15 @@ const LICENSE = "" +
 	"// limitations under the License.\n"
 
 func main() {
+	// the OpenAPI schema file and API version are hard-coded for now
+	input := "openapi-2.0.json"
+	version := "OpenAPIv2"
+
 	base_schema := jsonschema.NewSchemaFromFile("schema.json")
 	base_schema.ResolveRefs()
 	base_schema.ResolveAllOfs()
 
-	openapi_schema := jsonschema.NewSchemaFromFile("openapi-2.0.json")
+	openapi_schema := jsonschema.NewSchemaFromFile(input)
 	openapi_schema.ResolveRefs()
 	openapi_schema.ResolveAllOfs()
 
@@ -59,25 +63,24 @@ func main() {
 	cc.build()
 	log.Printf("Class Model:\n%s", cc.description())
 
-	if true {
-		var err error
+	var err error
 
-		// generate the protocol buffer description
-		proto := cc.generateProto("OpenAPIv2", LICENSE)
-		proto_filename := "openapi-v2.proto"
-		err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
-		if err != nil {
-			panic(err)
-		}
-
-		// generate the compiler
-		compiler := cc.generateCompiler("OpenAPIv2", LICENSE)
-		go_filename := "openapi-v2.go"
-		err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
-		if err != nil {
-			panic(err)
-		}
-		// format the compiler
-		err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+	// generate the protocol buffer description
+	proto := cc.generateProto(version, LICENSE)
+	proto_filename := version + "/" + version + ".proto"
+	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
+	if err != nil {
+		panic(err)
 	}
+
+	// generate the compiler
+	compiler := cc.generateCompiler(version, LICENSE)
+	go_filename := version + "/" + version + ".go"
+	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
+	if err != nil {
+		panic(err)
+	}
+	// format the compiler
+	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+
 }

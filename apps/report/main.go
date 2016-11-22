@@ -23,7 +23,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/printer"
 
-	pb "openapi"
+	pb "github.com/googleapis/openapi-compiler/OpenAPIv2"
 )
 
 func readDocumentFromFileWithName(filename string) *pb.Document {
