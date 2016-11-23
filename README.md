@@ -1,8 +1,9 @@
 # OpenAPI Compiler
 
 This repository contains an experimental project whose goal is to
-read OpenAPI JSON descriptions and write equivalent Protocol Buffer
-representations. These Protocol Buffer representations are to be
+read OpenAPI specifications in JSON or YAML formats and write 
+equivalent Protocol Buffer representations. 
+These Protocol Buffer representations are to be
 preprocessed, checked for errors, and made available for use in any
 language that is supported by the Protocol Buffer tools.
 
@@ -26,7 +27,7 @@ and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
 2. [Optional] Build and run the compiler generator. 
 This uses the OpenAPI JSON schema to generate a Protocol Buffer language file 
 that describes the OpenAPI specification and a Go-language file of code that 
-will read a JSON OpenAPI representation into the generated protocol 
+will read a JSON or YAML OpenAPI representation into the generated protocol 
 buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
 
         cd $GOPATH/src/github.com/googleapis/openapi-compiler/generator
