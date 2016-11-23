@@ -16,28 +16,36 @@ package helpers
 
 import (
 	// "log"
+	"gopkg.in/yaml.v2"
 	"regexp"
-	"sort"
 )
 
 // compiler helper functions, usually called from generated code
 
-func UnpackMap(in interface{}) (map[string]interface{}, []string, bool) {
-	m, ok := in.(map[string]interface{})
+func UnpackMap(in interface{}) (yaml.MapSlice, bool) {
+	m, ok := in.(yaml.MapSlice)
 	if !ok {
-		return nil, nil, ok
+		return nil, ok
 	}
-	var keys []string
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return m, keys, ok
+	return m, ok
 }
 
-func MapHasKey(m map[string]interface{}, key string) bool {
-	_, ok := m[key]
-	return ok
+func MapHasKey(m yaml.MapSlice, key string) bool {
+	for _, item := range m {
+		if key == item.Key.(string) {
+			return true
+		}
+	}
+	return false
+}
+
+func MapValueForKey(m yaml.MapSlice, key string) interface{} {
+	for _, item := range m {
+		if key == item.Key.(string) {
+			return item.Value
+		}
+	}
+	return nil
 }
 
 func ConvertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
@@ -59,10 +67,9 @@ func PatternMatches(pattern string, value string) bool {
 	return matched
 }
 
-func MapContainsAllKeys(m map[string]interface{}, keys []string) bool {
+func MapContainsAllKeys(m yaml.MapSlice, keys []string) bool {
 	for _, k := range keys {
-		_, found := m[k]
-		if !found {
+		if !MapHasKey(m, k) {
 			//log.Printf("ERROR: map does not contain required key %s (%+v)", k, m)
 			return false
 		}
@@ -70,8 +77,9 @@ func MapContainsAllKeys(m map[string]interface{}, keys []string) bool {
 	return true
 }
 
-func MapContainsOnlyKeysAndPatterns(m map[string]interface{}, keys []string, patterns []string) bool {
-	for k, _ := range m {
+func MapContainsOnlyKeysAndPatterns(m yaml.MapSlice, keys []string, patterns []string) bool {
+	for _, item := range m {
+		k := item.Key.(string)
 		found := false
 		// does the key match an allowed key
 		for _, k2 := range keys {

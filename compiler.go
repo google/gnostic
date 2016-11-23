@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path"
@@ -64,9 +65,10 @@ func readFile(filename string) interface{} {
 		fmt.Printf("File error: %v\n", e)
 		os.Exit(1)
 	}
-	var raw interface{}
-	json.Unmarshal(file, &raw)
-	return raw
+
+	var info yaml.MapSlice
+	yaml.Unmarshal(file, &info)
+	return info
 }
 
 func main() {

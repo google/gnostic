@@ -87,11 +87,10 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print()
 			continue
 		}
-		code.Print("m, keys, ok := helpers.UnpackMap(in)")
+		code.Print("m, ok := helpers.UnpackMap(in)")
 		code.Print("if (!ok) {")
 		code.Print("log.Printf(\"unexpected argument to Build%s: %%+v\", in)", className)
 		code.Print("log.Printf(\"%%d\\n\", len(m))")
-		code.Print("log.Printf(\"%%+v\\n\", keys)")
 		code.Print("return nil")
 		code.Print("}")
 		oneOfWrapper := classModel.OneOfWrapper
@@ -187,7 +186,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 					code.Print("// repeated class %s", classModel.Name)
 					code.Print("x.%s = make([]*%s, 0)", fieldName, classModel.Name)
-					code.Print("a, ok := m[\"%s\"].([]interface{})", propertyName)
+					code.Print("a, ok := helpers.MapValueForKey(m, \"%s\").([]interface{})", propertyName)
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
 					code.Print("x.%s = append(x.%s, Build%s(item))", fieldName, fieldName, classModel.Name)
@@ -204,36 +203,36 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("}")
 					} else {
 						code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-						code.Print("x.%s = Build%s(m[\"%v\"])", fieldName, classModel.Name, propertyName)
+						code.Print("x.%s = Build%s(helpers.MapValueForKey(m,\"%v\"))", fieldName, classModel.Name, propertyName)
 						code.Print("}")
 					}
 				}
 			} else if propertyType == "string" {
 				if propertyModel.Repeated {
 					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-					code.Print("v, ok := m[\"%v\"].([]interface{})", propertyName)
+					code.Print("v, ok := helpers.MapValueForKey(m, \"%v\").([]interface{})", propertyName)
 					code.Print("if ok {")
 					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
-					code.Print(" log.Printf(\"unexpected: %%+v\", m[\"%v\"])", propertyName)
+					code.Print(" log.Printf(\"unexpected: %%+v\", helpers.MapValueForKey(m,\"%v\"))", propertyName)
 					code.Print("}")
 					code.Print("}")
 				} else {
 					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-					code.Print("x.%s = m[\"%v\"].(string)", fieldName, propertyName)
+					code.Print("x.%s = helpers.MapValueForKey(m,\"%v\").(string)", fieldName, propertyName)
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
 				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = m[\"%v\"].(float64)", fieldName, propertyName)
+				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(float64)", fieldName, propertyName)
 				code.Print("}")
 			} else if propertyType == "int64" {
 				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = m[\"%v\"].(int64)", fieldName, propertyName)
+				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(int64)", fieldName, propertyName)
 				code.Print("}")
 			} else if propertyType == "bool" {
 				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = m[\"%v\"].(bool)", fieldName, propertyName)
+				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(bool)", fieldName, propertyName)
 				code.Print("}")
 			} else {
 				mapTypeName := propertyModel.MapType
@@ -245,7 +244,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					} else {
 						code.Print("x.%s = make([]*Named%s, 0)", fieldName, mapTypeName)
 					}
-					code.Print("for k, v := range m {")
+					code.Print("for _, item := range m {")
+					code.Print("k := item.Key.(string)")
+					code.Print("v := item.Value")
 					if propertyModel.Pattern != "" {
 						code.Print("if helpers.PatternMatches(\"%s\", k) {", propertyModel.Pattern)
 					}
