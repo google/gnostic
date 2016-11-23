@@ -217,15 +217,15 @@ func printVendorExtension(code *printer.Code, vendorExtension []*pb.NamedAny) {
 }
 
 func main() {
-	var input = flag.String("input", "", "OpenAPI source file to read")
 	flag.Parse()
+	args := flag.Args()
 
-	if *input == "" {
-		flag.PrintDefaults()
+	if len(args) != 1 {
+		fmt.Printf("Usage: report <file.pb>\n")
 		return
 	}
 
-	document := readDocumentFromFileWithName(*input)
+	document := readDocumentFromFileWithName(args[0])
 
 	code := &printer.Code{}
 	code.Print("API REPORT")

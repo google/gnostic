@@ -55,7 +55,7 @@ Protocol Buffer description of a sample API.
 6. For a sample application, see apps/report.
 
         go install github.com/googleapis/openapi-compiler/apps/report
-		report -input petstore.pb
+		report petstore.pb
 
 ## Copyright
 
