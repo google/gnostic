@@ -236,7 +236,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				code.Print("x.%s = m[\"%v\"].(bool)", fieldName, propertyName)
 				code.Print("}")
 			} else {
-				isMap, mapTypeName := mapTypeInfo(propertyType)
+				mapTypeName := propertyModel.MapType
+				isMap := mapTypeName != ""
 				if isMap {
 					code.Print("// MAP: %s %s", mapTypeName, propertyModel.Pattern)
 					if mapTypeName == "string" {

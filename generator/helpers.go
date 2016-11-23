@@ -14,10 +14,6 @@
 
 package main
 
-import (
-	"regexp"
-)
-
 // Returns a "snake case" form of a camel-cased string.
 func camelCaseToSnakeCase(input string) string {
 	var out = ""
@@ -35,20 +31,4 @@ func camelCaseToSnakeCase(input string) string {
 
 	}
 	return out
-}
-
-// Extracts a map value type from a string of the form map<string, (valuetype)>
-func mapTypeInfo(typeName string) (isMap bool, valueTypeName string) {
-	r, err := regexp.Compile("^map<string, (.*)>$")
-	if err != nil {
-		panic(err)
-	}
-	match := r.FindStringSubmatch(typeName)
-	if len(match) != 2 {
-		isMap = false
-	} else {
-		isMap = true
-		valueTypeName = match[1]
-	}
-	return
 }
