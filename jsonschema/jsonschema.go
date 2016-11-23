@@ -15,8 +15,8 @@
 package jsonschema
 
 import (
-	"encoding/json"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -135,8 +135,8 @@ func NewSchemaFromFile(filename string) *Schema {
 		fmt.Printf("File error: %v\n", e)
 		os.Exit(1)
 	}
-	var info interface{}
-	json.Unmarshal(file, &info)
+	var info yaml.MapSlice
+	yaml.Unmarshal(file, &info)
 	return NewSchemaFromObject(info)
 }
 
@@ -148,9 +148,11 @@ func NewSchemaFromObject(jsonData interface{}) *Schema {
 	default:
 		fmt.Printf("schemaValue: unexpected type %T\n", t)
 		return nil
-	case map[string]interface{}:
+	case yaml.MapSlice:
 		schema := &Schema{}
-		for k, v := range t {
+		for _, mapItem := range t {
+			k := mapItem.Key.(string)
+			v := mapItem.Value
 
 			switch k {
 			case "$schema":
@@ -320,6 +322,9 @@ func (schema *Schema) numberValue(v interface{}) *SchemaNumber {
 		v2 := float64(v)
 		number.Float = &v2
 		return number
+	case int:
+		v2 := int64(v)
+		number.Integer = &v2
 	}
 	return nil
 }
@@ -334,6 +339,9 @@ func (schema *Schema) intValue(v interface{}) *int64 {
 		return &v2
 	case int64:
 		return &v
+	case int:
+		v2 := int64(v)
+		return &v2
 	}
 	return nil
 }
@@ -354,9 +362,11 @@ func (schema *Schema) mapOfSchemasValue(v interface{}) *map[string]*Schema {
 	switch v := v.(type) {
 	default:
 		fmt.Printf("mapOfSchemasValue: unexpected type %T\n", v)
-	case map[string]interface{}:
+	case yaml.MapSlice:
 		m := make(map[string]*Schema)
-		for k2, v2 := range v {
+		for _, mapItem := range v {
+			k2 := mapItem.Key.(string)
+			v2 := mapItem.Value
 			m[k2] = NewSchemaFromObject(v2)
 		}
 		return &m
@@ -375,13 +385,13 @@ func (schema *Schema) arrayOfSchemasValue(v interface{}) *[]*Schema {
 			switch v2 := v2.(type) {
 			default:
 				fmt.Printf("arrayOfSchemasValue: unexpected type %T\n", v2)
-			case map[string]interface{}:
+			case yaml.MapSlice:
 				s := NewSchemaFromObject(v2)
 				m = append(m, s)
 			}
 		}
 		return &m
-	case map[string]interface{}:
+	case yaml.MapSlice:
 		m := make([]*Schema, 0)
 		s := NewSchemaFromObject(v)
 		m = append(m, s)
@@ -407,7 +417,7 @@ func (schema *Schema) schemaOrSchemaArrayValue(v interface{}) *SchemaOrSchemaArr
 			}
 		}
 		return &SchemaOrSchemaArray{SchemaArray: &m}
-	case map[string]interface{}:
+	case yaml.MapSlice:
 		s := NewSchemaFromObject(v)
 		return &SchemaOrSchemaArray{Schema: s}
 	}
@@ -496,8 +506,10 @@ func (schema *Schema) mapOfSchemasOrStringArraysValue(v interface{}) *map[string
 	switch v := v.(type) {
 	default:
 		fmt.Printf("mapOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v, v)
-	case map[string]interface{}:
-		for k2, v2 := range v {
+	case yaml.MapSlice:
+		for _, mapItem := range v {
+			k2 := mapItem.Key.(string)
+			v2 := mapItem.Value
 			switch v2 := v2.(type) {
 			default:
 				fmt.Printf("mapOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v2, v2)
@@ -526,7 +538,7 @@ func (schema *Schema) schemaOrBooleanValue(v interface{}) *SchemaOrBoolean {
 	switch v := v.(type) {
 	case bool:
 		schemaOrBoolean.Boolean = &v
-	case map[string]interface{}:
+	case yaml.MapSlice:
 		schemaOrBoolean.Schema = NewSchemaFromObject(v)
 	default:
 		fmt.Printf("schemaOrBooleanValue: unexpected type %T\n", v)

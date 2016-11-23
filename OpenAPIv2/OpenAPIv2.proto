@@ -28,10 +28,10 @@ message Any {
 }
 
 message ApiKeySecurity {
-  string name = 1;
-  string in = 2;
-  string description = 3;
-  string type = 4;
+  string type = 1;
+  string name = 2;
+  string in = 3;
+  string description = 4;
   map<string, Any> vendor_extension = 5;
 }
 
@@ -42,11 +42,11 @@ message BasicAuthenticationSecurity {
 }
 
 message BodyParameter {
-  Schema schema = 1;
-  string description = 2;
-  string name = 3;
-  string in = 4;
-  bool required = 5;
+  string name = 1;
+  string in = 2;
+  bool required = 3;
+  Schema schema = 4;
+  string description = 5;
   map<string, Any> vendor_extension = 6;
 }
 
@@ -67,19 +67,19 @@ message Definitions {
 
 message Document {
   Definitions definitions = 1;
-  repeated SecurityRequirement security = 2;
-  string host = 3;
-  ParameterDefinitions parameters = 4;
-  ResponseDefinitions responses = 5;
-  repeated string produces = 6;
-  SecurityDefinitions security_definitions = 7;
-  string swagger = 8;
+  ParameterDefinitions parameters = 2;
+  ResponseDefinitions responses = 3;
+  repeated Tag tags = 4;
+  string host = 5;
+  Paths paths = 6;
+  repeated SecurityRequirement security = 7;
+  string base_path = 8;
   repeated string consumes = 9;
-  Paths paths = 10;
-  string base_path = 11;
-  repeated string schemes = 12;
-  repeated Tag tags = 13;
-  ExternalDocs external_docs = 14;
+  repeated string produces = 10;
+  SecurityDefinitions security_definitions = 11;
+  ExternalDocs external_docs = 12;
+  string swagger = 13;
+  repeated string schemes = 14;
   Info info = 15;
 }
 
@@ -88,94 +88,94 @@ message Examples {
 }
 
 message ExternalDocs {
-  string url = 1;
-  string description = 2;
+  string description = 1;
+  string url = 2;
   map<string, Any> vendor_extension = 3;
 }
 
 message FileSchema {
-  bool read_only = 1;
-  Any example = 2;
-  Any default = 3;
-  ExternalDocs external_docs = 4;
-  string type = 5;
-  repeated string required = 6;
-  string format = 7;
-  string title = 8;
-  string description = 9;
+  string title = 1;
+  string description = 2;
+  string type = 3;
+  Any example = 4;
+  string format = 5;
+  Any default = 6;
+  repeated string required = 7;
+  bool read_only = 8;
+  ExternalDocs external_docs = 9;
   map<string, Any> vendor_extension = 10;
 }
 
 message FormDataParameterSubSchema {
-  string collection_format = 1;
-  Any default = 2;
-  repeated Any enum = 3;
+  bool required = 1;
+  string name = 2;
+  string format = 3;
   string in = 4;
-  bool unique_items = 5;
-  string description = 6;
+  bool exclusive_minimum = 5;
+  repeated Any enum = 6;
   bool allow_empty_value = 7;
-  PrimitivesItems items = 8;
-  bool exclusive_minimum = 9;
-  string pattern = 10;
-  string format = 11;
-  string name = 12;
-  double multiple_of = 13;
-  double minimum = 14;
-  double maximum = 15;
-  int64 min_length = 16;
-  string type = 17;
-  int64 max_items = 18;
-  bool required = 19;
-  bool exclusive_maximum = 20;
-  int64 max_length = 21;
-  int64 min_items = 22;
+  string type = 8;
+  PrimitivesItems items = 9;
+  Any default = 10;
+  double minimum = 11;
+  int64 max_length = 12;
+  string pattern = 13;
+  bool unique_items = 14;
+  string description = 15;
+  string collection_format = 16;
+  double maximum = 17;
+  bool exclusive_maximum = 18;
+  int64 min_length = 19;
+  int64 max_items = 20;
+  int64 min_items = 21;
+  double multiple_of = 22;
   map<string, Any> vendor_extension = 23;
 }
 
 message Header {
-  int64 min_length = 1;
-  double multiple_of = 2;
-  int64 max_length = 3;
-  string description = 4;
-  PrimitivesItems items = 5;
-  string collection_format = 6;
-  string type = 7;
-  int64 min_items = 8;
-  bool exclusive_minimum = 9;
-  int64 max_items = 10;
-  string pattern = 11;
-  bool exclusive_maximum = 12;
-  bool unique_items = 13;
-  Any default = 14;
-  string format = 15;
-  double minimum = 16;
-  double maximum = 17;
-  repeated Any enum = 18;
+  int64 max_length = 1;
+  string pattern = 2;
+  int64 min_items = 3;
+  string format = 4;
+  double minimum = 5;
+  bool exclusive_minimum = 6;
+  int64 min_length = 7;
+  int64 max_items = 8;
+  bool unique_items = 9;
+  string collection_format = 10;
+  Any default = 11;
+  double maximum = 12;
+  double multiple_of = 13;
+  string description = 14;
+  PrimitivesItems items = 15;
+  bool exclusive_maximum = 16;
+  repeated Any enum = 17;
+  string type = 18;
   map<string, Any> vendor_extension = 19;
 }
 
 message HeaderParameterSubSchema {
-  repeated Any enum = 1;
-  PrimitivesItems items = 2;
-  string description = 3;
-  string collection_format = 4;
-  int64 min_items = 5;
-  bool required = 6;
-  bool exclusive_minimum = 7;
-  double multiple_of = 8;
-  string format = 9;
-  bool exclusive_maximum = 10;
-  int64 max_items = 11;
-  int64 max_length = 12;
-  Any default = 13;
-  int64 min_length = 14;
-  string in = 15;
-  double maximum = 16;
-  string name = 17;
-  string pattern = 18;
-  double minimum = 19;
+  bool required = 1;
+  string in = 2;
+  string format = 3;
+  double maximum = 4;
+  int64 max_length = 5;
+  int64 min_length = 6;
+  string name = 7;
+  Any default = 8;
+  int64 min_items = 9;
+  double multiple_of = 10;
+  string type = 11;
+  PrimitivesItems items = 12;
+  bool exclusive_maximum = 13;
+  double minimum = 14;
+  int64 max_items = 15;
+  string description = 16;
+  string collection_format = 17;
+  bool exclusive_minimum = 18;
+  string pattern = 19;
   bool unique_items = 20;
-  string type = 21;
+  repeated Any enum = 21;
   map<string, Any> vendor_extension = 22;
 }
 
@@ -184,12 +184,12 @@ message Headers {
 }
 
 message Info {
-  string terms_of_service = 1;
-  Contact contact = 2;
-  License license = 3;
-  string title = 4;
-  string version = 5;
-  string description = 6;
+  string title = 1;
+  string version = 2;
+  string description = 3;
+  string terms_of_service = 4;
+  Contact contact = 5;
+  License license = 6;
   map<string, Any> vendor_extension = 7;
 }
 
@@ -217,34 +217,16 @@ message NonBodyParameter {
 }
 
 message Oauth2AccessCodeSecurity {
-  Oauth2Scopes scopes = 1;
-  string authorization_url = 2;
-  string token_url = 3;
-  string description = 4;
-  string type = 5;
-  string flow = 6;
-  map<string, Any> vendor_extension = 7;
-}
-
-message Oauth2ApplicationSecurity {
-  string type = 1;
-  string flow = 2;
-  Oauth2Scopes scopes = 3;
-  string token_url = 4;
-  string description = 5;
-  map<string, Any> vendor_extension = 6;
-}
-
-message Oauth2ImplicitSecurity {
   string type = 1;
   string flow = 2;
   Oauth2Scopes scopes = 3;
   string authorization_url = 4;
-  string description = 5;
-  map<string, Any> vendor_extension = 6;
+  string token_url = 5;
+  string description = 6;
+  map<string, Any> vendor_extension = 7;
 }
 
-message Oauth2PasswordSecurity {
+message Oauth2ApplicationSecurity {
   string token_url = 1;
   string description = 2;
   string type = 3;
@@ -253,23 +235,41 @@ message Oauth2PasswordSecurity {
   map<string, Any> vendor_extension = 6;
 }
 
+message Oauth2ImplicitSecurity {
+  string description = 1;
+  string type = 2;
+  string flow = 3;
+  Oauth2Scopes scopes = 4;
+  string authorization_url = 5;
+  map<string, Any> vendor_extension = 6;
+}
+
+message Oauth2PasswordSecurity {
+  Oauth2Scopes scopes = 1;
+  string token_url = 2;
+  string description = 3;
+  string type = 4;
+  string flow = 5;
+  map<string, Any> vendor_extension = 6;
+}
+
 message Oauth2Scopes {
   map<string, string> additional_properties = 1;
 }
 
 message Operation {
-  repeated string tags = 1;
-  string summary = 2;
-  string description = 3;
-  string operation_id = 4;
-  bool deprecated = 5;
-  repeated ParametersItem parameters = 6;
-  Responses responses = 7;
-  repeated string consumes = 8;
-  repeated string schemes = 9;
-  repeated SecurityRequirement security = 10;
+  repeated string produces = 1;
+  repeated string consumes = 2;
+  Responses responses = 3;
+  repeated SecurityRequirement security = 4;
+  repeated string tags = 5;
+  string summary = 6;
+  string operation_id = 7;
+  repeated string schemes = 8;
+  bool deprecated = 9;
+  string description = 10;
   ExternalDocs external_docs = 11;
-  repeated string produces = 12;
+  repeated ParametersItem parameters = 12;
   map<string, Any> vendor_extension = 13;
 }
 
@@ -292,40 +292,40 @@ message ParametersItem {
 }
 
 message PathItem {
-  Operation get = 1;
-  Operation delete = 2;
-  Operation put = 3;
-  Operation post = 4;
-  Operation options = 5;
-  string _ref = 6;
+  Operation delete = 1;
+  Operation options = 2;
+  string _ref = 3;
+  Operation get = 4;
+  Operation put = 5;
+  Operation post = 6;
   Operation head = 7;
-  repeated ParametersItem parameters = 8;
-  Operation patch = 9;
+  Operation patch = 8;
+  repeated ParametersItem parameters = 9;
   map<string, Any> vendor_extension = 10;
 }
 
 message PathParameterSubSchema {
-  string name = 1;
-  string description = 2;
-  bool required = 3;
-  string collection_format = 4;
+  string type = 1;
+  double minimum = 2;
+  repeated Any enum = 3;
+  bool required = 4;
   bool exclusive_maximum = 5;
-  bool exclusive_minimum = 6;
-  double minimum = 7;
-  int64 min_items = 8;
-  Any default = 9;
-  PrimitivesItems items = 10;
-  int64 min_length = 11;
-  string type = 12;
-  int64 max_length = 13;
-  int64 max_items = 14;
-  double maximum = 15;
-  string pattern = 16;
-  double multiple_of = 17;
-  string format = 18;
-  bool unique_items = 19;
-  repeated Any enum = 20;
-  string in = 21;
+  int64 max_length = 6;
+  double multiple_of = 7;
+  bool exclusive_minimum = 8;
+  int64 min_items = 9;
+  string in = 10;
+  string description = 11;
+  string format = 12;
+  Any default = 13;
+  double maximum = 14;
+  int64 max_items = 15;
+  bool unique_items = 16;
+  string name = 17;
+  PrimitivesItems items = 18;
+  string collection_format = 19;
+  int64 min_length = 20;
+  string pattern = 21;
   map<string, Any> vendor_extension = 22;
 }
 
@@ -335,22 +335,22 @@ message Paths {
 }
 
 message PrimitivesItems {
-  bool exclusive_minimum = 1;
-  int64 min_length = 2;
-  string format = 3;
-  int64 max_items = 4;
+  string format = 1;
+  Any default = 2;
+  bool exclusive_maximum = 3;
+  double minimum = 4;
   int64 min_items = 5;
-  Any default = 6;
-  repeated Any enum = 7;
-  PrimitivesItems items = 8;
-  double minimum = 9;
-  double multiple_of = 10;
-  int64 max_length = 11;
-  string type = 12;
-  bool unique_items = 13;
-  double maximum = 14;
-  string pattern = 15;
-  bool exclusive_maximum = 16;
+  repeated Any enum = 6;
+  string type = 7;
+  int64 max_length = 8;
+  bool exclusive_minimum = 9;
+  string pattern = 10;
+  PrimitivesItems items = 11;
+  double maximum = 12;
+  int64 min_length = 13;
+  int64 max_items = 14;
+  bool unique_items = 15;
+  double multiple_of = 16;
   string collection_format = 17;
   map<string, Any> vendor_extension = 18;
 }
@@ -360,36 +360,36 @@ message Properties {
 }
 
 message QueryParameterSubSchema {
-  repeated Any enum = 1;
-  PrimitivesItems items = 2;
-  string in = 3;
-  bool exclusive_minimum = 4;
-  int64 max_length = 5;
-  int64 min_items = 6;
-  bool exclusive_maximum = 7;
-  Any default = 8;
-  int64 min_length = 9;
-  string name = 10;
-  double multiple_of = 11;
-  string description = 12;
-  bool allow_empty_value = 13;
-  bool unique_items = 14;
-  string format = 15;
-  double minimum = 16;
-  string collection_format = 17;
-  double maximum = 18;
-  string pattern = 19;
-  string type = 20;
-  int64 max_items = 21;
-  bool required = 22;
+  string format = 1;
+  Any default = 2;
+  string type = 3;
+  string collection_format = 4;
+  double maximum = 5;
+  bool exclusive_maximum = 6;
+  int64 min_length = 7;
+  int64 min_items = 8;
+  bool unique_items = 9;
+  repeated Any enum = 10;
+  string description = 11;
+  double multiple_of = 12;
+  int64 max_length = 13;
+  string in = 14;
+  string name = 15;
+  bool allow_empty_value = 16;
+  PrimitivesItems items = 17;
+  double minimum = 18;
+  bool exclusive_minimum = 19;
+  string pattern = 20;
+  bool required = 21;
+  int64 max_items = 22;
   map<string, Any> vendor_extension = 23;
 }
 
 message Response {
-  Examples examples = 1;
-  string description = 2;
-  SchemaItem schema = 3;
-  Headers headers = 4;
+  string description = 1;
+  SchemaItem schema = 2;
+  Headers headers = 3;
+  Examples examples = 4;
   map<string, Any> vendor_extension = 5;
 }
 
@@ -410,36 +410,36 @@ message Responses {
 }
 
 message Schema {
-  string _ref = 1;
-  int64 min_length = 2;
-  AdditionalPropertiesItem additional_properties = 3;
-  string discriminator = 4;
-  ItemsItem items = 5;
-  bool unique_items = 6;
-  repeated Any enum = 7;
-  double multiple_of = 8;
-  bool exclusive_maximum = 9;
-  string format = 10;
-  repeated string required = 11;
-  int64 min_items = 12;
-  int64 min_properties = 13;
-  ExternalDocs external_docs = 14;
-  TypeItem type = 15;
-  string pattern = 16;
-  Properties properties = 17;
-  Xml xml = 18;
-  double maximum = 19;
-  int64 max_properties = 20;
-  bool read_only = 21;
-  double minimum = 22;
-  Any default = 23;
-  string description = 24;
-  string title = 25;
-  Any example = 26;
-  int64 max_items = 27;
-  repeated Schema all_of = 28;
-  bool exclusive_minimum = 29;
-  int64 max_length = 30;
+  ExternalDocs external_docs = 1;
+  Any example = 2;
+  string _ref = 3;
+  string title = 4;
+  string description = 5;
+  double minimum = 6;
+  bool read_only = 7;
+  int64 min_length = 8;
+  repeated Schema all_of = 9;
+  double maximum = 10;
+  int64 max_length = 11;
+  string pattern = 12;
+  ItemsItem items = 13;
+  string discriminator = 14;
+  Properties properties = 15;
+  string format = 16;
+  int64 min_items = 17;
+  int64 max_properties = 18;
+  repeated Any enum = 19;
+  AdditionalPropertiesItem additional_properties = 20;
+  bool exclusive_maximum = 21;
+  int64 min_properties = 22;
+  TypeItem type = 23;
+  Any default = 24;
+  double multiple_of = 25;
+  int64 max_items = 26;
+  bool unique_items = 27;
+  bool exclusive_minimum = 28;
+  repeated string required = 29;
+  Xml xml = 30;
   map<string, Any> vendor_extension = 31;
 }
 
@@ -489,11 +489,11 @@ message VendorExtension {
 }
 
 message Xml {
-  string name = 1;
-  string namespace = 2;
-  string prefix = 3;
-  bool attribute = 4;
-  bool wrapped = 5;
+  bool attribute = 1;
+  bool wrapped = 2;
+  string name = 3;
+  string namespace = 4;
+  string prefix = 5;
   map<string, Any> vendor_extension = 6;
 }
 
