@@ -76,6 +76,7 @@ type ClassModel struct {
 	Open          bool             // open classes can have keys outside the specified set
 	OpenPatterns  []string         // patterns for properties that we allow
 	IsStringArray bool             // ugly override
+	IsItemArray   bool             // ugly override
 	IsBlob        bool             // ugly override
 	IsPair        bool             // class is a name-value pair used to support ordered maps
 }
@@ -419,6 +420,7 @@ func (classes *ClassCollection) addAnonymousAccessorForSchema(
 			property := NewClassPropertyWithNameAndType(*propertyName, className)
 			property.Repeated = true
 			classModel.AddProperty(property)
+			classModel.IsItemArray = true
 		}
 	} else {
 		className := "string"

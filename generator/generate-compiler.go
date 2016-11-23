@@ -54,7 +54,28 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x.Value = make([]string, 0)")
 			code.Print("x.Value = append(x.Value, value)")
 			code.Print("} else {")
-			code.Print("log.Printf(\"unexpected: %+v\", in)")
+			code.Print("log.Printf(\"unexpected: %%+v\", in)")
+			code.Print("}")
+			code.Print("return x")
+			code.Print("}")
+			code.Print()
+			continue
+		}
+
+		if classModel.IsItemArray {
+			code.Print("m, ok := helpers.UnpackMap(in)")
+			code.Print("if (!ok) {")
+			code.Print("log.Printf(\"unexpected argument to Build%s: %%+v\", in)", className)
+			code.Print("log.Printf(\"%%d\\n\", len(m))")
+			code.Print("return nil")
+			code.Print("}")
+
+			code.Print("x := &ItemsItem{}")
+			code.Print("if ok {")
+			code.Print("x.Schema = make([]*Schema, 0)")
+			code.Print("x.Schema = append(x.Schema, BuildSchema(m))")
+			code.Print("} else {")
+			code.Print("log.Printf(\"unexpected: %%+v\", in)")
 			code.Print("}")
 			code.Print("return x")
 			code.Print("}")

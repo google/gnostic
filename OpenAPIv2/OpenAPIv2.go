@@ -972,22 +972,12 @@ func BuildItemsItem(in interface{}) *ItemsItem {
 		log.Printf("%d\n", len(m))
 		return nil
 	}
-	allowedKeys := []string{"schema"}
-	allowedPatterns := []string{}
-	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
-	}
 	x := &ItemsItem{}
-	// repeated Schema schema = 1;
-	if helpers.MapHasKey(m, "schema") {
-		// repeated class Schema
+	if ok {
 		x.Schema = make([]*Schema, 0)
-		a, ok := helpers.MapValueForKey(m, "schema").([]interface{})
-		if ok {
-			for _, item := range a {
-				x.Schema = append(x.Schema, BuildSchema(item))
-			}
-		}
+		x.Schema = append(x.Schema, BuildSchema(m))
+	} else {
+		log.Printf("unexpected: %+v", in)
 	}
 	return x
 }
@@ -2747,7 +2737,7 @@ func BuildTypeItem(in interface{}) *TypeItem {
 		x.Value = make([]string, 0)
 		x.Value = append(x.Value, value)
 	} else {
-		log.Printf("unexpected: %!v(MISSING)", in)
+		log.Printf("unexpected: %+v", in)
 	}
 	return x
 }
