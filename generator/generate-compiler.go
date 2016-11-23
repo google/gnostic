@@ -182,7 +182,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			}
 
 			classModel, classFound := classes.ClassModels[propertyType]
-			if classFound {
+			if classFound && !classModel.IsPair {
 				if propertyModel.Repeated {
 					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
 					code.Print("// repeated class %s", classModel.Name)
@@ -241,19 +241,22 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				if isMap {
 					code.Print("// MAP: %s %s", mapTypeName, propertyModel.Pattern)
 					if mapTypeName == "string" {
-						code.Print("x.%s = make(map[string]string, 0)", fieldName)
+						code.Print("x.%s = make([]*NamedString, 0)", fieldName)
 					} else {
-						code.Print("x.%s = make(map[string]*%s, 0)", fieldName, mapTypeName)
+						code.Print("x.%s = make([]*Named%s, 0)", fieldName, mapTypeName)
 					}
 					code.Print("for k, v := range m {")
 					if propertyModel.Pattern != "" {
 						code.Print("if helpers.PatternMatches(\"%s\", k) {", propertyModel.Pattern)
 					}
+					code.Print("pair := &Named" + strings.Title(mapTypeName) + "{}")
+					code.Print("pair.Name = k")
 					if mapTypeName == "string" {
-						code.Print("x.%s[k] = v.(string)", fieldName)
+						code.Print("pair.Value = v.(string)")
 					} else {
-						code.Print("x.%s[k] = Build%v(v)", fieldName, mapTypeName)
+						code.Print("pair.Value = Build%v(v)", mapTypeName)
 					}
+					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)
 					if propertyModel.Pattern != "" {
 						code.Print("}")
 					}

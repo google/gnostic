@@ -32,13 +32,13 @@ message ApiKeySecurity {
   string name = 2;
   string in = 3;
   string description = 4;
-  map<string, Any> vendor_extension = 5;
+  repeated NamedAny vendor_extension = 5;
 }
 
 message BasicAuthenticationSecurity {
   string type = 1;
   string description = 2;
-  map<string, Any> vendor_extension = 3;
+  repeated NamedAny vendor_extension = 3;
 }
 
 message BodyParameter {
@@ -47,22 +47,22 @@ message BodyParameter {
   string in = 3;
   bool required = 4;
   Schema schema = 5;
-  map<string, Any> vendor_extension = 6;
+  repeated NamedAny vendor_extension = 6;
 }
 
 message Contact {
   string name = 1;
   string url = 2;
   string email = 3;
-  map<string, Any> vendor_extension = 4;
+  repeated NamedAny vendor_extension = 4;
 }
 
 message Default {
-  map<string, Any> additional_properties = 1;
+  repeated NamedAny additional_properties = 1;
 }
 
 message Definitions {
-  map<string, Schema> additional_properties = 1;
+  repeated NamedSchema additional_properties = 1;
 }
 
 message Document {
@@ -84,13 +84,13 @@ message Document {
 }
 
 message Examples {
-  map<string, Any> additional_properties = 1;
+  repeated NamedAny additional_properties = 1;
 }
 
 message ExternalDocs {
   string description = 1;
   string url = 2;
-  map<string, Any> vendor_extension = 3;
+  repeated NamedAny vendor_extension = 3;
 }
 
 message FileSchema {
@@ -103,7 +103,7 @@ message FileSchema {
   bool read_only = 7;
   ExternalDocs external_docs = 8;
   Any example = 9;
-  map<string, Any> vendor_extension = 10;
+  repeated NamedAny vendor_extension = 10;
 }
 
 message FormDataParameterSubSchema {
@@ -129,7 +129,7 @@ message FormDataParameterSubSchema {
   bool unique_items = 20;
   repeated Any enum = 21;
   double multiple_of = 22;
-  map<string, Any> vendor_extension = 23;
+  repeated NamedAny vendor_extension = 23;
 }
 
 message Header {
@@ -151,7 +151,7 @@ message Header {
   repeated Any enum = 16;
   double multiple_of = 17;
   string description = 18;
-  map<string, Any> vendor_extension = 19;
+  repeated NamedAny vendor_extension = 19;
 }
 
 message HeaderParameterSubSchema {
@@ -176,11 +176,11 @@ message HeaderParameterSubSchema {
   bool unique_items = 19;
   repeated Any enum = 20;
   double multiple_of = 21;
-  map<string, Any> vendor_extension = 22;
+  repeated NamedAny vendor_extension = 22;
 }
 
 message Headers {
-  map<string, Header> additional_properties = 1;
+  repeated NamedHeader additional_properties = 1;
 }
 
 message Info {
@@ -190,7 +190,7 @@ message Info {
   string terms_of_service = 4;
   Contact contact = 5;
   License license = 6;
-  map<string, Any> vendor_extension = 7;
+  repeated NamedAny vendor_extension = 7;
 }
 
 message ItemsItem {
@@ -204,7 +204,57 @@ message JsonReference {
 message License {
   string name = 1;
   string url = 2;
-  map<string, Any> vendor_extension = 3;
+  repeated NamedAny vendor_extension = 3;
+}
+
+message NamedAny {
+  string name = 1;
+  Any value = 2;
+}
+
+message NamedHeader {
+  string name = 1;
+  Header value = 2;
+}
+
+message NamedParameter {
+  string name = 1;
+  Parameter value = 2;
+}
+
+message NamedPathItem {
+  string name = 1;
+  PathItem value = 2;
+}
+
+message NamedResponse {
+  string name = 1;
+  Response value = 2;
+}
+
+message NamedResponseValue {
+  string name = 1;
+  ResponseValue value = 2;
+}
+
+message NamedSchema {
+  string name = 1;
+  Schema value = 2;
+}
+
+message NamedSecurityDefinitionsItem {
+  string name = 1;
+  SecurityDefinitionsItem value = 2;
+}
+
+message NamedString {
+  string name = 1;
+  string value = 2;
+}
+
+message NamedStringArray {
+  string name = 1;
+  StringArray value = 2;
 }
 
 message NonBodyParameter {
@@ -223,7 +273,7 @@ message Oauth2AccessCodeSecurity {
   string authorization_url = 4;
   string token_url = 5;
   string description = 6;
-  map<string, Any> vendor_extension = 7;
+  repeated NamedAny vendor_extension = 7;
 }
 
 message Oauth2ApplicationSecurity {
@@ -232,7 +282,7 @@ message Oauth2ApplicationSecurity {
   Oauth2Scopes scopes = 3;
   string token_url = 4;
   string description = 5;
-  map<string, Any> vendor_extension = 6;
+  repeated NamedAny vendor_extension = 6;
 }
 
 message Oauth2ImplicitSecurity {
@@ -241,7 +291,7 @@ message Oauth2ImplicitSecurity {
   Oauth2Scopes scopes = 3;
   string authorization_url = 4;
   string description = 5;
-  map<string, Any> vendor_extension = 6;
+  repeated NamedAny vendor_extension = 6;
 }
 
 message Oauth2PasswordSecurity {
@@ -250,11 +300,11 @@ message Oauth2PasswordSecurity {
   Oauth2Scopes scopes = 3;
   string token_url = 4;
   string description = 5;
-  map<string, Any> vendor_extension = 6;
+  repeated NamedAny vendor_extension = 6;
 }
 
 message Oauth2Scopes {
-  map<string, string> additional_properties = 1;
+  repeated NamedString additional_properties = 1;
 }
 
 message Operation {
@@ -270,7 +320,7 @@ message Operation {
   repeated string schemes = 10;
   bool deprecated = 11;
   repeated SecurityRequirement security = 12;
-  map<string, Any> vendor_extension = 13;
+  repeated NamedAny vendor_extension = 13;
 }
 
 message Parameter {
@@ -281,7 +331,7 @@ message Parameter {
 }
 
 message ParameterDefinitions {
-  map<string, Parameter> additional_properties = 1;
+  repeated NamedParameter additional_properties = 1;
 }
 
 message ParametersItem {
@@ -301,7 +351,7 @@ message PathItem {
   Operation head = 7;
   Operation patch = 8;
   repeated ParametersItem parameters = 9;
-  map<string, Any> vendor_extension = 10;
+  repeated NamedAny vendor_extension = 10;
 }
 
 message PathParameterSubSchema {
@@ -326,12 +376,12 @@ message PathParameterSubSchema {
   bool unique_items = 19;
   repeated Any enum = 20;
   double multiple_of = 21;
-  map<string, Any> vendor_extension = 22;
+  repeated NamedAny vendor_extension = 22;
 }
 
 message Paths {
-  map<string, Any> vendor_extension = 1;
-  map<string, PathItem> path = 2;
+  repeated NamedAny vendor_extension = 1;
+  repeated NamedPathItem path = 2;
 }
 
 message PrimitivesItems {
@@ -352,11 +402,11 @@ message PrimitivesItems {
   bool unique_items = 15;
   repeated Any enum = 16;
   double multiple_of = 17;
-  map<string, Any> vendor_extension = 18;
+  repeated NamedAny vendor_extension = 18;
 }
 
 message Properties {
-  map<string, Schema> additional_properties = 1;
+  repeated NamedSchema additional_properties = 1;
 }
 
 message QueryParameterSubSchema {
@@ -382,7 +432,7 @@ message QueryParameterSubSchema {
   bool unique_items = 20;
   repeated Any enum = 21;
   double multiple_of = 22;
-  map<string, Any> vendor_extension = 23;
+  repeated NamedAny vendor_extension = 23;
 }
 
 message Response {
@@ -390,11 +440,11 @@ message Response {
   SchemaItem schema = 2;
   Headers headers = 3;
   Examples examples = 4;
-  map<string, Any> vendor_extension = 5;
+  repeated NamedAny vendor_extension = 5;
 }
 
 message ResponseDefinitions {
-  map<string, Response> additional_properties = 1;
+  repeated NamedResponse additional_properties = 1;
 }
 
 message ResponseValue {
@@ -405,8 +455,8 @@ message ResponseValue {
 }
 
 message Responses {
-  map<string, ResponseValue> response_code = 1;
-  map<string, Any> vendor_extension = 2;
+  repeated NamedResponseValue response_code = 1;
+  repeated NamedAny vendor_extension = 2;
 }
 
 message Schema {
@@ -440,7 +490,7 @@ message Schema {
   Xml xml = 28;
   ExternalDocs external_docs = 29;
   Any example = 30;
-  map<string, Any> vendor_extension = 31;
+  repeated NamedAny vendor_extension = 31;
 }
 
 message SchemaItem {
@@ -451,7 +501,7 @@ message SchemaItem {
 }
 
 message SecurityDefinitions {
-  map<string, SecurityDefinitionsItem> additional_properties = 1;
+  repeated NamedSecurityDefinitionsItem additional_properties = 1;
 }
 
 message SecurityDefinitionsItem {
@@ -466,7 +516,7 @@ message SecurityDefinitionsItem {
 }
 
 message SecurityRequirement {
-  map<string, StringArray> additional_properties = 1;
+  repeated NamedStringArray additional_properties = 1;
 }
 
 message StringArray {
@@ -477,7 +527,7 @@ message Tag {
   string name = 1;
   string description = 2;
   ExternalDocs external_docs = 3;
-  map<string, Any> vendor_extension = 4;
+  repeated NamedAny vendor_extension = 4;
 }
 
 message TypeItem {
@@ -485,7 +535,7 @@ message TypeItem {
 }
 
 message VendorExtension {
-  map<string, Any> additional_properties = 1;
+  repeated NamedAny additional_properties = 1;
 }
 
 message Xml {
@@ -494,6 +544,6 @@ message Xml {
   string prefix = 3;
   bool attribute = 4;
   bool wrapped = 5;
-  map<string, Any> vendor_extension = 6;
+  repeated NamedAny vendor_extension = 6;
 }
 

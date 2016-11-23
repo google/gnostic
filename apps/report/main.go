@@ -45,10 +45,10 @@ func printDocument(code *printer.Code, document *pb.Document) {
 	code.Print("Consumes: %+v", document.Consumes)
 	code.Print("Definitions:")
 	code.Indent()
-	for k, v := range document.Definitions.AdditionalProperties {
-		code.Print("%s", k)
+	for _, pair := range document.Definitions.AdditionalProperties {
+		code.Print("%s", pair.Name)
 		code.Indent()
-		printSchema(code, v)
+		printSchema(code, pair.Value)
 		code.Outdent()
 	}
 	code.Outdent()
@@ -67,9 +67,10 @@ func printDocument(code *printer.Code, document *pb.Document) {
 	code.Print("Parameters: %+v", document.Parameters)
 	code.Print("Paths:")
 	code.Indent()
-	for k, v := range document.Paths.Path {
-		code.Print("%+v", k)
+	for _, pair := range document.Paths.Path {
+		code.Print("%+v", pair.Name)
 		code.Indent()
+		v := pair.Value
 		if v.Get != nil {
 			code.Print("GET")
 			code.Indent()
@@ -91,9 +92,10 @@ func printDocument(code *printer.Code, document *pb.Document) {
 	code.Print("Security: %+v", document.Security)
 	code.Print("SecurityDefinitions:")
 	code.Indent()
-	for k, v := range document.SecurityDefinitions.AdditionalProperties {
-		code.Print("%s", k)
+	for _, pair := range document.SecurityDefinitions.AdditionalProperties {
+		code.Print("%s", pair.Name)
 		code.Indent()
+		v := pair.Value
 		switch t := v.Oneof.(type) {
 		default:
 			code.Print("unexpected type %T", t) // %T prints whatever type t has
@@ -112,8 +114,8 @@ func printDocument(code *printer.Code, document *pb.Document) {
 			code.Print("Flow: %+v", t.Oauth2ImplicitSecurity.Flow)
 			code.Print("Scopes:")
 			code.Indent()
-			for k, v := range t.Oauth2ImplicitSecurity.Scopes.AdditionalProperties {
-				code.Print("%s -> %s", k, v)
+			for _, pair := range t.Oauth2ImplicitSecurity.Scopes.AdditionalProperties {
+				code.Print("%s -> %s", pair.Name, pair.Value)
 			}
 			code.Outdent()
 			code.Outdent()
@@ -162,8 +164,8 @@ func printOperation(code *printer.Code, operation *pb.Operation) {
 	code.Indent()
 	code.Print("ResponseCode:")
 	code.Indent()
-	for k, v := range operation.Responses.ResponseCode {
-		code.Print("%s %s", k, v)
+	for _, pair := range operation.Responses.ResponseCode {
+		code.Print("%s %s", pair.Name, pair.Value)
 	}
 	code.Outdent()
 	printVendorExtension(code, operation.Responses.VendorExtension)
@@ -183,10 +185,10 @@ func printSchema(code *printer.Code, schema *pb.Schema) {
 	if schema.Properties != nil {
 		code.Print("Properties")
 		code.Indent()
-		for k, v := range schema.Properties.AdditionalProperties {
-			code.Print("%s", k)
+		for _, pair := range schema.Properties.AdditionalProperties {
+			code.Print("%s", pair.Name)
 			code.Indent()
-			printSchema(code, v)
+			printSchema(code, pair.Value)
 			code.Outdent()
 		}
 		code.Outdent()
@@ -200,7 +202,7 @@ func printSchema(code *printer.Code, schema *pb.Schema) {
 	printVendorExtension(code, schema.VendorExtension)
 }
 
-func printVendorExtension(code *printer.Code, vendorExtension map[string]*pb.Any) {
+func printVendorExtension(code *printer.Code, vendorExtension []*pb.NamedAny) {
 	if len(vendorExtension) > 0 {
 		code.Print("VendorExtension: %+v", vendorExtension)
 	}

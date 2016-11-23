@@ -77,6 +77,7 @@ type ClassModel struct {
 	OpenPatterns  []string         // patterns for properties that we allow
 	IsStringArray bool             // ugly override
 	IsBlob        bool             // ugly override
+	IsPair        bool             // class is a name-value pair used to support ordered maps
 }
 
 func (classModel *ClassModel) AddProperty(property *ClassProperty) {
@@ -107,6 +108,7 @@ type ClassCollection struct {
 	Schema              *jsonschema.Schema       // top-level schema
 	PatternNames        map[string]string        // a configured mapping from patterns to property names
 	ObjectClassRequests map[string]*ClassRequest // anonymous classes implied by class instantiation
+	MapClassRequests    map[string]string        // "NamedObject" classes that will be used to implement ordered maps
 }
 
 func NewClassCollection(schema *jsonschema.Schema) *ClassCollection {
@@ -114,6 +116,7 @@ func NewClassCollection(schema *jsonschema.Schema) *ClassCollection {
 	cc.ClassModels = make(map[string]*ClassModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
 	cc.ObjectClassRequests = make(map[string]*ClassRequest, 0)
+	cc.MapClassRequests = make(map[string]string, 0)
 	cc.Schema = schema
 	return cc
 }
@@ -281,10 +284,12 @@ func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassM
 			if propertySchema.Ref != nil {
 				className = classes.classNameForReference(*propertySchema.Ref)
 			}
-			propertyTypeName := fmt.Sprintf("map<string, %s>", className)
+			propertyTypeName := fmt.Sprintf("Named%s", className)
 			property := NewClassPropertyWithNameTypeAndPattern(propertyName, propertyTypeName, propertyPattern)
 			property.Implicit = true
 			property.MapType = className
+			property.Repeated = true
+			classes.MapClassRequests[property.MapType] = property.MapType
 			classModel.AddProperty(property)
 		}
 	}
@@ -296,10 +301,12 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 			if *schema.AdditionalProperties.Boolean == true {
 				classModel.Open = true
 				propertyName := "additionalProperties"
-				className := "map<string, Any>"
+				className := "NamedAny"
 				property := NewClassPropertyWithNameAndType(propertyName, className)
 				property.Implicit = true
 				property.MapType = "Any"
+				property.Repeated = true
+				classes.MapClassRequests[property.MapType] = property.MapType
 				classModel.AddProperty(property)
 				return
 			}
@@ -309,20 +316,24 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 			if schema.Ref != nil {
 				propertyName := "additionalProperties"
 				mapType := classes.classNameForReference(*schema.Ref)
-				className := fmt.Sprintf("map<string, %s>", mapType)
+				className := fmt.Sprintf("Named%s", mapType)
 				property := NewClassPropertyWithNameAndType(propertyName, className)
 				property.Implicit = true
 				property.MapType = mapType
+				property.Repeated = true
+				classes.MapClassRequests[property.MapType] = property.MapType
 				classModel.AddProperty(property)
 				return
 			} else if schema.Type != nil {
 				typeName := *schema.Type.String
 				if typeName == "string" {
 					propertyName := "additionalProperties"
-					className := "map<string, string>"
+					className := "NamedString"
 					property := NewClassPropertyWithNameAndType(propertyName, className)
 					property.Implicit = true
 					property.MapType = "string"
+					property.Repeated = true
+					classes.MapClassRequests[property.MapType] = property.MapType
 					classModel.AddProperty(property)
 					return
 				} else if typeName == "array" {
@@ -330,10 +341,12 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 						itemType := *schema.Items.Schema.Type.String
 						if itemType == "string" {
 							propertyName := "additionalProperties"
-							className := "map<string, StringArray>"
+							className := "NamedStringArray"
 							property := NewClassPropertyWithNameAndType(propertyName, className)
 							property.Implicit = true
 							property.MapType = "StringArray"
+							property.Repeated = true
+							classes.MapClassRequests[property.MapType] = property.MapType
 							classModel.AddProperty(property)
 							return
 						}
@@ -342,10 +355,12 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 			} else if schema.OneOf != nil {
 				propertyClassName := classes.classNameForStub(classModel.Name + "Item")
 				propertyName := "additionalProperties"
-				className := fmt.Sprintf("map<string, %s>", propertyClassName)
+				className := fmt.Sprintf("Named%s", propertyClassName)
 				property := NewClassPropertyWithNameAndType(propertyName, className)
 				property.Implicit = true
 				property.MapType = propertyClassName
+				property.Repeated = true
+				classes.MapClassRequests[property.MapType] = property.MapType
 				classModel.AddProperty(property)
 
 				classes.ObjectClassRequests[propertyClassName] =
@@ -455,9 +470,11 @@ func (classes *ClassCollection) buildAnyOfAccessors(classModel *ClassModel, sche
 func (classes *ClassCollection) buildDefaultAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	classModel.Open = true
 	propertyName := "additionalProperties"
-	className := "map<string, Any>"
+	className := "NamedAny"
 	property := NewClassPropertyWithNameAndType(propertyName, className)
 	property.MapType = "Any"
+	property.Repeated = true
+	classes.MapClassRequests[property.MapType] = property.MapType
 	classModel.AddProperty(property)
 }
 
@@ -515,6 +532,32 @@ func (classes *ClassCollection) build() {
 	for className, classRequest := range classes.ObjectClassRequests {
 		classes.ClassModels[classRequest.Name] =
 			classes.buildClassForDefinitionObject(className, classRequest.PropertyName, classRequest.Schema)
+	}
+
+	// iterate over map item classes to be instantiated and generate a class for each
+	mapClassNames := make([]string, 0)
+	for mapClassName, _ := range classes.MapClassRequests {
+		mapClassNames = append(mapClassNames, mapClassName)
+	}
+	sort.Strings(mapClassNames)
+
+	for _, mapClassName := range mapClassNames {
+		className := "Named" + strings.Title(mapClassName)
+		classModel := NewClassModel()
+		classModel.Name = className
+		classModel.IsPair = true
+
+		nameProperty := NewClassProperty()
+		nameProperty.Name = "name"
+		nameProperty.Type = "string"
+		classModel.AddProperty(nameProperty)
+
+		valueProperty := NewClassProperty()
+		valueProperty.Name = "value"
+		valueProperty.Type = mapClassName
+		classModel.AddProperty(valueProperty)
+
+		classes.ClassModels[className] = classModel
 	}
 
 	// add a class for string arrays
