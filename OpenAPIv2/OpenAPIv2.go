@@ -34,7 +34,7 @@ func BuildAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"schema", "boolean"}
+	allowedKeys := []string{"boolean", "schema"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -65,11 +65,11 @@ func BuildApiKeySecurity(in interface{}) *ApiKeySecurity {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"type", "name", "in"}
+	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"name", "in", "description", "vendorExtension", "type"}
+	allowedKeys := []string{"description", "in", "name", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -114,7 +114,7 @@ func BuildBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecuri
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"vendorExtension", "type", "description"}
+	allowedKeys := []string{"description", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -147,11 +147,11 @@ func BuildBodyParameter(in interface{}) *BodyParameter {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"name", "in", "schema"}
+	requiredKeys := []string{"in", "name", "schema"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"description", "name", "in", "required", "schema", "vendorExtension"}
+	allowedKeys := []string{"description", "in", "name", "required", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -196,7 +196,7 @@ func BuildContact(in interface{}) *Contact {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"name", "vendorExtension", "url", "email"}
+	allowedKeys := []string{"email", "name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -269,11 +269,11 @@ func BuildDocument(in interface{}) *Document {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"swagger", "info", "paths"}
+	requiredKeys := []string{"info", "paths", "swagger"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"swagger", "info", "security", "responses", "paths", "consumes", "externalDocs", "host", "produces", "schemes", "parameters", "definitions", "basePath", "tags", "securityDefinitions"}
+	allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -401,7 +401,7 @@ func BuildExternalDocs(in interface{}) *ExternalDocs {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"description", "url", "vendorExtension"}
+	allowedKeys := []string{"description", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -438,7 +438,7 @@ func BuildFileSchema(in interface{}) *FileSchema {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"format", "title", "externalDocs", "description", "required", "vendorExtension", "type", "example", "default", "readOnly"}
+	allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -504,7 +504,7 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"exclusiveMaximum", "maxLength", "default", "collectionFormat", "multipleOf", "pattern", "description", "minimum", "exclusiveMinimum", "items", "minItems", "required", "maximum", "vendorExtension", "uniqueItems", "maxItems", "in", "allowEmptyValue", "type", "format", "minLength", "name", "enum"}
+	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -628,7 +628,7 @@ func BuildHeader(in interface{}) *Header {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"type", "maximum", "uniqueItems", "maxLength", "collectionFormat", "maxItems", "enum", "pattern", "minimum", "default", "vendorExtension", "exclusiveMaximum", "items", "multipleOf", "description", "minItems", "format", "exclusiveMinimum", "minLength"}
+	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -732,7 +732,7 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"collectionFormat", "maxLength", "minItems", "maximum", "type", "minLength", "exclusiveMaximum", "minimum", "items", "required", "format", "maxItems", "multipleOf", "uniqueItems", "name", "in", "exclusiveMinimum", "default", "description", "enum", "pattern", "vendorExtension"}
+	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -866,11 +866,11 @@ func BuildInfo(in interface{}) *Info {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"version", "title"}
+	requiredKeys := []string{"title", "version"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"title", "version", "description", "vendorExtension", "termsOfService", "contact", "license"}
+	allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -976,7 +976,7 @@ func BuildLicense(in interface{}) *License {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"name", "url", "vendorExtension"}
+	allowedKeys := []string{"name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1009,7 +1009,7 @@ func BuildNonBodyParameter(in interface{}) *NonBodyParameter {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"name", "in", "type"}
+	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
@@ -1053,11 +1053,11 @@ func BuildOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"type", "flow", "authorizationUrl", "tokenUrl"}
+	requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"authorizationUrl", "tokenUrl", "description", "type", "vendorExtension", "flow", "scopes"}
+	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1106,11 +1106,11 @@ func BuildOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"type", "flow", "tokenUrl"}
+	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"type", "vendorExtension", "flow", "scopes", "tokenUrl", "description"}
+	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1155,11 +1155,11 @@ func BuildOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"type", "flow", "authorizationUrl"}
+	requiredKeys := []string{"authorizationUrl", "flow", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"description", "type", "flow", "scopes", "authorizationUrl", "vendorExtension"}
+	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1204,11 +1204,11 @@ func BuildOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	requiredKeys := []string{"type", "flow", "tokenUrl"}
+	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"vendorExtension", "type", "flow", "scopes", "tokenUrl", "description"}
+	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1275,7 +1275,7 @@ func BuildOperation(in interface{}) *Operation {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"externalDocs", "security", "summary", "produces", "consumes", "responses", "deprecated", "tags", "operationId", "vendorExtension", "description", "schemes", "parameters"}
+	allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1452,7 +1452,7 @@ func BuildPathItem(in interface{}) *PathItem {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"vendorExtension", "patch", "$ref", "put", "head", "post", "delete", "get", "parameters", "options"}
+	allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1524,7 +1524,7 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"required", "in", "name", "maxItems", "enum", "minLength", "maxLength", "exclusiveMinimum", "description", "minimum", "vendorExtension", "format", "default", "exclusiveMaximum", "items", "collectionFormat", "maximum", "multipleOf", "minItems", "uniqueItems", "type", "pattern"}
+	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1640,7 +1640,7 @@ func BuildPaths(in interface{}) *Paths {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"vendorExtension", "path"}
+	allowedKeys := []string{}
 	allowedPatterns := []string{"^x-", "^/"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1673,7 +1673,7 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"vendorExtension", "pattern", "default", "format", "collectionFormat", "minLength", "exclusiveMaximum", "multipleOf", "enum", "type", "maxItems", "items", "exclusiveMinimum", "minimum", "minItems", "maxLength", "uniqueItems", "maximum"}
+	allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1791,7 +1791,7 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"type", "maxItems", "maximum", "exclusiveMinimum", "collectionFormat", "minLength", "format", "minItems", "enum", "required", "minimum", "maxLength", "description", "items", "vendorExtension", "allowEmptyValue", "in", "default", "pattern", "exclusiveMaximum", "uniqueItems", "multipleOf", "name"}
+	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -1915,7 +1915,7 @@ func BuildResponse(in interface{}) *Response {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"vendorExtension", "description", "schema", "headers", "examples"}
+	allowedKeys := []string{"description", "examples", "headers", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -2000,7 +2000,7 @@ func BuildResponses(in interface{}) *Responses {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"responseCode", "vendorExtension"}
+	allowedKeys := []string{}
 	allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -2033,7 +2033,7 @@ func BuildSchema(in interface{}) *Schema {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"multipleOf", "minProperties", "description", "default", "discriminator", "maximum", "externalDocs", "$ref", "readOnly", "required", "exclusiveMinimum", "maxLength", "minLength", "xml", "additionalProperties", "pattern", "uniqueItems", "properties", "example", "maxProperties", "items", "enum", "minimum", "allOf", "exclusiveMaximum", "minItems", "title", "format", "type", "vendorExtension", "maxItems"}
+	allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -2331,7 +2331,7 @@ func BuildTag(in interface{}) *Tag {
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
 		return nil
 	}
-	allowedKeys := []string{"name", "description", "externalDocs", "vendorExtension"}
+	allowedKeys := []string{"description", "externalDocs", "name"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil
@@ -2398,7 +2398,7 @@ func BuildXml(in interface{}) *Xml {
 		log.Printf("%+v\n", keys)
 		return nil
 	}
-	allowedKeys := []string{"prefix", "vendorExtension", "attribute", "wrapped", "name", "namespace"}
+	allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		return nil

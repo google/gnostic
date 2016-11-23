@@ -43,6 +43,7 @@ type ClassProperty struct {
 	Type     string // type for property (scalar or message type)
 	Repeated bool   // true if this property is repeated (an array)
 	Pattern  string // if the property is a pattern property, names must match this pattern.
+	Implicit bool   // true if this property is implied by a pattern or "additional properties" property
 }
 
 func (classProperty *ClassProperty) description() string {
@@ -279,7 +280,9 @@ func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassM
 				className = classes.classNameForReference(*propertySchema.Ref)
 			}
 			propertyTypeName := fmt.Sprintf("map<string, %s>", className)
-			classModel.Properties[propertyName] = NewClassPropertyWithNameTypeAndPattern(propertyName, propertyTypeName, propertyPattern)
+			property := NewClassPropertyWithNameTypeAndPattern(propertyName, propertyTypeName, propertyPattern)
+			property.Implicit = true
+			classModel.Properties[propertyName] = property
 		}
 	}
 }
@@ -291,7 +294,9 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 				classModel.Open = true
 				propertyName := "additionalProperties"
 				className := "map<string, Any>"
-				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+				property := NewClassPropertyWithNameAndType(propertyName, className)
+				property.Implicit = true
+				classModel.Properties[propertyName] = property
 				return
 			}
 		} else if schema.AdditionalProperties.Schema != nil {
@@ -300,14 +305,18 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 			if schema.Ref != nil {
 				propertyName := "additionalProperties"
 				className := fmt.Sprintf("map<string, %s>", classes.classNameForReference(*schema.Ref))
-				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+				property := NewClassPropertyWithNameAndType(propertyName, className)
+				property.Implicit = true
+				classModel.Properties[propertyName] = property
 				return
 			} else if schema.Type != nil {
 				typeName := *schema.Type.String
 				if typeName == "string" {
 					propertyName := "additionalProperties"
 					className := "map<string, string>"
-					classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+					property := NewClassPropertyWithNameAndType(propertyName, className)
+					property.Implicit = true
+					classModel.Properties[propertyName] = property
 					return
 				} else if typeName == "array" {
 					if schema.Items != nil {
@@ -315,7 +324,9 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 						if itemType == "string" {
 							propertyName := "additionalProperties"
 							className := "map<string, StringArray>"
-							classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+							property := NewClassPropertyWithNameAndType(propertyName, className)
+							property.Implicit = true
+							classModel.Properties[propertyName] = property
 							return
 						}
 					}
@@ -324,7 +335,9 @@ func (classes *ClassCollection) buildAdditionalPropertyAccessors(classModel *Cla
 				propertyClassName := classes.classNameForStub(classModel.Name + "Item")
 				propertyName := "additionalProperties"
 				className := fmt.Sprintf("map<string, %s>", propertyClassName)
-				classModel.Properties[propertyName] = NewClassPropertyWithNameAndType(propertyName, className)
+				property := NewClassPropertyWithNameAndType(propertyName, className)
+				property.Implicit = true
+				classModel.Properties[propertyName] = property
 
 				classes.ObjectClassRequests[propertyClassName] =
 					NewClassRequest(propertyClassName, propertyName, schema)

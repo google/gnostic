@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/googleapis/openapi-compiler/printer"
@@ -95,10 +96,10 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("}")
 		oneOfWrapper := classModel.OneOfWrapper
 
-		propertyNames := classModel.sortedPropertyNames()
 		if len(classModel.Required) > 0 {
 			// verify that map includes all required keys
 			keyString := ""
+			sort.Strings(classModel.Required)
 			for _, k := range classModel.Required {
 				if keyString != "" {
 					keyString += ","
@@ -115,13 +116,20 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 		if !classModel.Open {
 			// verify that map has no unspecified keys
-			allowedKeyString := ""
+			allowedKeys := make([]string, 0)
 			for _, property := range classModel.Properties {
+				if !property.Implicit {
+					allowedKeys = append(allowedKeys, property.Name)
+				}
+			}
+			sort.Strings(allowedKeys)
+			allowedKeyString := ""
+			for _, allowedKey := range allowedKeys {
 				if allowedKeyString != "" {
 					allowedKeyString += ","
 				}
 				allowedKeyString += "\""
-				allowedKeyString += property.Name
+				allowedKeyString += allowedKey
 				allowedKeyString += "\""
 			}
 			allowedPatternString := ""
@@ -146,6 +154,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("  x := &%s{}", className)
 
 		var fieldNumber = 0
+		propertyNames := classModel.sortedPropertyNames()
 		for _, propertyName := range propertyNames {
 			propertyModel := classModel.Properties[propertyName]
 			fieldNumber += 1
