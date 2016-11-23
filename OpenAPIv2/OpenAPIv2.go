@@ -40,13 +40,13 @@ func BuildAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 		return nil
 	}
 	x := &AdditionalPropertiesItem{}
-	// bool boolean = 1;
-	if helpers.MapHasKey(m, "boolean") {
-		x.Boolean = m["boolean"].(bool)
-	}
-	// Schema schema = 2;
+	// Schema schema = 1;
 	if helpers.MapHasKey(m, "schema") {
 		x.Schema = BuildSchema(m["schema"])
+	}
+	// bool boolean = 2;
+	if helpers.MapHasKey(m, "boolean") {
+		x.Boolean = m["boolean"].(bool)
 	}
 	return x
 }
@@ -75,17 +75,17 @@ func BuildApiKeySecurity(in interface{}) *ApiKeySecurity {
 		return nil
 	}
 	x := &ApiKeySecurity{}
-	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
+	// string name = 1;
+	if helpers.MapHasKey(m, "name") {
+		x.Name = m["name"].(string)
 	}
 	// string in = 2;
 	if helpers.MapHasKey(m, "in") {
 		x.In = m["in"].(string)
 	}
-	// string name = 3;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = m["name"].(string)
+	// string description = 3;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
 	}
 	// string type = 4;
 	if helpers.MapHasKey(m, "type") {
@@ -157,25 +157,25 @@ func BuildBodyParameter(in interface{}) *BodyParameter {
 		return nil
 	}
 	x := &BodyParameter{}
-	// string description = 1;
+	// Schema schema = 1;
+	if helpers.MapHasKey(m, "schema") {
+		x.Schema = BuildSchema(m["schema"])
+	}
+	// string description = 2;
 	if helpers.MapHasKey(m, "description") {
 		x.Description = m["description"].(string)
-	}
-	// string in = 2;
-	if helpers.MapHasKey(m, "in") {
-		x.In = m["in"].(string)
 	}
 	// string name = 3;
 	if helpers.MapHasKey(m, "name") {
 		x.Name = m["name"].(string)
 	}
-	// bool required = 4;
+	// string in = 4;
+	if helpers.MapHasKey(m, "in") {
+		x.In = m["in"].(string)
+	}
+	// bool required = 5;
 	if helpers.MapHasKey(m, "required") {
 		x.Required = m["required"].(bool)
-	}
-	// Schema schema = 5;
-	if helpers.MapHasKey(m, "schema") {
-		x.Schema = BuildSchema(m["schema"])
 	}
 	// map<string, Any> vendor_extension = 6;
 	// MAP: Any ^x-
@@ -202,17 +202,17 @@ func BuildContact(in interface{}) *Contact {
 		return nil
 	}
 	x := &Contact{}
-	// string email = 1;
-	if helpers.MapHasKey(m, "email") {
-		x.Email = m["email"].(string)
-	}
-	// string name = 2;
+	// string name = 1;
 	if helpers.MapHasKey(m, "name") {
 		x.Name = m["name"].(string)
 	}
-	// string url = 3;
+	// string url = 2;
 	if helpers.MapHasKey(m, "url") {
 		x.Url = m["url"].(string)
+	}
+	// string email = 3;
+	if helpers.MapHasKey(m, "email") {
+		x.Email = m["email"].(string)
 	}
 	// map<string, Any> vendor_extension = 4;
 	// MAP: Any ^x-
@@ -279,66 +279,11 @@ func BuildDocument(in interface{}) *Document {
 		return nil
 	}
 	x := &Document{}
-	// string base_path = 1;
-	if helpers.MapHasKey(m, "basePath") {
-		x.BasePath = m["basePath"].(string)
-	}
-	// repeated string consumes = 2;
-	if helpers.MapHasKey(m, "consumes") {
-		v, ok := m["consumes"].([]interface{})
-		if ok {
-			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			log.Printf("unexpected: %+v", m["consumes"])
-		}
-	}
-	// Definitions definitions = 3;
+	// Definitions definitions = 1;
 	if helpers.MapHasKey(m, "definitions") {
 		x.Definitions = BuildDefinitions(m["definitions"])
 	}
-	// ExternalDocs external_docs = 4;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
-	}
-	// string host = 5;
-	if helpers.MapHasKey(m, "host") {
-		x.Host = m["host"].(string)
-	}
-	// Info info = 6;
-	if helpers.MapHasKey(m, "info") {
-		x.Info = BuildInfo(m["info"])
-	}
-	// ParameterDefinitions parameters = 7;
-	if helpers.MapHasKey(m, "parameters") {
-		x.Parameters = BuildParameterDefinitions(m["parameters"])
-	}
-	// Paths paths = 8;
-	if helpers.MapHasKey(m, "paths") {
-		x.Paths = BuildPaths(m["paths"])
-	}
-	// repeated string produces = 9;
-	if helpers.MapHasKey(m, "produces") {
-		v, ok := m["produces"].([]interface{})
-		if ok {
-			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			log.Printf("unexpected: %+v", m["produces"])
-		}
-	}
-	// ResponseDefinitions responses = 10;
-	if helpers.MapHasKey(m, "responses") {
-		x.Responses = BuildResponseDefinitions(m["responses"])
-	}
-	// repeated string schemes = 11;
-	if helpers.MapHasKey(m, "schemes") {
-		v, ok := m["schemes"].([]interface{})
-		if ok {
-			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			log.Printf("unexpected: %+v", m["schemes"])
-		}
-	}
-	// repeated SecurityRequirement security = 12;
+	// repeated SecurityRequirement security = 2;
 	if helpers.MapHasKey(m, "security") {
 		// repeated class SecurityRequirement
 		x.Security = make([]*SecurityRequirement, 0)
@@ -349,15 +294,62 @@ func BuildDocument(in interface{}) *Document {
 			}
 		}
 	}
-	// SecurityDefinitions security_definitions = 13;
+	// string host = 3;
+	if helpers.MapHasKey(m, "host") {
+		x.Host = m["host"].(string)
+	}
+	// ParameterDefinitions parameters = 4;
+	if helpers.MapHasKey(m, "parameters") {
+		x.Parameters = BuildParameterDefinitions(m["parameters"])
+	}
+	// ResponseDefinitions responses = 5;
+	if helpers.MapHasKey(m, "responses") {
+		x.Responses = BuildResponseDefinitions(m["responses"])
+	}
+	// repeated string produces = 6;
+	if helpers.MapHasKey(m, "produces") {
+		v, ok := m["produces"].([]interface{})
+		if ok {
+			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
+		} else {
+			log.Printf("unexpected: %+v", m["produces"])
+		}
+	}
+	// SecurityDefinitions security_definitions = 7;
 	if helpers.MapHasKey(m, "securityDefinitions") {
 		x.SecurityDefinitions = BuildSecurityDefinitions(m["securityDefinitions"])
 	}
-	// string swagger = 14;
+	// string swagger = 8;
 	if helpers.MapHasKey(m, "swagger") {
 		x.Swagger = m["swagger"].(string)
 	}
-	// repeated Tag tags = 15;
+	// repeated string consumes = 9;
+	if helpers.MapHasKey(m, "consumes") {
+		v, ok := m["consumes"].([]interface{})
+		if ok {
+			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
+		} else {
+			log.Printf("unexpected: %+v", m["consumes"])
+		}
+	}
+	// Paths paths = 10;
+	if helpers.MapHasKey(m, "paths") {
+		x.Paths = BuildPaths(m["paths"])
+	}
+	// string base_path = 11;
+	if helpers.MapHasKey(m, "basePath") {
+		x.BasePath = m["basePath"].(string)
+	}
+	// repeated string schemes = 12;
+	if helpers.MapHasKey(m, "schemes") {
+		v, ok := m["schemes"].([]interface{})
+		if ok {
+			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
+		} else {
+			log.Printf("unexpected: %+v", m["schemes"])
+		}
+	}
+	// repeated Tag tags = 13;
 	if helpers.MapHasKey(m, "tags") {
 		// repeated class Tag
 		x.Tags = make([]*Tag, 0)
@@ -367,6 +359,14 @@ func BuildDocument(in interface{}) *Document {
 				x.Tags = append(x.Tags, BuildTag(item))
 			}
 		}
+	}
+	// ExternalDocs external_docs = 14;
+	if helpers.MapHasKey(m, "externalDocs") {
+		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
+	}
+	// Info info = 15;
+	if helpers.MapHasKey(m, "info") {
+		x.Info = BuildInfo(m["info"])
 	}
 	return x
 }
@@ -407,13 +407,13 @@ func BuildExternalDocs(in interface{}) *ExternalDocs {
 		return nil
 	}
 	x := &ExternalDocs{}
-	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// string url = 2;
+	// string url = 1;
 	if helpers.MapHasKey(m, "url") {
 		x.Url = m["url"].(string)
+	}
+	// string description = 2;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
 	}
 	// map<string, Any> vendor_extension = 3;
 	// MAP: Any ^x-
@@ -444,31 +444,27 @@ func BuildFileSchema(in interface{}) *FileSchema {
 		return nil
 	}
 	x := &FileSchema{}
-	// Any default = 1;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(m["default"])
+	// bool read_only = 1;
+	if helpers.MapHasKey(m, "readOnly") {
+		x.ReadOnly = m["readOnly"].(bool)
 	}
-	// string description = 2;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// Any example = 3;
+	// Any example = 2;
 	if helpers.MapHasKey(m, "example") {
 		x.Example = BuildAny(m["example"])
+	}
+	// Any default = 3;
+	if helpers.MapHasKey(m, "default") {
+		x.Default = BuildAny(m["default"])
 	}
 	// ExternalDocs external_docs = 4;
 	if helpers.MapHasKey(m, "externalDocs") {
 		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
 	}
-	// string format = 5;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
+	// string type = 5;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
 	}
-	// bool read_only = 6;
-	if helpers.MapHasKey(m, "readOnly") {
-		x.ReadOnly = m["readOnly"].(bool)
-	}
-	// repeated string required = 7;
+	// repeated string required = 6;
 	if helpers.MapHasKey(m, "required") {
 		v, ok := m["required"].([]interface{})
 		if ok {
@@ -477,13 +473,17 @@ func BuildFileSchema(in interface{}) *FileSchema {
 			log.Printf("unexpected: %+v", m["required"])
 		}
 	}
+	// string format = 7;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
+	}
 	// string title = 8;
 	if helpers.MapHasKey(m, "title") {
 		x.Title = m["title"].(string)
 	}
-	// string type = 9;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
+	// string description = 9;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
 	}
 	// map<string, Any> vendor_extension = 10;
 	// MAP: Any ^x-
@@ -510,23 +510,15 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 		return nil
 	}
 	x := &FormDataParameterSubSchema{}
-	// bool allow_empty_value = 1;
-	if helpers.MapHasKey(m, "allowEmptyValue") {
-		x.AllowEmptyValue = m["allowEmptyValue"].(bool)
-	}
-	// string collection_format = 2;
+	// string collection_format = 1;
 	if helpers.MapHasKey(m, "collectionFormat") {
 		x.CollectionFormat = m["collectionFormat"].(string)
 	}
-	// Any default = 3;
+	// Any default = 2;
 	if helpers.MapHasKey(m, "default") {
 		x.Default = BuildAny(m["default"])
 	}
-	// string description = 4;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// repeated Any enum = 5;
+	// repeated Any enum = 3;
 	if helpers.MapHasKey(m, "enum") {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
@@ -537,73 +529,81 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 			}
 		}
 	}
-	// bool exclusive_maximum = 6;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
-	}
-	// bool exclusive_minimum = 7;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// string format = 8;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
-	}
-	// string in = 9;
+	// string in = 4;
 	if helpers.MapHasKey(m, "in") {
 		x.In = m["in"].(string)
 	}
-	// PrimitivesItems items = 10;
+	// bool unique_items = 5;
+	if helpers.MapHasKey(m, "uniqueItems") {
+		x.UniqueItems = m["uniqueItems"].(bool)
+	}
+	// string description = 6;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// bool allow_empty_value = 7;
+	if helpers.MapHasKey(m, "allowEmptyValue") {
+		x.AllowEmptyValue = m["allowEmptyValue"].(bool)
+	}
+	// PrimitivesItems items = 8;
 	if helpers.MapHasKey(m, "items") {
 		x.Items = BuildPrimitivesItems(m["items"])
 	}
-	// int64 max_items = 11;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = m["maxItems"].(int64)
+	// bool exclusive_minimum = 9;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
 	}
-	// int64 max_length = 12;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = m["maxLength"].(int64)
-	}
-	// float maximum = 13;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 14;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = m["minItems"].(int64)
-	}
-	// int64 min_length = 15;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = m["minLength"].(int64)
-	}
-	// float minimum = 16;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = m["minimum"].(float64)
-	}
-	// float multiple_of = 17;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = m["multipleOf"].(float64)
-	}
-	// string name = 18;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = m["name"].(string)
-	}
-	// string pattern = 19;
+	// string pattern = 10;
 	if helpers.MapHasKey(m, "pattern") {
 		x.Pattern = m["pattern"].(string)
 	}
-	// bool required = 20;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = m["required"].(bool)
+	// string format = 11;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
 	}
-	// string type = 21;
+	// string name = 12;
+	if helpers.MapHasKey(m, "name") {
+		x.Name = m["name"].(string)
+	}
+	// float multiple_of = 13;
+	if helpers.MapHasKey(m, "multipleOf") {
+		x.MultipleOf = m["multipleOf"].(float64)
+	}
+	// float minimum = 14;
+	if helpers.MapHasKey(m, "minimum") {
+		x.Minimum = m["minimum"].(float64)
+	}
+	// float maximum = 15;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
+	}
+	// int64 min_length = 16;
+	if helpers.MapHasKey(m, "minLength") {
+		x.MinLength = m["minLength"].(int64)
+	}
+	// string type = 17;
 	if helpers.MapHasKey(m, "type") {
 		x.Type = m["type"].(string)
 	}
-	// bool unique_items = 22;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = m["uniqueItems"].(bool)
+	// int64 max_items = 18;
+	if helpers.MapHasKey(m, "maxItems") {
+		x.MaxItems = m["maxItems"].(int64)
+	}
+	// bool required = 19;
+	if helpers.MapHasKey(m, "required") {
+		x.Required = m["required"].(bool)
+	}
+	// bool exclusive_maximum = 20;
+	if helpers.MapHasKey(m, "exclusiveMaximum") {
+		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
+	}
+	// int64 max_length = 21;
+	if helpers.MapHasKey(m, "maxLength") {
+		x.MaxLength = m["maxLength"].(int64)
+	}
+	// int64 min_items = 22;
+	if helpers.MapHasKey(m, "minItems") {
+		x.MinItems = m["minItems"].(int64)
 	}
 	// map<string, Any> vendor_extension = 23;
 	// MAP: Any ^x-
@@ -634,19 +634,75 @@ func BuildHeader(in interface{}) *Header {
 		return nil
 	}
 	x := &Header{}
-	// string collection_format = 1;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = m["collectionFormat"].(string)
+	// int64 min_length = 1;
+	if helpers.MapHasKey(m, "minLength") {
+		x.MinLength = m["minLength"].(int64)
 	}
-	// Any default = 2;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(m["default"])
+	// float multiple_of = 2;
+	if helpers.MapHasKey(m, "multipleOf") {
+		x.MultipleOf = m["multipleOf"].(float64)
 	}
-	// string description = 3;
+	// int64 max_length = 3;
+	if helpers.MapHasKey(m, "maxLength") {
+		x.MaxLength = m["maxLength"].(int64)
+	}
+	// string description = 4;
 	if helpers.MapHasKey(m, "description") {
 		x.Description = m["description"].(string)
 	}
-	// repeated Any enum = 4;
+	// PrimitivesItems items = 5;
+	if helpers.MapHasKey(m, "items") {
+		x.Items = BuildPrimitivesItems(m["items"])
+	}
+	// string collection_format = 6;
+	if helpers.MapHasKey(m, "collectionFormat") {
+		x.CollectionFormat = m["collectionFormat"].(string)
+	}
+	// string type = 7;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
+	}
+	// int64 min_items = 8;
+	if helpers.MapHasKey(m, "minItems") {
+		x.MinItems = m["minItems"].(int64)
+	}
+	// bool exclusive_minimum = 9;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
+	}
+	// int64 max_items = 10;
+	if helpers.MapHasKey(m, "maxItems") {
+		x.MaxItems = m["maxItems"].(int64)
+	}
+	// string pattern = 11;
+	if helpers.MapHasKey(m, "pattern") {
+		x.Pattern = m["pattern"].(string)
+	}
+	// bool exclusive_maximum = 12;
+	if helpers.MapHasKey(m, "exclusiveMaximum") {
+		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
+	}
+	// bool unique_items = 13;
+	if helpers.MapHasKey(m, "uniqueItems") {
+		x.UniqueItems = m["uniqueItems"].(bool)
+	}
+	// Any default = 14;
+	if helpers.MapHasKey(m, "default") {
+		x.Default = BuildAny(m["default"])
+	}
+	// string format = 15;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
+	}
+	// float minimum = 16;
+	if helpers.MapHasKey(m, "minimum") {
+		x.Minimum = m["minimum"].(float64)
+	}
+	// float maximum = 17;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
+	}
+	// repeated Any enum = 18;
 	if helpers.MapHasKey(m, "enum") {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
@@ -656,62 +712,6 @@ func BuildHeader(in interface{}) *Header {
 				x.Enum = append(x.Enum, BuildAny(item))
 			}
 		}
-	}
-	// bool exclusive_maximum = 5;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
-	}
-	// bool exclusive_minimum = 6;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// string format = 7;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
-	}
-	// PrimitivesItems items = 8;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(m["items"])
-	}
-	// int64 max_items = 9;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = m["maxItems"].(int64)
-	}
-	// int64 max_length = 10;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = m["maxLength"].(int64)
-	}
-	// float maximum = 11;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 12;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = m["minItems"].(int64)
-	}
-	// int64 min_length = 13;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = m["minLength"].(int64)
-	}
-	// float minimum = 14;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = m["minimum"].(float64)
-	}
-	// float multiple_of = 15;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = m["multipleOf"].(float64)
-	}
-	// string pattern = 16;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = m["pattern"].(string)
-	}
-	// string type = 17;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
-	}
-	// bool unique_items = 18;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = m["uniqueItems"].(bool)
 	}
 	// map<string, Any> vendor_extension = 19;
 	// MAP: Any ^x-
@@ -738,19 +738,7 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		return nil
 	}
 	x := &HeaderParameterSubSchema{}
-	// string collection_format = 1;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = m["collectionFormat"].(string)
-	}
-	// Any default = 2;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(m["default"])
-	}
-	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// repeated Any enum = 4;
+	// repeated Any enum = 1;
 	if helpers.MapHasKey(m, "enum") {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
@@ -761,53 +749,65 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 			}
 		}
 	}
-	// bool exclusive_maximum = 5;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
-	}
-	// bool exclusive_minimum = 6;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// string format = 7;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
-	}
-	// string in = 8;
-	if helpers.MapHasKey(m, "in") {
-		x.In = m["in"].(string)
-	}
-	// PrimitivesItems items = 9;
+	// PrimitivesItems items = 2;
 	if helpers.MapHasKey(m, "items") {
 		x.Items = BuildPrimitivesItems(m["items"])
 	}
-	// int64 max_items = 10;
+	// string description = 3;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// string collection_format = 4;
+	if helpers.MapHasKey(m, "collectionFormat") {
+		x.CollectionFormat = m["collectionFormat"].(string)
+	}
+	// int64 min_items = 5;
+	if helpers.MapHasKey(m, "minItems") {
+		x.MinItems = m["minItems"].(int64)
+	}
+	// bool required = 6;
+	if helpers.MapHasKey(m, "required") {
+		x.Required = m["required"].(bool)
+	}
+	// bool exclusive_minimum = 7;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
+	}
+	// float multiple_of = 8;
+	if helpers.MapHasKey(m, "multipleOf") {
+		x.MultipleOf = m["multipleOf"].(float64)
+	}
+	// string format = 9;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
+	}
+	// bool exclusive_maximum = 10;
+	if helpers.MapHasKey(m, "exclusiveMaximum") {
+		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
+	}
+	// int64 max_items = 11;
 	if helpers.MapHasKey(m, "maxItems") {
 		x.MaxItems = m["maxItems"].(int64)
 	}
-	// int64 max_length = 11;
+	// int64 max_length = 12;
 	if helpers.MapHasKey(m, "maxLength") {
 		x.MaxLength = m["maxLength"].(int64)
 	}
-	// float maximum = 12;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 13;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = m["minItems"].(int64)
+	// Any default = 13;
+	if helpers.MapHasKey(m, "default") {
+		x.Default = BuildAny(m["default"])
 	}
 	// int64 min_length = 14;
 	if helpers.MapHasKey(m, "minLength") {
 		x.MinLength = m["minLength"].(int64)
 	}
-	// float minimum = 15;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = m["minimum"].(float64)
+	// string in = 15;
+	if helpers.MapHasKey(m, "in") {
+		x.In = m["in"].(string)
 	}
-	// float multiple_of = 16;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = m["multipleOf"].(float64)
+	// float maximum = 16;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
 	}
 	// string name = 17;
 	if helpers.MapHasKey(m, "name") {
@@ -817,17 +817,17 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	if helpers.MapHasKey(m, "pattern") {
 		x.Pattern = m["pattern"].(string)
 	}
-	// bool required = 19;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = m["required"].(bool)
+	// float minimum = 19;
+	if helpers.MapHasKey(m, "minimum") {
+		x.Minimum = m["minimum"].(float64)
 	}
-	// string type = 20;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
-	}
-	// bool unique_items = 21;
+	// bool unique_items = 20;
 	if helpers.MapHasKey(m, "uniqueItems") {
 		x.UniqueItems = m["uniqueItems"].(bool)
+	}
+	// string type = 21;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
 	}
 	// map<string, Any> vendor_extension = 22;
 	// MAP: Any ^x-
@@ -876,37 +876,37 @@ func BuildInfo(in interface{}) *Info {
 		return nil
 	}
 	x := &Info{}
-	// Contact contact = 1;
+	// string terms_of_service = 1;
+	if helpers.MapHasKey(m, "termsOfService") {
+		x.TermsOfService = m["termsOfService"].(string)
+	}
+	// Contact contact = 2;
 	if helpers.MapHasKey(m, "contact") {
 		x.Contact = BuildContact(m["contact"])
-	}
-	// string description = 2;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
 	}
 	// License license = 3;
 	if helpers.MapHasKey(m, "license") {
 		x.License = BuildLicense(m["license"])
 	}
-	// string terms_of_service = 4;
-	if helpers.MapHasKey(m, "termsOfService") {
-		x.TermsOfService = m["termsOfService"].(string)
-	}
-	// string title = 5;
+	// string title = 4;
 	if helpers.MapHasKey(m, "title") {
 		x.Title = m["title"].(string)
 	}
-	// map<string, Any> vendor_extension = 6;
+	// string version = 5;
+	if helpers.MapHasKey(m, "version") {
+		x.Version = m["version"].(string)
+	}
+	// string description = 6;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// map<string, Any> vendor_extension = 7;
 	// MAP: Any ^x-
 	x.VendorExtension = make(map[string]*Any, 0)
 	for k, v := range m {
 		if helpers.PatternMatches("^x-", k) {
 			x.VendorExtension[k] = BuildAny(v)
 		}
-	}
-	// string version = 7;
-	if helpers.MapHasKey(m, "version") {
-		x.Version = m["version"].(string)
 	}
 	return x
 }
@@ -1014,32 +1014,32 @@ func BuildNonBodyParameter(in interface{}) *NonBodyParameter {
 		return nil
 	}
 	x := &NonBodyParameter{}
-	// FormDataParameterSubSchema form_data_parameter_sub_schema = 1;
-	{
-		t := BuildFormDataParameterSubSchema(m)
-		if t != nil {
-			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
-		}
-	}
-	// HeaderParameterSubSchema header_parameter_sub_schema = 2;
+	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
 		t := BuildHeaderParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
 	}
-	// PathParameterSubSchema path_parameter_sub_schema = 3;
+	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
-		t := BuildPathParameterSubSchema(m)
+		t := BuildFormDataParameterSubSchema(m)
 		if t != nil {
-			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
+			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
 	}
-	// QueryParameterSubSchema query_parameter_sub_schema = 4;
+	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
 		t := BuildQueryParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
+		}
+	}
+	// PathParameterSubSchema path_parameter_sub_schema = 4;
+	{
+		t := BuildPathParameterSubSchema(m)
+		if t != nil {
+			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
 	}
 	return x
@@ -1063,29 +1063,29 @@ func BuildOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 		return nil
 	}
 	x := &Oauth2AccessCodeSecurity{}
-	// string authorization_url = 1;
-	if helpers.MapHasKey(m, "authorizationUrl") {
-		x.AuthorizationUrl = m["authorizationUrl"].(string)
-	}
-	// string description = 2;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// string flow = 3;
-	if helpers.MapHasKey(m, "flow") {
-		x.Flow = m["flow"].(string)
-	}
-	// Oauth2Scopes scopes = 4;
+	// Oauth2Scopes scopes = 1;
 	if helpers.MapHasKey(m, "scopes") {
 		x.Scopes = BuildOauth2Scopes(m["scopes"])
 	}
-	// string token_url = 5;
+	// string authorization_url = 2;
+	if helpers.MapHasKey(m, "authorizationUrl") {
+		x.AuthorizationUrl = m["authorizationUrl"].(string)
+	}
+	// string token_url = 3;
 	if helpers.MapHasKey(m, "tokenUrl") {
 		x.TokenUrl = m["tokenUrl"].(string)
 	}
-	// string type = 6;
+	// string description = 4;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// string type = 5;
 	if helpers.MapHasKey(m, "type") {
 		x.Type = m["type"].(string)
+	}
+	// string flow = 6;
+	if helpers.MapHasKey(m, "flow") {
+		x.Flow = m["flow"].(string)
 	}
 	// map<string, Any> vendor_extension = 7;
 	// MAP: Any ^x-
@@ -1116,9 +1116,9 @@ func BuildOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 		return nil
 	}
 	x := &Oauth2ApplicationSecurity{}
-	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
+	// string type = 1;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
 	}
 	// string flow = 2;
 	if helpers.MapHasKey(m, "flow") {
@@ -1132,9 +1132,9 @@ func BuildOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 	if helpers.MapHasKey(m, "tokenUrl") {
 		x.TokenUrl = m["tokenUrl"].(string)
 	}
-	// string type = 5;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
+	// string description = 5;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
 	}
 	// map<string, Any> vendor_extension = 6;
 	// MAP: Any ^x-
@@ -1165,25 +1165,25 @@ func BuildOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 		return nil
 	}
 	x := &Oauth2ImplicitSecurity{}
-	// string authorization_url = 1;
-	if helpers.MapHasKey(m, "authorizationUrl") {
-		x.AuthorizationUrl = m["authorizationUrl"].(string)
+	// string type = 1;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
 	}
-	// string description = 2;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// string flow = 3;
+	// string flow = 2;
 	if helpers.MapHasKey(m, "flow") {
 		x.Flow = m["flow"].(string)
 	}
-	// Oauth2Scopes scopes = 4;
+	// Oauth2Scopes scopes = 3;
 	if helpers.MapHasKey(m, "scopes") {
 		x.Scopes = BuildOauth2Scopes(m["scopes"])
 	}
-	// string type = 5;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
+	// string authorization_url = 4;
+	if helpers.MapHasKey(m, "authorizationUrl") {
+		x.AuthorizationUrl = m["authorizationUrl"].(string)
+	}
+	// string description = 5;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
 	}
 	// map<string, Any> vendor_extension = 6;
 	// MAP: Any ^x-
@@ -1214,25 +1214,25 @@ func BuildOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 		return nil
 	}
 	x := &Oauth2PasswordSecurity{}
-	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// string flow = 2;
-	if helpers.MapHasKey(m, "flow") {
-		x.Flow = m["flow"].(string)
-	}
-	// Oauth2Scopes scopes = 3;
-	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = BuildOauth2Scopes(m["scopes"])
-	}
-	// string token_url = 4;
+	// string token_url = 1;
 	if helpers.MapHasKey(m, "tokenUrl") {
 		x.TokenUrl = m["tokenUrl"].(string)
 	}
-	// string type = 5;
+	// string description = 2;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// string type = 3;
 	if helpers.MapHasKey(m, "type") {
 		x.Type = m["type"].(string)
+	}
+	// string flow = 4;
+	if helpers.MapHasKey(m, "flow") {
+		x.Flow = m["flow"].(string)
+	}
+	// Oauth2Scopes scopes = 5;
+	if helpers.MapHasKey(m, "scopes") {
+		x.Scopes = BuildOauth2Scopes(m["scopes"])
 	}
 	// map<string, Any> vendor_extension = 6;
 	// MAP: Any ^x-
@@ -1281,30 +1281,30 @@ func BuildOperation(in interface{}) *Operation {
 		return nil
 	}
 	x := &Operation{}
-	// repeated string consumes = 1;
-	if helpers.MapHasKey(m, "consumes") {
-		v, ok := m["consumes"].([]interface{})
+	// repeated string tags = 1;
+	if helpers.MapHasKey(m, "tags") {
+		v, ok := m["tags"].([]interface{})
 		if ok {
-			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
+			x.Tags = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", m["consumes"])
+			log.Printf("unexpected: %+v", m["tags"])
 		}
 	}
-	// bool deprecated = 2;
-	if helpers.MapHasKey(m, "deprecated") {
-		x.Deprecated = m["deprecated"].(bool)
+	// string summary = 2;
+	if helpers.MapHasKey(m, "summary") {
+		x.Summary = m["summary"].(string)
 	}
 	// string description = 3;
 	if helpers.MapHasKey(m, "description") {
 		x.Description = m["description"].(string)
 	}
-	// ExternalDocs external_docs = 4;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
-	}
-	// string operation_id = 5;
+	// string operation_id = 4;
 	if helpers.MapHasKey(m, "operationId") {
 		x.OperationId = m["operationId"].(string)
+	}
+	// bool deprecated = 5;
+	if helpers.MapHasKey(m, "deprecated") {
+		x.Deprecated = m["deprecated"].(bool)
 	}
 	// repeated ParametersItem parameters = 6;
 	if helpers.MapHasKey(m, "parameters") {
@@ -1317,18 +1317,18 @@ func BuildOperation(in interface{}) *Operation {
 			}
 		}
 	}
-	// repeated string produces = 7;
-	if helpers.MapHasKey(m, "produces") {
-		v, ok := m["produces"].([]interface{})
-		if ok {
-			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			log.Printf("unexpected: %+v", m["produces"])
-		}
-	}
-	// Responses responses = 8;
+	// Responses responses = 7;
 	if helpers.MapHasKey(m, "responses") {
 		x.Responses = BuildResponses(m["responses"])
+	}
+	// repeated string consumes = 8;
+	if helpers.MapHasKey(m, "consumes") {
+		v, ok := m["consumes"].([]interface{})
+		if ok {
+			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
+		} else {
+			log.Printf("unexpected: %+v", m["consumes"])
+		}
 	}
 	// repeated string schemes = 9;
 	if helpers.MapHasKey(m, "schemes") {
@@ -1350,17 +1350,17 @@ func BuildOperation(in interface{}) *Operation {
 			}
 		}
 	}
-	// string summary = 11;
-	if helpers.MapHasKey(m, "summary") {
-		x.Summary = m["summary"].(string)
+	// ExternalDocs external_docs = 11;
+	if helpers.MapHasKey(m, "externalDocs") {
+		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
 	}
-	// repeated string tags = 12;
-	if helpers.MapHasKey(m, "tags") {
-		v, ok := m["tags"].([]interface{})
+	// repeated string produces = 12;
+	if helpers.MapHasKey(m, "produces") {
+		v, ok := m["produces"].([]interface{})
 		if ok {
-			x.Tags = helpers.ConvertInterfaceArrayToStringArray(v)
+			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", m["tags"])
+			log.Printf("unexpected: %+v", m["produces"])
 		}
 	}
 	// map<string, Any> vendor_extension = 13;
@@ -1427,18 +1427,18 @@ func BuildParametersItem(in interface{}) *ParametersItem {
 		return nil
 	}
 	x := &ParametersItem{}
-	// JsonReference json_reference = 1;
-	{
-		t := BuildJsonReference(m)
-		if t != nil {
-			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
-		}
-	}
-	// Parameter parameter = 2;
+	// Parameter parameter = 1;
 	{
 		t := BuildParameter(m)
 		if t != nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
+		}
+	}
+	// JsonReference json_reference = 2;
+	{
+		t := BuildJsonReference(m)
+		if t != nil {
+			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
 	}
 	return x
@@ -1458,27 +1458,35 @@ func BuildPathItem(in interface{}) *PathItem {
 		return nil
 	}
 	x := &PathItem{}
-	// string _ref = 1;
-	if helpers.MapHasKey(m, "$ref") {
-		x.XRef = m["$ref"].(string)
+	// Operation get = 1;
+	if helpers.MapHasKey(m, "get") {
+		x.Get = BuildOperation(m["get"])
 	}
 	// Operation delete = 2;
 	if helpers.MapHasKey(m, "delete") {
 		x.Delete = BuildOperation(m["delete"])
 	}
-	// Operation get = 3;
-	if helpers.MapHasKey(m, "get") {
-		x.Get = BuildOperation(m["get"])
+	// Operation put = 3;
+	if helpers.MapHasKey(m, "put") {
+		x.Put = BuildOperation(m["put"])
 	}
-	// Operation head = 4;
-	if helpers.MapHasKey(m, "head") {
-		x.Head = BuildOperation(m["head"])
+	// Operation post = 4;
+	if helpers.MapHasKey(m, "post") {
+		x.Post = BuildOperation(m["post"])
 	}
 	// Operation options = 5;
 	if helpers.MapHasKey(m, "options") {
 		x.Options = BuildOperation(m["options"])
 	}
-	// repeated ParametersItem parameters = 6;
+	// string _ref = 6;
+	if helpers.MapHasKey(m, "$ref") {
+		x.XRef = m["$ref"].(string)
+	}
+	// Operation head = 7;
+	if helpers.MapHasKey(m, "head") {
+		x.Head = BuildOperation(m["head"])
+	}
+	// repeated ParametersItem parameters = 8;
 	if helpers.MapHasKey(m, "parameters") {
 		// repeated class ParametersItem
 		x.Parameters = make([]*ParametersItem, 0)
@@ -1489,17 +1497,9 @@ func BuildPathItem(in interface{}) *PathItem {
 			}
 		}
 	}
-	// Operation patch = 7;
+	// Operation patch = 9;
 	if helpers.MapHasKey(m, "patch") {
 		x.Patch = BuildOperation(m["patch"])
-	}
-	// Operation post = 8;
-	if helpers.MapHasKey(m, "post") {
-		x.Post = BuildOperation(m["post"])
-	}
-	// Operation put = 9;
-	if helpers.MapHasKey(m, "put") {
-		x.Put = BuildOperation(m["put"])
 	}
 	// map<string, Any> vendor_extension = 10;
 	// MAP: Any ^x-
@@ -1530,19 +1530,83 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 		return nil
 	}
 	x := &PathParameterSubSchema{}
-	// string collection_format = 1;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = m["collectionFormat"].(string)
+	// string name = 1;
+	if helpers.MapHasKey(m, "name") {
+		x.Name = m["name"].(string)
 	}
-	// Any default = 2;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(m["default"])
-	}
-	// string description = 3;
+	// string description = 2;
 	if helpers.MapHasKey(m, "description") {
 		x.Description = m["description"].(string)
 	}
-	// repeated Any enum = 4;
+	// bool required = 3;
+	if helpers.MapHasKey(m, "required") {
+		x.Required = m["required"].(bool)
+	}
+	// string collection_format = 4;
+	if helpers.MapHasKey(m, "collectionFormat") {
+		x.CollectionFormat = m["collectionFormat"].(string)
+	}
+	// bool exclusive_maximum = 5;
+	if helpers.MapHasKey(m, "exclusiveMaximum") {
+		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
+	}
+	// bool exclusive_minimum = 6;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
+	}
+	// float minimum = 7;
+	if helpers.MapHasKey(m, "minimum") {
+		x.Minimum = m["minimum"].(float64)
+	}
+	// int64 min_items = 8;
+	if helpers.MapHasKey(m, "minItems") {
+		x.MinItems = m["minItems"].(int64)
+	}
+	// Any default = 9;
+	if helpers.MapHasKey(m, "default") {
+		x.Default = BuildAny(m["default"])
+	}
+	// PrimitivesItems items = 10;
+	if helpers.MapHasKey(m, "items") {
+		x.Items = BuildPrimitivesItems(m["items"])
+	}
+	// int64 min_length = 11;
+	if helpers.MapHasKey(m, "minLength") {
+		x.MinLength = m["minLength"].(int64)
+	}
+	// string type = 12;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
+	}
+	// int64 max_length = 13;
+	if helpers.MapHasKey(m, "maxLength") {
+		x.MaxLength = m["maxLength"].(int64)
+	}
+	// int64 max_items = 14;
+	if helpers.MapHasKey(m, "maxItems") {
+		x.MaxItems = m["maxItems"].(int64)
+	}
+	// float maximum = 15;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
+	}
+	// string pattern = 16;
+	if helpers.MapHasKey(m, "pattern") {
+		x.Pattern = m["pattern"].(string)
+	}
+	// float multiple_of = 17;
+	if helpers.MapHasKey(m, "multipleOf") {
+		x.MultipleOf = m["multipleOf"].(float64)
+	}
+	// string format = 18;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
+	}
+	// bool unique_items = 19;
+	if helpers.MapHasKey(m, "uniqueItems") {
+		x.UniqueItems = m["uniqueItems"].(bool)
+	}
+	// repeated Any enum = 20;
 	if helpers.MapHasKey(m, "enum") {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
@@ -1553,73 +1617,9 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 			}
 		}
 	}
-	// bool exclusive_maximum = 5;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
-	}
-	// bool exclusive_minimum = 6;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// string format = 7;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
-	}
-	// string in = 8;
+	// string in = 21;
 	if helpers.MapHasKey(m, "in") {
 		x.In = m["in"].(string)
-	}
-	// PrimitivesItems items = 9;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(m["items"])
-	}
-	// int64 max_items = 10;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = m["maxItems"].(int64)
-	}
-	// int64 max_length = 11;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = m["maxLength"].(int64)
-	}
-	// float maximum = 12;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 13;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = m["minItems"].(int64)
-	}
-	// int64 min_length = 14;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = m["minLength"].(int64)
-	}
-	// float minimum = 15;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = m["minimum"].(float64)
-	}
-	// float multiple_of = 16;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = m["multipleOf"].(float64)
-	}
-	// string name = 17;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = m["name"].(string)
-	}
-	// string pattern = 18;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = m["pattern"].(string)
-	}
-	// bool required = 19;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = m["required"].(bool)
-	}
-	// string type = 20;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
-	}
-	// bool unique_items = 21;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = m["uniqueItems"].(bool)
 	}
 	// map<string, Any> vendor_extension = 22;
 	// MAP: Any ^x-
@@ -1646,20 +1646,20 @@ func BuildPaths(in interface{}) *Paths {
 		return nil
 	}
 	x := &Paths{}
-	// map<string, PathItem> path = 1;
-	// MAP: PathItem ^/
-	x.Path = make(map[string]*PathItem, 0)
-	for k, v := range m {
-		if helpers.PatternMatches("^/", k) {
-			x.Path[k] = BuildPathItem(v)
-		}
-	}
-	// map<string, Any> vendor_extension = 2;
+	// map<string, Any> vendor_extension = 1;
 	// MAP: Any ^x-
 	x.VendorExtension = make(map[string]*Any, 0)
 	for k, v := range m {
 		if helpers.PatternMatches("^x-", k) {
 			x.VendorExtension[k] = BuildAny(v)
+		}
+	}
+	// map<string, PathItem> path = 2;
+	// MAP: PathItem ^/
+	x.Path = make(map[string]*PathItem, 0)
+	for k, v := range m {
+		if helpers.PatternMatches("^/", k) {
+			x.Path[k] = BuildPathItem(v)
 		}
 	}
 	return x
@@ -1679,15 +1679,31 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 		return nil
 	}
 	x := &PrimitivesItems{}
-	// string collection_format = 1;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = m["collectionFormat"].(string)
+	// bool exclusive_minimum = 1;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
 	}
-	// Any default = 2;
+	// int64 min_length = 2;
+	if helpers.MapHasKey(m, "minLength") {
+		x.MinLength = m["minLength"].(int64)
+	}
+	// string format = 3;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
+	}
+	// int64 max_items = 4;
+	if helpers.MapHasKey(m, "maxItems") {
+		x.MaxItems = m["maxItems"].(int64)
+	}
+	// int64 min_items = 5;
+	if helpers.MapHasKey(m, "minItems") {
+		x.MinItems = m["minItems"].(int64)
+	}
+	// Any default = 6;
 	if helpers.MapHasKey(m, "default") {
 		x.Default = BuildAny(m["default"])
 	}
-	// repeated Any enum = 3;
+	// repeated Any enum = 7;
 	if helpers.MapHasKey(m, "enum") {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
@@ -1698,61 +1714,45 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 			}
 		}
 	}
-	// bool exclusive_maximum = 4;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
-	}
-	// bool exclusive_minimum = 5;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// string format = 6;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
-	}
-	// PrimitivesItems items = 7;
+	// PrimitivesItems items = 8;
 	if helpers.MapHasKey(m, "items") {
 		x.Items = BuildPrimitivesItems(m["items"])
 	}
-	// int64 max_items = 8;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = m["maxItems"].(int64)
-	}
-	// int64 max_length = 9;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = m["maxLength"].(int64)
-	}
-	// float maximum = 10;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 11;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = m["minItems"].(int64)
-	}
-	// int64 min_length = 12;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = m["minLength"].(int64)
-	}
-	// float minimum = 13;
+	// float minimum = 9;
 	if helpers.MapHasKey(m, "minimum") {
 		x.Minimum = m["minimum"].(float64)
 	}
-	// float multiple_of = 14;
+	// float multiple_of = 10;
 	if helpers.MapHasKey(m, "multipleOf") {
 		x.MultipleOf = m["multipleOf"].(float64)
+	}
+	// int64 max_length = 11;
+	if helpers.MapHasKey(m, "maxLength") {
+		x.MaxLength = m["maxLength"].(int64)
+	}
+	// string type = 12;
+	if helpers.MapHasKey(m, "type") {
+		x.Type = m["type"].(string)
+	}
+	// bool unique_items = 13;
+	if helpers.MapHasKey(m, "uniqueItems") {
+		x.UniqueItems = m["uniqueItems"].(bool)
+	}
+	// float maximum = 14;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
 	}
 	// string pattern = 15;
 	if helpers.MapHasKey(m, "pattern") {
 		x.Pattern = m["pattern"].(string)
 	}
-	// string type = 16;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = m["type"].(string)
+	// bool exclusive_maximum = 16;
+	if helpers.MapHasKey(m, "exclusiveMaximum") {
+		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
 	}
-	// bool unique_items = 17;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = m["uniqueItems"].(bool)
+	// string collection_format = 17;
+	if helpers.MapHasKey(m, "collectionFormat") {
+		x.CollectionFormat = m["collectionFormat"].(string)
 	}
 	// map<string, Any> vendor_extension = 18;
 	// MAP: Any ^x-
@@ -1797,23 +1797,7 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		return nil
 	}
 	x := &QueryParameterSubSchema{}
-	// bool allow_empty_value = 1;
-	if helpers.MapHasKey(m, "allowEmptyValue") {
-		x.AllowEmptyValue = m["allowEmptyValue"].(bool)
-	}
-	// string collection_format = 2;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = m["collectionFormat"].(string)
-	}
-	// Any default = 3;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(m["default"])
-	}
-	// string description = 4;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// repeated Any enum = 5;
+	// repeated Any enum = 1;
 	if helpers.MapHasKey(m, "enum") {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
@@ -1824,73 +1808,89 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 			}
 		}
 	}
-	// bool exclusive_maximum = 6;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
-	}
-	// bool exclusive_minimum = 7;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// string format = 8;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = m["format"].(string)
-	}
-	// string in = 9;
-	if helpers.MapHasKey(m, "in") {
-		x.In = m["in"].(string)
-	}
-	// PrimitivesItems items = 10;
+	// PrimitivesItems items = 2;
 	if helpers.MapHasKey(m, "items") {
 		x.Items = BuildPrimitivesItems(m["items"])
 	}
-	// int64 max_items = 11;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = m["maxItems"].(int64)
+	// string in = 3;
+	if helpers.MapHasKey(m, "in") {
+		x.In = m["in"].(string)
 	}
-	// int64 max_length = 12;
+	// bool exclusive_minimum = 4;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
+	}
+	// int64 max_length = 5;
 	if helpers.MapHasKey(m, "maxLength") {
 		x.MaxLength = m["maxLength"].(int64)
 	}
-	// float maximum = 13;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 14;
+	// int64 min_items = 6;
 	if helpers.MapHasKey(m, "minItems") {
 		x.MinItems = m["minItems"].(int64)
 	}
-	// int64 min_length = 15;
+	// bool exclusive_maximum = 7;
+	if helpers.MapHasKey(m, "exclusiveMaximum") {
+		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
+	}
+	// Any default = 8;
+	if helpers.MapHasKey(m, "default") {
+		x.Default = BuildAny(m["default"])
+	}
+	// int64 min_length = 9;
 	if helpers.MapHasKey(m, "minLength") {
 		x.MinLength = m["minLength"].(int64)
+	}
+	// string name = 10;
+	if helpers.MapHasKey(m, "name") {
+		x.Name = m["name"].(string)
+	}
+	// float multiple_of = 11;
+	if helpers.MapHasKey(m, "multipleOf") {
+		x.MultipleOf = m["multipleOf"].(float64)
+	}
+	// string description = 12;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// bool allow_empty_value = 13;
+	if helpers.MapHasKey(m, "allowEmptyValue") {
+		x.AllowEmptyValue = m["allowEmptyValue"].(bool)
+	}
+	// bool unique_items = 14;
+	if helpers.MapHasKey(m, "uniqueItems") {
+		x.UniqueItems = m["uniqueItems"].(bool)
+	}
+	// string format = 15;
+	if helpers.MapHasKey(m, "format") {
+		x.Format = m["format"].(string)
 	}
 	// float minimum = 16;
 	if helpers.MapHasKey(m, "minimum") {
 		x.Minimum = m["minimum"].(float64)
 	}
-	// float multiple_of = 17;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = m["multipleOf"].(float64)
+	// string collection_format = 17;
+	if helpers.MapHasKey(m, "collectionFormat") {
+		x.CollectionFormat = m["collectionFormat"].(string)
 	}
-	// string name = 18;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = m["name"].(string)
+	// float maximum = 18;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
 	}
 	// string pattern = 19;
 	if helpers.MapHasKey(m, "pattern") {
 		x.Pattern = m["pattern"].(string)
 	}
-	// bool required = 20;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = m["required"].(bool)
-	}
-	// string type = 21;
+	// string type = 20;
 	if helpers.MapHasKey(m, "type") {
 		x.Type = m["type"].(string)
 	}
-	// bool unique_items = 22;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = m["uniqueItems"].(bool)
+	// int64 max_items = 21;
+	if helpers.MapHasKey(m, "maxItems") {
+		x.MaxItems = m["maxItems"].(int64)
+	}
+	// bool required = 22;
+	if helpers.MapHasKey(m, "required") {
+		x.Required = m["required"].(bool)
 	}
 	// map<string, Any> vendor_extension = 23;
 	// MAP: Any ^x-
@@ -1921,21 +1921,21 @@ func BuildResponse(in interface{}) *Response {
 		return nil
 	}
 	x := &Response{}
-	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// Examples examples = 2;
+	// Examples examples = 1;
 	if helpers.MapHasKey(m, "examples") {
 		x.Examples = BuildExamples(m["examples"])
 	}
-	// Headers headers = 3;
-	if helpers.MapHasKey(m, "headers") {
-		x.Headers = BuildHeaders(m["headers"])
+	// string description = 2;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
 	}
-	// SchemaItem schema = 4;
+	// SchemaItem schema = 3;
 	if helpers.MapHasKey(m, "schema") {
 		x.Schema = BuildSchemaItem(m["schema"])
+	}
+	// Headers headers = 4;
+	if helpers.MapHasKey(m, "headers") {
+		x.Headers = BuildHeaders(m["headers"])
 	}
 	// map<string, Any> vendor_extension = 5;
 	// MAP: Any ^x-
@@ -1975,18 +1975,18 @@ func BuildResponseValue(in interface{}) *ResponseValue {
 		return nil
 	}
 	x := &ResponseValue{}
-	// JsonReference json_reference = 1;
-	{
-		t := BuildJsonReference(m)
-		if t != nil {
-			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
-		}
-	}
-	// Response response = 2;
+	// Response response = 1;
 	{
 		t := BuildResponse(m)
 		if t != nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
+		}
+	}
+	// JsonReference json_reference = 2;
+	{
+		t := BuildJsonReference(m)
+		if t != nil {
+			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
 	}
 	return x
@@ -2043,32 +2043,25 @@ func BuildSchema(in interface{}) *Schema {
 	if helpers.MapHasKey(m, "$ref") {
 		x.XRef = m["$ref"].(string)
 	}
-	// AdditionalPropertiesItem additional_properties = 2;
+	// int64 min_length = 2;
+	if helpers.MapHasKey(m, "minLength") {
+		x.MinLength = m["minLength"].(int64)
+	}
+	// AdditionalPropertiesItem additional_properties = 3;
 	if helpers.MapHasKey(m, "additionalProperties") {
 		x.AdditionalProperties = BuildAdditionalPropertiesItem(m["additionalProperties"])
 	}
-	// repeated Schema all_of = 3;
-	if helpers.MapHasKey(m, "allOf") {
-		// repeated class Schema
-		x.AllOf = make([]*Schema, 0)
-		a, ok := m["allOf"].([]interface{})
-		if ok {
-			for _, item := range a {
-				x.AllOf = append(x.AllOf, BuildSchema(item))
-			}
-		}
-	}
-	// Any default = 4;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(m["default"])
-	}
-	// string description = 5;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = m["description"].(string)
-	}
-	// string discriminator = 6;
+	// string discriminator = 4;
 	if helpers.MapHasKey(m, "discriminator") {
 		x.Discriminator = m["discriminator"].(string)
+	}
+	// ItemsItem items = 5;
+	if helpers.MapHasKey(m, "items") {
+		x.Items = BuildItemsItem(m["items"])
+	}
+	// bool unique_items = 6;
+	if helpers.MapHasKey(m, "uniqueItems") {
+		x.UniqueItems = m["uniqueItems"].(bool)
 	}
 	// repeated Any enum = 7;
 	if helpers.MapHasKey(m, "enum") {
@@ -2081,79 +2074,19 @@ func BuildSchema(in interface{}) *Schema {
 			}
 		}
 	}
-	// Any example = 8;
-	if helpers.MapHasKey(m, "example") {
-		x.Example = BuildAny(m["example"])
+	// float multiple_of = 8;
+	if helpers.MapHasKey(m, "multipleOf") {
+		x.MultipleOf = m["multipleOf"].(float64)
 	}
 	// bool exclusive_maximum = 9;
 	if helpers.MapHasKey(m, "exclusiveMaximum") {
 		x.ExclusiveMaximum = m["exclusiveMaximum"].(bool)
 	}
-	// bool exclusive_minimum = 10;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
-	}
-	// ExternalDocs external_docs = 11;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
-	}
-	// string format = 12;
+	// string format = 10;
 	if helpers.MapHasKey(m, "format") {
 		x.Format = m["format"].(string)
 	}
-	// ItemsItem items = 13;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildItemsItem(m["items"])
-	}
-	// int64 max_items = 14;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = m["maxItems"].(int64)
-	}
-	// int64 max_length = 15;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = m["maxLength"].(int64)
-	}
-	// int64 max_properties = 16;
-	if helpers.MapHasKey(m, "maxProperties") {
-		x.MaxProperties = m["maxProperties"].(int64)
-	}
-	// float maximum = 17;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = m["maximum"].(float64)
-	}
-	// int64 min_items = 18;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = m["minItems"].(int64)
-	}
-	// int64 min_length = 19;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = m["minLength"].(int64)
-	}
-	// int64 min_properties = 20;
-	if helpers.MapHasKey(m, "minProperties") {
-		x.MinProperties = m["minProperties"].(int64)
-	}
-	// float minimum = 21;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = m["minimum"].(float64)
-	}
-	// float multiple_of = 22;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = m["multipleOf"].(float64)
-	}
-	// string pattern = 23;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = m["pattern"].(string)
-	}
-	// Properties properties = 24;
-	if helpers.MapHasKey(m, "properties") {
-		x.Properties = BuildProperties(m["properties"])
-	}
-	// bool read_only = 25;
-	if helpers.MapHasKey(m, "readOnly") {
-		x.ReadOnly = m["readOnly"].(bool)
-	}
-	// repeated string required = 26;
+	// repeated string required = 11;
 	if helpers.MapHasKey(m, "required") {
 		v, ok := m["required"].([]interface{})
 		if ok {
@@ -2162,29 +2095,96 @@ func BuildSchema(in interface{}) *Schema {
 			log.Printf("unexpected: %+v", m["required"])
 		}
 	}
-	// string title = 27;
-	if helpers.MapHasKey(m, "title") {
-		x.Title = m["title"].(string)
+	// int64 min_items = 12;
+	if helpers.MapHasKey(m, "minItems") {
+		x.MinItems = m["minItems"].(int64)
 	}
-	// TypeItem type = 28;
+	// int64 min_properties = 13;
+	if helpers.MapHasKey(m, "minProperties") {
+		x.MinProperties = m["minProperties"].(int64)
+	}
+	// ExternalDocs external_docs = 14;
+	if helpers.MapHasKey(m, "externalDocs") {
+		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
+	}
+	// TypeItem type = 15;
 	if helpers.MapHasKey(m, "type") {
 		x.Type = BuildTypeItem(m["type"])
 	}
-	// bool unique_items = 29;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = m["uniqueItems"].(bool)
+	// string pattern = 16;
+	if helpers.MapHasKey(m, "pattern") {
+		x.Pattern = m["pattern"].(string)
 	}
-	// map<string, Any> vendor_extension = 30;
+	// Properties properties = 17;
+	if helpers.MapHasKey(m, "properties") {
+		x.Properties = BuildProperties(m["properties"])
+	}
+	// Xml xml = 18;
+	if helpers.MapHasKey(m, "xml") {
+		x.Xml = BuildXml(m["xml"])
+	}
+	// float maximum = 19;
+	if helpers.MapHasKey(m, "maximum") {
+		x.Maximum = m["maximum"].(float64)
+	}
+	// int64 max_properties = 20;
+	if helpers.MapHasKey(m, "maxProperties") {
+		x.MaxProperties = m["maxProperties"].(int64)
+	}
+	// bool read_only = 21;
+	if helpers.MapHasKey(m, "readOnly") {
+		x.ReadOnly = m["readOnly"].(bool)
+	}
+	// float minimum = 22;
+	if helpers.MapHasKey(m, "minimum") {
+		x.Minimum = m["minimum"].(float64)
+	}
+	// Any default = 23;
+	if helpers.MapHasKey(m, "default") {
+		x.Default = BuildAny(m["default"])
+	}
+	// string description = 24;
+	if helpers.MapHasKey(m, "description") {
+		x.Description = m["description"].(string)
+	}
+	// string title = 25;
+	if helpers.MapHasKey(m, "title") {
+		x.Title = m["title"].(string)
+	}
+	// Any example = 26;
+	if helpers.MapHasKey(m, "example") {
+		x.Example = BuildAny(m["example"])
+	}
+	// int64 max_items = 27;
+	if helpers.MapHasKey(m, "maxItems") {
+		x.MaxItems = m["maxItems"].(int64)
+	}
+	// repeated Schema all_of = 28;
+	if helpers.MapHasKey(m, "allOf") {
+		// repeated class Schema
+		x.AllOf = make([]*Schema, 0)
+		a, ok := m["allOf"].([]interface{})
+		if ok {
+			for _, item := range a {
+				x.AllOf = append(x.AllOf, BuildSchema(item))
+			}
+		}
+	}
+	// bool exclusive_minimum = 29;
+	if helpers.MapHasKey(m, "exclusiveMinimum") {
+		x.ExclusiveMinimum = m["exclusiveMinimum"].(bool)
+	}
+	// int64 max_length = 30;
+	if helpers.MapHasKey(m, "maxLength") {
+		x.MaxLength = m["maxLength"].(int64)
+	}
+	// map<string, Any> vendor_extension = 31;
 	// MAP: Any ^x-
 	x.VendorExtension = make(map[string]*Any, 0)
 	for k, v := range m {
 		if helpers.PatternMatches("^x-", k) {
 			x.VendorExtension[k] = BuildAny(v)
 		}
-	}
-	// Xml xml = 31;
-	if helpers.MapHasKey(m, "xml") {
-		x.Xml = BuildXml(m["xml"])
 	}
 	return x
 }
@@ -2198,18 +2198,18 @@ func BuildSchemaItem(in interface{}) *SchemaItem {
 		return nil
 	}
 	x := &SchemaItem{}
-	// FileSchema file_schema = 1;
-	{
-		t := BuildFileSchema(m)
-		if t != nil {
-			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
-		}
-	}
-	// Schema schema = 2;
+	// Schema schema = 1;
 	{
 		t := BuildSchema(m)
 		if t != nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
+		}
+	}
+	// FileSchema file_schema = 2;
+	{
+		t := BuildFileSchema(m)
+		if t != nil {
+			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
 	}
 	return x
@@ -2242,46 +2242,46 @@ func BuildSecurityDefinitionsItem(in interface{}) *SecurityDefinitionsItem {
 		return nil
 	}
 	x := &SecurityDefinitionsItem{}
-	// ApiKeySecurity api_key_security = 1;
-	{
-		t := BuildApiKeySecurity(m)
-		if t != nil {
-			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
-		}
-	}
-	// BasicAuthenticationSecurity basic_authentication_security = 2;
+	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
 		t := BuildBasicAuthenticationSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
 	}
-	// Oauth2AccessCodeSecurity oauth2_access_code_security = 3;
+	// ApiKeySecurity api_key_security = 2;
 	{
-		t := BuildOauth2AccessCodeSecurity(m)
+		t := BuildApiKeySecurity(m)
 		if t != nil {
-			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
+			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
 	}
-	// Oauth2ApplicationSecurity oauth2_application_security = 4;
-	{
-		t := BuildOauth2ApplicationSecurity(m)
-		if t != nil {
-			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
-		}
-	}
-	// Oauth2ImplicitSecurity oauth2_implicit_security = 5;
+	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
 		t := BuildOauth2ImplicitSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
 	}
-	// Oauth2PasswordSecurity oauth2_password_security = 6;
+	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
 		t := BuildOauth2PasswordSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
+		}
+	}
+	// Oauth2ApplicationSecurity oauth2_application_security = 5;
+	{
+		t := BuildOauth2ApplicationSecurity(m)
+		if t != nil {
+			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
+		}
+	}
+	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
+	{
+		t := BuildOauth2AccessCodeSecurity(m)
+		if t != nil {
+			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
 	}
 	return x
@@ -2337,17 +2337,17 @@ func BuildTag(in interface{}) *Tag {
 		return nil
 	}
 	x := &Tag{}
-	// string description = 1;
+	// string name = 1;
+	if helpers.MapHasKey(m, "name") {
+		x.Name = m["name"].(string)
+	}
+	// string description = 2;
 	if helpers.MapHasKey(m, "description") {
 		x.Description = m["description"].(string)
 	}
-	// ExternalDocs external_docs = 2;
+	// ExternalDocs external_docs = 3;
 	if helpers.MapHasKey(m, "externalDocs") {
 		x.ExternalDocs = BuildExternalDocs(m["externalDocs"])
-	}
-	// string name = 3;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = m["name"].(string)
 	}
 	// map<string, Any> vendor_extension = 4;
 	// MAP: Any ^x-
@@ -2404,33 +2404,33 @@ func BuildXml(in interface{}) *Xml {
 		return nil
 	}
 	x := &Xml{}
-	// bool attribute = 1;
-	if helpers.MapHasKey(m, "attribute") {
-		x.Attribute = m["attribute"].(bool)
-	}
-	// string name = 2;
+	// string name = 1;
 	if helpers.MapHasKey(m, "name") {
 		x.Name = m["name"].(string)
 	}
-	// string namespace = 3;
+	// string namespace = 2;
 	if helpers.MapHasKey(m, "namespace") {
 		x.Namespace = m["namespace"].(string)
 	}
-	// string prefix = 4;
+	// string prefix = 3;
 	if helpers.MapHasKey(m, "prefix") {
 		x.Prefix = m["prefix"].(string)
 	}
-	// map<string, Any> vendor_extension = 5;
+	// bool attribute = 4;
+	if helpers.MapHasKey(m, "attribute") {
+		x.Attribute = m["attribute"].(bool)
+	}
+	// bool wrapped = 5;
+	if helpers.MapHasKey(m, "wrapped") {
+		x.Wrapped = m["wrapped"].(bool)
+	}
+	// map<string, Any> vendor_extension = 6;
 	// MAP: Any ^x-
 	x.VendorExtension = make(map[string]*Any, 0)
 	for k, v := range m {
 		if helpers.PatternMatches("^x-", k) {
 			x.VendorExtension[k] = BuildAny(v)
 		}
-	}
-	// bool wrapped = 6;
-	if helpers.MapHasKey(m, "wrapped") {
-		x.Wrapped = m["wrapped"].(bool)
 	}
 	return x
 }

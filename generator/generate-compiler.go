@@ -154,9 +154,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("  x := &%s{}", className)
 
 		var fieldNumber = 0
-		propertyNames := classModel.sortedPropertyNames()
-		for _, propertyName := range propertyNames {
-			propertyModel := classModel.Properties[propertyName]
+		for _, propertyModel := range classModel.Properties {
+			propertyName := propertyModel.Name
 			fieldNumber += 1
 			propertyType := propertyModel.Type
 			if propertyType == "int" {

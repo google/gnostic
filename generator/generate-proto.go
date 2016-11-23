@@ -42,10 +42,9 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 			code.Print("oneof oneof {")
 			code.Indent()
 		}
-		propertyNames := classModel.sortedPropertyNames()
 		var fieldNumber = 0
-		for _, propertyName := range propertyNames {
-			propertyModel := classModel.Properties[propertyName]
+		for _, propertyModel := range classModel.Properties {
+			propertyName := propertyModel.Name
 			fieldNumber += 1
 			propertyType := propertyModel.Type
 			if propertyType == "int" {
