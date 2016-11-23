@@ -205,7 +205,9 @@ func (classes *ClassCollection) arrayItemTypeForSchema(propertyName string, sche
 
 func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, schema *jsonschema.Schema) {
 	if schema.Properties != nil {
-		for propertyName, propertySchema := range *(schema.Properties) {
+		for _, pair := range *(schema.Properties) {
+			propertyName := pair.Name
+			propertySchema := pair.Value
 			if propertySchema.Ref != nil {
 				// the property schema is a reference, so we will add a property with the type of the referenced schema
 				propertyClassName := classes.classNameForReference(*(propertySchema.Ref))
@@ -269,7 +271,9 @@ func (classes *ClassCollection) buildClassRequirements(classModel *ClassModel, s
 func (classes *ClassCollection) buildPatternPropertyAccessors(classModel *ClassModel, schema *jsonschema.Schema) {
 	if schema.PatternProperties != nil {
 		classModel.OpenPatterns = make([]string, 0)
-		for propertyPattern, propertySchema := range *(schema.PatternProperties) {
+		for _, pair := range *(schema.PatternProperties) {
+			propertyPattern := pair.Name
+			propertySchema := pair.Value
 			classModel.OpenPatterns = append(classModel.OpenPatterns, propertyPattern)
 			className := "Any"
 			propertyName := classes.PatternNames[propertyPattern]
@@ -487,7 +491,9 @@ func (classes *ClassCollection) build() {
 	classes.ClassModels[className] = classModel
 
 	// create a class for each object defined in the schema
-	for definitionName, definitionSchema := range *(classes.Schema.Definitions) {
+	for _, pair := range *(classes.Schema.Definitions) {
+		definitionName := pair.Name
+		definitionSchema := pair.Value
 		className := classes.classNameForStub(definitionName)
 		classModel := classes.buildClassForDefinition(className, definitionName, definitionSchema)
 		if classModel != nil {

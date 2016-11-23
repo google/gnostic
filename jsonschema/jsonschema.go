@@ -60,9 +60,9 @@ type Schema struct {
 	MinProperties        *int64
 	Required             *[]string
 	AdditionalProperties *SchemaOrBoolean
-	Properties           *map[string]*Schema
-	PatternProperties    *map[string]*Schema
-	Dependencies         *map[string]*SchemaOrStringArray
+	Properties           *[]*NamedSchema
+	PatternProperties    *[]*NamedSchema
+	Dependencies         *[]*NamedSchemaOrStringArray
 
 	// 5.5.  Validation keywords for any instance type
 	Enumeration *[]SchemaEnumValue
@@ -71,7 +71,7 @@ type Schema struct {
 	AnyOf       *[]*Schema
 	OneOf       *[]*Schema
 	Not         *Schema
-	Definitions *map[string]*Schema
+	Definitions *[]*NamedSchema
 
 	// 6.  Metadata keywords
 	Title       *string
@@ -124,6 +124,18 @@ type SchemaOrSchemaArray struct {
 type SchemaEnumValue struct {
 	String *string
 	Bool   *bool
+}
+
+// These structs provide key-value pairs that are kept in slices.
+// They are used to emulate maps with ordered keys.
+type NamedSchema struct {
+	Name  string
+	Value *Schema
+}
+
+type NamedSchemaOrStringArray struct {
+	Name  string
+	Value *SchemaOrStringArray
 }
 
 // Reads a schema from a file.
@@ -358,16 +370,17 @@ func (schema *Schema) boolValue(v interface{}) *bool {
 }
 
 // Gets a map of Schemas from an interface{} value if possible.
-func (schema *Schema) mapOfSchemasValue(v interface{}) *map[string]*Schema {
+func (schema *Schema) mapOfSchemasValue(v interface{}) *[]*NamedSchema {
 	switch v := v.(type) {
 	default:
 		fmt.Printf("mapOfSchemasValue: unexpected type %T\n", v)
 	case yaml.MapSlice:
-		m := make(map[string]*Schema)
+		m := make([]*NamedSchema, 0)
 		for _, mapItem := range v {
 			k2 := mapItem.Key.(string)
 			v2 := mapItem.Value
-			m[k2] = NewSchemaFromObject(v2)
+			pair := &NamedSchema{Name: k2, Value: NewSchemaFromObject(v2)}
+			m = append(m, pair)
 		}
 		return &m
 	}
@@ -501,8 +514,8 @@ func (schema *Schema) arrayOfEnumValuesValue(v interface{}) *[]SchemaEnumValue {
 }
 
 // Gets a map of schemas or string arrays from an interface{} value if possible.
-func (schema *Schema) mapOfSchemasOrStringArraysValue(v interface{}) *map[string]*SchemaOrStringArray {
-	m := make(map[string]*SchemaOrStringArray, 0)
+func (schema *Schema) mapOfSchemasOrStringArraysValue(v interface{}) *[]*NamedSchemaOrStringArray {
+	m := make([]*NamedSchemaOrStringArray, 0)
 	switch v := v.(type) {
 	default:
 		fmt.Printf("mapOfSchemasOrStringArraysValue: unexpected type %T %+v\n", v, v)
@@ -525,7 +538,8 @@ func (schema *Schema) mapOfSchemasOrStringArraysValue(v interface{}) *map[string
 				}
 				s := &SchemaOrStringArray{}
 				s.StringArray = &a
-				m[k2] = s
+				pair := &NamedSchemaOrStringArray{Name: k2, Value: s}
+				m = append(m, pair)
 			}
 		}
 	}
@@ -643,21 +657,27 @@ func (schema *Schema) describeSchema(indent string) string {
 	}
 	if schema.Properties != nil {
 		result += indent + "properties:\n"
-		for name, s := range *(schema.Properties) {
+		for _, pair := range *(schema.Properties) {
+			name := pair.Name
+			s := pair.Value
 			result += indent + "  " + name + ":\n"
 			result += s.describeSchema(indent + "  " + "  ")
 		}
 	}
 	if schema.PatternProperties != nil {
 		result += indent + "patternProperties:\n"
-		for name, s := range *(schema.PatternProperties) {
+		for _, pair := range *(schema.PatternProperties) {
+			name := pair.Name
+			s := pair.Value
 			result += indent + "  " + name + ":\n"
 			result += s.describeSchema(indent + "  " + "  ")
 		}
 	}
 	if schema.Dependencies != nil {
 		result += indent + "dependencies:\n"
-		for name, schemaOrStringArray := range *(schema.Dependencies) {
+		for _, pair := range *(schema.Dependencies) {
+			name := pair.Name
+			schemaOrStringArray := pair.Value
 			s := schemaOrStringArray.Schema
 			if s != nil {
 				result += indent + "  " + name + ":\n"
@@ -714,7 +734,9 @@ func (schema *Schema) describeSchema(indent string) string {
 	}
 	if schema.Definitions != nil {
 		result += indent + "definitions:\n"
-		for name, s := range *(schema.Definitions) {
+		for _, pair := range *(schema.Definitions) {
+			name := pair.Name
+			s := pair.Value
 			result += indent + "  " + name + ":\n"
 			result += s.describeSchema(indent + "  " + "  ")
 		}
@@ -774,18 +796,21 @@ func (schema *Schema) applyToSchemas(operation SchemaOperation, context string) 
 	}
 
 	if schema.Properties != nil {
-		for _, s := range *(schema.Properties) {
+		for _, pair := range *(schema.Properties) {
+			s := pair.Value
 			s.applyToSchemas(operation, "Properties")
 		}
 	}
 	if schema.PatternProperties != nil {
-		for _, s := range *(schema.PatternProperties) {
+		for _, pair := range *(schema.PatternProperties) {
+			s := pair.Value
 			s.applyToSchemas(operation, "PatternProperties")
 		}
 	}
 
 	if schema.Dependencies != nil {
-		for _, schemaOrStringArray := range *(schema.Dependencies) {
+		for _, pair := range *(schema.Dependencies) {
+			schemaOrStringArray := pair.Value
 			s := schemaOrStringArray.Schema
 			if s != nil {
 				s.applyToSchemas(operation, "Dependencies")
@@ -813,7 +838,8 @@ func (schema *Schema) applyToSchemas(operation SchemaOperation, context string) 
 	}
 
 	if schema.Definitions != nil {
-		for _, s := range *(schema.Definitions) {
+		for _, pair := range *(schema.Definitions) {
+			s := pair.Value
 			s.applyToSchemas(operation, "Definitions")
 		}
 	}
@@ -996,10 +1022,18 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 			switch pathParts[1] {
 			case "definitions":
 				dictionary := document.Definitions
-				result = (*dictionary)[pathParts[2]]
+				for _, pair := range *dictionary {
+					if pair.Name == pathParts[2] {
+						result = pair.Value
+					}
+				}
 			case "properties":
 				dictionary := document.Properties
-				result = (*dictionary)[pathParts[2]]
+				for _, pair := range *dictionary {
+					if pair.Name == pathParts[2] {
+						result = pair.Value
+					}
+				}
 			default:
 				break
 			}
