@@ -205,10 +205,11 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			classModel, classFound := classes.ClassModels[propertyType]
 			if classFound && !classModel.IsPair {
 				if propertyModel.Repeated {
-					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
+					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("// repeated class %s", classModel.Name)
 					code.Print("x.%s = make([]*%s, 0)", fieldName, classModel.Name)
-					code.Print("a, ok := helpers.MapValueForKey(m, \"%s\").([]interface{})", propertyName)
+					code.Print("a, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
 					code.Print("x.%s = append(x.%s, New%s(item))", fieldName, fieldName, classModel.Name)
@@ -224,15 +225,17 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("}")
 						code.Print("}")
 					} else {
-						code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-						code.Print("x.%s = New%s(helpers.MapValueForKey(m,\"%v\"))", fieldName, classModel.Name, propertyName)
+						code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+						code.Print("if (v%d != nil) {", fieldNumber)
+						code.Print("x.%s = New%s(v%d)", fieldName, classModel.Name, fieldNumber)
 						code.Print("}")
 					}
 				}
 			} else if propertyType == "string" {
 				if propertyModel.Repeated {
-					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-					code.Print("v, ok := helpers.MapValueForKey(m, \"%v\").([]interface{})", propertyName)
+					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+					code.Print("if (v%d != nil) {", fieldNumber)
+					code.Print("v, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
@@ -240,21 +243,25 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("}")
 					code.Print("}")
 				} else {
-					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-					code.Print("x.%s = helpers.MapValueForKey(m,\"%v\").(string)", fieldName, propertyName)
+					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+					code.Print("if (v%d != nil) {", fieldNumber)
+					code.Print("x.%s = v%d.(string)", fieldName, fieldNumber)
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
-				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(float64)", fieldName, propertyName)
+				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+				code.Print("if (v%d != nil) {", fieldNumber)
+				code.Print("x.%s = v%d.(float64)", fieldName, fieldNumber)
 				code.Print("}")
 			} else if propertyType == "int64" {
-				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(int64)", fieldName, propertyName)
+				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+				code.Print("if (v%d != nil) {", fieldNumber)
+				code.Print("x.%s = v%d.(int64)", fieldName, fieldNumber)
 				code.Print("}")
 			} else if propertyType == "bool" {
-				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(bool)", fieldName, propertyName)
+				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+				code.Print("if (v%d != nil) {", fieldNumber)
+				code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
 				code.Print("}")
 			} else {
 				mapTypeName := propertyModel.MapType

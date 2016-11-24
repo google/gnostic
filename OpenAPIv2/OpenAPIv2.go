@@ -40,12 +40,14 @@ func NewAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 	}
 	x := &AdditionalPropertiesItem{}
 	// Schema schema = 1;
-	if helpers.MapHasKey(m, "schema") {
-		x.Schema = NewSchema(helpers.MapValueForKey(m, "schema"))
+	v1 := helpers.MapValueForKey(m, "schema")
+	if v1 != nil {
+		x.Schema = NewSchema(v1)
 	}
 	// bool boolean = 2;
-	if helpers.MapHasKey(m, "boolean") {
-		x.Boolean = helpers.MapValueForKey(m, "boolean").(bool)
+	v2 := helpers.MapValueForKey(m, "boolean")
+	if v2 != nil {
+		x.Boolean = v2.(bool)
 	}
 	return x
 }
@@ -75,20 +77,24 @@ func NewApiKeySecurity(in interface{}) *ApiKeySecurity {
 	}
 	x := &ApiKeySecurity{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string name = 2;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v2 := helpers.MapValueForKey(m, "name")
+	if v2 != nil {
+		x.Name = v2.(string)
 	}
 	// string in = 3;
-	if helpers.MapHasKey(m, "in") {
-		x.In = helpers.MapValueForKey(m, "in").(string)
+	v3 := helpers.MapValueForKey(m, "in")
+	if v3 != nil {
+		x.In = v3.(string)
 	}
 	// string description = 4;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v4 := helpers.MapValueForKey(m, "description")
+	if v4 != nil {
+		x.Description = v4.(string)
 	}
 	// repeated NamedAny vendor_extension = 5;
 	// MAP: Any ^x-
@@ -124,12 +130,14 @@ func NewBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecurity
 	}
 	x := &BasicAuthenticationSecurity{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string description = 2;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v2 := helpers.MapValueForKey(m, "description")
+	if v2 != nil {
+		x.Description = v2.(string)
 	}
 	// repeated NamedAny vendor_extension = 3;
 	// MAP: Any ^x-
@@ -165,24 +173,29 @@ func NewBodyParameter(in interface{}) *BodyParameter {
 	}
 	x := &BodyParameter{}
 	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v1 := helpers.MapValueForKey(m, "description")
+	if v1 != nil {
+		x.Description = v1.(string)
 	}
 	// string name = 2;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v2 := helpers.MapValueForKey(m, "name")
+	if v2 != nil {
+		x.Name = v2.(string)
 	}
 	// string in = 3;
-	if helpers.MapHasKey(m, "in") {
-		x.In = helpers.MapValueForKey(m, "in").(string)
+	v3 := helpers.MapValueForKey(m, "in")
+	if v3 != nil {
+		x.In = v3.(string)
 	}
 	// bool required = 4;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = helpers.MapValueForKey(m, "required").(bool)
+	v4 := helpers.MapValueForKey(m, "required")
+	if v4 != nil {
+		x.Required = v4.(bool)
 	}
 	// Schema schema = 5;
-	if helpers.MapHasKey(m, "schema") {
-		x.Schema = NewSchema(helpers.MapValueForKey(m, "schema"))
+	v5 := helpers.MapValueForKey(m, "schema")
+	if v5 != nil {
+		x.Schema = NewSchema(v5)
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
@@ -214,16 +227,19 @@ func NewContact(in interface{}) *Contact {
 	}
 	x := &Contact{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// string url = 2;
-	if helpers.MapHasKey(m, "url") {
-		x.Url = helpers.MapValueForKey(m, "url").(string)
+	v2 := helpers.MapValueForKey(m, "url")
+	if v2 != nil {
+		x.Url = v2.(string)
 	}
 	// string email = 3;
-	if helpers.MapHasKey(m, "email") {
-		x.Email = helpers.MapValueForKey(m, "email").(string)
+	v3 := helpers.MapValueForKey(m, "email")
+	if v3 != nil {
+		x.Email = v3.(string)
 	}
 	// repeated NamedAny vendor_extension = 4;
 	// MAP: Any ^x-
@@ -303,24 +319,29 @@ func NewDocument(in interface{}) *Document {
 	}
 	x := &Document{}
 	// string swagger = 1;
-	if helpers.MapHasKey(m, "swagger") {
-		x.Swagger = helpers.MapValueForKey(m, "swagger").(string)
+	v1 := helpers.MapValueForKey(m, "swagger")
+	if v1 != nil {
+		x.Swagger = v1.(string)
 	}
 	// Info info = 2;
-	if helpers.MapHasKey(m, "info") {
-		x.Info = NewInfo(helpers.MapValueForKey(m, "info"))
+	v2 := helpers.MapValueForKey(m, "info")
+	if v2 != nil {
+		x.Info = NewInfo(v2)
 	}
 	// string host = 3;
-	if helpers.MapHasKey(m, "host") {
-		x.Host = helpers.MapValueForKey(m, "host").(string)
+	v3 := helpers.MapValueForKey(m, "host")
+	if v3 != nil {
+		x.Host = v3.(string)
 	}
 	// string base_path = 4;
-	if helpers.MapHasKey(m, "basePath") {
-		x.BasePath = helpers.MapValueForKey(m, "basePath").(string)
+	v4 := helpers.MapValueForKey(m, "basePath")
+	if v4 != nil {
+		x.BasePath = v4.(string)
 	}
 	// repeated string schemes = 5;
-	if helpers.MapHasKey(m, "schemes") {
-		v, ok := helpers.MapValueForKey(m, "schemes").([]interface{})
+	v5 := helpers.MapValueForKey(m, "schemes")
+	if v5 != nil {
+		v, ok := v5.([]interface{})
 		if ok {
 			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -328,8 +349,9 @@ func NewDocument(in interface{}) *Document {
 		}
 	}
 	// repeated string consumes = 6;
-	if helpers.MapHasKey(m, "consumes") {
-		v, ok := helpers.MapValueForKey(m, "consumes").([]interface{})
+	v6 := helpers.MapValueForKey(m, "consumes")
+	if v6 != nil {
+		v, ok := v6.([]interface{})
 		if ok {
 			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -337,8 +359,9 @@ func NewDocument(in interface{}) *Document {
 		}
 	}
 	// repeated string produces = 7;
-	if helpers.MapHasKey(m, "produces") {
-		v, ok := helpers.MapValueForKey(m, "produces").([]interface{})
+	v7 := helpers.MapValueForKey(m, "produces")
+	if v7 != nil {
+		v, ok := v7.([]interface{})
 		if ok {
 			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -346,26 +369,31 @@ func NewDocument(in interface{}) *Document {
 		}
 	}
 	// Paths paths = 8;
-	if helpers.MapHasKey(m, "paths") {
-		x.Paths = NewPaths(helpers.MapValueForKey(m, "paths"))
+	v8 := helpers.MapValueForKey(m, "paths")
+	if v8 != nil {
+		x.Paths = NewPaths(v8)
 	}
 	// Definitions definitions = 9;
-	if helpers.MapHasKey(m, "definitions") {
-		x.Definitions = NewDefinitions(helpers.MapValueForKey(m, "definitions"))
+	v9 := helpers.MapValueForKey(m, "definitions")
+	if v9 != nil {
+		x.Definitions = NewDefinitions(v9)
 	}
 	// ParameterDefinitions parameters = 10;
-	if helpers.MapHasKey(m, "parameters") {
-		x.Parameters = NewParameterDefinitions(helpers.MapValueForKey(m, "parameters"))
+	v10 := helpers.MapValueForKey(m, "parameters")
+	if v10 != nil {
+		x.Parameters = NewParameterDefinitions(v10)
 	}
 	// ResponseDefinitions responses = 11;
-	if helpers.MapHasKey(m, "responses") {
-		x.Responses = NewResponseDefinitions(helpers.MapValueForKey(m, "responses"))
+	v11 := helpers.MapValueForKey(m, "responses")
+	if v11 != nil {
+		x.Responses = NewResponseDefinitions(v11)
 	}
 	// repeated SecurityRequirement security = 12;
-	if helpers.MapHasKey(m, "security") {
+	v12 := helpers.MapValueForKey(m, "security")
+	if v12 != nil {
 		// repeated class SecurityRequirement
 		x.Security = make([]*SecurityRequirement, 0)
-		a, ok := helpers.MapValueForKey(m, "security").([]interface{})
+		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Security = append(x.Security, NewSecurityRequirement(item))
@@ -373,14 +401,16 @@ func NewDocument(in interface{}) *Document {
 		}
 	}
 	// SecurityDefinitions security_definitions = 13;
-	if helpers.MapHasKey(m, "securityDefinitions") {
-		x.SecurityDefinitions = NewSecurityDefinitions(helpers.MapValueForKey(m, "securityDefinitions"))
+	v13 := helpers.MapValueForKey(m, "securityDefinitions")
+	if v13 != nil {
+		x.SecurityDefinitions = NewSecurityDefinitions(v13)
 	}
 	// repeated Tag tags = 14;
-	if helpers.MapHasKey(m, "tags") {
+	v14 := helpers.MapValueForKey(m, "tags")
+	if v14 != nil {
 		// repeated class Tag
 		x.Tags = make([]*Tag, 0)
-		a, ok := helpers.MapValueForKey(m, "tags").([]interface{})
+		a, ok := v14.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Tags = append(x.Tags, NewTag(item))
@@ -388,8 +418,9 @@ func NewDocument(in interface{}) *Document {
 		}
 	}
 	// ExternalDocs external_docs = 15;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+	v15 := helpers.MapValueForKey(m, "externalDocs")
+	if v15 != nil {
+		x.ExternalDocs = NewExternalDocs(v15)
 	}
 	return x
 }
@@ -434,12 +465,14 @@ func NewExternalDocs(in interface{}) *ExternalDocs {
 	}
 	x := &ExternalDocs{}
 	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v1 := helpers.MapValueForKey(m, "description")
+	if v1 != nil {
+		x.Description = v1.(string)
 	}
 	// string url = 2;
-	if helpers.MapHasKey(m, "url") {
-		x.Url = helpers.MapValueForKey(m, "url").(string)
+	v2 := helpers.MapValueForKey(m, "url")
+	if v2 != nil {
+		x.Url = v2.(string)
 	}
 	// repeated NamedAny vendor_extension = 3;
 	// MAP: Any ^x-
@@ -475,24 +508,29 @@ func NewFileSchema(in interface{}) *FileSchema {
 	}
 	x := &FileSchema{}
 	// string format = 1;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v1 := helpers.MapValueForKey(m, "format")
+	if v1 != nil {
+		x.Format = v1.(string)
 	}
 	// string title = 2;
-	if helpers.MapHasKey(m, "title") {
-		x.Title = helpers.MapValueForKey(m, "title").(string)
+	v2 := helpers.MapValueForKey(m, "title")
+	if v2 != nil {
+		x.Title = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// Any default = 4;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v4 := helpers.MapValueForKey(m, "default")
+	if v4 != nil {
+		x.Default = NewAny(v4)
 	}
 	// repeated string required = 5;
-	if helpers.MapHasKey(m, "required") {
-		v, ok := helpers.MapValueForKey(m, "required").([]interface{})
+	v5 := helpers.MapValueForKey(m, "required")
+	if v5 != nil {
+		v, ok := v5.([]interface{})
 		if ok {
 			x.Required = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -500,20 +538,24 @@ func NewFileSchema(in interface{}) *FileSchema {
 		}
 	}
 	// string type = 6;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v6 := helpers.MapValueForKey(m, "type")
+	if v6 != nil {
+		x.Type = v6.(string)
 	}
 	// bool read_only = 7;
-	if helpers.MapHasKey(m, "readOnly") {
-		x.ReadOnly = helpers.MapValueForKey(m, "readOnly").(bool)
+	v7 := helpers.MapValueForKey(m, "readOnly")
+	if v7 != nil {
+		x.ReadOnly = v7.(bool)
 	}
 	// ExternalDocs external_docs = 8;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+	v8 := helpers.MapValueForKey(m, "externalDocs")
+	if v8 != nil {
+		x.ExternalDocs = NewExternalDocs(v8)
 	}
 	// Any example = 9;
-	if helpers.MapHasKey(m, "example") {
-		x.Example = NewAny(helpers.MapValueForKey(m, "example"))
+	v9 := helpers.MapValueForKey(m, "example")
+	if v9 != nil {
+		x.Example = NewAny(v9)
 	}
 	// repeated NamedAny vendor_extension = 10;
 	// MAP: Any ^x-
@@ -545,90 +587,111 @@ func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 	}
 	x := &FormDataParameterSubSchema{}
 	// bool required = 1;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = helpers.MapValueForKey(m, "required").(bool)
+	v1 := helpers.MapValueForKey(m, "required")
+	if v1 != nil {
+		x.Required = v1.(bool)
 	}
 	// string in = 2;
-	if helpers.MapHasKey(m, "in") {
-		x.In = helpers.MapValueForKey(m, "in").(string)
+	v2 := helpers.MapValueForKey(m, "in")
+	if v2 != nil {
+		x.In = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// string name = 4;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v4 := helpers.MapValueForKey(m, "name")
+	if v4 != nil {
+		x.Name = v4.(string)
 	}
 	// bool allow_empty_value = 5;
-	if helpers.MapHasKey(m, "allowEmptyValue") {
-		x.AllowEmptyValue = helpers.MapValueForKey(m, "allowEmptyValue").(bool)
+	v5 := helpers.MapValueForKey(m, "allowEmptyValue")
+	if v5 != nil {
+		x.AllowEmptyValue = v5.(bool)
 	}
 	// string type = 6;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v6 := helpers.MapValueForKey(m, "type")
+	if v6 != nil {
+		x.Type = v6.(string)
 	}
 	// string format = 7;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v7 := helpers.MapValueForKey(m, "format")
+	if v7 != nil {
+		x.Format = v7.(string)
 	}
 	// PrimitivesItems items = 8;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
+	v8 := helpers.MapValueForKey(m, "items")
+	if v8 != nil {
+		x.Items = NewPrimitivesItems(v8)
 	}
 	// string collection_format = 9;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = helpers.MapValueForKey(m, "collectionFormat").(string)
+	v9 := helpers.MapValueForKey(m, "collectionFormat")
+	if v9 != nil {
+		x.CollectionFormat = v9.(string)
 	}
 	// Any default = 10;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v10 := helpers.MapValueForKey(m, "default")
+	if v10 != nil {
+		x.Default = NewAny(v10)
 	}
 	// float maximum = 11;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v11 := helpers.MapValueForKey(m, "maximum")
+	if v11 != nil {
+		x.Maximum = v11.(float64)
 	}
 	// bool exclusive_maximum = 12;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v12 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v12 != nil {
+		x.ExclusiveMaximum = v12.(bool)
 	}
 	// float minimum = 13;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v13 := helpers.MapValueForKey(m, "minimum")
+	if v13 != nil {
+		x.Minimum = v13.(float64)
 	}
 	// bool exclusive_minimum = 14;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v14 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v14 != nil {
+		x.ExclusiveMinimum = v14.(bool)
 	}
 	// int64 max_length = 15;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v15 := helpers.MapValueForKey(m, "maxLength")
+	if v15 != nil {
+		x.MaxLength = v15.(int64)
 	}
 	// int64 min_length = 16;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v16 := helpers.MapValueForKey(m, "minLength")
+	if v16 != nil {
+		x.MinLength = v16.(int64)
 	}
 	// string pattern = 17;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v17 := helpers.MapValueForKey(m, "pattern")
+	if v17 != nil {
+		x.Pattern = v17.(string)
 	}
 	// int64 max_items = 18;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v18 := helpers.MapValueForKey(m, "maxItems")
+	if v18 != nil {
+		x.MaxItems = v18.(int64)
 	}
 	// int64 min_items = 19;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v19 := helpers.MapValueForKey(m, "minItems")
+	if v19 != nil {
+		x.MinItems = v19.(int64)
 	}
 	// bool unique_items = 20;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v20 := helpers.MapValueForKey(m, "uniqueItems")
+	if v20 != nil {
+		x.UniqueItems = v20.(bool)
 	}
 	// repeated Any enum = 21;
-	if helpers.MapHasKey(m, "enum") {
+	v21 := helpers.MapValueForKey(m, "enum")
+	if v21 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -636,8 +699,9 @@ func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 		}
 	}
 	// float multiple_of = 22;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v22 := helpers.MapValueForKey(m, "multipleOf")
+	if v22 != nil {
+		x.MultipleOf = v22.(float64)
 	}
 	// repeated NamedAny vendor_extension = 23;
 	// MAP: Any ^x-
@@ -673,70 +737,86 @@ func NewHeader(in interface{}) *Header {
 	}
 	x := &Header{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string format = 2;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v2 := helpers.MapValueForKey(m, "format")
+	if v2 != nil {
+		x.Format = v2.(string)
 	}
 	// PrimitivesItems items = 3;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
+	v3 := helpers.MapValueForKey(m, "items")
+	if v3 != nil {
+		x.Items = NewPrimitivesItems(v3)
 	}
 	// string collection_format = 4;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = helpers.MapValueForKey(m, "collectionFormat").(string)
+	v4 := helpers.MapValueForKey(m, "collectionFormat")
+	if v4 != nil {
+		x.CollectionFormat = v4.(string)
 	}
 	// Any default = 5;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v5 := helpers.MapValueForKey(m, "default")
+	if v5 != nil {
+		x.Default = NewAny(v5)
 	}
 	// float maximum = 6;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v6 := helpers.MapValueForKey(m, "maximum")
+	if v6 != nil {
+		x.Maximum = v6.(float64)
 	}
 	// bool exclusive_maximum = 7;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v7 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v7 != nil {
+		x.ExclusiveMaximum = v7.(bool)
 	}
 	// float minimum = 8;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v8 := helpers.MapValueForKey(m, "minimum")
+	if v8 != nil {
+		x.Minimum = v8.(float64)
 	}
 	// bool exclusive_minimum = 9;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v9 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v9 != nil {
+		x.ExclusiveMinimum = v9.(bool)
 	}
 	// int64 max_length = 10;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v10 := helpers.MapValueForKey(m, "maxLength")
+	if v10 != nil {
+		x.MaxLength = v10.(int64)
 	}
 	// int64 min_length = 11;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v11 := helpers.MapValueForKey(m, "minLength")
+	if v11 != nil {
+		x.MinLength = v11.(int64)
 	}
 	// string pattern = 12;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v12 := helpers.MapValueForKey(m, "pattern")
+	if v12 != nil {
+		x.Pattern = v12.(string)
 	}
 	// int64 max_items = 13;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v13 := helpers.MapValueForKey(m, "maxItems")
+	if v13 != nil {
+		x.MaxItems = v13.(int64)
 	}
 	// int64 min_items = 14;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v14 := helpers.MapValueForKey(m, "minItems")
+	if v14 != nil {
+		x.MinItems = v14.(int64)
 	}
 	// bool unique_items = 15;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v15 := helpers.MapValueForKey(m, "uniqueItems")
+	if v15 != nil {
+		x.UniqueItems = v15.(bool)
 	}
 	// repeated Any enum = 16;
-	if helpers.MapHasKey(m, "enum") {
+	v16 := helpers.MapValueForKey(m, "enum")
+	if v16 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -744,12 +824,14 @@ func NewHeader(in interface{}) *Header {
 		}
 	}
 	// float multiple_of = 17;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v17 := helpers.MapValueForKey(m, "multipleOf")
+	if v17 != nil {
+		x.MultipleOf = v17.(float64)
 	}
 	// string description = 18;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v18 := helpers.MapValueForKey(m, "description")
+	if v18 != nil {
+		x.Description = v18.(string)
 	}
 	// repeated NamedAny vendor_extension = 19;
 	// MAP: Any ^x-
@@ -781,86 +863,106 @@ func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	}
 	x := &HeaderParameterSubSchema{}
 	// bool required = 1;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = helpers.MapValueForKey(m, "required").(bool)
+	v1 := helpers.MapValueForKey(m, "required")
+	if v1 != nil {
+		x.Required = v1.(bool)
 	}
 	// string in = 2;
-	if helpers.MapHasKey(m, "in") {
-		x.In = helpers.MapValueForKey(m, "in").(string)
+	v2 := helpers.MapValueForKey(m, "in")
+	if v2 != nil {
+		x.In = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// string name = 4;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v4 := helpers.MapValueForKey(m, "name")
+	if v4 != nil {
+		x.Name = v4.(string)
 	}
 	// string type = 5;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v5 := helpers.MapValueForKey(m, "type")
+	if v5 != nil {
+		x.Type = v5.(string)
 	}
 	// string format = 6;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v6 := helpers.MapValueForKey(m, "format")
+	if v6 != nil {
+		x.Format = v6.(string)
 	}
 	// PrimitivesItems items = 7;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
+	v7 := helpers.MapValueForKey(m, "items")
+	if v7 != nil {
+		x.Items = NewPrimitivesItems(v7)
 	}
 	// string collection_format = 8;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = helpers.MapValueForKey(m, "collectionFormat").(string)
+	v8 := helpers.MapValueForKey(m, "collectionFormat")
+	if v8 != nil {
+		x.CollectionFormat = v8.(string)
 	}
 	// Any default = 9;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v9 := helpers.MapValueForKey(m, "default")
+	if v9 != nil {
+		x.Default = NewAny(v9)
 	}
 	// float maximum = 10;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v10 := helpers.MapValueForKey(m, "maximum")
+	if v10 != nil {
+		x.Maximum = v10.(float64)
 	}
 	// bool exclusive_maximum = 11;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v11 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v11 != nil {
+		x.ExclusiveMaximum = v11.(bool)
 	}
 	// float minimum = 12;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v12 := helpers.MapValueForKey(m, "minimum")
+	if v12 != nil {
+		x.Minimum = v12.(float64)
 	}
 	// bool exclusive_minimum = 13;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v13 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v13 != nil {
+		x.ExclusiveMinimum = v13.(bool)
 	}
 	// int64 max_length = 14;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v14 := helpers.MapValueForKey(m, "maxLength")
+	if v14 != nil {
+		x.MaxLength = v14.(int64)
 	}
 	// int64 min_length = 15;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v15 := helpers.MapValueForKey(m, "minLength")
+	if v15 != nil {
+		x.MinLength = v15.(int64)
 	}
 	// string pattern = 16;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v16 := helpers.MapValueForKey(m, "pattern")
+	if v16 != nil {
+		x.Pattern = v16.(string)
 	}
 	// int64 max_items = 17;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v17 := helpers.MapValueForKey(m, "maxItems")
+	if v17 != nil {
+		x.MaxItems = v17.(int64)
 	}
 	// int64 min_items = 18;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v18 := helpers.MapValueForKey(m, "minItems")
+	if v18 != nil {
+		x.MinItems = v18.(int64)
 	}
 	// bool unique_items = 19;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v19 := helpers.MapValueForKey(m, "uniqueItems")
+	if v19 != nil {
+		x.UniqueItems = v19.(bool)
 	}
 	// repeated Any enum = 20;
-	if helpers.MapHasKey(m, "enum") {
+	v20 := helpers.MapValueForKey(m, "enum")
+	if v20 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -868,8 +970,9 @@ func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		}
 	}
 	// float multiple_of = 21;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v21 := helpers.MapValueForKey(m, "multipleOf")
+	if v21 != nil {
+		x.MultipleOf = v21.(float64)
 	}
 	// repeated NamedAny vendor_extension = 22;
 	// MAP: Any ^x-
@@ -927,28 +1030,34 @@ func NewInfo(in interface{}) *Info {
 	}
 	x := &Info{}
 	// string title = 1;
-	if helpers.MapHasKey(m, "title") {
-		x.Title = helpers.MapValueForKey(m, "title").(string)
+	v1 := helpers.MapValueForKey(m, "title")
+	if v1 != nil {
+		x.Title = v1.(string)
 	}
 	// string version = 2;
-	if helpers.MapHasKey(m, "version") {
-		x.Version = helpers.MapValueForKey(m, "version").(string)
+	v2 := helpers.MapValueForKey(m, "version")
+	if v2 != nil {
+		x.Version = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// string terms_of_service = 4;
-	if helpers.MapHasKey(m, "termsOfService") {
-		x.TermsOfService = helpers.MapValueForKey(m, "termsOfService").(string)
+	v4 := helpers.MapValueForKey(m, "termsOfService")
+	if v4 != nil {
+		x.TermsOfService = v4.(string)
 	}
 	// Contact contact = 5;
-	if helpers.MapHasKey(m, "contact") {
-		x.Contact = NewContact(helpers.MapValueForKey(m, "contact"))
+	v5 := helpers.MapValueForKey(m, "contact")
+	if v5 != nil {
+		x.Contact = NewContact(v5)
 	}
 	// License license = 6;
-	if helpers.MapHasKey(m, "license") {
-		x.License = NewLicense(helpers.MapValueForKey(m, "license"))
+	v6 := helpers.MapValueForKey(m, "license")
+	if v6 != nil {
+		x.License = NewLicense(v6)
 	}
 	// repeated NamedAny vendor_extension = 7;
 	// MAP: Any ^x-
@@ -1001,8 +1110,9 @@ func NewJsonReference(in interface{}) *JsonReference {
 	}
 	x := &JsonReference{}
 	// string _ref = 1;
-	if helpers.MapHasKey(m, "$ref") {
-		x.XRef = helpers.MapValueForKey(m, "$ref").(string)
+	v1 := helpers.MapValueForKey(m, "$ref")
+	if v1 != nil {
+		x.XRef = v1.(string)
 	}
 	return x
 }
@@ -1025,12 +1135,14 @@ func NewLicense(in interface{}) *License {
 	}
 	x := &License{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// string url = 2;
-	if helpers.MapHasKey(m, "url") {
-		x.Url = helpers.MapValueForKey(m, "url").(string)
+	v2 := helpers.MapValueForKey(m, "url")
+	if v2 != nil {
+		x.Url = v2.(string)
 	}
 	// repeated NamedAny vendor_extension = 3;
 	// MAP: Any ^x-
@@ -1062,12 +1174,14 @@ func NewNamedAny(in interface{}) *NamedAny {
 	}
 	x := &NamedAny{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// Any value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewAny(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewAny(v2)
 	}
 	return x
 }
@@ -1086,12 +1200,14 @@ func NewNamedHeader(in interface{}) *NamedHeader {
 	}
 	x := &NamedHeader{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// Header value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewHeader(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewHeader(v2)
 	}
 	return x
 }
@@ -1110,12 +1226,14 @@ func NewNamedParameter(in interface{}) *NamedParameter {
 	}
 	x := &NamedParameter{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// Parameter value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewParameter(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewParameter(v2)
 	}
 	return x
 }
@@ -1134,12 +1252,14 @@ func NewNamedPathItem(in interface{}) *NamedPathItem {
 	}
 	x := &NamedPathItem{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// PathItem value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewPathItem(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewPathItem(v2)
 	}
 	return x
 }
@@ -1158,12 +1278,14 @@ func NewNamedResponse(in interface{}) *NamedResponse {
 	}
 	x := &NamedResponse{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// Response value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewResponse(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewResponse(v2)
 	}
 	return x
 }
@@ -1182,12 +1304,14 @@ func NewNamedResponseValue(in interface{}) *NamedResponseValue {
 	}
 	x := &NamedResponseValue{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// ResponseValue value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewResponseValue(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewResponseValue(v2)
 	}
 	return x
 }
@@ -1206,12 +1330,14 @@ func NewNamedSchema(in interface{}) *NamedSchema {
 	}
 	x := &NamedSchema{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// Schema value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewSchema(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewSchema(v2)
 	}
 	return x
 }
@@ -1230,12 +1356,14 @@ func NewNamedSecurityDefinitionsItem(in interface{}) *NamedSecurityDefinitionsIt
 	}
 	x := &NamedSecurityDefinitionsItem{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// SecurityDefinitionsItem value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewSecurityDefinitionsItem(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewSecurityDefinitionsItem(v2)
 	}
 	return x
 }
@@ -1254,12 +1382,14 @@ func NewNamedString(in interface{}) *NamedString {
 	}
 	x := &NamedString{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// string value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = helpers.MapValueForKey(m, "value").(string)
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = v2.(string)
 	}
 	return x
 }
@@ -1278,12 +1408,14 @@ func NewNamedStringArray(in interface{}) *NamedStringArray {
 	}
 	x := &NamedStringArray{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// StringArray value = 2;
-	if helpers.MapHasKey(m, "value") {
-		x.Value = NewStringArray(helpers.MapValueForKey(m, "value"))
+	v2 := helpers.MapValueForKey(m, "value")
+	if v2 != nil {
+		x.Value = NewStringArray(v2)
 	}
 	return x
 }
@@ -1349,28 +1481,34 @@ func NewOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 	}
 	x := &Oauth2AccessCodeSecurity{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string flow = 2;
-	if helpers.MapHasKey(m, "flow") {
-		x.Flow = helpers.MapValueForKey(m, "flow").(string)
+	v2 := helpers.MapValueForKey(m, "flow")
+	if v2 != nil {
+		x.Flow = v2.(string)
 	}
 	// Oauth2Scopes scopes = 3;
-	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+	v3 := helpers.MapValueForKey(m, "scopes")
+	if v3 != nil {
+		x.Scopes = NewOauth2Scopes(v3)
 	}
 	// string authorization_url = 4;
-	if helpers.MapHasKey(m, "authorizationUrl") {
-		x.AuthorizationUrl = helpers.MapValueForKey(m, "authorizationUrl").(string)
+	v4 := helpers.MapValueForKey(m, "authorizationUrl")
+	if v4 != nil {
+		x.AuthorizationUrl = v4.(string)
 	}
 	// string token_url = 5;
-	if helpers.MapHasKey(m, "tokenUrl") {
-		x.TokenUrl = helpers.MapValueForKey(m, "tokenUrl").(string)
+	v5 := helpers.MapValueForKey(m, "tokenUrl")
+	if v5 != nil {
+		x.TokenUrl = v5.(string)
 	}
 	// string description = 6;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v6 := helpers.MapValueForKey(m, "description")
+	if v6 != nil {
+		x.Description = v6.(string)
 	}
 	// repeated NamedAny vendor_extension = 7;
 	// MAP: Any ^x-
@@ -1406,24 +1544,29 @@ func NewOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 	}
 	x := &Oauth2ApplicationSecurity{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string flow = 2;
-	if helpers.MapHasKey(m, "flow") {
-		x.Flow = helpers.MapValueForKey(m, "flow").(string)
+	v2 := helpers.MapValueForKey(m, "flow")
+	if v2 != nil {
+		x.Flow = v2.(string)
 	}
 	// Oauth2Scopes scopes = 3;
-	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+	v3 := helpers.MapValueForKey(m, "scopes")
+	if v3 != nil {
+		x.Scopes = NewOauth2Scopes(v3)
 	}
 	// string token_url = 4;
-	if helpers.MapHasKey(m, "tokenUrl") {
-		x.TokenUrl = helpers.MapValueForKey(m, "tokenUrl").(string)
+	v4 := helpers.MapValueForKey(m, "tokenUrl")
+	if v4 != nil {
+		x.TokenUrl = v4.(string)
 	}
 	// string description = 5;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v5 := helpers.MapValueForKey(m, "description")
+	if v5 != nil {
+		x.Description = v5.(string)
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
@@ -1459,24 +1602,29 @@ func NewOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 	}
 	x := &Oauth2ImplicitSecurity{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string flow = 2;
-	if helpers.MapHasKey(m, "flow") {
-		x.Flow = helpers.MapValueForKey(m, "flow").(string)
+	v2 := helpers.MapValueForKey(m, "flow")
+	if v2 != nil {
+		x.Flow = v2.(string)
 	}
 	// Oauth2Scopes scopes = 3;
-	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+	v3 := helpers.MapValueForKey(m, "scopes")
+	if v3 != nil {
+		x.Scopes = NewOauth2Scopes(v3)
 	}
 	// string authorization_url = 4;
-	if helpers.MapHasKey(m, "authorizationUrl") {
-		x.AuthorizationUrl = helpers.MapValueForKey(m, "authorizationUrl").(string)
+	v4 := helpers.MapValueForKey(m, "authorizationUrl")
+	if v4 != nil {
+		x.AuthorizationUrl = v4.(string)
 	}
 	// string description = 5;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v5 := helpers.MapValueForKey(m, "description")
+	if v5 != nil {
+		x.Description = v5.(string)
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
@@ -1512,24 +1660,29 @@ func NewOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 	}
 	x := &Oauth2PasswordSecurity{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string flow = 2;
-	if helpers.MapHasKey(m, "flow") {
-		x.Flow = helpers.MapValueForKey(m, "flow").(string)
+	v2 := helpers.MapValueForKey(m, "flow")
+	if v2 != nil {
+		x.Flow = v2.(string)
 	}
 	// Oauth2Scopes scopes = 3;
-	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+	v3 := helpers.MapValueForKey(m, "scopes")
+	if v3 != nil {
+		x.Scopes = NewOauth2Scopes(v3)
 	}
 	// string token_url = 4;
-	if helpers.MapHasKey(m, "tokenUrl") {
-		x.TokenUrl = helpers.MapValueForKey(m, "tokenUrl").(string)
+	v4 := helpers.MapValueForKey(m, "tokenUrl")
+	if v4 != nil {
+		x.TokenUrl = v4.(string)
 	}
 	// string description = 5;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v5 := helpers.MapValueForKey(m, "description")
+	if v5 != nil {
+		x.Description = v5.(string)
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
@@ -1587,8 +1740,9 @@ func NewOperation(in interface{}) *Operation {
 	}
 	x := &Operation{}
 	// repeated string tags = 1;
-	if helpers.MapHasKey(m, "tags") {
-		v, ok := helpers.MapValueForKey(m, "tags").([]interface{})
+	v1 := helpers.MapValueForKey(m, "tags")
+	if v1 != nil {
+		v, ok := v1.([]interface{})
 		if ok {
 			x.Tags = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -1596,24 +1750,29 @@ func NewOperation(in interface{}) *Operation {
 		}
 	}
 	// string summary = 2;
-	if helpers.MapHasKey(m, "summary") {
-		x.Summary = helpers.MapValueForKey(m, "summary").(string)
+	v2 := helpers.MapValueForKey(m, "summary")
+	if v2 != nil {
+		x.Summary = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// ExternalDocs external_docs = 4;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+	v4 := helpers.MapValueForKey(m, "externalDocs")
+	if v4 != nil {
+		x.ExternalDocs = NewExternalDocs(v4)
 	}
 	// string operation_id = 5;
-	if helpers.MapHasKey(m, "operationId") {
-		x.OperationId = helpers.MapValueForKey(m, "operationId").(string)
+	v5 := helpers.MapValueForKey(m, "operationId")
+	if v5 != nil {
+		x.OperationId = v5.(string)
 	}
 	// repeated string produces = 6;
-	if helpers.MapHasKey(m, "produces") {
-		v, ok := helpers.MapValueForKey(m, "produces").([]interface{})
+	v6 := helpers.MapValueForKey(m, "produces")
+	if v6 != nil {
+		v, ok := v6.([]interface{})
 		if ok {
 			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -1621,8 +1780,9 @@ func NewOperation(in interface{}) *Operation {
 		}
 	}
 	// repeated string consumes = 7;
-	if helpers.MapHasKey(m, "consumes") {
-		v, ok := helpers.MapValueForKey(m, "consumes").([]interface{})
+	v7 := helpers.MapValueForKey(m, "consumes")
+	if v7 != nil {
+		v, ok := v7.([]interface{})
 		if ok {
 			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -1630,10 +1790,11 @@ func NewOperation(in interface{}) *Operation {
 		}
 	}
 	// repeated ParametersItem parameters = 8;
-	if helpers.MapHasKey(m, "parameters") {
+	v8 := helpers.MapValueForKey(m, "parameters")
+	if v8 != nil {
 		// repeated class ParametersItem
 		x.Parameters = make([]*ParametersItem, 0)
-		a, ok := helpers.MapValueForKey(m, "parameters").([]interface{})
+		a, ok := v8.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Parameters = append(x.Parameters, NewParametersItem(item))
@@ -1641,12 +1802,14 @@ func NewOperation(in interface{}) *Operation {
 		}
 	}
 	// Responses responses = 9;
-	if helpers.MapHasKey(m, "responses") {
-		x.Responses = NewResponses(helpers.MapValueForKey(m, "responses"))
+	v9 := helpers.MapValueForKey(m, "responses")
+	if v9 != nil {
+		x.Responses = NewResponses(v9)
 	}
 	// repeated string schemes = 10;
-	if helpers.MapHasKey(m, "schemes") {
-		v, ok := helpers.MapValueForKey(m, "schemes").([]interface{})
+	v10 := helpers.MapValueForKey(m, "schemes")
+	if v10 != nil {
+		v, ok := v10.([]interface{})
 		if ok {
 			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -1654,14 +1817,16 @@ func NewOperation(in interface{}) *Operation {
 		}
 	}
 	// bool deprecated = 11;
-	if helpers.MapHasKey(m, "deprecated") {
-		x.Deprecated = helpers.MapValueForKey(m, "deprecated").(bool)
+	v11 := helpers.MapValueForKey(m, "deprecated")
+	if v11 != nil {
+		x.Deprecated = v11.(bool)
 	}
 	// repeated SecurityRequirement security = 12;
-	if helpers.MapHasKey(m, "security") {
+	v12 := helpers.MapValueForKey(m, "security")
+	if v12 != nil {
 		// repeated class SecurityRequirement
 		x.Security = make([]*SecurityRequirement, 0)
-		a, ok := helpers.MapValueForKey(m, "security").([]interface{})
+		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Security = append(x.Security, NewSecurityRequirement(item))
@@ -1770,42 +1935,51 @@ func NewPathItem(in interface{}) *PathItem {
 	}
 	x := &PathItem{}
 	// string _ref = 1;
-	if helpers.MapHasKey(m, "$ref") {
-		x.XRef = helpers.MapValueForKey(m, "$ref").(string)
+	v1 := helpers.MapValueForKey(m, "$ref")
+	if v1 != nil {
+		x.XRef = v1.(string)
 	}
 	// Operation get = 2;
-	if helpers.MapHasKey(m, "get") {
-		x.Get = NewOperation(helpers.MapValueForKey(m, "get"))
+	v2 := helpers.MapValueForKey(m, "get")
+	if v2 != nil {
+		x.Get = NewOperation(v2)
 	}
 	// Operation put = 3;
-	if helpers.MapHasKey(m, "put") {
-		x.Put = NewOperation(helpers.MapValueForKey(m, "put"))
+	v3 := helpers.MapValueForKey(m, "put")
+	if v3 != nil {
+		x.Put = NewOperation(v3)
 	}
 	// Operation post = 4;
-	if helpers.MapHasKey(m, "post") {
-		x.Post = NewOperation(helpers.MapValueForKey(m, "post"))
+	v4 := helpers.MapValueForKey(m, "post")
+	if v4 != nil {
+		x.Post = NewOperation(v4)
 	}
 	// Operation delete = 5;
-	if helpers.MapHasKey(m, "delete") {
-		x.Delete = NewOperation(helpers.MapValueForKey(m, "delete"))
+	v5 := helpers.MapValueForKey(m, "delete")
+	if v5 != nil {
+		x.Delete = NewOperation(v5)
 	}
 	// Operation options = 6;
-	if helpers.MapHasKey(m, "options") {
-		x.Options = NewOperation(helpers.MapValueForKey(m, "options"))
+	v6 := helpers.MapValueForKey(m, "options")
+	if v6 != nil {
+		x.Options = NewOperation(v6)
 	}
 	// Operation head = 7;
-	if helpers.MapHasKey(m, "head") {
-		x.Head = NewOperation(helpers.MapValueForKey(m, "head"))
+	v7 := helpers.MapValueForKey(m, "head")
+	if v7 != nil {
+		x.Head = NewOperation(v7)
 	}
 	// Operation patch = 8;
-	if helpers.MapHasKey(m, "patch") {
-		x.Patch = NewOperation(helpers.MapValueForKey(m, "patch"))
+	v8 := helpers.MapValueForKey(m, "patch")
+	if v8 != nil {
+		x.Patch = NewOperation(v8)
 	}
 	// repeated ParametersItem parameters = 9;
-	if helpers.MapHasKey(m, "parameters") {
+	v9 := helpers.MapValueForKey(m, "parameters")
+	if v9 != nil {
 		// repeated class ParametersItem
 		x.Parameters = make([]*ParametersItem, 0)
-		a, ok := helpers.MapValueForKey(m, "parameters").([]interface{})
+		a, ok := v9.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Parameters = append(x.Parameters, NewParametersItem(item))
@@ -1846,86 +2020,106 @@ func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	}
 	x := &PathParameterSubSchema{}
 	// bool required = 1;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = helpers.MapValueForKey(m, "required").(bool)
+	v1 := helpers.MapValueForKey(m, "required")
+	if v1 != nil {
+		x.Required = v1.(bool)
 	}
 	// string in = 2;
-	if helpers.MapHasKey(m, "in") {
-		x.In = helpers.MapValueForKey(m, "in").(string)
+	v2 := helpers.MapValueForKey(m, "in")
+	if v2 != nil {
+		x.In = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// string name = 4;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v4 := helpers.MapValueForKey(m, "name")
+	if v4 != nil {
+		x.Name = v4.(string)
 	}
 	// string type = 5;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v5 := helpers.MapValueForKey(m, "type")
+	if v5 != nil {
+		x.Type = v5.(string)
 	}
 	// string format = 6;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v6 := helpers.MapValueForKey(m, "format")
+	if v6 != nil {
+		x.Format = v6.(string)
 	}
 	// PrimitivesItems items = 7;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
+	v7 := helpers.MapValueForKey(m, "items")
+	if v7 != nil {
+		x.Items = NewPrimitivesItems(v7)
 	}
 	// string collection_format = 8;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = helpers.MapValueForKey(m, "collectionFormat").(string)
+	v8 := helpers.MapValueForKey(m, "collectionFormat")
+	if v8 != nil {
+		x.CollectionFormat = v8.(string)
 	}
 	// Any default = 9;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v9 := helpers.MapValueForKey(m, "default")
+	if v9 != nil {
+		x.Default = NewAny(v9)
 	}
 	// float maximum = 10;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v10 := helpers.MapValueForKey(m, "maximum")
+	if v10 != nil {
+		x.Maximum = v10.(float64)
 	}
 	// bool exclusive_maximum = 11;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v11 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v11 != nil {
+		x.ExclusiveMaximum = v11.(bool)
 	}
 	// float minimum = 12;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v12 := helpers.MapValueForKey(m, "minimum")
+	if v12 != nil {
+		x.Minimum = v12.(float64)
 	}
 	// bool exclusive_minimum = 13;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v13 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v13 != nil {
+		x.ExclusiveMinimum = v13.(bool)
 	}
 	// int64 max_length = 14;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v14 := helpers.MapValueForKey(m, "maxLength")
+	if v14 != nil {
+		x.MaxLength = v14.(int64)
 	}
 	// int64 min_length = 15;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v15 := helpers.MapValueForKey(m, "minLength")
+	if v15 != nil {
+		x.MinLength = v15.(int64)
 	}
 	// string pattern = 16;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v16 := helpers.MapValueForKey(m, "pattern")
+	if v16 != nil {
+		x.Pattern = v16.(string)
 	}
 	// int64 max_items = 17;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v17 := helpers.MapValueForKey(m, "maxItems")
+	if v17 != nil {
+		x.MaxItems = v17.(int64)
 	}
 	// int64 min_items = 18;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v18 := helpers.MapValueForKey(m, "minItems")
+	if v18 != nil {
+		x.MinItems = v18.(int64)
 	}
 	// bool unique_items = 19;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v19 := helpers.MapValueForKey(m, "uniqueItems")
+	if v19 != nil {
+		x.UniqueItems = v19.(bool)
 	}
 	// repeated Any enum = 20;
-	if helpers.MapHasKey(m, "enum") {
+	v20 := helpers.MapValueForKey(m, "enum")
+	if v20 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -1933,8 +2127,9 @@ func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 		}
 	}
 	// float multiple_of = 21;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v21 := helpers.MapValueForKey(m, "multipleOf")
+	if v21 != nil {
+		x.MultipleOf = v21.(float64)
 	}
 	// repeated NamedAny vendor_extension = 22;
 	// MAP: Any ^x-
@@ -2008,70 +2203,86 @@ func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 	}
 	x := &PrimitivesItems{}
 	// string type = 1;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v1 := helpers.MapValueForKey(m, "type")
+	if v1 != nil {
+		x.Type = v1.(string)
 	}
 	// string format = 2;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v2 := helpers.MapValueForKey(m, "format")
+	if v2 != nil {
+		x.Format = v2.(string)
 	}
 	// PrimitivesItems items = 3;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
+	v3 := helpers.MapValueForKey(m, "items")
+	if v3 != nil {
+		x.Items = NewPrimitivesItems(v3)
 	}
 	// string collection_format = 4;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = helpers.MapValueForKey(m, "collectionFormat").(string)
+	v4 := helpers.MapValueForKey(m, "collectionFormat")
+	if v4 != nil {
+		x.CollectionFormat = v4.(string)
 	}
 	// Any default = 5;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v5 := helpers.MapValueForKey(m, "default")
+	if v5 != nil {
+		x.Default = NewAny(v5)
 	}
 	// float maximum = 6;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v6 := helpers.MapValueForKey(m, "maximum")
+	if v6 != nil {
+		x.Maximum = v6.(float64)
 	}
 	// bool exclusive_maximum = 7;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v7 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v7 != nil {
+		x.ExclusiveMaximum = v7.(bool)
 	}
 	// float minimum = 8;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v8 := helpers.MapValueForKey(m, "minimum")
+	if v8 != nil {
+		x.Minimum = v8.(float64)
 	}
 	// bool exclusive_minimum = 9;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v9 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v9 != nil {
+		x.ExclusiveMinimum = v9.(bool)
 	}
 	// int64 max_length = 10;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v10 := helpers.MapValueForKey(m, "maxLength")
+	if v10 != nil {
+		x.MaxLength = v10.(int64)
 	}
 	// int64 min_length = 11;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v11 := helpers.MapValueForKey(m, "minLength")
+	if v11 != nil {
+		x.MinLength = v11.(int64)
 	}
 	// string pattern = 12;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v12 := helpers.MapValueForKey(m, "pattern")
+	if v12 != nil {
+		x.Pattern = v12.(string)
 	}
 	// int64 max_items = 13;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v13 := helpers.MapValueForKey(m, "maxItems")
+	if v13 != nil {
+		x.MaxItems = v13.(int64)
 	}
 	// int64 min_items = 14;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v14 := helpers.MapValueForKey(m, "minItems")
+	if v14 != nil {
+		x.MinItems = v14.(int64)
 	}
 	// bool unique_items = 15;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v15 := helpers.MapValueForKey(m, "uniqueItems")
+	if v15 != nil {
+		x.UniqueItems = v15.(bool)
 	}
 	// repeated Any enum = 16;
-	if helpers.MapHasKey(m, "enum") {
+	v16 := helpers.MapValueForKey(m, "enum")
+	if v16 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -2079,8 +2290,9 @@ func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 		}
 	}
 	// float multiple_of = 17;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v17 := helpers.MapValueForKey(m, "multipleOf")
+	if v17 != nil {
+		x.MultipleOf = v17.(float64)
 	}
 	// repeated NamedAny vendor_extension = 18;
 	// MAP: Any ^x-
@@ -2134,90 +2346,111 @@ func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 	}
 	x := &QueryParameterSubSchema{}
 	// bool required = 1;
-	if helpers.MapHasKey(m, "required") {
-		x.Required = helpers.MapValueForKey(m, "required").(bool)
+	v1 := helpers.MapValueForKey(m, "required")
+	if v1 != nil {
+		x.Required = v1.(bool)
 	}
 	// string in = 2;
-	if helpers.MapHasKey(m, "in") {
-		x.In = helpers.MapValueForKey(m, "in").(string)
+	v2 := helpers.MapValueForKey(m, "in")
+	if v2 != nil {
+		x.In = v2.(string)
 	}
 	// string description = 3;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v3 := helpers.MapValueForKey(m, "description")
+	if v3 != nil {
+		x.Description = v3.(string)
 	}
 	// string name = 4;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v4 := helpers.MapValueForKey(m, "name")
+	if v4 != nil {
+		x.Name = v4.(string)
 	}
 	// bool allow_empty_value = 5;
-	if helpers.MapHasKey(m, "allowEmptyValue") {
-		x.AllowEmptyValue = helpers.MapValueForKey(m, "allowEmptyValue").(bool)
+	v5 := helpers.MapValueForKey(m, "allowEmptyValue")
+	if v5 != nil {
+		x.AllowEmptyValue = v5.(bool)
 	}
 	// string type = 6;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = helpers.MapValueForKey(m, "type").(string)
+	v6 := helpers.MapValueForKey(m, "type")
+	if v6 != nil {
+		x.Type = v6.(string)
 	}
 	// string format = 7;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v7 := helpers.MapValueForKey(m, "format")
+	if v7 != nil {
+		x.Format = v7.(string)
 	}
 	// PrimitivesItems items = 8;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
+	v8 := helpers.MapValueForKey(m, "items")
+	if v8 != nil {
+		x.Items = NewPrimitivesItems(v8)
 	}
 	// string collection_format = 9;
-	if helpers.MapHasKey(m, "collectionFormat") {
-		x.CollectionFormat = helpers.MapValueForKey(m, "collectionFormat").(string)
+	v9 := helpers.MapValueForKey(m, "collectionFormat")
+	if v9 != nil {
+		x.CollectionFormat = v9.(string)
 	}
 	// Any default = 10;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v10 := helpers.MapValueForKey(m, "default")
+	if v10 != nil {
+		x.Default = NewAny(v10)
 	}
 	// float maximum = 11;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v11 := helpers.MapValueForKey(m, "maximum")
+	if v11 != nil {
+		x.Maximum = v11.(float64)
 	}
 	// bool exclusive_maximum = 12;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v12 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v12 != nil {
+		x.ExclusiveMaximum = v12.(bool)
 	}
 	// float minimum = 13;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v13 := helpers.MapValueForKey(m, "minimum")
+	if v13 != nil {
+		x.Minimum = v13.(float64)
 	}
 	// bool exclusive_minimum = 14;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v14 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v14 != nil {
+		x.ExclusiveMinimum = v14.(bool)
 	}
 	// int64 max_length = 15;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v15 := helpers.MapValueForKey(m, "maxLength")
+	if v15 != nil {
+		x.MaxLength = v15.(int64)
 	}
 	// int64 min_length = 16;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v16 := helpers.MapValueForKey(m, "minLength")
+	if v16 != nil {
+		x.MinLength = v16.(int64)
 	}
 	// string pattern = 17;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v17 := helpers.MapValueForKey(m, "pattern")
+	if v17 != nil {
+		x.Pattern = v17.(string)
 	}
 	// int64 max_items = 18;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v18 := helpers.MapValueForKey(m, "maxItems")
+	if v18 != nil {
+		x.MaxItems = v18.(int64)
 	}
 	// int64 min_items = 19;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v19 := helpers.MapValueForKey(m, "minItems")
+	if v19 != nil {
+		x.MinItems = v19.(int64)
 	}
 	// bool unique_items = 20;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v20 := helpers.MapValueForKey(m, "uniqueItems")
+	if v20 != nil {
+		x.UniqueItems = v20.(bool)
 	}
 	// repeated Any enum = 21;
-	if helpers.MapHasKey(m, "enum") {
+	v21 := helpers.MapValueForKey(m, "enum")
+	if v21 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -2225,8 +2458,9 @@ func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		}
 	}
 	// float multiple_of = 22;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v22 := helpers.MapValueForKey(m, "multipleOf")
+	if v22 != nil {
+		x.MultipleOf = v22.(float64)
 	}
 	// repeated NamedAny vendor_extension = 23;
 	// MAP: Any ^x-
@@ -2262,20 +2496,24 @@ func NewResponse(in interface{}) *Response {
 	}
 	x := &Response{}
 	// string description = 1;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v1 := helpers.MapValueForKey(m, "description")
+	if v1 != nil {
+		x.Description = v1.(string)
 	}
 	// SchemaItem schema = 2;
-	if helpers.MapHasKey(m, "schema") {
-		x.Schema = NewSchemaItem(helpers.MapValueForKey(m, "schema"))
+	v2 := helpers.MapValueForKey(m, "schema")
+	if v2 != nil {
+		x.Schema = NewSchemaItem(v2)
 	}
 	// Headers headers = 3;
-	if helpers.MapHasKey(m, "headers") {
-		x.Headers = NewHeaders(helpers.MapValueForKey(m, "headers"))
+	v3 := helpers.MapValueForKey(m, "headers")
+	if v3 != nil {
+		x.Headers = NewHeaders(v3)
 	}
 	// Examples examples = 4;
-	if helpers.MapHasKey(m, "examples") {
-		x.Examples = NewExamples(helpers.MapValueForKey(m, "examples"))
+	v4 := helpers.MapValueForKey(m, "examples")
+	if v4 != nil {
+		x.Examples = NewExamples(v4)
 	}
 	// repeated NamedAny vendor_extension = 5;
 	// MAP: Any ^x-
@@ -2396,80 +2634,99 @@ func NewSchema(in interface{}) *Schema {
 	}
 	x := &Schema{}
 	// string _ref = 1;
-	if helpers.MapHasKey(m, "$ref") {
-		x.XRef = helpers.MapValueForKey(m, "$ref").(string)
+	v1 := helpers.MapValueForKey(m, "$ref")
+	if v1 != nil {
+		x.XRef = v1.(string)
 	}
 	// string format = 2;
-	if helpers.MapHasKey(m, "format") {
-		x.Format = helpers.MapValueForKey(m, "format").(string)
+	v2 := helpers.MapValueForKey(m, "format")
+	if v2 != nil {
+		x.Format = v2.(string)
 	}
 	// string title = 3;
-	if helpers.MapHasKey(m, "title") {
-		x.Title = helpers.MapValueForKey(m, "title").(string)
+	v3 := helpers.MapValueForKey(m, "title")
+	if v3 != nil {
+		x.Title = v3.(string)
 	}
 	// string description = 4;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v4 := helpers.MapValueForKey(m, "description")
+	if v4 != nil {
+		x.Description = v4.(string)
 	}
 	// Any default = 5;
-	if helpers.MapHasKey(m, "default") {
-		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
+	v5 := helpers.MapValueForKey(m, "default")
+	if v5 != nil {
+		x.Default = NewAny(v5)
 	}
 	// float multiple_of = 6;
-	if helpers.MapHasKey(m, "multipleOf") {
-		x.MultipleOf = helpers.MapValueForKey(m, "multipleOf").(float64)
+	v6 := helpers.MapValueForKey(m, "multipleOf")
+	if v6 != nil {
+		x.MultipleOf = v6.(float64)
 	}
 	// float maximum = 7;
-	if helpers.MapHasKey(m, "maximum") {
-		x.Maximum = helpers.MapValueForKey(m, "maximum").(float64)
+	v7 := helpers.MapValueForKey(m, "maximum")
+	if v7 != nil {
+		x.Maximum = v7.(float64)
 	}
 	// bool exclusive_maximum = 8;
-	if helpers.MapHasKey(m, "exclusiveMaximum") {
-		x.ExclusiveMaximum = helpers.MapValueForKey(m, "exclusiveMaximum").(bool)
+	v8 := helpers.MapValueForKey(m, "exclusiveMaximum")
+	if v8 != nil {
+		x.ExclusiveMaximum = v8.(bool)
 	}
 	// float minimum = 9;
-	if helpers.MapHasKey(m, "minimum") {
-		x.Minimum = helpers.MapValueForKey(m, "minimum").(float64)
+	v9 := helpers.MapValueForKey(m, "minimum")
+	if v9 != nil {
+		x.Minimum = v9.(float64)
 	}
 	// bool exclusive_minimum = 10;
-	if helpers.MapHasKey(m, "exclusiveMinimum") {
-		x.ExclusiveMinimum = helpers.MapValueForKey(m, "exclusiveMinimum").(bool)
+	v10 := helpers.MapValueForKey(m, "exclusiveMinimum")
+	if v10 != nil {
+		x.ExclusiveMinimum = v10.(bool)
 	}
 	// int64 max_length = 11;
-	if helpers.MapHasKey(m, "maxLength") {
-		x.MaxLength = helpers.MapValueForKey(m, "maxLength").(int64)
+	v11 := helpers.MapValueForKey(m, "maxLength")
+	if v11 != nil {
+		x.MaxLength = v11.(int64)
 	}
 	// int64 min_length = 12;
-	if helpers.MapHasKey(m, "minLength") {
-		x.MinLength = helpers.MapValueForKey(m, "minLength").(int64)
+	v12 := helpers.MapValueForKey(m, "minLength")
+	if v12 != nil {
+		x.MinLength = v12.(int64)
 	}
 	// string pattern = 13;
-	if helpers.MapHasKey(m, "pattern") {
-		x.Pattern = helpers.MapValueForKey(m, "pattern").(string)
+	v13 := helpers.MapValueForKey(m, "pattern")
+	if v13 != nil {
+		x.Pattern = v13.(string)
 	}
 	// int64 max_items = 14;
-	if helpers.MapHasKey(m, "maxItems") {
-		x.MaxItems = helpers.MapValueForKey(m, "maxItems").(int64)
+	v14 := helpers.MapValueForKey(m, "maxItems")
+	if v14 != nil {
+		x.MaxItems = v14.(int64)
 	}
 	// int64 min_items = 15;
-	if helpers.MapHasKey(m, "minItems") {
-		x.MinItems = helpers.MapValueForKey(m, "minItems").(int64)
+	v15 := helpers.MapValueForKey(m, "minItems")
+	if v15 != nil {
+		x.MinItems = v15.(int64)
 	}
 	// bool unique_items = 16;
-	if helpers.MapHasKey(m, "uniqueItems") {
-		x.UniqueItems = helpers.MapValueForKey(m, "uniqueItems").(bool)
+	v16 := helpers.MapValueForKey(m, "uniqueItems")
+	if v16 != nil {
+		x.UniqueItems = v16.(bool)
 	}
 	// int64 max_properties = 17;
-	if helpers.MapHasKey(m, "maxProperties") {
-		x.MaxProperties = helpers.MapValueForKey(m, "maxProperties").(int64)
+	v17 := helpers.MapValueForKey(m, "maxProperties")
+	if v17 != nil {
+		x.MaxProperties = v17.(int64)
 	}
 	// int64 min_properties = 18;
-	if helpers.MapHasKey(m, "minProperties") {
-		x.MinProperties = helpers.MapValueForKey(m, "minProperties").(int64)
+	v18 := helpers.MapValueForKey(m, "minProperties")
+	if v18 != nil {
+		x.MinProperties = v18.(int64)
 	}
 	// repeated string required = 19;
-	if helpers.MapHasKey(m, "required") {
-		v, ok := helpers.MapValueForKey(m, "required").([]interface{})
+	v19 := helpers.MapValueForKey(m, "required")
+	if v19 != nil {
+		v, ok := v19.([]interface{})
 		if ok {
 			x.Required = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
@@ -2477,10 +2734,11 @@ func NewSchema(in interface{}) *Schema {
 		}
 	}
 	// repeated Any enum = 20;
-	if helpers.MapHasKey(m, "enum") {
+	v20 := helpers.MapValueForKey(m, "enum")
+	if v20 != nil {
 		// repeated class Any
 		x.Enum = make([]*Any, 0)
-		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
+		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.Enum = append(x.Enum, NewAny(item))
@@ -2488,22 +2746,26 @@ func NewSchema(in interface{}) *Schema {
 		}
 	}
 	// AdditionalPropertiesItem additional_properties = 21;
-	if helpers.MapHasKey(m, "additionalProperties") {
-		x.AdditionalProperties = NewAdditionalPropertiesItem(helpers.MapValueForKey(m, "additionalProperties"))
+	v21 := helpers.MapValueForKey(m, "additionalProperties")
+	if v21 != nil {
+		x.AdditionalProperties = NewAdditionalPropertiesItem(v21)
 	}
 	// TypeItem type = 22;
-	if helpers.MapHasKey(m, "type") {
-		x.Type = NewTypeItem(helpers.MapValueForKey(m, "type"))
+	v22 := helpers.MapValueForKey(m, "type")
+	if v22 != nil {
+		x.Type = NewTypeItem(v22)
 	}
 	// ItemsItem items = 23;
-	if helpers.MapHasKey(m, "items") {
-		x.Items = NewItemsItem(helpers.MapValueForKey(m, "items"))
+	v23 := helpers.MapValueForKey(m, "items")
+	if v23 != nil {
+		x.Items = NewItemsItem(v23)
 	}
 	// repeated Schema all_of = 24;
-	if helpers.MapHasKey(m, "allOf") {
+	v24 := helpers.MapValueForKey(m, "allOf")
+	if v24 != nil {
 		// repeated class Schema
 		x.AllOf = make([]*Schema, 0)
-		a, ok := helpers.MapValueForKey(m, "allOf").([]interface{})
+		a, ok := v24.([]interface{})
 		if ok {
 			for _, item := range a {
 				x.AllOf = append(x.AllOf, NewSchema(item))
@@ -2511,28 +2773,34 @@ func NewSchema(in interface{}) *Schema {
 		}
 	}
 	// Properties properties = 25;
-	if helpers.MapHasKey(m, "properties") {
-		x.Properties = NewProperties(helpers.MapValueForKey(m, "properties"))
+	v25 := helpers.MapValueForKey(m, "properties")
+	if v25 != nil {
+		x.Properties = NewProperties(v25)
 	}
 	// string discriminator = 26;
-	if helpers.MapHasKey(m, "discriminator") {
-		x.Discriminator = helpers.MapValueForKey(m, "discriminator").(string)
+	v26 := helpers.MapValueForKey(m, "discriminator")
+	if v26 != nil {
+		x.Discriminator = v26.(string)
 	}
 	// bool read_only = 27;
-	if helpers.MapHasKey(m, "readOnly") {
-		x.ReadOnly = helpers.MapValueForKey(m, "readOnly").(bool)
+	v27 := helpers.MapValueForKey(m, "readOnly")
+	if v27 != nil {
+		x.ReadOnly = v27.(bool)
 	}
 	// Xml xml = 28;
-	if helpers.MapHasKey(m, "xml") {
-		x.Xml = NewXml(helpers.MapValueForKey(m, "xml"))
+	v28 := helpers.MapValueForKey(m, "xml")
+	if v28 != nil {
+		x.Xml = NewXml(v28)
 	}
 	// ExternalDocs external_docs = 29;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+	v29 := helpers.MapValueForKey(m, "externalDocs")
+	if v29 != nil {
+		x.ExternalDocs = NewExternalDocs(v29)
 	}
 	// Any example = 30;
-	if helpers.MapHasKey(m, "example") {
-		x.Example = NewAny(helpers.MapValueForKey(m, "example"))
+	v30 := helpers.MapValueForKey(m, "example")
+	if v30 != nil {
+		x.Example = NewAny(v30)
 	}
 	// repeated NamedAny vendor_extension = 31;
 	// MAP: Any ^x-
@@ -2704,16 +2972,19 @@ func NewTag(in interface{}) *Tag {
 	}
 	x := &Tag{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// string description = 2;
-	if helpers.MapHasKey(m, "description") {
-		x.Description = helpers.MapValueForKey(m, "description").(string)
+	v2 := helpers.MapValueForKey(m, "description")
+	if v2 != nil {
+		x.Description = v2.(string)
 	}
 	// ExternalDocs external_docs = 3;
-	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+	v3 := helpers.MapValueForKey(m, "externalDocs")
+	if v3 != nil {
+		x.ExternalDocs = NewExternalDocs(v3)
 	}
 	// repeated NamedAny vendor_extension = 4;
 	// MAP: Any ^x-
@@ -2779,24 +3050,29 @@ func NewXml(in interface{}) *Xml {
 	}
 	x := &Xml{}
 	// string name = 1;
-	if helpers.MapHasKey(m, "name") {
-		x.Name = helpers.MapValueForKey(m, "name").(string)
+	v1 := helpers.MapValueForKey(m, "name")
+	if v1 != nil {
+		x.Name = v1.(string)
 	}
 	// string namespace = 2;
-	if helpers.MapHasKey(m, "namespace") {
-		x.Namespace = helpers.MapValueForKey(m, "namespace").(string)
+	v2 := helpers.MapValueForKey(m, "namespace")
+	if v2 != nil {
+		x.Namespace = v2.(string)
 	}
 	// string prefix = 3;
-	if helpers.MapHasKey(m, "prefix") {
-		x.Prefix = helpers.MapValueForKey(m, "prefix").(string)
+	v3 := helpers.MapValueForKey(m, "prefix")
+	if v3 != nil {
+		x.Prefix = v3.(string)
 	}
 	// bool attribute = 4;
-	if helpers.MapHasKey(m, "attribute") {
-		x.Attribute = helpers.MapValueForKey(m, "attribute").(bool)
+	v4 := helpers.MapValueForKey(m, "attribute")
+	if v4 != nil {
+		x.Attribute = v4.(bool)
 	}
 	// bool wrapped = 5;
-	if helpers.MapHasKey(m, "wrapped") {
-		x.Wrapped = helpers.MapValueForKey(m, "wrapped").(bool)
+	v5 := helpers.MapValueForKey(m, "wrapped")
+	if v5 != nil {
+		x.Wrapped = v5.(bool)
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
