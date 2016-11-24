@@ -26,10 +26,10 @@ func Version() string {
 	return "OpenAPIv2"
 }
 
-func BuildAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
+func NewAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildAdditionalPropertiesItem: %+v", in)
+		log.Printf("unexpected argument to NewAdditionalPropertiesItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -41,7 +41,7 @@ func BuildAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 	x := &AdditionalPropertiesItem{}
 	// Schema schema = 1;
 	if helpers.MapHasKey(m, "schema") {
-		x.Schema = BuildSchema(helpers.MapValueForKey(m, "schema"))
+		x.Schema = NewSchema(helpers.MapValueForKey(m, "schema"))
 	}
 	// bool boolean = 2;
 	if helpers.MapHasKey(m, "boolean") {
@@ -50,16 +50,16 @@ func BuildAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 	return x
 }
 
-func BuildAny(in interface{}) *Any {
+func NewAny(in interface{}) *Any {
 	x := &Any{}
 	x.Value = fmt.Sprintf("%+v", in)
 	return x
 }
 
-func BuildApiKeySecurity(in interface{}) *ApiKeySecurity {
+func NewApiKeySecurity(in interface{}) *ApiKeySecurity {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildApiKeySecurity: %+v", in)
+		log.Printf("unexpected argument to NewApiKeySecurity: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -98,17 +98,17 @@ func BuildApiKeySecurity(in interface{}) *ApiKeySecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecurity {
+func NewBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecurity {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildBasicAuthenticationSecurity: %+v", in)
+		log.Printf("unexpected argument to NewBasicAuthenticationSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -139,17 +139,17 @@ func BuildBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecuri
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildBodyParameter(in interface{}) *BodyParameter {
+func NewBodyParameter(in interface{}) *BodyParameter {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildBodyParameter: %+v", in)
+		log.Printf("unexpected argument to NewBodyParameter: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -181,7 +181,7 @@ func BuildBodyParameter(in interface{}) *BodyParameter {
 	}
 	// Schema schema = 5;
 	if helpers.MapHasKey(m, "schema") {
-		x.Schema = BuildSchema(helpers.MapValueForKey(m, "schema"))
+		x.Schema = NewSchema(helpers.MapValueForKey(m, "schema"))
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
@@ -192,17 +192,17 @@ func BuildBodyParameter(in interface{}) *BodyParameter {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildContact(in interface{}) *Contact {
+func NewContact(in interface{}) *Contact {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildContact: %+v", in)
+		log.Printf("unexpected argument to NewContact: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -233,17 +233,17 @@ func BuildContact(in interface{}) *Contact {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildDefault(in interface{}) *Default {
+func NewDefault(in interface{}) *Default {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildDefault: %+v", in)
+		log.Printf("unexpected argument to NewDefault: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -256,16 +256,16 @@ func BuildDefault(in interface{}) *Default {
 		v := item.Value
 		pair := &NamedAny{}
 		pair.Name = k
-		pair.Value = BuildAny(v)
+		pair.Value = NewAny(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildDefinitions(in interface{}) *Definitions {
+func NewDefinitions(in interface{}) *Definitions {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildDefinitions: %+v", in)
+		log.Printf("unexpected argument to NewDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -278,16 +278,16 @@ func BuildDefinitions(in interface{}) *Definitions {
 		v := item.Value
 		pair := &NamedSchema{}
 		pair.Name = k
-		pair.Value = BuildSchema(v)
+		pair.Value = NewSchema(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildDocument(in interface{}) *Document {
+func NewDocument(in interface{}) *Document {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildDocument: %+v", in)
+		log.Printf("unexpected argument to NewDocument: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -307,7 +307,7 @@ func BuildDocument(in interface{}) *Document {
 	}
 	// Info info = 2;
 	if helpers.MapHasKey(m, "info") {
-		x.Info = BuildInfo(helpers.MapValueForKey(m, "info"))
+		x.Info = NewInfo(helpers.MapValueForKey(m, "info"))
 	}
 	// string host = 3;
 	if helpers.MapHasKey(m, "host") {
@@ -346,19 +346,19 @@ func BuildDocument(in interface{}) *Document {
 	}
 	// Paths paths = 8;
 	if helpers.MapHasKey(m, "paths") {
-		x.Paths = BuildPaths(helpers.MapValueForKey(m, "paths"))
+		x.Paths = NewPaths(helpers.MapValueForKey(m, "paths"))
 	}
 	// Definitions definitions = 9;
 	if helpers.MapHasKey(m, "definitions") {
-		x.Definitions = BuildDefinitions(helpers.MapValueForKey(m, "definitions"))
+		x.Definitions = NewDefinitions(helpers.MapValueForKey(m, "definitions"))
 	}
 	// ParameterDefinitions parameters = 10;
 	if helpers.MapHasKey(m, "parameters") {
-		x.Parameters = BuildParameterDefinitions(helpers.MapValueForKey(m, "parameters"))
+		x.Parameters = NewParameterDefinitions(helpers.MapValueForKey(m, "parameters"))
 	}
 	// ResponseDefinitions responses = 11;
 	if helpers.MapHasKey(m, "responses") {
-		x.Responses = BuildResponseDefinitions(helpers.MapValueForKey(m, "responses"))
+		x.Responses = NewResponseDefinitions(helpers.MapValueForKey(m, "responses"))
 	}
 	// repeated SecurityRequirement security = 12;
 	if helpers.MapHasKey(m, "security") {
@@ -367,13 +367,13 @@ func BuildDocument(in interface{}) *Document {
 		a, ok := helpers.MapValueForKey(m, "security").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Security = append(x.Security, BuildSecurityRequirement(item))
+				x.Security = append(x.Security, NewSecurityRequirement(item))
 			}
 		}
 	}
 	// SecurityDefinitions security_definitions = 13;
 	if helpers.MapHasKey(m, "securityDefinitions") {
-		x.SecurityDefinitions = BuildSecurityDefinitions(helpers.MapValueForKey(m, "securityDefinitions"))
+		x.SecurityDefinitions = NewSecurityDefinitions(helpers.MapValueForKey(m, "securityDefinitions"))
 	}
 	// repeated Tag tags = 14;
 	if helpers.MapHasKey(m, "tags") {
@@ -382,21 +382,21 @@ func BuildDocument(in interface{}) *Document {
 		a, ok := helpers.MapValueForKey(m, "tags").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Tags = append(x.Tags, BuildTag(item))
+				x.Tags = append(x.Tags, NewTag(item))
 			}
 		}
 	}
 	// ExternalDocs external_docs = 15;
 	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
 	}
 	return x
 }
 
-func BuildExamples(in interface{}) *Examples {
+func NewExamples(in interface{}) *Examples {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildExamples: %+v", in)
+		log.Printf("unexpected argument to NewExamples: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -409,16 +409,16 @@ func BuildExamples(in interface{}) *Examples {
 		v := item.Value
 		pair := &NamedAny{}
 		pair.Name = k
-		pair.Value = BuildAny(v)
+		pair.Value = NewAny(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildExternalDocs(in interface{}) *ExternalDocs {
+func NewExternalDocs(in interface{}) *ExternalDocs {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildExternalDocs: %+v", in)
+		log.Printf("unexpected argument to NewExternalDocs: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -449,17 +449,17 @@ func BuildExternalDocs(in interface{}) *ExternalDocs {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildFileSchema(in interface{}) *FileSchema {
+func NewFileSchema(in interface{}) *FileSchema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildFileSchema: %+v", in)
+		log.Printf("unexpected argument to NewFileSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -487,7 +487,7 @@ func BuildFileSchema(in interface{}) *FileSchema {
 	}
 	// Any default = 4;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// repeated string required = 5;
 	if helpers.MapHasKey(m, "required") {
@@ -508,11 +508,11 @@ func BuildFileSchema(in interface{}) *FileSchema {
 	}
 	// ExternalDocs external_docs = 8;
 	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
 	}
 	// Any example = 9;
 	if helpers.MapHasKey(m, "example") {
-		x.Example = BuildAny(helpers.MapValueForKey(m, "example"))
+		x.Example = NewAny(helpers.MapValueForKey(m, "example"))
 	}
 	// repeated NamedAny vendor_extension = 10;
 	// MAP: Any ^x-
@@ -523,17 +523,17 @@ func BuildFileSchema(in interface{}) *FileSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
+func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildFormDataParameterSubSchema: %+v", in)
+		log.Printf("unexpected argument to NewFormDataParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -573,7 +573,7 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 	}
 	// PrimitivesItems items = 8;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(helpers.MapValueForKey(m, "items"))
+		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
 	}
 	// string collection_format = 9;
 	if helpers.MapHasKey(m, "collectionFormat") {
@@ -581,7 +581,7 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 	}
 	// Any default = 10;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float maximum = 11;
 	if helpers.MapHasKey(m, "maximum") {
@@ -630,7 +630,7 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
@@ -647,17 +647,17 @@ func BuildFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildHeader(in interface{}) *Header {
+func NewHeader(in interface{}) *Header {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildHeader: %+v", in)
+		log.Printf("unexpected argument to NewHeader: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -681,7 +681,7 @@ func BuildHeader(in interface{}) *Header {
 	}
 	// PrimitivesItems items = 3;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(helpers.MapValueForKey(m, "items"))
+		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
 	}
 	// string collection_format = 4;
 	if helpers.MapHasKey(m, "collectionFormat") {
@@ -689,7 +689,7 @@ func BuildHeader(in interface{}) *Header {
 	}
 	// Any default = 5;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float maximum = 6;
 	if helpers.MapHasKey(m, "maximum") {
@@ -738,7 +738,7 @@ func BuildHeader(in interface{}) *Header {
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
@@ -759,17 +759,17 @@ func BuildHeader(in interface{}) *Header {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
+func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildHeaderParameterSubSchema: %+v", in)
+		log.Printf("unexpected argument to NewHeaderParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -805,7 +805,7 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	}
 	// PrimitivesItems items = 7;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(helpers.MapValueForKey(m, "items"))
+		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
 	}
 	// string collection_format = 8;
 	if helpers.MapHasKey(m, "collectionFormat") {
@@ -813,7 +813,7 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	}
 	// Any default = 9;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float maximum = 10;
 	if helpers.MapHasKey(m, "maximum") {
@@ -862,7 +862,7 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
@@ -879,17 +879,17 @@ func BuildHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildHeaders(in interface{}) *Headers {
+func NewHeaders(in interface{}) *Headers {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildHeaders: %+v", in)
+		log.Printf("unexpected argument to NewHeaders: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -902,16 +902,16 @@ func BuildHeaders(in interface{}) *Headers {
 		v := item.Value
 		pair := &NamedHeader{}
 		pair.Name = k
-		pair.Value = BuildHeader(v)
+		pair.Value = NewHeader(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildInfo(in interface{}) *Info {
+func NewInfo(in interface{}) *Info {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildInfo: %+v", in)
+		log.Printf("unexpected argument to NewInfo: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -943,11 +943,11 @@ func BuildInfo(in interface{}) *Info {
 	}
 	// Contact contact = 5;
 	if helpers.MapHasKey(m, "contact") {
-		x.Contact = BuildContact(helpers.MapValueForKey(m, "contact"))
+		x.Contact = NewContact(helpers.MapValueForKey(m, "contact"))
 	}
 	// License license = 6;
 	if helpers.MapHasKey(m, "license") {
-		x.License = BuildLicense(helpers.MapValueForKey(m, "license"))
+		x.License = NewLicense(helpers.MapValueForKey(m, "license"))
 	}
 	// repeated NamedAny vendor_extension = 7;
 	// MAP: Any ^x-
@@ -958,34 +958,34 @@ func BuildInfo(in interface{}) *Info {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildItemsItem(in interface{}) *ItemsItem {
+func NewItemsItem(in interface{}) *ItemsItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildItemsItem: %+v", in)
+		log.Printf("unexpected argument to NewItemsItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
 	x := &ItemsItem{}
 	if ok {
 		x.Schema = make([]*Schema, 0)
-		x.Schema = append(x.Schema, BuildSchema(m))
+		x.Schema = append(x.Schema, NewSchema(m))
 	} else {
 		log.Printf("unexpected: %+v", in)
 	}
 	return x
 }
 
-func BuildJsonReference(in interface{}) *JsonReference {
+func NewJsonReference(in interface{}) *JsonReference {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildJsonReference: %+v", in)
+		log.Printf("unexpected argument to NewJsonReference: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1006,10 +1006,10 @@ func BuildJsonReference(in interface{}) *JsonReference {
 	return x
 }
 
-func BuildLicense(in interface{}) *License {
+func NewLicense(in interface{}) *License {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildLicense: %+v", in)
+		log.Printf("unexpected argument to NewLicense: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1040,17 +1040,17 @@ func BuildLicense(in interface{}) *License {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildNamedAny(in interface{}) *NamedAny {
+func NewNamedAny(in interface{}) *NamedAny {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedAny: %+v", in)
+		log.Printf("unexpected argument to NewNamedAny: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1066,15 +1066,15 @@ func BuildNamedAny(in interface{}) *NamedAny {
 	}
 	// Any value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildAny(helpers.MapValueForKey(m, "value"))
+		x.Value = NewAny(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedHeader(in interface{}) *NamedHeader {
+func NewNamedHeader(in interface{}) *NamedHeader {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedHeader: %+v", in)
+		log.Printf("unexpected argument to NewNamedHeader: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1090,15 +1090,15 @@ func BuildNamedHeader(in interface{}) *NamedHeader {
 	}
 	// Header value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildHeader(helpers.MapValueForKey(m, "value"))
+		x.Value = NewHeader(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedParameter(in interface{}) *NamedParameter {
+func NewNamedParameter(in interface{}) *NamedParameter {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedParameter: %+v", in)
+		log.Printf("unexpected argument to NewNamedParameter: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1114,15 +1114,15 @@ func BuildNamedParameter(in interface{}) *NamedParameter {
 	}
 	// Parameter value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildParameter(helpers.MapValueForKey(m, "value"))
+		x.Value = NewParameter(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedPathItem(in interface{}) *NamedPathItem {
+func NewNamedPathItem(in interface{}) *NamedPathItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedPathItem: %+v", in)
+		log.Printf("unexpected argument to NewNamedPathItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1138,15 +1138,15 @@ func BuildNamedPathItem(in interface{}) *NamedPathItem {
 	}
 	// PathItem value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildPathItem(helpers.MapValueForKey(m, "value"))
+		x.Value = NewPathItem(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedResponse(in interface{}) *NamedResponse {
+func NewNamedResponse(in interface{}) *NamedResponse {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedResponse: %+v", in)
+		log.Printf("unexpected argument to NewNamedResponse: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1162,15 +1162,15 @@ func BuildNamedResponse(in interface{}) *NamedResponse {
 	}
 	// Response value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildResponse(helpers.MapValueForKey(m, "value"))
+		x.Value = NewResponse(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedResponseValue(in interface{}) *NamedResponseValue {
+func NewNamedResponseValue(in interface{}) *NamedResponseValue {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedResponseValue: %+v", in)
+		log.Printf("unexpected argument to NewNamedResponseValue: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1186,15 +1186,15 @@ func BuildNamedResponseValue(in interface{}) *NamedResponseValue {
 	}
 	// ResponseValue value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildResponseValue(helpers.MapValueForKey(m, "value"))
+		x.Value = NewResponseValue(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedSchema(in interface{}) *NamedSchema {
+func NewNamedSchema(in interface{}) *NamedSchema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedSchema: %+v", in)
+		log.Printf("unexpected argument to NewNamedSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1210,15 +1210,15 @@ func BuildNamedSchema(in interface{}) *NamedSchema {
 	}
 	// Schema value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildSchema(helpers.MapValueForKey(m, "value"))
+		x.Value = NewSchema(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedSecurityDefinitionsItem(in interface{}) *NamedSecurityDefinitionsItem {
+func NewNamedSecurityDefinitionsItem(in interface{}) *NamedSecurityDefinitionsItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedSecurityDefinitionsItem: %+v", in)
+		log.Printf("unexpected argument to NewNamedSecurityDefinitionsItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1234,15 +1234,15 @@ func BuildNamedSecurityDefinitionsItem(in interface{}) *NamedSecurityDefinitions
 	}
 	// SecurityDefinitionsItem value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildSecurityDefinitionsItem(helpers.MapValueForKey(m, "value"))
+		x.Value = NewSecurityDefinitionsItem(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNamedString(in interface{}) *NamedString {
+func NewNamedString(in interface{}) *NamedString {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedString: %+v", in)
+		log.Printf("unexpected argument to NewNamedString: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1263,10 +1263,10 @@ func BuildNamedString(in interface{}) *NamedString {
 	return x
 }
 
-func BuildNamedStringArray(in interface{}) *NamedStringArray {
+func NewNamedStringArray(in interface{}) *NamedStringArray {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNamedStringArray: %+v", in)
+		log.Printf("unexpected argument to NewNamedStringArray: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1282,15 +1282,15 @@ func BuildNamedStringArray(in interface{}) *NamedStringArray {
 	}
 	// StringArray value = 2;
 	if helpers.MapHasKey(m, "value") {
-		x.Value = BuildStringArray(helpers.MapValueForKey(m, "value"))
+		x.Value = NewStringArray(helpers.MapValueForKey(m, "value"))
 	}
 	return x
 }
 
-func BuildNonBodyParameter(in interface{}) *NonBodyParameter {
+func NewNonBodyParameter(in interface{}) *NonBodyParameter {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildNonBodyParameter: %+v", in)
+		log.Printf("unexpected argument to NewNonBodyParameter: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1301,28 +1301,28 @@ func BuildNonBodyParameter(in interface{}) *NonBodyParameter {
 	x := &NonBodyParameter{}
 	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
-		t := BuildHeaderParameterSubSchema(m)
+		t := NewHeaderParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
 	}
 	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
-		t := BuildFormDataParameterSubSchema(m)
+		t := NewFormDataParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
 	}
 	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
-		t := BuildQueryParameterSubSchema(m)
+		t := NewQueryParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 		}
 	}
 	// PathParameterSubSchema path_parameter_sub_schema = 4;
 	{
-		t := BuildPathParameterSubSchema(m)
+		t := NewPathParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
@@ -1330,10 +1330,10 @@ func BuildNonBodyParameter(in interface{}) *NonBodyParameter {
 	return x
 }
 
-func BuildOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
+func NewOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildOauth2AccessCodeSecurity: %+v", in)
+		log.Printf("unexpected argument to NewOauth2AccessCodeSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1357,7 +1357,7 @@ func BuildOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 	}
 	// Oauth2Scopes scopes = 3;
 	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = BuildOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
 	}
 	// string authorization_url = 4;
 	if helpers.MapHasKey(m, "authorizationUrl") {
@@ -1380,17 +1380,17 @@ func BuildOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
+func NewOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildOauth2ApplicationSecurity: %+v", in)
+		log.Printf("unexpected argument to NewOauth2ApplicationSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1414,7 +1414,7 @@ func BuildOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 	}
 	// Oauth2Scopes scopes = 3;
 	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = BuildOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
 	}
 	// string token_url = 4;
 	if helpers.MapHasKey(m, "tokenUrl") {
@@ -1433,17 +1433,17 @@ func BuildOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
+func NewOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildOauth2ImplicitSecurity: %+v", in)
+		log.Printf("unexpected argument to NewOauth2ImplicitSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1467,7 +1467,7 @@ func BuildOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 	}
 	// Oauth2Scopes scopes = 3;
 	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = BuildOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
 	}
 	// string authorization_url = 4;
 	if helpers.MapHasKey(m, "authorizationUrl") {
@@ -1486,17 +1486,17 @@ func BuildOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
+func NewOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildOauth2PasswordSecurity: %+v", in)
+		log.Printf("unexpected argument to NewOauth2PasswordSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1520,7 +1520,7 @@ func BuildOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 	}
 	// Oauth2Scopes scopes = 3;
 	if helpers.MapHasKey(m, "scopes") {
-		x.Scopes = BuildOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
+		x.Scopes = NewOauth2Scopes(helpers.MapValueForKey(m, "scopes"))
 	}
 	// string token_url = 4;
 	if helpers.MapHasKey(m, "tokenUrl") {
@@ -1539,17 +1539,17 @@ func BuildOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildOauth2Scopes(in interface{}) *Oauth2Scopes {
+func NewOauth2Scopes(in interface{}) *Oauth2Scopes {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildOauth2Scopes: %+v", in)
+		log.Printf("unexpected argument to NewOauth2Scopes: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1568,10 +1568,10 @@ func BuildOauth2Scopes(in interface{}) *Oauth2Scopes {
 	return x
 }
 
-func BuildOperation(in interface{}) *Operation {
+func NewOperation(in interface{}) *Operation {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildOperation: %+v", in)
+		log.Printf("unexpected argument to NewOperation: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1604,7 +1604,7 @@ func BuildOperation(in interface{}) *Operation {
 	}
 	// ExternalDocs external_docs = 4;
 	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
 	}
 	// string operation_id = 5;
 	if helpers.MapHasKey(m, "operationId") {
@@ -1635,13 +1635,13 @@ func BuildOperation(in interface{}) *Operation {
 		a, ok := helpers.MapValueForKey(m, "parameters").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Parameters = append(x.Parameters, BuildParametersItem(item))
+				x.Parameters = append(x.Parameters, NewParametersItem(item))
 			}
 		}
 	}
 	// Responses responses = 9;
 	if helpers.MapHasKey(m, "responses") {
-		x.Responses = BuildResponses(helpers.MapValueForKey(m, "responses"))
+		x.Responses = NewResponses(helpers.MapValueForKey(m, "responses"))
 	}
 	// repeated string schemes = 10;
 	if helpers.MapHasKey(m, "schemes") {
@@ -1663,7 +1663,7 @@ func BuildOperation(in interface{}) *Operation {
 		a, ok := helpers.MapValueForKey(m, "security").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Security = append(x.Security, BuildSecurityRequirement(item))
+				x.Security = append(x.Security, NewSecurityRequirement(item))
 			}
 		}
 	}
@@ -1676,31 +1676,31 @@ func BuildOperation(in interface{}) *Operation {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildParameter(in interface{}) *Parameter {
+func NewParameter(in interface{}) *Parameter {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildParameter: %+v", in)
+		log.Printf("unexpected argument to NewParameter: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
 	x := &Parameter{}
 	// BodyParameter body_parameter = 1;
 	{
-		t := BuildBodyParameter(m)
+		t := NewBodyParameter(m)
 		if t != nil {
 			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 		}
 	}
 	// NonBodyParameter non_body_parameter = 2;
 	{
-		t := BuildNonBodyParameter(m)
+		t := NewNonBodyParameter(m)
 		if t != nil {
 			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 		}
@@ -1708,10 +1708,10 @@ func BuildParameter(in interface{}) *Parameter {
 	return x
 }
 
-func BuildParameterDefinitions(in interface{}) *ParameterDefinitions {
+func NewParameterDefinitions(in interface{}) *ParameterDefinitions {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildParameterDefinitions: %+v", in)
+		log.Printf("unexpected argument to NewParameterDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1724,30 +1724,30 @@ func BuildParameterDefinitions(in interface{}) *ParameterDefinitions {
 		v := item.Value
 		pair := &NamedParameter{}
 		pair.Name = k
-		pair.Value = BuildParameter(v)
+		pair.Value = NewParameter(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildParametersItem(in interface{}) *ParametersItem {
+func NewParametersItem(in interface{}) *ParametersItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildParametersItem: %+v", in)
+		log.Printf("unexpected argument to NewParametersItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
 	x := &ParametersItem{}
 	// Parameter parameter = 1;
 	{
-		t := BuildParameter(m)
+		t := NewParameter(m)
 		if t != nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
-		t := BuildJsonReference(m)
+		t := NewJsonReference(m)
 		if t != nil {
 			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
@@ -1755,10 +1755,10 @@ func BuildParametersItem(in interface{}) *ParametersItem {
 	return x
 }
 
-func BuildPathItem(in interface{}) *PathItem {
+func NewPathItem(in interface{}) *PathItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildPathItem: %+v", in)
+		log.Printf("unexpected argument to NewPathItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1774,31 +1774,31 @@ func BuildPathItem(in interface{}) *PathItem {
 	}
 	// Operation get = 2;
 	if helpers.MapHasKey(m, "get") {
-		x.Get = BuildOperation(helpers.MapValueForKey(m, "get"))
+		x.Get = NewOperation(helpers.MapValueForKey(m, "get"))
 	}
 	// Operation put = 3;
 	if helpers.MapHasKey(m, "put") {
-		x.Put = BuildOperation(helpers.MapValueForKey(m, "put"))
+		x.Put = NewOperation(helpers.MapValueForKey(m, "put"))
 	}
 	// Operation post = 4;
 	if helpers.MapHasKey(m, "post") {
-		x.Post = BuildOperation(helpers.MapValueForKey(m, "post"))
+		x.Post = NewOperation(helpers.MapValueForKey(m, "post"))
 	}
 	// Operation delete = 5;
 	if helpers.MapHasKey(m, "delete") {
-		x.Delete = BuildOperation(helpers.MapValueForKey(m, "delete"))
+		x.Delete = NewOperation(helpers.MapValueForKey(m, "delete"))
 	}
 	// Operation options = 6;
 	if helpers.MapHasKey(m, "options") {
-		x.Options = BuildOperation(helpers.MapValueForKey(m, "options"))
+		x.Options = NewOperation(helpers.MapValueForKey(m, "options"))
 	}
 	// Operation head = 7;
 	if helpers.MapHasKey(m, "head") {
-		x.Head = BuildOperation(helpers.MapValueForKey(m, "head"))
+		x.Head = NewOperation(helpers.MapValueForKey(m, "head"))
 	}
 	// Operation patch = 8;
 	if helpers.MapHasKey(m, "patch") {
-		x.Patch = BuildOperation(helpers.MapValueForKey(m, "patch"))
+		x.Patch = NewOperation(helpers.MapValueForKey(m, "patch"))
 	}
 	// repeated ParametersItem parameters = 9;
 	if helpers.MapHasKey(m, "parameters") {
@@ -1807,7 +1807,7 @@ func BuildPathItem(in interface{}) *PathItem {
 		a, ok := helpers.MapValueForKey(m, "parameters").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Parameters = append(x.Parameters, BuildParametersItem(item))
+				x.Parameters = append(x.Parameters, NewParametersItem(item))
 			}
 		}
 	}
@@ -1820,17 +1820,17 @@ func BuildPathItem(in interface{}) *PathItem {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
+func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildPathParameterSubSchema: %+v", in)
+		log.Printf("unexpected argument to NewPathParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1870,7 +1870,7 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	}
 	// PrimitivesItems items = 7;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(helpers.MapValueForKey(m, "items"))
+		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
 	}
 	// string collection_format = 8;
 	if helpers.MapHasKey(m, "collectionFormat") {
@@ -1878,7 +1878,7 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	}
 	// Any default = 9;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float maximum = 10;
 	if helpers.MapHasKey(m, "maximum") {
@@ -1927,7 +1927,7 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
@@ -1944,17 +1944,17 @@ func BuildPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildPaths(in interface{}) *Paths {
+func NewPaths(in interface{}) *Paths {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildPaths: %+v", in)
+		log.Printf("unexpected argument to NewPaths: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -1973,7 +1973,7 @@ func BuildPaths(in interface{}) *Paths {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
@@ -1986,17 +1986,17 @@ func BuildPaths(in interface{}) *Paths {
 		if helpers.PatternMatches("^/", k) {
 			pair := &NamedPathItem{}
 			pair.Name = k
-			pair.Value = BuildPathItem(v)
+			pair.Value = NewPathItem(v)
 			x.Path = append(x.Path, pair)
 		}
 	}
 	return x
 }
 
-func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
+func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildPrimitivesItems: %+v", in)
+		log.Printf("unexpected argument to NewPrimitivesItems: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2016,7 +2016,7 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 	}
 	// PrimitivesItems items = 3;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(helpers.MapValueForKey(m, "items"))
+		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
 	}
 	// string collection_format = 4;
 	if helpers.MapHasKey(m, "collectionFormat") {
@@ -2024,7 +2024,7 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 	}
 	// Any default = 5;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float maximum = 6;
 	if helpers.MapHasKey(m, "maximum") {
@@ -2073,7 +2073,7 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
@@ -2090,17 +2090,17 @@ func BuildPrimitivesItems(in interface{}) *PrimitivesItems {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildProperties(in interface{}) *Properties {
+func NewProperties(in interface{}) *Properties {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildProperties: %+v", in)
+		log.Printf("unexpected argument to NewProperties: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2113,16 +2113,16 @@ func BuildProperties(in interface{}) *Properties {
 		v := item.Value
 		pair := &NamedSchema{}
 		pair.Name = k
-		pair.Value = BuildSchema(v)
+		pair.Value = NewSchema(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
+func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildQueryParameterSubSchema: %+v", in)
+		log.Printf("unexpected argument to NewQueryParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2162,7 +2162,7 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 	}
 	// PrimitivesItems items = 8;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildPrimitivesItems(helpers.MapValueForKey(m, "items"))
+		x.Items = NewPrimitivesItems(helpers.MapValueForKey(m, "items"))
 	}
 	// string collection_format = 9;
 	if helpers.MapHasKey(m, "collectionFormat") {
@@ -2170,7 +2170,7 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 	}
 	// Any default = 10;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float maximum = 11;
 	if helpers.MapHasKey(m, "maximum") {
@@ -2219,7 +2219,7 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
@@ -2236,17 +2236,17 @@ func BuildQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildResponse(in interface{}) *Response {
+func NewResponse(in interface{}) *Response {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildResponse: %+v", in)
+		log.Printf("unexpected argument to NewResponse: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2266,15 +2266,15 @@ func BuildResponse(in interface{}) *Response {
 	}
 	// SchemaItem schema = 2;
 	if helpers.MapHasKey(m, "schema") {
-		x.Schema = BuildSchemaItem(helpers.MapValueForKey(m, "schema"))
+		x.Schema = NewSchemaItem(helpers.MapValueForKey(m, "schema"))
 	}
 	// Headers headers = 3;
 	if helpers.MapHasKey(m, "headers") {
-		x.Headers = BuildHeaders(helpers.MapValueForKey(m, "headers"))
+		x.Headers = NewHeaders(helpers.MapValueForKey(m, "headers"))
 	}
 	// Examples examples = 4;
 	if helpers.MapHasKey(m, "examples") {
-		x.Examples = BuildExamples(helpers.MapValueForKey(m, "examples"))
+		x.Examples = NewExamples(helpers.MapValueForKey(m, "examples"))
 	}
 	// repeated NamedAny vendor_extension = 5;
 	// MAP: Any ^x-
@@ -2285,17 +2285,17 @@ func BuildResponse(in interface{}) *Response {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildResponseDefinitions(in interface{}) *ResponseDefinitions {
+func NewResponseDefinitions(in interface{}) *ResponseDefinitions {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildResponseDefinitions: %+v", in)
+		log.Printf("unexpected argument to NewResponseDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2308,30 +2308,30 @@ func BuildResponseDefinitions(in interface{}) *ResponseDefinitions {
 		v := item.Value
 		pair := &NamedResponse{}
 		pair.Name = k
-		pair.Value = BuildResponse(v)
+		pair.Value = NewResponse(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildResponseValue(in interface{}) *ResponseValue {
+func NewResponseValue(in interface{}) *ResponseValue {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildResponseValue: %+v", in)
+		log.Printf("unexpected argument to NewResponseValue: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
 	x := &ResponseValue{}
 	// Response response = 1;
 	{
-		t := BuildResponse(m)
+		t := NewResponse(m)
 		if t != nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
-		t := BuildJsonReference(m)
+		t := NewJsonReference(m)
 		if t != nil {
 			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
@@ -2339,10 +2339,10 @@ func BuildResponseValue(in interface{}) *ResponseValue {
 	return x
 }
 
-func BuildResponses(in interface{}) *Responses {
+func NewResponses(in interface{}) *Responses {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildResponses: %+v", in)
+		log.Printf("unexpected argument to NewResponses: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2361,7 +2361,7 @@ func BuildResponses(in interface{}) *Responses {
 		if helpers.PatternMatches("^([0-9]{3})$|^(default)$", k) {
 			pair := &NamedResponseValue{}
 			pair.Name = k
-			pair.Value = BuildResponseValue(v)
+			pair.Value = NewResponseValue(v)
 			x.ResponseCode = append(x.ResponseCode, pair)
 		}
 	}
@@ -2374,17 +2374,17 @@ func BuildResponses(in interface{}) *Responses {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildSchema(in interface{}) *Schema {
+func NewSchema(in interface{}) *Schema {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildSchema: %+v", in)
+		log.Printf("unexpected argument to NewSchema: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2412,7 +2412,7 @@ func BuildSchema(in interface{}) *Schema {
 	}
 	// Any default = 5;
 	if helpers.MapHasKey(m, "default") {
-		x.Default = BuildAny(helpers.MapValueForKey(m, "default"))
+		x.Default = NewAny(helpers.MapValueForKey(m, "default"))
 	}
 	// float multiple_of = 6;
 	if helpers.MapHasKey(m, "multipleOf") {
@@ -2482,21 +2482,21 @@ func BuildSchema(in interface{}) *Schema {
 		a, ok := helpers.MapValueForKey(m, "enum").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, BuildAny(item))
+				x.Enum = append(x.Enum, NewAny(item))
 			}
 		}
 	}
 	// AdditionalPropertiesItem additional_properties = 21;
 	if helpers.MapHasKey(m, "additionalProperties") {
-		x.AdditionalProperties = BuildAdditionalPropertiesItem(helpers.MapValueForKey(m, "additionalProperties"))
+		x.AdditionalProperties = NewAdditionalPropertiesItem(helpers.MapValueForKey(m, "additionalProperties"))
 	}
 	// TypeItem type = 22;
 	if helpers.MapHasKey(m, "type") {
-		x.Type = BuildTypeItem(helpers.MapValueForKey(m, "type"))
+		x.Type = NewTypeItem(helpers.MapValueForKey(m, "type"))
 	}
 	// ItemsItem items = 23;
 	if helpers.MapHasKey(m, "items") {
-		x.Items = BuildItemsItem(helpers.MapValueForKey(m, "items"))
+		x.Items = NewItemsItem(helpers.MapValueForKey(m, "items"))
 	}
 	// repeated Schema all_of = 24;
 	if helpers.MapHasKey(m, "allOf") {
@@ -2505,13 +2505,13 @@ func BuildSchema(in interface{}) *Schema {
 		a, ok := helpers.MapValueForKey(m, "allOf").([]interface{})
 		if ok {
 			for _, item := range a {
-				x.AllOf = append(x.AllOf, BuildSchema(item))
+				x.AllOf = append(x.AllOf, NewSchema(item))
 			}
 		}
 	}
 	// Properties properties = 25;
 	if helpers.MapHasKey(m, "properties") {
-		x.Properties = BuildProperties(helpers.MapValueForKey(m, "properties"))
+		x.Properties = NewProperties(helpers.MapValueForKey(m, "properties"))
 	}
 	// string discriminator = 26;
 	if helpers.MapHasKey(m, "discriminator") {
@@ -2523,15 +2523,15 @@ func BuildSchema(in interface{}) *Schema {
 	}
 	// Xml xml = 28;
 	if helpers.MapHasKey(m, "xml") {
-		x.Xml = BuildXml(helpers.MapValueForKey(m, "xml"))
+		x.Xml = NewXml(helpers.MapValueForKey(m, "xml"))
 	}
 	// ExternalDocs external_docs = 29;
 	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
 	}
 	// Any example = 30;
 	if helpers.MapHasKey(m, "example") {
-		x.Example = BuildAny(helpers.MapValueForKey(m, "example"))
+		x.Example = NewAny(helpers.MapValueForKey(m, "example"))
 	}
 	// repeated NamedAny vendor_extension = 31;
 	// MAP: Any ^x-
@@ -2542,31 +2542,31 @@ func BuildSchema(in interface{}) *Schema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildSchemaItem(in interface{}) *SchemaItem {
+func NewSchemaItem(in interface{}) *SchemaItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildSchemaItem: %+v", in)
+		log.Printf("unexpected argument to NewSchemaItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
 	x := &SchemaItem{}
 	// Schema schema = 1;
 	{
-		t := BuildSchema(m)
+		t := NewSchema(m)
 		if t != nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
 		}
 	}
 	// FileSchema file_schema = 2;
 	{
-		t := BuildFileSchema(m)
+		t := NewFileSchema(m)
 		if t != nil {
 			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
@@ -2574,10 +2574,10 @@ func BuildSchemaItem(in interface{}) *SchemaItem {
 	return x
 }
 
-func BuildSecurityDefinitions(in interface{}) *SecurityDefinitions {
+func NewSecurityDefinitions(in interface{}) *SecurityDefinitions {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildSecurityDefinitions: %+v", in)
+		log.Printf("unexpected argument to NewSecurityDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2590,58 +2590,58 @@ func BuildSecurityDefinitions(in interface{}) *SecurityDefinitions {
 		v := item.Value
 		pair := &NamedSecurityDefinitionsItem{}
 		pair.Name = k
-		pair.Value = BuildSecurityDefinitionsItem(v)
+		pair.Value = NewSecurityDefinitionsItem(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildSecurityDefinitionsItem(in interface{}) *SecurityDefinitionsItem {
+func NewSecurityDefinitionsItem(in interface{}) *SecurityDefinitionsItem {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildSecurityDefinitionsItem: %+v", in)
+		log.Printf("unexpected argument to NewSecurityDefinitionsItem: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
 	x := &SecurityDefinitionsItem{}
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
-		t := BuildBasicAuthenticationSecurity(m)
+		t := NewBasicAuthenticationSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
 	}
 	// ApiKeySecurity api_key_security = 2;
 	{
-		t := BuildApiKeySecurity(m)
+		t := NewApiKeySecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
 	}
 	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
-		t := BuildOauth2ImplicitSecurity(m)
+		t := NewOauth2ImplicitSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
 	}
 	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
-		t := BuildOauth2PasswordSecurity(m)
+		t := NewOauth2PasswordSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 		}
 	}
 	// Oauth2ApplicationSecurity oauth2_application_security = 5;
 	{
-		t := BuildOauth2ApplicationSecurity(m)
+		t := NewOauth2ApplicationSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 		}
 	}
 	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
 	{
-		t := BuildOauth2AccessCodeSecurity(m)
+		t := NewOauth2AccessCodeSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
@@ -2649,10 +2649,10 @@ func BuildSecurityDefinitionsItem(in interface{}) *SecurityDefinitionsItem {
 	return x
 }
 
-func BuildSecurityRequirement(in interface{}) *SecurityRequirement {
+func NewSecurityRequirement(in interface{}) *SecurityRequirement {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildSecurityRequirement: %+v", in)
+		log.Printf("unexpected argument to NewSecurityRequirement: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2665,13 +2665,13 @@ func BuildSecurityRequirement(in interface{}) *SecurityRequirement {
 		v := item.Value
 		pair := &NamedStringArray{}
 		pair.Name = k
-		pair.Value = BuildStringArray(v)
+		pair.Value = NewStringArray(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildStringArray(in interface{}) *StringArray {
+func NewStringArray(in interface{}) *StringArray {
 	a, ok := in.([]interface{})
 	if ok {
 		x := &StringArray{}
@@ -2685,10 +2685,10 @@ func BuildStringArray(in interface{}) *StringArray {
 	}
 }
 
-func BuildTag(in interface{}) *Tag {
+func NewTag(in interface{}) *Tag {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildTag: %+v", in)
+		log.Printf("unexpected argument to NewTag: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2712,7 +2712,7 @@ func BuildTag(in interface{}) *Tag {
 	}
 	// ExternalDocs external_docs = 3;
 	if helpers.MapHasKey(m, "externalDocs") {
-		x.ExternalDocs = BuildExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
+		x.ExternalDocs = NewExternalDocs(helpers.MapValueForKey(m, "externalDocs"))
 	}
 	// repeated NamedAny vendor_extension = 4;
 	// MAP: Any ^x-
@@ -2723,14 +2723,14 @@ func BuildTag(in interface{}) *Tag {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	return x
 }
 
-func BuildTypeItem(in interface{}) *TypeItem {
+func NewTypeItem(in interface{}) *TypeItem {
 	value, ok := in.(string)
 	x := &TypeItem{}
 	if ok {
@@ -2742,10 +2742,10 @@ func BuildTypeItem(in interface{}) *TypeItem {
 	return x
 }
 
-func BuildVendorExtension(in interface{}) *VendorExtension {
+func NewVendorExtension(in interface{}) *VendorExtension {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildVendorExtension: %+v", in)
+		log.Printf("unexpected argument to NewVendorExtension: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2758,16 +2758,16 @@ func BuildVendorExtension(in interface{}) *VendorExtension {
 		v := item.Value
 		pair := &NamedAny{}
 		pair.Name = k
-		pair.Value = BuildAny(v)
+		pair.Value = NewAny(v)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x
 }
 
-func BuildXml(in interface{}) *Xml {
+func NewXml(in interface{}) *Xml {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to BuildXml: %+v", in)
+		log.Printf("unexpected argument to NewXml: %+v", in)
 		log.Printf("%d\n", len(m))
 		return nil
 	}
@@ -2806,7 +2806,7 @@ func BuildXml(in interface{}) *Xml {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = BuildAny(v)
+			pair.Value = NewAny(v)
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
