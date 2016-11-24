@@ -17,7 +17,7 @@
 package OpenAPIv2
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/googleapis/openapi-compiler/helpers"
 	"log"
 )
@@ -52,7 +52,8 @@ func NewAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
 
 func NewAny(in interface{}) *Any {
 	x := &Any{}
-	x.Value = fmt.Sprintf("%+v", in)
+	bytes, _ := json.Marshal(in)
+	x.Value = string(bytes)
 	return x
 }
 

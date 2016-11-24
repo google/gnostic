@@ -30,8 +30,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print("package %s", packageName)
 	code.Print()
 	code.Print("import (")
-	code.Print("\"fmt\"")
 	code.Print("\"log\"")
+	code.Print("\"encoding/json\"")
 	code.Print("\"github.com/googleapis/openapi-compiler/helpers\"")
 	code.Print(")")
 	code.Print()
@@ -85,7 +85,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 		if classModel.IsBlob {
 			code.Print("x := &Any{}")
-			code.Print("x.Value = fmt.Sprintf(\"%%+v\", in)")
+			code.Print("bytes, _ := json.Marshal(in)")
+			code.Print("x.Value = string(bytes)")
 			code.Print("return x")
 			code.Print("}")
 			code.Print()
