@@ -19,6 +19,7 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/googleapis/openapi-compiler/jsonschema"
 )
@@ -41,7 +42,9 @@ const LICENSE = "" +
 func main() {
 	// the OpenAPI schema file and API version are hard-coded for now
 	input := "openapi-2.0.json"
-	version := "OpenAPIv2"
+	filename := "OpenAPIv2"
+	proto_packagename := "openapi.v2"
+	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
 
 	base_schema := jsonschema.NewSchemaFromFile("schema.json")
 	base_schema.ResolveRefs()
@@ -66,16 +69,16 @@ func main() {
 	var err error
 
 	// generate the protocol buffer description
-	proto := cc.generateProto(version, LICENSE)
-	proto_filename := version + "/" + version + ".proto"
+	proto := cc.generateProto(proto_packagename, LICENSE)
+	proto_filename := filename + "/" + filename + ".proto"
 	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
 		panic(err)
 	}
 
 	// generate the compiler
-	compiler := cc.generateCompiler(version, LICENSE)
-	go_filename := version + "/" + version + ".go"
+	compiler := cc.generateCompiler(go_packagename, LICENSE)
+	go_filename := filename + "/" + filename + ".go"
 	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {
 		panic(err)

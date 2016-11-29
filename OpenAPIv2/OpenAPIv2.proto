@@ -16,7 +16,7 @@
 
 syntax = "proto3";
 
-package OpenAPIv2;
+package openapi.v2;
 
 message AdditionalPropertiesItem {
   Schema schema = 1;

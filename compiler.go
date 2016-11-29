@@ -84,7 +84,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Compiling %s (%s)\n", *input, OpenAPIv2.Version())
+	fmt.Printf("Compiling %s (%s)\n", *input, openapi_v2.Version())
 
 	raw := readFile(*input)
 	if *rawInput {
@@ -93,7 +93,7 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	document := OpenAPIv2.NewDocument(raw)
+	document := openapi_v2.NewDocument(raw)
 
 	if *textProtobuf {
 		textProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".text"
