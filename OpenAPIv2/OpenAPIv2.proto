@@ -42,17 +42,25 @@ message BasicAuthenticationSecurity {
 }
 
 message BodyParameter {
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 1;
+  // The name of the parameter.
   string name = 2;
+  // Determines the location of the parameter.
   string in = 3;
+  // Determines whether or not this parameter is required or optional.
   bool required = 4;
   Schema schema = 5;
   repeated NamedAny vendor_extension = 6;
 }
 
+// Contact information for the owners of the API.
 message Contact {
+  // The identifying name of the contact person/organization.
   string name = 1;
+  // The URL pointing to the contact information.
   string url = 2;
+  // The email address of the contact person/organization.
   string email = 3;
   repeated NamedAny vendor_extension = 4;
 }
@@ -61,17 +69,24 @@ message Default {
   repeated NamedAny additional_properties = 1;
 }
 
+// One or more JSON objects describing the schemas being consumed and produced by the API.
 message Definitions {
   repeated NamedSchema additional_properties = 1;
 }
 
 message Document {
+  // The Swagger version of this document.
   string swagger = 1;
   Info info = 2;
+  // The host (name or ip) of the API. Example: 'swagger.io'
   string host = 3;
+  // The base path to the API. Example: '/api'.
   string base_path = 4;
+  // The transfer protocol of the API.
   repeated string schemes = 5;
+  // A list of MIME types accepted by the API.
   repeated string consumes = 6;
+  // A list of MIME types the API can produce.
   repeated string produces = 7;
   Paths paths = 8;
   Definitions definitions = 9;
@@ -87,12 +102,14 @@ message Examples {
   repeated NamedAny additional_properties = 1;
 }
 
+// information about external documentation
 message ExternalDocs {
   string description = 1;
   string url = 2;
   repeated NamedAny vendor_extension = 3;
 }
 
+// A deterministic version of a JSON Schema object.
 message FileSchema {
   string format = 1;
   string title = 2;
@@ -107,10 +124,15 @@ message FileSchema {
 }
 
 message FormDataParameterSubSchema {
+  // Determines whether or not this parameter is required or optional.
   bool required = 1;
+  // Determines the location of the parameter.
   string in = 2;
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
+  // The name of the parameter.
   string name = 4;
+  // allows sending a parameter by name only or with an empty value.
   bool allow_empty_value = 5;
   string type = 6;
   string format = 7;
@@ -155,9 +177,13 @@ message Header {
 }
 
 message HeaderParameterSubSchema {
+  // Determines whether or not this parameter is required or optional.
   bool required = 1;
+  // Determines the location of the parameter.
   string in = 2;
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
+  // The name of the parameter.
   string name = 4;
   string type = 5;
   string format = 6;
@@ -183,10 +209,15 @@ message Headers {
   repeated NamedHeader additional_properties = 1;
 }
 
+// General information about the API.
 message Info {
+  // A unique and precise title of the API.
   string title = 1;
+  // A semantic version number of the API.
   string version = 2;
+  // A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.
   string description = 3;
+  // The terms of service for the API.
   string terms_of_service = 4;
   Contact contact = 5;
   License license = 6;
@@ -202,7 +233,9 @@ message JsonReference {
 }
 
 message License {
+  // The name of the license type. It's encouraged to use an OSI compatible license.
   string name = 1;
+  // The URL pointing to the license.
   string url = 2;
   repeated NamedAny vendor_extension = 3;
 }
@@ -309,14 +342,21 @@ message Oauth2Scopes {
 
 message Operation {
   repeated string tags = 1;
+  // A brief summary of the operation.
   string summary = 2;
+  // A longer description of the operation, GitHub Flavored Markdown is allowed.
   string description = 3;
   ExternalDocs external_docs = 4;
+  // A unique identifier of the operation.
   string operation_id = 5;
+  // A list of MIME types the API can produce.
   repeated string produces = 6;
+  // A list of MIME types the API can consume.
   repeated string consumes = 7;
+  // The parameters needed to send a valid API call.
   repeated ParametersItem parameters = 8;
   Responses responses = 9;
+  // The transfer protocol of the API.
   repeated string schemes = 10;
   bool deprecated = 11;
   repeated SecurityRequirement security = 12;
@@ -330,6 +370,7 @@ message Parameter {
   }
 }
 
+// One or more JSON representations for parameters
 message ParameterDefinitions {
   repeated NamedParameter additional_properties = 1;
 }
@@ -350,14 +391,19 @@ message PathItem {
   Operation options = 6;
   Operation head = 7;
   Operation patch = 8;
+  // The parameters needed to send a valid API call.
   repeated ParametersItem parameters = 9;
   repeated NamedAny vendor_extension = 10;
 }
 
 message PathParameterSubSchema {
+  // Determines whether or not this parameter is required or optional.
   bool required = 1;
+  // Determines the location of the parameter.
   string in = 2;
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
+  // The name of the parameter.
   string name = 4;
   string type = 5;
   string format = 6;
@@ -379,6 +425,7 @@ message PathParameterSubSchema {
   repeated NamedAny vendor_extension = 22;
 }
 
+// Relative paths to the individual endpoints. They must be relative to the 'basePath'.
 message Paths {
   repeated NamedAny vendor_extension = 1;
   repeated NamedPathItem path = 2;
@@ -410,10 +457,15 @@ message Properties {
 }
 
 message QueryParameterSubSchema {
+  // Determines whether or not this parameter is required or optional.
   bool required = 1;
+  // Determines the location of the parameter.
   string in = 2;
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
+  // The name of the parameter.
   string name = 4;
+  // allows sending a parameter by name only or with an empty value.
   bool allow_empty_value = 5;
   string type = 6;
   string format = 7;
@@ -443,6 +495,7 @@ message Response {
   repeated NamedAny vendor_extension = 5;
 }
 
+// One or more JSON representations for parameters
 message ResponseDefinitions {
   repeated NamedResponse additional_properties = 1;
 }
@@ -454,11 +507,13 @@ message ResponseValue {
   }
 }
 
+// Response objects names can either be any valid HTTP status code or 'default'.
 message Responses {
   repeated NamedResponseValue response_code = 1;
   repeated NamedAny vendor_extension = 2;
 }
 
+// A deterministic version of a JSON Schema object.
 message Schema {
   string _ref = 1;
   string format = 2;
@@ -534,6 +589,7 @@ message TypeItem {
   repeated string value = 1;
 }
 
+// Any property starting with x- is valid.
 message VendorExtension {
   repeated NamedAny additional_properties = 1;
 }

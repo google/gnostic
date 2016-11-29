@@ -152,9 +152,13 @@ func (m *BasicAuthenticationSecurity) GetVendorExtension() []*NamedAny {
 }
 
 type BodyParameter struct {
-	Description     string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
-	Name            string      `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	In              string      `protobuf:"bytes,3,opt,name=in" json:"in,omitempty"`
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
+	Description string `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	// The name of the parameter.
+	Name string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	// Determines the location of the parameter.
+	In string `protobuf:"bytes,3,opt,name=in" json:"in,omitempty"`
+	// Determines whether or not this parameter is required or optional.
 	Required        bool        `protobuf:"varint,4,opt,name=required" json:"required,omitempty"`
 	Schema          *Schema     `protobuf:"bytes,5,opt,name=schema" json:"schema,omitempty"`
 	VendorExtension []*NamedAny `protobuf:"bytes,6,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
@@ -179,9 +183,13 @@ func (m *BodyParameter) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
+// Contact information for the owners of the API.
 type Contact struct {
-	Name            string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Url             string      `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
+	// The identifying name of the contact person/organization.
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// The URL pointing to the contact information.
+	Url string `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
+	// The email address of the contact person/organization.
 	Email           string      `protobuf:"bytes,3,opt,name=email" json:"email,omitempty"`
 	VendorExtension []*NamedAny `protobuf:"bytes,4,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
@@ -214,6 +222,7 @@ func (m *Default) GetAdditionalProperties() []*NamedAny {
 	return nil
 }
 
+// One or more JSON objects describing the schemas being consumed and produced by the API.
 type Definitions struct {
 	AdditionalProperties []*NamedSchema `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
@@ -231,12 +240,18 @@ func (m *Definitions) GetAdditionalProperties() []*NamedSchema {
 }
 
 type Document struct {
-	Swagger             string                 `protobuf:"bytes,1,opt,name=swagger" json:"swagger,omitempty"`
-	Info                *Info                  `protobuf:"bytes,2,opt,name=info" json:"info,omitempty"`
-	Host                string                 `protobuf:"bytes,3,opt,name=host" json:"host,omitempty"`
-	BasePath            string                 `protobuf:"bytes,4,opt,name=base_path,json=basePath" json:"base_path,omitempty"`
-	Schemes             []string               `protobuf:"bytes,5,rep,name=schemes" json:"schemes,omitempty"`
-	Consumes            []string               `protobuf:"bytes,6,rep,name=consumes" json:"consumes,omitempty"`
+	// The Swagger version of this document.
+	Swagger string `protobuf:"bytes,1,opt,name=swagger" json:"swagger,omitempty"`
+	Info    *Info  `protobuf:"bytes,2,opt,name=info" json:"info,omitempty"`
+	// The host (name or ip) of the API. Example: 'swagger.io'
+	Host string `protobuf:"bytes,3,opt,name=host" json:"host,omitempty"`
+	// The base path to the API. Example: '/api'.
+	BasePath string `protobuf:"bytes,4,opt,name=base_path,json=basePath" json:"base_path,omitempty"`
+	// The transfer protocol of the API.
+	Schemes []string `protobuf:"bytes,5,rep,name=schemes" json:"schemes,omitempty"`
+	// A list of MIME types accepted by the API.
+	Consumes []string `protobuf:"bytes,6,rep,name=consumes" json:"consumes,omitempty"`
+	// A list of MIME types the API can produce.
 	Produces            []string               `protobuf:"bytes,7,rep,name=produces" json:"produces,omitempty"`
 	Paths               *Paths                 `protobuf:"bytes,8,opt,name=paths" json:"paths,omitempty"`
 	Definitions         *Definitions           `protobuf:"bytes,9,opt,name=definitions" json:"definitions,omitempty"`
@@ -332,6 +347,7 @@ func (m *Examples) GetAdditionalProperties() []*NamedAny {
 	return nil
 }
 
+// information about external documentation
 type ExternalDocs struct {
 	Description     string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
 	Url             string      `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
@@ -350,6 +366,7 @@ func (m *ExternalDocs) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
+// A deterministic version of a JSON Schema object.
 type FileSchema struct {
 	Format          string        `protobuf:"bytes,1,opt,name=format" json:"format,omitempty"`
 	Title           string        `protobuf:"bytes,2,opt,name=title" json:"title,omitempty"`
@@ -397,10 +414,15 @@ func (m *FileSchema) GetVendorExtension() []*NamedAny {
 }
 
 type FormDataParameterSubSchema struct {
-	Required         bool             `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
-	In               string           `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
-	Description      string           `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	Name             string           `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
+	// Determines whether or not this parameter is required or optional.
+	Required bool `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
+	// Determines the location of the parameter.
+	In string `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// The name of the parameter.
+	Name string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
+	// allows sending a parameter by name only or with an empty value.
 	AllowEmptyValue  bool             `protobuf:"varint,5,opt,name=allow_empty_value,json=allowEmptyValue" json:"allow_empty_value,omitempty"`
 	Type             string           `protobuf:"bytes,6,opt,name=type" json:"type,omitempty"`
 	Format           string           `protobuf:"bytes,7,opt,name=format" json:"format,omitempty"`
@@ -511,9 +533,13 @@ func (m *Header) GetVendorExtension() []*NamedAny {
 }
 
 type HeaderParameterSubSchema struct {
-	Required         bool             `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
-	In               string           `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
-	Description      string           `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// Determines whether or not this parameter is required or optional.
+	Required bool `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
+	// Determines the location of the parameter.
+	In string `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// The name of the parameter.
 	Name             string           `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
 	Type             string           `protobuf:"bytes,5,opt,name=type" json:"type,omitempty"`
 	Format           string           `protobuf:"bytes,6,opt,name=format" json:"format,omitempty"`
@@ -584,10 +610,15 @@ func (m *Headers) GetAdditionalProperties() []*NamedHeader {
 	return nil
 }
 
+// General information about the API.
 type Info struct {
-	Title           string      `protobuf:"bytes,1,opt,name=title" json:"title,omitempty"`
-	Version         string      `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
-	Description     string      `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// A unique and precise title of the API.
+	Title string `protobuf:"bytes,1,opt,name=title" json:"title,omitempty"`
+	// A semantic version number of the API.
+	Version string `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
+	// A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// The terms of service for the API.
 	TermsOfService  string      `protobuf:"bytes,4,opt,name=terms_of_service,json=termsOfService" json:"terms_of_service,omitempty"`
 	Contact         *Contact    `protobuf:"bytes,5,opt,name=contact" json:"contact,omitempty"`
 	License         *License    `protobuf:"bytes,6,opt,name=license" json:"license,omitempty"`
@@ -646,7 +677,9 @@ func (*JsonReference) ProtoMessage()               {}
 func (*JsonReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
 type License struct {
-	Name            string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// The name of the license type. It's encouraged to use an OSI compatible license.
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// The URL pointing to the license.
 	Url             string      `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
 	VendorExtension []*NamedAny `protobuf:"bytes,3,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
@@ -1139,15 +1172,22 @@ func (m *Oauth2Scopes) GetAdditionalProperties() []*NamedString {
 }
 
 type Operation struct {
-	Tags            []string               `protobuf:"bytes,1,rep,name=tags" json:"tags,omitempty"`
-	Summary         string                 `protobuf:"bytes,2,opt,name=summary" json:"summary,omitempty"`
-	Description     string                 `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	ExternalDocs    *ExternalDocs          `protobuf:"bytes,4,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
-	OperationId     string                 `protobuf:"bytes,5,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
-	Produces        []string               `protobuf:"bytes,6,rep,name=produces" json:"produces,omitempty"`
-	Consumes        []string               `protobuf:"bytes,7,rep,name=consumes" json:"consumes,omitempty"`
-	Parameters      []*ParametersItem      `protobuf:"bytes,8,rep,name=parameters" json:"parameters,omitempty"`
-	Responses       *Responses             `protobuf:"bytes,9,opt,name=responses" json:"responses,omitempty"`
+	Tags []string `protobuf:"bytes,1,rep,name=tags" json:"tags,omitempty"`
+	// A brief summary of the operation.
+	Summary string `protobuf:"bytes,2,opt,name=summary" json:"summary,omitempty"`
+	// A longer description of the operation, GitHub Flavored Markdown is allowed.
+	Description  string        `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	ExternalDocs *ExternalDocs `protobuf:"bytes,4,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
+	// A unique identifier of the operation.
+	OperationId string `protobuf:"bytes,5,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
+	// A list of MIME types the API can produce.
+	Produces []string `protobuf:"bytes,6,rep,name=produces" json:"produces,omitempty"`
+	// A list of MIME types the API can consume.
+	Consumes []string `protobuf:"bytes,7,rep,name=consumes" json:"consumes,omitempty"`
+	// The parameters needed to send a valid API call.
+	Parameters []*ParametersItem `protobuf:"bytes,8,rep,name=parameters" json:"parameters,omitempty"`
+	Responses  *Responses        `protobuf:"bytes,9,opt,name=responses" json:"responses,omitempty"`
+	// The transfer protocol of the API.
 	Schemes         []string               `protobuf:"bytes,10,rep,name=schemes" json:"schemes,omitempty"`
 	Deprecated      bool                   `protobuf:"varint,11,opt,name=deprecated" json:"deprecated,omitempty"`
 	Security        []*SecurityRequirement `protobuf:"bytes,12,rep,name=security" json:"security,omitempty"`
@@ -1315,6 +1355,7 @@ func _Parameter_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
+// One or more JSON representations for parameters
 type ParameterDefinitions struct {
 	AdditionalProperties []*NamedParameter `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
@@ -1453,14 +1494,15 @@ func _ParametersItem_OneofSizer(msg proto.Message) (n int) {
 }
 
 type PathItem struct {
-	XRef            string            `protobuf:"bytes,1,opt,name=_ref,json=ref" json:"_ref,omitempty"`
-	Get             *Operation        `protobuf:"bytes,2,opt,name=get" json:"get,omitempty"`
-	Put             *Operation        `protobuf:"bytes,3,opt,name=put" json:"put,omitempty"`
-	Post            *Operation        `protobuf:"bytes,4,opt,name=post" json:"post,omitempty"`
-	Delete          *Operation        `protobuf:"bytes,5,opt,name=delete" json:"delete,omitempty"`
-	Options         *Operation        `protobuf:"bytes,6,opt,name=options" json:"options,omitempty"`
-	Head            *Operation        `protobuf:"bytes,7,opt,name=head" json:"head,omitempty"`
-	Patch           *Operation        `protobuf:"bytes,8,opt,name=patch" json:"patch,omitempty"`
+	XRef    string     `protobuf:"bytes,1,opt,name=_ref,json=ref" json:"_ref,omitempty"`
+	Get     *Operation `protobuf:"bytes,2,opt,name=get" json:"get,omitempty"`
+	Put     *Operation `protobuf:"bytes,3,opt,name=put" json:"put,omitempty"`
+	Post    *Operation `protobuf:"bytes,4,opt,name=post" json:"post,omitempty"`
+	Delete  *Operation `protobuf:"bytes,5,opt,name=delete" json:"delete,omitempty"`
+	Options *Operation `protobuf:"bytes,6,opt,name=options" json:"options,omitempty"`
+	Head    *Operation `protobuf:"bytes,7,opt,name=head" json:"head,omitempty"`
+	Patch   *Operation `protobuf:"bytes,8,opt,name=patch" json:"patch,omitempty"`
+	// The parameters needed to send a valid API call.
 	Parameters      []*ParametersItem `protobuf:"bytes,9,rep,name=parameters" json:"parameters,omitempty"`
 	VendorExtension []*NamedAny       `protobuf:"bytes,10,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
@@ -1534,9 +1576,13 @@ func (m *PathItem) GetVendorExtension() []*NamedAny {
 }
 
 type PathParameterSubSchema struct {
-	Required         bool             `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
-	In               string           `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
-	Description      string           `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// Determines whether or not this parameter is required or optional.
+	Required bool `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
+	// Determines the location of the parameter.
+	In string `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// The name of the parameter.
 	Name             string           `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
 	Type             string           `protobuf:"bytes,5,opt,name=type" json:"type,omitempty"`
 	Format           string           `protobuf:"bytes,6,opt,name=format" json:"format,omitempty"`
@@ -1591,6 +1637,7 @@ func (m *PathParameterSubSchema) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
+// Relative paths to the individual endpoints. They must be relative to the 'basePath'.
 type Paths struct {
 	VendorExtension []*NamedAny      `protobuf:"bytes,1,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 	Path            []*NamedPathItem `protobuf:"bytes,2,rep,name=path" json:"path,omitempty"`
@@ -1686,10 +1733,15 @@ func (m *Properties) GetAdditionalProperties() []*NamedSchema {
 }
 
 type QueryParameterSubSchema struct {
-	Required         bool             `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
-	In               string           `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
-	Description      string           `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	Name             string           `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
+	// Determines whether or not this parameter is required or optional.
+	Required bool `protobuf:"varint,1,opt,name=required" json:"required,omitempty"`
+	// Determines the location of the parameter.
+	In string `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// The name of the parameter.
+	Name string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
+	// allows sending a parameter by name only or with an empty value.
 	AllowEmptyValue  bool             `protobuf:"varint,5,opt,name=allow_empty_value,json=allowEmptyValue" json:"allow_empty_value,omitempty"`
 	Type             string           `protobuf:"bytes,6,opt,name=type" json:"type,omitempty"`
 	Format           string           `protobuf:"bytes,7,opt,name=format" json:"format,omitempty"`
@@ -1785,6 +1837,7 @@ func (m *Response) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
+// One or more JSON representations for parameters
 type ResponseDefinitions struct {
 	AdditionalProperties []*NamedResponse `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
@@ -1922,6 +1975,7 @@ func _ResponseValue_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
+// Response objects names can either be any valid HTTP status code or 'default'.
 type Responses struct {
 	ResponseCode    []*NamedResponseValue `protobuf:"bytes,1,rep,name=response_code,json=responseCode" json:"response_code,omitempty"`
 	VendorExtension []*NamedAny           `protobuf:"bytes,2,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
@@ -1946,6 +2000,7 @@ func (m *Responses) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
+// A deterministic version of a JSON Schema object.
 type Schema struct {
 	XRef                 string                    `protobuf:"bytes,1,opt,name=_ref,json=ref" json:"_ref,omitempty"`
 	Format               string                    `protobuf:"bytes,2,opt,name=format" json:"format,omitempty"`
@@ -2504,6 +2559,7 @@ func (m *TypeItem) String() string            { return proto.CompactTextString(m
 func (*TypeItem) ProtoMessage()               {}
 func (*TypeItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{57} }
 
+// Any property starting with x- is valid.
 type VendorExtension struct {
 	AdditionalProperties []*NamedAny `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }

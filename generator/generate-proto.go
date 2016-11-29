@@ -35,15 +35,21 @@ func (classes *ClassCollection) generateProto(packageName string, license string
 
 	classNames := classes.sortedClassNames()
 	for _, className := range classNames {
+		classModel := classes.ClassModels[className]
+		if classModel.Description != "" {
+			code.Print("// %s", classModel.Description)
+		}
 		code.Print("message %s {", className)
 		code.Indent()
-		classModel := classes.ClassModels[className]
 		if classModel.OneOfWrapper {
 			code.Print("oneof oneof {")
 			code.Indent()
 		}
 		var fieldNumber = 0
 		for _, propertyModel := range classModel.Properties {
+			if propertyModel.Description != "" {
+				code.Print("// %s", propertyModel.Description)
+			}
 			propertyName := propertyModel.Name
 			fieldNumber += 1
 			propertyType := propertyModel.Type
