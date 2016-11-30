@@ -93,7 +93,10 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	document := openapi_v2.NewDocument(raw)
+	document, err := openapi_v2.NewDocument(raw)
+	if err != nil {
+		fmt.Printf("Error %+v\n", err)
+	}
 
 	if *textProtobuf {
 		textProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".text"

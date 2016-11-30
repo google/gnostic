@@ -18,6 +18,7 @@ package openapi_v2
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/googleapis/openapi-compiler/helpers"
 	"log"
 )
@@ -26,54 +27,58 @@ func Version() string {
 	return "openapi_v2"
 }
 
-func NewAdditionalPropertiesItem(in interface{}) *AdditionalPropertiesItem {
+func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewAdditionalPropertiesItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"boolean", "schema"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("AdditionalPropertiesItem includes properties not in ('boolean','schema') or ()")
 	}
 	x := &AdditionalPropertiesItem{}
 	// Schema schema = 1;
 	v1 := helpers.MapValueForKey(m, "schema")
 	if v1 != nil {
-		x.Schema = NewSchema(v1)
+		var err error
+		x.Schema, err = NewSchema(v1)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// bool boolean = 2;
 	v2 := helpers.MapValueForKey(m, "boolean")
 	if v2 != nil {
 		x.Boolean = v2.(bool)
 	}
-	return x
+	return x, nil
 }
 
-func NewAny(in interface{}) *Any {
+func NewAny(in interface{}) (*Any, error) {
 	x := &Any{}
 	bytes, _ := json.Marshal(in)
 	x.Value = string(bytes)
-	return x
+	return x, nil
 }
 
-func NewApiKeySecurity(in interface{}) *ApiKeySecurity {
+func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewApiKeySecurity: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("ApiKeySecurity does not contain all required properties ('in','name','type')")
 	}
 	allowedKeys := []string{"description", "in", "name", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("ApiKeySecurity includes properties not in ('description','in','name','type') or ('^x-')")
 	}
 	x := &ApiKeySecurity{}
 	// string type = 1;
@@ -105,28 +110,32 @@ func NewApiKeySecurity(in interface{}) *ApiKeySecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecurity {
+func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewBasicAuthenticationSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("BasicAuthenticationSecurity does not contain all required properties ('type')")
 	}
 	allowedKeys := []string{"description", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("BasicAuthenticationSecurity includes properties not in ('description','type') or ('^x-')")
 	}
 	x := &BasicAuthenticationSecurity{}
 	// string type = 1;
@@ -148,28 +157,32 @@ func NewBasicAuthenticationSecurity(in interface{}) *BasicAuthenticationSecurity
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewBodyParameter(in interface{}) *BodyParameter {
+func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewBodyParameter: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"in", "name", "schema"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("BodyParameter does not contain all required properties ('in','name','schema')")
 	}
 	allowedKeys := []string{"description", "in", "name", "required", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("BodyParameter includes properties not in ('description','in','name','required','schema') or ('^x-')")
 	}
 	x := &BodyParameter{}
 	// string description = 1;
@@ -195,7 +208,11 @@ func NewBodyParameter(in interface{}) *BodyParameter {
 	// Schema schema = 5;
 	v5 := helpers.MapValueForKey(m, "schema")
 	if v5 != nil {
-		x.Schema = NewSchema(v5)
+		var err error
+		x.Schema, err = NewSchema(v5)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated NamedAny vendor_extension = 6;
 	// MAP: Any ^x-
@@ -206,24 +223,28 @@ func NewBodyParameter(in interface{}) *BodyParameter {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewContact(in interface{}) *Contact {
+func NewContact(in interface{}) (*Contact, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewContact: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"email", "name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Contact includes properties not in ('email','name','url') or ('^x-')")
 	}
 	x := &Contact{}
 	// string name = 1;
@@ -250,19 +271,23 @@ func NewContact(in interface{}) *Contact {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewDefault(in interface{}) *Default {
+func NewDefault(in interface{}) (*Default, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewDefault: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Default{}
 	// repeated NamedAny additional_properties = 1;
@@ -273,18 +298,22 @@ func NewDefault(in interface{}) *Default {
 		v := item.Value
 		pair := &NamedAny{}
 		pair.Name = k
-		pair.Value = NewAny(v)
+		var err error
+		pair.Value, err = NewAny(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewDefinitions(in interface{}) *Definitions {
+func NewDefinitions(in interface{}) (*Definitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Definitions{}
 	// repeated NamedSchema additional_properties = 1;
@@ -295,27 +324,31 @@ func NewDefinitions(in interface{}) *Definitions {
 		v := item.Value
 		pair := &NamedSchema{}
 		pair.Name = k
-		pair.Value = NewSchema(v)
+		var err error
+		pair.Value, err = NewSchema(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewDocument(in interface{}) *Document {
+func NewDocument(in interface{}) (*Document, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewDocument: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"info", "paths", "swagger"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Document does not contain all required properties ('info','paths','swagger')")
 	}
 	allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Document includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or ()")
 	}
 	x := &Document{}
 	// string swagger = 1;
@@ -326,7 +359,11 @@ func NewDocument(in interface{}) *Document {
 	// Info info = 2;
 	v2 := helpers.MapValueForKey(m, "info")
 	if v2 != nil {
-		x.Info = NewInfo(v2)
+		var err error
+		x.Info, err = NewInfo(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string host = 3;
 	v3 := helpers.MapValueForKey(m, "host")
@@ -371,22 +408,38 @@ func NewDocument(in interface{}) *Document {
 	// Paths paths = 8;
 	v8 := helpers.MapValueForKey(m, "paths")
 	if v8 != nil {
-		x.Paths = NewPaths(v8)
+		var err error
+		x.Paths, err = NewPaths(v8)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Definitions definitions = 9;
 	v9 := helpers.MapValueForKey(m, "definitions")
 	if v9 != nil {
-		x.Definitions = NewDefinitions(v9)
+		var err error
+		x.Definitions, err = NewDefinitions(v9)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// ParameterDefinitions parameters = 10;
 	v10 := helpers.MapValueForKey(m, "parameters")
 	if v10 != nil {
-		x.Parameters = NewParameterDefinitions(v10)
+		var err error
+		x.Parameters, err = NewParameterDefinitions(v10)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// ResponseDefinitions responses = 11;
 	v11 := helpers.MapValueForKey(m, "responses")
 	if v11 != nil {
-		x.Responses = NewResponseDefinitions(v11)
+		var err error
+		x.Responses, err = NewResponseDefinitions(v11)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated SecurityRequirement security = 12;
 	v12 := helpers.MapValueForKey(m, "security")
@@ -396,14 +449,22 @@ func NewDocument(in interface{}) *Document {
 		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Security = append(x.Security, NewSecurityRequirement(item))
+				y, err := NewSecurityRequirement(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Security = append(x.Security, y)
 			}
 		}
 	}
 	// SecurityDefinitions security_definitions = 13;
 	v13 := helpers.MapValueForKey(m, "securityDefinitions")
 	if v13 != nil {
-		x.SecurityDefinitions = NewSecurityDefinitions(v13)
+		var err error
+		x.SecurityDefinitions, err = NewSecurityDefinitions(v13)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated Tag tags = 14;
 	v14 := helpers.MapValueForKey(m, "tags")
@@ -413,24 +474,32 @@ func NewDocument(in interface{}) *Document {
 		a, ok := v14.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Tags = append(x.Tags, NewTag(item))
+				y, err := NewTag(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Tags = append(x.Tags, y)
 			}
 		}
 	}
 	// ExternalDocs external_docs = 15;
 	v15 := helpers.MapValueForKey(m, "externalDocs")
 	if v15 != nil {
-		x.ExternalDocs = NewExternalDocs(v15)
+		var err error
+		x.ExternalDocs, err = NewExternalDocs(v15)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewExamples(in interface{}) *Examples {
+func NewExamples(in interface{}) (*Examples, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewExamples: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Examples{}
 	// repeated NamedAny additional_properties = 1;
@@ -441,27 +510,31 @@ func NewExamples(in interface{}) *Examples {
 		v := item.Value
 		pair := &NamedAny{}
 		pair.Name = k
-		pair.Value = NewAny(v)
+		var err error
+		pair.Value, err = NewAny(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewExternalDocs(in interface{}) *ExternalDocs {
+func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewExternalDocs: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"url"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("ExternalDocs does not contain all required properties ('url')")
 	}
 	allowedKeys := []string{"description", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("ExternalDocs includes properties not in ('description','url') or ('^x-')")
 	}
 	x := &ExternalDocs{}
 	// string description = 1;
@@ -483,28 +556,32 @@ func NewExternalDocs(in interface{}) *ExternalDocs {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewFileSchema(in interface{}) *FileSchema {
+func NewFileSchema(in interface{}) (*FileSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewFileSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("FileSchema does not contain all required properties ('type')")
 	}
 	allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("FileSchema includes properties not in ('default','description','example','externalDocs','format','readOnly','required','title','type') or ('^x-')")
 	}
 	x := &FileSchema{}
 	// string format = 1;
@@ -525,7 +602,11 @@ func NewFileSchema(in interface{}) *FileSchema {
 	// Any default = 4;
 	v4 := helpers.MapValueForKey(m, "default")
 	if v4 != nil {
-		x.Default = NewAny(v4)
+		var err error
+		x.Default, err = NewAny(v4)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated string required = 5;
 	v5 := helpers.MapValueForKey(m, "required")
@@ -550,12 +631,20 @@ func NewFileSchema(in interface{}) *FileSchema {
 	// ExternalDocs external_docs = 8;
 	v8 := helpers.MapValueForKey(m, "externalDocs")
 	if v8 != nil {
-		x.ExternalDocs = NewExternalDocs(v8)
+		var err error
+		x.ExternalDocs, err = NewExternalDocs(v8)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Any example = 9;
 	v9 := helpers.MapValueForKey(m, "example")
 	if v9 != nil {
-		x.Example = NewAny(v9)
+		var err error
+		x.Example, err = NewAny(v9)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated NamedAny vendor_extension = 10;
 	// MAP: Any ^x-
@@ -566,24 +655,28 @@ func NewFileSchema(in interface{}) *FileSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
+func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewFormDataParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("FormDataParameterSubSchema includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
 	}
 	x := &FormDataParameterSubSchema{}
 	// bool required = 1;
@@ -624,7 +717,11 @@ func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 	// PrimitivesItems items = 8;
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
-		x.Items = NewPrimitivesItems(v8)
+		var err error
+		x.Items, err = NewPrimitivesItems(v8)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string collection_format = 9;
 	v9 := helpers.MapValueForKey(m, "collectionFormat")
@@ -634,7 +731,11 @@ func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 	// Any default = 10;
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
-		x.Default = NewAny(v10)
+		var err error
+		x.Default, err = NewAny(v10)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float maximum = 11;
 	v11 := helpers.MapValueForKey(m, "maximum")
@@ -694,7 +795,11 @@ func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
@@ -712,28 +817,32 @@ func NewFormDataParameterSubSchema(in interface{}) *FormDataParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewHeader(in interface{}) *Header {
+func NewHeader(in interface{}) (*Header, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewHeader: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Header does not contain all required properties ('type')")
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Header includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-')")
 	}
 	x := &Header{}
 	// string type = 1;
@@ -749,7 +858,11 @@ func NewHeader(in interface{}) *Header {
 	// PrimitivesItems items = 3;
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
-		x.Items = NewPrimitivesItems(v3)
+		var err error
+		x.Items, err = NewPrimitivesItems(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string collection_format = 4;
 	v4 := helpers.MapValueForKey(m, "collectionFormat")
@@ -759,7 +872,11 @@ func NewHeader(in interface{}) *Header {
 	// Any default = 5;
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
-		x.Default = NewAny(v5)
+		var err error
+		x.Default, err = NewAny(v5)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float maximum = 6;
 	v6 := helpers.MapValueForKey(m, "maximum")
@@ -819,7 +936,11 @@ func NewHeader(in interface{}) *Header {
 		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
@@ -842,24 +963,28 @@ func NewHeader(in interface{}) *Header {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
+func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewHeaderParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("HeaderParameterSubSchema includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
 	}
 	x := &HeaderParameterSubSchema{}
 	// bool required = 1;
@@ -895,7 +1020,11 @@ func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	// PrimitivesItems items = 7;
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
-		x.Items = NewPrimitivesItems(v7)
+		var err error
+		x.Items, err = NewPrimitivesItems(v7)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string collection_format = 8;
 	v8 := helpers.MapValueForKey(m, "collectionFormat")
@@ -905,7 +1034,11 @@ func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 	// Any default = 9;
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
-		x.Default = NewAny(v9)
+		var err error
+		x.Default, err = NewAny(v9)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float maximum = 10;
 	v10 := helpers.MapValueForKey(m, "maximum")
@@ -965,7 +1098,11 @@ func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
@@ -983,19 +1120,23 @@ func NewHeaderParameterSubSchema(in interface{}) *HeaderParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewHeaders(in interface{}) *Headers {
+func NewHeaders(in interface{}) (*Headers, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewHeaders: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Headers{}
 	// repeated NamedHeader additional_properties = 1;
@@ -1006,27 +1147,31 @@ func NewHeaders(in interface{}) *Headers {
 		v := item.Value
 		pair := &NamedHeader{}
 		pair.Name = k
-		pair.Value = NewHeader(v)
+		var err error
+		pair.Value, err = NewHeader(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewInfo(in interface{}) *Info {
+func NewInfo(in interface{}) (*Info, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewInfo: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"title", "version"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Info does not contain all required properties ('title','version')")
 	}
 	allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Info includes properties not in ('contact','description','license','termsOfService','title','version') or ('^x-')")
 	}
 	x := &Info{}
 	// string title = 1;
@@ -1052,12 +1197,20 @@ func NewInfo(in interface{}) *Info {
 	// Contact contact = 5;
 	v5 := helpers.MapValueForKey(m, "contact")
 	if v5 != nil {
-		x.Contact = NewContact(v5)
+		var err error
+		x.Contact, err = NewContact(v5)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// License license = 6;
 	v6 := helpers.MapValueForKey(m, "license")
 	if v6 != nil {
-		x.License = NewLicense(v6)
+		var err error
+		x.License, err = NewLicense(v6)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated NamedAny vendor_extension = 7;
 	// MAP: Any ^x-
@@ -1068,45 +1221,53 @@ func NewInfo(in interface{}) *Info {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewItemsItem(in interface{}) *ItemsItem {
+func NewItemsItem(in interface{}) (*ItemsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewItemsItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &ItemsItem{}
 	if ok {
 		x.Schema = make([]*Schema, 0)
-		x.Schema = append(x.Schema, NewSchema(m))
+		y, err := NewSchema(m)
+		if err != nil {
+			return nil, err
+		}
+		x.Schema = append(x.Schema, y)
 	} else {
 		log.Printf("unexpected: %+v", in)
 	}
-	return x
+	return x, nil
 }
 
-func NewJsonReference(in interface{}) *JsonReference {
+func NewJsonReference(in interface{}) (*JsonReference, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewJsonReference: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"$ref"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("JsonReference does not contain all required properties ('$ref')")
 	}
 	allowedKeys := []string{"$ref"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("JsonReference includes properties not in ('$ref') or ()")
 	}
 	x := &JsonReference{}
 	// string _ref = 1;
@@ -1114,24 +1275,24 @@ func NewJsonReference(in interface{}) *JsonReference {
 	if v1 != nil {
 		x.XRef = v1.(string)
 	}
-	return x
+	return x, nil
 }
 
-func NewLicense(in interface{}) *License {
+func NewLicense(in interface{}) (*License, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewLicense: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"name"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("License does not contain all required properties ('name')")
 	}
 	allowedKeys := []string{"name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("License includes properties not in ('name','url') or ('^x-')")
 	}
 	x := &License{}
 	// string name = 1;
@@ -1153,24 +1314,28 @@ func NewLicense(in interface{}) *License {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedAny(in interface{}) *NamedAny {
+func NewNamedAny(in interface{}) (*NamedAny, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedAny: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedAny includes properties not in ('name','value') or ()")
 	}
 	x := &NamedAny{}
 	// string name = 1;
@@ -1181,22 +1346,26 @@ func NewNamedAny(in interface{}) *NamedAny {
 	// Any value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewAny(v2)
+		var err error
+		x.Value, err = NewAny(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedHeader(in interface{}) *NamedHeader {
+func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedHeader: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedHeader includes properties not in ('name','value') or ()")
 	}
 	x := &NamedHeader{}
 	// string name = 1;
@@ -1207,22 +1376,26 @@ func NewNamedHeader(in interface{}) *NamedHeader {
 	// Header value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewHeader(v2)
+		var err error
+		x.Value, err = NewHeader(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedParameter(in interface{}) *NamedParameter {
+func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedParameter: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedParameter includes properties not in ('name','value') or ()")
 	}
 	x := &NamedParameter{}
 	// string name = 1;
@@ -1233,22 +1406,26 @@ func NewNamedParameter(in interface{}) *NamedParameter {
 	// Parameter value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewParameter(v2)
+		var err error
+		x.Value, err = NewParameter(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedPathItem(in interface{}) *NamedPathItem {
+func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedPathItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedPathItem includes properties not in ('name','value') or ()")
 	}
 	x := &NamedPathItem{}
 	// string name = 1;
@@ -1259,22 +1436,26 @@ func NewNamedPathItem(in interface{}) *NamedPathItem {
 	// PathItem value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewPathItem(v2)
+		var err error
+		x.Value, err = NewPathItem(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedResponse(in interface{}) *NamedResponse {
+func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedResponse: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedResponse includes properties not in ('name','value') or ()")
 	}
 	x := &NamedResponse{}
 	// string name = 1;
@@ -1285,22 +1466,26 @@ func NewNamedResponse(in interface{}) *NamedResponse {
 	// Response value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewResponse(v2)
+		var err error
+		x.Value, err = NewResponse(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedResponseValue(in interface{}) *NamedResponseValue {
+func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedResponseValue: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedResponseValue includes properties not in ('name','value') or ()")
 	}
 	x := &NamedResponseValue{}
 	// string name = 1;
@@ -1311,22 +1496,26 @@ func NewNamedResponseValue(in interface{}) *NamedResponseValue {
 	// ResponseValue value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewResponseValue(v2)
+		var err error
+		x.Value, err = NewResponseValue(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedSchema(in interface{}) *NamedSchema {
+func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedSchema includes properties not in ('name','value') or ()")
 	}
 	x := &NamedSchema{}
 	// string name = 1;
@@ -1337,22 +1526,26 @@ func NewNamedSchema(in interface{}) *NamedSchema {
 	// Schema value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewSchema(v2)
+		var err error
+		x.Value, err = NewSchema(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedSecurityDefinitionsItem(in interface{}) *NamedSecurityDefinitionsItem {
+func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedSecurityDefinitionsItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedSecurityDefinitionsItem includes properties not in ('name','value') or ()")
 	}
 	x := &NamedSecurityDefinitionsItem{}
 	// string name = 1;
@@ -1363,22 +1556,26 @@ func NewNamedSecurityDefinitionsItem(in interface{}) *NamedSecurityDefinitionsIt
 	// SecurityDefinitionsItem value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewSecurityDefinitionsItem(v2)
+		var err error
+		x.Value, err = NewSecurityDefinitionsItem(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedString(in interface{}) *NamedString {
+func NewNamedString(in interface{}) (*NamedString, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedString: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedString includes properties not in ('name','value') or ()")
 	}
 	x := &NamedString{}
 	// string name = 1;
@@ -1391,20 +1588,20 @@ func NewNamedString(in interface{}) *NamedString {
 	if v2 != nil {
 		x.Value = v2.(string)
 	}
-	return x
+	return x, nil
 }
 
-func NewNamedStringArray(in interface{}) *NamedStringArray {
+func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNamedStringArray: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("NamedStringArray includes properties not in ('name','value') or ()")
 	}
 	x := &NamedStringArray{}
 	// string name = 1;
@@ -1415,69 +1612,77 @@ func NewNamedStringArray(in interface{}) *NamedStringArray {
 	// StringArray value = 2;
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
-		x.Value = NewStringArray(v2)
+		var err error
+		x.Value, err = NewStringArray(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return x
+	return x, nil
 }
 
-func NewNonBodyParameter(in interface{}) *NonBodyParameter {
+func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewNonBodyParameter: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("NonBodyParameter does not contain all required properties ('in','name','type')")
 	}
 	x := &NonBodyParameter{}
 	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
-		t := NewHeaderParameterSubSchema(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewHeaderParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
 	}
 	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
-		t := NewFormDataParameterSubSchema(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewFormDataParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
 	}
 	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
-		t := NewQueryParameterSubSchema(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewQueryParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 		}
 	}
 	// PathParameterSubSchema path_parameter_sub_schema = 4;
 	{
-		t := NewPathParameterSubSchema(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewPathParameterSubSchema(m)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
+func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewOauth2AccessCodeSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Oauth2AccessCodeSecurity does not contain all required properties ('authorizationUrl','flow','tokenUrl','type')")
 	}
 	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Oauth2AccessCodeSecurity includes properties not in ('authorizationUrl','description','flow','scopes','tokenUrl','type') or ('^x-')")
 	}
 	x := &Oauth2AccessCodeSecurity{}
 	// string type = 1;
@@ -1493,7 +1698,11 @@ func NewOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 	// Oauth2Scopes scopes = 3;
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
-		x.Scopes = NewOauth2Scopes(v3)
+		var err error
+		x.Scopes, err = NewOauth2Scopes(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string authorization_url = 4;
 	v4 := helpers.MapValueForKey(m, "authorizationUrl")
@@ -1519,28 +1728,32 @@ func NewOauth2AccessCodeSecurity(in interface{}) *Oauth2AccessCodeSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
+func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewOauth2ApplicationSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Oauth2ApplicationSecurity does not contain all required properties ('flow','tokenUrl','type')")
 	}
 	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Oauth2ApplicationSecurity includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-')")
 	}
 	x := &Oauth2ApplicationSecurity{}
 	// string type = 1;
@@ -1556,7 +1769,11 @@ func NewOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 	// Oauth2Scopes scopes = 3;
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
-		x.Scopes = NewOauth2Scopes(v3)
+		var err error
+		x.Scopes, err = NewOauth2Scopes(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string token_url = 4;
 	v4 := helpers.MapValueForKey(m, "tokenUrl")
@@ -1577,28 +1794,32 @@ func NewOauth2ApplicationSecurity(in interface{}) *Oauth2ApplicationSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
+func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewOauth2ImplicitSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"authorizationUrl", "flow", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Oauth2ImplicitSecurity does not contain all required properties ('authorizationUrl','flow','type')")
 	}
 	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Oauth2ImplicitSecurity includes properties not in ('authorizationUrl','description','flow','scopes','type') or ('^x-')")
 	}
 	x := &Oauth2ImplicitSecurity{}
 	// string type = 1;
@@ -1614,7 +1835,11 @@ func NewOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 	// Oauth2Scopes scopes = 3;
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
-		x.Scopes = NewOauth2Scopes(v3)
+		var err error
+		x.Scopes, err = NewOauth2Scopes(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string authorization_url = 4;
 	v4 := helpers.MapValueForKey(m, "authorizationUrl")
@@ -1635,28 +1860,32 @@ func NewOauth2ImplicitSecurity(in interface{}) *Oauth2ImplicitSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
+func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewOauth2PasswordSecurity: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Oauth2PasswordSecurity does not contain all required properties ('flow','tokenUrl','type')")
 	}
 	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Oauth2PasswordSecurity includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-')")
 	}
 	x := &Oauth2PasswordSecurity{}
 	// string type = 1;
@@ -1672,7 +1901,11 @@ func NewOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 	// Oauth2Scopes scopes = 3;
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
-		x.Scopes = NewOauth2Scopes(v3)
+		var err error
+		x.Scopes, err = NewOauth2Scopes(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string token_url = 4;
 	v4 := helpers.MapValueForKey(m, "tokenUrl")
@@ -1693,19 +1926,23 @@ func NewOauth2PasswordSecurity(in interface{}) *Oauth2PasswordSecurity {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewOauth2Scopes(in interface{}) *Oauth2Scopes {
+func NewOauth2Scopes(in interface{}) (*Oauth2Scopes, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewOauth2Scopes: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Oauth2Scopes{}
 	// repeated NamedString additional_properties = 1;
@@ -1719,24 +1956,24 @@ func NewOauth2Scopes(in interface{}) *Oauth2Scopes {
 		pair.Value = v.(string)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewOperation(in interface{}) *Operation {
+func NewOperation(in interface{}) (*Operation, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewOperation: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"responses"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Operation does not contain all required properties ('responses')")
 	}
 	allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Operation includes properties not in ('consumes','deprecated','description','externalDocs','operationId','parameters','produces','responses','schemes','security','summary','tags') or ('^x-')")
 	}
 	x := &Operation{}
 	// repeated string tags = 1;
@@ -1762,7 +1999,11 @@ func NewOperation(in interface{}) *Operation {
 	// ExternalDocs external_docs = 4;
 	v4 := helpers.MapValueForKey(m, "externalDocs")
 	if v4 != nil {
-		x.ExternalDocs = NewExternalDocs(v4)
+		var err error
+		x.ExternalDocs, err = NewExternalDocs(v4)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string operation_id = 5;
 	v5 := helpers.MapValueForKey(m, "operationId")
@@ -1797,14 +2038,22 @@ func NewOperation(in interface{}) *Operation {
 		a, ok := v8.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Parameters = append(x.Parameters, NewParametersItem(item))
+				y, err := NewParametersItem(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Parameters = append(x.Parameters, y)
 			}
 		}
 	}
 	// Responses responses = 9;
 	v9 := helpers.MapValueForKey(m, "responses")
 	if v9 != nil {
-		x.Responses = NewResponses(v9)
+		var err error
+		x.Responses, err = NewResponses(v9)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated string schemes = 10;
 	v10 := helpers.MapValueForKey(m, "schemes")
@@ -1829,7 +2078,11 @@ func NewOperation(in interface{}) *Operation {
 		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Security = append(x.Security, NewSecurityRequirement(item))
+				y, err := NewSecurityRequirement(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Security = append(x.Security, y)
 			}
 		}
 	}
@@ -1842,44 +2095,50 @@ func NewOperation(in interface{}) *Operation {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewParameter(in interface{}) *Parameter {
+func NewParameter(in interface{}) (*Parameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewParameter: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Parameter{}
 	// BodyParameter body_parameter = 1;
 	{
-		t := NewBodyParameter(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewBodyParameter(m)
 		if t != nil {
 			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 		}
 	}
 	// NonBodyParameter non_body_parameter = 2;
 	{
-		t := NewNonBodyParameter(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewNonBodyParameter(m)
 		if t != nil {
 			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewParameterDefinitions(in interface{}) *ParameterDefinitions {
+func NewParameterDefinitions(in interface{}) (*ParameterDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewParameterDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &ParameterDefinitions{}
 	// repeated NamedParameter additional_properties = 1;
@@ -1890,48 +2149,54 @@ func NewParameterDefinitions(in interface{}) *ParameterDefinitions {
 		v := item.Value
 		pair := &NamedParameter{}
 		pair.Name = k
-		pair.Value = NewParameter(v)
+		var err error
+		pair.Value, err = NewParameter(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewParametersItem(in interface{}) *ParametersItem {
+func NewParametersItem(in interface{}) (*ParametersItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewParametersItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &ParametersItem{}
 	// Parameter parameter = 1;
 	{
-		t := NewParameter(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewParameter(m)
 		if t != nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
-		t := NewJsonReference(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewJsonReference(m)
 		if t != nil {
 			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewPathItem(in interface{}) *PathItem {
+func NewPathItem(in interface{}) (*PathItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewPathItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("PathItem includes properties not in ('$ref','delete','get','head','options','parameters','patch','post','put') or ('^x-')")
 	}
 	x := &PathItem{}
 	// string _ref = 1;
@@ -1942,37 +2207,65 @@ func NewPathItem(in interface{}) *PathItem {
 	// Operation get = 2;
 	v2 := helpers.MapValueForKey(m, "get")
 	if v2 != nil {
-		x.Get = NewOperation(v2)
+		var err error
+		x.Get, err = NewOperation(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Operation put = 3;
 	v3 := helpers.MapValueForKey(m, "put")
 	if v3 != nil {
-		x.Put = NewOperation(v3)
+		var err error
+		x.Put, err = NewOperation(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Operation post = 4;
 	v4 := helpers.MapValueForKey(m, "post")
 	if v4 != nil {
-		x.Post = NewOperation(v4)
+		var err error
+		x.Post, err = NewOperation(v4)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Operation delete = 5;
 	v5 := helpers.MapValueForKey(m, "delete")
 	if v5 != nil {
-		x.Delete = NewOperation(v5)
+		var err error
+		x.Delete, err = NewOperation(v5)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Operation options = 6;
 	v6 := helpers.MapValueForKey(m, "options")
 	if v6 != nil {
-		x.Options = NewOperation(v6)
+		var err error
+		x.Options, err = NewOperation(v6)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Operation head = 7;
 	v7 := helpers.MapValueForKey(m, "head")
 	if v7 != nil {
-		x.Head = NewOperation(v7)
+		var err error
+		x.Head, err = NewOperation(v7)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Operation patch = 8;
 	v8 := helpers.MapValueForKey(m, "patch")
 	if v8 != nil {
-		x.Patch = NewOperation(v8)
+		var err error
+		x.Patch, err = NewOperation(v8)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated ParametersItem parameters = 9;
 	v9 := helpers.MapValueForKey(m, "parameters")
@@ -1982,7 +2275,11 @@ func NewPathItem(in interface{}) *PathItem {
 		a, ok := v9.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Parameters = append(x.Parameters, NewParametersItem(item))
+				y, err := NewParametersItem(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Parameters = append(x.Parameters, y)
 			}
 		}
 	}
@@ -1995,28 +2292,32 @@ func NewPathItem(in interface{}) *PathItem {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
+func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewPathParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"required"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("PathParameterSubSchema does not contain all required properties ('required')")
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("PathParameterSubSchema includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
 	}
 	x := &PathParameterSubSchema{}
 	// bool required = 1;
@@ -2052,7 +2353,11 @@ func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	// PrimitivesItems items = 7;
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
-		x.Items = NewPrimitivesItems(v7)
+		var err error
+		x.Items, err = NewPrimitivesItems(v7)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string collection_format = 8;
 	v8 := helpers.MapValueForKey(m, "collectionFormat")
@@ -2062,7 +2367,11 @@ func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 	// Any default = 9;
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
-		x.Default = NewAny(v9)
+		var err error
+		x.Default, err = NewAny(v9)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float maximum = 10;
 	v10 := helpers.MapValueForKey(m, "maximum")
@@ -2122,7 +2431,11 @@ func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
@@ -2140,24 +2453,28 @@ func NewPathParameterSubSchema(in interface{}) *PathParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewPaths(in interface{}) *Paths {
+func NewPaths(in interface{}) (*Paths, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewPaths: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^x-", "^/"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Paths includes properties not in () or ('^x-','^/')")
 	}
 	x := &Paths{}
 	// repeated NamedAny vendor_extension = 1;
@@ -2169,7 +2486,11 @@ func NewPaths(in interface{}) *Paths {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
@@ -2182,24 +2503,28 @@ func NewPaths(in interface{}) *Paths {
 		if helpers.PatternMatches("^/", k) {
 			pair := &NamedPathItem{}
 			pair.Name = k
-			pair.Value = NewPathItem(v)
+			var err error
+			pair.Value, err = NewPathItem(v)
+			if err != nil {
+				return nil, err
+			}
 			x.Path = append(x.Path, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewPrimitivesItems(in interface{}) *PrimitivesItems {
+func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewPrimitivesItems: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("PrimitivesItems includes properties not in ('collectionFormat','default','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-')")
 	}
 	x := &PrimitivesItems{}
 	// string type = 1;
@@ -2215,7 +2540,11 @@ func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 	// PrimitivesItems items = 3;
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
-		x.Items = NewPrimitivesItems(v3)
+		var err error
+		x.Items, err = NewPrimitivesItems(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string collection_format = 4;
 	v4 := helpers.MapValueForKey(m, "collectionFormat")
@@ -2225,7 +2554,11 @@ func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 	// Any default = 5;
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
-		x.Default = NewAny(v5)
+		var err error
+		x.Default, err = NewAny(v5)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float maximum = 6;
 	v6 := helpers.MapValueForKey(m, "maximum")
@@ -2285,7 +2618,11 @@ func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
@@ -2303,19 +2640,23 @@ func NewPrimitivesItems(in interface{}) *PrimitivesItems {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewProperties(in interface{}) *Properties {
+func NewProperties(in interface{}) (*Properties, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewProperties: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &Properties{}
 	// repeated NamedSchema additional_properties = 1;
@@ -2326,23 +2667,27 @@ func NewProperties(in interface{}) *Properties {
 		v := item.Value
 		pair := &NamedSchema{}
 		pair.Name = k
-		pair.Value = NewSchema(v)
+		var err error
+		pair.Value, err = NewSchema(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
+func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewQueryParameterSubSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("QueryParameterSubSchema includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
 	}
 	x := &QueryParameterSubSchema{}
 	// bool required = 1;
@@ -2383,7 +2728,11 @@ func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 	// PrimitivesItems items = 8;
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
-		x.Items = NewPrimitivesItems(v8)
+		var err error
+		x.Items, err = NewPrimitivesItems(v8)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string collection_format = 9;
 	v9 := helpers.MapValueForKey(m, "collectionFormat")
@@ -2393,7 +2742,11 @@ func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 	// Any default = 10;
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
-		x.Default = NewAny(v10)
+		var err error
+		x.Default, err = NewAny(v10)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float maximum = 11;
 	v11 := helpers.MapValueForKey(m, "maximum")
@@ -2453,7 +2806,11 @@ func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
@@ -2471,28 +2828,32 @@ func NewQueryParameterSubSchema(in interface{}) *QueryParameterSubSchema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewResponse(in interface{}) *Response {
+func NewResponse(in interface{}) (*Response, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewResponse: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"description"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Response does not contain all required properties ('description')")
 	}
 	allowedKeys := []string{"description", "examples", "headers", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Response includes properties not in ('description','examples','headers','schema') or ('^x-')")
 	}
 	x := &Response{}
 	// string description = 1;
@@ -2503,17 +2864,29 @@ func NewResponse(in interface{}) *Response {
 	// SchemaItem schema = 2;
 	v2 := helpers.MapValueForKey(m, "schema")
 	if v2 != nil {
-		x.Schema = NewSchemaItem(v2)
+		var err error
+		x.Schema, err = NewSchemaItem(v2)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Headers headers = 3;
 	v3 := helpers.MapValueForKey(m, "headers")
 	if v3 != nil {
-		x.Headers = NewHeaders(v3)
+		var err error
+		x.Headers, err = NewHeaders(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Examples examples = 4;
 	v4 := helpers.MapValueForKey(m, "examples")
 	if v4 != nil {
-		x.Examples = NewExamples(v4)
+		var err error
+		x.Examples, err = NewExamples(v4)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated NamedAny vendor_extension = 5;
 	// MAP: Any ^x-
@@ -2524,19 +2897,23 @@ func NewResponse(in interface{}) *Response {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewResponseDefinitions(in interface{}) *ResponseDefinitions {
+func NewResponseDefinitions(in interface{}) (*ResponseDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewResponseDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &ResponseDefinitions{}
 	// repeated NamedResponse additional_properties = 1;
@@ -2547,48 +2924,54 @@ func NewResponseDefinitions(in interface{}) *ResponseDefinitions {
 		v := item.Value
 		pair := &NamedResponse{}
 		pair.Name = k
-		pair.Value = NewResponse(v)
+		var err error
+		pair.Value, err = NewResponse(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewResponseValue(in interface{}) *ResponseValue {
+func NewResponseValue(in interface{}) (*ResponseValue, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewResponseValue: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &ResponseValue{}
 	// Response response = 1;
 	{
-		t := NewResponse(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewResponse(m)
 		if t != nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
-		t := NewJsonReference(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewJsonReference(m)
 		if t != nil {
 			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewResponses(in interface{}) *Responses {
+func NewResponses(in interface{}) (*Responses, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewResponses: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Responses includes properties not in () or ('^([0-9]{3})$|^(default)$','^x-')")
 	}
 	x := &Responses{}
 	// repeated NamedResponseValue response_code = 1;
@@ -2600,7 +2983,11 @@ func NewResponses(in interface{}) *Responses {
 		if helpers.PatternMatches("^([0-9]{3})$|^(default)$", k) {
 			pair := &NamedResponseValue{}
 			pair.Name = k
-			pair.Value = NewResponseValue(v)
+			var err error
+			pair.Value, err = NewResponseValue(v)
+			if err != nil {
+				return nil, err
+			}
 			x.ResponseCode = append(x.ResponseCode, pair)
 		}
 	}
@@ -2613,24 +3000,28 @@ func NewResponses(in interface{}) *Responses {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewSchema(in interface{}) *Schema {
+func NewSchema(in interface{}) (*Schema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewSchema: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Schema includes properties not in ('$ref','additionalProperties','allOf','default','description','discriminator','enum','example','exclusiveMaximum','exclusiveMinimum','externalDocs','format','items','maxItems','maxLength','maxProperties','maximum','minItems','minLength','minProperties','minimum','multipleOf','pattern','properties','readOnly','required','title','type','uniqueItems','xml') or ('^x-')")
 	}
 	x := &Schema{}
 	// string _ref = 1;
@@ -2656,7 +3047,11 @@ func NewSchema(in interface{}) *Schema {
 	// Any default = 5;
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
-		x.Default = NewAny(v5)
+		var err error
+		x.Default, err = NewAny(v5)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// float multiple_of = 6;
 	v6 := helpers.MapValueForKey(m, "multipleOf")
@@ -2741,24 +3136,40 @@ func NewSchema(in interface{}) *Schema {
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.Enum = append(x.Enum, NewAny(item))
+				y, err := NewAny(item)
+				if err != nil {
+					return nil, err
+				}
+				x.Enum = append(x.Enum, y)
 			}
 		}
 	}
 	// AdditionalPropertiesItem additional_properties = 21;
 	v21 := helpers.MapValueForKey(m, "additionalProperties")
 	if v21 != nil {
-		x.AdditionalProperties = NewAdditionalPropertiesItem(v21)
+		var err error
+		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// TypeItem type = 22;
 	v22 := helpers.MapValueForKey(m, "type")
 	if v22 != nil {
-		x.Type = NewTypeItem(v22)
+		var err error
+		x.Type, err = NewTypeItem(v22)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// ItemsItem items = 23;
 	v23 := helpers.MapValueForKey(m, "items")
 	if v23 != nil {
-		x.Items = NewItemsItem(v23)
+		var err error
+		x.Items, err = NewItemsItem(v23)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated Schema all_of = 24;
 	v24 := helpers.MapValueForKey(m, "allOf")
@@ -2768,14 +3179,22 @@ func NewSchema(in interface{}) *Schema {
 		a, ok := v24.([]interface{})
 		if ok {
 			for _, item := range a {
-				x.AllOf = append(x.AllOf, NewSchema(item))
+				y, err := NewSchema(item)
+				if err != nil {
+					return nil, err
+				}
+				x.AllOf = append(x.AllOf, y)
 			}
 		}
 	}
 	// Properties properties = 25;
 	v25 := helpers.MapValueForKey(m, "properties")
 	if v25 != nil {
-		x.Properties = NewProperties(v25)
+		var err error
+		x.Properties, err = NewProperties(v25)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// string discriminator = 26;
 	v26 := helpers.MapValueForKey(m, "discriminator")
@@ -2790,17 +3209,29 @@ func NewSchema(in interface{}) *Schema {
 	// Xml xml = 28;
 	v28 := helpers.MapValueForKey(m, "xml")
 	if v28 != nil {
-		x.Xml = NewXml(v28)
+		var err error
+		x.Xml, err = NewXml(v28)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// ExternalDocs external_docs = 29;
 	v29 := helpers.MapValueForKey(m, "externalDocs")
 	if v29 != nil {
-		x.ExternalDocs = NewExternalDocs(v29)
+		var err error
+		x.ExternalDocs, err = NewExternalDocs(v29)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Any example = 30;
 	v30 := helpers.MapValueForKey(m, "example")
 	if v30 != nil {
-		x.Example = NewAny(v30)
+		var err error
+		x.Example, err = NewAny(v30)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated NamedAny vendor_extension = 31;
 	// MAP: Any ^x-
@@ -2811,44 +3242,50 @@ func NewSchema(in interface{}) *Schema {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewSchemaItem(in interface{}) *SchemaItem {
+func NewSchemaItem(in interface{}) (*SchemaItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewSchemaItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &SchemaItem{}
 	// Schema schema = 1;
 	{
-		t := NewSchema(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewSchema(m)
 		if t != nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
 		}
 	}
 	// FileSchema file_schema = 2;
 	{
-		t := NewFileSchema(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewFileSchema(m)
 		if t != nil {
 			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewSecurityDefinitions(in interface{}) *SecurityDefinitions {
+func NewSecurityDefinitions(in interface{}) (*SecurityDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewSecurityDefinitions: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &SecurityDefinitions{}
 	// repeated NamedSecurityDefinitionsItem additional_properties = 1;
@@ -2859,71 +3296,81 @@ func NewSecurityDefinitions(in interface{}) *SecurityDefinitions {
 		v := item.Value
 		pair := &NamedSecurityDefinitionsItem{}
 		pair.Name = k
-		pair.Value = NewSecurityDefinitionsItem(v)
+		var err error
+		pair.Value, err = NewSecurityDefinitionsItem(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewSecurityDefinitionsItem(in interface{}) *SecurityDefinitionsItem {
+func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewSecurityDefinitionsItem: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &SecurityDefinitionsItem{}
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
-		t := NewBasicAuthenticationSecurity(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewBasicAuthenticationSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
 	}
 	// ApiKeySecurity api_key_security = 2;
 	{
-		t := NewApiKeySecurity(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewApiKeySecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
 	}
 	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
-		t := NewOauth2ImplicitSecurity(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewOauth2ImplicitSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
 	}
 	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
-		t := NewOauth2PasswordSecurity(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewOauth2PasswordSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 		}
 	}
 	// Oauth2ApplicationSecurity oauth2_application_security = 5;
 	{
-		t := NewOauth2ApplicationSecurity(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewOauth2ApplicationSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 		}
 	}
 	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
 	{
-		t := NewOauth2AccessCodeSecurity(m)
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewOauth2AccessCodeSecurity(m)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewSecurityRequirement(in interface{}) *SecurityRequirement {
+func NewSecurityRequirement(in interface{}) (*SecurityRequirement, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewSecurityRequirement: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &SecurityRequirement{}
 	// repeated NamedStringArray additional_properties = 1;
@@ -2934,13 +3381,17 @@ func NewSecurityRequirement(in interface{}) *SecurityRequirement {
 		v := item.Value
 		pair := &NamedStringArray{}
 		pair.Name = k
-		pair.Value = NewStringArray(v)
+		var err error
+		pair.Value, err = NewStringArray(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewStringArray(in interface{}) *StringArray {
+func NewStringArray(in interface{}) (*StringArray, error) {
 	a, ok := in.([]interface{})
 	if ok {
 		x := &StringArray{}
@@ -2948,27 +3399,27 @@ func NewStringArray(in interface{}) *StringArray {
 		for _, s := range a {
 			x.Value = append(x.Value, s.(string))
 		}
-		return x
+		return x, nil
 	} else {
-		return nil
+		return nil, nil
 	}
 }
 
-func NewTag(in interface{}) *Tag {
+func NewTag(in interface{}) (*Tag, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewTag: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	requiredKeys := []string{"name"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil
+		return nil, errors.New("Tag does not contain all required properties ('name')")
 	}
 	allowedKeys := []string{"description", "externalDocs", "name"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Tag includes properties not in ('description','externalDocs','name') or ('^x-')")
 	}
 	x := &Tag{}
 	// string name = 1;
@@ -2984,7 +3435,11 @@ func NewTag(in interface{}) *Tag {
 	// ExternalDocs external_docs = 3;
 	v3 := helpers.MapValueForKey(m, "externalDocs")
 	if v3 != nil {
-		x.ExternalDocs = NewExternalDocs(v3)
+		var err error
+		x.ExternalDocs, err = NewExternalDocs(v3)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// repeated NamedAny vendor_extension = 4;
 	// MAP: Any ^x-
@@ -2995,14 +3450,18 @@ func NewTag(in interface{}) *Tag {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
 
-func NewTypeItem(in interface{}) *TypeItem {
+func NewTypeItem(in interface{}) (*TypeItem, error) {
 	value, ok := in.(string)
 	x := &TypeItem{}
 	if ok {
@@ -3011,15 +3470,15 @@ func NewTypeItem(in interface{}) *TypeItem {
 	} else {
 		log.Printf("unexpected: %+v", in)
 	}
-	return x
+	return x, nil
 }
 
-func NewVendorExtension(in interface{}) *VendorExtension {
+func NewVendorExtension(in interface{}) (*VendorExtension, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewVendorExtension: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	x := &VendorExtension{}
 	// repeated NamedAny additional_properties = 1;
@@ -3030,23 +3489,27 @@ func NewVendorExtension(in interface{}) *VendorExtension {
 		v := item.Value
 		pair := &NamedAny{}
 		pair.Name = k
-		pair.Value = NewAny(v)
+		var err error
+		pair.Value, err = NewAny(v)
+		if err != nil {
+			return nil, err
+		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x
+	return x, nil
 }
 
-func NewXml(in interface{}) *Xml {
+func NewXml(in interface{}) (*Xml, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		log.Printf("unexpected argument to NewXml: %+v", in)
 		log.Printf("%d\n", len(m))
-		return nil
+		return nil, nil
 	}
 	allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil
+		return nil, errors.New("Xml includes properties not in ('attribute','name','namespace','prefix','wrapped') or ('^x-')")
 	}
 	x := &Xml{}
 	// string name = 1;
@@ -3083,9 +3546,13 @@ func NewXml(in interface{}) *Xml {
 		if helpers.PatternMatches("^x-", k) {
 			pair := &NamedAny{}
 			pair.Name = k
-			pair.Value = NewAny(v)
+			var err error
+			pair.Value, err = NewAny(v)
+			if err != nil {
+				return nil, err
+			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x
+	return x, nil
 }
