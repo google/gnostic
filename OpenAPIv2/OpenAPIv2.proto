@@ -240,53 +240,83 @@ message License {
   repeated NamedAny vendor_extension = 3;
 }
 
+// Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
 message NamedAny {
+  // Map key
   string name = 1;
+  // Mapped value
   Any value = 2;
 }
 
+// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
 message NamedHeader {
+  // Map key
   string name = 1;
+  // Mapped value
   Header value = 2;
 }
 
+// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
 message NamedParameter {
+  // Map key
   string name = 1;
+  // Mapped value
   Parameter value = 2;
 }
 
+// Automatically-generated message used to represent maps of PathItem as ordered (name,value) pairs.
 message NamedPathItem {
+  // Map key
   string name = 1;
+  // Mapped value
   PathItem value = 2;
 }
 
+// Automatically-generated message used to represent maps of Response as ordered (name,value) pairs.
 message NamedResponse {
+  // Map key
   string name = 1;
+  // Mapped value
   Response value = 2;
 }
 
+// Automatically-generated message used to represent maps of ResponseValue as ordered (name,value) pairs.
 message NamedResponseValue {
+  // Map key
   string name = 1;
+  // Mapped value
   ResponseValue value = 2;
 }
 
+// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
 message NamedSchema {
+  // Map key
   string name = 1;
+  // Mapped value
   Schema value = 2;
 }
 
+// Automatically-generated message used to represent maps of SecurityDefinitionsItem as ordered (name,value) pairs.
 message NamedSecurityDefinitionsItem {
+  // Map key
   string name = 1;
+  // Mapped value
   SecurityDefinitionsItem value = 2;
 }
 
+// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
 message NamedString {
+  // Map key
   string name = 1;
+  // Mapped value
   string value = 2;
 }
 
+// Automatically-generated message used to represent maps of StringArray as ordered (name,value) pairs.
 message NamedStringArray {
+  // Map key
   string name = 1;
+  // Mapped value
   StringArray value = 2;
 }
 

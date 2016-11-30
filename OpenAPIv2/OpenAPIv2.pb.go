@@ -696,9 +696,12 @@ func (m *License) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
 type NamedAny struct {
-	Name  string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Value *Any   `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
+	Value *Any `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
 func (m *NamedAny) Reset()                    { *m = NamedAny{} }
@@ -713,8 +716,11 @@ func (m *NamedAny) GetValue() *Any {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
 type NamedHeader struct {
-	Name  string  `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *Header `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -730,8 +736,11 @@ func (m *NamedHeader) GetValue() *Header {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
 type NamedParameter struct {
-	Name  string     `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *Parameter `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -747,8 +756,11 @@ func (m *NamedParameter) GetValue() *Parameter {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of PathItem as ordered (name,value) pairs.
 type NamedPathItem struct {
-	Name  string    `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *PathItem `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -764,8 +776,11 @@ func (m *NamedPathItem) GetValue() *PathItem {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of Response as ordered (name,value) pairs.
 type NamedResponse struct {
-	Name  string    `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *Response `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -781,8 +796,11 @@ func (m *NamedResponse) GetValue() *Response {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of ResponseValue as ordered (name,value) pairs.
 type NamedResponseValue struct {
-	Name  string         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *ResponseValue `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -798,8 +816,11 @@ func (m *NamedResponseValue) GetValue() *ResponseValue {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
 type NamedSchema struct {
-	Name  string  `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *Schema `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -815,8 +836,11 @@ func (m *NamedSchema) GetValue() *Schema {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of SecurityDefinitionsItem as ordered (name,value) pairs.
 type NamedSecurityDefinitionsItem struct {
-	Name  string                   `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *SecurityDefinitionsItem `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -832,8 +856,11 @@ func (m *NamedSecurityDefinitionsItem) GetValue() *SecurityDefinitionsItem {
 	return nil
 }
 
+// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
 type NamedString struct {
-	Name  string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
@@ -842,8 +869,11 @@ func (m *NamedString) String() string            { return proto.CompactTextStrin
 func (*NamedString) ProtoMessage()               {}
 func (*NamedString) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
 
+// Automatically-generated message used to represent maps of StringArray as ordered (name,value) pairs.
 type NamedStringArray struct {
-	Name  string       `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Map key
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// Mapped value
 	Value *StringArray `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 

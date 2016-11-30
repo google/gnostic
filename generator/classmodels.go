@@ -588,16 +588,21 @@ func (classes *ClassCollection) build() {
 		className := "Named" + strings.Title(mapClassName)
 		classModel := NewClassModel()
 		classModel.Name = className
+		classModel.Description = fmt.Sprintf(
+			"Automatically-generated message used to represent maps of %s as ordered (name,value) pairs.",
+			mapClassName)
 		classModel.IsPair = true
 
 		nameProperty := NewClassProperty()
 		nameProperty.Name = "name"
 		nameProperty.Type = "string"
+		nameProperty.Description = "Map key"
 		classModel.AddProperty(nameProperty)
 
 		valueProperty := NewClassProperty()
 		valueProperty.Name = "value"
 		valueProperty.Type = mapClassName
+		valueProperty.Description = "Mapped value"
 		classModel.AddProperty(valueProperty)
 
 		classes.ClassModels[className] = classModel
