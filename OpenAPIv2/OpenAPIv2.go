@@ -19,6 +19,7 @@ package openapi_v2
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/googleapis/openapi-compiler/helpers"
 	"log"
 )
@@ -30,9 +31,7 @@ func Version() string {
 func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewAdditionalPropertiesItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for AdditionalPropertiesItem section: %+v", in))
 	}
 	allowedKeys := []string{"boolean", "schema"}
 	allowedPatterns := []string{}
@@ -67,9 +66,7 @@ func NewAny(in interface{}) (*Any, error) {
 func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewApiKeySecurity: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for ApiKeySecurity section: %+v", in))
 	}
 	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -124,9 +121,7 @@ func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
 func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewBasicAuthenticationSecurity: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for BasicAuthenticationSecurity section: %+v", in))
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -171,9 +166,7 @@ func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurit
 func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewBodyParameter: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for BodyParameter section: %+v", in))
 	}
 	requiredKeys := []string{"in", "name", "schema"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -237,9 +230,7 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 func NewContact(in interface{}) (*Contact, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewContact: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Contact section: %+v", in))
 	}
 	allowedKeys := []string{"email", "name", "url"}
 	allowedPatterns := []string{"^x-"}
@@ -285,9 +276,7 @@ func NewContact(in interface{}) (*Contact, error) {
 func NewDefault(in interface{}) (*Default, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewDefault: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Default section: %+v", in))
 	}
 	x := &Default{}
 	// repeated NamedAny additional_properties = 1;
@@ -311,9 +300,7 @@ func NewDefault(in interface{}) (*Default, error) {
 func NewDefinitions(in interface{}) (*Definitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewDefinitions: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Definitions section: %+v", in))
 	}
 	x := &Definitions{}
 	// repeated NamedSchema additional_properties = 1;
@@ -337,9 +324,7 @@ func NewDefinitions(in interface{}) (*Definitions, error) {
 func NewDocument(in interface{}) (*Document, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewDocument: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Document section: %+v", in))
 	}
 	requiredKeys := []string{"info", "paths", "swagger"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -497,9 +482,7 @@ func NewDocument(in interface{}) (*Document, error) {
 func NewExamples(in interface{}) (*Examples, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewExamples: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Examples section: %+v", in))
 	}
 	x := &Examples{}
 	// repeated NamedAny additional_properties = 1;
@@ -523,9 +506,7 @@ func NewExamples(in interface{}) (*Examples, error) {
 func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewExternalDocs: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for ExternalDocs section: %+v", in))
 	}
 	requiredKeys := []string{"url"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -570,9 +551,7 @@ func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
 func NewFileSchema(in interface{}) (*FileSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewFileSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for FileSchema section: %+v", in))
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -669,9 +648,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewFormDataParameterSubSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for FormDataParameterSubSchema section: %+v", in))
 	}
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
@@ -831,9 +808,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 func NewHeader(in interface{}) (*Header, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewHeader: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Header section: %+v", in))
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -977,9 +952,7 @@ func NewHeader(in interface{}) (*Header, error) {
 func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewHeaderParameterSubSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for HeaderParameterSubSchema section: %+v", in))
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
@@ -1134,9 +1107,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 func NewHeaders(in interface{}) (*Headers, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewHeaders: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Headers section: %+v", in))
 	}
 	x := &Headers{}
 	// repeated NamedHeader additional_properties = 1;
@@ -1160,9 +1131,7 @@ func NewHeaders(in interface{}) (*Headers, error) {
 func NewInfo(in interface{}) (*Info, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewInfo: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Info section: %+v", in))
 	}
 	requiredKeys := []string{"title", "version"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1256,9 +1225,7 @@ func NewItemsItem(in interface{}) (*ItemsItem, error) {
 func NewJsonReference(in interface{}) (*JsonReference, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewJsonReference: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for JsonReference section: %+v", in))
 	}
 	requiredKeys := []string{"$ref"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1281,9 +1248,7 @@ func NewJsonReference(in interface{}) (*JsonReference, error) {
 func NewLicense(in interface{}) (*License, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewLicense: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for License section: %+v", in))
 	}
 	requiredKeys := []string{"name"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1328,9 +1293,7 @@ func NewLicense(in interface{}) (*License, error) {
 func NewNamedAny(in interface{}) (*NamedAny, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedAny: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedAny section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1358,9 +1321,7 @@ func NewNamedAny(in interface{}) (*NamedAny, error) {
 func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedHeader: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedHeader section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1388,9 +1349,7 @@ func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedParameter: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedParameter section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1418,9 +1377,7 @@ func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedPathItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedPathItem section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1448,9 +1405,7 @@ func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedResponse: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedResponse section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1478,9 +1433,7 @@ func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedResponseValue: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedResponseValue section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1508,9 +1461,7 @@ func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedSchema section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1538,9 +1489,7 @@ func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedSecurityDefinitionsItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedSecurityDefinitionsItem section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1568,9 +1517,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsI
 func NewNamedString(in interface{}) (*NamedString, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedString: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedString section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1594,9 +1541,7 @@ func NewNamedString(in interface{}) (*NamedString, error) {
 func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNamedStringArray: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NamedStringArray section: %+v", in))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
@@ -1624,9 +1569,7 @@ func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewNonBodyParameter: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for NonBodyParameter section: %+v", in))
 	}
 	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1671,9 +1614,7 @@ func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewOauth2AccessCodeSecurity: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2AccessCodeSecurity section: %+v", in))
 	}
 	requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1742,9 +1683,7 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewOauth2ApplicationSecurity: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2ApplicationSecurity section: %+v", in))
 	}
 	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1808,9 +1747,7 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewOauth2ImplicitSecurity: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2ImplicitSecurity section: %+v", in))
 	}
 	requiredKeys := []string{"authorizationUrl", "flow", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1874,9 +1811,7 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewOauth2PasswordSecurity: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2PasswordSecurity section: %+v", in))
 	}
 	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -1940,9 +1875,7 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 func NewOauth2Scopes(in interface{}) (*Oauth2Scopes, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewOauth2Scopes: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2Scopes section: %+v", in))
 	}
 	x := &Oauth2Scopes{}
 	// repeated NamedString additional_properties = 1;
@@ -1962,9 +1895,7 @@ func NewOauth2Scopes(in interface{}) (*Oauth2Scopes, error) {
 func NewOperation(in interface{}) (*Operation, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewOperation: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Operation section: %+v", in))
 	}
 	requiredKeys := []string{"responses"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -2109,9 +2040,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 func NewParameter(in interface{}) (*Parameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewParameter: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Parameter section: %+v", in))
 	}
 	x := &Parameter{}
 	// BodyParameter body_parameter = 1;
@@ -2136,9 +2065,7 @@ func NewParameter(in interface{}) (*Parameter, error) {
 func NewParameterDefinitions(in interface{}) (*ParameterDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewParameterDefinitions: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for ParameterDefinitions section: %+v", in))
 	}
 	x := &ParameterDefinitions{}
 	// repeated NamedParameter additional_properties = 1;
@@ -2162,9 +2089,7 @@ func NewParameterDefinitions(in interface{}) (*ParameterDefinitions, error) {
 func NewParametersItem(in interface{}) (*ParametersItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewParametersItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for ParametersItem section: %+v", in))
 	}
 	x := &ParametersItem{}
 	// Parameter parameter = 1;
@@ -2189,9 +2114,7 @@ func NewParametersItem(in interface{}) (*ParametersItem, error) {
 func NewPathItem(in interface{}) (*PathItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewPathItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for PathItem section: %+v", in))
 	}
 	allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
 	allowedPatterns := []string{"^x-"}
@@ -2306,9 +2229,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewPathParameterSubSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for PathParameterSubSchema section: %+v", in))
 	}
 	requiredKeys := []string{"required"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -2467,9 +2388,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 func NewPaths(in interface{}) (*Paths, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewPaths: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Paths section: %+v", in))
 	}
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^x-", "^/"}
@@ -2517,9 +2436,7 @@ func NewPaths(in interface{}) (*Paths, error) {
 func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewPrimitivesItems: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for PrimitivesItems section: %+v", in))
 	}
 	allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
@@ -2654,9 +2571,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 func NewProperties(in interface{}) (*Properties, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewProperties: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Properties section: %+v", in))
 	}
 	x := &Properties{}
 	// repeated NamedSchema additional_properties = 1;
@@ -2680,9 +2595,7 @@ func NewProperties(in interface{}) (*Properties, error) {
 func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewQueryParameterSubSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for QueryParameterSubSchema section: %+v", in))
 	}
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
@@ -2842,9 +2755,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 func NewResponse(in interface{}) (*Response, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewResponse: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Response section: %+v", in))
 	}
 	requiredKeys := []string{"description"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -2911,9 +2822,7 @@ func NewResponse(in interface{}) (*Response, error) {
 func NewResponseDefinitions(in interface{}) (*ResponseDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewResponseDefinitions: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for ResponseDefinitions section: %+v", in))
 	}
 	x := &ResponseDefinitions{}
 	// repeated NamedResponse additional_properties = 1;
@@ -2937,9 +2846,7 @@ func NewResponseDefinitions(in interface{}) (*ResponseDefinitions, error) {
 func NewResponseValue(in interface{}) (*ResponseValue, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewResponseValue: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for ResponseValue section: %+v", in))
 	}
 	x := &ResponseValue{}
 	// Response response = 1;
@@ -2964,9 +2871,7 @@ func NewResponseValue(in interface{}) (*ResponseValue, error) {
 func NewResponses(in interface{}) (*Responses, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewResponses: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Responses section: %+v", in))
 	}
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
@@ -3014,9 +2919,7 @@ func NewResponses(in interface{}) (*Responses, error) {
 func NewSchema(in interface{}) (*Schema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewSchema: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Schema section: %+v", in))
 	}
 	allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
 	allowedPatterns := []string{"^x-"}
@@ -3256,9 +3159,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 func NewSchemaItem(in interface{}) (*SchemaItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewSchemaItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for SchemaItem section: %+v", in))
 	}
 	x := &SchemaItem{}
 	// Schema schema = 1;
@@ -3283,9 +3184,7 @@ func NewSchemaItem(in interface{}) (*SchemaItem, error) {
 func NewSecurityDefinitions(in interface{}) (*SecurityDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewSecurityDefinitions: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for SecurityDefinitions section: %+v", in))
 	}
 	x := &SecurityDefinitions{}
 	// repeated NamedSecurityDefinitionsItem additional_properties = 1;
@@ -3309,9 +3208,7 @@ func NewSecurityDefinitions(in interface{}) (*SecurityDefinitions, error) {
 func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewSecurityDefinitionsItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for SecurityDefinitionsItem section: %+v", in))
 	}
 	x := &SecurityDefinitionsItem{}
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
@@ -3368,9 +3265,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 func NewSecurityRequirement(in interface{}) (*SecurityRequirement, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewSecurityRequirement: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for SecurityRequirement section: %+v", in))
 	}
 	x := &SecurityRequirement{}
 	// repeated NamedStringArray additional_properties = 1;
@@ -3408,9 +3303,7 @@ func NewStringArray(in interface{}) (*StringArray, error) {
 func NewTag(in interface{}) (*Tag, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewTag: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Tag section: %+v", in))
 	}
 	requiredKeys := []string{"name"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
@@ -3476,9 +3369,7 @@ func NewTypeItem(in interface{}) (*TypeItem, error) {
 func NewVendorExtension(in interface{}) (*VendorExtension, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewVendorExtension: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for VendorExtension section: %+v", in))
 	}
 	x := &VendorExtension{}
 	// repeated NamedAny additional_properties = 1;
@@ -3502,9 +3393,7 @@ func NewVendorExtension(in interface{}) (*VendorExtension, error) {
 func NewXml(in interface{}) (*Xml, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewXml: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for Xml section: %+v", in))
 	}
 	allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
 	allowedPatterns := []string{"^x-"}

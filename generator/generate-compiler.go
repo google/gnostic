@@ -32,6 +32,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print("import (")
 	imports := []string{
 		"errors",
+		"fmt",
 		"log",
 		"encoding/json",
 		"github.com/googleapis/openapi-compiler/helpers",
@@ -119,9 +120,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		}
 		code.Print("m, ok := helpers.UnpackMap(in)")
 		code.Print("if (!ok) {")
-		code.Print("log.Printf(\"unexpected argument to New%s: %%+v\", in)", className)
-		code.Print("log.Printf(\"%%d\\n\", len(m))")
-		code.Print("return nil, nil")
+		code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for %s section: %%+v\", in))", className)
 		code.Print("}")
 		oneOfWrapper := classModel.OneOfWrapper
 
