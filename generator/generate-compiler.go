@@ -30,10 +30,15 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print("package %s", packageName)
 	code.Print()
 	code.Print("import (")
-	code.Print("\"errors\"")
-	code.Print("\"log\"")
-	code.Print("\"encoding/json\"")
-	code.Print("\"github.com/googleapis/openapi-compiler/helpers\"")
+	imports := []string{
+		"errors",
+		"log",
+		"encoding/json",
+		"github.com/googleapis/openapi-compiler/helpers",
+	}
+	for _, filename := range imports {
+		code.Print("\"" + filename + "\"")
+	}
 	code.Print(")")
 	code.Print()
 	code.Print("func Version() string {")
