@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/googleapis/openapi-compiler/helpers"
-	"log"
 )
 
 func Version() string {
@@ -367,7 +366,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		if ok {
 			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "schemes"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for schemes property: %+v", in))
 		}
 	}
 	// repeated string consumes = 6;
@@ -377,7 +376,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		if ok {
 			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "consumes"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for consumes property: %+v", in))
 		}
 	}
 	// repeated string produces = 7;
@@ -387,7 +386,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		if ok {
 			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "produces"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for produces property: %+v", in))
 		}
 	}
 	// Paths paths = 8;
@@ -594,7 +593,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		if ok {
 			x.Required = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "required"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for required property: %+v", in))
 		}
 	}
 	// string type = 6;
@@ -1204,9 +1203,7 @@ func NewInfo(in interface{}) (*Info, error) {
 func NewItemsItem(in interface{}) (*ItemsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		log.Printf("unexpected argument to NewItemsItem: %+v", in)
-		log.Printf("%d\n", len(m))
-		return nil, nil
+		return nil, errors.New(fmt.Sprintf("unexpected value for item array: %+v", in))
 	}
 	x := &ItemsItem{}
 	if ok {
@@ -1217,7 +1214,7 @@ func NewItemsItem(in interface{}) (*ItemsItem, error) {
 		}
 		x.Schema = append(x.Schema, y)
 	} else {
-		log.Printf("unexpected: %+v", in)
+		return nil, errors.New(fmt.Sprintf("unexpected value for item array: %+v", in))
 	}
 	return x, nil
 }
@@ -1914,7 +1911,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		if ok {
 			x.Tags = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "tags"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for tags property: %+v", in))
 		}
 	}
 	// string summary = 2;
@@ -1948,7 +1945,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		if ok {
 			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "produces"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for produces property: %+v", in))
 		}
 	}
 	// repeated string consumes = 7;
@@ -1958,7 +1955,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		if ok {
 			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "consumes"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for consumes property: %+v", in))
 		}
 	}
 	// repeated ParametersItem parameters = 8;
@@ -1993,7 +1990,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		if ok {
 			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "schemes"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for schemes property: %+v", in))
 		}
 	}
 	// bool deprecated = 11;
@@ -3028,7 +3025,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		if ok {
 			x.Required = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			log.Printf("unexpected: %+v", helpers.MapValueForKey(m, "required"))
+			return nil, errors.New(fmt.Sprintf("unexpected value for required property: %+v", in))
 		}
 	}
 	// repeated Any enum = 20;
@@ -3361,7 +3358,7 @@ func NewTypeItem(in interface{}) (*TypeItem, error) {
 		x.Value = make([]string, 0)
 		x.Value = append(x.Value, value)
 	} else {
-		log.Printf("unexpected: %+v", in)
+		return nil, errors.New(fmt.Sprintf("unexpected value for string array: %+v", in))
 	}
 	return x, nil
 }

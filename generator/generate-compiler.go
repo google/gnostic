@@ -33,7 +33,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	imports := []string{
 		"errors",
 		"fmt",
-		"log",
 		"encoding/json",
 		"github.com/googleapis/openapi-compiler/helpers",
 	}
@@ -61,7 +60,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x.Value = make([]string, 0)")
 			code.Print("x.Value = append(x.Value, value)")
 			code.Print("} else {")
-			code.Print("log.Printf(\"unexpected: %%+v\", in)")
+			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for string array: %%+v\", in))")
 			code.Print("}")
 			code.Print("return x, nil")
 			code.Print("}")
@@ -72,9 +71,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		if classModel.IsItemArray {
 			code.Print("m, ok := helpers.UnpackMap(in)")
 			code.Print("if (!ok) {")
-			code.Print("log.Printf(\"unexpected argument to New%s: %%+v\", in)", className)
-			code.Print("log.Printf(\"%%d\\n\", len(m))")
-			code.Print("return nil, nil")
+			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
 			code.Print("}")
 
 			code.Print("x := &ItemsItem{}")
@@ -84,7 +81,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("if err != nil {return nil, err}")
 			code.Print("x.Schema = append(x.Schema, y)")
 			code.Print("} else {")
-			code.Print("log.Printf(\"unexpected: %%+v\", in)")
+			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
 			code.Print("}")
 			code.Print("return x, nil")
 			code.Print("}")
@@ -256,7 +253,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("if ok {")
 					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
-					code.Print(" log.Printf(\"unexpected: %%+v\", helpers.MapValueForKey(m,\"%v\"))", propertyName)
+					code.Print(" return nil, errors.New(fmt.Sprintf(\"unexpected value for %s property: %%+v\", in))", propertyName)
 					code.Print("}")
 					code.Print("}")
 				} else {
