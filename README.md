@@ -30,10 +30,9 @@ that describes the OpenAPI specification and a Go-language file of code that
 will read a JSON or YAML OpenAPI representation into the generated protocol 
 buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
 
-        cd $GOPATH/src/github.com/googleapis/openapi-compiler/generator
-        go build generator.go
-        cd ..
-        ./generator/generator
+        cd $GOPATH/src/github.com/googleapis/openapi-compiler
+        go build -o generator/generator generator/*.go
+        generator/generator
 
 3. [Optional] Generate protocol buffer support code. 
 A pre-generated version of this file is checked into the OpenAPIv2 directory.
