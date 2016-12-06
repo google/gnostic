@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/googleapis/openapi-compiler/helpers"
+	"log"
 )
 
 func Version() string {
@@ -3441,4 +3442,870 @@ func NewXml(in interface{}) (*Xml, error) {
 		}
 	}
 	return x, nil
+}
+
+func (m *AdditionalPropertiesItem) ResolveReferences(root string) error {
+	if m.Schema != nil {
+		m.Schema.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *Any) ResolveReferences(root string) error {
+	return nil
+}
+
+func (m *ApiKeySecurity) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *BasicAuthenticationSecurity) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *BodyParameter) ResolveReferences(root string) error {
+	if m.Schema != nil {
+		m.Schema.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Contact) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Default) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedAny
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Definitions) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedSchema
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Document) ResolveReferences(root string) error {
+	if m.Info != nil {
+		m.Info.ResolveReferences(root)
+	}
+	// DO SOMETHING with Schemes, an array of type string
+	// DO SOMETHING with Consumes, an array of type string
+	// DO SOMETHING with Produces, an array of type string
+	if m.Paths != nil {
+		m.Paths.ResolveReferences(root)
+	}
+	if m.Definitions != nil {
+		m.Definitions.ResolveReferences(root)
+	}
+	if m.Parameters != nil {
+		m.Parameters.ResolveReferences(root)
+	}
+	if m.Responses != nil {
+		m.Responses.ResolveReferences(root)
+	}
+	// DO SOMETHING with Security, an array of type SecurityRequirement
+	for _, item := range m.Security {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	if m.SecurityDefinitions != nil {
+		m.SecurityDefinitions.ResolveReferences(root)
+	}
+	// DO SOMETHING with Tags, an array of type Tag
+	for _, item := range m.Tags {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	if m.ExternalDocs != nil {
+		m.ExternalDocs.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *Examples) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedAny
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *ExternalDocs) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *FileSchema) ResolveReferences(root string) error {
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Required, an array of type string
+	if m.ExternalDocs != nil {
+		m.ExternalDocs.ResolveReferences(root)
+	}
+	if m.Example != nil {
+		m.Example.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *FormDataParameterSubSchema) ResolveReferences(root string) error {
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Header) ResolveReferences(root string) error {
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *HeaderParameterSubSchema) ResolveReferences(root string) error {
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Headers) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedHeader
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Info) ResolveReferences(root string) error {
+	if m.Contact != nil {
+		m.Contact.ResolveReferences(root)
+	}
+	if m.License != nil {
+		m.License.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *ItemsItem) ResolveReferences(root string) error {
+	// DO SOMETHING with Schema, an array of type Schema
+	for _, item := range m.Schema {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *JsonReference) ResolveReferences(root string) error {
+	if m.XRef != "" {
+		log.Printf("JsonReference reference to resolve %+v", m.XRef)
+	}
+	return nil
+}
+
+func (m *License) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *NamedAny) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedHeader) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedParameter) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedPathItem) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedResponse) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedResponseValue) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedSchema) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedSecurityDefinitionsItem) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NamedString) ResolveReferences(root string) error {
+	return nil
+}
+
+func (m *NamedStringArray) ResolveReferences(root string) error {
+	if m.Value != nil {
+		m.Value.ResolveReferences(root)
+	}
+	return nil
+}
+
+func (m *NonBodyParameter) ResolveReferences(root string) error {
+	if true {
+		p, ok := m.Oneof.(*NonBodyParameter_HeaderParameterSubSchema)
+		if ok {
+			p.HeaderParameterSubSchema.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*NonBodyParameter_FormDataParameterSubSchema)
+		if ok {
+			p.FormDataParameterSubSchema.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*NonBodyParameter_QueryParameterSubSchema)
+		if ok {
+			p.QueryParameterSubSchema.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*NonBodyParameter_PathParameterSubSchema)
+		if ok {
+			p.PathParameterSubSchema.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Oauth2AccessCodeSecurity) ResolveReferences(root string) error {
+	if m.Scopes != nil {
+		m.Scopes.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Oauth2ApplicationSecurity) ResolveReferences(root string) error {
+	if m.Scopes != nil {
+		m.Scopes.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Oauth2ImplicitSecurity) ResolveReferences(root string) error {
+	if m.Scopes != nil {
+		m.Scopes.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Oauth2PasswordSecurity) ResolveReferences(root string) error {
+	if m.Scopes != nil {
+		m.Scopes.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Oauth2Scopes) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedString
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Operation) ResolveReferences(root string) error {
+	// DO SOMETHING with Tags, an array of type string
+	if m.ExternalDocs != nil {
+		m.ExternalDocs.ResolveReferences(root)
+	}
+	// DO SOMETHING with Produces, an array of type string
+	// DO SOMETHING with Consumes, an array of type string
+	// DO SOMETHING with Parameters, an array of type ParametersItem
+	for _, item := range m.Parameters {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	if m.Responses != nil {
+		m.Responses.ResolveReferences(root)
+	}
+	// DO SOMETHING with Schemes, an array of type string
+	// DO SOMETHING with Security, an array of type SecurityRequirement
+	for _, item := range m.Security {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Parameter) ResolveReferences(root string) error {
+	if true {
+		p, ok := m.Oneof.(*Parameter_BodyParameter)
+		if ok {
+			p.BodyParameter.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*Parameter_NonBodyParameter)
+		if ok {
+			p.NonBodyParameter.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *ParameterDefinitions) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedParameter
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *ParametersItem) ResolveReferences(root string) error {
+	if true {
+		p, ok := m.Oneof.(*ParametersItem_Parameter)
+		if ok {
+			p.Parameter.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*ParametersItem_JsonReference)
+		if ok {
+			p.JsonReference.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *PathItem) ResolveReferences(root string) error {
+	if m.XRef != "" {
+		log.Printf("PathItem reference to resolve %+v", m.XRef)
+	}
+	if m.Get != nil {
+		m.Get.ResolveReferences(root)
+	}
+	if m.Put != nil {
+		m.Put.ResolveReferences(root)
+	}
+	if m.Post != nil {
+		m.Post.ResolveReferences(root)
+	}
+	if m.Delete != nil {
+		m.Delete.ResolveReferences(root)
+	}
+	if m.Options != nil {
+		m.Options.ResolveReferences(root)
+	}
+	if m.Head != nil {
+		m.Head.ResolveReferences(root)
+	}
+	if m.Patch != nil {
+		m.Patch.ResolveReferences(root)
+	}
+	// DO SOMETHING with Parameters, an array of type ParametersItem
+	for _, item := range m.Parameters {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *PathParameterSubSchema) ResolveReferences(root string) error {
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Paths) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with Path, an array of type NamedPathItem
+	for _, item := range m.Path {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *PrimitivesItems) ResolveReferences(root string) error {
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Properties) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedSchema
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *QueryParameterSubSchema) ResolveReferences(root string) error {
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Response) ResolveReferences(root string) error {
+	if m.Schema != nil {
+		m.Schema.ResolveReferences(root)
+	}
+	if m.Headers != nil {
+		m.Headers.ResolveReferences(root)
+	}
+	if m.Examples != nil {
+		m.Examples.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *ResponseDefinitions) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedResponse
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *ResponseValue) ResolveReferences(root string) error {
+	if true {
+		p, ok := m.Oneof.(*ResponseValue_Response)
+		if ok {
+			p.Response.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*ResponseValue_JsonReference)
+		if ok {
+			p.JsonReference.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Responses) ResolveReferences(root string) error {
+	// DO SOMETHING with ResponseCode, an array of type NamedResponseValue
+	for _, item := range m.ResponseCode {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Schema) ResolveReferences(root string) error {
+	if m.XRef != "" {
+		log.Printf("Schema reference to resolve %+v", m.XRef)
+	}
+	if m.Default != nil {
+		m.Default.ResolveReferences(root)
+	}
+	// DO SOMETHING with Required, an array of type string
+	// DO SOMETHING with Enum, an array of type Any
+	for _, item := range m.Enum {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	if m.AdditionalProperties != nil {
+		m.AdditionalProperties.ResolveReferences(root)
+	}
+	if m.Type != nil {
+		m.Type.ResolveReferences(root)
+	}
+	if m.Items != nil {
+		m.Items.ResolveReferences(root)
+	}
+	// DO SOMETHING with AllOf, an array of type Schema
+	for _, item := range m.AllOf {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	if m.Properties != nil {
+		m.Properties.ResolveReferences(root)
+	}
+	if m.Xml != nil {
+		m.Xml.ResolveReferences(root)
+	}
+	if m.ExternalDocs != nil {
+		m.ExternalDocs.ResolveReferences(root)
+	}
+	if m.Example != nil {
+		m.Example.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *SchemaItem) ResolveReferences(root string) error {
+	if true {
+		p, ok := m.Oneof.(*SchemaItem_Schema)
+		if ok {
+			p.Schema.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*SchemaItem_FileSchema)
+		if ok {
+			p.FileSchema.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *SecurityDefinitions) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedSecurityDefinitionsItem
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *SecurityDefinitionsItem) ResolveReferences(root string) error {
+	if true {
+		p, ok := m.Oneof.(*SecurityDefinitionsItem_BasicAuthenticationSecurity)
+		if ok {
+			p.BasicAuthenticationSecurity.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*SecurityDefinitionsItem_ApiKeySecurity)
+		if ok {
+			p.ApiKeySecurity.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2ImplicitSecurity)
+		if ok {
+			p.Oauth2ImplicitSecurity.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2PasswordSecurity)
+		if ok {
+			p.Oauth2PasswordSecurity.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2ApplicationSecurity)
+		if ok {
+			p.Oauth2ApplicationSecurity.ResolveReferences(root)
+		}
+	}
+	if true {
+		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2AccessCodeSecurity)
+		if ok {
+			p.Oauth2AccessCodeSecurity.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *SecurityRequirement) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedStringArray
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *StringArray) ResolveReferences(root string) error {
+	// DO SOMETHING with Value, an array of type string
+	return nil
+}
+
+func (m *Tag) ResolveReferences(root string) error {
+	if m.ExternalDocs != nil {
+		m.ExternalDocs.ResolveReferences(root)
+	}
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *TypeItem) ResolveReferences(root string) error {
+	// DO SOMETHING with Value, an array of type string
+	return nil
+}
+
+func (m *VendorExtension) ResolveReferences(root string) error {
+	// DO SOMETHING with AdditionalProperties, an array of type NamedAny
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
+}
+
+func (m *Xml) ResolveReferences(root string) error {
+	// DO SOMETHING with VendorExtension, an array of type NamedAny
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
+	}
+	return nil
 }

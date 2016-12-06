@@ -33,6 +33,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	imports := []string{
 		"errors",
 		"fmt",
+		"log",
 		"encoding/json",
 		"github.com/googleapis/openapi-compiler/helpers",
 	}
@@ -41,6 +42,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	}
 	code.Print(")")
 	code.Print()
+
 	code.Print("func Version() string {")
 	code.Print("  return \"%s\"", packageName)
 	code.Print("}")
@@ -315,5 +317,74 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("  return x, nil")
 		code.Print("}\n")
 	}
+
+	for _, className := range classNames {
+		code.Print("func (m *%s) ResolveReferences(root string) error {", className)
+		//code.Print("  log.Printf(\"%s.ResolveReferences(%%+v)\", m)", className)
+		classModel := classes.ClassModels[className]
+
+		if classModel.OneOfWrapper {
+
+			// call ResolveReferences on whatever is in the Oneof.
+
+			for _, propertyModel := range classModel.Properties {
+				//propertyName := propertyModel.Name
+				propertyType := propertyModel.Type
+				code.Print("if true {")
+				code.Print("p, ok := m.Oneof.(*%s_%s)", className, propertyType)
+				code.Print("if ok {")
+				code.Print("p.%s.ResolveReferences(root)", propertyType)
+				code.Print("}")
+				code.Print("}")
+			}
+		} else {
+			for _, propertyModel := range classModel.Properties {
+				propertyName := propertyModel.Name
+				var displayName = propertyName
+				if displayName == "$ref" {
+					displayName = "_ref"
+				}
+				if displayName == "$schema" {
+					displayName = "_schema"
+				}
+				displayName = camelCaseToSnakeCase(displayName)
+
+				fieldName := strings.Title(propertyName)
+				if propertyName == "$ref" {
+					fieldName = "XRef"
+					code.Print("if m.XRef != \"\" {")
+					code.Print("log.Printf(\"%s reference to resolve %%+v\", m.XRef)", className)
+					code.Print("}")
+				}
+
+				if !propertyModel.Repeated {
+					propertyType := propertyModel.Type
+					classModel, classFound := classes.ClassModels[propertyType]
+					if classFound && !classModel.IsPair {
+						code.Print("if m.%s != nil {", fieldName)
+						code.Print("m.%s.ResolveReferences(root)", fieldName)
+						code.Print("}")
+					}
+				} else {
+					propertyType := propertyModel.Type
+					code.Print("// DO SOMETHING with %v, an array of type %v", fieldName, propertyType)
+
+					_, classFound := classes.ClassModels[propertyType]
+					if classFound {
+						code.Print("for _, item := range m.%s {", fieldName)
+						code.Print("if item != nil {")
+						code.Print("item.ResolveReferences(root)")
+						code.Print("}")
+						code.Print("}")
+					}
+
+				}
+			}
+		}
+
+		code.Print("  return nil")
+		code.Print("}\n")
+	}
+
 	return code.String()
 }

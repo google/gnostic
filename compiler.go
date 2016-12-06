@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -93,7 +94,14 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
+	dir, _ := filepath.Split(*input)
+
 	document, err := openapi_v2.NewDocument(raw)
+	if err != nil {
+		fmt.Printf("Error %+v\n", err)
+	}
+
+	err = document.ResolveReferences(dir)
 	if err != nil {
 		fmt.Printf("Error %+v\n", err)
 	}

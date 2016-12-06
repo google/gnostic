@@ -75,17 +75,18 @@ func NewClassPropertyWithNameTypeAndPattern(name string, typeName string, patter
 
 // models classes
 type ClassModel struct {
-	Name          string           // class name
-	Properties    []*ClassProperty // slice of properties
-	Required      []string         // required property names
-	OneOfWrapper  bool             // true if this class wraps "oneof" properties
-	Open          bool             // open classes can have keys outside the specified set
-	OpenPatterns  []string         // patterns for properties that we allow
-	IsStringArray bool             // ugly override
-	IsItemArray   bool             // ugly override
-	IsBlob        bool             // ugly override
-	IsPair        bool             // class is a name-value pair used to support ordered maps
-	Description   string           // if present, the "description" field in the schema
+	Name           string           // class name
+	Properties     []*ClassProperty // slice of properties
+	Required       []string         // required property names
+	OneOfWrapper   bool             // true if this class wraps "oneof" properties
+	Open           bool             // open classes can have keys outside the specified set
+	OpenPatterns   []string         // patterns for properties that we allow
+	IsStringArray  bool             // ugly override
+	IsItemArray    bool             // ugly override
+	IsBlob         bool             // ugly override
+	IsPair         bool             // class is a name-value pair used to support ordered maps
+	PairValueClass string           // class for pair values (valid if IsPair == true)
+	Description    string           // if present, the "description" field in the schema
 }
 
 func (classModel *ClassModel) AddProperty(property *ClassProperty) {
@@ -592,6 +593,7 @@ func (classes *ClassCollection) build() {
 			"Automatically-generated message used to represent maps of %s as ordered (name,value) pairs.",
 			mapClassName)
 		classModel.IsPair = true
+		classModel.PairValueClass = mapClassName
 
 		nameProperty := NewClassProperty()
 		nameProperty.Name = "name"
