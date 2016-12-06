@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/googleapis/openapi-compiler.svg?branch=master)](https://travis-ci.org/googleapis/openapi-compiler)
+
 # OpenAPI Compiler
 
 This repository contains an experimental project whose goal is to
