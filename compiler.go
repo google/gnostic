@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -52,14 +51,12 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	dir, _ := filepath.Split(*input)
-
 	document, err := openapi_v2.NewDocument(raw)
 	if err != nil {
 		fmt.Printf("Error %+v\n", err)
 	}
 
-	_, err = document.ResolveReferences(dir)
+	_, err = document.ResolveReferences(*input)
 	if err != nil {
 		fmt.Printf("Error %+v\n", err)
 	}

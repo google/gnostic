@@ -361,7 +361,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("if info != nil {")
 						code.Print("replacement, _ := New%s(info)", className)
 						code.Print("*m = *replacement")
-						code.Print("return nil, nil")
+						code.Print("return m.ResolveReferences(root)")
 						code.Print("}")
 					} else {
 						code.Print("return info, nil")

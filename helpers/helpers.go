@@ -20,6 +20,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -123,9 +124,17 @@ func ReadFile(filename string) interface{} {
 	return info
 }
 
-func ReadInfoForRef(base string, ref string) interface{} {
+func ReadInfoForRef(basefile string, ref string) interface{} {
+
+	basedir, _ := filepath.Split(basefile)
+
 	parts := strings.Split(ref, "#")
-	filename := base + parts[0]
+	var filename string
+	if parts[0] != "" {
+		filename = basedir + parts[0]
+	} else {
+		filename = basefile
+	}
 	info := ReadFile(filename)
 	if len(parts) > 1 {
 		path := strings.Split(parts[1], "/")

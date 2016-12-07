@@ -3922,7 +3922,7 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 		if info != nil {
 			replacement, _ := NewPathItem(info)
 			*m = *replacement
-			return nil, nil
+			return m.ResolveReferences(root)
 		}
 		return info, nil
 	}
@@ -4108,7 +4108,7 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 		if info != nil {
 			replacement, _ := NewSchema(info)
 			*m = *replacement
-			return nil, nil
+			return m.ResolveReferences(root)
 		}
 		return info, nil
 	}
