@@ -49,6 +49,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print()
 
 	classNames := classes.sortedClassNames()
+
+	// constructors
 	for _, className := range classNames {
 		code.Print("func New%s(in interface{}) (*%s, error) {", className, className)
 
@@ -318,19 +320,17 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("}\n")
 	}
 
+	// ResolveReferences() methods
 	for _, className := range classNames {
-		code.Print("func (m *%s) ResolveReferences(root string) error {", className)
+		code.Print("func (m *%s) ResolveReferences(root string) (interface{}, error) {", className)
 		//code.Print("  log.Printf(\"%s.ResolveReferences(%%+v)\", m)", className)
+
 		classModel := classes.ClassModels[className]
-
 		if classModel.OneOfWrapper {
-
 			// call ResolveReferences on whatever is in the Oneof.
-
 			for _, propertyModel := range classModel.Properties {
-				//propertyName := propertyModel.Name
 				propertyType := propertyModel.Type
-				code.Print("if true {")
+				code.Print("{")
 				code.Print("p, ok := m.Oneof.(*%s_%s)", className, propertyType)
 				code.Print("if ok {")
 				code.Print("p.%s.ResolveReferences(root)", propertyType)
@@ -354,6 +354,20 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					fieldName = "XRef"
 					code.Print("if m.XRef != \"\" {")
 					code.Print("log.Printf(\"%s reference to resolve %%+v\", m.XRef)", className)
+					code.Print("info := helpers.ReadInfoForRef(root, m.XRef)")
+					code.Print("log.Printf(\"%%+v\", info)")
+
+					if len(classModel.Properties) > 1 {
+						code.Print("if info != nil {")
+						code.Print("replacement, _ := New%s(info)", className)
+						code.Print("*m = *replacement")
+						code.Print("return nil, nil")
+						code.Print("}")
+					} else {
+						code.Print("return info, nil")
+					}
+
+					code.Print("return info, nil")
 					code.Print("}")
 				}
 
@@ -367,8 +381,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					}
 				} else {
 					propertyType := propertyModel.Type
-					code.Print("// DO SOMETHING with %v, an array of type %v", fieldName, propertyType)
-
 					_, classFound := classes.ClassModels[propertyType]
 					if classFound {
 						code.Print("for _, item := range m.%s {", fieldName)
@@ -381,8 +393,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				}
 			}
 		}
-
-		code.Print("  return nil")
+		code.Print("  return nil, nil")
 		code.Print("}\n")
 	}
 

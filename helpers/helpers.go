@@ -16,8 +16,13 @@ package helpers
 
 import (
 	// "log"
+	"fmt"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"os"
 	"regexp"
+	"sort"
+	"strings"
 )
 
 // compiler helper functions, usually called from generated code
@@ -104,4 +109,66 @@ func MapContainsOnlyKeysAndPatterns(m yaml.MapSlice, keys []string, patterns []s
 		}
 	}
 	return true
+}
+
+func ReadFile(filename string) interface{} {
+	file, e := ioutil.ReadFile(filename)
+	if e != nil {
+		fmt.Printf("File error: %v\n", e)
+		os.Exit(1)
+	}
+
+	var info yaml.MapSlice
+	yaml.Unmarshal(file, &info)
+	return info
+}
+
+func ReadInfoForRef(base string, ref string) interface{} {
+	parts := strings.Split(ref, "#")
+	filename := base + parts[0]
+	info := ReadFile(filename)
+	if len(parts) > 1 {
+		path := strings.Split(parts[1], "/")
+		for i, key := range path {
+			if i > 0 {
+				m, ok := info.(yaml.MapSlice)
+				if ok {
+					for _, section := range m {
+						if section.Key == key {
+							info = section.Value
+						}
+					}
+				}
+			}
+		}
+	}
+	return info
+}
+
+func DescribeMap(in interface{}, indent string) string {
+	description := ""
+	m, ok := in.(map[string]interface{})
+	if ok {
+		keys := make([]string, 0)
+		for k, _ := range m {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			v := m[k]
+			description += fmt.Sprintf("%s%s:\n", indent, k)
+			description += DescribeMap(v, indent+"  ")
+		}
+		return description
+	}
+	a, ok := in.([]interface{})
+	if ok {
+		for i, v := range a {
+			description += fmt.Sprintf("%s%d:\n", indent, i)
+			description += DescribeMap(v, indent+"  ")
+		}
+		return description
+	}
+	description += fmt.Sprintf("%s%+v\n", indent, in)
+	return description
 }
