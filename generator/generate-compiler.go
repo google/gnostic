@@ -177,7 +177,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
 			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
 			code.Print("if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
-			code.Print("return nil, errors.New(\"%s includes properties not in (%s) or (%s)\")",
+			code.Print("return nil, errors.New(\nfmt.Sprintf(\"%s includes properties not in (%s) or (%s): %%+v\",\nhelpers.SortedKeysForMap(m)))",
 				classModel.Name,
 				strings.Replace(allowedKeyString, "\"", "'", -1),
 				strings.Replace(allowedPatternString, "\"", "'", -1))
@@ -244,7 +244,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("var err error")
 						code.Print("x.%s, err = New%s(v%d)", fieldName, classModel.Name, fieldNumber)
-						code.Print("if err != nil {return nil, err}")
+						code.Print("if err != nil {return nil, helpers.ExtendError(\"%s\", err)}", classModel.Name)
 						code.Print("}")
 					}
 				}

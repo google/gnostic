@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 
@@ -54,6 +55,7 @@ func main() {
 	document, err := openapi_v2.NewDocument(raw)
 	if err != nil {
 		fmt.Printf("Error %+v\n", err)
+		os.Exit(-1)
 	}
 
 	_, err = document.ResolveReferences(*input)

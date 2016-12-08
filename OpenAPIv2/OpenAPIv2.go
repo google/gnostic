@@ -35,7 +35,9 @@ func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, err
 	allowedKeys := []string{"boolean", "schema"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("AdditionalPropertiesItem includes properties not in ('boolean','schema') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("AdditionalPropertiesItem includes properties not in ('boolean','schema') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &AdditionalPropertiesItem{}
 	// Schema schema = 1;
@@ -44,7 +46,7 @@ func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, err
 		var err error
 		x.Schema, err = NewSchema(v1)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Schema", err)
 		}
 	}
 	// bool boolean = 2;
@@ -74,7 +76,9 @@ func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
 	allowedKeys := []string{"description", "in", "name", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("ApiKeySecurity includes properties not in ('description','in','name','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("ApiKeySecurity includes properties not in ('description','in','name','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &ApiKeySecurity{}
 	// string type = 1;
@@ -129,7 +133,9 @@ func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurit
 	allowedKeys := []string{"description", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("BasicAuthenticationSecurity includes properties not in ('description','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("BasicAuthenticationSecurity includes properties not in ('description','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &BasicAuthenticationSecurity{}
 	// string type = 1;
@@ -174,7 +180,9 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 	allowedKeys := []string{"description", "in", "name", "required", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("BodyParameter includes properties not in ('description','in','name','required','schema') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("BodyParameter includes properties not in ('description','in','name','required','schema') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &BodyParameter{}
 	// string description = 1;
@@ -203,7 +211,7 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 		var err error
 		x.Schema, err = NewSchema(v5)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Schema", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 6;
@@ -234,7 +242,9 @@ func NewContact(in interface{}) (*Contact, error) {
 	allowedKeys := []string{"email", "name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Contact includes properties not in ('email','name','url') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Contact includes properties not in ('email','name','url') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Contact{}
 	// string name = 1;
@@ -332,7 +342,9 @@ func NewDocument(in interface{}) (*Document, error) {
 	allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Document includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("Document includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Document{}
 	// string swagger = 1;
@@ -346,7 +358,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Info, err = NewInfo(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Info", err)
 		}
 	}
 	// string host = 3;
@@ -395,7 +407,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Paths, err = NewPaths(v8)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Paths", err)
 		}
 	}
 	// Definitions definitions = 9;
@@ -404,7 +416,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Definitions, err = NewDefinitions(v9)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Definitions", err)
 		}
 	}
 	// ParameterDefinitions parameters = 10;
@@ -413,7 +425,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Parameters, err = NewParameterDefinitions(v10)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ParameterDefinitions", err)
 		}
 	}
 	// ResponseDefinitions responses = 11;
@@ -422,7 +434,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Responses, err = NewResponseDefinitions(v11)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ResponseDefinitions", err)
 		}
 	}
 	// repeated SecurityRequirement security = 12;
@@ -447,7 +459,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.SecurityDefinitions, err = NewSecurityDefinitions(v13)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("SecurityDefinitions", err)
 		}
 	}
 	// repeated Tag tags = 14;
@@ -472,7 +484,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v15)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ExternalDocs", err)
 		}
 	}
 	return x, nil
@@ -514,7 +526,9 @@ func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
 	allowedKeys := []string{"description", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("ExternalDocs includes properties not in ('description','url') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("ExternalDocs includes properties not in ('description','url') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &ExternalDocs{}
 	// string description = 1;
@@ -559,7 +573,9 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 	allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("FileSchema includes properties not in ('default','description','example','externalDocs','format','readOnly','required','title','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("FileSchema includes properties not in ('default','description','example','externalDocs','format','readOnly','required','title','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &FileSchema{}
 	// string format = 1;
@@ -583,7 +599,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		var err error
 		x.Default, err = NewAny(v4)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// repeated string required = 5;
@@ -612,7 +628,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v8)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ExternalDocs", err)
 		}
 	}
 	// Any example = 9;
@@ -621,7 +637,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		var err error
 		x.Example, err = NewAny(v9)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 10;
@@ -652,7 +668,9 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("FormDataParameterSubSchema includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("FormDataParameterSubSchema includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &FormDataParameterSubSchema{}
 	// bool required = 1;
@@ -696,7 +714,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 		var err error
 		x.Items, err = NewPrimitivesItems(v8)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PrimitivesItems", err)
 		}
 	}
 	// string collection_format = 9;
@@ -710,7 +728,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 		var err error
 		x.Default, err = NewAny(v10)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float maximum = 11;
@@ -816,7 +834,9 @@ func NewHeader(in interface{}) (*Header, error) {
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Header includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Header includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Header{}
 	// string type = 1;
@@ -835,7 +855,7 @@ func NewHeader(in interface{}) (*Header, error) {
 		var err error
 		x.Items, err = NewPrimitivesItems(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PrimitivesItems", err)
 		}
 	}
 	// string collection_format = 4;
@@ -849,7 +869,7 @@ func NewHeader(in interface{}) (*Header, error) {
 		var err error
 		x.Default, err = NewAny(v5)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float maximum = 6;
@@ -956,7 +976,9 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("HeaderParameterSubSchema includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("HeaderParameterSubSchema includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &HeaderParameterSubSchema{}
 	// bool required = 1;
@@ -995,7 +1017,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 		var err error
 		x.Items, err = NewPrimitivesItems(v7)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PrimitivesItems", err)
 		}
 	}
 	// string collection_format = 8;
@@ -1009,7 +1031,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 		var err error
 		x.Default, err = NewAny(v9)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float maximum = 10;
@@ -1139,7 +1161,9 @@ func NewInfo(in interface{}) (*Info, error) {
 	allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Info includes properties not in ('contact','description','license','termsOfService','title','version') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Info includes properties not in ('contact','description','license','termsOfService','title','version') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Info{}
 	// string title = 1;
@@ -1168,7 +1192,7 @@ func NewInfo(in interface{}) (*Info, error) {
 		var err error
 		x.Contact, err = NewContact(v5)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Contact", err)
 		}
 	}
 	// License license = 6;
@@ -1177,7 +1201,7 @@ func NewInfo(in interface{}) (*Info, error) {
 		var err error
 		x.License, err = NewLicense(v6)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("License", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 7;
@@ -1231,7 +1255,9 @@ func NewJsonReference(in interface{}) (*JsonReference, error) {
 	allowedKeys := []string{"$ref"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("JsonReference includes properties not in ('$ref') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("JsonReference includes properties not in ('$ref') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &JsonReference{}
 	// string _ref = 1;
@@ -1254,7 +1280,9 @@ func NewLicense(in interface{}) (*License, error) {
 	allowedKeys := []string{"name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("License includes properties not in ('name','url') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("License includes properties not in ('name','url') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &License{}
 	// string name = 1;
@@ -1295,7 +1323,9 @@ func NewNamedAny(in interface{}) (*NamedAny, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedAny includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedAny includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedAny{}
 	// string name = 1;
@@ -1309,7 +1339,7 @@ func NewNamedAny(in interface{}) (*NamedAny, error) {
 		var err error
 		x.Value, err = NewAny(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	return x, nil
@@ -1323,7 +1353,9 @@ func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedHeader includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedHeader includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedHeader{}
 	// string name = 1;
@@ -1337,7 +1369,7 @@ func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 		var err error
 		x.Value, err = NewHeader(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Header", err)
 		}
 	}
 	return x, nil
@@ -1351,7 +1383,9 @@ func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedParameter includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedParameter includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedParameter{}
 	// string name = 1;
@@ -1365,7 +1399,7 @@ func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 		var err error
 		x.Value, err = NewParameter(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Parameter", err)
 		}
 	}
 	return x, nil
@@ -1379,7 +1413,9 @@ func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedPathItem includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedPathItem includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedPathItem{}
 	// string name = 1;
@@ -1393,7 +1429,7 @@ func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 		var err error
 		x.Value, err = NewPathItem(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PathItem", err)
 		}
 	}
 	return x, nil
@@ -1407,7 +1443,9 @@ func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedResponse includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedResponse includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedResponse{}
 	// string name = 1;
@@ -1421,7 +1459,7 @@ func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 		var err error
 		x.Value, err = NewResponse(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Response", err)
 		}
 	}
 	return x, nil
@@ -1435,7 +1473,9 @@ func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedResponseValue includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedResponseValue includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedResponseValue{}
 	// string name = 1;
@@ -1449,7 +1489,7 @@ func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 		var err error
 		x.Value, err = NewResponseValue(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ResponseValue", err)
 		}
 	}
 	return x, nil
@@ -1463,7 +1503,9 @@ func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedSchema includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedSchema includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedSchema{}
 	// string name = 1;
@@ -1477,7 +1519,7 @@ func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 		var err error
 		x.Value, err = NewSchema(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Schema", err)
 		}
 	}
 	return x, nil
@@ -1491,7 +1533,9 @@ func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsI
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedSecurityDefinitionsItem includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedSecurityDefinitionsItem includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedSecurityDefinitionsItem{}
 	// string name = 1;
@@ -1505,7 +1549,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsI
 		var err error
 		x.Value, err = NewSecurityDefinitionsItem(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("SecurityDefinitionsItem", err)
 		}
 	}
 	return x, nil
@@ -1519,7 +1563,9 @@ func NewNamedString(in interface{}) (*NamedString, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedString includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedString includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedString{}
 	// string name = 1;
@@ -1543,7 +1589,9 @@ func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("NamedStringArray includes properties not in ('name','value') or ()")
+		return nil, errors.New(
+			fmt.Sprintf("NamedStringArray includes properties not in ('name','value') or (): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &NamedStringArray{}
 	// string name = 1;
@@ -1557,7 +1605,7 @@ func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 		var err error
 		x.Value, err = NewStringArray(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("StringArray", err)
 		}
 	}
 	return x, nil
@@ -1620,7 +1668,9 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Oauth2AccessCodeSecurity includes properties not in ('authorizationUrl','description','flow','scopes','tokenUrl','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Oauth2AccessCodeSecurity includes properties not in ('authorizationUrl','description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Oauth2AccessCodeSecurity{}
 	// string type = 1;
@@ -1639,7 +1689,7 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Oauth2Scopes", err)
 		}
 	}
 	// string authorization_url = 4;
@@ -1689,7 +1739,9 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Oauth2ApplicationSecurity includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Oauth2ApplicationSecurity includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Oauth2ApplicationSecurity{}
 	// string type = 1;
@@ -1708,7 +1760,7 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Oauth2Scopes", err)
 		}
 	}
 	// string token_url = 4;
@@ -1753,7 +1805,9 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Oauth2ImplicitSecurity includes properties not in ('authorizationUrl','description','flow','scopes','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Oauth2ImplicitSecurity includes properties not in ('authorizationUrl','description','flow','scopes','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Oauth2ImplicitSecurity{}
 	// string type = 1;
@@ -1772,7 +1826,7 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Oauth2Scopes", err)
 		}
 	}
 	// string authorization_url = 4;
@@ -1817,7 +1871,9 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Oauth2PasswordSecurity includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Oauth2PasswordSecurity includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Oauth2PasswordSecurity{}
 	// string type = 1;
@@ -1836,7 +1892,7 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Oauth2Scopes", err)
 		}
 	}
 	// string token_url = 4;
@@ -1901,7 +1957,9 @@ func NewOperation(in interface{}) (*Operation, error) {
 	allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Operation includes properties not in ('consumes','deprecated','description','externalDocs','operationId','parameters','produces','responses','schemes','security','summary','tags') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Operation includes properties not in ('consumes','deprecated','description','externalDocs','operationId','parameters','produces','responses','schemes','security','summary','tags') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Operation{}
 	// repeated string tags = 1;
@@ -1930,7 +1988,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v4)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ExternalDocs", err)
 		}
 	}
 	// string operation_id = 5;
@@ -1980,7 +2038,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		var err error
 		x.Responses, err = NewResponses(v9)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Responses", err)
 		}
 	}
 	// repeated string schemes = 10;
@@ -2116,7 +2174,9 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("PathItem includes properties not in ('$ref','delete','get','head','options','parameters','patch','post','put') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("PathItem includes properties not in ('$ref','delete','get','head','options','parameters','patch','post','put') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &PathItem{}
 	// string _ref = 1;
@@ -2130,7 +2190,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Get, err = NewOperation(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// Operation put = 3;
@@ -2139,7 +2199,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Put, err = NewOperation(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// Operation post = 4;
@@ -2148,7 +2208,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Post, err = NewOperation(v4)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// Operation delete = 5;
@@ -2157,7 +2217,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Delete, err = NewOperation(v5)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// Operation options = 6;
@@ -2166,7 +2226,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Options, err = NewOperation(v6)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// Operation head = 7;
@@ -2175,7 +2235,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Head, err = NewOperation(v7)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// Operation patch = 8;
@@ -2184,7 +2244,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Patch, err = NewOperation(v8)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Operation", err)
 		}
 	}
 	// repeated ParametersItem parameters = 9;
@@ -2235,7 +2295,9 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("PathParameterSubSchema includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("PathParameterSubSchema includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &PathParameterSubSchema{}
 	// bool required = 1;
@@ -2274,7 +2336,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 		var err error
 		x.Items, err = NewPrimitivesItems(v7)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PrimitivesItems", err)
 		}
 	}
 	// string collection_format = 8;
@@ -2288,7 +2350,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 		var err error
 		x.Default, err = NewAny(v9)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float maximum = 10;
@@ -2390,7 +2452,9 @@ func NewPaths(in interface{}) (*Paths, error) {
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^x-", "^/"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Paths includes properties not in () or ('^x-','^/')")
+		return nil, errors.New(
+			fmt.Sprintf("Paths includes properties not in () or ('^x-','^/'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Paths{}
 	// repeated NamedAny vendor_extension = 1;
@@ -2438,7 +2502,9 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 	allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("PrimitivesItems includes properties not in ('collectionFormat','default','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("PrimitivesItems includes properties not in ('collectionFormat','default','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &PrimitivesItems{}
 	// string type = 1;
@@ -2457,7 +2523,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 		var err error
 		x.Items, err = NewPrimitivesItems(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PrimitivesItems", err)
 		}
 	}
 	// string collection_format = 4;
@@ -2471,7 +2537,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 		var err error
 		x.Default, err = NewAny(v5)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float maximum = 6;
@@ -2597,7 +2663,9 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("QueryParameterSubSchema includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("QueryParameterSubSchema includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &QueryParameterSubSchema{}
 	// bool required = 1;
@@ -2641,7 +2709,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 		var err error
 		x.Items, err = NewPrimitivesItems(v8)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("PrimitivesItems", err)
 		}
 	}
 	// string collection_format = 9;
@@ -2655,7 +2723,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 		var err error
 		x.Default, err = NewAny(v10)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float maximum = 11;
@@ -2761,7 +2829,9 @@ func NewResponse(in interface{}) (*Response, error) {
 	allowedKeys := []string{"description", "examples", "headers", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Response includes properties not in ('description','examples','headers','schema') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Response includes properties not in ('description','examples','headers','schema') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Response{}
 	// string description = 1;
@@ -2775,7 +2845,7 @@ func NewResponse(in interface{}) (*Response, error) {
 		var err error
 		x.Schema, err = NewSchemaItem(v2)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("SchemaItem", err)
 		}
 	}
 	// Headers headers = 3;
@@ -2784,7 +2854,7 @@ func NewResponse(in interface{}) (*Response, error) {
 		var err error
 		x.Headers, err = NewHeaders(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Headers", err)
 		}
 	}
 	// Examples examples = 4;
@@ -2793,7 +2863,7 @@ func NewResponse(in interface{}) (*Response, error) {
 		var err error
 		x.Examples, err = NewExamples(v4)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Examples", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 5;
@@ -2873,7 +2943,9 @@ func NewResponses(in interface{}) (*Responses, error) {
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Responses includes properties not in () or ('^([0-9]{3})$|^(default)$','^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Responses includes properties not in () or ('^([0-9]{3})$|^(default)$','^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Responses{}
 	// repeated NamedResponseValue response_code = 1;
@@ -2921,7 +2993,9 @@ func NewSchema(in interface{}) (*Schema, error) {
 	allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Schema includes properties not in ('$ref','additionalProperties','allOf','default','description','discriminator','enum','example','exclusiveMaximum','exclusiveMinimum','externalDocs','format','items','maxItems','maxLength','maxProperties','maximum','minItems','minLength','minProperties','minimum','multipleOf','pattern','properties','readOnly','required','title','type','uniqueItems','xml') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Schema includes properties not in ('$ref','additionalProperties','allOf','default','description','discriminator','enum','example','exclusiveMaximum','exclusiveMinimum','externalDocs','format','items','maxItems','maxLength','maxProperties','maximum','minItems','minLength','minProperties','minimum','multipleOf','pattern','properties','readOnly','required','title','type','uniqueItems','xml') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Schema{}
 	// string _ref = 1;
@@ -2950,7 +3024,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Default, err = NewAny(v5)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// float multiple_of = 6;
@@ -3050,7 +3124,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("AdditionalPropertiesItem", err)
 		}
 	}
 	// TypeItem type = 22;
@@ -3059,7 +3133,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Type, err = NewTypeItem(v22)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("TypeItem", err)
 		}
 	}
 	// ItemsItem items = 23;
@@ -3068,7 +3142,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Items, err = NewItemsItem(v23)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ItemsItem", err)
 		}
 	}
 	// repeated Schema all_of = 24;
@@ -3093,7 +3167,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Properties, err = NewProperties(v25)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Properties", err)
 		}
 	}
 	// string discriminator = 26;
@@ -3112,7 +3186,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Xml, err = NewXml(v28)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Xml", err)
 		}
 	}
 	// ExternalDocs external_docs = 29;
@@ -3121,7 +3195,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v29)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ExternalDocs", err)
 		}
 	}
 	// Any example = 30;
@@ -3130,7 +3204,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Example, err = NewAny(v30)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("Any", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 31;
@@ -3309,7 +3383,9 @@ func NewTag(in interface{}) (*Tag, error) {
 	allowedKeys := []string{"description", "externalDocs", "name"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Tag includes properties not in ('description','externalDocs','name') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Tag includes properties not in ('description','externalDocs','name') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Tag{}
 	// string name = 1;
@@ -3328,7 +3404,7 @@ func NewTag(in interface{}) (*Tag, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v3)
 		if err != nil {
-			return nil, err
+			return nil, helpers.ExtendError("ExternalDocs", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 4;
@@ -3395,7 +3471,9 @@ func NewXml(in interface{}) (*Xml, error) {
 	allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New("Xml includes properties not in ('attribute','name','namespace','prefix','wrapped') or ('^x-')")
+		return nil, errors.New(
+			fmt.Sprintf("Xml includes properties not in ('attribute','name','namespace','prefix','wrapped') or ('^x-'): %+v",
+				helpers.SortedKeysForMap(m)))
 	}
 	x := &Xml{}
 	// string name = 1;

@@ -15,6 +15,7 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -27,12 +28,25 @@ import (
 
 // compiler helper functions, usually called from generated code
 
+func ExtendError(context string, err error) error {
+	return errors.New(fmt.Sprintf("%s:%+v", context, err))
+}
+
 func UnpackMap(in interface{}) (yaml.MapSlice, bool) {
 	m, ok := in.(yaml.MapSlice)
 	if !ok {
 		return nil, ok
 	}
 	return m, ok
+}
+
+func SortedKeysForMap(m yaml.MapSlice) []string {
+	keys := make([]string, 0)
+	for _, item := range m {
+		keys = append(keys, item.Key.(string))
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func MapHasKey(m yaml.MapSlice, key string) bool {
