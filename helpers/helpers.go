@@ -15,7 +15,6 @@
 package helpers
 
 import (
-	// "log"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -112,22 +111,21 @@ func MapContainsOnlyKeysAndPatterns(m yaml.MapSlice, keys []string, patterns []s
 	return true
 }
 
+// read a file and unmarshal it as a yaml.MapSlice
 func ReadFile(filename string) interface{} {
 	file, e := ioutil.ReadFile(filename)
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)
 		os.Exit(1)
 	}
-
 	var info yaml.MapSlice
 	yaml.Unmarshal(file, &info)
 	return info
 }
 
+// read a file and return the fragment needed to resolve a $ref
 func ReadInfoForRef(basefile string, ref string) interface{} {
-
 	basedir, _ := filepath.Split(basefile)
-
 	parts := strings.Split(ref, "#")
 	var filename string
 	if parts[0] != "" {
@@ -154,6 +152,7 @@ func ReadInfoForRef(basefile string, ref string) interface{} {
 	return info
 }
 
+// describe a map (for debugging purposes)
 func DescribeMap(in interface{}, indent string) string {
 	description := ""
 	m, ok := in.(map[string]interface{})

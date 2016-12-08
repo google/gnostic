@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/googleapis/openapi-compiler/helpers"
-	"log"
 )
 
 func Version() string {
@@ -3678,9 +3677,7 @@ func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 
 func (m *JsonReference) ResolveReferences(root string) (interface{}, error) {
 	if m.XRef != "" {
-		log.Printf("JsonReference reference to resolve %+v", m.XRef)
 		info := helpers.ReadInfoForRef(root, m.XRef)
-		log.Printf("%+v", info)
 		return info, nil
 		return info, nil
 	}
@@ -3908,7 +3905,18 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 	{
 		p, ok := m.Oneof.(*ParametersItem_JsonReference)
 		if ok {
-			p.JsonReference.ResolveReferences(root)
+			info, err := p.JsonReference.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			} else if info != nil {
+				n, err := NewParametersItem(info)
+				if err != nil {
+					return nil, err
+				} else if n != nil {
+					*m = *n
+					return nil, nil
+				}
+			}
 		}
 	}
 	return nil, nil
@@ -3916,9 +3924,7 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 
 func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 	if m.XRef != "" {
-		log.Printf("PathItem reference to resolve %+v", m.XRef)
 		info := helpers.ReadInfoForRef(root, m.XRef)
-		log.Printf("%+v", info)
 		if info != nil {
 			replacement, _ := NewPathItem(info)
 			*m = *replacement
@@ -4080,7 +4086,18 @@ func (m *ResponseValue) ResolveReferences(root string) (interface{}, error) {
 	{
 		p, ok := m.Oneof.(*ResponseValue_JsonReference)
 		if ok {
-			p.JsonReference.ResolveReferences(root)
+			info, err := p.JsonReference.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			} else if info != nil {
+				n, err := NewResponseValue(info)
+				if err != nil {
+					return nil, err
+				} else if n != nil {
+					*m = *n
+					return nil, nil
+				}
+			}
 		}
 	}
 	return nil, nil
@@ -4102,9 +4119,7 @@ func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	if m.XRef != "" {
-		log.Printf("Schema reference to resolve %+v", m.XRef)
 		info := helpers.ReadInfoForRef(root, m.XRef)
-		log.Printf("%+v", info)
 		if info != nil {
 			replacement, _ := NewSchema(info)
 			*m = *replacement

@@ -33,7 +33,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	imports := []string{
 		"errors",
 		"fmt",
-		"log",
 		"encoding/json",
 		"github.com/googleapis/openapi-compiler/helpers",
 	}
@@ -333,7 +332,22 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				code.Print("{")
 				code.Print("p, ok := m.Oneof.(*%s_%s)", className, propertyType)
 				code.Print("if ok {")
-				code.Print("p.%s.ResolveReferences(root)", propertyType)
+				if propertyType == "JsonReference" { // Special case for OpenAPI
+					code.Print("info, err := p.%s.ResolveReferences(root)", propertyType)
+					code.Print("if err != nil {")
+					code.Print("  return nil, err")
+					code.Print("} else if info != nil {")
+					code.Print("  n, err := New%s(info)", className)
+					code.Print("  if err != nil {")
+					code.Print("    return nil, err")
+					code.Print("  } else if n != nil {")
+					code.Print("    *m = *n")
+					code.Print("    return nil, nil")
+					code.Print("  }")
+					code.Print("}")
+				} else {
+					code.Print("p.%s.ResolveReferences(root)", propertyType)
+				}
 				code.Print("}")
 				code.Print("}")
 			}
@@ -353,9 +367,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				if propertyName == "$ref" {
 					fieldName = "XRef"
 					code.Print("if m.XRef != \"\" {")
-					code.Print("log.Printf(\"%s reference to resolve %%+v\", m.XRef)", className)
+					//code.Print("log.Printf(\"%s reference to resolve %%+v\", m.XRef)", className)
 					code.Print("info := helpers.ReadInfoForRef(root, m.XRef)")
-					code.Print("log.Printf(\"%%+v\", info)")
+					//code.Print("log.Printf(\"%%+v\", info)")
 
 					if len(classModel.Properties) > 1 {
 						code.Print("if info != nil {")
