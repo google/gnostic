@@ -30,7 +30,7 @@ import (
 )
 
 func main() {
-	var input = flag.String("input", "", "OpenAPI source file to read")
+	var input = flag.String("in", "", "OpenAPI source file to read")
 	var rawInput = flag.Bool("raw", false, "Output the raw json input")
 	var textProtobuf = flag.Bool("text", false, "Output a text protobuf representation")
 	var jsonProtobuf = flag.Bool("json", false, "Output a json protobuf representation")

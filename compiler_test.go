@@ -18,7 +18,7 @@ func test_compiler(t *testing.T, input_file string, reference_file string) {
 		t.FailNow()
 	}
 	// run the compiler
-	err = exec.Command("./openapi-compiler", "-input", input_file, "-text").Run()
+	err = exec.Command("openapi-compiler", "-in", input_file, "-text").Run()
 	if err != nil {
 		t.Logf("JSON compile failed: %+v", err)
 		t.FailNow()
