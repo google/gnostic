@@ -32,27 +32,14 @@ func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, err
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for AdditionalPropertiesItem section: %+v", in))
 	}
-	allowedKeys := []string{"boolean", "schema"}
-	allowedPatterns := []string{}
-	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, errors.New(
-			fmt.Sprintf("AdditionalPropertiesItem includes properties not in ('boolean','schema') or (): %+v",
-				helpers.SortedKeysForMap(m)))
-	}
 	x := &AdditionalPropertiesItem{}
 	// Schema schema = 1;
-	v1 := helpers.MapValueForKey(m, "schema")
-	if v1 != nil {
-		var err error
-		x.Schema, err = NewSchema(v1)
-		if err != nil {
-			return nil, helpers.ExtendError("Schema", err)
+	{
+		// errors are ok here, they mean we just don't have the right subtype
+		t, _ := NewSchema(m)
+		if t != nil {
+			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 		}
-	}
-	// bool boolean = 2;
-	v2 := helpers.MapValueForKey(m, "boolean")
-	if v2 != nil {
-		x.Boolean = v2.(bool)
 	}
 	return x, nil
 }
@@ -211,7 +198,7 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 		var err error
 		x.Schema, err = NewSchema(v5)
 		if err != nil {
-			return nil, helpers.ExtendError("Schema", err)
+			return nil, helpers.ExtendError("schema", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 6;
@@ -358,7 +345,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Info, err = NewInfo(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Info", err)
+			return nil, helpers.ExtendError("info", err)
 		}
 	}
 	// string host = 3;
@@ -407,7 +394,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Paths, err = NewPaths(v8)
 		if err != nil {
-			return nil, helpers.ExtendError("Paths", err)
+			return nil, helpers.ExtendError("paths", err)
 		}
 	}
 	// Definitions definitions = 9;
@@ -416,7 +403,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Definitions, err = NewDefinitions(v9)
 		if err != nil {
-			return nil, helpers.ExtendError("Definitions", err)
+			return nil, helpers.ExtendError("definitions", err)
 		}
 	}
 	// ParameterDefinitions parameters = 10;
@@ -425,7 +412,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Parameters, err = NewParameterDefinitions(v10)
 		if err != nil {
-			return nil, helpers.ExtendError("ParameterDefinitions", err)
+			return nil, helpers.ExtendError("parameters", err)
 		}
 	}
 	// ResponseDefinitions responses = 11;
@@ -434,7 +421,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.Responses, err = NewResponseDefinitions(v11)
 		if err != nil {
-			return nil, helpers.ExtendError("ResponseDefinitions", err)
+			return nil, helpers.ExtendError("responses", err)
 		}
 	}
 	// repeated SecurityRequirement security = 12;
@@ -459,7 +446,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.SecurityDefinitions, err = NewSecurityDefinitions(v13)
 		if err != nil {
-			return nil, helpers.ExtendError("SecurityDefinitions", err)
+			return nil, helpers.ExtendError("securityDefinitions", err)
 		}
 	}
 	// repeated Tag tags = 14;
@@ -484,7 +471,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v15)
 		if err != nil {
-			return nil, helpers.ExtendError("ExternalDocs", err)
+			return nil, helpers.ExtendError("externalDocs", err)
 		}
 	}
 	return x, nil
@@ -599,7 +586,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		var err error
 		x.Default, err = NewAny(v4)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// repeated string required = 5;
@@ -628,7 +615,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v8)
 		if err != nil {
-			return nil, helpers.ExtendError("ExternalDocs", err)
+			return nil, helpers.ExtendError("externalDocs", err)
 		}
 	}
 	// Any example = 9;
@@ -637,7 +624,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 		var err error
 		x.Example, err = NewAny(v9)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("example", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 10;
@@ -714,7 +701,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 		var err error
 		x.Items, err = NewPrimitivesItems(v8)
 		if err != nil {
-			return nil, helpers.ExtendError("PrimitivesItems", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// string collection_format = 9;
@@ -728,7 +715,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 		var err error
 		x.Default, err = NewAny(v10)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float maximum = 11;
@@ -855,7 +842,7 @@ func NewHeader(in interface{}) (*Header, error) {
 		var err error
 		x.Items, err = NewPrimitivesItems(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("PrimitivesItems", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// string collection_format = 4;
@@ -869,7 +856,7 @@ func NewHeader(in interface{}) (*Header, error) {
 		var err error
 		x.Default, err = NewAny(v5)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float maximum = 6;
@@ -1017,7 +1004,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 		var err error
 		x.Items, err = NewPrimitivesItems(v7)
 		if err != nil {
-			return nil, helpers.ExtendError("PrimitivesItems", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// string collection_format = 8;
@@ -1031,7 +1018,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 		var err error
 		x.Default, err = NewAny(v9)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float maximum = 10;
@@ -1192,7 +1179,7 @@ func NewInfo(in interface{}) (*Info, error) {
 		var err error
 		x.Contact, err = NewContact(v5)
 		if err != nil {
-			return nil, helpers.ExtendError("Contact", err)
+			return nil, helpers.ExtendError("contact", err)
 		}
 	}
 	// License license = 6;
@@ -1201,7 +1188,7 @@ func NewInfo(in interface{}) (*Info, error) {
 		var err error
 		x.License, err = NewLicense(v6)
 		if err != nil {
-			return nil, helpers.ExtendError("License", err)
+			return nil, helpers.ExtendError("license", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 7;
@@ -1339,7 +1326,7 @@ func NewNamedAny(in interface{}) (*NamedAny, error) {
 		var err error
 		x.Value, err = NewAny(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1369,7 +1356,7 @@ func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 		var err error
 		x.Value, err = NewHeader(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Header", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1399,7 +1386,7 @@ func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 		var err error
 		x.Value, err = NewParameter(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Parameter", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1429,7 +1416,7 @@ func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 		var err error
 		x.Value, err = NewPathItem(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("PathItem", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1459,7 +1446,7 @@ func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 		var err error
 		x.Value, err = NewResponse(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Response", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1489,7 +1476,7 @@ func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 		var err error
 		x.Value, err = NewResponseValue(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("ResponseValue", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1519,7 +1506,7 @@ func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 		var err error
 		x.Value, err = NewSchema(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Schema", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1549,7 +1536,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsI
 		var err error
 		x.Value, err = NewSecurityDefinitionsItem(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("SecurityDefinitionsItem", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1605,7 +1592,7 @@ func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 		var err error
 		x.Value, err = NewStringArray(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("StringArray", err)
+			return nil, helpers.ExtendError("value", err)
 		}
 	}
 	return x, nil
@@ -1689,7 +1676,7 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("Oauth2Scopes", err)
+			return nil, helpers.ExtendError("scopes", err)
 		}
 	}
 	// string authorization_url = 4;
@@ -1760,7 +1747,7 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("Oauth2Scopes", err)
+			return nil, helpers.ExtendError("scopes", err)
 		}
 	}
 	// string token_url = 4;
@@ -1826,7 +1813,7 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("Oauth2Scopes", err)
+			return nil, helpers.ExtendError("scopes", err)
 		}
 	}
 	// string authorization_url = 4;
@@ -1892,7 +1879,7 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("Oauth2Scopes", err)
+			return nil, helpers.ExtendError("scopes", err)
 		}
 	}
 	// string token_url = 4;
@@ -1988,7 +1975,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v4)
 		if err != nil {
-			return nil, helpers.ExtendError("ExternalDocs", err)
+			return nil, helpers.ExtendError("externalDocs", err)
 		}
 	}
 	// string operation_id = 5;
@@ -2038,7 +2025,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		var err error
 		x.Responses, err = NewResponses(v9)
 		if err != nil {
-			return nil, helpers.ExtendError("Responses", err)
+			return nil, helpers.ExtendError("responses", err)
 		}
 	}
 	// repeated string schemes = 10;
@@ -2190,7 +2177,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Get, err = NewOperation(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("get", err)
 		}
 	}
 	// Operation put = 3;
@@ -2199,7 +2186,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Put, err = NewOperation(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("put", err)
 		}
 	}
 	// Operation post = 4;
@@ -2208,7 +2195,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Post, err = NewOperation(v4)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("post", err)
 		}
 	}
 	// Operation delete = 5;
@@ -2217,7 +2204,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Delete, err = NewOperation(v5)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("delete", err)
 		}
 	}
 	// Operation options = 6;
@@ -2226,7 +2213,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Options, err = NewOperation(v6)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("options", err)
 		}
 	}
 	// Operation head = 7;
@@ -2235,7 +2222,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Head, err = NewOperation(v7)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("head", err)
 		}
 	}
 	// Operation patch = 8;
@@ -2244,7 +2231,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		var err error
 		x.Patch, err = NewOperation(v8)
 		if err != nil {
-			return nil, helpers.ExtendError("Operation", err)
+			return nil, helpers.ExtendError("patch", err)
 		}
 	}
 	// repeated ParametersItem parameters = 9;
@@ -2336,7 +2323,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 		var err error
 		x.Items, err = NewPrimitivesItems(v7)
 		if err != nil {
-			return nil, helpers.ExtendError("PrimitivesItems", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// string collection_format = 8;
@@ -2350,7 +2337,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 		var err error
 		x.Default, err = NewAny(v9)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float maximum = 10;
@@ -2523,7 +2510,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 		var err error
 		x.Items, err = NewPrimitivesItems(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("PrimitivesItems", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// string collection_format = 4;
@@ -2537,7 +2524,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 		var err error
 		x.Default, err = NewAny(v5)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float maximum = 6;
@@ -2709,7 +2696,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 		var err error
 		x.Items, err = NewPrimitivesItems(v8)
 		if err != nil {
-			return nil, helpers.ExtendError("PrimitivesItems", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// string collection_format = 9;
@@ -2723,7 +2710,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 		var err error
 		x.Default, err = NewAny(v10)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float maximum = 11;
@@ -2845,7 +2832,7 @@ func NewResponse(in interface{}) (*Response, error) {
 		var err error
 		x.Schema, err = NewSchemaItem(v2)
 		if err != nil {
-			return nil, helpers.ExtendError("SchemaItem", err)
+			return nil, helpers.ExtendError("schema", err)
 		}
 	}
 	// Headers headers = 3;
@@ -2854,7 +2841,7 @@ func NewResponse(in interface{}) (*Response, error) {
 		var err error
 		x.Headers, err = NewHeaders(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("Headers", err)
+			return nil, helpers.ExtendError("headers", err)
 		}
 	}
 	// Examples examples = 4;
@@ -2863,7 +2850,7 @@ func NewResponse(in interface{}) (*Response, error) {
 		var err error
 		x.Examples, err = NewExamples(v4)
 		if err != nil {
-			return nil, helpers.ExtendError("Examples", err)
+			return nil, helpers.ExtendError("examples", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 5;
@@ -3024,7 +3011,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Default, err = NewAny(v5)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("default", err)
 		}
 	}
 	// float multiple_of = 6;
@@ -3124,7 +3111,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21)
 		if err != nil {
-			return nil, helpers.ExtendError("AdditionalPropertiesItem", err)
+			return nil, helpers.ExtendError("additionalProperties", err)
 		}
 	}
 	// TypeItem type = 22;
@@ -3133,7 +3120,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Type, err = NewTypeItem(v22)
 		if err != nil {
-			return nil, helpers.ExtendError("TypeItem", err)
+			return nil, helpers.ExtendError("type", err)
 		}
 	}
 	// ItemsItem items = 23;
@@ -3142,7 +3129,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Items, err = NewItemsItem(v23)
 		if err != nil {
-			return nil, helpers.ExtendError("ItemsItem", err)
+			return nil, helpers.ExtendError("items", err)
 		}
 	}
 	// repeated Schema all_of = 24;
@@ -3167,7 +3154,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Properties, err = NewProperties(v25)
 		if err != nil {
-			return nil, helpers.ExtendError("Properties", err)
+			return nil, helpers.ExtendError("properties", err)
 		}
 	}
 	// string discriminator = 26;
@@ -3186,7 +3173,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Xml, err = NewXml(v28)
 		if err != nil {
-			return nil, helpers.ExtendError("Xml", err)
+			return nil, helpers.ExtendError("xml", err)
 		}
 	}
 	// ExternalDocs external_docs = 29;
@@ -3195,7 +3182,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v29)
 		if err != nil {
-			return nil, helpers.ExtendError("ExternalDocs", err)
+			return nil, helpers.ExtendError("externalDocs", err)
 		}
 	}
 	// Any example = 30;
@@ -3204,7 +3191,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		var err error
 		x.Example, err = NewAny(v30)
 		if err != nil {
-			return nil, helpers.ExtendError("Any", err)
+			return nil, helpers.ExtendError("example", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 31;
@@ -3404,7 +3391,7 @@ func NewTag(in interface{}) (*Tag, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v3)
 		if err != nil {
-			return nil, helpers.ExtendError("ExternalDocs", err)
+			return nil, helpers.ExtendError("externalDocs", err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 4;
@@ -3522,8 +3509,11 @@ func NewXml(in interface{}) (*Xml, error) {
 }
 
 func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
-	if m.Schema != nil {
-		m.Schema.ResolveReferences(root)
+	{
+		p, ok := m.Oneof.(*AdditionalPropertiesItem_Schema)
+		if ok {
+			p.Schema.ResolveReferences(root)
+		}
 	}
 	return nil, nil
 }

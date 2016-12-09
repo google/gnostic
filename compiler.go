@@ -36,6 +36,7 @@ func main() {
 	var textProtobuf = flag.Bool("text", false, "Output a text protobuf representation")
 	var jsonProtobuf = flag.Bool("json", false, "Output a json protobuf representation")
 	var binaryProtobuf = flag.Bool("pb", false, "Output a binary protobuf representation")
+	var keepReferences = flag.Bool("keep-refs", false, "Disable resolution of $ref references")
 	flag.Parse()
 
 	if *input == "" {
@@ -58,9 +59,11 @@ func main() {
 		os.Exit(-1)
 	}
 
-	_, err = document.ResolveReferences(*input)
-	if err != nil {
-		fmt.Printf("Error %+v\n", err)
+	if !*keepReferences {
+		_, err = document.ResolveReferences(*input)
+		if err != nil {
+			fmt.Printf("Error %+v\n", err)
+		}
 	}
 
 	if *textProtobuf {

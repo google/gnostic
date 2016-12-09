@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -137,8 +138,24 @@ func ReadFile(filename string) interface{} {
 	return info
 }
 
+var info_cache map[string]interface{}
+var count int64
+
 // read a file and return the fragment needed to resolve a $ref
 func ReadInfoForRef(basefile string, ref string) interface{} {
+	if info_cache == nil {
+		log.Printf("making cache")
+		info_cache = make(map[string]interface{}, 0)
+	}
+	{
+		info, ok := info_cache[ref]
+		if ok {
+			return info
+		}
+	}
+
+	log.Printf("%d Resolving %s", count, ref)
+	count = count + 1
 	basedir, _ := filepath.Split(basefile)
 	parts := strings.Split(ref, "#")
 	var filename string
@@ -163,6 +180,8 @@ func ReadInfoForRef(basefile string, ref string) interface{} {
 			}
 		}
 	}
+
+	info_cache[ref] = info
 	return info
 }
 

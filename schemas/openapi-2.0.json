@@ -1002,7 +1002,7 @@
           "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
         },
         "additionalProperties": {
-          "anyOf": [
+          "oneOf": [
             {
               "$ref": "#/definitions/schema"
             },

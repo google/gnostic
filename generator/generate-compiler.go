@@ -244,7 +244,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("var err error")
 						code.Print("x.%s, err = New%s(v%d)", fieldName, classModel.Name, fieldNumber)
-						code.Print("if err != nil {return nil, helpers.ExtendError(\"%s\", err)}", classModel.Name)
+						code.Print("if err != nil {return nil, helpers.ExtendError(\"%s\", err)}", propertyName)
 						code.Print("}")
 					}
 				}
