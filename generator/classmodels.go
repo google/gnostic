@@ -101,7 +101,11 @@ func (classModel *ClassModel) description() string {
 	if classModel.Description != "" {
 		result += fmt.Sprintf("// %+s\n", classModel.Description)
 	}
-	result += fmt.Sprintf("%+s\n", classModel.Name)
+	var wrapperinfo string
+	if classModel.OneOfWrapper {
+		wrapperinfo = " oneof wrapper"
+	}
+	result += fmt.Sprintf("%+s%s\n", classModel.Name, wrapperinfo)
 	for _, property := range classModel.Properties {
 		result += property.description()
 	}
@@ -417,7 +421,6 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	classModel.Open = true
 	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
-		//log.Printf("ONEOF\n%+v", oneOf.description())
 		if oneOf.Ref != nil {
 			ref := *oneOf.Ref
 			className := classes.classNameForReference(ref)
@@ -427,7 +430,13 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 				classProperty := NewClassPropertyWithNameAndType(*propertyName, className)
 				classModel.AddProperty(classProperty)
 			}
+		} else if oneOf.Type != nil && oneOf.Type.String != nil && *oneOf.Type.String == "boolean" {
+			classProperty := NewClassPropertyWithNameAndType("boolean", "bool")
+			classModel.AddProperty(classProperty)
+		} else {
+			log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
 		}
+
 	}
 }
 

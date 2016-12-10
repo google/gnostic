@@ -278,7 +278,12 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			} else if propertyType == "bool" {
 				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("if (v%d != nil) {", fieldNumber)
-				code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
+				if oneOfWrapper {
+					propertyName := "Boolean"
+					code.Print("x.Oneof = &%s_%s{%s: v%d.(bool)}", parentClassName, propertyName, propertyName, fieldNumber)
+				} else {
+					code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
+				}
 				code.Print("}")
 			} else {
 				mapTypeName := propertyModel.MapType
@@ -329,27 +334,30 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			// call ResolveReferences on whatever is in the Oneof.
 			for _, propertyModel := range classModel.Properties {
 				propertyType := propertyModel.Type
-				code.Print("{")
-				code.Print("p, ok := m.Oneof.(*%s_%s)", className, propertyType)
-				code.Print("if ok {")
-				if propertyType == "JsonReference" { // Special case for OpenAPI
-					code.Print("info, err := p.%s.ResolveReferences(root)", propertyType)
-					code.Print("if err != nil {")
-					code.Print("  return nil, err")
-					code.Print("} else if info != nil {")
-					code.Print("  n, err := New%s(info)", className)
-					code.Print("  if err != nil {")
-					code.Print("    return nil, err")
-					code.Print("  } else if n != nil {")
-					code.Print("    *m = *n")
-					code.Print("    return nil, nil")
-					code.Print("  }")
+				_, classFound := classes.ClassModels[propertyType]
+				if classFound {
+					code.Print("{")
+					code.Print("p, ok := m.Oneof.(*%s_%s)", className, propertyType)
+					code.Print("if ok {")
+					if propertyType == "JsonReference" { // Special case for OpenAPI
+						code.Print("info, err := p.%s.ResolveReferences(root)", propertyType)
+						code.Print("if err != nil {")
+						code.Print("  return nil, err")
+						code.Print("} else if info != nil {")
+						code.Print("  n, err := New%s(info)", className)
+						code.Print("  if err != nil {")
+						code.Print("    return nil, err")
+						code.Print("  } else if n != nil {")
+						code.Print("    *m = *n")
+						code.Print("    return nil, nil")
+						code.Print("  }")
+						code.Print("}")
+					} else {
+						code.Print("p.%s.ResolveReferences(root)", propertyType)
+					}
 					code.Print("}")
-				} else {
-					code.Print("p.%s.ResolveReferences(root)", propertyType)
+					code.Print("}")
 				}
-				code.Print("}")
-				code.Print("}")
 			}
 		} else {
 			for _, propertyModel := range classModel.Properties {

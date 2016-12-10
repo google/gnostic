@@ -21,6 +21,7 @@ package openapi.v2;
 message AdditionalPropertiesItem {
   oneof oneof {
     Schema schema = 1;
+    bool boolean = 2;
   }
 }
 

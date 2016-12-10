@@ -41,6 +41,11 @@ func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, err
 			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 		}
 	}
+	// bool boolean = 2;
+	v2 := helpers.MapValueForKey(m, "boolean")
+	if v2 != nil {
+		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: v2.(bool)}
+	}
 	return x, nil
 }
 
