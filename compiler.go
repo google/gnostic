@@ -53,7 +53,7 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	document, err := openapi_v2.NewDocument(raw)
+	document, err := openapi_v2.NewDocument(raw, nil)
 	if err != nil {
 		fmt.Printf("Error %+v\n", err)
 		os.Exit(-1)

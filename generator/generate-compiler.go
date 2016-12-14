@@ -51,7 +51,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 	// constructors
 	for _, className := range classNames {
-		code.Print("func New%s(in interface{}) (*%s, error) {", className, className)
+		code.Print("func New%s(in interface{}, context *helpers.Context) (*%s, error) {", className, className)
 
 		classModel := classes.ClassModels[className]
 		parentClassName := className
@@ -80,7 +80,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x := &ItemsItem{}")
 			code.Print("if ok {")
 			code.Print("x.Schema = make([]*Schema, 0)")
-			code.Print("y, err := NewSchema(m)")
+			code.Print("y, err := NewSchema(m, context)")
 			code.Print("if err != nil {return nil, err}")
 			code.Print("x.Schema = append(x.Schema, y)")
 			code.Print("} else {")
@@ -224,7 +224,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("a, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
-					code.Print("y, err := New%s(item)", classModel.Name)
+					code.Print("y, err := New%s(item, context)", classModel.Name)
 					code.Print("if err != nil {return nil, err}")
 					code.Print("x.%s = append(x.%s, y)", fieldName, fieldName)
 					code.Print("}")
@@ -234,7 +234,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					if oneOfWrapper {
 						code.Print("{")
 						code.Print("// errors are ok here, they mean we just don't have the right subtype")
-						code.Print("t, _ := New%s(m)", classModel.Name)
+						code.Print("t, _ := New%s(m, context)", classModel.Name)
 						code.Print("if t != nil {")
 						code.Print("x.Oneof = &%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
 						code.Print("}")
@@ -243,7 +243,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("var err error")
-						code.Print("x.%s, err = New%s(v%d)", fieldName, classModel.Name, fieldNumber)
+						code.Print("x.%s, err = New%s(v%d, context)", fieldName, classModel.Name, fieldNumber)
 						code.Print("if err != nil {return nil, helpers.ExtendError(\"%s\", err)}", propertyName)
 						code.Print("}")
 					}
@@ -307,7 +307,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("pair.Value = v.(string)")
 					} else {
 						code.Print("var err error")
-						code.Print("pair.Value, err = New%v(v)", mapTypeName)
+						code.Print("pair.Value, err = New%s(v, context)", mapTypeName)
 						code.Print("if err != nil {return nil, err}")
 					}
 					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)
@@ -344,7 +344,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("if err != nil {")
 						code.Print("  return nil, err")
 						code.Print("} else if info != nil {")
-						code.Print("  n, err := New%s(info)", className)
+						code.Print("  n, err := New%s(info, nil)", className)
 						code.Print("  if err != nil {")
 						code.Print("    return nil, err")
 						code.Print("  } else if n != nil {")
@@ -381,7 +381,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 					if len(classModel.Properties) > 1 {
 						code.Print("if info != nil {")
-						code.Print("replacement, _ := New%s(info)", className)
+						code.Print("replacement, _ := New%s(info, nil)", className)
 						code.Print("*m = *replacement")
 						code.Print("return m.ResolveReferences(root)")
 						code.Print("}")

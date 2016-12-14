@@ -27,7 +27,7 @@ func Version() string {
 	return "openapi_v2"
 }
 
-func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, error) {
+func NewAdditionalPropertiesItem(in interface{}, context *helpers.Context) (*AdditionalPropertiesItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for AdditionalPropertiesItem section: %+v", in))
@@ -36,7 +36,7 @@ func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, err
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewSchema(m)
+		t, _ := NewSchema(m, context)
 		if t != nil {
 			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 		}
@@ -49,14 +49,14 @@ func NewAdditionalPropertiesItem(in interface{}) (*AdditionalPropertiesItem, err
 	return x, nil
 }
 
-func NewAny(in interface{}) (*Any, error) {
+func NewAny(in interface{}, context *helpers.Context) (*Any, error) {
 	x := &Any{}
 	bytes, _ := json.Marshal(in)
 	x.Value = string(bytes)
 	return x, nil
 }
 
-func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
+func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for ApiKeySecurity section: %+v", in))
@@ -103,7 +103,7 @@ func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -113,7 +113,7 @@ func NewApiKeySecurity(in interface{}) (*ApiKeySecurity, error) {
 	return x, nil
 }
 
-func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurity, error) {
+func NewBasicAuthenticationSecurity(in interface{}, context *helpers.Context) (*BasicAuthenticationSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for BasicAuthenticationSecurity section: %+v", in))
@@ -150,7 +150,7 @@ func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurit
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -160,7 +160,7 @@ func NewBasicAuthenticationSecurity(in interface{}) (*BasicAuthenticationSecurit
 	return x, nil
 }
 
-func NewBodyParameter(in interface{}) (*BodyParameter, error) {
+func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for BodyParameter section: %+v", in))
@@ -201,7 +201,7 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 	v5 := helpers.MapValueForKey(m, "schema")
 	if v5 != nil {
 		var err error
-		x.Schema, err = NewSchema(v5)
+		x.Schema, err = NewSchema(v5, context)
 		if err != nil {
 			return nil, helpers.ExtendError("schema", err)
 		}
@@ -216,7 +216,7 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -226,7 +226,7 @@ func NewBodyParameter(in interface{}) (*BodyParameter, error) {
 	return x, nil
 }
 
-func NewContact(in interface{}) (*Contact, error) {
+func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Contact section: %+v", in))
@@ -264,7 +264,7 @@ func NewContact(in interface{}) (*Contact, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -274,7 +274,7 @@ func NewContact(in interface{}) (*Contact, error) {
 	return x, nil
 }
 
-func NewDefault(in interface{}) (*Default, error) {
+func NewDefault(in interface{}, context *helpers.Context) (*Default, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Default section: %+v", in))
@@ -289,7 +289,7 @@ func NewDefault(in interface{}) (*Default, error) {
 		pair := &NamedAny{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewAny(v)
+		pair.Value, err = NewAny(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -298,7 +298,7 @@ func NewDefault(in interface{}) (*Default, error) {
 	return x, nil
 }
 
-func NewDefinitions(in interface{}) (*Definitions, error) {
+func NewDefinitions(in interface{}, context *helpers.Context) (*Definitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Definitions section: %+v", in))
@@ -313,7 +313,7 @@ func NewDefinitions(in interface{}) (*Definitions, error) {
 		pair := &NamedSchema{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewSchema(v)
+		pair.Value, err = NewSchema(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -322,7 +322,7 @@ func NewDefinitions(in interface{}) (*Definitions, error) {
 	return x, nil
 }
 
-func NewDocument(in interface{}) (*Document, error) {
+func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Document section: %+v", in))
@@ -348,7 +348,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v2 := helpers.MapValueForKey(m, "info")
 	if v2 != nil {
 		var err error
-		x.Info, err = NewInfo(v2)
+		x.Info, err = NewInfo(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("info", err)
 		}
@@ -397,7 +397,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v8 := helpers.MapValueForKey(m, "paths")
 	if v8 != nil {
 		var err error
-		x.Paths, err = NewPaths(v8)
+		x.Paths, err = NewPaths(v8, context)
 		if err != nil {
 			return nil, helpers.ExtendError("paths", err)
 		}
@@ -406,7 +406,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v9 := helpers.MapValueForKey(m, "definitions")
 	if v9 != nil {
 		var err error
-		x.Definitions, err = NewDefinitions(v9)
+		x.Definitions, err = NewDefinitions(v9, context)
 		if err != nil {
 			return nil, helpers.ExtendError("definitions", err)
 		}
@@ -415,7 +415,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v10 := helpers.MapValueForKey(m, "parameters")
 	if v10 != nil {
 		var err error
-		x.Parameters, err = NewParameterDefinitions(v10)
+		x.Parameters, err = NewParameterDefinitions(v10, context)
 		if err != nil {
 			return nil, helpers.ExtendError("parameters", err)
 		}
@@ -424,7 +424,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v11 := helpers.MapValueForKey(m, "responses")
 	if v11 != nil {
 		var err error
-		x.Responses, err = NewResponseDefinitions(v11)
+		x.Responses, err = NewResponseDefinitions(v11, context)
 		if err != nil {
 			return nil, helpers.ExtendError("responses", err)
 		}
@@ -437,7 +437,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewSecurityRequirement(item)
+				y, err := NewSecurityRequirement(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -449,7 +449,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v13 := helpers.MapValueForKey(m, "securityDefinitions")
 	if v13 != nil {
 		var err error
-		x.SecurityDefinitions, err = NewSecurityDefinitions(v13)
+		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, context)
 		if err != nil {
 			return nil, helpers.ExtendError("securityDefinitions", err)
 		}
@@ -462,7 +462,7 @@ func NewDocument(in interface{}) (*Document, error) {
 		a, ok := v14.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewTag(item)
+				y, err := NewTag(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -474,7 +474,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	v15 := helpers.MapValueForKey(m, "externalDocs")
 	if v15 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v15)
+		x.ExternalDocs, err = NewExternalDocs(v15, context)
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -482,7 +482,7 @@ func NewDocument(in interface{}) (*Document, error) {
 	return x, nil
 }
 
-func NewExamples(in interface{}) (*Examples, error) {
+func NewExamples(in interface{}, context *helpers.Context) (*Examples, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Examples section: %+v", in))
@@ -497,7 +497,7 @@ func NewExamples(in interface{}) (*Examples, error) {
 		pair := &NamedAny{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewAny(v)
+		pair.Value, err = NewAny(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -506,7 +506,7 @@ func NewExamples(in interface{}) (*Examples, error) {
 	return x, nil
 }
 
-func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
+func NewExternalDocs(in interface{}, context *helpers.Context) (*ExternalDocs, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for ExternalDocs section: %+v", in))
@@ -543,7 +543,7 @@ func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -553,7 +553,7 @@ func NewExternalDocs(in interface{}) (*ExternalDocs, error) {
 	return x, nil
 }
 
-func NewFileSchema(in interface{}) (*FileSchema, error) {
+func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for FileSchema section: %+v", in))
@@ -589,7 +589,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 	v4 := helpers.MapValueForKey(m, "default")
 	if v4 != nil {
 		var err error
-		x.Default, err = NewAny(v4)
+		x.Default, err = NewAny(v4, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -618,7 +618,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 	v8 := helpers.MapValueForKey(m, "externalDocs")
 	if v8 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v8)
+		x.ExternalDocs, err = NewExternalDocs(v8, context)
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -627,7 +627,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 	v9 := helpers.MapValueForKey(m, "example")
 	if v9 != nil {
 		var err error
-		x.Example, err = NewAny(v9)
+		x.Example, err = NewAny(v9, context)
 		if err != nil {
 			return nil, helpers.ExtendError("example", err)
 		}
@@ -642,7 +642,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -652,7 +652,7 @@ func NewFileSchema(in interface{}) (*FileSchema, error) {
 	return x, nil
 }
 
-func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema, error) {
+func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*FormDataParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for FormDataParameterSubSchema section: %+v", in))
@@ -704,7 +704,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v8)
+		x.Items, err = NewPrimitivesItems(v8, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -718,7 +718,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
 		var err error
-		x.Default, err = NewAny(v10)
+		x.Default, err = NewAny(v10, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -781,7 +781,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -804,7 +804,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -814,7 +814,7 @@ func NewFormDataParameterSubSchema(in interface{}) (*FormDataParameterSubSchema,
 	return x, nil
 }
 
-func NewHeader(in interface{}) (*Header, error) {
+func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Header section: %+v", in))
@@ -845,7 +845,7 @@ func NewHeader(in interface{}) (*Header, error) {
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v3)
+		x.Items, err = NewPrimitivesItems(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -859,7 +859,7 @@ func NewHeader(in interface{}) (*Header, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5)
+		x.Default, err = NewAny(v5, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -922,7 +922,7 @@ func NewHeader(in interface{}) (*Header, error) {
 		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -950,7 +950,7 @@ func NewHeader(in interface{}) (*Header, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -960,7 +960,7 @@ func NewHeader(in interface{}) (*Header, error) {
 	return x, nil
 }
 
-func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, error) {
+func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*HeaderParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for HeaderParameterSubSchema section: %+v", in))
@@ -1007,7 +1007,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v7)
+		x.Items, err = NewPrimitivesItems(v7, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -1021,7 +1021,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
 		var err error
-		x.Default, err = NewAny(v9)
+		x.Default, err = NewAny(v9, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -1084,7 +1084,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -1107,7 +1107,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1117,7 +1117,7 @@ func NewHeaderParameterSubSchema(in interface{}) (*HeaderParameterSubSchema, err
 	return x, nil
 }
 
-func NewHeaders(in interface{}) (*Headers, error) {
+func NewHeaders(in interface{}, context *helpers.Context) (*Headers, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Headers section: %+v", in))
@@ -1132,7 +1132,7 @@ func NewHeaders(in interface{}) (*Headers, error) {
 		pair := &NamedHeader{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewHeader(v)
+		pair.Value, err = NewHeader(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -1141,7 +1141,7 @@ func NewHeaders(in interface{}) (*Headers, error) {
 	return x, nil
 }
 
-func NewInfo(in interface{}) (*Info, error) {
+func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Info section: %+v", in))
@@ -1182,7 +1182,7 @@ func NewInfo(in interface{}) (*Info, error) {
 	v5 := helpers.MapValueForKey(m, "contact")
 	if v5 != nil {
 		var err error
-		x.Contact, err = NewContact(v5)
+		x.Contact, err = NewContact(v5, context)
 		if err != nil {
 			return nil, helpers.ExtendError("contact", err)
 		}
@@ -1191,7 +1191,7 @@ func NewInfo(in interface{}) (*Info, error) {
 	v6 := helpers.MapValueForKey(m, "license")
 	if v6 != nil {
 		var err error
-		x.License, err = NewLicense(v6)
+		x.License, err = NewLicense(v6, context)
 		if err != nil {
 			return nil, helpers.ExtendError("license", err)
 		}
@@ -1206,7 +1206,7 @@ func NewInfo(in interface{}) (*Info, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1216,7 +1216,7 @@ func NewInfo(in interface{}) (*Info, error) {
 	return x, nil
 }
 
-func NewItemsItem(in interface{}) (*ItemsItem, error) {
+func NewItemsItem(in interface{}, context *helpers.Context) (*ItemsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for item array: %+v", in))
@@ -1224,7 +1224,7 @@ func NewItemsItem(in interface{}) (*ItemsItem, error) {
 	x := &ItemsItem{}
 	if ok {
 		x.Schema = make([]*Schema, 0)
-		y, err := NewSchema(m)
+		y, err := NewSchema(m, context)
 		if err != nil {
 			return nil, err
 		}
@@ -1235,7 +1235,7 @@ func NewItemsItem(in interface{}) (*ItemsItem, error) {
 	return x, nil
 }
 
-func NewJsonReference(in interface{}) (*JsonReference, error) {
+func NewJsonReference(in interface{}, context *helpers.Context) (*JsonReference, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for JsonReference section: %+v", in))
@@ -1260,7 +1260,7 @@ func NewJsonReference(in interface{}) (*JsonReference, error) {
 	return x, nil
 }
 
-func NewLicense(in interface{}) (*License, error) {
+func NewLicense(in interface{}, context *helpers.Context) (*License, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for License section: %+v", in))
@@ -1297,7 +1297,7 @@ func NewLicense(in interface{}) (*License, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1307,7 +1307,7 @@ func NewLicense(in interface{}) (*License, error) {
 	return x, nil
 }
 
-func NewNamedAny(in interface{}) (*NamedAny, error) {
+func NewNamedAny(in interface{}, context *helpers.Context) (*NamedAny, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedAny section: %+v", in))
@@ -1329,7 +1329,7 @@ func NewNamedAny(in interface{}) (*NamedAny, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewAny(v2)
+		x.Value, err = NewAny(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1337,7 +1337,7 @@ func NewNamedAny(in interface{}) (*NamedAny, error) {
 	return x, nil
 }
 
-func NewNamedHeader(in interface{}) (*NamedHeader, error) {
+func NewNamedHeader(in interface{}, context *helpers.Context) (*NamedHeader, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedHeader section: %+v", in))
@@ -1359,7 +1359,7 @@ func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewHeader(v2)
+		x.Value, err = NewHeader(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1367,7 +1367,7 @@ func NewNamedHeader(in interface{}) (*NamedHeader, error) {
 	return x, nil
 }
 
-func NewNamedParameter(in interface{}) (*NamedParameter, error) {
+func NewNamedParameter(in interface{}, context *helpers.Context) (*NamedParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedParameter section: %+v", in))
@@ -1389,7 +1389,7 @@ func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewParameter(v2)
+		x.Value, err = NewParameter(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1397,7 +1397,7 @@ func NewNamedParameter(in interface{}) (*NamedParameter, error) {
 	return x, nil
 }
 
-func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
+func NewNamedPathItem(in interface{}, context *helpers.Context) (*NamedPathItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedPathItem section: %+v", in))
@@ -1419,7 +1419,7 @@ func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewPathItem(v2)
+		x.Value, err = NewPathItem(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1427,7 +1427,7 @@ func NewNamedPathItem(in interface{}) (*NamedPathItem, error) {
 	return x, nil
 }
 
-func NewNamedResponse(in interface{}) (*NamedResponse, error) {
+func NewNamedResponse(in interface{}, context *helpers.Context) (*NamedResponse, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedResponse section: %+v", in))
@@ -1449,7 +1449,7 @@ func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewResponse(v2)
+		x.Value, err = NewResponse(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1457,7 +1457,7 @@ func NewNamedResponse(in interface{}) (*NamedResponse, error) {
 	return x, nil
 }
 
-func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
+func NewNamedResponseValue(in interface{}, context *helpers.Context) (*NamedResponseValue, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedResponseValue section: %+v", in))
@@ -1479,7 +1479,7 @@ func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewResponseValue(v2)
+		x.Value, err = NewResponseValue(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1487,7 +1487,7 @@ func NewNamedResponseValue(in interface{}) (*NamedResponseValue, error) {
 	return x, nil
 }
 
-func NewNamedSchema(in interface{}) (*NamedSchema, error) {
+func NewNamedSchema(in interface{}, context *helpers.Context) (*NamedSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedSchema section: %+v", in))
@@ -1509,7 +1509,7 @@ func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewSchema(v2)
+		x.Value, err = NewSchema(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1517,7 +1517,7 @@ func NewNamedSchema(in interface{}) (*NamedSchema, error) {
 	return x, nil
 }
 
-func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsItem, error) {
+func NewNamedSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*NamedSecurityDefinitionsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedSecurityDefinitionsItem section: %+v", in))
@@ -1539,7 +1539,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsI
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewSecurityDefinitionsItem(v2)
+		x.Value, err = NewSecurityDefinitionsItem(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1547,7 +1547,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}) (*NamedSecurityDefinitionsI
 	return x, nil
 }
 
-func NewNamedString(in interface{}) (*NamedString, error) {
+func NewNamedString(in interface{}, context *helpers.Context) (*NamedString, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedString section: %+v", in))
@@ -1573,7 +1573,7 @@ func NewNamedString(in interface{}) (*NamedString, error) {
 	return x, nil
 }
 
-func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
+func NewNamedStringArray(in interface{}, context *helpers.Context) (*NamedStringArray, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NamedStringArray section: %+v", in))
@@ -1595,7 +1595,7 @@ func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewStringArray(v2)
+		x.Value, err = NewStringArray(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1603,7 +1603,7 @@ func NewNamedStringArray(in interface{}) (*NamedStringArray, error) {
 	return x, nil
 }
 
-func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
+func NewNonBodyParameter(in interface{}, context *helpers.Context) (*NonBodyParameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for NonBodyParameter section: %+v", in))
@@ -1616,7 +1616,7 @@ func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewHeaderParameterSubSchema(m)
+		t, _ := NewHeaderParameterSubSchema(m, context)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
@@ -1624,7 +1624,7 @@ func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewFormDataParameterSubSchema(m)
+		t, _ := NewFormDataParameterSubSchema(m, context)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
@@ -1632,7 +1632,7 @@ func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewQueryParameterSubSchema(m)
+		t, _ := NewQueryParameterSubSchema(m, context)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 		}
@@ -1640,7 +1640,7 @@ func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	// PathParameterSubSchema path_parameter_sub_schema = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewPathParameterSubSchema(m)
+		t, _ := NewPathParameterSubSchema(m, context)
 		if t != nil {
 			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
@@ -1648,7 +1648,7 @@ func NewNonBodyParameter(in interface{}) (*NonBodyParameter, error) {
 	return x, nil
 }
 
-func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, error) {
+func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oauth2AccessCodeSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2AccessCodeSecurity section: %+v", in))
@@ -1679,7 +1679,7 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3)
+		x.Scopes, err = NewOauth2Scopes(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1709,7 +1709,7 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1719,7 +1719,7 @@ func NewOauth2AccessCodeSecurity(in interface{}) (*Oauth2AccessCodeSecurity, err
 	return x, nil
 }
 
-func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, error) {
+func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oauth2ApplicationSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2ApplicationSecurity section: %+v", in))
@@ -1750,7 +1750,7 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3)
+		x.Scopes, err = NewOauth2Scopes(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1775,7 +1775,7 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1785,7 +1785,7 @@ func NewOauth2ApplicationSecurity(in interface{}) (*Oauth2ApplicationSecurity, e
 	return x, nil
 }
 
-func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) {
+func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth2ImplicitSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2ImplicitSecurity section: %+v", in))
@@ -1816,7 +1816,7 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3)
+		x.Scopes, err = NewOauth2Scopes(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1841,7 +1841,7 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1851,7 +1851,7 @@ func NewOauth2ImplicitSecurity(in interface{}) (*Oauth2ImplicitSecurity, error) 
 	return x, nil
 }
 
-func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) {
+func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth2PasswordSecurity, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2PasswordSecurity section: %+v", in))
@@ -1882,7 +1882,7 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3)
+		x.Scopes, err = NewOauth2Scopes(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1907,7 +1907,7 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -1917,7 +1917,7 @@ func NewOauth2PasswordSecurity(in interface{}) (*Oauth2PasswordSecurity, error) 
 	return x, nil
 }
 
-func NewOauth2Scopes(in interface{}) (*Oauth2Scopes, error) {
+func NewOauth2Scopes(in interface{}, context *helpers.Context) (*Oauth2Scopes, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Oauth2Scopes section: %+v", in))
@@ -1937,7 +1937,7 @@ func NewOauth2Scopes(in interface{}) (*Oauth2Scopes, error) {
 	return x, nil
 }
 
-func NewOperation(in interface{}) (*Operation, error) {
+func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Operation section: %+v", in))
@@ -1978,7 +1978,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 	v4 := helpers.MapValueForKey(m, "externalDocs")
 	if v4 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v4)
+		x.ExternalDocs, err = NewExternalDocs(v4, context)
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -2016,7 +2016,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		a, ok := v8.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewParametersItem(item)
+				y, err := NewParametersItem(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -2028,7 +2028,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 	v9 := helpers.MapValueForKey(m, "responses")
 	if v9 != nil {
 		var err error
-		x.Responses, err = NewResponses(v9)
+		x.Responses, err = NewResponses(v9, context)
 		if err != nil {
 			return nil, helpers.ExtendError("responses", err)
 		}
@@ -2056,7 +2056,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewSecurityRequirement(item)
+				y, err := NewSecurityRequirement(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -2074,7 +2074,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2084,7 +2084,7 @@ func NewOperation(in interface{}) (*Operation, error) {
 	return x, nil
 }
 
-func NewParameter(in interface{}) (*Parameter, error) {
+func NewParameter(in interface{}, context *helpers.Context) (*Parameter, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Parameter section: %+v", in))
@@ -2093,7 +2093,7 @@ func NewParameter(in interface{}) (*Parameter, error) {
 	// BodyParameter body_parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewBodyParameter(m)
+		t, _ := NewBodyParameter(m, context)
 		if t != nil {
 			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 		}
@@ -2101,7 +2101,7 @@ func NewParameter(in interface{}) (*Parameter, error) {
 	// NonBodyParameter non_body_parameter = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewNonBodyParameter(m)
+		t, _ := NewNonBodyParameter(m, context)
 		if t != nil {
 			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 		}
@@ -2109,7 +2109,7 @@ func NewParameter(in interface{}) (*Parameter, error) {
 	return x, nil
 }
 
-func NewParameterDefinitions(in interface{}) (*ParameterDefinitions, error) {
+func NewParameterDefinitions(in interface{}, context *helpers.Context) (*ParameterDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for ParameterDefinitions section: %+v", in))
@@ -2124,7 +2124,7 @@ func NewParameterDefinitions(in interface{}) (*ParameterDefinitions, error) {
 		pair := &NamedParameter{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewParameter(v)
+		pair.Value, err = NewParameter(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -2133,7 +2133,7 @@ func NewParameterDefinitions(in interface{}) (*ParameterDefinitions, error) {
 	return x, nil
 }
 
-func NewParametersItem(in interface{}) (*ParametersItem, error) {
+func NewParametersItem(in interface{}, context *helpers.Context) (*ParametersItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for ParametersItem section: %+v", in))
@@ -2142,7 +2142,7 @@ func NewParametersItem(in interface{}) (*ParametersItem, error) {
 	// Parameter parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewParameter(m)
+		t, _ := NewParameter(m, context)
 		if t != nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
 		}
@@ -2150,7 +2150,7 @@ func NewParametersItem(in interface{}) (*ParametersItem, error) {
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewJsonReference(m)
+		t, _ := NewJsonReference(m, context)
 		if t != nil {
 			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
@@ -2158,7 +2158,7 @@ func NewParametersItem(in interface{}) (*ParametersItem, error) {
 	return x, nil
 }
 
-func NewPathItem(in interface{}) (*PathItem, error) {
+func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for PathItem section: %+v", in))
@@ -2180,7 +2180,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v2 := helpers.MapValueForKey(m, "get")
 	if v2 != nil {
 		var err error
-		x.Get, err = NewOperation(v2)
+		x.Get, err = NewOperation(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("get", err)
 		}
@@ -2189,7 +2189,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v3 := helpers.MapValueForKey(m, "put")
 	if v3 != nil {
 		var err error
-		x.Put, err = NewOperation(v3)
+		x.Put, err = NewOperation(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("put", err)
 		}
@@ -2198,7 +2198,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v4 := helpers.MapValueForKey(m, "post")
 	if v4 != nil {
 		var err error
-		x.Post, err = NewOperation(v4)
+		x.Post, err = NewOperation(v4, context)
 		if err != nil {
 			return nil, helpers.ExtendError("post", err)
 		}
@@ -2207,7 +2207,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v5 := helpers.MapValueForKey(m, "delete")
 	if v5 != nil {
 		var err error
-		x.Delete, err = NewOperation(v5)
+		x.Delete, err = NewOperation(v5, context)
 		if err != nil {
 			return nil, helpers.ExtendError("delete", err)
 		}
@@ -2216,7 +2216,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v6 := helpers.MapValueForKey(m, "options")
 	if v6 != nil {
 		var err error
-		x.Options, err = NewOperation(v6)
+		x.Options, err = NewOperation(v6, context)
 		if err != nil {
 			return nil, helpers.ExtendError("options", err)
 		}
@@ -2225,7 +2225,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v7 := helpers.MapValueForKey(m, "head")
 	if v7 != nil {
 		var err error
-		x.Head, err = NewOperation(v7)
+		x.Head, err = NewOperation(v7, context)
 		if err != nil {
 			return nil, helpers.ExtendError("head", err)
 		}
@@ -2234,7 +2234,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	v8 := helpers.MapValueForKey(m, "patch")
 	if v8 != nil {
 		var err error
-		x.Patch, err = NewOperation(v8)
+		x.Patch, err = NewOperation(v8, context)
 		if err != nil {
 			return nil, helpers.ExtendError("patch", err)
 		}
@@ -2247,7 +2247,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 		a, ok := v9.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewParametersItem(item)
+				y, err := NewParametersItem(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -2265,7 +2265,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2275,7 +2275,7 @@ func NewPathItem(in interface{}) (*PathItem, error) {
 	return x, nil
 }
 
-func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) {
+func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for PathParameterSubSchema section: %+v", in))
@@ -2326,7 +2326,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v7)
+		x.Items, err = NewPrimitivesItems(v7, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2340,7 +2340,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
 		var err error
-		x.Default, err = NewAny(v9)
+		x.Default, err = NewAny(v9, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2403,7 +2403,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -2426,7 +2426,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2436,7 +2436,7 @@ func NewPathParameterSubSchema(in interface{}) (*PathParameterSubSchema, error) 
 	return x, nil
 }
 
-func NewPaths(in interface{}) (*Paths, error) {
+func NewPaths(in interface{}, context *helpers.Context) (*Paths, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Paths section: %+v", in))
@@ -2459,7 +2459,7 @@ func NewPaths(in interface{}) (*Paths, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2476,7 +2476,7 @@ func NewPaths(in interface{}) (*Paths, error) {
 			pair := &NamedPathItem{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewPathItem(v)
+			pair.Value, err = NewPathItem(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2486,7 +2486,7 @@ func NewPaths(in interface{}) (*Paths, error) {
 	return x, nil
 }
 
-func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
+func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesItems, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for PrimitivesItems section: %+v", in))
@@ -2513,7 +2513,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v3)
+		x.Items, err = NewPrimitivesItems(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2527,7 +2527,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5)
+		x.Default, err = NewAny(v5, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2590,7 +2590,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -2613,7 +2613,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2623,7 +2623,7 @@ func NewPrimitivesItems(in interface{}) (*PrimitivesItems, error) {
 	return x, nil
 }
 
-func NewProperties(in interface{}) (*Properties, error) {
+func NewProperties(in interface{}, context *helpers.Context) (*Properties, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Properties section: %+v", in))
@@ -2638,7 +2638,7 @@ func NewProperties(in interface{}) (*Properties, error) {
 		pair := &NamedSchema{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewSchema(v)
+		pair.Value, err = NewSchema(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -2647,7 +2647,7 @@ func NewProperties(in interface{}) (*Properties, error) {
 	return x, nil
 }
 
-func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error) {
+func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*QueryParameterSubSchema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for QueryParameterSubSchema section: %+v", in))
@@ -2699,7 +2699,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v8)
+		x.Items, err = NewPrimitivesItems(v8, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2713,7 +2713,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
 		var err error
-		x.Default, err = NewAny(v10)
+		x.Default, err = NewAny(v10, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2776,7 +2776,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -2799,7 +2799,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2809,7 +2809,7 @@ func NewQueryParameterSubSchema(in interface{}) (*QueryParameterSubSchema, error
 	return x, nil
 }
 
-func NewResponse(in interface{}) (*Response, error) {
+func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Response section: %+v", in))
@@ -2835,7 +2835,7 @@ func NewResponse(in interface{}) (*Response, error) {
 	v2 := helpers.MapValueForKey(m, "schema")
 	if v2 != nil {
 		var err error
-		x.Schema, err = NewSchemaItem(v2)
+		x.Schema, err = NewSchemaItem(v2, context)
 		if err != nil {
 			return nil, helpers.ExtendError("schema", err)
 		}
@@ -2844,7 +2844,7 @@ func NewResponse(in interface{}) (*Response, error) {
 	v3 := helpers.MapValueForKey(m, "headers")
 	if v3 != nil {
 		var err error
-		x.Headers, err = NewHeaders(v3)
+		x.Headers, err = NewHeaders(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("headers", err)
 		}
@@ -2853,7 +2853,7 @@ func NewResponse(in interface{}) (*Response, error) {
 	v4 := helpers.MapValueForKey(m, "examples")
 	if v4 != nil {
 		var err error
-		x.Examples, err = NewExamples(v4)
+		x.Examples, err = NewExamples(v4, context)
 		if err != nil {
 			return nil, helpers.ExtendError("examples", err)
 		}
@@ -2868,7 +2868,7 @@ func NewResponse(in interface{}) (*Response, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2878,7 +2878,7 @@ func NewResponse(in interface{}) (*Response, error) {
 	return x, nil
 }
 
-func NewResponseDefinitions(in interface{}) (*ResponseDefinitions, error) {
+func NewResponseDefinitions(in interface{}, context *helpers.Context) (*ResponseDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for ResponseDefinitions section: %+v", in))
@@ -2893,7 +2893,7 @@ func NewResponseDefinitions(in interface{}) (*ResponseDefinitions, error) {
 		pair := &NamedResponse{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewResponse(v)
+		pair.Value, err = NewResponse(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -2902,7 +2902,7 @@ func NewResponseDefinitions(in interface{}) (*ResponseDefinitions, error) {
 	return x, nil
 }
 
-func NewResponseValue(in interface{}) (*ResponseValue, error) {
+func NewResponseValue(in interface{}, context *helpers.Context) (*ResponseValue, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for ResponseValue section: %+v", in))
@@ -2911,7 +2911,7 @@ func NewResponseValue(in interface{}) (*ResponseValue, error) {
 	// Response response = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewResponse(m)
+		t, _ := NewResponse(m, context)
 		if t != nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
 		}
@@ -2919,7 +2919,7 @@ func NewResponseValue(in interface{}) (*ResponseValue, error) {
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewJsonReference(m)
+		t, _ := NewJsonReference(m, context)
 		if t != nil {
 			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
@@ -2927,7 +2927,7 @@ func NewResponseValue(in interface{}) (*ResponseValue, error) {
 	return x, nil
 }
 
-func NewResponses(in interface{}) (*Responses, error) {
+func NewResponses(in interface{}, context *helpers.Context) (*Responses, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Responses section: %+v", in))
@@ -2950,7 +2950,7 @@ func NewResponses(in interface{}) (*Responses, error) {
 			pair := &NamedResponseValue{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewResponseValue(v)
+			pair.Value, err = NewResponseValue(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2967,7 +2967,7 @@ func NewResponses(in interface{}) (*Responses, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -2977,7 +2977,7 @@ func NewResponses(in interface{}) (*Responses, error) {
 	return x, nil
 }
 
-func NewSchema(in interface{}) (*Schema, error) {
+func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Schema section: %+v", in))
@@ -3014,7 +3014,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5)
+		x.Default, err = NewAny(v5, context)
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -3102,7 +3102,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item)
+				y, err := NewAny(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -3114,7 +3114,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v21 := helpers.MapValueForKey(m, "additionalProperties")
 	if v21 != nil {
 		var err error
-		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21)
+		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, context)
 		if err != nil {
 			return nil, helpers.ExtendError("additionalProperties", err)
 		}
@@ -3123,7 +3123,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v22 := helpers.MapValueForKey(m, "type")
 	if v22 != nil {
 		var err error
-		x.Type, err = NewTypeItem(v22)
+		x.Type, err = NewTypeItem(v22, context)
 		if err != nil {
 			return nil, helpers.ExtendError("type", err)
 		}
@@ -3132,7 +3132,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v23 := helpers.MapValueForKey(m, "items")
 	if v23 != nil {
 		var err error
-		x.Items, err = NewItemsItem(v23)
+		x.Items, err = NewItemsItem(v23, context)
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -3145,7 +3145,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 		a, ok := v24.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewSchema(item)
+				y, err := NewSchema(item, context)
 				if err != nil {
 					return nil, err
 				}
@@ -3157,7 +3157,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v25 := helpers.MapValueForKey(m, "properties")
 	if v25 != nil {
 		var err error
-		x.Properties, err = NewProperties(v25)
+		x.Properties, err = NewProperties(v25, context)
 		if err != nil {
 			return nil, helpers.ExtendError("properties", err)
 		}
@@ -3176,7 +3176,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v28 := helpers.MapValueForKey(m, "xml")
 	if v28 != nil {
 		var err error
-		x.Xml, err = NewXml(v28)
+		x.Xml, err = NewXml(v28, context)
 		if err != nil {
 			return nil, helpers.ExtendError("xml", err)
 		}
@@ -3185,7 +3185,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v29 := helpers.MapValueForKey(m, "externalDocs")
 	if v29 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v29)
+		x.ExternalDocs, err = NewExternalDocs(v29, context)
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -3194,7 +3194,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	v30 := helpers.MapValueForKey(m, "example")
 	if v30 != nil {
 		var err error
-		x.Example, err = NewAny(v30)
+		x.Example, err = NewAny(v30, context)
 		if err != nil {
 			return nil, helpers.ExtendError("example", err)
 		}
@@ -3209,7 +3209,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -3219,7 +3219,7 @@ func NewSchema(in interface{}) (*Schema, error) {
 	return x, nil
 }
 
-func NewSchemaItem(in interface{}) (*SchemaItem, error) {
+func NewSchemaItem(in interface{}, context *helpers.Context) (*SchemaItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for SchemaItem section: %+v", in))
@@ -3228,7 +3228,7 @@ func NewSchemaItem(in interface{}) (*SchemaItem, error) {
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewSchema(m)
+		t, _ := NewSchema(m, context)
 		if t != nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
 		}
@@ -3236,7 +3236,7 @@ func NewSchemaItem(in interface{}) (*SchemaItem, error) {
 	// FileSchema file_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewFileSchema(m)
+		t, _ := NewFileSchema(m, context)
 		if t != nil {
 			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
@@ -3244,7 +3244,7 @@ func NewSchemaItem(in interface{}) (*SchemaItem, error) {
 	return x, nil
 }
 
-func NewSecurityDefinitions(in interface{}) (*SecurityDefinitions, error) {
+func NewSecurityDefinitions(in interface{}, context *helpers.Context) (*SecurityDefinitions, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for SecurityDefinitions section: %+v", in))
@@ -3259,7 +3259,7 @@ func NewSecurityDefinitions(in interface{}) (*SecurityDefinitions, error) {
 		pair := &NamedSecurityDefinitionsItem{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewSecurityDefinitionsItem(v)
+		pair.Value, err = NewSecurityDefinitionsItem(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -3268,7 +3268,7 @@ func NewSecurityDefinitions(in interface{}) (*SecurityDefinitions, error) {
 	return x, nil
 }
 
-func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error) {
+func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*SecurityDefinitionsItem, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for SecurityDefinitionsItem section: %+v", in))
@@ -3277,7 +3277,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewBasicAuthenticationSecurity(m)
+		t, _ := NewBasicAuthenticationSecurity(m, context)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
@@ -3285,7 +3285,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	// ApiKeySecurity api_key_security = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewApiKeySecurity(m)
+		t, _ := NewApiKeySecurity(m, context)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
@@ -3293,7 +3293,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2ImplicitSecurity(m)
+		t, _ := NewOauth2ImplicitSecurity(m, context)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
@@ -3301,7 +3301,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2PasswordSecurity(m)
+		t, _ := NewOauth2PasswordSecurity(m, context)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 		}
@@ -3309,7 +3309,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	// Oauth2ApplicationSecurity oauth2_application_security = 5;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2ApplicationSecurity(m)
+		t, _ := NewOauth2ApplicationSecurity(m, context)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 		}
@@ -3317,7 +3317,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2AccessCodeSecurity(m)
+		t, _ := NewOauth2AccessCodeSecurity(m, context)
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
@@ -3325,7 +3325,7 @@ func NewSecurityDefinitionsItem(in interface{}) (*SecurityDefinitionsItem, error
 	return x, nil
 }
 
-func NewSecurityRequirement(in interface{}) (*SecurityRequirement, error) {
+func NewSecurityRequirement(in interface{}, context *helpers.Context) (*SecurityRequirement, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for SecurityRequirement section: %+v", in))
@@ -3340,7 +3340,7 @@ func NewSecurityRequirement(in interface{}) (*SecurityRequirement, error) {
 		pair := &NamedStringArray{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewStringArray(v)
+		pair.Value, err = NewStringArray(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -3349,7 +3349,7 @@ func NewSecurityRequirement(in interface{}) (*SecurityRequirement, error) {
 	return x, nil
 }
 
-func NewStringArray(in interface{}) (*StringArray, error) {
+func NewStringArray(in interface{}, context *helpers.Context) (*StringArray, error) {
 	a, ok := in.([]interface{})
 	if ok {
 		x := &StringArray{}
@@ -3363,7 +3363,7 @@ func NewStringArray(in interface{}) (*StringArray, error) {
 	}
 }
 
-func NewTag(in interface{}) (*Tag, error) {
+func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Tag section: %+v", in))
@@ -3394,7 +3394,7 @@ func NewTag(in interface{}) (*Tag, error) {
 	v3 := helpers.MapValueForKey(m, "externalDocs")
 	if v3 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v3)
+		x.ExternalDocs, err = NewExternalDocs(v3, context)
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -3409,7 +3409,7 @@ func NewTag(in interface{}) (*Tag, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -3419,7 +3419,7 @@ func NewTag(in interface{}) (*Tag, error) {
 	return x, nil
 }
 
-func NewTypeItem(in interface{}) (*TypeItem, error) {
+func NewTypeItem(in interface{}, context *helpers.Context) (*TypeItem, error) {
 	value, ok := in.(string)
 	x := &TypeItem{}
 	if ok {
@@ -3431,7 +3431,7 @@ func NewTypeItem(in interface{}) (*TypeItem, error) {
 	return x, nil
 }
 
-func NewVendorExtension(in interface{}) (*VendorExtension, error) {
+func NewVendorExtension(in interface{}, context *helpers.Context) (*VendorExtension, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for VendorExtension section: %+v", in))
@@ -3446,7 +3446,7 @@ func NewVendorExtension(in interface{}) (*VendorExtension, error) {
 		pair := &NamedAny{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewAny(v)
+		pair.Value, err = NewAny(v, context)
 		if err != nil {
 			return nil, err
 		}
@@ -3455,7 +3455,7 @@ func NewVendorExtension(in interface{}) (*VendorExtension, error) {
 	return x, nil
 }
 
-func NewXml(in interface{}) (*Xml, error) {
+func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("unexpected value for Xml section: %+v", in))
@@ -3503,7 +3503,7 @@ func NewXml(in interface{}) (*Xml, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v)
+			pair.Value, err = NewAny(v, context)
 			if err != nil {
 				return nil, err
 			}
@@ -3982,7 +3982,7 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 			if err != nil {
 				return nil, err
 			} else if info != nil {
-				n, err := NewParametersItem(info)
+				n, err := NewParametersItem(info, nil)
 				if err != nil {
 					return nil, err
 				} else if n != nil {
@@ -3999,7 +3999,7 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 	if m.XRef != "" {
 		info := helpers.ReadInfoForRef(root, m.XRef)
 		if info != nil {
-			replacement, _ := NewPathItem(info)
+			replacement, _ := NewPathItem(info, nil)
 			*m = *replacement
 			return m.ResolveReferences(root)
 		}
@@ -4163,7 +4163,7 @@ func (m *ResponseValue) ResolveReferences(root string) (interface{}, error) {
 			if err != nil {
 				return nil, err
 			} else if info != nil {
-				n, err := NewResponseValue(info)
+				n, err := NewResponseValue(info, nil)
 				if err != nil {
 					return nil, err
 				} else if n != nil {
@@ -4194,7 +4194,7 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	if m.XRef != "" {
 		info := helpers.ReadInfoForRef(root, m.XRef)
 		if info != nil {
-			replacement, _ := NewSchema(info)
+			replacement, _ := NewSchema(info, nil)
 			*m = *replacement
 			return m.ResolveReferences(root)
 		}
