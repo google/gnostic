@@ -224,7 +224,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("a, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
-					code.Print("y, err := New%s(item, context)", classModel.Name)
+					code.Print("y, err := New%s(item, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
 					code.Print("if err != nil {return nil, err}")
 					code.Print("x.%s = append(x.%s, y)", fieldName, fieldName)
 					code.Print("}")
@@ -234,7 +234,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					if oneOfWrapper {
 						code.Print("{")
 						code.Print("// errors are ok here, they mean we just don't have the right subtype")
-						code.Print("t, _ := New%s(m, context)", classModel.Name)
+						code.Print("t, _ := New%s(m, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
 						code.Print("if t != nil {")
 						code.Print("x.Oneof = &%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
 						code.Print("}")
@@ -243,7 +243,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("var err error")
-						code.Print("x.%s, err = New%s(v%d, context)", fieldName, classModel.Name, fieldNumber)
+						code.Print("x.%s, err = New%s(v%d, helpers.NewContext(\"%s\", context))",
+							fieldName, classModel.Name, fieldNumber, fieldName)
 						code.Print("if err != nil {return nil, helpers.ExtendError(\"%s\", err)}", propertyName)
 						code.Print("}")
 					}

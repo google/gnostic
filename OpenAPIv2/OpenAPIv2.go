@@ -36,7 +36,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *helpers.Context) (*Add
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewSchema(m, context)
+		t, _ := NewSchema(m, helpers.NewContext("schema", context))
 		if t != nil {
 			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 		}
@@ -201,7 +201,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 	v5 := helpers.MapValueForKey(m, "schema")
 	if v5 != nil {
 		var err error
-		x.Schema, err = NewSchema(v5, context)
+		x.Schema, err = NewSchema(v5, helpers.NewContext("Schema", context))
 		if err != nil {
 			return nil, helpers.ExtendError("schema", err)
 		}
@@ -348,7 +348,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v2 := helpers.MapValueForKey(m, "info")
 	if v2 != nil {
 		var err error
-		x.Info, err = NewInfo(v2, context)
+		x.Info, err = NewInfo(v2, helpers.NewContext("Info", context))
 		if err != nil {
 			return nil, helpers.ExtendError("info", err)
 		}
@@ -397,7 +397,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v8 := helpers.MapValueForKey(m, "paths")
 	if v8 != nil {
 		var err error
-		x.Paths, err = NewPaths(v8, context)
+		x.Paths, err = NewPaths(v8, helpers.NewContext("Paths", context))
 		if err != nil {
 			return nil, helpers.ExtendError("paths", err)
 		}
@@ -406,7 +406,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v9 := helpers.MapValueForKey(m, "definitions")
 	if v9 != nil {
 		var err error
-		x.Definitions, err = NewDefinitions(v9, context)
+		x.Definitions, err = NewDefinitions(v9, helpers.NewContext("Definitions", context))
 		if err != nil {
 			return nil, helpers.ExtendError("definitions", err)
 		}
@@ -415,7 +415,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v10 := helpers.MapValueForKey(m, "parameters")
 	if v10 != nil {
 		var err error
-		x.Parameters, err = NewParameterDefinitions(v10, context)
+		x.Parameters, err = NewParameterDefinitions(v10, helpers.NewContext("Parameters", context))
 		if err != nil {
 			return nil, helpers.ExtendError("parameters", err)
 		}
@@ -424,7 +424,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v11 := helpers.MapValueForKey(m, "responses")
 	if v11 != nil {
 		var err error
-		x.Responses, err = NewResponseDefinitions(v11, context)
+		x.Responses, err = NewResponseDefinitions(v11, helpers.NewContext("Responses", context))
 		if err != nil {
 			return nil, helpers.ExtendError("responses", err)
 		}
@@ -437,7 +437,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewSecurityRequirement(item, context)
+				y, err := NewSecurityRequirement(item, helpers.NewContext("security", context))
 				if err != nil {
 					return nil, err
 				}
@@ -449,7 +449,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v13 := helpers.MapValueForKey(m, "securityDefinitions")
 	if v13 != nil {
 		var err error
-		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, context)
+		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, helpers.NewContext("SecurityDefinitions", context))
 		if err != nil {
 			return nil, helpers.ExtendError("securityDefinitions", err)
 		}
@@ -462,7 +462,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		a, ok := v14.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewTag(item, context)
+				y, err := NewTag(item, helpers.NewContext("tags", context))
 				if err != nil {
 					return nil, err
 				}
@@ -474,7 +474,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v15 := helpers.MapValueForKey(m, "externalDocs")
 	if v15 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v15, context)
+		x.ExternalDocs, err = NewExternalDocs(v15, helpers.NewContext("ExternalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -589,7 +589,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	v4 := helpers.MapValueForKey(m, "default")
 	if v4 != nil {
 		var err error
-		x.Default, err = NewAny(v4, context)
+		x.Default, err = NewAny(v4, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -618,7 +618,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	v8 := helpers.MapValueForKey(m, "externalDocs")
 	if v8 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v8, context)
+		x.ExternalDocs, err = NewExternalDocs(v8, helpers.NewContext("ExternalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -627,7 +627,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	v9 := helpers.MapValueForKey(m, "example")
 	if v9 != nil {
 		var err error
-		x.Example, err = NewAny(v9, context)
+		x.Example, err = NewAny(v9, helpers.NewContext("Example", context))
 		if err != nil {
 			return nil, helpers.ExtendError("example", err)
 		}
@@ -704,7 +704,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v8, context)
+		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -718,7 +718,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
 		var err error
-		x.Default, err = NewAny(v10, context)
+		x.Default, err = NewAny(v10, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -781,7 +781,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -845,7 +845,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v3, context)
+		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -859,7 +859,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5, context)
+		x.Default, err = NewAny(v5, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -922,7 +922,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -1007,7 +1007,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v7, context)
+		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -1021,7 +1021,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
 		var err error
-		x.Default, err = NewAny(v9, context)
+		x.Default, err = NewAny(v9, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -1084,7 +1084,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -1182,7 +1182,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	v5 := helpers.MapValueForKey(m, "contact")
 	if v5 != nil {
 		var err error
-		x.Contact, err = NewContact(v5, context)
+		x.Contact, err = NewContact(v5, helpers.NewContext("Contact", context))
 		if err != nil {
 			return nil, helpers.ExtendError("contact", err)
 		}
@@ -1191,7 +1191,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	v6 := helpers.MapValueForKey(m, "license")
 	if v6 != nil {
 		var err error
-		x.License, err = NewLicense(v6, context)
+		x.License, err = NewLicense(v6, helpers.NewContext("License", context))
 		if err != nil {
 			return nil, helpers.ExtendError("license", err)
 		}
@@ -1329,7 +1329,7 @@ func NewNamedAny(in interface{}, context *helpers.Context) (*NamedAny, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewAny(v2, context)
+		x.Value, err = NewAny(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1359,7 +1359,7 @@ func NewNamedHeader(in interface{}, context *helpers.Context) (*NamedHeader, err
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewHeader(v2, context)
+		x.Value, err = NewHeader(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1389,7 +1389,7 @@ func NewNamedParameter(in interface{}, context *helpers.Context) (*NamedParamete
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewParameter(v2, context)
+		x.Value, err = NewParameter(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1419,7 +1419,7 @@ func NewNamedPathItem(in interface{}, context *helpers.Context) (*NamedPathItem,
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewPathItem(v2, context)
+		x.Value, err = NewPathItem(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1449,7 +1449,7 @@ func NewNamedResponse(in interface{}, context *helpers.Context) (*NamedResponse,
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewResponse(v2, context)
+		x.Value, err = NewResponse(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1479,7 +1479,7 @@ func NewNamedResponseValue(in interface{}, context *helpers.Context) (*NamedResp
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewResponseValue(v2, context)
+		x.Value, err = NewResponseValue(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1509,7 +1509,7 @@ func NewNamedSchema(in interface{}, context *helpers.Context) (*NamedSchema, err
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewSchema(v2, context)
+		x.Value, err = NewSchema(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1539,7 +1539,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *helpers.Context) (
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewSecurityDefinitionsItem(v2, context)
+		x.Value, err = NewSecurityDefinitionsItem(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1595,7 +1595,7 @@ func NewNamedStringArray(in interface{}, context *helpers.Context) (*NamedString
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewStringArray(v2, context)
+		x.Value, err = NewStringArray(v2, helpers.NewContext("Value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1616,7 +1616,7 @@ func NewNonBodyParameter(in interface{}, context *helpers.Context) (*NonBodyPara
 	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewHeaderParameterSubSchema(m, context)
+		t, _ := NewHeaderParameterSubSchema(m, helpers.NewContext("headerParameterSubSchema", context))
 		if t != nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
@@ -1624,7 +1624,7 @@ func NewNonBodyParameter(in interface{}, context *helpers.Context) (*NonBodyPara
 	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewFormDataParameterSubSchema(m, context)
+		t, _ := NewFormDataParameterSubSchema(m, helpers.NewContext("formDataParameterSubSchema", context))
 		if t != nil {
 			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
@@ -1632,7 +1632,7 @@ func NewNonBodyParameter(in interface{}, context *helpers.Context) (*NonBodyPara
 	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewQueryParameterSubSchema(m, context)
+		t, _ := NewQueryParameterSubSchema(m, helpers.NewContext("queryParameterSubSchema", context))
 		if t != nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 		}
@@ -1640,7 +1640,7 @@ func NewNonBodyParameter(in interface{}, context *helpers.Context) (*NonBodyPara
 	// PathParameterSubSchema path_parameter_sub_schema = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewPathParameterSubSchema(m, context)
+		t, _ := NewPathParameterSubSchema(m, helpers.NewContext("pathParameterSubSchema", context))
 		if t != nil {
 			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
@@ -1679,7 +1679,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, context)
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1750,7 +1750,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, context)
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1816,7 +1816,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, context)
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1882,7 +1882,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, context)
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1978,7 +1978,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	v4 := helpers.MapValueForKey(m, "externalDocs")
 	if v4 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v4, context)
+		x.ExternalDocs, err = NewExternalDocs(v4, helpers.NewContext("ExternalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -2016,7 +2016,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		a, ok := v8.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewParametersItem(item, context)
+				y, err := NewParametersItem(item, helpers.NewContext("parameters", context))
 				if err != nil {
 					return nil, err
 				}
@@ -2028,7 +2028,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	v9 := helpers.MapValueForKey(m, "responses")
 	if v9 != nil {
 		var err error
-		x.Responses, err = NewResponses(v9, context)
+		x.Responses, err = NewResponses(v9, helpers.NewContext("Responses", context))
 		if err != nil {
 			return nil, helpers.ExtendError("responses", err)
 		}
@@ -2056,7 +2056,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		a, ok := v12.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewSecurityRequirement(item, context)
+				y, err := NewSecurityRequirement(item, helpers.NewContext("security", context))
 				if err != nil {
 					return nil, err
 				}
@@ -2093,7 +2093,7 @@ func NewParameter(in interface{}, context *helpers.Context) (*Parameter, error) 
 	// BodyParameter body_parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewBodyParameter(m, context)
+		t, _ := NewBodyParameter(m, helpers.NewContext("bodyParameter", context))
 		if t != nil {
 			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 		}
@@ -2101,7 +2101,7 @@ func NewParameter(in interface{}, context *helpers.Context) (*Parameter, error) 
 	// NonBodyParameter non_body_parameter = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewNonBodyParameter(m, context)
+		t, _ := NewNonBodyParameter(m, helpers.NewContext("nonBodyParameter", context))
 		if t != nil {
 			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 		}
@@ -2142,7 +2142,7 @@ func NewParametersItem(in interface{}, context *helpers.Context) (*ParametersIte
 	// Parameter parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewParameter(m, context)
+		t, _ := NewParameter(m, helpers.NewContext("parameter", context))
 		if t != nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
 		}
@@ -2150,7 +2150,7 @@ func NewParametersItem(in interface{}, context *helpers.Context) (*ParametersIte
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewJsonReference(m, context)
+		t, _ := NewJsonReference(m, helpers.NewContext("jsonReference", context))
 		if t != nil {
 			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
@@ -2180,7 +2180,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v2 := helpers.MapValueForKey(m, "get")
 	if v2 != nil {
 		var err error
-		x.Get, err = NewOperation(v2, context)
+		x.Get, err = NewOperation(v2, helpers.NewContext("Get", context))
 		if err != nil {
 			return nil, helpers.ExtendError("get", err)
 		}
@@ -2189,7 +2189,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v3 := helpers.MapValueForKey(m, "put")
 	if v3 != nil {
 		var err error
-		x.Put, err = NewOperation(v3, context)
+		x.Put, err = NewOperation(v3, helpers.NewContext("Put", context))
 		if err != nil {
 			return nil, helpers.ExtendError("put", err)
 		}
@@ -2198,7 +2198,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v4 := helpers.MapValueForKey(m, "post")
 	if v4 != nil {
 		var err error
-		x.Post, err = NewOperation(v4, context)
+		x.Post, err = NewOperation(v4, helpers.NewContext("Post", context))
 		if err != nil {
 			return nil, helpers.ExtendError("post", err)
 		}
@@ -2207,7 +2207,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v5 := helpers.MapValueForKey(m, "delete")
 	if v5 != nil {
 		var err error
-		x.Delete, err = NewOperation(v5, context)
+		x.Delete, err = NewOperation(v5, helpers.NewContext("Delete", context))
 		if err != nil {
 			return nil, helpers.ExtendError("delete", err)
 		}
@@ -2216,7 +2216,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v6 := helpers.MapValueForKey(m, "options")
 	if v6 != nil {
 		var err error
-		x.Options, err = NewOperation(v6, context)
+		x.Options, err = NewOperation(v6, helpers.NewContext("Options", context))
 		if err != nil {
 			return nil, helpers.ExtendError("options", err)
 		}
@@ -2225,7 +2225,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v7 := helpers.MapValueForKey(m, "head")
 	if v7 != nil {
 		var err error
-		x.Head, err = NewOperation(v7, context)
+		x.Head, err = NewOperation(v7, helpers.NewContext("Head", context))
 		if err != nil {
 			return nil, helpers.ExtendError("head", err)
 		}
@@ -2234,7 +2234,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v8 := helpers.MapValueForKey(m, "patch")
 	if v8 != nil {
 		var err error
-		x.Patch, err = NewOperation(v8, context)
+		x.Patch, err = NewOperation(v8, helpers.NewContext("Patch", context))
 		if err != nil {
 			return nil, helpers.ExtendError("patch", err)
 		}
@@ -2247,7 +2247,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		a, ok := v9.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewParametersItem(item, context)
+				y, err := NewParametersItem(item, helpers.NewContext("parameters", context))
 				if err != nil {
 					return nil, err
 				}
@@ -2326,7 +2326,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v7, context)
+		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2340,7 +2340,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
 		var err error
-		x.Default, err = NewAny(v9, context)
+		x.Default, err = NewAny(v9, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2403,7 +2403,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -2513,7 +2513,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v3, context)
+		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2527,7 +2527,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5, context)
+		x.Default, err = NewAny(v5, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2590,7 +2590,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 		a, ok := v16.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -2699,7 +2699,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v8, context)
+		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2713,7 +2713,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
 		var err error
-		x.Default, err = NewAny(v10, context)
+		x.Default, err = NewAny(v10, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2776,7 +2776,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 		a, ok := v21.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -2835,7 +2835,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	v2 := helpers.MapValueForKey(m, "schema")
 	if v2 != nil {
 		var err error
-		x.Schema, err = NewSchemaItem(v2, context)
+		x.Schema, err = NewSchemaItem(v2, helpers.NewContext("Schema", context))
 		if err != nil {
 			return nil, helpers.ExtendError("schema", err)
 		}
@@ -2844,7 +2844,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	v3 := helpers.MapValueForKey(m, "headers")
 	if v3 != nil {
 		var err error
-		x.Headers, err = NewHeaders(v3, context)
+		x.Headers, err = NewHeaders(v3, helpers.NewContext("Headers", context))
 		if err != nil {
 			return nil, helpers.ExtendError("headers", err)
 		}
@@ -2853,7 +2853,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	v4 := helpers.MapValueForKey(m, "examples")
 	if v4 != nil {
 		var err error
-		x.Examples, err = NewExamples(v4, context)
+		x.Examples, err = NewExamples(v4, helpers.NewContext("Examples", context))
 		if err != nil {
 			return nil, helpers.ExtendError("examples", err)
 		}
@@ -2911,7 +2911,7 @@ func NewResponseValue(in interface{}, context *helpers.Context) (*ResponseValue,
 	// Response response = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewResponse(m, context)
+		t, _ := NewResponse(m, helpers.NewContext("response", context))
 		if t != nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
 		}
@@ -2919,7 +2919,7 @@ func NewResponseValue(in interface{}, context *helpers.Context) (*ResponseValue,
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewJsonReference(m, context)
+		t, _ := NewJsonReference(m, helpers.NewContext("jsonReference", context))
 		if t != nil {
 			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
@@ -3014,7 +3014,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5, context)
+		x.Default, err = NewAny(v5, helpers.NewContext("Default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -3102,7 +3102,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		a, ok := v20.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewAny(item, context)
+				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
 					return nil, err
 				}
@@ -3114,7 +3114,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v21 := helpers.MapValueForKey(m, "additionalProperties")
 	if v21 != nil {
 		var err error
-		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, context)
+		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, helpers.NewContext("AdditionalProperties", context))
 		if err != nil {
 			return nil, helpers.ExtendError("additionalProperties", err)
 		}
@@ -3123,7 +3123,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v22 := helpers.MapValueForKey(m, "type")
 	if v22 != nil {
 		var err error
-		x.Type, err = NewTypeItem(v22, context)
+		x.Type, err = NewTypeItem(v22, helpers.NewContext("Type", context))
 		if err != nil {
 			return nil, helpers.ExtendError("type", err)
 		}
@@ -3132,7 +3132,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v23 := helpers.MapValueForKey(m, "items")
 	if v23 != nil {
 		var err error
-		x.Items, err = NewItemsItem(v23, context)
+		x.Items, err = NewItemsItem(v23, helpers.NewContext("Items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -3145,7 +3145,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		a, ok := v24.([]interface{})
 		if ok {
 			for _, item := range a {
-				y, err := NewSchema(item, context)
+				y, err := NewSchema(item, helpers.NewContext("allOf", context))
 				if err != nil {
 					return nil, err
 				}
@@ -3157,7 +3157,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v25 := helpers.MapValueForKey(m, "properties")
 	if v25 != nil {
 		var err error
-		x.Properties, err = NewProperties(v25, context)
+		x.Properties, err = NewProperties(v25, helpers.NewContext("Properties", context))
 		if err != nil {
 			return nil, helpers.ExtendError("properties", err)
 		}
@@ -3176,7 +3176,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v28 := helpers.MapValueForKey(m, "xml")
 	if v28 != nil {
 		var err error
-		x.Xml, err = NewXml(v28, context)
+		x.Xml, err = NewXml(v28, helpers.NewContext("Xml", context))
 		if err != nil {
 			return nil, helpers.ExtendError("xml", err)
 		}
@@ -3185,7 +3185,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v29 := helpers.MapValueForKey(m, "externalDocs")
 	if v29 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v29, context)
+		x.ExternalDocs, err = NewExternalDocs(v29, helpers.NewContext("ExternalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -3194,7 +3194,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v30 := helpers.MapValueForKey(m, "example")
 	if v30 != nil {
 		var err error
-		x.Example, err = NewAny(v30, context)
+		x.Example, err = NewAny(v30, helpers.NewContext("Example", context))
 		if err != nil {
 			return nil, helpers.ExtendError("example", err)
 		}
@@ -3228,7 +3228,7 @@ func NewSchemaItem(in interface{}, context *helpers.Context) (*SchemaItem, error
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewSchema(m, context)
+		t, _ := NewSchema(m, helpers.NewContext("schema", context))
 		if t != nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
 		}
@@ -3236,7 +3236,7 @@ func NewSchemaItem(in interface{}, context *helpers.Context) (*SchemaItem, error
 	// FileSchema file_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewFileSchema(m, context)
+		t, _ := NewFileSchema(m, helpers.NewContext("fileSchema", context))
 		if t != nil {
 			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
@@ -3277,7 +3277,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*Secu
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewBasicAuthenticationSecurity(m, context)
+		t, _ := NewBasicAuthenticationSecurity(m, helpers.NewContext("basicAuthenticationSecurity", context))
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
@@ -3285,7 +3285,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*Secu
 	// ApiKeySecurity api_key_security = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewApiKeySecurity(m, context)
+		t, _ := NewApiKeySecurity(m, helpers.NewContext("apiKeySecurity", context))
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
@@ -3293,7 +3293,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*Secu
 	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2ImplicitSecurity(m, context)
+		t, _ := NewOauth2ImplicitSecurity(m, helpers.NewContext("oauth2ImplicitSecurity", context))
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
@@ -3301,7 +3301,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*Secu
 	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2PasswordSecurity(m, context)
+		t, _ := NewOauth2PasswordSecurity(m, helpers.NewContext("oauth2PasswordSecurity", context))
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 		}
@@ -3309,7 +3309,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*Secu
 	// Oauth2ApplicationSecurity oauth2_application_security = 5;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2ApplicationSecurity(m, context)
+		t, _ := NewOauth2ApplicationSecurity(m, helpers.NewContext("oauth2ApplicationSecurity", context))
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 		}
@@ -3317,7 +3317,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*Secu
 	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2AccessCodeSecurity(m, context)
+		t, _ := NewOauth2AccessCodeSecurity(m, helpers.NewContext("oauth2AccessCodeSecurity", context))
 		if t != nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
@@ -3394,7 +3394,7 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 	v3 := helpers.MapValueForKey(m, "externalDocs")
 	if v3 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v3, context)
+		x.ExternalDocs, err = NewExternalDocs(v3, helpers.NewContext("ExternalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
