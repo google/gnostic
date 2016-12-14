@@ -80,7 +80,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x := &ItemsItem{}")
 			code.Print("if ok {")
 			code.Print("x.Schema = make([]*Schema, 0)")
-			code.Print("y, err := NewSchema(m, context)")
+			code.Print("y, err := NewSchema(m, helpers.NewContext(\"<array>\", context))")
 			code.Print("if err != nil {return nil, err}")
 			code.Print("x.Schema = append(x.Schema, y)")
 			code.Print("} else {")
@@ -244,7 +244,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("var err error")
 						code.Print("x.%s, err = New%s(v%d, helpers.NewContext(\"%s\", context))",
-							fieldName, classModel.Name, fieldNumber, fieldName)
+							fieldName, classModel.Name, fieldNumber, propertyName)
 						code.Print("if err != nil {return nil, helpers.ExtendError(\"%s\", err)}", propertyName)
 						code.Print("}")
 					}
@@ -308,7 +308,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("pair.Value = v.(string)")
 					} else {
 						code.Print("var err error")
-						code.Print("pair.Value, err = New%s(v, context)", mapTypeName)
+						code.Print("pair.Value, err = New%s(v, helpers.NewContext(k, context))", mapTypeName)
 						code.Print("if err != nil {return nil, err}")
 					}
 					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)

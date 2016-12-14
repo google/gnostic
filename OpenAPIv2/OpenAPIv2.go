@@ -103,7 +103,7 @@ func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurit
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -150,7 +150,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *helpers.Context) (*
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -201,7 +201,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 	v5 := helpers.MapValueForKey(m, "schema")
 	if v5 != nil {
 		var err error
-		x.Schema, err = NewSchema(v5, helpers.NewContext("Schema", context))
+		x.Schema, err = NewSchema(v5, helpers.NewContext("schema", context))
 		if err != nil {
 			return nil, helpers.ExtendError("schema", err)
 		}
@@ -216,7 +216,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -264,7 +264,7 @@ func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -289,7 +289,7 @@ func NewDefault(in interface{}, context *helpers.Context) (*Default, error) {
 		pair := &NamedAny{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewAny(v, context)
+		pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -313,7 +313,7 @@ func NewDefinitions(in interface{}, context *helpers.Context) (*Definitions, err
 		pair := &NamedSchema{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewSchema(v, context)
+		pair.Value, err = NewSchema(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -348,7 +348,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v2 := helpers.MapValueForKey(m, "info")
 	if v2 != nil {
 		var err error
-		x.Info, err = NewInfo(v2, helpers.NewContext("Info", context))
+		x.Info, err = NewInfo(v2, helpers.NewContext("info", context))
 		if err != nil {
 			return nil, helpers.ExtendError("info", err)
 		}
@@ -397,7 +397,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v8 := helpers.MapValueForKey(m, "paths")
 	if v8 != nil {
 		var err error
-		x.Paths, err = NewPaths(v8, helpers.NewContext("Paths", context))
+		x.Paths, err = NewPaths(v8, helpers.NewContext("paths", context))
 		if err != nil {
 			return nil, helpers.ExtendError("paths", err)
 		}
@@ -406,7 +406,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v9 := helpers.MapValueForKey(m, "definitions")
 	if v9 != nil {
 		var err error
-		x.Definitions, err = NewDefinitions(v9, helpers.NewContext("Definitions", context))
+		x.Definitions, err = NewDefinitions(v9, helpers.NewContext("definitions", context))
 		if err != nil {
 			return nil, helpers.ExtendError("definitions", err)
 		}
@@ -415,7 +415,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v10 := helpers.MapValueForKey(m, "parameters")
 	if v10 != nil {
 		var err error
-		x.Parameters, err = NewParameterDefinitions(v10, helpers.NewContext("Parameters", context))
+		x.Parameters, err = NewParameterDefinitions(v10, helpers.NewContext("parameters", context))
 		if err != nil {
 			return nil, helpers.ExtendError("parameters", err)
 		}
@@ -424,7 +424,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v11 := helpers.MapValueForKey(m, "responses")
 	if v11 != nil {
 		var err error
-		x.Responses, err = NewResponseDefinitions(v11, helpers.NewContext("Responses", context))
+		x.Responses, err = NewResponseDefinitions(v11, helpers.NewContext("responses", context))
 		if err != nil {
 			return nil, helpers.ExtendError("responses", err)
 		}
@@ -449,7 +449,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v13 := helpers.MapValueForKey(m, "securityDefinitions")
 	if v13 != nil {
 		var err error
-		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, helpers.NewContext("SecurityDefinitions", context))
+		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, helpers.NewContext("securityDefinitions", context))
 		if err != nil {
 			return nil, helpers.ExtendError("securityDefinitions", err)
 		}
@@ -474,7 +474,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	v15 := helpers.MapValueForKey(m, "externalDocs")
 	if v15 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v15, helpers.NewContext("ExternalDocs", context))
+		x.ExternalDocs, err = NewExternalDocs(v15, helpers.NewContext("externalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -497,7 +497,7 @@ func NewExamples(in interface{}, context *helpers.Context) (*Examples, error) {
 		pair := &NamedAny{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewAny(v, context)
+		pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -543,7 +543,7 @@ func NewExternalDocs(in interface{}, context *helpers.Context) (*ExternalDocs, e
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -589,7 +589,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	v4 := helpers.MapValueForKey(m, "default")
 	if v4 != nil {
 		var err error
-		x.Default, err = NewAny(v4, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v4, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -618,7 +618,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	v8 := helpers.MapValueForKey(m, "externalDocs")
 	if v8 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v8, helpers.NewContext("ExternalDocs", context))
+		x.ExternalDocs, err = NewExternalDocs(v8, helpers.NewContext("externalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -627,7 +627,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	v9 := helpers.MapValueForKey(m, "example")
 	if v9 != nil {
 		var err error
-		x.Example, err = NewAny(v9, helpers.NewContext("Example", context))
+		x.Example, err = NewAny(v9, helpers.NewContext("example", context))
 		if err != nil {
 			return nil, helpers.ExtendError("example", err)
 		}
@@ -642,7 +642,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -704,7 +704,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("Items", context))
+		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -718,7 +718,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
 		var err error
-		x.Default, err = NewAny(v10, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v10, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -804,7 +804,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -845,7 +845,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("Items", context))
+		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -859,7 +859,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v5, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -950,7 +950,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1007,7 +1007,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("Items", context))
+		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -1021,7 +1021,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
 		var err error
-		x.Default, err = NewAny(v9, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v9, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -1107,7 +1107,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1132,7 +1132,7 @@ func NewHeaders(in interface{}, context *helpers.Context) (*Headers, error) {
 		pair := &NamedHeader{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewHeader(v, context)
+		pair.Value, err = NewHeader(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -1182,7 +1182,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	v5 := helpers.MapValueForKey(m, "contact")
 	if v5 != nil {
 		var err error
-		x.Contact, err = NewContact(v5, helpers.NewContext("Contact", context))
+		x.Contact, err = NewContact(v5, helpers.NewContext("contact", context))
 		if err != nil {
 			return nil, helpers.ExtendError("contact", err)
 		}
@@ -1191,7 +1191,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	v6 := helpers.MapValueForKey(m, "license")
 	if v6 != nil {
 		var err error
-		x.License, err = NewLicense(v6, helpers.NewContext("License", context))
+		x.License, err = NewLicense(v6, helpers.NewContext("license", context))
 		if err != nil {
 			return nil, helpers.ExtendError("license", err)
 		}
@@ -1206,7 +1206,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1224,7 +1224,7 @@ func NewItemsItem(in interface{}, context *helpers.Context) (*ItemsItem, error) 
 	x := &ItemsItem{}
 	if ok {
 		x.Schema = make([]*Schema, 0)
-		y, err := NewSchema(m, context)
+		y, err := NewSchema(m, helpers.NewContext("<array>", context))
 		if err != nil {
 			return nil, err
 		}
@@ -1297,7 +1297,7 @@ func NewLicense(in interface{}, context *helpers.Context) (*License, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1329,7 +1329,7 @@ func NewNamedAny(in interface{}, context *helpers.Context) (*NamedAny, error) {
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewAny(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewAny(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1359,7 +1359,7 @@ func NewNamedHeader(in interface{}, context *helpers.Context) (*NamedHeader, err
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewHeader(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewHeader(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1389,7 +1389,7 @@ func NewNamedParameter(in interface{}, context *helpers.Context) (*NamedParamete
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewParameter(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewParameter(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1419,7 +1419,7 @@ func NewNamedPathItem(in interface{}, context *helpers.Context) (*NamedPathItem,
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewPathItem(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewPathItem(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1449,7 +1449,7 @@ func NewNamedResponse(in interface{}, context *helpers.Context) (*NamedResponse,
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewResponse(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewResponse(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1479,7 +1479,7 @@ func NewNamedResponseValue(in interface{}, context *helpers.Context) (*NamedResp
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewResponseValue(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewResponseValue(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1509,7 +1509,7 @@ func NewNamedSchema(in interface{}, context *helpers.Context) (*NamedSchema, err
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewSchema(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewSchema(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1539,7 +1539,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *helpers.Context) (
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewSecurityDefinitionsItem(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewSecurityDefinitionsItem(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1595,7 +1595,7 @@ func NewNamedStringArray(in interface{}, context *helpers.Context) (*NamedString
 	v2 := helpers.MapValueForKey(m, "value")
 	if v2 != nil {
 		var err error
-		x.Value, err = NewStringArray(v2, helpers.NewContext("Value", context))
+		x.Value, err = NewStringArray(v2, helpers.NewContext("value", context))
 		if err != nil {
 			return nil, helpers.ExtendError("value", err)
 		}
@@ -1679,7 +1679,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1709,7 +1709,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1750,7 +1750,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1775,7 +1775,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1816,7 +1816,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1841,7 +1841,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1882,7 +1882,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 	v3 := helpers.MapValueForKey(m, "scopes")
 	if v3 != nil {
 		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("Scopes", context))
+		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
 			return nil, helpers.ExtendError("scopes", err)
 		}
@@ -1907,7 +1907,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -1978,7 +1978,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	v4 := helpers.MapValueForKey(m, "externalDocs")
 	if v4 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v4, helpers.NewContext("ExternalDocs", context))
+		x.ExternalDocs, err = NewExternalDocs(v4, helpers.NewContext("externalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -2028,7 +2028,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	v9 := helpers.MapValueForKey(m, "responses")
 	if v9 != nil {
 		var err error
-		x.Responses, err = NewResponses(v9, helpers.NewContext("Responses", context))
+		x.Responses, err = NewResponses(v9, helpers.NewContext("responses", context))
 		if err != nil {
 			return nil, helpers.ExtendError("responses", err)
 		}
@@ -2074,7 +2074,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2124,7 +2124,7 @@ func NewParameterDefinitions(in interface{}, context *helpers.Context) (*Paramet
 		pair := &NamedParameter{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewParameter(v, context)
+		pair.Value, err = NewParameter(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -2180,7 +2180,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v2 := helpers.MapValueForKey(m, "get")
 	if v2 != nil {
 		var err error
-		x.Get, err = NewOperation(v2, helpers.NewContext("Get", context))
+		x.Get, err = NewOperation(v2, helpers.NewContext("get", context))
 		if err != nil {
 			return nil, helpers.ExtendError("get", err)
 		}
@@ -2189,7 +2189,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v3 := helpers.MapValueForKey(m, "put")
 	if v3 != nil {
 		var err error
-		x.Put, err = NewOperation(v3, helpers.NewContext("Put", context))
+		x.Put, err = NewOperation(v3, helpers.NewContext("put", context))
 		if err != nil {
 			return nil, helpers.ExtendError("put", err)
 		}
@@ -2198,7 +2198,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v4 := helpers.MapValueForKey(m, "post")
 	if v4 != nil {
 		var err error
-		x.Post, err = NewOperation(v4, helpers.NewContext("Post", context))
+		x.Post, err = NewOperation(v4, helpers.NewContext("post", context))
 		if err != nil {
 			return nil, helpers.ExtendError("post", err)
 		}
@@ -2207,7 +2207,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v5 := helpers.MapValueForKey(m, "delete")
 	if v5 != nil {
 		var err error
-		x.Delete, err = NewOperation(v5, helpers.NewContext("Delete", context))
+		x.Delete, err = NewOperation(v5, helpers.NewContext("delete", context))
 		if err != nil {
 			return nil, helpers.ExtendError("delete", err)
 		}
@@ -2216,7 +2216,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v6 := helpers.MapValueForKey(m, "options")
 	if v6 != nil {
 		var err error
-		x.Options, err = NewOperation(v6, helpers.NewContext("Options", context))
+		x.Options, err = NewOperation(v6, helpers.NewContext("options", context))
 		if err != nil {
 			return nil, helpers.ExtendError("options", err)
 		}
@@ -2225,7 +2225,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v7 := helpers.MapValueForKey(m, "head")
 	if v7 != nil {
 		var err error
-		x.Head, err = NewOperation(v7, helpers.NewContext("Head", context))
+		x.Head, err = NewOperation(v7, helpers.NewContext("head", context))
 		if err != nil {
 			return nil, helpers.ExtendError("head", err)
 		}
@@ -2234,7 +2234,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	v8 := helpers.MapValueForKey(m, "patch")
 	if v8 != nil {
 		var err error
-		x.Patch, err = NewOperation(v8, helpers.NewContext("Patch", context))
+		x.Patch, err = NewOperation(v8, helpers.NewContext("patch", context))
 		if err != nil {
 			return nil, helpers.ExtendError("patch", err)
 		}
@@ -2265,7 +2265,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2326,7 +2326,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	v7 := helpers.MapValueForKey(m, "items")
 	if v7 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("Items", context))
+		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2340,7 +2340,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	v9 := helpers.MapValueForKey(m, "default")
 	if v9 != nil {
 		var err error
-		x.Default, err = NewAny(v9, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v9, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2426,7 +2426,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2459,7 +2459,7 @@ func NewPaths(in interface{}, context *helpers.Context) (*Paths, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2476,7 +2476,7 @@ func NewPaths(in interface{}, context *helpers.Context) (*Paths, error) {
 			pair := &NamedPathItem{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewPathItem(v, context)
+			pair.Value, err = NewPathItem(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2513,7 +2513,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	v3 := helpers.MapValueForKey(m, "items")
 	if v3 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("Items", context))
+		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2527,7 +2527,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v5, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2613,7 +2613,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2638,7 +2638,7 @@ func NewProperties(in interface{}, context *helpers.Context) (*Properties, error
 		pair := &NamedSchema{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewSchema(v, context)
+		pair.Value, err = NewSchema(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -2699,7 +2699,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	v8 := helpers.MapValueForKey(m, "items")
 	if v8 != nil {
 		var err error
-		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("Items", context))
+		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -2713,7 +2713,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	v10 := helpers.MapValueForKey(m, "default")
 	if v10 != nil {
 		var err error
-		x.Default, err = NewAny(v10, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v10, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -2799,7 +2799,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2835,7 +2835,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	v2 := helpers.MapValueForKey(m, "schema")
 	if v2 != nil {
 		var err error
-		x.Schema, err = NewSchemaItem(v2, helpers.NewContext("Schema", context))
+		x.Schema, err = NewSchemaItem(v2, helpers.NewContext("schema", context))
 		if err != nil {
 			return nil, helpers.ExtendError("schema", err)
 		}
@@ -2844,7 +2844,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	v3 := helpers.MapValueForKey(m, "headers")
 	if v3 != nil {
 		var err error
-		x.Headers, err = NewHeaders(v3, helpers.NewContext("Headers", context))
+		x.Headers, err = NewHeaders(v3, helpers.NewContext("headers", context))
 		if err != nil {
 			return nil, helpers.ExtendError("headers", err)
 		}
@@ -2853,7 +2853,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	v4 := helpers.MapValueForKey(m, "examples")
 	if v4 != nil {
 		var err error
-		x.Examples, err = NewExamples(v4, helpers.NewContext("Examples", context))
+		x.Examples, err = NewExamples(v4, helpers.NewContext("examples", context))
 		if err != nil {
 			return nil, helpers.ExtendError("examples", err)
 		}
@@ -2868,7 +2868,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2893,7 +2893,7 @@ func NewResponseDefinitions(in interface{}, context *helpers.Context) (*Response
 		pair := &NamedResponse{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewResponse(v, context)
+		pair.Value, err = NewResponse(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -2950,7 +2950,7 @@ func NewResponses(in interface{}, context *helpers.Context) (*Responses, error) 
 			pair := &NamedResponseValue{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewResponseValue(v, context)
+			pair.Value, err = NewResponseValue(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -2967,7 +2967,7 @@ func NewResponses(in interface{}, context *helpers.Context) (*Responses, error) 
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -3014,7 +3014,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v5 := helpers.MapValueForKey(m, "default")
 	if v5 != nil {
 		var err error
-		x.Default, err = NewAny(v5, helpers.NewContext("Default", context))
+		x.Default, err = NewAny(v5, helpers.NewContext("default", context))
 		if err != nil {
 			return nil, helpers.ExtendError("default", err)
 		}
@@ -3114,7 +3114,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v21 := helpers.MapValueForKey(m, "additionalProperties")
 	if v21 != nil {
 		var err error
-		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, helpers.NewContext("AdditionalProperties", context))
+		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, helpers.NewContext("additionalProperties", context))
 		if err != nil {
 			return nil, helpers.ExtendError("additionalProperties", err)
 		}
@@ -3123,7 +3123,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v22 := helpers.MapValueForKey(m, "type")
 	if v22 != nil {
 		var err error
-		x.Type, err = NewTypeItem(v22, helpers.NewContext("Type", context))
+		x.Type, err = NewTypeItem(v22, helpers.NewContext("type", context))
 		if err != nil {
 			return nil, helpers.ExtendError("type", err)
 		}
@@ -3132,7 +3132,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v23 := helpers.MapValueForKey(m, "items")
 	if v23 != nil {
 		var err error
-		x.Items, err = NewItemsItem(v23, helpers.NewContext("Items", context))
+		x.Items, err = NewItemsItem(v23, helpers.NewContext("items", context))
 		if err != nil {
 			return nil, helpers.ExtendError("items", err)
 		}
@@ -3157,7 +3157,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v25 := helpers.MapValueForKey(m, "properties")
 	if v25 != nil {
 		var err error
-		x.Properties, err = NewProperties(v25, helpers.NewContext("Properties", context))
+		x.Properties, err = NewProperties(v25, helpers.NewContext("properties", context))
 		if err != nil {
 			return nil, helpers.ExtendError("properties", err)
 		}
@@ -3176,7 +3176,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v28 := helpers.MapValueForKey(m, "xml")
 	if v28 != nil {
 		var err error
-		x.Xml, err = NewXml(v28, helpers.NewContext("Xml", context))
+		x.Xml, err = NewXml(v28, helpers.NewContext("xml", context))
 		if err != nil {
 			return nil, helpers.ExtendError("xml", err)
 		}
@@ -3185,7 +3185,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v29 := helpers.MapValueForKey(m, "externalDocs")
 	if v29 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v29, helpers.NewContext("ExternalDocs", context))
+		x.ExternalDocs, err = NewExternalDocs(v29, helpers.NewContext("externalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -3194,7 +3194,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	v30 := helpers.MapValueForKey(m, "example")
 	if v30 != nil {
 		var err error
-		x.Example, err = NewAny(v30, helpers.NewContext("Example", context))
+		x.Example, err = NewAny(v30, helpers.NewContext("example", context))
 		if err != nil {
 			return nil, helpers.ExtendError("example", err)
 		}
@@ -3209,7 +3209,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -3259,7 +3259,7 @@ func NewSecurityDefinitions(in interface{}, context *helpers.Context) (*Security
 		pair := &NamedSecurityDefinitionsItem{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewSecurityDefinitionsItem(v, context)
+		pair.Value, err = NewSecurityDefinitionsItem(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -3340,7 +3340,7 @@ func NewSecurityRequirement(in interface{}, context *helpers.Context) (*Security
 		pair := &NamedStringArray{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewStringArray(v, context)
+		pair.Value, err = NewStringArray(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -3394,7 +3394,7 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 	v3 := helpers.MapValueForKey(m, "externalDocs")
 	if v3 != nil {
 		var err error
-		x.ExternalDocs, err = NewExternalDocs(v3, helpers.NewContext("ExternalDocs", context))
+		x.ExternalDocs, err = NewExternalDocs(v3, helpers.NewContext("externalDocs", context))
 		if err != nil {
 			return nil, helpers.ExtendError("externalDocs", err)
 		}
@@ -3409,7 +3409,7 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
@@ -3446,7 +3446,7 @@ func NewVendorExtension(in interface{}, context *helpers.Context) (*VendorExtens
 		pair := &NamedAny{}
 		pair.Name = k
 		var err error
-		pair.Value, err = NewAny(v, context)
+		pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 		if err != nil {
 			return nil, err
 		}
@@ -3503,7 +3503,7 @@ func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
-			pair.Value, err = NewAny(v, context)
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
 			if err != nil {
 				return nil, err
 			}
