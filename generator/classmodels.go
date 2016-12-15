@@ -39,20 +39,26 @@ func NewClassRequest(name string, propertyName string, schema *jsonschema.Schema
 
 // models class properties, eg. fields
 type ClassProperty struct {
-	Name     string // name of property
-	Type     string // type for property (scalar or message type)
-	MapType  string // if this property is for a map, the name of the mapped type
-	Repeated bool   // true if this property is repeated (an array)
-	Pattern  string // if the property is a pattern property, names must match this pattern.
-	Implicit bool   // true if this property is implied by a pattern or "additional properties" property
+	Name        string // name of property
+	Type        string // type for property (scalar or message type)
+	MapType     string // if this property is for a map, the name of the mapped type
+	Repeated    bool   // true if this property is repeated (an array)
+	Pattern     string // if the property is a pattern property, names must match this pattern.
+	Implicit    bool   // true if this property is implied by a pattern or "additional properties" property
+	Description string // if present, the "description" field in the schema
 }
 
 func (classProperty *ClassProperty) description() string {
-	if classProperty.Repeated {
-		return fmt.Sprintf("\t%s %s repeated %s\n", classProperty.Name, classProperty.Type, classProperty.Pattern)
-	} else {
-		return fmt.Sprintf("\t%s %s %s \n", classProperty.Name, classProperty.Type, classProperty.Pattern)
+	result := ""
+	if classProperty.Description != "" {
+		result += fmt.Sprintf("\t// %+s\n", classProperty.Description)
 	}
+	if classProperty.Repeated {
+		result += fmt.Sprintf("\t%s %s repeated %s\n", classProperty.Name, classProperty.Type, classProperty.Pattern)
+	} else {
+		result += fmt.Sprintf("\t%s %s %s \n", classProperty.Name, classProperty.Type, classProperty.Pattern)
+	}
+	return result
 }
 
 func NewClassProperty() *ClassProperty {
@@ -79,6 +85,7 @@ type ClassModel struct {
 	IsItemArray   bool             // ugly override
 	IsBlob        bool             // ugly override
 	IsPair        bool             // class is a name-value pair used to support ordered maps
+	Description   string           // if present, the "description" field in the schema
 }
 
 func (classModel *ClassModel) AddProperty(property *ClassProperty) {
@@ -89,7 +96,11 @@ func (classModel *ClassModel) AddProperty(property *ClassProperty) {
 }
 
 func (classModel *ClassModel) description() string {
-	result := fmt.Sprintf("%+s\n", classModel.Name)
+	result := ""
+	if classModel.Description != "" {
+		result += fmt.Sprintf("// %+s\n", classModel.Description)
+	}
+	result += fmt.Sprintf("%+s\n", classModel.Name)
 	for _, property := range classModel.Properties {
 		result += property.description()
 	}
@@ -223,25 +234,48 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 			} else if propertySchema.Type != nil {
 				// the property schema specifies a type, so add a property with the specified type
 				if propertySchema.TypeIs("string") {
-					classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, "string"))
+					classProperty := NewClassPropertyWithNameAndType(propertyName, "string")
+					if propertySchema.Description != nil {
+						classProperty.Description = *propertySchema.Description
+					}
+					classModel.AddProperty(classProperty)
 				} else if propertySchema.TypeIs("boolean") {
-					classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, "bool"))
+					classProperty := NewClassPropertyWithNameAndType(propertyName, "bool")
+					if propertySchema.Description != nil {
+						classProperty.Description = *propertySchema.Description
+					}
+					classModel.AddProperty(classProperty)
 				} else if propertySchema.TypeIs("number") {
-					classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, "float"))
+					classProperty := NewClassPropertyWithNameAndType(propertyName, "float")
+					if propertySchema.Description != nil {
+						classProperty.Description = *propertySchema.Description
+					}
+					classModel.AddProperty(classProperty)
 				} else if propertySchema.TypeIs("integer") {
-					classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, "int"))
+					classProperty := NewClassPropertyWithNameAndType(propertyName, "int")
+					if propertySchema.Description != nil {
+						classProperty.Description = *propertySchema.Description
+					}
+					classModel.AddProperty(classProperty)
 				} else if propertySchema.TypeIs("object") {
 					// the property has an "anonymous" object schema, so define a new class for it and request its creation
 					anonymousObjectClassName := classes.classNameForStub(propertyName)
 					classes.ObjectClassRequests[anonymousObjectClassName] =
 						NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
 					// add a property with the type of the requested class
-					classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName))
+					classProperty := NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
+					if propertySchema.Description != nil {
+						classProperty.Description = *propertySchema.Description
+					}
+					classModel.AddProperty(classProperty)
 				} else if propertySchema.TypeIs("array") {
 					// the property has an array type, so define it as a a repeated property of the specified type
 					propertyClassName := classes.arrayItemTypeForSchema(propertyName, propertySchema)
 					classProperty := NewClassPropertyWithNameAndType(propertyName, propertyClassName)
 					classProperty.Repeated = true
+					if propertySchema.Description != nil {
+						classProperty.Description = *propertySchema.Description
+					}
 					classModel.AddProperty(classProperty)
 				} else {
 					log.Printf("ignoring %+v, which has an unsupported property type '%+v'", propertyName, propertySchema.Type)
@@ -249,17 +283,20 @@ func (classes *ClassCollection) buildClassProperties(classModel *ClassModel, sch
 			} else if propertySchema.IsEmpty() {
 				// an empty schema can contain anything, so add an accessor for a generic object
 				className := "Any"
-				classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, className))
+				classProperty := NewClassPropertyWithNameAndType(propertyName, className)
+				classModel.AddProperty(classProperty)
 			} else if propertySchema.OneOf != nil {
 				anonymousObjectClassName := classes.classNameForStub(propertyName + "Item")
 				classes.ObjectClassRequests[anonymousObjectClassName] =
 					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
-				classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName))
+				classProperty := NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
+				classModel.AddProperty(classProperty)
 			} else if propertySchema.AnyOf != nil {
 				anonymousObjectClassName := classes.classNameForStub(propertyName + "Item")
 				classes.ObjectClassRequests[anonymousObjectClassName] =
 					NewClassRequest(anonymousObjectClassName, propertyName, propertySchema)
-				classModel.AddProperty(NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName))
+				classProperty := NewClassPropertyWithNameAndType(propertyName, anonymousObjectClassName)
+				classModel.AddProperty(classProperty)
 			} else {
 				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", classModel.Name, propertyName, propertySchema.String())
 			}
@@ -386,7 +423,8 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 			propertyName := classes.propertyNameForReference(ref)
 
 			if propertyName != nil {
-				classModel.AddProperty(NewClassPropertyWithNameAndType(*propertyName, className))
+				classProperty := NewClassPropertyWithNameAndType(*propertyName, className)
+				classModel.AddProperty(classProperty)
 			}
 		}
 	}
@@ -500,6 +538,9 @@ func (classes *ClassCollection) buildClassForDefinitionObject(
 	if schema.IsEmpty() {
 		classes.buildDefaultAccessors(classModel, schema)
 	} else {
+		if schema.Description != nil {
+			classModel.Description = *schema.Description
+		}
 		classes.buildClassProperties(classModel, schema)
 		classes.buildClassRequirements(classModel, schema)
 		classes.buildPatternPropertyAccessors(classModel, schema)
@@ -547,16 +588,21 @@ func (classes *ClassCollection) build() {
 		className := "Named" + strings.Title(mapClassName)
 		classModel := NewClassModel()
 		classModel.Name = className
+		classModel.Description = fmt.Sprintf(
+			"Automatically-generated message used to represent maps of %s as ordered (name,value) pairs.",
+			mapClassName)
 		classModel.IsPair = true
 
 		nameProperty := NewClassProperty()
 		nameProperty.Name = "name"
 		nameProperty.Type = "string"
+		nameProperty.Description = "Map key"
 		classModel.AddProperty(nameProperty)
 
 		valueProperty := NewClassProperty()
 		valueProperty.Name = "value"
 		valueProperty.Type = mapClassName
+		valueProperty.Description = "Mapped value"
 		classModel.AddProperty(valueProperty)
 
 		classes.ClassModels[className] = classModel

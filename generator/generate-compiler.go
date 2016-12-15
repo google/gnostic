@@ -30,9 +30,15 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print("package %s", packageName)
 	code.Print()
 	code.Print("import (")
-	code.Print("\"fmt\"")
-	code.Print("\"log\"")
-	code.Print("\"github.com/googleapis/openapi-compiler/helpers\"")
+	imports := []string{
+		"errors",
+		"fmt",
+		"encoding/json",
+		"github.com/googleapis/openapi-compiler/helpers",
+	}
+	for _, filename := range imports {
+		code.Print("\"" + filename + "\"")
+	}
 	code.Print(")")
 	code.Print()
 	code.Print("func Version() string {")
@@ -42,7 +48,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 	classNames := classes.sortedClassNames()
 	for _, className := range classNames {
-		code.Print("func Build%s(in interface{}) *%s {", className, className)
+		code.Print("func New%s(in interface{}) (*%s, error) {", className, className)
 
 		classModel := classes.ClassModels[className]
 		parentClassName := className
@@ -54,9 +60,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x.Value = make([]string, 0)")
 			code.Print("x.Value = append(x.Value, value)")
 			code.Print("} else {")
-			code.Print("log.Printf(\"unexpected: %%+v\", in)")
+			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for string array: %%+v\", in))")
 			code.Print("}")
-			code.Print("return x")
+			code.Print("return x, nil")
 			code.Print("}")
 			code.Print()
 			continue
@@ -65,19 +71,19 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		if classModel.IsItemArray {
 			code.Print("m, ok := helpers.UnpackMap(in)")
 			code.Print("if (!ok) {")
-			code.Print("log.Printf(\"unexpected argument to Build%s: %%+v\", in)", className)
-			code.Print("log.Printf(\"%%d\\n\", len(m))")
-			code.Print("return nil")
+			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
 			code.Print("}")
 
 			code.Print("x := &ItemsItem{}")
 			code.Print("if ok {")
 			code.Print("x.Schema = make([]*Schema, 0)")
-			code.Print("x.Schema = append(x.Schema, BuildSchema(m))")
+			code.Print("y, err := NewSchema(m)")
+			code.Print("if err != nil {return nil, err}")
+			code.Print("x.Schema = append(x.Schema, y)")
 			code.Print("} else {")
-			code.Print("log.Printf(\"unexpected: %%+v\", in)")
+			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
 			code.Print("}")
-			code.Print("return x")
+			code.Print("return x, nil")
 			code.Print("}")
 			code.Print()
 			continue
@@ -85,8 +91,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 
 		if classModel.IsBlob {
 			code.Print("x := &Any{}")
-			code.Print("x.Value = fmt.Sprintf(\"%%+v\", in)")
-			code.Print("return x")
+			code.Print("bytes, _ := json.Marshal(in)")
+			code.Print("x.Value = string(bytes)")
+			code.Print("return x, nil")
 			code.Print("}")
 			code.Print()
 			continue
@@ -100,9 +107,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("for _, s := range a {")
 			code.Print("x.Value = append(x.Value, s.(string))")
 			code.Print("}")
-			code.Print("return x")
+			code.Print("return x, nil")
 			code.Print("} else {")
-			code.Print("return nil")
+			code.Print("return nil, nil")
 			code.Print("}")
 			code.Print("}")
 			code.Print()
@@ -110,9 +117,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		}
 		code.Print("m, ok := helpers.UnpackMap(in)")
 		code.Print("if (!ok) {")
-		code.Print("log.Printf(\"unexpected argument to Build%s: %%+v\", in)", className)
-		code.Print("log.Printf(\"%%d\\n\", len(m))")
-		code.Print("return nil")
+		code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for %s section: %%+v\", in))", className)
 		code.Print("}")
 		oneOfWrapper := classModel.OneOfWrapper
 
@@ -130,7 +135,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			}
 			code.Print("requiredKeys := []string{%s}", keyString)
 			code.Print("if !helpers.MapContainsAllKeys(m, requiredKeys) {")
-			code.Print("return nil")
+			code.Print("return nil, errors.New(\"%s does not contain all required properties (%s)\")",
+				classModel.Name,
+				strings.Replace(keyString, "\"", "'", -1))
 			code.Print("}")
 		}
 
@@ -167,7 +174,10 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
 			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
 			code.Print("if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
-			code.Print("return nil")
+			code.Print("return nil, errors.New(\"%s includes properties not in (%s) or (%s)\")",
+				classModel.Name,
+				strings.Replace(allowedKeyString, "\"", "'", -1),
+				strings.Replace(allowedPatternString, "\"", "'", -1))
 			code.Print("}")
 		}
 
@@ -204,56 +214,68 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			classModel, classFound := classes.ClassModels[propertyType]
 			if classFound && !classModel.IsPair {
 				if propertyModel.Repeated {
-					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
+					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("// repeated class %s", classModel.Name)
 					code.Print("x.%s = make([]*%s, 0)", fieldName, classModel.Name)
-					code.Print("a, ok := helpers.MapValueForKey(m, \"%s\").([]interface{})", propertyName)
+					code.Print("a, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
-					code.Print("x.%s = append(x.%s, Build%s(item))", fieldName, fieldName, classModel.Name)
+					code.Print("y, err := New%s(item)", classModel.Name)
+					code.Print("if err != nil {return nil, err}")
+					code.Print("x.%s = append(x.%s, y)", fieldName, fieldName)
 					code.Print("}")
 					code.Print("}")
 					code.Print("}")
 				} else {
 					if oneOfWrapper {
 						code.Print("{")
-						code.Print("t := Build%s(m)", classModel.Name)
+						code.Print("// errors are ok here, they mean we just don't have the right subtype")
+						code.Print("t, _ := New%s(m)", classModel.Name)
 						code.Print("if t != nil {")
 						code.Print("x.Oneof = &%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
 						code.Print("}")
 						code.Print("}")
 					} else {
-						code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-						code.Print("x.%s = Build%s(helpers.MapValueForKey(m,\"%v\"))", fieldName, classModel.Name, propertyName)
+						code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+						code.Print("if (v%d != nil) {", fieldNumber)
+						code.Print("var err error")
+						code.Print("x.%s, err = New%s(v%d)", fieldName, classModel.Name, fieldNumber)
+						code.Print("if err != nil {return nil, err}")
 						code.Print("}")
 					}
 				}
 			} else if propertyType == "string" {
 				if propertyModel.Repeated {
-					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-					code.Print("v, ok := helpers.MapValueForKey(m, \"%v\").([]interface{})", propertyName)
+					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+					code.Print("if (v%d != nil) {", fieldNumber)
+					code.Print("v, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
-					code.Print(" log.Printf(\"unexpected: %%+v\", helpers.MapValueForKey(m,\"%v\"))", propertyName)
+					code.Print(" return nil, errors.New(fmt.Sprintf(\"unexpected value for %s property: %%+v\", in))", propertyName)
 					code.Print("}")
 					code.Print("}")
 				} else {
-					code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-					code.Print("x.%s = helpers.MapValueForKey(m,\"%v\").(string)", fieldName, propertyName)
+					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+					code.Print("if (v%d != nil) {", fieldNumber)
+					code.Print("x.%s = v%d.(string)", fieldName, fieldNumber)
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
-				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(float64)", fieldName, propertyName)
+				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+				code.Print("if (v%d != nil) {", fieldNumber)
+				code.Print("x.%s = v%d.(float64)", fieldName, fieldNumber)
 				code.Print("}")
 			} else if propertyType == "int64" {
-				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(int64)", fieldName, propertyName)
+				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+				code.Print("if (v%d != nil) {", fieldNumber)
+				code.Print("x.%s = v%d.(int64)", fieldName, fieldNumber)
 				code.Print("}")
 			} else if propertyType == "bool" {
-				code.Print("if helpers.MapHasKey(m, \"%s\") {", propertyName)
-				code.Print("x.%s = helpers.MapValueForKey(m, \"%v\").(bool)", fieldName, propertyName)
+				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
+				code.Print("if (v%d != nil) {", fieldNumber)
+				code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
 				code.Print("}")
 			} else {
 				mapTypeName := propertyModel.MapType
@@ -276,7 +298,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					if mapTypeName == "string" {
 						code.Print("pair.Value = v.(string)")
 					} else {
-						code.Print("pair.Value = Build%v(v)", mapTypeName)
+						code.Print("var err error")
+						code.Print("pair.Value, err = New%v(v)", mapTypeName)
+						code.Print("if err != nil {return nil, err}")
 					}
 					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)
 					if propertyModel.Pattern != "" {
@@ -288,7 +312,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				}
 			}
 		}
-		code.Print("  return x")
+		code.Print("  return x, nil")
 		code.Print("}\n")
 	}
 	return code.String()
