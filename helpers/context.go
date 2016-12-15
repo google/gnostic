@@ -22,3 +22,11 @@ type Context struct {
 func NewContext(name string, parent *Context) *Context {
 	return &Context{Name: name, Parent: parent}
 }
+
+func (context *Context) Description() string {
+	if context.Parent != nil {
+		return context.Parent.Description() + "->" + context.Name
+	} else {
+		return context.Name
+	}
+}
