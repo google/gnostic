@@ -31,7 +31,6 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	code.Print()
 	code.Print("import (")
 	imports := []string{
-		"errors",
 		"fmt",
 		"encoding/json",
 		"github.com/googleapis/openapi-compiler/helpers",
@@ -41,14 +40,17 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	}
 	code.Print(")")
 	code.Print()
+
 	code.Print("func Version() string {")
 	code.Print("  return \"%s\"", packageName)
 	code.Print("}")
 	code.Print()
 
 	classNames := classes.sortedClassNames()
+
+	// constructors
 	for _, className := range classNames {
-		code.Print("func New%s(in interface{}) (*%s, error) {", className, className)
+		code.Print("func New%s(in interface{}, context *helpers.Context) (*%s, error) {", className, className)
 
 		classModel := classes.ClassModels[className]
 		parentClassName := className
@@ -60,7 +62,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x.Value = make([]string, 0)")
 			code.Print("x.Value = append(x.Value, value)")
 			code.Print("} else {")
-			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for string array: %%+v\", in))")
+			code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for string array: %%+v\", in))")
 			code.Print("}")
 			code.Print("return x, nil")
 			code.Print("}")
@@ -71,17 +73,17 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		if classModel.IsItemArray {
 			code.Print("m, ok := helpers.UnpackMap(in)")
 			code.Print("if (!ok) {")
-			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
+			code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
 			code.Print("}")
 
 			code.Print("x := &ItemsItem{}")
 			code.Print("if ok {")
 			code.Print("x.Schema = make([]*Schema, 0)")
-			code.Print("y, err := NewSchema(m)")
+			code.Print("y, err := NewSchema(m, helpers.NewContext(\"<array>\", context))")
 			code.Print("if err != nil {return nil, err}")
 			code.Print("x.Schema = append(x.Schema, y)")
 			code.Print("} else {")
-			code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
+			code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
 			code.Print("}")
 			code.Print("return x, nil")
 			code.Print("}")
@@ -117,7 +119,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		}
 		code.Print("m, ok := helpers.UnpackMap(in)")
 		code.Print("if (!ok) {")
-		code.Print("return nil, errors.New(fmt.Sprintf(\"unexpected value for %s section: %%+v\", in))", className)
+		code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s section: %%+v\", in))", className)
 		code.Print("}")
 		oneOfWrapper := classModel.OneOfWrapper
 
@@ -135,8 +137,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			}
 			code.Print("requiredKeys := []string{%s}", keyString)
 			code.Print("if !helpers.MapContainsAllKeys(m, requiredKeys) {")
-			code.Print("return nil, errors.New(\"%s does not contain all required properties (%s)\")",
-				classModel.Name,
+			code.Print("return nil, helpers.NewError(context, \"does not contain all required properties (%s)\")",
 				strings.Replace(keyString, "\"", "'", -1))
 			code.Print("}")
 		}
@@ -174,8 +175,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
 			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
 			code.Print("if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
-			code.Print("return nil, errors.New(\"%s includes properties not in (%s) or (%s)\")",
-				classModel.Name,
+			code.Print("return nil, helpers.NewError(context,\nfmt.Sprintf(\"includes properties not in (%s) or (%s): %%+v\",\nhelpers.SortedKeysForMap(m)))",
 				strings.Replace(allowedKeyString, "\"", "'", -1),
 				strings.Replace(allowedPatternString, "\"", "'", -1))
 			code.Print("}")
@@ -221,7 +221,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("a, ok := v%d.([]interface{})", fieldNumber)
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
-					code.Print("y, err := New%s(item)", classModel.Name)
+					code.Print("y, err := New%s(item, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
 					code.Print("if err != nil {return nil, err}")
 					code.Print("x.%s = append(x.%s, y)", fieldName, fieldName)
 					code.Print("}")
@@ -231,7 +231,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					if oneOfWrapper {
 						code.Print("{")
 						code.Print("// errors are ok here, they mean we just don't have the right subtype")
-						code.Print("t, _ := New%s(m)", classModel.Name)
+						code.Print("t, _ := New%s(m, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
 						code.Print("if t != nil {")
 						code.Print("x.Oneof = &%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
 						code.Print("}")
@@ -240,7 +240,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("var err error")
-						code.Print("x.%s, err = New%s(v%d)", fieldName, classModel.Name, fieldNumber)
+						code.Print("x.%s, err = New%s(v%d, helpers.NewContext(\"%s\", context))",
+							fieldName, classModel.Name, fieldNumber, propertyName)
 						code.Print("if err != nil {return nil, err}")
 						code.Print("}")
 					}
@@ -253,13 +254,14 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("if ok {")
 					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
-					code.Print(" return nil, errors.New(fmt.Sprintf(\"unexpected value for %s property: %%+v\", in))", propertyName)
+					code.Print(" return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s property: %%+v\", in))", propertyName)
 					code.Print("}")
 					code.Print("}")
 				} else {
 					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 					code.Print("if (v%d != nil) {", fieldNumber)
-					code.Print("x.%s = v%d.(string)", fieldName, fieldNumber)
+					code.Print("x.%s, ok = v%d.(string)", fieldName, fieldNumber)
+					code.Print("if !ok {return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s. expected a string, got %%+v\", v%d))}", propertyName, fieldNumber)
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
@@ -275,7 +277,12 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			} else if propertyType == "bool" {
 				code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("if (v%d != nil) {", fieldNumber)
-				code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
+				if oneOfWrapper {
+					propertyName := "Boolean"
+					code.Print("x.Oneof = &%s_%s{%s: v%d.(bool)}", parentClassName, propertyName, propertyName, fieldNumber)
+				} else {
+					code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
+				}
 				code.Print("}")
 			} else {
 				mapTypeName := propertyModel.MapType
@@ -299,7 +306,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("pair.Value = v.(string)")
 					} else {
 						code.Print("var err error")
-						code.Print("pair.Value, err = New%v(v)", mapTypeName)
+						code.Print("pair.Value, err = New%s(v, helpers.NewContext(k, context))", mapTypeName)
 						code.Print("if err != nil {return nil, err}")
 					}
 					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)
@@ -315,5 +322,101 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		code.Print("  return x, nil")
 		code.Print("}\n")
 	}
+
+	// ResolveReferences() methods
+	for _, className := range classNames {
+		code.Print("func (m *%s) ResolveReferences(root string) (interface{}, error) {", className)
+		//code.Print("  log.Printf(\"%s.ResolveReferences(%%+v)\", m)", className)
+
+		classModel := classes.ClassModels[className]
+		if classModel.OneOfWrapper {
+			// call ResolveReferences on whatever is in the Oneof.
+			for _, propertyModel := range classModel.Properties {
+				propertyType := propertyModel.Type
+				_, classFound := classes.ClassModels[propertyType]
+				if classFound {
+					code.Print("{")
+					code.Print("p, ok := m.Oneof.(*%s_%s)", className, propertyType)
+					code.Print("if ok {")
+					if propertyType == "JsonReference" { // Special case for OpenAPI
+						code.Print("info, err := p.%s.ResolveReferences(root)", propertyType)
+						code.Print("if err != nil {")
+						code.Print("  return nil, err")
+						code.Print("} else if info != nil {")
+						code.Print("  n, err := New%s(info, nil)", className)
+						code.Print("  if err != nil {")
+						code.Print("    return nil, err")
+						code.Print("  } else if n != nil {")
+						code.Print("    *m = *n")
+						code.Print("    return nil, nil")
+						code.Print("  }")
+						code.Print("}")
+					} else {
+						code.Print("p.%s.ResolveReferences(root)", propertyType)
+					}
+					code.Print("}")
+					code.Print("}")
+				}
+			}
+		} else {
+			for _, propertyModel := range classModel.Properties {
+				propertyName := propertyModel.Name
+				var displayName = propertyName
+				if displayName == "$ref" {
+					displayName = "_ref"
+				}
+				if displayName == "$schema" {
+					displayName = "_schema"
+				}
+				displayName = camelCaseToSnakeCase(displayName)
+
+				fieldName := strings.Title(propertyName)
+				if propertyName == "$ref" {
+					fieldName = "XRef"
+					code.Print("if m.XRef != \"\" {")
+					//code.Print("log.Printf(\"%s reference to resolve %%+v\", m.XRef)", className)
+					code.Print("info := helpers.ReadInfoForRef(root, m.XRef)")
+					//code.Print("log.Printf(\"%%+v\", info)")
+
+					if len(classModel.Properties) > 1 {
+						code.Print("if info != nil {")
+						code.Print("replacement, _ := New%s(info, nil)", className)
+						code.Print("*m = *replacement")
+						code.Print("return m.ResolveReferences(root)")
+						code.Print("}")
+					} else {
+						code.Print("return info, nil")
+					}
+
+					code.Print("return info, nil")
+					code.Print("}")
+				}
+
+				if !propertyModel.Repeated {
+					propertyType := propertyModel.Type
+					classModel, classFound := classes.ClassModels[propertyType]
+					if classFound && !classModel.IsPair {
+						code.Print("if m.%s != nil {", fieldName)
+						code.Print("m.%s.ResolveReferences(root)", fieldName)
+						code.Print("}")
+					}
+				} else {
+					propertyType := propertyModel.Type
+					_, classFound := classes.ClassModels[propertyType]
+					if classFound {
+						code.Print("for _, item := range m.%s {", fieldName)
+						code.Print("if item != nil {")
+						code.Print("item.ResolveReferences(root)")
+						code.Print("}")
+						code.Print("}")
+					}
+
+				}
+			}
+		}
+		code.Print("  return nil, nil")
+		code.Print("}\n")
+	}
+
 	return code.String()
 }

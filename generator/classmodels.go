@@ -75,17 +75,18 @@ func NewClassPropertyWithNameTypeAndPattern(name string, typeName string, patter
 
 // models classes
 type ClassModel struct {
-	Name          string           // class name
-	Properties    []*ClassProperty // slice of properties
-	Required      []string         // required property names
-	OneOfWrapper  bool             // true if this class wraps "oneof" properties
-	Open          bool             // open classes can have keys outside the specified set
-	OpenPatterns  []string         // patterns for properties that we allow
-	IsStringArray bool             // ugly override
-	IsItemArray   bool             // ugly override
-	IsBlob        bool             // ugly override
-	IsPair        bool             // class is a name-value pair used to support ordered maps
-	Description   string           // if present, the "description" field in the schema
+	Name           string           // class name
+	Properties     []*ClassProperty // slice of properties
+	Required       []string         // required property names
+	OneOfWrapper   bool             // true if this class wraps "oneof" properties
+	Open           bool             // open classes can have keys outside the specified set
+	OpenPatterns   []string         // patterns for properties that we allow
+	IsStringArray  bool             // ugly override
+	IsItemArray    bool             // ugly override
+	IsBlob         bool             // ugly override
+	IsPair         bool             // class is a name-value pair used to support ordered maps
+	PairValueClass string           // class for pair values (valid if IsPair == true)
+	Description    string           // if present, the "description" field in the schema
 }
 
 func (classModel *ClassModel) AddProperty(property *ClassProperty) {
@@ -100,7 +101,11 @@ func (classModel *ClassModel) description() string {
 	if classModel.Description != "" {
 		result += fmt.Sprintf("// %+s\n", classModel.Description)
 	}
-	result += fmt.Sprintf("%+s\n", classModel.Name)
+	var wrapperinfo string
+	if classModel.OneOfWrapper {
+		wrapperinfo = " oneof wrapper"
+	}
+	result += fmt.Sprintf("%+s%s\n", classModel.Name, wrapperinfo)
 	for _, property := range classModel.Properties {
 		result += property.description()
 	}
@@ -416,7 +421,6 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 	classModel.Open = true
 	classModel.OneOfWrapper = true
 	for _, oneOf := range *oneOfs {
-		//log.Printf("ONEOF\n%+v", oneOf.description())
 		if oneOf.Ref != nil {
 			ref := *oneOf.Ref
 			className := classes.classNameForReference(ref)
@@ -426,7 +430,13 @@ func (classes *ClassCollection) buildOneOfAccessors(classModel *ClassModel, sche
 				classProperty := NewClassPropertyWithNameAndType(*propertyName, className)
 				classModel.AddProperty(classProperty)
 			}
+		} else if oneOf.Type != nil && oneOf.Type.String != nil && *oneOf.Type.String == "boolean" {
+			classProperty := NewClassPropertyWithNameAndType("boolean", "bool")
+			classModel.AddProperty(classProperty)
+		} else {
+			log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
 		}
+
 	}
 }
 
@@ -592,6 +602,7 @@ func (classes *ClassCollection) build() {
 			"Automatically-generated message used to represent maps of %s as ordered (name,value) pairs.",
 			mapClassName)
 		classModel.IsPair = true
+		classModel.PairValueClass = mapClassName
 
 		nameProperty := NewClassProperty()
 		nameProperty.Name = "name"

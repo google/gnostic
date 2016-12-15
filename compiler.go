@@ -20,63 +20,23 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path"
-	"sort"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/OpenAPIv2"
+	"github.com/googleapis/openapi-compiler/helpers"
 )
 
-func describeMap(in interface{}, indent string) string {
-	description := ""
-	m, ok := in.(map[string]interface{})
-	if ok {
-		keys := make([]string, 0)
-		for k, _ := range m {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			v := m[k]
-			description += fmt.Sprintf("%s%s:\n", indent, k)
-			description += describeMap(v, indent+"  ")
-		}
-		return description
-	}
-	a, ok := in.([]interface{})
-	if ok {
-		for i, v := range a {
-			description += fmt.Sprintf("%s%d:\n", indent, i)
-			description += describeMap(v, indent+"  ")
-		}
-		return description
-	}
-	description += fmt.Sprintf("%s%+v\n", indent, in)
-	return description
-}
-
-func readFile(filename string) interface{} {
-	file, e := ioutil.ReadFile(filename)
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
-	}
-
-	var info yaml.MapSlice
-	yaml.Unmarshal(file, &info)
-	return info
-}
-
 func main() {
-	var input = flag.String("input", "", "OpenAPI source file to read")
+	var input = flag.String("in", "", "OpenAPI source file to read")
 	var rawInput = flag.Bool("raw", false, "Output the raw json input")
 	var textProtobuf = flag.Bool("text", false, "Output a text protobuf representation")
 	var jsonProtobuf = flag.Bool("json", false, "Output a json protobuf representation")
 	var binaryProtobuf = flag.Bool("pb", false, "Output a binary protobuf representation")
+	var keepReferences = flag.Bool("keep-refs", false, "Disable resolution of $ref references")
 	flag.Parse()
 
 	if *input == "" {
@@ -86,16 +46,24 @@ func main() {
 
 	fmt.Printf("Compiling %s (%s)\n", *input, openapi_v2.Version())
 
-	raw := readFile(*input)
+	raw := helpers.ReadFile(*input)
 	if *rawInput {
-		rawDescription := describeMap(raw, "")
+		rawDescription := helpers.DescribeMap(raw, "")
 		rawFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".raw"
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	document, err := openapi_v2.NewDocument(raw)
+	document, err := openapi_v2.NewDocument(raw, nil)
 	if err != nil {
 		fmt.Printf("Error %+v\n", err)
+		os.Exit(-1)
+	}
+
+	if !*keepReferences {
+		_, err = document.ResolveReferences(*input)
+		if err != nil {
+			fmt.Printf("Error %+v\n", err)
+		}
 	}
 
 	if *textProtobuf {

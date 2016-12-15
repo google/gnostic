@@ -15,9 +15,15 @@
 package helpers
 
 import (
-	// "log"
+	"fmt"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 	"regexp"
+	"sort"
+	"strings"
 )
 
 // compiler helper functions, usually called from generated code
@@ -28,6 +34,15 @@ func UnpackMap(in interface{}) (yaml.MapSlice, bool) {
 		return nil, ok
 	}
 	return m, ok
+}
+
+func SortedKeysForMap(m yaml.MapSlice) []string {
+	keys := make([]string, 0)
+	for _, item := range m {
+		keys = append(keys, item.Key.(string))
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func MapHasKey(m yaml.MapSlice, key string) bool {
@@ -104,4 +119,92 @@ func MapContainsOnlyKeysAndPatterns(m yaml.MapSlice, keys []string, patterns []s
 		}
 	}
 	return true
+}
+
+// read a file and unmarshal it as a yaml.MapSlice
+func ReadFile(filename string) interface{} {
+	file, e := ioutil.ReadFile(filename)
+	if e != nil {
+		fmt.Printf("File error: %v\n", e)
+		os.Exit(1)
+	}
+	var info yaml.MapSlice
+	yaml.Unmarshal(file, &info)
+	return info
+}
+
+var info_cache map[string]interface{}
+var count int64
+
+// read a file and return the fragment needed to resolve a $ref
+func ReadInfoForRef(basefile string, ref string) interface{} {
+	if info_cache == nil {
+		log.Printf("making cache")
+		info_cache = make(map[string]interface{}, 0)
+	}
+	{
+		info, ok := info_cache[ref]
+		if ok {
+			return info
+		}
+	}
+
+	log.Printf("%d Resolving %s", count, ref)
+	count = count + 1
+	basedir, _ := filepath.Split(basefile)
+	parts := strings.Split(ref, "#")
+	var filename string
+	if parts[0] != "" {
+		filename = basedir + parts[0]
+	} else {
+		filename = basefile
+	}
+	info := ReadFile(filename)
+	if len(parts) > 1 {
+		path := strings.Split(parts[1], "/")
+		for i, key := range path {
+			if i > 0 {
+				m, ok := info.(yaml.MapSlice)
+				if ok {
+					for _, section := range m {
+						if section.Key == key {
+							info = section.Value
+						}
+					}
+				}
+			}
+		}
+	}
+
+	info_cache[ref] = info
+	return info
+}
+
+// describe a map (for debugging purposes)
+func DescribeMap(in interface{}, indent string) string {
+	description := ""
+	m, ok := in.(map[string]interface{})
+	if ok {
+		keys := make([]string, 0)
+		for k, _ := range m {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			v := m[k]
+			description += fmt.Sprintf("%s%s:\n", indent, k)
+			description += DescribeMap(v, indent+"  ")
+		}
+		return description
+	}
+	a, ok := in.([]interface{})
+	if ok {
+		for i, v := range a {
+			description += fmt.Sprintf("%s%d:\n", indent, i)
+			description += DescribeMap(v, indent+"  ")
+		}
+		return description
+	}
+	description += fmt.Sprintf("%s%+v\n", indent, in)
+	return description
 }

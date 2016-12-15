@@ -40,7 +40,42 @@ paths: <
                 description: "An paged array of pets"
                 schema: <
                   schema: <
-                    _ref: "#/definitions/Pets"
+                    type: <
+                      value: "array"
+                    >
+                    items: <
+                      schema: <
+                        required: "id"
+                        required: "name"
+                        properties: <
+                          additional_properties: <
+                            name: "id"
+                            value: <
+                              format: "int64"
+                              type: <
+                                value: "integer"
+                              >
+                            >
+                          >
+                          additional_properties: <
+                            name: "name"
+                            value: <
+                              type: <
+                                value: "string"
+                              >
+                            >
+                          >
+                          additional_properties: <
+                            name: "tag"
+                            value: <
+                              type: <
+                                value: "string"
+                              >
+                            >
+                          >
+                        >
+                      >
+                    >
                   >
                 >
                 headers: <
@@ -62,7 +97,27 @@ paths: <
                 description: "unexpected error"
                 schema: <
                   schema: <
-                    _ref: "#/definitions/Error"
+                    required: "code"
+                    required: "message"
+                    properties: <
+                      additional_properties: <
+                        name: "code"
+                        value: <
+                          format: "int32"
+                          type: <
+                            value: "integer"
+                          >
+                        >
+                      >
+                      additional_properties: <
+                        name: "message"
+                        value: <
+                          type: <
+                            value: "string"
+                          >
+                        >
+                      >
+                    >
                   >
                 >
               >
@@ -90,7 +145,27 @@ paths: <
                 description: "unexpected error"
                 schema: <
                   schema: <
-                    _ref: "#/definitions/Error"
+                    required: "code"
+                    required: "message"
+                    properties: <
+                      additional_properties: <
+                        name: "code"
+                        value: <
+                          format: "int32"
+                          type: <
+                            value: "integer"
+                          >
+                        >
+                      >
+                      additional_properties: <
+                        name: "message"
+                        value: <
+                          type: <
+                            value: "string"
+                          >
+                        >
+                      >
+                    >
                   >
                 >
               >
@@ -128,7 +203,42 @@ paths: <
                 description: "Expected response to a valid request"
                 schema: <
                   schema: <
-                    _ref: "#/definitions/Pets"
+                    type: <
+                      value: "array"
+                    >
+                    items: <
+                      schema: <
+                        required: "id"
+                        required: "name"
+                        properties: <
+                          additional_properties: <
+                            name: "id"
+                            value: <
+                              format: "int64"
+                              type: <
+                                value: "integer"
+                              >
+                            >
+                          >
+                          additional_properties: <
+                            name: "name"
+                            value: <
+                              type: <
+                                value: "string"
+                              >
+                            >
+                          >
+                          additional_properties: <
+                            name: "tag"
+                            value: <
+                              type: <
+                                value: "string"
+                              >
+                            >
+                          >
+                        >
+                      >
+                    >
                   >
                 >
               >
@@ -141,7 +251,27 @@ paths: <
                 description: "unexpected error"
                 schema: <
                   schema: <
-                    _ref: "#/definitions/Error"
+                    required: "code"
+                    required: "message"
+                    properties: <
+                      additional_properties: <
+                        name: "code"
+                        value: <
+                          format: "int32"
+                          type: <
+                            value: "integer"
+                          >
+                        >
+                      >
+                      additional_properties: <
+                        name: "message"
+                        value: <
+                          type: <
+                            value: "string"
+                          >
+                        >
+                      >
+                    >
                   >
                 >
               >
@@ -195,7 +325,35 @@ definitions: <
       >
       items: <
         schema: <
-          _ref: "#/definitions/Pet"
+          required: "id"
+          required: "name"
+          properties: <
+            additional_properties: <
+              name: "id"
+              value: <
+                format: "int64"
+                type: <
+                  value: "integer"
+                >
+              >
+            >
+            additional_properties: <
+              name: "name"
+              value: <
+                type: <
+                  value: "string"
+                >
+              >
+            >
+            additional_properties: <
+              name: "tag"
+              value: <
+                type: <
+                  value: "string"
+                >
+              >
+            >
+          >
         >
       >
     >
