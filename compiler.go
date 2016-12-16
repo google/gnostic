@@ -27,7 +27,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/OpenAPIv2"
-	"github.com/googleapis/openapi-compiler/helpers"
+	"github.com/googleapis/openapi-compiler/compiler"
 )
 
 func main() {
@@ -46,9 +46,9 @@ func main() {
 
 	fmt.Printf("Compiling %s (%s)\n", *input, openapi_v2.Version())
 
-	raw := helpers.ReadFile(*input)
+	raw := compiler.ReadFile(*input)
 	if *rawInput {
-		rawDescription := helpers.DescribeMap(raw, "")
+		rawDescription := compiler.DescribeMap(raw, "")
 		rawFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".raw"
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
