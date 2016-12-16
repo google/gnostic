@@ -517,7 +517,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	// repeated SecurityRequirement security = 12;
 	v12 := compiler.MapValueForKey(m, "security")
 	if v12 != nil {
-		// repeated class SecurityRequirement
+		// repeated SecurityRequirement
 		x.Security = make([]*SecurityRequirement, 0)
 		a, ok := v12.([]interface{})
 		if ok {
@@ -542,7 +542,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	// repeated Tag tags = 14;
 	v14 := compiler.MapValueForKey(m, "tags")
 	if v14 != nil {
-		// repeated class Tag
+		// repeated Tag
 		x.Tags = make([]*Tag, 0)
 		a, ok := v14.([]interface{})
 		if ok {
@@ -937,7 +937,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 	// repeated Any enum = 21;
 	v21 := compiler.MapValueForKey(m, "enum")
 	if v21 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v21.([]interface{})
 		if ok {
@@ -1095,7 +1095,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	// repeated Any enum = 16;
 	v16 := compiler.MapValueForKey(m, "enum")
 	if v16 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v16.([]interface{})
 		if ok {
@@ -1286,7 +1286,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 	// repeated Any enum = 20;
 	v20 := compiler.MapValueForKey(m, "enum")
 	if v20 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v20.([]interface{})
 		if ok {
@@ -2442,7 +2442,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 	// repeated ParametersItem parameters = 8;
 	v8 := compiler.MapValueForKey(m, "parameters")
 	if v8 != nil {
-		// repeated class ParametersItem
+		// repeated ParametersItem
 		x.Parameters = make([]*ParametersItem, 0)
 		a, ok := v8.([]interface{})
 		if ok {
@@ -2482,7 +2482,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 	// repeated SecurityRequirement security = 12;
 	v12 := compiler.MapValueForKey(m, "security")
 	if v12 != nil {
-		// repeated class SecurityRequirement
+		// repeated SecurityRequirement
 		x.Security = make([]*SecurityRequirement, 0)
 		a, ok := v12.([]interface{})
 		if ok {
@@ -2696,7 +2696,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	// repeated ParametersItem parameters = 9;
 	v9 := compiler.MapValueForKey(m, "parameters")
 	if v9 != nil {
-		// repeated class ParametersItem
+		// repeated ParametersItem
 		x.Parameters = make([]*ParametersItem, 0)
 		a, ok := v9.([]interface{})
 		if ok {
@@ -2878,7 +2878,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 	// repeated Any enum = 20;
 	v20 := compiler.MapValueForKey(m, "enum")
 	if v20 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v20.([]interface{})
 		if ok {
@@ -3087,7 +3087,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 	// repeated Any enum = 16;
 	v16 := compiler.MapValueForKey(m, "enum")
 	if v16 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v16.([]interface{})
 		if ok {
@@ -3304,7 +3304,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 	// repeated Any enum = 21;
 	v21 := compiler.MapValueForKey(m, "enum")
 	if v21 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v21.([]interface{})
 		if ok {
@@ -3673,7 +3673,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	// repeated Any enum = 20;
 	v20 := compiler.MapValueForKey(m, "enum")
 	if v20 != nil {
-		// repeated class Any
+		// repeated Any
 		x.Enum = make([]*Any, 0)
 		a, ok := v20.([]interface{})
 		if ok {
@@ -3716,7 +3716,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	// repeated Schema all_of = 24;
 	v24 := compiler.MapValueForKey(m, "allOf")
 	if v24 != nil {
-		// repeated class Schema
+		// repeated Schema
 		x.AllOf = make([]*Schema, 0)
 		a, ok := v24.([]interface{})
 		if ok {
