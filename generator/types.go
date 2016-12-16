@@ -119,7 +119,7 @@ func NewTypeModel() *TypeModel {
 }
 
 // models a collection of types that is defined by a schema
-type TypeCollection struct {
+type Domain struct {
 	TypeModels         map[string]*TypeModel   // models of the types in the collection
 	Prefix             string                  // type prefix to use
 	Schema             *jsonschema.Schema      // top-level schema
@@ -128,8 +128,8 @@ type TypeCollection struct {
 	MapTypeRequests    map[string]string       // "NamedObject" types that will be used to implement ordered maps
 }
 
-func NewTypeCollection(schema *jsonschema.Schema) *TypeCollection {
-	cc := &TypeCollection{}
+func NewDomain(schema *jsonschema.Schema) *Domain {
+	cc := &Domain{}
 	cc.TypeModels = make(map[string]*TypeModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
 	cc.ObjectTypeRequests = make(map[string]*TypeRequest, 0)
@@ -139,24 +139,24 @@ func NewTypeCollection(schema *jsonschema.Schema) *TypeCollection {
 }
 
 // Returns a capitalized name to use for a generated type
-func (typeset *TypeCollection) typeNameForStub(stub string) string {
-	return typeset.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
+func (domain *Domain) typeNameForStub(stub string) string {
+	return domain.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
 }
 
 // Returns a capitalized name to use for a generated type based on a JSON reference
-func (typeset *TypeCollection) typeNameForReference(reference string) string {
+func (domain *Domain) typeNameForReference(reference string) string {
 	parts := strings.Split(reference, "/")
 	first := parts[0]
 	last := parts[len(parts)-1]
 	if first == "#" {
-		return typeset.typeNameForStub(last)
+		return domain.typeNameForStub(last)
 	} else {
 		return "Schema"
 	}
 }
 
 // Returns a property name to use for a JSON reference
-func (typeset *TypeCollection) propertyNameForReference(reference string) *string {
+func (domain *Domain) propertyNameForReference(reference string) *string {
 	parts := strings.Split(reference, "/")
 	first := parts[0]
 	last := parts[len(parts)-1]
@@ -169,7 +169,7 @@ func (typeset *TypeCollection) propertyNameForReference(reference string) *strin
 }
 
 // Determines the item type for arrays defined by a schema
-func (typeset *TypeCollection) arrayItemTypeForSchema(propertyName string, schema *jsonschema.Schema) string {
+func (domain *Domain) arrayItemTypeForSchema(propertyName string, schema *jsonschema.Schema) string {
 	// default
 	itemTypeName := "Any"
 
@@ -180,7 +180,7 @@ func (typeset *TypeCollection) arrayItemTypeForSchema(propertyName string, schem
 			if len(*(schema.Items.SchemaArray)) > 0 {
 				ref := (*schema.Items.SchemaArray)[0].Ref
 				if ref != nil {
-					itemTypeName = typeset.typeNameForReference(*ref)
+					itemTypeName = domain.typeNameForReference(*ref)
 				} else {
 					types := (*schema.Items.SchemaArray)[0].Type
 					if types == nil {
@@ -201,11 +201,11 @@ func (typeset *TypeCollection) arrayItemTypeForSchema(propertyName string, schem
 			types := schema.Items.Schema.Type
 
 			if schema.Items.Schema.Ref != nil {
-				itemTypeName = typeset.typeNameForReference(*schema.Items.Schema.Ref)
+				itemTypeName = domain.typeNameForReference(*schema.Items.Schema.Ref)
 			} else if schema.Items.Schema.OneOf != nil {
 				// this type is implied by the "oneOf"
-				itemTypeName = typeset.typeNameForStub(propertyName + "Item")
-				typeset.ObjectTypeRequests[itemTypeName] =
+				itemTypeName = domain.typeNameForStub(propertyName + "Item")
+				domain.ObjectTypeRequests[itemTypeName] =
 					NewTypeRequest(itemTypeName, propertyName, schema.Items.Schema)
 			} else if types == nil {
 				// do nothing
@@ -224,14 +224,14 @@ func (typeset *TypeCollection) arrayItemTypeForSchema(propertyName string, schem
 	return itemTypeName
 }
 
-func (typeset *TypeCollection) buildTypeProperties(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonschema.Schema) {
 	if schema.Properties != nil {
 		for _, pair := range *(schema.Properties) {
 			propertyName := pair.Name
 			propertySchema := pair.Value
 			if propertySchema.Ref != nil {
 				// the property schema is a reference, so we will add a property with the type of the referenced schema
-				propertyTypeName := typeset.typeNameForReference(*(propertySchema.Ref))
+				propertyTypeName := domain.typeNameForReference(*(propertySchema.Ref))
 				typeProperty := NewTypeProperty()
 				typeProperty.Name = propertyName
 				typeProperty.Type = propertyTypeName
@@ -264,8 +264,8 @@ func (typeset *TypeCollection) buildTypeProperties(typeModel *TypeModel, schema 
 					typeModel.AddProperty(typeProperty)
 				} else if propertySchema.TypeIs("object") {
 					// the property has an "anonymous" object schema, so define a new type for it and request its creation
-					anonymousObjectTypeName := typeset.typeNameForStub(propertyName)
-					typeset.ObjectTypeRequests[anonymousObjectTypeName] =
+					anonymousObjectTypeName := domain.typeNameForStub(propertyName)
+					domain.ObjectTypeRequests[anonymousObjectTypeName] =
 						NewTypeRequest(anonymousObjectTypeName, propertyName, propertySchema)
 					// add a property with the type of the requested type
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, anonymousObjectTypeName)
@@ -275,7 +275,7 @@ func (typeset *TypeCollection) buildTypeProperties(typeModel *TypeModel, schema 
 					typeModel.AddProperty(typeProperty)
 				} else if propertySchema.TypeIs("array") {
 					// the property has an array type, so define it as a a repeated property of the specified type
-					propertyTypeName := typeset.arrayItemTypeForSchema(propertyName, propertySchema)
+					propertyTypeName := domain.arrayItemTypeForSchema(propertyName, propertySchema)
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, propertyTypeName)
 					typeProperty.Repeated = true
 					if propertySchema.Description != nil {
@@ -291,14 +291,14 @@ func (typeset *TypeCollection) buildTypeProperties(typeModel *TypeModel, schema 
 				typeProperty := NewTypePropertyWithNameAndType(propertyName, typeName)
 				typeModel.AddProperty(typeProperty)
 			} else if propertySchema.OneOf != nil {
-				anonymousObjectTypeName := typeset.typeNameForStub(propertyName + "Item")
-				typeset.ObjectTypeRequests[anonymousObjectTypeName] =
+				anonymousObjectTypeName := domain.typeNameForStub(propertyName + "Item")
+				domain.ObjectTypeRequests[anonymousObjectTypeName] =
 					NewTypeRequest(anonymousObjectTypeName, propertyName, propertySchema)
 				typeProperty := NewTypePropertyWithNameAndType(propertyName, anonymousObjectTypeName)
 				typeModel.AddProperty(typeProperty)
 			} else if propertySchema.AnyOf != nil {
-				anonymousObjectTypeName := typeset.typeNameForStub(propertyName + "Item")
-				typeset.ObjectTypeRequests[anonymousObjectTypeName] =
+				anonymousObjectTypeName := domain.typeNameForStub(propertyName + "Item")
+				domain.ObjectTypeRequests[anonymousObjectTypeName] =
 					NewTypeRequest(anonymousObjectTypeName, propertyName, propertySchema)
 				typeProperty := NewTypePropertyWithNameAndType(propertyName, anonymousObjectTypeName)
 				typeModel.AddProperty(typeProperty)
@@ -309,13 +309,13 @@ func (typeset *TypeCollection) buildTypeProperties(typeModel *TypeModel, schema 
 	}
 }
 
-func (typeset *TypeCollection) buildTypeRequirements(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildTypeRequirements(typeModel *TypeModel, schema *jsonschema.Schema) {
 	if schema.Required != nil {
 		typeModel.Required = (*schema.Required)
 	}
 }
 
-func (typeset *TypeCollection) buildPatternPropertyAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildPatternPropertyAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
 	if schema.PatternProperties != nil {
 		typeModel.OpenPatterns = make([]string, 0)
 		for _, pair := range *(schema.PatternProperties) {
@@ -323,22 +323,22 @@ func (typeset *TypeCollection) buildPatternPropertyAccessors(typeModel *TypeMode
 			propertySchema := pair.Value
 			typeModel.OpenPatterns = append(typeModel.OpenPatterns, propertyPattern)
 			typeName := "Any"
-			propertyName := typeset.PatternNames[propertyPattern]
+			propertyName := domain.PatternNames[propertyPattern]
 			if propertySchema.Ref != nil {
-				typeName = typeset.typeNameForReference(*propertySchema.Ref)
+				typeName = domain.typeNameForReference(*propertySchema.Ref)
 			}
 			propertyTypeName := fmt.Sprintf("Named%s", typeName)
 			property := NewTypePropertyWithNameTypeAndPattern(propertyName, propertyTypeName, propertyPattern)
 			property.Implicit = true
 			property.MapType = typeName
 			property.Repeated = true
-			typeset.MapTypeRequests[property.MapType] = property.MapType
+			domain.MapTypeRequests[property.MapType] = property.MapType
 			typeModel.AddProperty(property)
 		}
 	}
 }
 
-func (typeset *TypeCollection) buildAdditionalPropertyAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
 	if schema.AdditionalProperties != nil {
 		if schema.AdditionalProperties.Boolean != nil {
 			if *schema.AdditionalProperties.Boolean == true {
@@ -349,7 +349,7 @@ func (typeset *TypeCollection) buildAdditionalPropertyAccessors(typeModel *TypeM
 				property.Implicit = true
 				property.MapType = "Any"
 				property.Repeated = true
-				typeset.MapTypeRequests[property.MapType] = property.MapType
+				domain.MapTypeRequests[property.MapType] = property.MapType
 				typeModel.AddProperty(property)
 				return
 			}
@@ -358,13 +358,13 @@ func (typeset *TypeCollection) buildAdditionalPropertyAccessors(typeModel *TypeM
 			schema := schema.AdditionalProperties.Schema
 			if schema.Ref != nil {
 				propertyName := "additionalProperties"
-				mapType := typeset.typeNameForReference(*schema.Ref)
+				mapType := domain.typeNameForReference(*schema.Ref)
 				typeName := fmt.Sprintf("Named%s", mapType)
 				property := NewTypePropertyWithNameAndType(propertyName, typeName)
 				property.Implicit = true
 				property.MapType = mapType
 				property.Repeated = true
-				typeset.MapTypeRequests[property.MapType] = property.MapType
+				domain.MapTypeRequests[property.MapType] = property.MapType
 				typeModel.AddProperty(property)
 				return
 			} else if schema.Type != nil {
@@ -376,7 +376,7 @@ func (typeset *TypeCollection) buildAdditionalPropertyAccessors(typeModel *TypeM
 					property.Implicit = true
 					property.MapType = "string"
 					property.Repeated = true
-					typeset.MapTypeRequests[property.MapType] = property.MapType
+					domain.MapTypeRequests[property.MapType] = property.MapType
 					typeModel.AddProperty(property)
 					return
 				} else if typeName == "array" {
@@ -389,31 +389,31 @@ func (typeset *TypeCollection) buildAdditionalPropertyAccessors(typeModel *TypeM
 							property.Implicit = true
 							property.MapType = "StringArray"
 							property.Repeated = true
-							typeset.MapTypeRequests[property.MapType] = property.MapType
+							domain.MapTypeRequests[property.MapType] = property.MapType
 							typeModel.AddProperty(property)
 							return
 						}
 					}
 				}
 			} else if schema.OneOf != nil {
-				propertyTypeName := typeset.typeNameForStub(typeModel.Name + "Item")
+				propertyTypeName := domain.typeNameForStub(typeModel.Name + "Item")
 				propertyName := "additionalProperties"
 				typeName := fmt.Sprintf("Named%s", propertyTypeName)
 				property := NewTypePropertyWithNameAndType(propertyName, typeName)
 				property.Implicit = true
 				property.MapType = propertyTypeName
 				property.Repeated = true
-				typeset.MapTypeRequests[property.MapType] = property.MapType
+				domain.MapTypeRequests[property.MapType] = property.MapType
 				typeModel.AddProperty(property)
 
-				typeset.ObjectTypeRequests[propertyTypeName] =
+				domain.ObjectTypeRequests[propertyTypeName] =
 					NewTypeRequest(propertyTypeName, propertyName, schema)
 			}
 		}
 	}
 }
 
-func (typeset *TypeCollection) buildOneOfAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildOneOfAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
 	oneOfs := schema.OneOf
 	if oneOfs == nil {
 		return
@@ -423,8 +423,8 @@ func (typeset *TypeCollection) buildOneOfAccessors(typeModel *TypeModel, schema 
 	for _, oneOf := range *oneOfs {
 		if oneOf.Ref != nil {
 			ref := *oneOf.Ref
-			typeName := typeset.typeNameForReference(ref)
-			propertyName := typeset.propertyNameForReference(ref)
+			typeName := domain.typeNameForReference(ref)
+			propertyName := domain.propertyNameForReference(ref)
 
 			if propertyName != nil {
 				typeProperty := NewTypePropertyWithNameAndType(*propertyName, typeName)
@@ -456,14 +456,14 @@ func schemaIsContainedInArray(s1 *jsonschema.Schema, s2 *jsonschema.Schema) bool
 	}
 }
 
-func (typeset *TypeCollection) addAnonymousAccessorForSchema(
+func (domain *Domain) addAnonymousAccessorForSchema(
 	typeModel *TypeModel,
 	schema *jsonschema.Schema,
 	repeated bool) {
 	ref := schema.Ref
 	if ref != nil {
-		typeName := typeset.typeNameForReference(*ref)
-		propertyName := typeset.propertyNameForReference(*ref)
+		typeName := domain.typeNameForReference(*ref)
+		propertyName := domain.propertyNameForReference(*ref)
 		if propertyName != nil {
 			property := NewTypePropertyWithNameAndType(*propertyName, typeName)
 			property.Repeated = true
@@ -480,7 +480,7 @@ func (typeset *TypeCollection) addAnonymousAccessorForSchema(
 	}
 }
 
-func (typeset *TypeCollection) buildAnyOfAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildAnyOfAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
 	anyOfs := schema.AnyOf
 	if anyOfs == nil {
 		return
@@ -489,17 +489,17 @@ func (typeset *TypeCollection) buildAnyOfAccessors(typeModel *TypeModel, schema 
 		if schemaIsContainedInArray((*anyOfs)[0], (*anyOfs)[1]) {
 			log.Printf("ARRAY OF %+v", (*anyOfs)[0].String())
 			schema := (*anyOfs)[0]
-			typeset.addAnonymousAccessorForSchema(typeModel, schema, true)
+			domain.addAnonymousAccessorForSchema(typeModel, schema, true)
 		} else if schemaIsContainedInArray((*anyOfs)[1], (*anyOfs)[0]) {
 			log.Printf("ARRAY OF %+v", (*anyOfs)[1].String())
 			schema := (*anyOfs)[1]
-			typeset.addAnonymousAccessorForSchema(typeModel, schema, true)
+			domain.addAnonymousAccessorForSchema(typeModel, schema, true)
 		} else {
 			for _, anyOf := range *anyOfs {
 				ref := anyOf.Ref
 				if ref != nil {
-					typeName := typeset.typeNameForReference(*ref)
-					propertyName := typeset.propertyNameForReference(*ref)
+					typeName := domain.typeNameForReference(*ref)
+					propertyName := domain.propertyNameForReference(*ref)
 					if propertyName != nil {
 						property := NewTypePropertyWithNameAndType(*propertyName, typeName)
 						typeModel.AddProperty(property)
@@ -517,83 +517,83 @@ func (typeset *TypeCollection) buildAnyOfAccessors(typeModel *TypeModel, schema 
 	}
 }
 
-func (typeset *TypeCollection) buildDefaultAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
+func (domain *Domain) buildDefaultAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
 	typeModel.Open = true
 	propertyName := "additionalProperties"
 	typeName := "NamedAny"
 	property := NewTypePropertyWithNameAndType(propertyName, typeName)
 	property.MapType = "Any"
 	property.Repeated = true
-	typeset.MapTypeRequests[property.MapType] = property.MapType
+	domain.MapTypeRequests[property.MapType] = property.MapType
 	typeModel.AddProperty(property)
 }
 
-func (typeset *TypeCollection) buildTypeForDefinition(
+func (domain *Domain) buildTypeForDefinition(
 	typeName string,
 	propertyName string,
 	schema *jsonschema.Schema) *TypeModel {
 	if (schema.Type == nil) || (*schema.Type.String == "object") {
-		return typeset.buildTypeForDefinitionObject(typeName, propertyName, schema)
+		return domain.buildTypeForDefinitionObject(typeName, propertyName, schema)
 	} else {
 		return nil
 	}
 }
 
-func (typeset *TypeCollection) buildTypeForDefinitionObject(
+func (domain *Domain) buildTypeForDefinitionObject(
 	typeName string,
 	propertyName string,
 	schema *jsonschema.Schema) *TypeModel {
 	typeModel := NewTypeModel()
 	typeModel.Name = typeName
 	if schema.IsEmpty() {
-		typeset.buildDefaultAccessors(typeModel, schema)
+		domain.buildDefaultAccessors(typeModel, schema)
 	} else {
 		if schema.Description != nil {
 			typeModel.Description = *schema.Description
 		}
-		typeset.buildTypeProperties(typeModel, schema)
-		typeset.buildTypeRequirements(typeModel, schema)
-		typeset.buildPatternPropertyAccessors(typeModel, schema)
-		typeset.buildAdditionalPropertyAccessors(typeModel, schema)
-		typeset.buildOneOfAccessors(typeModel, schema)
-		typeset.buildAnyOfAccessors(typeModel, schema)
+		domain.buildTypeProperties(typeModel, schema)
+		domain.buildTypeRequirements(typeModel, schema)
+		domain.buildPatternPropertyAccessors(typeModel, schema)
+		domain.buildAdditionalPropertyAccessors(typeModel, schema)
+		domain.buildOneOfAccessors(typeModel, schema)
+		domain.buildAnyOfAccessors(typeModel, schema)
 	}
 	return typeModel
 }
 
-func (typeset *TypeCollection) build() {
+func (domain *Domain) build() {
 	// create a type for the top-level schema
-	typeName := typeset.Prefix + "Document"
+	typeName := domain.Prefix + "Document"
 	typeModel := NewTypeModel()
 	typeModel.Name = typeName
-	typeset.buildTypeProperties(typeModel, typeset.Schema)
-	typeset.buildTypeRequirements(typeModel, typeset.Schema)
-	typeset.buildPatternPropertyAccessors(typeModel, typeset.Schema)
-	typeset.buildAdditionalPropertyAccessors(typeModel, typeset.Schema)
-	typeset.buildOneOfAccessors(typeModel, typeset.Schema)
-	typeset.buildAnyOfAccessors(typeModel, typeset.Schema)
-	typeset.TypeModels[typeName] = typeModel
+	domain.buildTypeProperties(typeModel, domain.Schema)
+	domain.buildTypeRequirements(typeModel, domain.Schema)
+	domain.buildPatternPropertyAccessors(typeModel, domain.Schema)
+	domain.buildAdditionalPropertyAccessors(typeModel, domain.Schema)
+	domain.buildOneOfAccessors(typeModel, domain.Schema)
+	domain.buildAnyOfAccessors(typeModel, domain.Schema)
+	domain.TypeModels[typeName] = typeModel
 
 	// create a type for each object defined in the schema
-	for _, pair := range *(typeset.Schema.Definitions) {
+	for _, pair := range *(domain.Schema.Definitions) {
 		definitionName := pair.Name
 		definitionSchema := pair.Value
-		typeName := typeset.typeNameForStub(definitionName)
-		typeModel := typeset.buildTypeForDefinition(typeName, definitionName, definitionSchema)
+		typeName := domain.typeNameForStub(definitionName)
+		typeModel := domain.buildTypeForDefinition(typeName, definitionName, definitionSchema)
 		if typeModel != nil {
-			typeset.TypeModels[typeName] = typeModel
+			domain.TypeModels[typeName] = typeModel
 		}
 	}
 
 	// iterate over anonymous object types to be instantiated and generate a type for each
-	for typeName, typeRequest := range typeset.ObjectTypeRequests {
-		typeset.TypeModels[typeRequest.Name] =
-			typeset.buildTypeForDefinitionObject(typeName, typeRequest.PropertyName, typeRequest.Schema)
+	for typeName, typeRequest := range domain.ObjectTypeRequests {
+		domain.TypeModels[typeRequest.Name] =
+			domain.buildTypeForDefinitionObject(typeName, typeRequest.PropertyName, typeRequest.Schema)
 	}
 
 	// iterate over map item types to be instantiated and generate a type for each
 	mapTypeNames := make([]string, 0)
-	for mapTypeName, _ := range typeset.MapTypeRequests {
+	for mapTypeName, _ := range domain.MapTypeRequests {
 		mapTypeNames = append(mapTypeNames, mapTypeName)
 	}
 	sort.Strings(mapTypeNames)
@@ -620,7 +620,7 @@ func (typeset *TypeCollection) build() {
 		valueProperty.Description = "Mapped value"
 		typeModel.AddProperty(valueProperty)
 
-		typeset.TypeModels[typeName] = typeModel
+		domain.TypeModels[typeName] = typeModel
 	}
 
 	// add a type for string arrays
@@ -631,7 +631,7 @@ func (typeset *TypeCollection) build() {
 	stringProperty.Type = "string"
 	stringProperty.Repeated = true
 	stringArrayType.AddProperty(stringProperty)
-	typeset.TypeModels[stringArrayType.Name] = stringArrayType
+	domain.TypeModels[stringArrayType.Name] = stringArrayType
 
 	// add a type for "Any"
 	anyType := NewTypeModel()
@@ -642,23 +642,23 @@ func (typeset *TypeCollection) build() {
 	valueProperty.Name = "value"
 	valueProperty.Type = "blob"
 	anyType.AddProperty(valueProperty)
-	typeset.TypeModels[anyType.Name] = anyType
+	domain.TypeModels[anyType.Name] = anyType
 }
 
-func (typeset *TypeCollection) sortedTypeNames() []string {
+func (domain *Domain) sortedTypeNames() []string {
 	typeNames := make([]string, 0)
-	for typeName, _ := range typeset.TypeModels {
+	for typeName, _ := range domain.TypeModels {
 		typeNames = append(typeNames, typeName)
 	}
 	sort.Strings(typeNames)
 	return typeNames
 }
 
-func (typeset *TypeCollection) description() string {
-	typeNames := typeset.sortedTypeNames()
+func (domain *Domain) description() string {
+	typeNames := domain.sortedTypeNames()
 	result := ""
 	for _, typeName := range typeNames {
-		result += typeset.TypeModels[typeName].description()
+		result += domain.TypeModels[typeName].description()
 	}
 	return result
 }
