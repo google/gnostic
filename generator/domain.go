@@ -140,7 +140,7 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 				typeProperty := NewTypeProperty()
 				typeProperty.Name = propertyName
 				typeProperty.Type = propertyTypeName
-				typeModel.AddProperty(typeProperty)
+				typeModel.addProperty(typeProperty)
 			} else if propertySchema.Type != nil {
 				// the property schema specifies a type, so add a property with the specified type
 				if propertySchema.TypeIs("string") {
@@ -148,25 +148,25 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
-					typeModel.AddProperty(typeProperty)
+					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("boolean") {
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, "bool")
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
-					typeModel.AddProperty(typeProperty)
+					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("number") {
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, "float")
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
-					typeModel.AddProperty(typeProperty)
+					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("integer") {
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, "int")
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
-					typeModel.AddProperty(typeProperty)
+					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("object") {
 					// the property has an "anonymous" object schema, so define a new type for it and request its creation
 					anonymousObjectTypeName := domain.typeNameForStub(propertyName)
@@ -177,7 +177,7 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
-					typeModel.AddProperty(typeProperty)
+					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("array") {
 					// the property has an array type, so define it as a a repeated property of the specified type
 					propertyTypeName := domain.arrayItemTypeForSchema(propertyName, propertySchema)
@@ -186,7 +186,7 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
-					typeModel.AddProperty(typeProperty)
+					typeModel.addProperty(typeProperty)
 				} else {
 					log.Printf("ignoring %+v, which has an unsupported property type '%+v'", propertyName, propertySchema.Type)
 				}
@@ -194,19 +194,19 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 				// an empty schema can contain anything, so add an accessor for a generic object
 				typeName := "Any"
 				typeProperty := NewTypePropertyWithNameAndType(propertyName, typeName)
-				typeModel.AddProperty(typeProperty)
+				typeModel.addProperty(typeProperty)
 			} else if propertySchema.OneOf != nil {
 				anonymousObjectTypeName := domain.typeNameForStub(propertyName + "Item")
 				domain.ObjectTypeRequests[anonymousObjectTypeName] =
 					NewTypeRequest(anonymousObjectTypeName, propertyName, propertySchema)
 				typeProperty := NewTypePropertyWithNameAndType(propertyName, anonymousObjectTypeName)
-				typeModel.AddProperty(typeProperty)
+				typeModel.addProperty(typeProperty)
 			} else if propertySchema.AnyOf != nil {
 				anonymousObjectTypeName := domain.typeNameForStub(propertyName + "Item")
 				domain.ObjectTypeRequests[anonymousObjectTypeName] =
 					NewTypeRequest(anonymousObjectTypeName, propertyName, propertySchema)
 				typeProperty := NewTypePropertyWithNameAndType(propertyName, anonymousObjectTypeName)
-				typeModel.AddProperty(typeProperty)
+				typeModel.addProperty(typeProperty)
 			} else {
 				log.Printf("ignoring %s.%s, which has an unrecognized schema:\n%+v", typeModel.Name, propertyName, propertySchema.String())
 			}
@@ -238,7 +238,7 @@ func (domain *Domain) buildPatternPropertyAccessors(typeModel *TypeModel, schema
 			property.MapType = typeName
 			property.Repeated = true
 			domain.MapTypeRequests[property.MapType] = property.MapType
-			typeModel.AddProperty(property)
+			typeModel.addProperty(property)
 		}
 	}
 }
@@ -255,7 +255,7 @@ func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, sch
 				property.MapType = "Any"
 				property.Repeated = true
 				domain.MapTypeRequests[property.MapType] = property.MapType
-				typeModel.AddProperty(property)
+				typeModel.addProperty(property)
 				return
 			}
 		} else if schema.AdditionalProperties.Schema != nil {
@@ -270,7 +270,7 @@ func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, sch
 				property.MapType = mapType
 				property.Repeated = true
 				domain.MapTypeRequests[property.MapType] = property.MapType
-				typeModel.AddProperty(property)
+				typeModel.addProperty(property)
 				return
 			} else if schema.Type != nil {
 				typeName := *schema.Type.String
@@ -282,7 +282,7 @@ func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, sch
 					property.MapType = "string"
 					property.Repeated = true
 					domain.MapTypeRequests[property.MapType] = property.MapType
-					typeModel.AddProperty(property)
+					typeModel.addProperty(property)
 					return
 				} else if typeName == "array" {
 					if schema.Items != nil {
@@ -295,7 +295,7 @@ func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, sch
 							property.MapType = "StringArray"
 							property.Repeated = true
 							domain.MapTypeRequests[property.MapType] = property.MapType
-							typeModel.AddProperty(property)
+							typeModel.addProperty(property)
 							return
 						}
 					}
@@ -309,7 +309,7 @@ func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, sch
 				property.MapType = propertyTypeName
 				property.Repeated = true
 				domain.MapTypeRequests[property.MapType] = property.MapType
-				typeModel.AddProperty(property)
+				typeModel.addProperty(property)
 
 				domain.ObjectTypeRequests[propertyTypeName] =
 					NewTypeRequest(propertyTypeName, propertyName, schema)
@@ -333,11 +333,11 @@ func (domain *Domain) buildOneOfAccessors(typeModel *TypeModel, schema *jsonsche
 
 			if propertyName != nil {
 				typeProperty := NewTypePropertyWithNameAndType(*propertyName, typeName)
-				typeModel.AddProperty(typeProperty)
+				typeModel.addProperty(typeProperty)
 			}
 		} else if oneOf.Type != nil && oneOf.Type.String != nil && *oneOf.Type.String == "boolean" {
 			typeProperty := NewTypePropertyWithNameAndType("boolean", "bool")
-			typeModel.AddProperty(typeProperty)
+			typeModel.addProperty(typeProperty)
 		} else {
 			log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
 		}
@@ -372,7 +372,7 @@ func (domain *Domain) addAnonymousAccessorForSchema(
 		if propertyName != nil {
 			property := NewTypePropertyWithNameAndType(*propertyName, typeName)
 			property.Repeated = true
-			typeModel.AddProperty(property)
+			typeModel.addProperty(property)
 			typeModel.IsItemArray = true
 		}
 	} else {
@@ -380,7 +380,7 @@ func (domain *Domain) addAnonymousAccessorForSchema(
 		propertyName := "value"
 		property := NewTypePropertyWithNameAndType(propertyName, typeName)
 		property.Repeated = true
-		typeModel.AddProperty(property)
+		typeModel.addProperty(property)
 		typeModel.IsStringArray = true
 	}
 }
@@ -407,13 +407,13 @@ func (domain *Domain) buildAnyOfAccessors(typeModel *TypeModel, schema *jsonsche
 					propertyName := domain.propertyNameForReference(*ref)
 					if propertyName != nil {
 						property := NewTypePropertyWithNameAndType(*propertyName, typeName)
-						typeModel.AddProperty(property)
+						typeModel.addProperty(property)
 					}
 				} else {
 					typeName := "bool"
 					propertyName := "boolean"
 					property := NewTypePropertyWithNameAndType(propertyName, typeName)
-					typeModel.AddProperty(property)
+					typeModel.addProperty(property)
 				}
 			}
 		}
@@ -430,7 +430,7 @@ func (domain *Domain) buildDefaultAccessors(typeModel *TypeModel, schema *jsonsc
 	property.MapType = "Any"
 	property.Repeated = true
 	domain.MapTypeRequests[property.MapType] = property.MapType
-	typeModel.AddProperty(property)
+	typeModel.addProperty(property)
 }
 
 func (domain *Domain) buildTypeForDefinition(
@@ -517,13 +517,13 @@ func (domain *Domain) build() {
 		nameProperty.Name = "name"
 		nameProperty.Type = "string"
 		nameProperty.Description = "Map key"
-		typeModel.AddProperty(nameProperty)
+		typeModel.addProperty(nameProperty)
 
 		valueProperty := NewTypeProperty()
 		valueProperty.Name = "value"
 		valueProperty.Type = mapTypeName
 		valueProperty.Description = "Mapped value"
-		typeModel.AddProperty(valueProperty)
+		typeModel.addProperty(valueProperty)
 
 		domain.TypeModels[typeName] = typeModel
 	}
@@ -535,7 +535,7 @@ func (domain *Domain) build() {
 	stringProperty.Name = "value"
 	stringProperty.Type = "string"
 	stringProperty.Repeated = true
-	stringArrayType.AddProperty(stringProperty)
+	stringArrayType.addProperty(stringProperty)
 	domain.TypeModels[stringArrayType.Name] = stringArrayType
 
 	// add a type for "Any"
@@ -546,7 +546,7 @@ func (domain *Domain) build() {
 	valueProperty := NewTypeProperty()
 	valueProperty.Name = "value"
 	valueProperty.Type = "blob"
-	anyType.AddProperty(valueProperty)
+	anyType.addProperty(valueProperty)
 	domain.TypeModels[anyType.Name] = anyType
 }
 

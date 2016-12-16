@@ -36,8 +36,8 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewSchema(m, compiler.NewContext("schema", context))
-		if errors == nil {
+		t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
+		if safe_errors == nil {
 			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 		}
 	}
@@ -46,11 +46,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 	if v2 != nil {
 		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: v2.(bool)}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
@@ -58,11 +54,7 @@ func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	x := &Any{}
 	bytes, _ := json.Marshal(in)
 	x.Value = string(bytes)
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecurity, error) {
@@ -127,16 +119,12 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (*BasicAuthenticationSecurity, error) {
@@ -185,16 +173,12 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter, error) {
@@ -265,16 +249,12 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
@@ -327,16 +307,12 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
@@ -357,15 +333,11 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 		var err error
 		pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, error) {
@@ -386,15 +358,11 @@ func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, er
 		var err error
 		pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
@@ -576,16 +544,12 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
@@ -606,15 +570,11 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 		var err error
 		pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, error) {
@@ -663,16 +623,12 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, error) {
@@ -779,16 +735,12 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*FormDataParameterSubSchema, error) {
@@ -967,16 +919,12 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
@@ -1133,16 +1081,12 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*HeaderParameterSubSchema, error) {
@@ -1316,16 +1260,12 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
@@ -1346,15 +1286,11 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 		var err error
 		pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
@@ -1437,16 +1373,12 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
@@ -1466,11 +1398,7 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 	} else {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in)))
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference, error) {
@@ -1499,11 +1427,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
@@ -1552,16 +1476,12 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
@@ -1595,11 +1515,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, error) {
@@ -1633,11 +1549,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParameter, error) {
@@ -1671,11 +1583,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem, error) {
@@ -1709,11 +1617,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse, error) {
@@ -1747,11 +1651,7 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedResponseValue, error) {
@@ -1785,11 +1685,7 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, error) {
@@ -1823,11 +1719,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*NamedSecurityDefinitionsItem, error) {
@@ -1861,11 +1753,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, error) {
@@ -1898,11 +1786,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for value. expected a string, got %+v", v2)))
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStringArray, error) {
@@ -1936,11 +1820,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyParameter, error) {
@@ -1957,40 +1837,36 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
-		if errors == nil {
+		t, safe_errors := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
+		if safe_errors == nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
 	}
 	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
-		if errors == nil {
+		t, safe_errors := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
+		if safe_errors == nil {
 			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
 	}
 	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
-		if errors == nil {
+		t, safe_errors := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
+		if safe_errors == nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 		}
 	}
 	// PathParameterSubSchema path_parameter_sub_schema = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
-		if errors == nil {
+		t, safe_errors := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
+		if safe_errors == nil {
 			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oauth2AccessCodeSecurity, error) {
@@ -2072,16 +1948,12 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*Oauth2ApplicationSecurity, error) {
@@ -2155,16 +2027,12 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oauth2ImplicitSecurity, error) {
@@ -2238,16 +2106,12 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oauth2PasswordSecurity, error) {
@@ -2321,16 +2185,12 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, error) {
@@ -2351,11 +2211,7 @@ func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, 
 		pair.Value = v.(string)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOperation(in interface{}, context *compiler.Context) (*Operation, error) {
@@ -2507,16 +2363,12 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error) {
@@ -2529,24 +2381,20 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 	// BodyParameter body_parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
-		if errors == nil {
+		t, safe_errors := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
+		if safe_errors == nil {
 			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 		}
 	}
 	// NonBodyParameter non_body_parameter = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
-		if errors == nil {
+		t, safe_errors := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
+		if safe_errors == nil {
 			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewParameterDefinitions(in interface{}, context *compiler.Context) (*ParameterDefinitions, error) {
@@ -2567,15 +2415,11 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 		var err error
 		pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersItem, error) {
@@ -2588,24 +2432,20 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 	// Parameter parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewParameter(m, compiler.NewContext("parameter", context))
-		if errors == nil {
+		t, safe_errors := NewParameter(m, compiler.NewContext("parameter", context))
+		if safe_errors == nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-		if errors == nil {
+		t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+		if safe_errors == nil {
 			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
@@ -2721,16 +2561,12 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*PathParameterSubSchema, error) {
@@ -2908,16 +2744,12 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
@@ -2946,7 +2778,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
@@ -2963,16 +2795,12 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 			var err error
 			pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.Path = append(x.Path, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesItems, error) {
@@ -3117,16 +2945,12 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
@@ -3147,15 +2971,11 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		var err error
 		pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*QueryParameterSubSchema, error) {
@@ -3334,16 +3154,12 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
@@ -3411,16 +3227,12 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewResponseDefinitions(in interface{}, context *compiler.Context) (*ResponseDefinitions, error) {
@@ -3441,15 +3253,11 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 		var err error
 		pair.Value, err = NewResponse(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue, error) {
@@ -3462,24 +3270,20 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 	// Response response = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewResponse(m, compiler.NewContext("response", context))
-		if errors == nil {
+		t, safe_errors := NewResponse(m, compiler.NewContext("response", context))
+		if safe_errors == nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-		if errors == nil {
+		t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+		if safe_errors == nil {
 			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewResponses(in interface{}, context *compiler.Context) (*Responses, error) {
@@ -3508,7 +3312,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 			var err error
 			pair.Value, err = NewResponseValue(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.ResponseCode = append(x.ResponseCode, pair)
 		}
@@ -3525,16 +3329,12 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
@@ -3790,16 +3590,12 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, error) {
@@ -3812,24 +3608,20 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewSchema(m, compiler.NewContext("schema", context))
-		if errors == nil {
+		t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
+		if safe_errors == nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
 		}
 	}
 	// FileSchema file_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewFileSchema(m, compiler.NewContext("fileSchema", context))
-		if errors == nil {
+		t, safe_errors := NewFileSchema(m, compiler.NewContext("fileSchema", context))
+		if safe_errors == nil {
 			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*SecurityDefinitions, error) {
@@ -3850,15 +3642,11 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 		var err error
 		pair.Value, err = NewSecurityDefinitionsItem(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*SecurityDefinitionsItem, error) {
@@ -3871,56 +3659,52 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
-		if errors == nil {
+		t, safe_errors := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
+		if safe_errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
 	}
 	// ApiKeySecurity api_key_security = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
-		if errors == nil {
+		t, safe_errors := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
+		if safe_errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
 	}
 	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
-		if errors == nil {
+		t, safe_errors := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
+		if safe_errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
 	}
 	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
-		if errors == nil {
+		t, safe_errors := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
+		if safe_errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 		}
 	}
 	// Oauth2ApplicationSecurity oauth2_application_security = 5;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
-		if errors == nil {
+		t, safe_errors := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
+		if safe_errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 		}
 	}
 	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, errors := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
-		if errors == nil {
+		t, safe_errors := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
+		if safe_errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewSecurityRequirement(in interface{}, context *compiler.Context) (*SecurityRequirement, error) {
@@ -3941,34 +3725,27 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 		var err error
 		pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, error) {
 	errors := make([]error, 0)
 	a, ok := in.([]interface{})
+	if !ok {
+		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for StringArray: %+v", in)))
+	}
+	x := &StringArray{}
 	if ok {
-		x := &StringArray{}
 		x.Value = make([]string, 0)
 		for _, s := range a {
 			x.Value = append(x.Value, s.(string))
 		}
-		if len(errors) > 0 {
-			return x, compiler.NewErrorGroup(errors)
-		} else {
-			return x, nil
-		}
-	} else {
-		return nil, nil
 	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
@@ -4026,16 +3803,12 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
@@ -4048,11 +3821,7 @@ func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
 	} else {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for string array: %+v", in)))
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExtension, error) {
@@ -4073,15 +3842,11 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 		var err error
 		pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
@@ -4144,16 +3909,12 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 			var err error
 			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
 			if err != nil {
-				return nil, err
+				errors = append(errors, err)
 			}
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	if len(errors) > 0 {
-		return x, compiler.NewErrorGroup(errors)
-	} else {
-		return x, nil
-	}
+	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {

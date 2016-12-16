@@ -22,7 +22,7 @@ import (
 
 /// Type Modeling
 
-// models types that we encounter during traversal that have no named schema
+// models types that we encounter during model-building that have no named schema
 type TypeRequest struct {
 	Name         string             // name of type to be created
 	PropertyName string             // name of a property that refers to this type
@@ -86,7 +86,7 @@ type TypeModel struct {
 	Description   string          // if present, the "description" field in the schema
 }
 
-func (typeModel *TypeModel) AddProperty(property *TypeProperty) {
+func (typeModel *TypeModel) addProperty(property *TypeProperty) {
 	if typeModel.Properties == nil {
 		typeModel.Properties = make([]*TypeProperty, 0)
 	}

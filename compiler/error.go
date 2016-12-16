@@ -37,8 +37,14 @@ type ErrorGroup struct {
 	Errors []error
 }
 
-func NewErrorGroup(errors []error) *ErrorGroup {
-	return &ErrorGroup{Errors: errors}
+func NewErrorGroupOrNil(errors []error) error {
+	if len(errors) == 0 {
+		return nil
+	} else if len(errors) == 1 {
+		return errors[0]
+	} else {
+		return &ErrorGroup{Errors: errors}
+	}
 }
 
 func (group *ErrorGroup) Error() string {
