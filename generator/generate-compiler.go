@@ -51,6 +51,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 	// constructors
 	for _, className := range classNames {
 		code.Print("func New%s(in interface{}, context *helpers.Context) (*%s, error) {", className, className)
+		code.Print("errors := make([]error, 0)")
 
 		classModel := classes.ClassModels[className]
 		parentClassName := className
@@ -62,9 +63,13 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x.Value = make([]string, 0)")
 			code.Print("x.Value = append(x.Value, value)")
 			code.Print("} else {")
-			code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for string array: %%+v\", in))")
+			code.Print("errors = append(errors, helpers.NewError(context, fmt.Sprintf(\"unexpected value for string array: %%+v\", in)))")
 			code.Print("}")
-			code.Print("return x, nil")
+			code.Print("if len(errors) > 0 {")
+			code.Print("  return x, helpers.NewErrorGroup(errors)")
+			code.Print("} else {")
+			code.Print("  return x, nil")
+			code.Print("}")
 			code.Print("}")
 			code.Print()
 			continue
@@ -73,19 +78,25 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		if classModel.IsItemArray {
 			code.Print("m, ok := helpers.UnpackMap(in)")
 			code.Print("if (!ok) {")
-			code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
+			code.Print("errors = append(errors, helpers.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in)))")
 			code.Print("}")
 
 			code.Print("x := &ItemsItem{}")
 			code.Print("if ok {")
 			code.Print("x.Schema = make([]*Schema, 0)")
 			code.Print("y, err := NewSchema(m, helpers.NewContext(\"<array>\", context))")
-			code.Print("if err != nil {return nil, err}")
+			code.Print("if err != nil {")
+			code.Print("return nil, err")
+			code.Print("}")
 			code.Print("x.Schema = append(x.Schema, y)")
 			code.Print("} else {")
-			code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in))")
+			code.Print("errors = append(errors, helpers.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in)))")
 			code.Print("}")
-			code.Print("return x, nil")
+			code.Print("if len(errors) > 0 {")
+			code.Print("  return x, helpers.NewErrorGroup(errors)")
+			code.Print("} else {")
+			code.Print("  return x, nil")
+			code.Print("}")
 			code.Print("}")
 			code.Print()
 			continue
@@ -95,7 +106,11 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("x := &Any{}")
 			code.Print("bytes, _ := json.Marshal(in)")
 			code.Print("x.Value = string(bytes)")
-			code.Print("return x, nil")
+			code.Print("if len(errors) > 0 {")
+			code.Print("  return x, helpers.NewErrorGroup(errors)")
+			code.Print("} else {")
+			code.Print("  return x, nil")
+			code.Print("}")
 			code.Print("}")
 			code.Print()
 			continue
@@ -109,7 +124,11 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("for _, s := range a {")
 			code.Print("x.Value = append(x.Value, s.(string))")
 			code.Print("}")
-			code.Print("return x, nil")
+			code.Print("if len(errors) > 0 {")
+			code.Print("  return x, helpers.NewErrorGroup(errors)")
+			code.Print("} else {")
+			code.Print("  return x, nil")
+			code.Print("}")
 			code.Print("} else {")
 			code.Print("return nil, nil")
 			code.Print("}")
@@ -119,7 +138,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 		}
 		code.Print("m, ok := helpers.UnpackMap(in)")
 		code.Print("if (!ok) {")
-		code.Print("return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s section: %%+v\", in))", className)
+		code.Print("errors = append(errors, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s section: %%+v\", in)))", className)
 		code.Print("}")
 		oneOfWrapper := classModel.OneOfWrapper
 
@@ -137,7 +156,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			}
 			code.Print("requiredKeys := []string{%s}", keyString)
 			code.Print("if !helpers.MapContainsAllKeys(m, requiredKeys) {")
-			code.Print("return nil, helpers.NewError(context, \"does not contain all required properties (%s)\")",
+			code.Print("errors = append(errors, helpers.NewError(context, \"does not contain all required properties (%s)\"))",
 				strings.Replace(keyString, "\"", "'", -1))
 			code.Print("}")
 		}
@@ -175,7 +194,7 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
 			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
 			code.Print("if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
-			code.Print("return nil, helpers.NewError(context,\nfmt.Sprintf(\"includes properties not in (%s) or (%s): %%+v\",\nhelpers.SortedKeysForMap(m)))",
+			code.Print("errors = append(errors, helpers.NewError(context,\nfmt.Sprintf(\"includes properties not in (%s) or (%s): %%+v\",\nhelpers.SortedKeysForMap(m))))",
 				strings.Replace(allowedKeyString, "\"", "'", -1),
 				strings.Replace(allowedPatternString, "\"", "'", -1))
 			code.Print("}")
@@ -222,7 +241,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("if ok {")
 					code.Print("for _, item := range a {")
 					code.Print("y, err := New%s(item, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
-					code.Print("if err != nil {return nil, err}")
+					code.Print("if err != nil {")
+					code.Print("errors = append(errors, err)")
+					code.Print("}")
 					code.Print("x.%s = append(x.%s, y)", fieldName, fieldName)
 					code.Print("}")
 					code.Print("}")
@@ -231,8 +252,8 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					if oneOfWrapper {
 						code.Print("{")
 						code.Print("// errors are ok here, they mean we just don't have the right subtype")
-						code.Print("t, _ := New%s(m, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
-						code.Print("if t != nil {")
+						code.Print("t, errors := New%s(m, helpers.NewContext(\"%s\", context))", classModel.Name, propertyName)
+						code.Print("if errors == nil {")
 						code.Print("x.Oneof = &%s_%s{%s: t}", parentClassName, classModel.Name, classModel.Name)
 						code.Print("}")
 						code.Print("}")
@@ -242,7 +263,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 						code.Print("var err error")
 						code.Print("x.%s, err = New%s(v%d, helpers.NewContext(\"%s\", context))",
 							fieldName, classModel.Name, fieldNumber, propertyName)
-						code.Print("if err != nil {return nil, err}")
+						code.Print("if err != nil {")
+						code.Print(" errors = append(errors, err)")
+						code.Print("}")
 						code.Print("}")
 					}
 				}
@@ -254,14 +277,14 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					code.Print("if ok {")
 					code.Print("x.%s = helpers.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("} else {")
-					code.Print(" return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s property: %%+v\", in))", propertyName)
+					code.Print(" errors = append(errors, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s property: %%+v\", in)))", propertyName)
 					code.Print("}")
 					code.Print("}")
 				} else {
 					code.Print("v%d := helpers.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("x.%s, ok = v%d.(string)", fieldName, fieldNumber)
-					code.Print("if !ok {return nil, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s. expected a string, got %%+v\", v%d))}", propertyName, fieldNumber)
+					code.Print("if !ok {errors = append(errors, helpers.NewError(context, fmt.Sprintf(\"unexpected value for %s. expected a string, got %%+v\", v%d)))}", propertyName, fieldNumber)
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
@@ -307,7 +330,9 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 					} else {
 						code.Print("var err error")
 						code.Print("pair.Value, err = New%s(v, helpers.NewContext(k, context))", mapTypeName)
-						code.Print("if err != nil {return nil, err}")
+						code.Print("if err != nil {")
+						code.Print("return nil, err")
+						code.Print("}")
 					}
 					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)
 					if propertyModel.Pattern != "" {
@@ -319,7 +344,11 @@ func (classes *ClassCollection) generateCompiler(packageName string, license str
 				}
 			}
 		}
+		code.Print("if len(errors) > 0 {")
+		code.Print("  return x, helpers.NewErrorGroup(errors)")
+		code.Print("} else {")
 		code.Print("  return x, nil")
+		code.Print("}")
 		code.Print("}\n")
 	}
 

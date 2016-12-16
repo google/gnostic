@@ -30,10 +30,10 @@ func (err *Error) Error() string {
 
 // container for groups of errors
 type ErrorGroup struct {
-	Errors []Error
+	Errors []error
 }
 
-func NewErrorGroup(errors []Error) *ErrorGroup {
+func NewErrorGroup(errors []error) *ErrorGroup {
 	return &ErrorGroup{Errors: errors}
 }
 

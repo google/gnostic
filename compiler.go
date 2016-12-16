@@ -55,7 +55,7 @@ func main() {
 
 	document, err := openapi_v2.NewDocument(raw, nil)
 	if err != nil {
-		fmt.Printf("Error %+v\n", err)
+		fmt.Printf("Error(s):\n%+v\n", err)
 		os.Exit(-1)
 	}
 

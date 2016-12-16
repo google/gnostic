@@ -27,16 +27,17 @@ func Version() string {
 }
 
 func NewAdditionalPropertiesItem(in interface{}, context *helpers.Context) (*AdditionalPropertiesItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for AdditionalPropertiesItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for AdditionalPropertiesItem section: %+v", in)))
 	}
 	x := &AdditionalPropertiesItem{}
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewSchema(m, helpers.NewContext("schema", context))
-		if t != nil {
+		t, errors := NewSchema(m, helpers.NewContext("schema", context))
+		if errors == nil {
 			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 		}
 	}
@@ -45,31 +46,41 @@ func NewAdditionalPropertiesItem(in interface{}, context *helpers.Context) (*Add
 	if v2 != nil {
 		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: v2.(bool)}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewAny(in interface{}, context *helpers.Context) (*Any, error) {
+	errors := make([]error, 0)
 	x := &Any{}
 	bytes, _ := json.Marshal(in)
 	x.Value = string(bytes)
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurity, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for ApiKeySecurity section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for ApiKeySecurity section: %+v", in)))
 	}
 	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('in','name','type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('in','name','type')"))
 	}
 	allowedKeys := []string{"description", "in", "name", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','in','name','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &ApiKeySecurity{}
 	// string type = 1;
@@ -77,7 +88,7 @@ func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurit
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string name = 2;
@@ -85,7 +96,7 @@ func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurit
 	if v2 != nil {
 		x.Name, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2)))
 		}
 	}
 	// string in = 3;
@@ -93,7 +104,7 @@ func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurit
 	if v3 != nil {
 		x.In, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3)))
 		}
 	}
 	// string description = 4;
@@ -101,7 +112,7 @@ func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurit
 	if v4 != nil {
 		x.Description, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 5;
@@ -121,24 +132,29 @@ func NewApiKeySecurity(in interface{}, context *helpers.Context) (*ApiKeySecurit
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewBasicAuthenticationSecurity(in interface{}, context *helpers.Context) (*BasicAuthenticationSecurity, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for BasicAuthenticationSecurity section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for BasicAuthenticationSecurity section: %+v", in)))
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('type')"))
 	}
 	allowedKeys := []string{"description", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &BasicAuthenticationSecurity{}
 	// string type = 1;
@@ -146,7 +162,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *helpers.Context) (*
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string description = 2;
@@ -154,7 +170,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *helpers.Context) (*
 	if v2 != nil {
 		x.Description, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 3;
@@ -174,24 +190,29 @@ func NewBasicAuthenticationSecurity(in interface{}, context *helpers.Context) (*
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for BodyParameter section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for BodyParameter section: %+v", in)))
 	}
 	requiredKeys := []string{"in", "name", "schema"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('in','name','schema')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('in','name','schema')"))
 	}
 	allowedKeys := []string{"description", "in", "name", "required", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','in','name','required','schema') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &BodyParameter{}
 	// string description = 1;
@@ -199,7 +220,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 	if v1 != nil {
 		x.Description, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
 		}
 	}
 	// string name = 2;
@@ -207,7 +228,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 	if v2 != nil {
 		x.Name, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2)))
 		}
 	}
 	// string in = 3;
@@ -215,7 +236,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 	if v3 != nil {
 		x.In, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3)))
 		}
 	}
 	// bool required = 4;
@@ -229,7 +250,7 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 		var err error
 		x.Schema, err = NewSchema(v5, helpers.NewContext("schema", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 6;
@@ -249,20 +270,25 @@ func NewBodyParameter(in interface{}, context *helpers.Context) (*BodyParameter,
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Contact section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Contact section: %+v", in)))
 	}
 	allowedKeys := []string{"email", "name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('email','name','url') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Contact{}
 	// string name = 1;
@@ -270,7 +296,7 @@ func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// string url = 2;
@@ -278,7 +304,7 @@ func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
 	if v2 != nil {
 		x.Url, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
 		}
 	}
 	// string email = 3;
@@ -286,7 +312,7 @@ func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
 	if v3 != nil {
 		x.Email, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for email. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for email. expected a string, got %+v", v3)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 4;
@@ -306,13 +332,18 @@ func NewContact(in interface{}, context *helpers.Context) (*Contact, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewDefault(in interface{}, context *helpers.Context) (*Default, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Default section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Default section: %+v", in)))
 	}
 	x := &Default{}
 	// repeated NamedAny additional_properties = 1;
@@ -330,13 +361,18 @@ func NewDefault(in interface{}, context *helpers.Context) (*Default, error) {
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewDefinitions(in interface{}, context *helpers.Context) (*Definitions, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Definitions section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Definitions section: %+v", in)))
 	}
 	x := &Definitions{}
 	// repeated NamedSchema additional_properties = 1;
@@ -354,24 +390,29 @@ func NewDefinitions(in interface{}, context *helpers.Context) (*Definitions, err
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Document section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Document section: %+v", in)))
 	}
 	requiredKeys := []string{"info", "paths", "swagger"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('info','paths','swagger')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('info','paths','swagger')"))
 	}
 	allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Document{}
 	// string swagger = 1;
@@ -379,7 +420,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	if v1 != nil {
 		x.Swagger, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for swagger. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for swagger. expected a string, got %+v", v1)))
 		}
 	}
 	// Info info = 2;
@@ -388,7 +429,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.Info, err = NewInfo(v2, helpers.NewContext("info", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string host = 3;
@@ -396,7 +437,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	if v3 != nil {
 		x.Host, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for host. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for host. expected a string, got %+v", v3)))
 		}
 	}
 	// string base_path = 4;
@@ -404,7 +445,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 	if v4 != nil {
 		x.BasePath, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for basePath. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for basePath. expected a string, got %+v", v4)))
 		}
 	}
 	// repeated string schemes = 5;
@@ -414,7 +455,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		if ok {
 			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in)))
 		}
 	}
 	// repeated string consumes = 6;
@@ -424,7 +465,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		if ok {
 			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in)))
 		}
 	}
 	// repeated string produces = 7;
@@ -434,7 +475,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		if ok {
 			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in)))
 		}
 	}
 	// Paths paths = 8;
@@ -443,7 +484,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.Paths, err = NewPaths(v8, helpers.NewContext("paths", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Definitions definitions = 9;
@@ -452,7 +493,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.Definitions, err = NewDefinitions(v9, helpers.NewContext("definitions", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// ParameterDefinitions parameters = 10;
@@ -461,7 +502,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.Parameters, err = NewParameterDefinitions(v10, helpers.NewContext("parameters", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// ResponseDefinitions responses = 11;
@@ -470,7 +511,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.Responses, err = NewResponseDefinitions(v11, helpers.NewContext("responses", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated SecurityRequirement security = 12;
@@ -483,7 +524,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 			for _, item := range a {
 				y, err := NewSecurityRequirement(item, helpers.NewContext("security", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Security = append(x.Security, y)
 			}
@@ -495,7 +536,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, helpers.NewContext("securityDefinitions", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated Tag tags = 14;
@@ -508,7 +549,7 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 			for _, item := range a {
 				y, err := NewTag(item, helpers.NewContext("tags", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Tags = append(x.Tags, y)
 			}
@@ -520,16 +561,21 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v15, helpers.NewContext("externalDocs", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewExamples(in interface{}, context *helpers.Context) (*Examples, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Examples section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Examples section: %+v", in)))
 	}
 	x := &Examples{}
 	// repeated NamedAny additional_properties = 1;
@@ -547,24 +593,29 @@ func NewExamples(in interface{}, context *helpers.Context) (*Examples, error) {
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewExternalDocs(in interface{}, context *helpers.Context) (*ExternalDocs, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for ExternalDocs section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for ExternalDocs section: %+v", in)))
 	}
 	requiredKeys := []string{"url"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('url')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('url')"))
 	}
 	allowedKeys := []string{"description", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','url') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &ExternalDocs{}
 	// string description = 1;
@@ -572,7 +623,7 @@ func NewExternalDocs(in interface{}, context *helpers.Context) (*ExternalDocs, e
 	if v1 != nil {
 		x.Description, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
 		}
 	}
 	// string url = 2;
@@ -580,7 +631,7 @@ func NewExternalDocs(in interface{}, context *helpers.Context) (*ExternalDocs, e
 	if v2 != nil {
 		x.Url, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 3;
@@ -600,24 +651,29 @@ func NewExternalDocs(in interface{}, context *helpers.Context) (*ExternalDocs, e
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for FileSchema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for FileSchema section: %+v", in)))
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('type')"))
 	}
 	allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('default','description','example','externalDocs','format','readOnly','required','title','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &FileSchema{}
 	// string format = 1;
@@ -625,7 +681,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	if v1 != nil {
 		x.Format, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v1)))
 		}
 	}
 	// string title = 2;
@@ -633,7 +689,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	if v2 != nil {
 		x.Title, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -641,7 +697,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// Any default = 4;
@@ -650,7 +706,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 		var err error
 		x.Default, err = NewAny(v4, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated string required = 5;
@@ -660,7 +716,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 		if ok {
 			x.Required = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in)))
 		}
 	}
 	// string type = 6;
@@ -668,7 +724,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 	if v6 != nil {
 		x.Type, ok = v6.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
 		}
 	}
 	// bool read_only = 7;
@@ -682,7 +738,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v8, helpers.NewContext("externalDocs", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Any example = 9;
@@ -691,7 +747,7 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 		var err error
 		x.Example, err = NewAny(v9, helpers.NewContext("example", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 10;
@@ -711,20 +767,25 @@ func NewFileSchema(in interface{}, context *helpers.Context) (*FileSchema, error
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*FormDataParameterSubSchema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for FormDataParameterSubSchema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for FormDataParameterSubSchema section: %+v", in)))
 	}
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &FormDataParameterSubSchema{}
 	// bool required = 1;
@@ -737,7 +798,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v2 != nil {
 		x.In, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -745,7 +806,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// string name = 4;
@@ -753,7 +814,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v4 != nil {
 		x.Name, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
 		}
 	}
 	// bool allow_empty_value = 5;
@@ -766,7 +827,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v6 != nil {
 		x.Type, ok = v6.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
 		}
 	}
 	// string format = 7;
@@ -774,7 +835,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v7 != nil {
 		x.Format, ok = v7.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7)))
 		}
 	}
 	// PrimitivesItems items = 8;
@@ -783,7 +844,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 		var err error
 		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string collection_format = 9;
@@ -791,7 +852,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v9 != nil {
 		x.CollectionFormat, ok = v9.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9)))
 		}
 	}
 	// Any default = 10;
@@ -800,7 +861,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 		var err error
 		x.Default, err = NewAny(v10, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float maximum = 11;
@@ -838,7 +899,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 	if v17 != nil {
 		x.Pattern, ok = v17.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17)))
 		}
 	}
 	// int64 max_items = 18;
@@ -866,7 +927,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -894,24 +955,29 @@ func NewFormDataParameterSubSchema(in interface{}, context *helpers.Context) (*F
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Header section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Header section: %+v", in)))
 	}
 	requiredKeys := []string{"type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('type')"))
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Header{}
 	// string type = 1;
@@ -919,7 +985,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string format = 2;
@@ -927,7 +993,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	if v2 != nil {
 		x.Format, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
 		}
 	}
 	// PrimitivesItems items = 3;
@@ -936,7 +1002,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 		var err error
 		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string collection_format = 4;
@@ -944,7 +1010,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	if v4 != nil {
 		x.CollectionFormat, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4)))
 		}
 	}
 	// Any default = 5;
@@ -953,7 +1019,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 		var err error
 		x.Default, err = NewAny(v5, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float maximum = 6;
@@ -991,7 +1057,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	if v12 != nil {
 		x.Pattern, ok = v12.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12)))
 		}
 	}
 	// int64 max_items = 13;
@@ -1019,7 +1085,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -1035,7 +1101,7 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 	if v18 != nil {
 		x.Description, ok = v18.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v18))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v18)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 19;
@@ -1055,20 +1121,25 @@ func NewHeader(in interface{}, context *helpers.Context) (*Header, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*HeaderParameterSubSchema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for HeaderParameterSubSchema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for HeaderParameterSubSchema section: %+v", in)))
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &HeaderParameterSubSchema{}
 	// bool required = 1;
@@ -1081,7 +1152,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v2 != nil {
 		x.In, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -1089,7 +1160,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// string name = 4;
@@ -1097,7 +1168,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v4 != nil {
 		x.Name, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
 		}
 	}
 	// string type = 5;
@@ -1105,7 +1176,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v5 != nil {
 		x.Type, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5)))
 		}
 	}
 	// string format = 6;
@@ -1113,7 +1184,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v6 != nil {
 		x.Format, ok = v6.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6)))
 		}
 	}
 	// PrimitivesItems items = 7;
@@ -1122,7 +1193,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 		var err error
 		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string collection_format = 8;
@@ -1130,7 +1201,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v8 != nil {
 		x.CollectionFormat, ok = v8.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8)))
 		}
 	}
 	// Any default = 9;
@@ -1139,7 +1210,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 		var err error
 		x.Default, err = NewAny(v9, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float maximum = 10;
@@ -1177,7 +1248,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 	if v16 != nil {
 		x.Pattern, ok = v16.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16)))
 		}
 	}
 	// int64 max_items = 17;
@@ -1205,7 +1276,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -1233,13 +1304,18 @@ func NewHeaderParameterSubSchema(in interface{}, context *helpers.Context) (*Hea
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewHeaders(in interface{}, context *helpers.Context) (*Headers, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Headers section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Headers section: %+v", in)))
 	}
 	x := &Headers{}
 	// repeated NamedHeader additional_properties = 1;
@@ -1257,24 +1333,29 @@ func NewHeaders(in interface{}, context *helpers.Context) (*Headers, error) {
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Info section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Info section: %+v", in)))
 	}
 	requiredKeys := []string{"title", "version"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('title','version')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('title','version')"))
 	}
 	allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('contact','description','license','termsOfService','title','version') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Info{}
 	// string title = 1;
@@ -1282,7 +1363,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	if v1 != nil {
 		x.Title, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v1)))
 		}
 	}
 	// string version = 2;
@@ -1290,7 +1371,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	if v2 != nil {
 		x.Version, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for version. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for version. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -1298,7 +1379,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// string terms_of_service = 4;
@@ -1306,7 +1387,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 	if v4 != nil {
 		x.TermsOfService, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for termsOfService. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for termsOfService. expected a string, got %+v", v4)))
 		}
 	}
 	// Contact contact = 5;
@@ -1315,7 +1396,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 		var err error
 		x.Contact, err = NewContact(v5, helpers.NewContext("contact", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// License license = 6;
@@ -1324,7 +1405,7 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 		var err error
 		x.License, err = NewLicense(v6, helpers.NewContext("license", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 7;
@@ -1344,13 +1425,18 @@ func NewInfo(in interface{}, context *helpers.Context) (*Info, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewItemsItem(in interface{}, context *helpers.Context) (*ItemsItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in)))
 	}
 	x := &ItemsItem{}
 	if ok {
@@ -1361,26 +1447,31 @@ func NewItemsItem(in interface{}, context *helpers.Context) (*ItemsItem, error) 
 		}
 		x.Schema = append(x.Schema, y)
 	} else {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in)))
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewJsonReference(in interface{}, context *helpers.Context) (*JsonReference, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for JsonReference section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for JsonReference section: %+v", in)))
 	}
 	requiredKeys := []string{"$ref"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('$ref')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('$ref')"))
 	}
 	allowedKeys := []string{"$ref"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('$ref') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &JsonReference{}
 	// string _ref = 1;
@@ -1388,27 +1479,32 @@ func NewJsonReference(in interface{}, context *helpers.Context) (*JsonReference,
 	if v1 != nil {
 		x.XRef, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewLicense(in interface{}, context *helpers.Context) (*License, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for License section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for License section: %+v", in)))
 	}
 	requiredKeys := []string{"name"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('name')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('name')"))
 	}
 	allowedKeys := []string{"name", "url"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','url') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &License{}
 	// string name = 1;
@@ -1416,7 +1512,7 @@ func NewLicense(in interface{}, context *helpers.Context) (*License, error) {
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// string url = 2;
@@ -1424,7 +1520,7 @@ func NewLicense(in interface{}, context *helpers.Context) (*License, error) {
 	if v2 != nil {
 		x.Url, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 3;
@@ -1444,20 +1540,25 @@ func NewLicense(in interface{}, context *helpers.Context) (*License, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedAny(in interface{}, context *helpers.Context) (*NamedAny, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedAny section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedAny section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedAny{}
 	// string name = 1;
@@ -1465,7 +1566,7 @@ func NewNamedAny(in interface{}, context *helpers.Context) (*NamedAny, error) {
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// Any value = 2;
@@ -1474,23 +1575,28 @@ func NewNamedAny(in interface{}, context *helpers.Context) (*NamedAny, error) {
 		var err error
 		x.Value, err = NewAny(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedHeader(in interface{}, context *helpers.Context) (*NamedHeader, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedHeader section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedHeader section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedHeader{}
 	// string name = 1;
@@ -1498,7 +1604,7 @@ func NewNamedHeader(in interface{}, context *helpers.Context) (*NamedHeader, err
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// Header value = 2;
@@ -1507,23 +1613,28 @@ func NewNamedHeader(in interface{}, context *helpers.Context) (*NamedHeader, err
 		var err error
 		x.Value, err = NewHeader(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedParameter(in interface{}, context *helpers.Context) (*NamedParameter, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedParameter section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedParameter section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedParameter{}
 	// string name = 1;
@@ -1531,7 +1642,7 @@ func NewNamedParameter(in interface{}, context *helpers.Context) (*NamedParamete
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// Parameter value = 2;
@@ -1540,23 +1651,28 @@ func NewNamedParameter(in interface{}, context *helpers.Context) (*NamedParamete
 		var err error
 		x.Value, err = NewParameter(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedPathItem(in interface{}, context *helpers.Context) (*NamedPathItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedPathItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedPathItem section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedPathItem{}
 	// string name = 1;
@@ -1564,7 +1680,7 @@ func NewNamedPathItem(in interface{}, context *helpers.Context) (*NamedPathItem,
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// PathItem value = 2;
@@ -1573,23 +1689,28 @@ func NewNamedPathItem(in interface{}, context *helpers.Context) (*NamedPathItem,
 		var err error
 		x.Value, err = NewPathItem(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedResponse(in interface{}, context *helpers.Context) (*NamedResponse, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedResponse section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedResponse section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedResponse{}
 	// string name = 1;
@@ -1597,7 +1718,7 @@ func NewNamedResponse(in interface{}, context *helpers.Context) (*NamedResponse,
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// Response value = 2;
@@ -1606,23 +1727,28 @@ func NewNamedResponse(in interface{}, context *helpers.Context) (*NamedResponse,
 		var err error
 		x.Value, err = NewResponse(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedResponseValue(in interface{}, context *helpers.Context) (*NamedResponseValue, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedResponseValue section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedResponseValue section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedResponseValue{}
 	// string name = 1;
@@ -1630,7 +1756,7 @@ func NewNamedResponseValue(in interface{}, context *helpers.Context) (*NamedResp
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// ResponseValue value = 2;
@@ -1639,23 +1765,28 @@ func NewNamedResponseValue(in interface{}, context *helpers.Context) (*NamedResp
 		var err error
 		x.Value, err = NewResponseValue(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedSchema(in interface{}, context *helpers.Context) (*NamedSchema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedSchema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedSchema section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedSchema{}
 	// string name = 1;
@@ -1663,7 +1794,7 @@ func NewNamedSchema(in interface{}, context *helpers.Context) (*NamedSchema, err
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// Schema value = 2;
@@ -1672,23 +1803,28 @@ func NewNamedSchema(in interface{}, context *helpers.Context) (*NamedSchema, err
 		var err error
 		x.Value, err = NewSchema(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*NamedSecurityDefinitionsItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedSecurityDefinitionsItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedSecurityDefinitionsItem section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedSecurityDefinitionsItem{}
 	// string name = 1;
@@ -1696,7 +1832,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *helpers.Context) (
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// SecurityDefinitionsItem value = 2;
@@ -1705,23 +1841,28 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *helpers.Context) (
 		var err error
 		x.Value, err = NewSecurityDefinitionsItem(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedString(in interface{}, context *helpers.Context) (*NamedString, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedString section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedString section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedString{}
 	// string name = 1;
@@ -1729,7 +1870,7 @@ func NewNamedString(in interface{}, context *helpers.Context) (*NamedString, err
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// string value = 2;
@@ -1737,23 +1878,28 @@ func NewNamedString(in interface{}, context *helpers.Context) (*NamedString, err
 	if v2 != nil {
 		x.Value, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for value. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for value. expected a string, got %+v", v2)))
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNamedStringArray(in interface{}, context *helpers.Context) (*NamedStringArray, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedStringArray section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NamedStringArray section: %+v", in)))
 	}
 	allowedKeys := []string{"name", "value"}
 	allowedPatterns := []string{}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &NamedStringArray{}
 	// string name = 1;
@@ -1761,7 +1907,7 @@ func NewNamedStringArray(in interface{}, context *helpers.Context) (*NamedString
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// StringArray value = 2;
@@ -1770,72 +1916,82 @@ func NewNamedStringArray(in interface{}, context *helpers.Context) (*NamedString
 		var err error
 		x.Value, err = NewStringArray(v2, helpers.NewContext("value", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewNonBodyParameter(in interface{}, context *helpers.Context) (*NonBodyParameter, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for NonBodyParameter section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for NonBodyParameter section: %+v", in)))
 	}
 	requiredKeys := []string{"in", "name", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('in','name','type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('in','name','type')"))
 	}
 	x := &NonBodyParameter{}
 	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewHeaderParameterSubSchema(m, helpers.NewContext("headerParameterSubSchema", context))
-		if t != nil {
+		t, errors := NewHeaderParameterSubSchema(m, helpers.NewContext("headerParameterSubSchema", context))
+		if errors == nil {
 			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 		}
 	}
 	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewFormDataParameterSubSchema(m, helpers.NewContext("formDataParameterSubSchema", context))
-		if t != nil {
+		t, errors := NewFormDataParameterSubSchema(m, helpers.NewContext("formDataParameterSubSchema", context))
+		if errors == nil {
 			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 		}
 	}
 	// QueryParameterSubSchema query_parameter_sub_schema = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewQueryParameterSubSchema(m, helpers.NewContext("queryParameterSubSchema", context))
-		if t != nil {
+		t, errors := NewQueryParameterSubSchema(m, helpers.NewContext("queryParameterSubSchema", context))
+		if errors == nil {
 			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 		}
 	}
 	// PathParameterSubSchema path_parameter_sub_schema = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewPathParameterSubSchema(m, helpers.NewContext("pathParameterSubSchema", context))
-		if t != nil {
+		t, errors := NewPathParameterSubSchema(m, helpers.NewContext("pathParameterSubSchema", context))
+		if errors == nil {
 			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oauth2AccessCodeSecurity, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2AccessCodeSecurity section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2AccessCodeSecurity section: %+v", in)))
 	}
 	requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('authorizationUrl','flow','tokenUrl','type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('authorizationUrl','flow','tokenUrl','type')"))
 	}
 	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('authorizationUrl','description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Oauth2AccessCodeSecurity{}
 	// string type = 1;
@@ -1843,7 +1999,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string flow = 2;
@@ -1851,7 +2007,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	if v2 != nil {
 		x.Flow, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
 		}
 	}
 	// Oauth2Scopes scopes = 3;
@@ -1860,7 +2016,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string authorization_url = 4;
@@ -1868,7 +2024,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	if v4 != nil {
 		x.AuthorizationUrl, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4)))
 		}
 	}
 	// string token_url = 5;
@@ -1876,7 +2032,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	if v5 != nil {
 		x.TokenUrl, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v5)))
 		}
 	}
 	// string description = 6;
@@ -1884,7 +2040,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 	if v6 != nil {
 		x.Description, ok = v6.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v6))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v6)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 7;
@@ -1904,24 +2060,29 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *helpers.Context) (*Oau
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oauth2ApplicationSecurity, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2ApplicationSecurity section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2ApplicationSecurity section: %+v", in)))
 	}
 	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')"))
 	}
 	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Oauth2ApplicationSecurity{}
 	// string type = 1;
@@ -1929,7 +2090,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string flow = 2;
@@ -1937,7 +2098,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 	if v2 != nil {
 		x.Flow, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
 		}
 	}
 	// Oauth2Scopes scopes = 3;
@@ -1946,7 +2107,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string token_url = 4;
@@ -1954,7 +2115,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 	if v4 != nil {
 		x.TokenUrl, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4)))
 		}
 	}
 	// string description = 5;
@@ -1962,7 +2123,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 	if v5 != nil {
 		x.Description, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 6;
@@ -1982,24 +2143,29 @@ func NewOauth2ApplicationSecurity(in interface{}, context *helpers.Context) (*Oa
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth2ImplicitSecurity, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2ImplicitSecurity section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2ImplicitSecurity section: %+v", in)))
 	}
 	requiredKeys := []string{"authorizationUrl", "flow", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('authorizationUrl','flow','type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('authorizationUrl','flow','type')"))
 	}
 	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('authorizationUrl','description','flow','scopes','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Oauth2ImplicitSecurity{}
 	// string type = 1;
@@ -2007,7 +2173,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string flow = 2;
@@ -2015,7 +2181,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v2 != nil {
 		x.Flow, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
 		}
 	}
 	// Oauth2Scopes scopes = 3;
@@ -2024,7 +2190,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string authorization_url = 4;
@@ -2032,7 +2198,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v4 != nil {
 		x.AuthorizationUrl, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4)))
 		}
 	}
 	// string description = 5;
@@ -2040,7 +2206,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v5 != nil {
 		x.Description, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 6;
@@ -2060,24 +2226,29 @@ func NewOauth2ImplicitSecurity(in interface{}, context *helpers.Context) (*Oauth
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth2PasswordSecurity, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2PasswordSecurity section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2PasswordSecurity section: %+v", in)))
 	}
 	requiredKeys := []string{"flow", "tokenUrl", "type"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')"))
 	}
 	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Oauth2PasswordSecurity{}
 	// string type = 1;
@@ -2085,7 +2256,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string flow = 2;
@@ -2093,7 +2264,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v2 != nil {
 		x.Flow, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
 		}
 	}
 	// Oauth2Scopes scopes = 3;
@@ -2102,7 +2273,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 		var err error
 		x.Scopes, err = NewOauth2Scopes(v3, helpers.NewContext("scopes", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string token_url = 4;
@@ -2110,7 +2281,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v4 != nil {
 		x.TokenUrl, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4)))
 		}
 	}
 	// string description = 5;
@@ -2118,7 +2289,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 	if v5 != nil {
 		x.Description, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
 		}
 	}
 	// repeated NamedAny vendor_extension = 6;
@@ -2138,13 +2309,18 @@ func NewOauth2PasswordSecurity(in interface{}, context *helpers.Context) (*Oauth
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewOauth2Scopes(in interface{}, context *helpers.Context) (*Oauth2Scopes, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2Scopes section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Oauth2Scopes section: %+v", in)))
 	}
 	x := &Oauth2Scopes{}
 	// repeated NamedString additional_properties = 1;
@@ -2158,24 +2334,29 @@ func NewOauth2Scopes(in interface{}, context *helpers.Context) (*Oauth2Scopes, e
 		pair.Value = v.(string)
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Operation section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Operation section: %+v", in)))
 	}
 	requiredKeys := []string{"responses"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('responses')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('responses')"))
 	}
 	allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('consumes','deprecated','description','externalDocs','operationId','parameters','produces','responses','schemes','security','summary','tags') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Operation{}
 	// repeated string tags = 1;
@@ -2185,7 +2366,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		if ok {
 			x.Tags = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for tags property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for tags property: %+v", in)))
 		}
 	}
 	// string summary = 2;
@@ -2193,7 +2374,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	if v2 != nil {
 		x.Summary, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for summary. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for summary. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -2201,7 +2382,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// ExternalDocs external_docs = 4;
@@ -2210,7 +2391,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v4, helpers.NewContext("externalDocs", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string operation_id = 5;
@@ -2218,7 +2399,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 	if v5 != nil {
 		x.OperationId, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for operationId. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for operationId. expected a string, got %+v", v5)))
 		}
 	}
 	// repeated string produces = 6;
@@ -2228,7 +2409,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		if ok {
 			x.Produces = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in)))
 		}
 	}
 	// repeated string consumes = 7;
@@ -2238,7 +2419,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		if ok {
 			x.Consumes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in)))
 		}
 	}
 	// repeated ParametersItem parameters = 8;
@@ -2251,7 +2432,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 			for _, item := range a {
 				y, err := NewParametersItem(item, helpers.NewContext("parameters", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Parameters = append(x.Parameters, y)
 			}
@@ -2263,7 +2444,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		var err error
 		x.Responses, err = NewResponses(v9, helpers.NewContext("responses", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated string schemes = 10;
@@ -2273,7 +2454,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 		if ok {
 			x.Schemes = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in)))
 		}
 	}
 	// bool deprecated = 11;
@@ -2291,7 +2472,7 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 			for _, item := range a {
 				y, err := NewSecurityRequirement(item, helpers.NewContext("security", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Security = append(x.Security, y)
 			}
@@ -2314,38 +2495,48 @@ func NewOperation(in interface{}, context *helpers.Context) (*Operation, error) 
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewParameter(in interface{}, context *helpers.Context) (*Parameter, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Parameter section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Parameter section: %+v", in)))
 	}
 	x := &Parameter{}
 	// BodyParameter body_parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewBodyParameter(m, helpers.NewContext("bodyParameter", context))
-		if t != nil {
+		t, errors := NewBodyParameter(m, helpers.NewContext("bodyParameter", context))
+		if errors == nil {
 			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 		}
 	}
 	// NonBodyParameter non_body_parameter = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewNonBodyParameter(m, helpers.NewContext("nonBodyParameter", context))
-		if t != nil {
+		t, errors := NewNonBodyParameter(m, helpers.NewContext("nonBodyParameter", context))
+		if errors == nil {
 			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewParameterDefinitions(in interface{}, context *helpers.Context) (*ParameterDefinitions, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for ParameterDefinitions section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for ParameterDefinitions section: %+v", in)))
 	}
 	x := &ParameterDefinitions{}
 	// repeated NamedParameter additional_properties = 1;
@@ -2363,45 +2554,55 @@ func NewParameterDefinitions(in interface{}, context *helpers.Context) (*Paramet
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewParametersItem(in interface{}, context *helpers.Context) (*ParametersItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for ParametersItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for ParametersItem section: %+v", in)))
 	}
 	x := &ParametersItem{}
 	// Parameter parameter = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewParameter(m, helpers.NewContext("parameter", context))
-		if t != nil {
+		t, errors := NewParameter(m, helpers.NewContext("parameter", context))
+		if errors == nil {
 			x.Oneof = &ParametersItem_Parameter{Parameter: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewJsonReference(m, helpers.NewContext("jsonReference", context))
-		if t != nil {
+		t, errors := NewJsonReference(m, helpers.NewContext("jsonReference", context))
+		if errors == nil {
 			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for PathItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for PathItem section: %+v", in)))
 	}
 	allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('$ref','delete','get','head','options','parameters','patch','post','put') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &PathItem{}
 	// string _ref = 1;
@@ -2409,7 +2610,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 	if v1 != nil {
 		x.XRef, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
 		}
 	}
 	// Operation get = 2;
@@ -2418,7 +2619,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Get, err = NewOperation(v2, helpers.NewContext("get", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Operation put = 3;
@@ -2427,7 +2628,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Put, err = NewOperation(v3, helpers.NewContext("put", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Operation post = 4;
@@ -2436,7 +2637,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Post, err = NewOperation(v4, helpers.NewContext("post", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Operation delete = 5;
@@ -2445,7 +2646,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Delete, err = NewOperation(v5, helpers.NewContext("delete", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Operation options = 6;
@@ -2454,7 +2655,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Options, err = NewOperation(v6, helpers.NewContext("options", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Operation head = 7;
@@ -2463,7 +2664,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Head, err = NewOperation(v7, helpers.NewContext("head", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Operation patch = 8;
@@ -2472,7 +2673,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 		var err error
 		x.Patch, err = NewOperation(v8, helpers.NewContext("patch", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated ParametersItem parameters = 9;
@@ -2485,7 +2686,7 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 			for _, item := range a {
 				y, err := NewParametersItem(item, helpers.NewContext("parameters", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Parameters = append(x.Parameters, y)
 			}
@@ -2508,24 +2709,29 @@ func NewPathItem(in interface{}, context *helpers.Context) (*PathItem, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathParameterSubSchema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for PathParameterSubSchema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for PathParameterSubSchema section: %+v", in)))
 	}
 	requiredKeys := []string{"required"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('required')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('required')"))
 	}
 	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &PathParameterSubSchema{}
 	// bool required = 1;
@@ -2538,7 +2744,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v2 != nil {
 		x.In, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -2546,7 +2752,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// string name = 4;
@@ -2554,7 +2760,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v4 != nil {
 		x.Name, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
 		}
 	}
 	// string type = 5;
@@ -2562,7 +2768,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v5 != nil {
 		x.Type, ok = v5.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5)))
 		}
 	}
 	// string format = 6;
@@ -2570,7 +2776,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v6 != nil {
 		x.Format, ok = v6.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6)))
 		}
 	}
 	// PrimitivesItems items = 7;
@@ -2579,7 +2785,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 		var err error
 		x.Items, err = NewPrimitivesItems(v7, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string collection_format = 8;
@@ -2587,7 +2793,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v8 != nil {
 		x.CollectionFormat, ok = v8.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8)))
 		}
 	}
 	// Any default = 9;
@@ -2596,7 +2802,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 		var err error
 		x.Default, err = NewAny(v9, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float maximum = 10;
@@ -2634,7 +2840,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 	if v16 != nil {
 		x.Pattern, ok = v16.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16)))
 		}
 	}
 	// int64 max_items = 17;
@@ -2662,7 +2868,7 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -2690,20 +2896,25 @@ func NewPathParameterSubSchema(in interface{}, context *helpers.Context) (*PathP
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewPaths(in interface{}, context *helpers.Context) (*Paths, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Paths section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Paths section: %+v", in)))
 	}
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^x-", "^/"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in () or ('^x-','^/'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Paths{}
 	// repeated NamedAny vendor_extension = 1;
@@ -2740,20 +2951,25 @@ func NewPaths(in interface{}, context *helpers.Context) (*Paths, error) {
 			x.Path = append(x.Path, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesItems, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for PrimitivesItems section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for PrimitivesItems section: %+v", in)))
 	}
 	allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('collectionFormat','default','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &PrimitivesItems{}
 	// string type = 1;
@@ -2761,7 +2977,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	if v1 != nil {
 		x.Type, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 		}
 	}
 	// string format = 2;
@@ -2769,7 +2985,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	if v2 != nil {
 		x.Format, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
 		}
 	}
 	// PrimitivesItems items = 3;
@@ -2778,7 +2994,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 		var err error
 		x.Items, err = NewPrimitivesItems(v3, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string collection_format = 4;
@@ -2786,7 +3002,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	if v4 != nil {
 		x.CollectionFormat, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4)))
 		}
 	}
 	// Any default = 5;
@@ -2795,7 +3011,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 		var err error
 		x.Default, err = NewAny(v5, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float maximum = 6;
@@ -2833,7 +3049,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 	if v12 != nil {
 		x.Pattern, ok = v12.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12)))
 		}
 	}
 	// int64 max_items = 13;
@@ -2861,7 +3077,7 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -2889,13 +3105,18 @@ func NewPrimitivesItems(in interface{}, context *helpers.Context) (*PrimitivesIt
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewProperties(in interface{}, context *helpers.Context) (*Properties, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Properties section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Properties section: %+v", in)))
 	}
 	x := &Properties{}
 	// repeated NamedSchema additional_properties = 1;
@@ -2913,20 +3134,25 @@ func NewProperties(in interface{}, context *helpers.Context) (*Properties, error
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*QueryParameterSubSchema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for QueryParameterSubSchema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for QueryParameterSubSchema section: %+v", in)))
 	}
 	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &QueryParameterSubSchema{}
 	// bool required = 1;
@@ -2939,7 +3165,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v2 != nil {
 		x.In, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 		}
 	}
 	// string description = 3;
@@ -2947,7 +3173,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v3 != nil {
 		x.Description, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
 		}
 	}
 	// string name = 4;
@@ -2955,7 +3181,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v4 != nil {
 		x.Name, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
 		}
 	}
 	// bool allow_empty_value = 5;
@@ -2968,7 +3194,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v6 != nil {
 		x.Type, ok = v6.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
 		}
 	}
 	// string format = 7;
@@ -2976,7 +3202,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v7 != nil {
 		x.Format, ok = v7.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7)))
 		}
 	}
 	// PrimitivesItems items = 8;
@@ -2985,7 +3211,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 		var err error
 		x.Items, err = NewPrimitivesItems(v8, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string collection_format = 9;
@@ -2993,7 +3219,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v9 != nil {
 		x.CollectionFormat, ok = v9.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9)))
 		}
 	}
 	// Any default = 10;
@@ -3002,7 +3228,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 		var err error
 		x.Default, err = NewAny(v10, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float maximum = 11;
@@ -3040,7 +3266,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 	if v17 != nil {
 		x.Pattern, ok = v17.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17)))
 		}
 	}
 	// int64 max_items = 18;
@@ -3068,7 +3294,7 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -3096,24 +3322,29 @@ func NewQueryParameterSubSchema(in interface{}, context *helpers.Context) (*Quer
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Response section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Response section: %+v", in)))
 	}
 	requiredKeys := []string{"description"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('description')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('description')"))
 	}
 	allowedKeys := []string{"description", "examples", "headers", "schema"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','examples','headers','schema') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Response{}
 	// string description = 1;
@@ -3121,7 +3352,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 	if v1 != nil {
 		x.Description, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
 		}
 	}
 	// SchemaItem schema = 2;
@@ -3130,7 +3361,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 		var err error
 		x.Schema, err = NewSchemaItem(v2, helpers.NewContext("schema", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Headers headers = 3;
@@ -3139,7 +3370,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 		var err error
 		x.Headers, err = NewHeaders(v3, helpers.NewContext("headers", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Examples examples = 4;
@@ -3148,7 +3379,7 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 		var err error
 		x.Examples, err = NewExamples(v4, helpers.NewContext("examples", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 5;
@@ -3168,13 +3399,18 @@ func NewResponse(in interface{}, context *helpers.Context) (*Response, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewResponseDefinitions(in interface{}, context *helpers.Context) (*ResponseDefinitions, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for ResponseDefinitions section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for ResponseDefinitions section: %+v", in)))
 	}
 	x := &ResponseDefinitions{}
 	// repeated NamedResponse additional_properties = 1;
@@ -3192,45 +3428,55 @@ func NewResponseDefinitions(in interface{}, context *helpers.Context) (*Response
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewResponseValue(in interface{}, context *helpers.Context) (*ResponseValue, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for ResponseValue section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for ResponseValue section: %+v", in)))
 	}
 	x := &ResponseValue{}
 	// Response response = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewResponse(m, helpers.NewContext("response", context))
-		if t != nil {
+		t, errors := NewResponse(m, helpers.NewContext("response", context))
+		if errors == nil {
 			x.Oneof = &ResponseValue_Response{Response: t}
 		}
 	}
 	// JsonReference json_reference = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewJsonReference(m, helpers.NewContext("jsonReference", context))
-		if t != nil {
+		t, errors := NewJsonReference(m, helpers.NewContext("jsonReference", context))
+		if errors == nil {
 			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewResponses(in interface{}, context *helpers.Context) (*Responses, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Responses section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Responses section: %+v", in)))
 	}
 	allowedKeys := []string{}
 	allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in () or ('^([0-9]{3})$|^(default)$','^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Responses{}
 	// repeated NamedResponseValue response_code = 1;
@@ -3267,20 +3513,25 @@ func NewResponses(in interface{}, context *helpers.Context) (*Responses, error) 
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Schema section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Schema section: %+v", in)))
 	}
 	allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('$ref','additionalProperties','allOf','default','description','discriminator','enum','example','exclusiveMaximum','exclusiveMinimum','externalDocs','format','items','maxItems','maxLength','maxProperties','maximum','minItems','minLength','minProperties','minimum','multipleOf','pattern','properties','readOnly','required','title','type','uniqueItems','xml') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Schema{}
 	// string _ref = 1;
@@ -3288,7 +3539,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	if v1 != nil {
 		x.XRef, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
 		}
 	}
 	// string format = 2;
@@ -3296,7 +3547,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	if v2 != nil {
 		x.Format, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
 		}
 	}
 	// string title = 3;
@@ -3304,7 +3555,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	if v3 != nil {
 		x.Title, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v3)))
 		}
 	}
 	// string description = 4;
@@ -3312,7 +3563,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	if v4 != nil {
 		x.Description, ok = v4.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4)))
 		}
 	}
 	// Any default = 5;
@@ -3321,7 +3572,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.Default, err = NewAny(v5, helpers.NewContext("default", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// float multiple_of = 6;
@@ -3364,7 +3615,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	if v13 != nil {
 		x.Pattern, ok = v13.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v13))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v13)))
 		}
 	}
 	// int64 max_items = 14;
@@ -3399,7 +3650,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		if ok {
 			x.Required = helpers.ConvertInterfaceArrayToStringArray(v)
 		} else {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in)))
 		}
 	}
 	// repeated Any enum = 20;
@@ -3412,7 +3663,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 			for _, item := range a {
 				y, err := NewAny(item, helpers.NewContext("enum", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.Enum = append(x.Enum, y)
 			}
@@ -3424,7 +3675,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, helpers.NewContext("additionalProperties", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// TypeItem type = 22;
@@ -3433,7 +3684,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.Type, err = NewTypeItem(v22, helpers.NewContext("type", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// ItemsItem items = 23;
@@ -3442,7 +3693,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.Items, err = NewItemsItem(v23, helpers.NewContext("items", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated Schema all_of = 24;
@@ -3455,7 +3706,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 			for _, item := range a {
 				y, err := NewSchema(item, helpers.NewContext("allOf", context))
 				if err != nil {
-					return nil, err
+					errors = append(errors, err)
 				}
 				x.AllOf = append(x.AllOf, y)
 			}
@@ -3467,7 +3718,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.Properties, err = NewProperties(v25, helpers.NewContext("properties", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// string discriminator = 26;
@@ -3475,7 +3726,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 	if v26 != nil {
 		x.Discriminator, ok = v26.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for discriminator. expected a string, got %+v", v26))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for discriminator. expected a string, got %+v", v26)))
 		}
 	}
 	// bool read_only = 27;
@@ -3489,7 +3740,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.Xml, err = NewXml(v28, helpers.NewContext("xml", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// ExternalDocs external_docs = 29;
@@ -3498,7 +3749,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v29, helpers.NewContext("externalDocs", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// Any example = 30;
@@ -3507,7 +3758,7 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 		var err error
 		x.Example, err = NewAny(v30, helpers.NewContext("example", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 31;
@@ -3527,38 +3778,48 @@ func NewSchema(in interface{}, context *helpers.Context) (*Schema, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewSchemaItem(in interface{}, context *helpers.Context) (*SchemaItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for SchemaItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for SchemaItem section: %+v", in)))
 	}
 	x := &SchemaItem{}
 	// Schema schema = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewSchema(m, helpers.NewContext("schema", context))
-		if t != nil {
+		t, errors := NewSchema(m, helpers.NewContext("schema", context))
+		if errors == nil {
 			x.Oneof = &SchemaItem_Schema{Schema: t}
 		}
 	}
 	// FileSchema file_schema = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewFileSchema(m, helpers.NewContext("fileSchema", context))
-		if t != nil {
+		t, errors := NewFileSchema(m, helpers.NewContext("fileSchema", context))
+		if errors == nil {
 			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewSecurityDefinitions(in interface{}, context *helpers.Context) (*SecurityDefinitions, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for SecurityDefinitions section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for SecurityDefinitions section: %+v", in)))
 	}
 	x := &SecurityDefinitions{}
 	// repeated NamedSecurityDefinitionsItem additional_properties = 1;
@@ -3576,70 +3837,80 @@ func NewSecurityDefinitions(in interface{}, context *helpers.Context) (*Security
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewSecurityDefinitionsItem(in interface{}, context *helpers.Context) (*SecurityDefinitionsItem, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for SecurityDefinitionsItem section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for SecurityDefinitionsItem section: %+v", in)))
 	}
 	x := &SecurityDefinitionsItem{}
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewBasicAuthenticationSecurity(m, helpers.NewContext("basicAuthenticationSecurity", context))
-		if t != nil {
+		t, errors := NewBasicAuthenticationSecurity(m, helpers.NewContext("basicAuthenticationSecurity", context))
+		if errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 		}
 	}
 	// ApiKeySecurity api_key_security = 2;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewApiKeySecurity(m, helpers.NewContext("apiKeySecurity", context))
-		if t != nil {
+		t, errors := NewApiKeySecurity(m, helpers.NewContext("apiKeySecurity", context))
+		if errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 		}
 	}
 	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2ImplicitSecurity(m, helpers.NewContext("oauth2ImplicitSecurity", context))
-		if t != nil {
+		t, errors := NewOauth2ImplicitSecurity(m, helpers.NewContext("oauth2ImplicitSecurity", context))
+		if errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 		}
 	}
 	// Oauth2PasswordSecurity oauth2_password_security = 4;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2PasswordSecurity(m, helpers.NewContext("oauth2PasswordSecurity", context))
-		if t != nil {
+		t, errors := NewOauth2PasswordSecurity(m, helpers.NewContext("oauth2PasswordSecurity", context))
+		if errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 		}
 	}
 	// Oauth2ApplicationSecurity oauth2_application_security = 5;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2ApplicationSecurity(m, helpers.NewContext("oauth2ApplicationSecurity", context))
-		if t != nil {
+		t, errors := NewOauth2ApplicationSecurity(m, helpers.NewContext("oauth2ApplicationSecurity", context))
+		if errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 		}
 	}
 	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
 	{
 		// errors are ok here, they mean we just don't have the right subtype
-		t, _ := NewOauth2AccessCodeSecurity(m, helpers.NewContext("oauth2AccessCodeSecurity", context))
-		if t != nil {
+		t, errors := NewOauth2AccessCodeSecurity(m, helpers.NewContext("oauth2AccessCodeSecurity", context))
+		if errors == nil {
 			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewSecurityRequirement(in interface{}, context *helpers.Context) (*SecurityRequirement, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for SecurityRequirement section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for SecurityRequirement section: %+v", in)))
 	}
 	x := &SecurityRequirement{}
 	// repeated NamedStringArray additional_properties = 1;
@@ -3657,10 +3928,15 @@ func NewSecurityRequirement(in interface{}, context *helpers.Context) (*Security
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewStringArray(in interface{}, context *helpers.Context) (*StringArray, error) {
+	errors := make([]error, 0)
 	a, ok := in.([]interface{})
 	if ok {
 		x := &StringArray{}
@@ -3668,27 +3944,32 @@ func NewStringArray(in interface{}, context *helpers.Context) (*StringArray, err
 		for _, s := range a {
 			x.Value = append(x.Value, s.(string))
 		}
-		return x, nil
+		if len(errors) > 0 {
+			return x, helpers.NewErrorGroup(errors)
+		} else {
+			return x, nil
+		}
 	} else {
 		return nil, nil
 	}
 }
 
 func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Tag section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Tag section: %+v", in)))
 	}
 	requiredKeys := []string{"name"}
 	if !helpers.MapContainsAllKeys(m, requiredKeys) {
-		return nil, helpers.NewError(context, "does not contain all required properties ('name')")
+		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('name')"))
 	}
 	allowedKeys := []string{"description", "externalDocs", "name"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('description','externalDocs','name') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Tag{}
 	// string name = 1;
@@ -3696,7 +3977,7 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// string description = 2;
@@ -3704,7 +3985,7 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 	if v2 != nil {
 		x.Description, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2)))
 		}
 	}
 	// ExternalDocs external_docs = 3;
@@ -3713,7 +3994,7 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 		var err error
 		x.ExternalDocs, err = NewExternalDocs(v3, helpers.NewContext("externalDocs", context))
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
 		}
 	}
 	// repeated NamedAny vendor_extension = 4;
@@ -3733,25 +4014,35 @@ func NewTag(in interface{}, context *helpers.Context) (*Tag, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewTypeItem(in interface{}, context *helpers.Context) (*TypeItem, error) {
+	errors := make([]error, 0)
 	value, ok := in.(string)
 	x := &TypeItem{}
 	if ok {
 		x.Value = make([]string, 0)
 		x.Value = append(x.Value, value)
 	} else {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for string array: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for string array: %+v", in)))
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewVendorExtension(in interface{}, context *helpers.Context) (*VendorExtension, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for VendorExtension section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for VendorExtension section: %+v", in)))
 	}
 	x := &VendorExtension{}
 	// repeated NamedAny additional_properties = 1;
@@ -3769,20 +4060,25 @@ func NewVendorExtension(in interface{}, context *helpers.Context) (*VendorExtens
 		}
 		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
+	errors := make([]error, 0)
 	m, ok := helpers.UnpackMap(in)
 	if !ok {
-		return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for Xml section: %+v", in))
+		errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for Xml section: %+v", in)))
 	}
 	allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
 	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		return nil, helpers.NewError(context,
+		errors = append(errors, helpers.NewError(context,
 			fmt.Sprintf("includes properties not in ('attribute','name','namespace','prefix','wrapped') or ('^x-'): %+v",
-				helpers.SortedKeysForMap(m)))
+				helpers.SortedKeysForMap(m))))
 	}
 	x := &Xml{}
 	// string name = 1;
@@ -3790,7 +4086,7 @@ func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
 	if v1 != nil {
 		x.Name, ok = v1.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 		}
 	}
 	// string namespace = 2;
@@ -3798,7 +4094,7 @@ func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
 	if v2 != nil {
 		x.Namespace, ok = v2.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for namespace. expected a string, got %+v", v2))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for namespace. expected a string, got %+v", v2)))
 		}
 	}
 	// string prefix = 3;
@@ -3806,7 +4102,7 @@ func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
 	if v3 != nil {
 		x.Prefix, ok = v3.(string)
 		if !ok {
-			return nil, helpers.NewError(context, fmt.Sprintf("unexpected value for prefix. expected a string, got %+v", v3))
+			errors = append(errors, helpers.NewError(context, fmt.Sprintf("unexpected value for prefix. expected a string, got %+v", v3)))
 		}
 	}
 	// bool attribute = 4;
@@ -3836,7 +4132,11 @@ func NewXml(in interface{}, context *helpers.Context) (*Xml, error) {
 			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
-	return x, nil
+	if len(errors) > 0 {
+		return x, helpers.NewErrorGroup(errors)
+	} else {
+		return x, nil
+	}
 }
 
 func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
