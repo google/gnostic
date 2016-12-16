@@ -1399,20 +1399,17 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 
 func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
 	errors := make([]error, 0)
+	x := &ItemsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in)))
-	}
-	x := &ItemsItem{}
-	if ok {
+	} else {
 		x.Schema = make([]*Schema, 0)
 		y, err := NewSchema(m, compiler.NewContext("<array>", context))
 		if err != nil {
 			return nil, err
 		}
 		x.Schema = append(x.Schema, y)
-	} else {
-		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for item array: %+v", in)))
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3787,12 +3784,11 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 
 func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, error) {
 	errors := make([]error, 0)
+	x := &StringArray{}
 	a, ok := in.([]interface{})
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for StringArray: %+v", in)))
-	}
-	x := &StringArray{}
-	if ok {
+	} else {
 		x.Value = make([]string, 0)
 		for _, s := range a {
 			x.Value = append(x.Value, s.(string))
@@ -3867,8 +3863,8 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 
 func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
 	errors := make([]error, 0)
-	value, ok := in.(string)
 	x := &TypeItem{}
+	value, ok := in.(string)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for string array: %+v", in)))
 	} else {
