@@ -568,6 +568,10 @@ func (classes *ClassCollection) build() {
 	classModel.Name = className
 	classes.buildClassProperties(classModel, classes.Schema)
 	classes.buildClassRequirements(classModel, classes.Schema)
+	classes.buildPatternPropertyAccessors(classModel, classes.Schema)
+	classes.buildAdditionalPropertyAccessors(classModel, classes.Schema)
+	classes.buildOneOfAccessors(classModel, classes.Schema)
+	classes.buildAnyOfAccessors(classModel, classes.Schema)
 	classes.ClassModels[className] = classModel
 
 	// create a class for each object defined in the schema

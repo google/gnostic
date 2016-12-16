@@ -408,10 +408,10 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		errors = append(errors, helpers.NewError(context, "does not contain all required properties ('info','paths','swagger')"))
 	}
 	allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
-	allowedPatterns := []string{}
+	allowedPatterns := []string{"^x-"}
 	if !helpers.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
 		errors = append(errors, helpers.NewError(context,
-			fmt.Sprintf("includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or (): %+v",
+			fmt.Sprintf("includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or ('^x-'): %+v",
 				helpers.SortedKeysForMap(m))))
 	}
 	x := &Document{}
@@ -562,6 +562,23 @@ func NewDocument(in interface{}, context *helpers.Context) (*Document, error) {
 		x.ExternalDocs, err = NewExternalDocs(v15, helpers.NewContext("externalDocs", context))
 		if err != nil {
 			errors = append(errors, err)
+		}
+	}
+	// repeated NamedAny vendor_extension = 16;
+	// MAP: Any ^x-
+	x.VendorExtension = make([]*NamedAny, 0)
+	for _, item := range m {
+		k := item.Key.(string)
+		v := item.Value
+		if helpers.PatternMatches("^x-", k) {
+			pair := &NamedAny{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewAny(v, helpers.NewContext(k, context))
+			if err != nil {
+				return nil, err
+			}
+			x.VendorExtension = append(x.VendorExtension, pair)
 		}
 	}
 	if len(errors) > 0 {
@@ -4241,6 +4258,11 @@ func (m *Document) ResolveReferences(root string) (interface{}, error) {
 	}
 	if m.ExternalDocs != nil {
 		m.ExternalDocs.ResolveReferences(root)
+	}
+	for _, item := range m.VendorExtension {
+		if item != nil {
+			item.ResolveReferences(root)
+		}
 	}
 	return nil, nil
 }

@@ -98,6 +98,7 @@ message Document {
   SecurityDefinitions security_definitions = 13;
   repeated Tag tags = 14;
   ExternalDocs external_docs = 15;
+  repeated NamedAny vendor_extension = 16;
 }
 
 message Examples {
