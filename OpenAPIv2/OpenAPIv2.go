@@ -28,23 +28,24 @@ func Version() string {
 
 func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*AdditionalPropertiesItem, error) {
 	errors := make([]error, 0)
+	x := &AdditionalPropertiesItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for AdditionalPropertiesItem section: %+v", in)))
-	}
-	x := &AdditionalPropertiesItem{}
-	// Schema schema = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
-		if safe_errors == nil {
-			x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
+	} else {
+		// Schema schema = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
+			if safe_errors == nil {
+				x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
+			}
 		}
-	}
-	// bool boolean = 2;
-	v2 := compiler.MapValueForKey(m, "boolean")
-	if v2 != nil {
-		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: v2.(bool)}
+		// bool boolean = 2;
+		v2 := compiler.MapValueForKey(m, "boolean")
+		if v2 != nil {
+			x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: v2.(bool)}
+		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -59,69 +60,70 @@ func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 
 func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecurity, error) {
 	errors := make([]error, 0)
+	x := &ApiKeySecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ApiKeySecurity section: %+v", in)))
-	}
-	requiredKeys := []string{"in", "name", "type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('in','name','type')"))
-	}
-	allowedKeys := []string{"description", "in", "name", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','in','name','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &ApiKeySecurity{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"in", "name", "type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('in','name','type')"))
 		}
-	}
-	// string name = 2;
-	v2 := compiler.MapValueForKey(m, "name")
-	if v2 != nil {
-		x.Name, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2)))
+		allowedKeys := []string{"description", "in", "name", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','in','name','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string in = 3;
-	v3 := compiler.MapValueForKey(m, "in")
-	if v3 != nil {
-		x.In, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3)))
-		}
-	}
-	// string description = 4;
-	v4 := compiler.MapValueForKey(m, "description")
-	if v4 != nil {
-		x.Description, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 5;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string name = 2;
+		v2 := compiler.MapValueForKey(m, "name")
+		if v2 != nil {
+			x.Name, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2)))
+			}
+		}
+		// string in = 3;
+		v3 := compiler.MapValueForKey(m, "in")
+		if v3 != nil {
+			x.In, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3)))
+			}
+		}
+		// string description = 4;
+		v4 := compiler.MapValueForKey(m, "description")
+		if v4 != nil {
+			x.Description, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 5;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -129,53 +131,54 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 
 func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (*BasicAuthenticationSecurity, error) {
 	errors := make([]error, 0)
+	x := &BasicAuthenticationSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for BasicAuthenticationSecurity section: %+v", in)))
-	}
-	requiredKeys := []string{"type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('type')"))
-	}
-	allowedKeys := []string{"description", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &BasicAuthenticationSecurity{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('type')"))
 		}
-	}
-	// string description = 2;
-	v2 := compiler.MapValueForKey(m, "description")
-	if v2 != nil {
-		x.Description, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2)))
+		allowedKeys := []string{"description", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// repeated NamedAny vendor_extension = 3;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string description = 2;
+		v2 := compiler.MapValueForKey(m, "description")
+		if v2 != nil {
+			x.Description, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 3;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -183,75 +186,76 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 
 func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter, error) {
 	errors := make([]error, 0)
+	x := &BodyParameter{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for BodyParameter section: %+v", in)))
-	}
-	requiredKeys := []string{"in", "name", "schema"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('in','name','schema')"))
-	}
-	allowedKeys := []string{"description", "in", "name", "required", "schema"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','in','name','required','schema') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &BodyParameter{}
-	// string description = 1;
-	v1 := compiler.MapValueForKey(m, "description")
-	if v1 != nil {
-		x.Description, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"in", "name", "schema"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('in','name','schema')"))
 		}
-	}
-	// string name = 2;
-	v2 := compiler.MapValueForKey(m, "name")
-	if v2 != nil {
-		x.Name, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2)))
+		allowedKeys := []string{"description", "in", "name", "required", "schema"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','in','name','required','schema') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string in = 3;
-	v3 := compiler.MapValueForKey(m, "in")
-	if v3 != nil {
-		x.In, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3)))
+		// string description = 1;
+		v1 := compiler.MapValueForKey(m, "description")
+		if v1 != nil {
+			x.Description, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// bool required = 4;
-	v4 := compiler.MapValueForKey(m, "required")
-	if v4 != nil {
-		x.Required = v4.(bool)
-	}
-	// Schema schema = 5;
-	v5 := compiler.MapValueForKey(m, "schema")
-	if v5 != nil {
-		var err error
-		x.Schema, err = NewSchema(v5, compiler.NewContext("schema", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 2;
+		v2 := compiler.MapValueForKey(m, "name")
+		if v2 != nil {
+			x.Name, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// repeated NamedAny vendor_extension = 6;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string in = 3;
+		v3 := compiler.MapValueForKey(m, "in")
+		if v3 != nil {
+			x.In, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v3)))
+			}
+		}
+		// bool required = 4;
+		v4 := compiler.MapValueForKey(m, "required")
+		if v4 != nil {
+			x.Required = v4.(bool)
+		}
+		// Schema schema = 5;
+		v5 := compiler.MapValueForKey(m, "schema")
+		if v5 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Schema, err = NewSchema(v5, compiler.NewContext("schema", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// repeated NamedAny vendor_extension = 6;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -259,57 +263,58 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 
 func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 	errors := make([]error, 0)
+	x := &Contact{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Contact section: %+v", in)))
-	}
-	allowedKeys := []string{"email", "name", "url"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('email','name','url') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Contact{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"email", "name", "url"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('email','name','url') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string url = 2;
-	v2 := compiler.MapValueForKey(m, "url")
-	if v2 != nil {
-		x.Url, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
-		}
-	}
-	// string email = 3;
-	v3 := compiler.MapValueForKey(m, "email")
-	if v3 != nil {
-		x.Email, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for email. expected a string, got %+v", v3)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 4;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string url = 2;
+		v2 := compiler.MapValueForKey(m, "url")
+		if v2 != nil {
+			x.Url, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
+			}
+		}
+		// string email = 3;
+		v3 := compiler.MapValueForKey(m, "email")
+		if v3 != nil {
+			x.Email, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for email. expected a string, got %+v", v3)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 4;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -317,228 +322,17 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 
 func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 	errors := make([]error, 0)
+	x := &Default{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Default section: %+v", in)))
-	}
-	x := &Default{}
-	// repeated NamedAny additional_properties = 1;
-	// MAP: Any
-	x.AdditionalProperties = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedAny{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, error) {
-	errors := make([]error, 0)
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Definitions section: %+v", in)))
-	}
-	x := &Definitions{}
-	// repeated NamedSchema additional_properties = 1;
-	// MAP: Schema
-	x.AdditionalProperties = make([]*NamedSchema, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedSchema{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
-	errors := make([]error, 0)
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Document section: %+v", in)))
-	}
-	requiredKeys := []string{"info", "paths", "swagger"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('info','paths','swagger')"))
-	}
-	allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Document{}
-	// string swagger = 1;
-	v1 := compiler.MapValueForKey(m, "swagger")
-	if v1 != nil {
-		x.Swagger, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for swagger. expected a string, got %+v", v1)))
-		}
-	}
-	// Info info = 2;
-	v2 := compiler.MapValueForKey(m, "info")
-	if v2 != nil {
-		var err error
-		x.Info, err = NewInfo(v2, compiler.NewContext("info", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string host = 3;
-	v3 := compiler.MapValueForKey(m, "host")
-	if v3 != nil {
-		x.Host, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for host. expected a string, got %+v", v3)))
-		}
-	}
-	// string base_path = 4;
-	v4 := compiler.MapValueForKey(m, "basePath")
-	if v4 != nil {
-		x.BasePath, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for basePath. expected a string, got %+v", v4)))
-		}
-	}
-	// repeated string schemes = 5;
-	v5 := compiler.MapValueForKey(m, "schemes")
-	if v5 != nil {
-		v, ok := v5.([]interface{})
-		if ok {
-			x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in)))
-		}
-	}
-	// repeated string consumes = 6;
-	v6 := compiler.MapValueForKey(m, "consumes")
-	if v6 != nil {
-		v, ok := v6.([]interface{})
-		if ok {
-			x.Consumes = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in)))
-		}
-	}
-	// repeated string produces = 7;
-	v7 := compiler.MapValueForKey(m, "produces")
-	if v7 != nil {
-		v, ok := v7.([]interface{})
-		if ok {
-			x.Produces = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in)))
-		}
-	}
-	// Paths paths = 8;
-	v8 := compiler.MapValueForKey(m, "paths")
-	if v8 != nil {
-		var err error
-		x.Paths, err = NewPaths(v8, compiler.NewContext("paths", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Definitions definitions = 9;
-	v9 := compiler.MapValueForKey(m, "definitions")
-	if v9 != nil {
-		var err error
-		x.Definitions, err = NewDefinitions(v9, compiler.NewContext("definitions", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// ParameterDefinitions parameters = 10;
-	v10 := compiler.MapValueForKey(m, "parameters")
-	if v10 != nil {
-		var err error
-		x.Parameters, err = NewParameterDefinitions(v10, compiler.NewContext("parameters", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// ResponseDefinitions responses = 11;
-	v11 := compiler.MapValueForKey(m, "responses")
-	if v11 != nil {
-		var err error
-		x.Responses, err = NewResponseDefinitions(v11, compiler.NewContext("responses", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated SecurityRequirement security = 12;
-	v12 := compiler.MapValueForKey(m, "security")
-	if v12 != nil {
-		// repeated SecurityRequirement
-		x.Security = make([]*SecurityRequirement, 0)
-		a, ok := v12.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewSecurityRequirement(item, compiler.NewContext("security", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Security = append(x.Security, y)
-			}
-		}
-	}
-	// SecurityDefinitions security_definitions = 13;
-	v13 := compiler.MapValueForKey(m, "securityDefinitions")
-	if v13 != nil {
-		var err error
-		x.SecurityDefinitions, err = NewSecurityDefinitions(v13, compiler.NewContext("securityDefinitions", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated Tag tags = 14;
-	v14 := compiler.MapValueForKey(m, "tags")
-	if v14 != nil {
-		// repeated Tag
-		x.Tags = make([]*Tag, 0)
-		a, ok := v14.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewTag(item, compiler.NewContext("tags", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Tags = append(x.Tags, y)
-			}
-		}
-	}
-	// ExternalDocs external_docs = 15;
-	v15 := compiler.MapValueForKey(m, "externalDocs")
-	if v15 != nil {
-		var err error
-		x.ExternalDocs, err = NewExternalDocs(v15, compiler.NewContext("externalDocs", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated NamedAny vendor_extension = 16;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
+	} else {
+		// repeated NamedAny additional_properties = 1;
+		// MAP: Any
+		x.AdditionalProperties = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
@@ -546,7 +340,221 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, error) {
+	errors := make([]error, 0)
+	x := &Definitions{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Definitions section: %+v", in)))
+	} else {
+		// repeated NamedSchema additional_properties = 1;
+		// MAP: Schema
+		x.AdditionalProperties = make([]*NamedSchema, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedSchema{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
+	errors := make([]error, 0)
+	x := &Document{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Document section: %+v", in)))
+	} else {
+		requiredKeys := []string{"info", "paths", "swagger"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('info','paths','swagger')"))
+		}
+		allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('basePath','consumes','definitions','externalDocs','host','info','parameters','paths','produces','responses','schemes','security','securityDefinitions','swagger','tags') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
+		}
+		// string swagger = 1;
+		v1 := compiler.MapValueForKey(m, "swagger")
+		if v1 != nil {
+			x.Swagger, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for swagger. expected a string, got %+v", v1)))
+			}
+		}
+		// Info info = 2;
+		v2 := compiler.MapValueForKey(m, "info")
+		if v2 != nil {
+			var err error
+			x.Info, err = NewInfo(v2, compiler.NewContext("info", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// string host = 3;
+		v3 := compiler.MapValueForKey(m, "host")
+		if v3 != nil {
+			x.Host, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for host. expected a string, got %+v", v3)))
+			}
+		}
+		// string base_path = 4;
+		v4 := compiler.MapValueForKey(m, "basePath")
+		if v4 != nil {
+			x.BasePath, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for basePath. expected a string, got %+v", v4)))
+			}
+		}
+		// repeated string schemes = 5;
+		v5 := compiler.MapValueForKey(m, "schemes")
+		if v5 != nil {
+			v, ok := v5.([]interface{})
+			if ok {
+				x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in)))
+			}
+		}
+		// repeated string consumes = 6;
+		v6 := compiler.MapValueForKey(m, "consumes")
+		if v6 != nil {
+			v, ok := v6.([]interface{})
+			if ok {
+				x.Consumes = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in)))
+			}
+		}
+		// repeated string produces = 7;
+		v7 := compiler.MapValueForKey(m, "produces")
+		if v7 != nil {
+			v, ok := v7.([]interface{})
+			if ok {
+				x.Produces = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in)))
+			}
+		}
+		// Paths paths = 8;
+		v8 := compiler.MapValueForKey(m, "paths")
+		if v8 != nil {
+			var err error
+			x.Paths, err = NewPaths(v8, compiler.NewContext("paths", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Definitions definitions = 9;
+		v9 := compiler.MapValueForKey(m, "definitions")
+		if v9 != nil {
+			var err error
+			x.Definitions, err = NewDefinitions(v9, compiler.NewContext("definitions", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// ParameterDefinitions parameters = 10;
+		v10 := compiler.MapValueForKey(m, "parameters")
+		if v10 != nil {
+			var err error
+			x.Parameters, err = NewParameterDefinitions(v10, compiler.NewContext("parameters", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// ResponseDefinitions responses = 11;
+		v11 := compiler.MapValueForKey(m, "responses")
+		if v11 != nil {
+			var err error
+			x.Responses, err = NewResponseDefinitions(v11, compiler.NewContext("responses", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated SecurityRequirement security = 12;
+		v12 := compiler.MapValueForKey(m, "security")
+		if v12 != nil {
+			// repeated SecurityRequirement
+			x.Security = make([]*SecurityRequirement, 0)
+			a, ok := v12.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewSecurityRequirement(item, compiler.NewContext("security", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Security = append(x.Security, y)
+				}
+			}
+		}
+		// SecurityDefinitions security_definitions = 13;
+		v13 := compiler.MapValueForKey(m, "securityDefinitions")
+		if v13 != nil {
+			var err error
+			x.SecurityDefinitions, err = NewSecurityDefinitions(v13, compiler.NewContext("securityDefinitions", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated Tag tags = 14;
+		v14 := compiler.MapValueForKey(m, "tags")
+		if v14 != nil {
+			// repeated Tag
+			x.Tags = make([]*Tag, 0)
+			a, ok := v14.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewTag(item, compiler.NewContext("tags", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Tags = append(x.Tags, y)
+				}
+			}
+		}
+		// ExternalDocs external_docs = 15;
+		v15 := compiler.MapValueForKey(m, "externalDocs")
+		if v15 != nil {
+			var err error
+			x.ExternalDocs, err = NewExternalDocs(v15, compiler.NewContext("externalDocs", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedAny vendor_extension = 16;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -554,70 +562,17 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 
 func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 	errors := make([]error, 0)
+	x := &Examples{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Examples section: %+v", in)))
-	}
-	x := &Examples{}
-	// repeated NamedAny additional_properties = 1;
-	// MAP: Any
-	x.AdditionalProperties = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedAny{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, error) {
-	errors := make([]error, 0)
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ExternalDocs section: %+v", in)))
-	}
-	requiredKeys := []string{"url"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('url')"))
-	}
-	allowedKeys := []string{"description", "url"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','url') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &ExternalDocs{}
-	// string description = 1;
-	v1 := compiler.MapValueForKey(m, "description")
-	if v1 != nil {
-		x.Description, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
-		}
-	}
-	// string url = 2;
-	v2 := compiler.MapValueForKey(m, "url")
-	if v2 != nil {
-		x.Url, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 3;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
+	} else {
+		// repeated NamedAny additional_properties = 1;
+		// MAP: Any
+		x.AdditionalProperties = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
@@ -625,7 +580,62 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, error) {
+	errors := make([]error, 0)
+	x := &ExternalDocs{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ExternalDocs section: %+v", in)))
+	} else {
+		requiredKeys := []string{"url"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('url')"))
+		}
+		allowedKeys := []string{"description", "url"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','url') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
+		}
+		// string description = 1;
+		v1 := compiler.MapValueForKey(m, "description")
+		if v1 != nil {
+			x.Description, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
+			}
+		}
+		// string url = 2;
+		v2 := compiler.MapValueForKey(m, "url")
+		if v2 != nil {
+			x.Url, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 3;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -633,111 +643,112 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 
 func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, error) {
 	errors := make([]error, 0)
+	x := &FileSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for FileSchema section: %+v", in)))
-	}
-	requiredKeys := []string{"type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('type')"))
-	}
-	allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('default','description','example','externalDocs','format','readOnly','required','title','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &FileSchema{}
-	// string format = 1;
-	v1 := compiler.MapValueForKey(m, "format")
-	if v1 != nil {
-		x.Format, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('type')"))
 		}
-	}
-	// string title = 2;
-	v2 := compiler.MapValueForKey(m, "title")
-	if v2 != nil {
-		x.Title, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v2)))
+		allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('default','description','example','externalDocs','format','readOnly','required','title','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+		// string format = 1;
+		v1 := compiler.MapValueForKey(m, "format")
+		if v1 != nil {
+			x.Format, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// Any default = 4;
-	v4 := compiler.MapValueForKey(m, "default")
-	if v4 != nil {
-		var err error
-		x.Default, err = NewAny(v4, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string title = 2;
+		v2 := compiler.MapValueForKey(m, "title")
+		if v2 != nil {
+			x.Title, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// repeated string required = 5;
-	v5 := compiler.MapValueForKey(m, "required")
-	if v5 != nil {
-		v, ok := v5.([]interface{})
-		if ok {
-			x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in)))
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
 		}
-	}
-	// string type = 6;
-	v6 := compiler.MapValueForKey(m, "type")
-	if v6 != nil {
-		x.Type, ok = v6.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
-		}
-	}
-	// bool read_only = 7;
-	v7 := compiler.MapValueForKey(m, "readOnly")
-	if v7 != nil {
-		x.ReadOnly = v7.(bool)
-	}
-	// ExternalDocs external_docs = 8;
-	v8 := compiler.MapValueForKey(m, "externalDocs")
-	if v8 != nil {
-		var err error
-		x.ExternalDocs, err = NewExternalDocs(v8, compiler.NewContext("externalDocs", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Any example = 9;
-	v9 := compiler.MapValueForKey(m, "example")
-	if v9 != nil {
-		var err error
-		x.Example, err = NewAny(v9, compiler.NewContext("example", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated NamedAny vendor_extension = 10;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Any default = 4;
+		v4 := compiler.MapValueForKey(m, "default")
+		if v4 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Default, err = NewAny(v4, compiler.NewContext("default", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// repeated string required = 5;
+		v5 := compiler.MapValueForKey(m, "required")
+		if v5 != nil {
+			v, ok := v5.([]interface{})
+			if ok {
+				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in)))
+			}
+		}
+		// string type = 6;
+		v6 := compiler.MapValueForKey(m, "type")
+		if v6 != nil {
+			x.Type, ok = v6.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
+			}
+		}
+		// bool read_only = 7;
+		v7 := compiler.MapValueForKey(m, "readOnly")
+		if v7 != nil {
+			x.ReadOnly = v7.(bool)
+		}
+		// ExternalDocs external_docs = 8;
+		v8 := compiler.MapValueForKey(m, "externalDocs")
+		if v8 != nil {
+			var err error
+			x.ExternalDocs, err = NewExternalDocs(v8, compiler.NewContext("externalDocs", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Any example = 9;
+		v9 := compiler.MapValueForKey(m, "example")
+		if v9 != nil {
+			var err error
+			x.Example, err = NewAny(v9, compiler.NewContext("example", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedAny vendor_extension = 10;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -745,183 +756,184 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 
 func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*FormDataParameterSubSchema, error) {
 	errors := make([]error, 0)
+	x := &FormDataParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for FormDataParameterSubSchema section: %+v", in)))
-	}
-	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &FormDataParameterSubSchema{}
-	// bool required = 1;
-	v1 := compiler.MapValueForKey(m, "required")
-	if v1 != nil {
-		x.Required = v1.(bool)
-	}
-	// string in = 2;
-	v2 := compiler.MapValueForKey(m, "in")
-	if v2 != nil {
-		x.In, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
+	} else {
+		allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+		// bool required = 1;
+		v1 := compiler.MapValueForKey(m, "required")
+		if v1 != nil {
+			x.Required = v1.(bool)
 		}
-	}
-	// string name = 4;
-	v4 := compiler.MapValueForKey(m, "name")
-	if v4 != nil {
-		x.Name, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
-		}
-	}
-	// bool allow_empty_value = 5;
-	v5 := compiler.MapValueForKey(m, "allowEmptyValue")
-	if v5 != nil {
-		x.AllowEmptyValue = v5.(bool)
-	}
-	// string type = 6;
-	v6 := compiler.MapValueForKey(m, "type")
-	if v6 != nil {
-		x.Type, ok = v6.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
-		}
-	}
-	// string format = 7;
-	v7 := compiler.MapValueForKey(m, "format")
-	if v7 != nil {
-		x.Format, ok = v7.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7)))
-		}
-	}
-	// PrimitivesItems items = 8;
-	v8 := compiler.MapValueForKey(m, "items")
-	if v8 != nil {
-		var err error
-		x.Items, err = NewPrimitivesItems(v8, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string collection_format = 9;
-	v9 := compiler.MapValueForKey(m, "collectionFormat")
-	if v9 != nil {
-		x.CollectionFormat, ok = v9.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9)))
-		}
-	}
-	// Any default = 10;
-	v10 := compiler.MapValueForKey(m, "default")
-	if v10 != nil {
-		var err error
-		x.Default, err = NewAny(v10, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float maximum = 11;
-	v11 := compiler.MapValueForKey(m, "maximum")
-	if v11 != nil {
-		x.Maximum = v11.(float64)
-	}
-	// bool exclusive_maximum = 12;
-	v12 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v12 != nil {
-		x.ExclusiveMaximum = v12.(bool)
-	}
-	// float minimum = 13;
-	v13 := compiler.MapValueForKey(m, "minimum")
-	if v13 != nil {
-		x.Minimum = v13.(float64)
-	}
-	// bool exclusive_minimum = 14;
-	v14 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v14 != nil {
-		x.ExclusiveMinimum = v14.(bool)
-	}
-	// int64 max_length = 15;
-	v15 := compiler.MapValueForKey(m, "maxLength")
-	if v15 != nil {
-		x.MaxLength = v15.(int64)
-	}
-	// int64 min_length = 16;
-	v16 := compiler.MapValueForKey(m, "minLength")
-	if v16 != nil {
-		x.MinLength = v16.(int64)
-	}
-	// string pattern = 17;
-	v17 := compiler.MapValueForKey(m, "pattern")
-	if v17 != nil {
-		x.Pattern, ok = v17.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17)))
-		}
-	}
-	// int64 max_items = 18;
-	v18 := compiler.MapValueForKey(m, "maxItems")
-	if v18 != nil {
-		x.MaxItems = v18.(int64)
-	}
-	// int64 min_items = 19;
-	v19 := compiler.MapValueForKey(m, "minItems")
-	if v19 != nil {
-		x.MinItems = v19.(int64)
-	}
-	// bool unique_items = 20;
-	v20 := compiler.MapValueForKey(m, "uniqueItems")
-	if v20 != nil {
-		x.UniqueItems = v20.(bool)
-	}
-	// repeated Any enum = 21;
-	v21 := compiler.MapValueForKey(m, "enum")
-	if v21 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v21.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string in = 2;
+		v2 := compiler.MapValueForKey(m, "in")
+		if v2 != nil {
+			x.In, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 			}
 		}
-	}
-	// float multiple_of = 22;
-	v22 := compiler.MapValueForKey(m, "multipleOf")
-	if v22 != nil {
-		x.MultipleOf = v22.(float64)
-	}
-	// repeated NamedAny vendor_extension = 23;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
+		}
+		// string name = 4;
+		v4 := compiler.MapValueForKey(m, "name")
+		if v4 != nil {
+			x.Name, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
+			}
+		}
+		// bool allow_empty_value = 5;
+		v5 := compiler.MapValueForKey(m, "allowEmptyValue")
+		if v5 != nil {
+			x.AllowEmptyValue = v5.(bool)
+		}
+		// string type = 6;
+		v6 := compiler.MapValueForKey(m, "type")
+		if v6 != nil {
+			x.Type, ok = v6.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
+			}
+		}
+		// string format = 7;
+		v7 := compiler.MapValueForKey(m, "format")
+		if v7 != nil {
+			x.Format, ok = v7.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7)))
+			}
+		}
+		// PrimitivesItems items = 8;
+		v8 := compiler.MapValueForKey(m, "items")
+		if v8 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Items, err = NewPrimitivesItems(v8, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string collection_format = 9;
+		v9 := compiler.MapValueForKey(m, "collectionFormat")
+		if v9 != nil {
+			x.CollectionFormat, ok = v9.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9)))
+			}
+		}
+		// Any default = 10;
+		v10 := compiler.MapValueForKey(m, "default")
+		if v10 != nil {
+			var err error
+			x.Default, err = NewAny(v10, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// float maximum = 11;
+		v11 := compiler.MapValueForKey(m, "maximum")
+		if v11 != nil {
+			x.Maximum = v11.(float64)
+		}
+		// bool exclusive_maximum = 12;
+		v12 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v12 != nil {
+			x.ExclusiveMaximum = v12.(bool)
+		}
+		// float minimum = 13;
+		v13 := compiler.MapValueForKey(m, "minimum")
+		if v13 != nil {
+			x.Minimum = v13.(float64)
+		}
+		// bool exclusive_minimum = 14;
+		v14 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v14 != nil {
+			x.ExclusiveMinimum = v14.(bool)
+		}
+		// int64 max_length = 15;
+		v15 := compiler.MapValueForKey(m, "maxLength")
+		if v15 != nil {
+			x.MaxLength = v15.(int64)
+		}
+		// int64 min_length = 16;
+		v16 := compiler.MapValueForKey(m, "minLength")
+		if v16 != nil {
+			x.MinLength = v16.(int64)
+		}
+		// string pattern = 17;
+		v17 := compiler.MapValueForKey(m, "pattern")
+		if v17 != nil {
+			x.Pattern, ok = v17.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17)))
+			}
+		}
+		// int64 max_items = 18;
+		v18 := compiler.MapValueForKey(m, "maxItems")
+		if v18 != nil {
+			x.MaxItems = v18.(int64)
+		}
+		// int64 min_items = 19;
+		v19 := compiler.MapValueForKey(m, "minItems")
+		if v19 != nil {
+			x.MinItems = v19.(int64)
+		}
+		// bool unique_items = 20;
+		v20 := compiler.MapValueForKey(m, "uniqueItems")
+		if v20 != nil {
+			x.UniqueItems = v20.(bool)
+		}
+		// repeated Any enum = 21;
+		v21 := compiler.MapValueForKey(m, "enum")
+		if v21 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v21.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// float multiple_of = 22;
+		v22 := compiler.MapValueForKey(m, "multipleOf")
+		if v22 != nil {
+			x.MultipleOf = v22.(float64)
+		}
+		// repeated NamedAny vendor_extension = 23;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -929,161 +941,162 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 
 func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	errors := make([]error, 0)
+	x := &Header{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Header section: %+v", in)))
-	}
-	requiredKeys := []string{"type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('type')"))
-	}
-	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Header{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('type')"))
 		}
-	}
-	// string format = 2;
-	v2 := compiler.MapValueForKey(m, "format")
-	if v2 != nil {
-		x.Format, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
+		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// PrimitivesItems items = 3;
-	v3 := compiler.MapValueForKey(m, "items")
-	if v3 != nil {
-		var err error
-		x.Items, err = NewPrimitivesItems(v3, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string collection_format = 4;
-	v4 := compiler.MapValueForKey(m, "collectionFormat")
-	if v4 != nil {
-		x.CollectionFormat, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4)))
-		}
-	}
-	// Any default = 5;
-	v5 := compiler.MapValueForKey(m, "default")
-	if v5 != nil {
-		var err error
-		x.Default, err = NewAny(v5, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float maximum = 6;
-	v6 := compiler.MapValueForKey(m, "maximum")
-	if v6 != nil {
-		x.Maximum = v6.(float64)
-	}
-	// bool exclusive_maximum = 7;
-	v7 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v7 != nil {
-		x.ExclusiveMaximum = v7.(bool)
-	}
-	// float minimum = 8;
-	v8 := compiler.MapValueForKey(m, "minimum")
-	if v8 != nil {
-		x.Minimum = v8.(float64)
-	}
-	// bool exclusive_minimum = 9;
-	v9 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v9 != nil {
-		x.ExclusiveMinimum = v9.(bool)
-	}
-	// int64 max_length = 10;
-	v10 := compiler.MapValueForKey(m, "maxLength")
-	if v10 != nil {
-		x.MaxLength = v10.(int64)
-	}
-	// int64 min_length = 11;
-	v11 := compiler.MapValueForKey(m, "minLength")
-	if v11 != nil {
-		x.MinLength = v11.(int64)
-	}
-	// string pattern = 12;
-	v12 := compiler.MapValueForKey(m, "pattern")
-	if v12 != nil {
-		x.Pattern, ok = v12.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12)))
-		}
-	}
-	// int64 max_items = 13;
-	v13 := compiler.MapValueForKey(m, "maxItems")
-	if v13 != nil {
-		x.MaxItems = v13.(int64)
-	}
-	// int64 min_items = 14;
-	v14 := compiler.MapValueForKey(m, "minItems")
-	if v14 != nil {
-		x.MinItems = v14.(int64)
-	}
-	// bool unique_items = 15;
-	v15 := compiler.MapValueForKey(m, "uniqueItems")
-	if v15 != nil {
-		x.UniqueItems = v15.(bool)
-	}
-	// repeated Any enum = 16;
-	v16 := compiler.MapValueForKey(m, "enum")
-	if v16 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v16.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 			}
 		}
-	}
-	// float multiple_of = 17;
-	v17 := compiler.MapValueForKey(m, "multipleOf")
-	if v17 != nil {
-		x.MultipleOf = v17.(float64)
-	}
-	// string description = 18;
-	v18 := compiler.MapValueForKey(m, "description")
-	if v18 != nil {
-		x.Description, ok = v18.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v18)))
+		// string format = 2;
+		v2 := compiler.MapValueForKey(m, "format")
+		if v2 != nil {
+			x.Format, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// repeated NamedAny vendor_extension = 19;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// PrimitivesItems items = 3;
+		v3 := compiler.MapValueForKey(m, "items")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Items, err = NewPrimitivesItems(v3, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string collection_format = 4;
+		v4 := compiler.MapValueForKey(m, "collectionFormat")
+		if v4 != nil {
+			x.CollectionFormat, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4)))
+			}
+		}
+		// Any default = 5;
+		v5 := compiler.MapValueForKey(m, "default")
+		if v5 != nil {
+			var err error
+			x.Default, err = NewAny(v5, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// float maximum = 6;
+		v6 := compiler.MapValueForKey(m, "maximum")
+		if v6 != nil {
+			x.Maximum = v6.(float64)
+		}
+		// bool exclusive_maximum = 7;
+		v7 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v7 != nil {
+			x.ExclusiveMaximum = v7.(bool)
+		}
+		// float minimum = 8;
+		v8 := compiler.MapValueForKey(m, "minimum")
+		if v8 != nil {
+			x.Minimum = v8.(float64)
+		}
+		// bool exclusive_minimum = 9;
+		v9 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v9 != nil {
+			x.ExclusiveMinimum = v9.(bool)
+		}
+		// int64 max_length = 10;
+		v10 := compiler.MapValueForKey(m, "maxLength")
+		if v10 != nil {
+			x.MaxLength = v10.(int64)
+		}
+		// int64 min_length = 11;
+		v11 := compiler.MapValueForKey(m, "minLength")
+		if v11 != nil {
+			x.MinLength = v11.(int64)
+		}
+		// string pattern = 12;
+		v12 := compiler.MapValueForKey(m, "pattern")
+		if v12 != nil {
+			x.Pattern, ok = v12.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12)))
+			}
+		}
+		// int64 max_items = 13;
+		v13 := compiler.MapValueForKey(m, "maxItems")
+		if v13 != nil {
+			x.MaxItems = v13.(int64)
+		}
+		// int64 min_items = 14;
+		v14 := compiler.MapValueForKey(m, "minItems")
+		if v14 != nil {
+			x.MinItems = v14.(int64)
+		}
+		// bool unique_items = 15;
+		v15 := compiler.MapValueForKey(m, "uniqueItems")
+		if v15 != nil {
+			x.UniqueItems = v15.(bool)
+		}
+		// repeated Any enum = 16;
+		v16 := compiler.MapValueForKey(m, "enum")
+		if v16 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v16.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// float multiple_of = 17;
+		v17 := compiler.MapValueForKey(m, "multipleOf")
+		if v17 != nil {
+			x.MultipleOf = v17.(float64)
+		}
+		// string description = 18;
+		v18 := compiler.MapValueForKey(m, "description")
+		if v18 != nil {
+			x.Description, ok = v18.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v18)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 19;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1091,178 +1104,179 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 
 func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*HeaderParameterSubSchema, error) {
 	errors := make([]error, 0)
+	x := &HeaderParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for HeaderParameterSubSchema section: %+v", in)))
-	}
-	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &HeaderParameterSubSchema{}
-	// bool required = 1;
-	v1 := compiler.MapValueForKey(m, "required")
-	if v1 != nil {
-		x.Required = v1.(bool)
-	}
-	// string in = 2;
-	v2 := compiler.MapValueForKey(m, "in")
-	if v2 != nil {
-		x.In, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
+	} else {
+		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+		// bool required = 1;
+		v1 := compiler.MapValueForKey(m, "required")
+		if v1 != nil {
+			x.Required = v1.(bool)
 		}
-	}
-	// string name = 4;
-	v4 := compiler.MapValueForKey(m, "name")
-	if v4 != nil {
-		x.Name, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
-		}
-	}
-	// string type = 5;
-	v5 := compiler.MapValueForKey(m, "type")
-	if v5 != nil {
-		x.Type, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5)))
-		}
-	}
-	// string format = 6;
-	v6 := compiler.MapValueForKey(m, "format")
-	if v6 != nil {
-		x.Format, ok = v6.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6)))
-		}
-	}
-	// PrimitivesItems items = 7;
-	v7 := compiler.MapValueForKey(m, "items")
-	if v7 != nil {
-		var err error
-		x.Items, err = NewPrimitivesItems(v7, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string collection_format = 8;
-	v8 := compiler.MapValueForKey(m, "collectionFormat")
-	if v8 != nil {
-		x.CollectionFormat, ok = v8.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8)))
-		}
-	}
-	// Any default = 9;
-	v9 := compiler.MapValueForKey(m, "default")
-	if v9 != nil {
-		var err error
-		x.Default, err = NewAny(v9, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float maximum = 10;
-	v10 := compiler.MapValueForKey(m, "maximum")
-	if v10 != nil {
-		x.Maximum = v10.(float64)
-	}
-	// bool exclusive_maximum = 11;
-	v11 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v11 != nil {
-		x.ExclusiveMaximum = v11.(bool)
-	}
-	// float minimum = 12;
-	v12 := compiler.MapValueForKey(m, "minimum")
-	if v12 != nil {
-		x.Minimum = v12.(float64)
-	}
-	// bool exclusive_minimum = 13;
-	v13 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v13 != nil {
-		x.ExclusiveMinimum = v13.(bool)
-	}
-	// int64 max_length = 14;
-	v14 := compiler.MapValueForKey(m, "maxLength")
-	if v14 != nil {
-		x.MaxLength = v14.(int64)
-	}
-	// int64 min_length = 15;
-	v15 := compiler.MapValueForKey(m, "minLength")
-	if v15 != nil {
-		x.MinLength = v15.(int64)
-	}
-	// string pattern = 16;
-	v16 := compiler.MapValueForKey(m, "pattern")
-	if v16 != nil {
-		x.Pattern, ok = v16.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16)))
-		}
-	}
-	// int64 max_items = 17;
-	v17 := compiler.MapValueForKey(m, "maxItems")
-	if v17 != nil {
-		x.MaxItems = v17.(int64)
-	}
-	// int64 min_items = 18;
-	v18 := compiler.MapValueForKey(m, "minItems")
-	if v18 != nil {
-		x.MinItems = v18.(int64)
-	}
-	// bool unique_items = 19;
-	v19 := compiler.MapValueForKey(m, "uniqueItems")
-	if v19 != nil {
-		x.UniqueItems = v19.(bool)
-	}
-	// repeated Any enum = 20;
-	v20 := compiler.MapValueForKey(m, "enum")
-	if v20 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v20.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string in = 2;
+		v2 := compiler.MapValueForKey(m, "in")
+		if v2 != nil {
+			x.In, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 			}
 		}
-	}
-	// float multiple_of = 21;
-	v21 := compiler.MapValueForKey(m, "multipleOf")
-	if v21 != nil {
-		x.MultipleOf = v21.(float64)
-	}
-	// repeated NamedAny vendor_extension = 22;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
+		}
+		// string name = 4;
+		v4 := compiler.MapValueForKey(m, "name")
+		if v4 != nil {
+			x.Name, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
+			}
+		}
+		// string type = 5;
+		v5 := compiler.MapValueForKey(m, "type")
+		if v5 != nil {
+			x.Type, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5)))
+			}
+		}
+		// string format = 6;
+		v6 := compiler.MapValueForKey(m, "format")
+		if v6 != nil {
+			x.Format, ok = v6.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6)))
+			}
+		}
+		// PrimitivesItems items = 7;
+		v7 := compiler.MapValueForKey(m, "items")
+		if v7 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Items, err = NewPrimitivesItems(v7, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string collection_format = 8;
+		v8 := compiler.MapValueForKey(m, "collectionFormat")
+		if v8 != nil {
+			x.CollectionFormat, ok = v8.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8)))
+			}
+		}
+		// Any default = 9;
+		v9 := compiler.MapValueForKey(m, "default")
+		if v9 != nil {
+			var err error
+			x.Default, err = NewAny(v9, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// float maximum = 10;
+		v10 := compiler.MapValueForKey(m, "maximum")
+		if v10 != nil {
+			x.Maximum = v10.(float64)
+		}
+		// bool exclusive_maximum = 11;
+		v11 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v11 != nil {
+			x.ExclusiveMaximum = v11.(bool)
+		}
+		// float minimum = 12;
+		v12 := compiler.MapValueForKey(m, "minimum")
+		if v12 != nil {
+			x.Minimum = v12.(float64)
+		}
+		// bool exclusive_minimum = 13;
+		v13 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v13 != nil {
+			x.ExclusiveMinimum = v13.(bool)
+		}
+		// int64 max_length = 14;
+		v14 := compiler.MapValueForKey(m, "maxLength")
+		if v14 != nil {
+			x.MaxLength = v14.(int64)
+		}
+		// int64 min_length = 15;
+		v15 := compiler.MapValueForKey(m, "minLength")
+		if v15 != nil {
+			x.MinLength = v15.(int64)
+		}
+		// string pattern = 16;
+		v16 := compiler.MapValueForKey(m, "pattern")
+		if v16 != nil {
+			x.Pattern, ok = v16.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16)))
+			}
+		}
+		// int64 max_items = 17;
+		v17 := compiler.MapValueForKey(m, "maxItems")
+		if v17 != nil {
+			x.MaxItems = v17.(int64)
+		}
+		// int64 min_items = 18;
+		v18 := compiler.MapValueForKey(m, "minItems")
+		if v18 != nil {
+			x.MinItems = v18.(int64)
+		}
+		// bool unique_items = 19;
+		v19 := compiler.MapValueForKey(m, "uniqueItems")
+		if v19 != nil {
+			x.UniqueItems = v19.(bool)
+		}
+		// repeated Any enum = 20;
+		v20 := compiler.MapValueForKey(m, "enum")
+		if v20 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v20.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// float multiple_of = 21;
+		v21 := compiler.MapValueForKey(m, "multipleOf")
+		if v21 != nil {
+			x.MultipleOf = v21.(float64)
+		}
+		// repeated NamedAny vendor_extension = 22;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1270,112 +1284,114 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 
 func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	errors := make([]error, 0)
+	x := &Headers{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Headers section: %+v", in)))
-	}
-	x := &Headers{}
-	// repeated NamedHeader additional_properties = 1;
-	// MAP: Header
-	x.AdditionalProperties = make([]*NamedHeader, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedHeader{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
+	} else {
+		// repeated NamedHeader additional_properties = 1;
+		// MAP: Header
+		x.AdditionalProperties = make([]*NamedHeader, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedHeader{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	errors := make([]error, 0)
+	x := &Info{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Info section: %+v", in)))
-	}
-	requiredKeys := []string{"title", "version"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('title','version')"))
-	}
-	allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('contact','description','license','termsOfService','title','version') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Info{}
-	// string title = 1;
-	v1 := compiler.MapValueForKey(m, "title")
-	if v1 != nil {
-		x.Title, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"title", "version"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('title','version')"))
 		}
-	}
-	// string version = 2;
-	v2 := compiler.MapValueForKey(m, "version")
-	if v2 != nil {
-		x.Version, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for version. expected a string, got %+v", v2)))
+		allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('contact','description','license','termsOfService','title','version') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+		// string title = 1;
+		v1 := compiler.MapValueForKey(m, "title")
+		if v1 != nil {
+			x.Title, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// string terms_of_service = 4;
-	v4 := compiler.MapValueForKey(m, "termsOfService")
-	if v4 != nil {
-		x.TermsOfService, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for termsOfService. expected a string, got %+v", v4)))
+		// string version = 2;
+		v2 := compiler.MapValueForKey(m, "version")
+		if v2 != nil {
+			x.Version, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for version. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// Contact contact = 5;
-	v5 := compiler.MapValueForKey(m, "contact")
-	if v5 != nil {
-		var err error
-		x.Contact, err = NewContact(v5, compiler.NewContext("contact", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
 		}
-	}
-	// License license = 6;
-	v6 := compiler.MapValueForKey(m, "license")
-	if v6 != nil {
-		var err error
-		x.License, err = NewLicense(v6, compiler.NewContext("license", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string terms_of_service = 4;
+		v4 := compiler.MapValueForKey(m, "termsOfService")
+		if v4 != nil {
+			x.TermsOfService, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for termsOfService. expected a string, got %+v", v4)))
+			}
 		}
-	}
-	// repeated NamedAny vendor_extension = 7;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Contact contact = 5;
+		v5 := compiler.MapValueForKey(m, "contact")
+		if v5 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Contact, err = NewContact(v5, compiler.NewContext("contact", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// License license = 6;
+		v6 := compiler.MapValueForKey(m, "license")
+		if v6 != nil {
+			var err error
+			x.License, err = NewLicense(v6, compiler.NewContext("license", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedAny vendor_extension = 7;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1403,28 +1419,29 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 
 func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference, error) {
 	errors := make([]error, 0)
+	x := &JsonReference{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for JsonReference section: %+v", in)))
-	}
-	requiredKeys := []string{"$ref"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('$ref')"))
-	}
-	allowedKeys := []string{"$ref"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('$ref') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &JsonReference{}
-	// string _ref = 1;
-	v1 := compiler.MapValueForKey(m, "$ref")
-	if v1 != nil {
-		x.XRef, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"$ref"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('$ref')"))
+		}
+		allowedKeys := []string{"$ref"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('$ref') or (): %+v",
+					compiler.SortedKeysForMap(m))))
+		}
+		// string _ref = 1;
+		v1 := compiler.MapValueForKey(m, "$ref")
+		if v1 != nil {
+			x.XRef, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1432,53 +1449,54 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 
 func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	errors := make([]error, 0)
+	x := &License{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for License section: %+v", in)))
-	}
-	requiredKeys := []string{"name"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('name')"))
-	}
-	allowedKeys := []string{"name", "url"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','url') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &License{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"name"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('name')"))
 		}
-	}
-	// string url = 2;
-	v2 := compiler.MapValueForKey(m, "url")
-	if v2 != nil {
-		x.Url, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
+		allowedKeys := []string{"name", "url"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','url') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// repeated NamedAny vendor_extension = 3;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string url = 2;
+		v2 := compiler.MapValueForKey(m, "url")
+		if v2 != nil {
+			x.Url, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for url. expected a string, got %+v", v2)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 3;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1486,33 +1504,34 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 
 func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	errors := make([]error, 0)
+	x := &NamedAny{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedAny section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedAny{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Any value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewAny(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// Any value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewAny(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1520,33 +1539,34 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 
 func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, error) {
 	errors := make([]error, 0)
+	x := &NamedHeader{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedHeader section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedHeader{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Header value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewHeader(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// Header value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewHeader(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1554,33 +1574,34 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 
 func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParameter, error) {
 	errors := make([]error, 0)
+	x := &NamedParameter{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedParameter section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedParameter{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Parameter value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewParameter(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// Parameter value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewParameter(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1588,33 +1609,34 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 
 func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem, error) {
 	errors := make([]error, 0)
+	x := &NamedPathItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedPathItem section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedPathItem{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// PathItem value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewPathItem(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// PathItem value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewPathItem(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1622,33 +1644,34 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 
 func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse, error) {
 	errors := make([]error, 0)
+	x := &NamedResponse{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedResponse section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedResponse{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Response value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewResponse(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// Response value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewResponse(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1656,33 +1679,34 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 
 func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedResponseValue, error) {
 	errors := make([]error, 0)
+	x := &NamedResponseValue{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedResponseValue section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedResponseValue{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// ResponseValue value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewResponseValue(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// ResponseValue value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewResponseValue(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1690,33 +1714,34 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 
 func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, error) {
 	errors := make([]error, 0)
+	x := &NamedSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedSchema section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedSchema{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Schema value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewSchema(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// Schema value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewSchema(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1724,33 +1749,34 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 
 func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*NamedSecurityDefinitionsItem, error) {
 	errors := make([]error, 0)
+	x := &NamedSecurityDefinitionsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedSecurityDefinitionsItem section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedSecurityDefinitionsItem{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// SecurityDefinitionsItem value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewSecurityDefinitionsItem(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// SecurityDefinitionsItem value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewSecurityDefinitionsItem(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1758,32 +1784,33 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 
 func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, error) {
 	errors := make([]error, 0)
+	x := &NamedString{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedString section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedString{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		x.Value, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for value. expected a string, got %+v", v2)))
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// string value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			x.Value, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for value. expected a string, got %+v", v2)))
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1791,33 +1818,34 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 
 func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStringArray, error) {
 	errors := make([]error, 0)
+	x := &NamedStringArray{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NamedStringArray section: %+v", in)))
-	}
-	allowedKeys := []string{"name", "value"}
-	allowedPatterns := []string{}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &NamedStringArray{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('name','value') or (): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// StringArray value = 2;
-	v2 := compiler.MapValueForKey(m, "value")
-	if v2 != nil {
-		var err error
-		x.Value, err = NewStringArray(v2, compiler.NewContext("value", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// StringArray value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewStringArray(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1825,45 +1853,46 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 
 func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyParameter, error) {
 	errors := make([]error, 0)
+	x := &NonBodyParameter{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for NonBodyParameter section: %+v", in)))
-	}
-	requiredKeys := []string{"in", "name", "type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('in','name','type')"))
-	}
-	x := &NonBodyParameter{}
-	// HeaderParameterSubSchema header_parameter_sub_schema = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
-		if safe_errors == nil {
-			x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
+	} else {
+		requiredKeys := []string{"in", "name", "type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('in','name','type')"))
 		}
-	}
-	// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
-		if safe_errors == nil {
-			x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
+		// HeaderParameterSubSchema header_parameter_sub_schema = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
+			if safe_errors == nil {
+				x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
+			}
 		}
-	}
-	// QueryParameterSubSchema query_parameter_sub_schema = 3;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
-		if safe_errors == nil {
-			x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
+		// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
+			if safe_errors == nil {
+				x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
+			}
 		}
-	}
-	// PathParameterSubSchema path_parameter_sub_schema = 4;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
-		if safe_errors == nil {
-			x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
+		// QueryParameterSubSchema query_parameter_sub_schema = 3;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
+			if safe_errors == nil {
+				x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
+			}
+		}
+		// PathParameterSubSchema path_parameter_sub_schema = 4;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
+			if safe_errors == nil {
+				x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1871,86 +1900,87 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 
 func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oauth2AccessCodeSecurity, error) {
 	errors := make([]error, 0)
+	x := &Oauth2AccessCodeSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Oauth2AccessCodeSecurity section: %+v", in)))
-	}
-	requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('authorizationUrl','flow','tokenUrl','type')"))
-	}
-	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('authorizationUrl','description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Oauth2AccessCodeSecurity{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('authorizationUrl','flow','tokenUrl','type')"))
 		}
-	}
-	// string flow = 2;
-	v2 := compiler.MapValueForKey(m, "flow")
-	if v2 != nil {
-		x.Flow, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+		allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('authorizationUrl','description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Oauth2Scopes scopes = 3;
-	v3 := compiler.MapValueForKey(m, "scopes")
-	if v3 != nil {
-		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// string authorization_url = 4;
-	v4 := compiler.MapValueForKey(m, "authorizationUrl")
-	if v4 != nil {
-		x.AuthorizationUrl, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4)))
+		// string flow = 2;
+		v2 := compiler.MapValueForKey(m, "flow")
+		if v2 != nil {
+			x.Flow, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// string token_url = 5;
-	v5 := compiler.MapValueForKey(m, "tokenUrl")
-	if v5 != nil {
-		x.TokenUrl, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v5)))
-		}
-	}
-	// string description = 6;
-	v6 := compiler.MapValueForKey(m, "description")
-	if v6 != nil {
-		x.Description, ok = v6.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v6)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 7;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Oauth2Scopes scopes = 3;
+		v3 := compiler.MapValueForKey(m, "scopes")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string authorization_url = 4;
+		v4 := compiler.MapValueForKey(m, "authorizationUrl")
+		if v4 != nil {
+			x.AuthorizationUrl, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4)))
+			}
+		}
+		// string token_url = 5;
+		v5 := compiler.MapValueForKey(m, "tokenUrl")
+		if v5 != nil {
+			x.TokenUrl, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v5)))
+			}
+		}
+		// string description = 6;
+		v6 := compiler.MapValueForKey(m, "description")
+		if v6 != nil {
+			x.Description, ok = v6.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v6)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 7;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1958,78 +1988,79 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 
 func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*Oauth2ApplicationSecurity, error) {
 	errors := make([]error, 0)
+	x := &Oauth2ApplicationSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Oauth2ApplicationSecurity section: %+v", in)))
-	}
-	requiredKeys := []string{"flow", "tokenUrl", "type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')"))
-	}
-	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Oauth2ApplicationSecurity{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"flow", "tokenUrl", "type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')"))
 		}
-	}
-	// string flow = 2;
-	v2 := compiler.MapValueForKey(m, "flow")
-	if v2 != nil {
-		x.Flow, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+		allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Oauth2Scopes scopes = 3;
-	v3 := compiler.MapValueForKey(m, "scopes")
-	if v3 != nil {
-		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// string token_url = 4;
-	v4 := compiler.MapValueForKey(m, "tokenUrl")
-	if v4 != nil {
-		x.TokenUrl, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4)))
+		// string flow = 2;
+		v2 := compiler.MapValueForKey(m, "flow")
+		if v2 != nil {
+			x.Flow, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// string description = 5;
-	v5 := compiler.MapValueForKey(m, "description")
-	if v5 != nil {
-		x.Description, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 6;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Oauth2Scopes scopes = 3;
+		v3 := compiler.MapValueForKey(m, "scopes")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string token_url = 4;
+		v4 := compiler.MapValueForKey(m, "tokenUrl")
+		if v4 != nil {
+			x.TokenUrl, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4)))
+			}
+		}
+		// string description = 5;
+		v5 := compiler.MapValueForKey(m, "description")
+		if v5 != nil {
+			x.Description, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 6;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2037,78 +2068,79 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 
 func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oauth2ImplicitSecurity, error) {
 	errors := make([]error, 0)
+	x := &Oauth2ImplicitSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Oauth2ImplicitSecurity section: %+v", in)))
-	}
-	requiredKeys := []string{"authorizationUrl", "flow", "type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('authorizationUrl','flow','type')"))
-	}
-	allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('authorizationUrl','description','flow','scopes','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Oauth2ImplicitSecurity{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"authorizationUrl", "flow", "type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('authorizationUrl','flow','type')"))
 		}
-	}
-	// string flow = 2;
-	v2 := compiler.MapValueForKey(m, "flow")
-	if v2 != nil {
-		x.Flow, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+		allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('authorizationUrl','description','flow','scopes','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Oauth2Scopes scopes = 3;
-	v3 := compiler.MapValueForKey(m, "scopes")
-	if v3 != nil {
-		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// string authorization_url = 4;
-	v4 := compiler.MapValueForKey(m, "authorizationUrl")
-	if v4 != nil {
-		x.AuthorizationUrl, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4)))
+		// string flow = 2;
+		v2 := compiler.MapValueForKey(m, "flow")
+		if v2 != nil {
+			x.Flow, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// string description = 5;
-	v5 := compiler.MapValueForKey(m, "description")
-	if v5 != nil {
-		x.Description, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 6;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Oauth2Scopes scopes = 3;
+		v3 := compiler.MapValueForKey(m, "scopes")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string authorization_url = 4;
+		v4 := compiler.MapValueForKey(m, "authorizationUrl")
+		if v4 != nil {
+			x.AuthorizationUrl, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for authorizationUrl. expected a string, got %+v", v4)))
+			}
+		}
+		// string description = 5;
+		v5 := compiler.MapValueForKey(m, "description")
+		if v5 != nil {
+			x.Description, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 6;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2116,78 +2148,79 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 
 func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oauth2PasswordSecurity, error) {
 	errors := make([]error, 0)
+	x := &Oauth2PasswordSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Oauth2PasswordSecurity section: %+v", in)))
-	}
-	requiredKeys := []string{"flow", "tokenUrl", "type"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')"))
-	}
-	allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Oauth2PasswordSecurity{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"flow", "tokenUrl", "type"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('flow','tokenUrl','type')"))
 		}
-	}
-	// string flow = 2;
-	v2 := compiler.MapValueForKey(m, "flow")
-	if v2 != nil {
-		x.Flow, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+		allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','flow','scopes','tokenUrl','type') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Oauth2Scopes scopes = 3;
-	v3 := compiler.MapValueForKey(m, "scopes")
-	if v3 != nil {
-		var err error
-		x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// string token_url = 4;
-	v4 := compiler.MapValueForKey(m, "tokenUrl")
-	if v4 != nil {
-		x.TokenUrl, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4)))
+		// string flow = 2;
+		v2 := compiler.MapValueForKey(m, "flow")
+		if v2 != nil {
+			x.Flow, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for flow. expected a string, got %+v", v2)))
+			}
 		}
-	}
-	// string description = 5;
-	v5 := compiler.MapValueForKey(m, "description")
-	if v5 != nil {
-		x.Description, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
-		}
-	}
-	// repeated NamedAny vendor_extension = 6;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Oauth2Scopes scopes = 3;
+		v3 := compiler.MapValueForKey(m, "scopes")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Scopes, err = NewOauth2Scopes(v3, compiler.NewContext("scopes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string token_url = 4;
+		v4 := compiler.MapValueForKey(m, "tokenUrl")
+		if v4 != nil {
+			x.TokenUrl, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tokenUrl. expected a string, got %+v", v4)))
+			}
+		}
+		// string description = 5;
+		v5 := compiler.MapValueForKey(m, "description")
+		if v5 != nil {
+			x.Description, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v5)))
+			}
+		}
+		// repeated NamedAny vendor_extension = 6;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2195,177 +2228,179 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 
 func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, error) {
 	errors := make([]error, 0)
+	x := &Oauth2Scopes{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Oauth2Scopes section: %+v", in)))
-	}
-	x := &Oauth2Scopes{}
-	// repeated NamedString additional_properties = 1;
-	// MAP: string
-	x.AdditionalProperties = make([]*NamedString, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedString{}
-		pair.Name = k
-		pair.Value = v.(string)
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
+	} else {
+		// repeated NamedString additional_properties = 1;
+		// MAP: string
+		x.AdditionalProperties = make([]*NamedString, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedString{}
+			pair.Name = k
+			pair.Value = v.(string)
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
+		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewOperation(in interface{}, context *compiler.Context) (*Operation, error) {
 	errors := make([]error, 0)
+	x := &Operation{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Operation section: %+v", in)))
-	}
-	requiredKeys := []string{"responses"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('responses')"))
-	}
-	allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('consumes','deprecated','description','externalDocs','operationId','parameters','produces','responses','schemes','security','summary','tags') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Operation{}
-	// repeated string tags = 1;
-	v1 := compiler.MapValueForKey(m, "tags")
-	if v1 != nil {
-		v, ok := v1.([]interface{})
-		if ok {
-			x.Tags = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tags property: %+v", in)))
+	} else {
+		requiredKeys := []string{"responses"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('responses')"))
 		}
-	}
-	// string summary = 2;
-	v2 := compiler.MapValueForKey(m, "summary")
-	if v2 != nil {
-		x.Summary, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for summary. expected a string, got %+v", v2)))
+		allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('consumes','deprecated','description','externalDocs','operationId','parameters','produces','responses','schemes','security','summary','tags') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
-		}
-	}
-	// ExternalDocs external_docs = 4;
-	v4 := compiler.MapValueForKey(m, "externalDocs")
-	if v4 != nil {
-		var err error
-		x.ExternalDocs, err = NewExternalDocs(v4, compiler.NewContext("externalDocs", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string operation_id = 5;
-	v5 := compiler.MapValueForKey(m, "operationId")
-	if v5 != nil {
-		x.OperationId, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for operationId. expected a string, got %+v", v5)))
-		}
-	}
-	// repeated string produces = 6;
-	v6 := compiler.MapValueForKey(m, "produces")
-	if v6 != nil {
-		v, ok := v6.([]interface{})
-		if ok {
-			x.Produces = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in)))
-		}
-	}
-	// repeated string consumes = 7;
-	v7 := compiler.MapValueForKey(m, "consumes")
-	if v7 != nil {
-		v, ok := v7.([]interface{})
-		if ok {
-			x.Consumes = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in)))
-		}
-	}
-	// repeated ParametersItem parameters = 8;
-	v8 := compiler.MapValueForKey(m, "parameters")
-	if v8 != nil {
-		// repeated ParametersItem
-		x.Parameters = make([]*ParametersItem, 0)
-		a, ok := v8.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewParametersItem(item, compiler.NewContext("parameters", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Parameters = append(x.Parameters, y)
+		// repeated string tags = 1;
+		v1 := compiler.MapValueForKey(m, "tags")
+		if v1 != nil {
+			v, ok := v1.([]interface{})
+			if ok {
+				x.Tags = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for tags property: %+v", in)))
 			}
 		}
-	}
-	// Responses responses = 9;
-	v9 := compiler.MapValueForKey(m, "responses")
-	if v9 != nil {
-		var err error
-		x.Responses, err = NewResponses(v9, compiler.NewContext("responses", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated string schemes = 10;
-	v10 := compiler.MapValueForKey(m, "schemes")
-	if v10 != nil {
-		v, ok := v10.([]interface{})
-		if ok {
-			x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in)))
-		}
-	}
-	// bool deprecated = 11;
-	v11 := compiler.MapValueForKey(m, "deprecated")
-	if v11 != nil {
-		x.Deprecated = v11.(bool)
-	}
-	// repeated SecurityRequirement security = 12;
-	v12 := compiler.MapValueForKey(m, "security")
-	if v12 != nil {
-		// repeated SecurityRequirement
-		x.Security = make([]*SecurityRequirement, 0)
-		a, ok := v12.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewSecurityRequirement(item, compiler.NewContext("security", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Security = append(x.Security, y)
+		// string summary = 2;
+		v2 := compiler.MapValueForKey(m, "summary")
+		if v2 != nil {
+			x.Summary, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for summary. expected a string, got %+v", v2)))
 			}
 		}
-	}
-	// repeated NamedAny vendor_extension = 13;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
+		}
+		// ExternalDocs external_docs = 4;
+		v4 := compiler.MapValueForKey(m, "externalDocs")
+		if v4 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.ExternalDocs, err = NewExternalDocs(v4, compiler.NewContext("externalDocs", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string operation_id = 5;
+		v5 := compiler.MapValueForKey(m, "operationId")
+		if v5 != nil {
+			x.OperationId, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for operationId. expected a string, got %+v", v5)))
+			}
+		}
+		// repeated string produces = 6;
+		v6 := compiler.MapValueForKey(m, "produces")
+		if v6 != nil {
+			v, ok := v6.([]interface{})
+			if ok {
+				x.Produces = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for produces property: %+v", in)))
+			}
+		}
+		// repeated string consumes = 7;
+		v7 := compiler.MapValueForKey(m, "consumes")
+		if v7 != nil {
+			v, ok := v7.([]interface{})
+			if ok {
+				x.Consumes = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for consumes property: %+v", in)))
+			}
+		}
+		// repeated ParametersItem parameters = 8;
+		v8 := compiler.MapValueForKey(m, "parameters")
+		if v8 != nil {
+			// repeated ParametersItem
+			x.Parameters = make([]*ParametersItem, 0)
+			a, ok := v8.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewParametersItem(item, compiler.NewContext("parameters", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Parameters = append(x.Parameters, y)
+				}
+			}
+		}
+		// Responses responses = 9;
+		v9 := compiler.MapValueForKey(m, "responses")
+		if v9 != nil {
+			var err error
+			x.Responses, err = NewResponses(v9, compiler.NewContext("responses", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated string schemes = 10;
+		v10 := compiler.MapValueForKey(m, "schemes")
+		if v10 != nil {
+			v, ok := v10.([]interface{})
+			if ok {
+				x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for schemes property: %+v", in)))
+			}
+		}
+		// bool deprecated = 11;
+		v11 := compiler.MapValueForKey(m, "deprecated")
+		if v11 != nil {
+			x.Deprecated = v11.(bool)
+		}
+		// repeated SecurityRequirement security = 12;
+		v12 := compiler.MapValueForKey(m, "security")
+		if v12 != nil {
+			// repeated SecurityRequirement
+			x.Security = make([]*SecurityRequirement, 0)
+			a, ok := v12.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewSecurityRequirement(item, compiler.NewContext("security", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Security = append(x.Security, y)
+				}
+			}
+		}
+		// repeated NamedAny vendor_extension = 13;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2373,25 +2408,26 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 
 func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error) {
 	errors := make([]error, 0)
+	x := &Parameter{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Parameter section: %+v", in)))
-	}
-	x := &Parameter{}
-	// BodyParameter body_parameter = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
-		if safe_errors == nil {
-			x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
+	} else {
+		// BodyParameter body_parameter = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
+			if safe_errors == nil {
+				x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
+			}
 		}
-	}
-	// NonBodyParameter non_body_parameter = 2;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
-		if safe_errors == nil {
-			x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
+		// NonBodyParameter non_body_parameter = 2;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
+			if safe_errors == nil {
+				x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2399,50 +2435,52 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 
 func NewParameterDefinitions(in interface{}, context *compiler.Context) (*ParameterDefinitions, error) {
 	errors := make([]error, 0)
+	x := &ParameterDefinitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ParameterDefinitions section: %+v", in)))
-	}
-	x := &ParameterDefinitions{}
-	// repeated NamedParameter additional_properties = 1;
-	// MAP: Parameter
-	x.AdditionalProperties = make([]*NamedParameter, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedParameter{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
+	} else {
+		// repeated NamedParameter additional_properties = 1;
+		// MAP: Parameter
+		x.AdditionalProperties = make([]*NamedParameter, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedParameter{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersItem, error) {
 	errors := make([]error, 0)
+	x := &ParametersItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ParametersItem section: %+v", in)))
-	}
-	x := &ParametersItem{}
-	// Parameter parameter = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewParameter(m, compiler.NewContext("parameter", context))
-		if safe_errors == nil {
-			x.Oneof = &ParametersItem_Parameter{Parameter: t}
+	} else {
+		// Parameter parameter = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewParameter(m, compiler.NewContext("parameter", context))
+			if safe_errors == nil {
+				x.Oneof = &ParametersItem_Parameter{Parameter: t}
+			}
 		}
-	}
-	// JsonReference json_reference = 2;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-		if safe_errors == nil {
-			x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
+		// JsonReference json_reference = 2;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+			if safe_errors == nil {
+				x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2450,120 +2488,121 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 
 func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	errors := make([]error, 0)
+	x := &PathItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for PathItem section: %+v", in)))
-	}
-	allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('$ref','delete','get','head','options','parameters','patch','post','put') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &PathItem{}
-	// string _ref = 1;
-	v1 := compiler.MapValueForKey(m, "$ref")
-	if v1 != nil {
-		x.XRef, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('$ref','delete','get','head','options','parameters','patch','post','put') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Operation get = 2;
-	v2 := compiler.MapValueForKey(m, "get")
-	if v2 != nil {
-		var err error
-		x.Get, err = NewOperation(v2, compiler.NewContext("get", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Operation put = 3;
-	v3 := compiler.MapValueForKey(m, "put")
-	if v3 != nil {
-		var err error
-		x.Put, err = NewOperation(v3, compiler.NewContext("put", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Operation post = 4;
-	v4 := compiler.MapValueForKey(m, "post")
-	if v4 != nil {
-		var err error
-		x.Post, err = NewOperation(v4, compiler.NewContext("post", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Operation delete = 5;
-	v5 := compiler.MapValueForKey(m, "delete")
-	if v5 != nil {
-		var err error
-		x.Delete, err = NewOperation(v5, compiler.NewContext("delete", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Operation options = 6;
-	v6 := compiler.MapValueForKey(m, "options")
-	if v6 != nil {
-		var err error
-		x.Options, err = NewOperation(v6, compiler.NewContext("options", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Operation head = 7;
-	v7 := compiler.MapValueForKey(m, "head")
-	if v7 != nil {
-		var err error
-		x.Head, err = NewOperation(v7, compiler.NewContext("head", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Operation patch = 8;
-	v8 := compiler.MapValueForKey(m, "patch")
-	if v8 != nil {
-		var err error
-		x.Patch, err = NewOperation(v8, compiler.NewContext("patch", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated ParametersItem parameters = 9;
-	v9 := compiler.MapValueForKey(m, "parameters")
-	if v9 != nil {
-		// repeated ParametersItem
-		x.Parameters = make([]*ParametersItem, 0)
-		a, ok := v9.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewParametersItem(item, compiler.NewContext("parameters", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Parameters = append(x.Parameters, y)
+		// string _ref = 1;
+		v1 := compiler.MapValueForKey(m, "$ref")
+		if v1 != nil {
+			x.XRef, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
 			}
 		}
-	}
-	// repeated NamedAny vendor_extension = 10;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Operation get = 2;
+		v2 := compiler.MapValueForKey(m, "get")
+		if v2 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Get, err = NewOperation(v2, compiler.NewContext("get", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// Operation put = 3;
+		v3 := compiler.MapValueForKey(m, "put")
+		if v3 != nil {
+			var err error
+			x.Put, err = NewOperation(v3, compiler.NewContext("put", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Operation post = 4;
+		v4 := compiler.MapValueForKey(m, "post")
+		if v4 != nil {
+			var err error
+			x.Post, err = NewOperation(v4, compiler.NewContext("post", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Operation delete = 5;
+		v5 := compiler.MapValueForKey(m, "delete")
+		if v5 != nil {
+			var err error
+			x.Delete, err = NewOperation(v5, compiler.NewContext("delete", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Operation options = 6;
+		v6 := compiler.MapValueForKey(m, "options")
+		if v6 != nil {
+			var err error
+			x.Options, err = NewOperation(v6, compiler.NewContext("options", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Operation head = 7;
+		v7 := compiler.MapValueForKey(m, "head")
+		if v7 != nil {
+			var err error
+			x.Head, err = NewOperation(v7, compiler.NewContext("head", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Operation patch = 8;
+		v8 := compiler.MapValueForKey(m, "patch")
+		if v8 != nil {
+			var err error
+			x.Patch, err = NewOperation(v8, compiler.NewContext("patch", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated ParametersItem parameters = 9;
+		v9 := compiler.MapValueForKey(m, "parameters")
+		if v9 != nil {
+			// repeated ParametersItem
+			x.Parameters = make([]*ParametersItem, 0)
+			a, ok := v9.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewParametersItem(item, compiler.NewContext("parameters", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Parameters = append(x.Parameters, y)
+				}
+			}
+		}
+		// repeated NamedAny vendor_extension = 10;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2571,182 +2610,183 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 
 func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*PathParameterSubSchema, error) {
 	errors := make([]error, 0)
+	x := &PathParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for PathParameterSubSchema section: %+v", in)))
-	}
-	requiredKeys := []string{"required"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('required')"))
-	}
-	allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &PathParameterSubSchema{}
-	// bool required = 1;
-	v1 := compiler.MapValueForKey(m, "required")
-	if v1 != nil {
-		x.Required = v1.(bool)
-	}
-	// string in = 2;
-	v2 := compiler.MapValueForKey(m, "in")
-	if v2 != nil {
-		x.In, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
+	} else {
+		requiredKeys := []string{"required"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('required')"))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string name = 4;
-	v4 := compiler.MapValueForKey(m, "name")
-	if v4 != nil {
-		x.Name, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
+		// bool required = 1;
+		v1 := compiler.MapValueForKey(m, "required")
+		if v1 != nil {
+			x.Required = v1.(bool)
 		}
-	}
-	// string type = 5;
-	v5 := compiler.MapValueForKey(m, "type")
-	if v5 != nil {
-		x.Type, ok = v5.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5)))
-		}
-	}
-	// string format = 6;
-	v6 := compiler.MapValueForKey(m, "format")
-	if v6 != nil {
-		x.Format, ok = v6.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6)))
-		}
-	}
-	// PrimitivesItems items = 7;
-	v7 := compiler.MapValueForKey(m, "items")
-	if v7 != nil {
-		var err error
-		x.Items, err = NewPrimitivesItems(v7, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string collection_format = 8;
-	v8 := compiler.MapValueForKey(m, "collectionFormat")
-	if v8 != nil {
-		x.CollectionFormat, ok = v8.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8)))
-		}
-	}
-	// Any default = 9;
-	v9 := compiler.MapValueForKey(m, "default")
-	if v9 != nil {
-		var err error
-		x.Default, err = NewAny(v9, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float maximum = 10;
-	v10 := compiler.MapValueForKey(m, "maximum")
-	if v10 != nil {
-		x.Maximum = v10.(float64)
-	}
-	// bool exclusive_maximum = 11;
-	v11 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v11 != nil {
-		x.ExclusiveMaximum = v11.(bool)
-	}
-	// float minimum = 12;
-	v12 := compiler.MapValueForKey(m, "minimum")
-	if v12 != nil {
-		x.Minimum = v12.(float64)
-	}
-	// bool exclusive_minimum = 13;
-	v13 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v13 != nil {
-		x.ExclusiveMinimum = v13.(bool)
-	}
-	// int64 max_length = 14;
-	v14 := compiler.MapValueForKey(m, "maxLength")
-	if v14 != nil {
-		x.MaxLength = v14.(int64)
-	}
-	// int64 min_length = 15;
-	v15 := compiler.MapValueForKey(m, "minLength")
-	if v15 != nil {
-		x.MinLength = v15.(int64)
-	}
-	// string pattern = 16;
-	v16 := compiler.MapValueForKey(m, "pattern")
-	if v16 != nil {
-		x.Pattern, ok = v16.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16)))
-		}
-	}
-	// int64 max_items = 17;
-	v17 := compiler.MapValueForKey(m, "maxItems")
-	if v17 != nil {
-		x.MaxItems = v17.(int64)
-	}
-	// int64 min_items = 18;
-	v18 := compiler.MapValueForKey(m, "minItems")
-	if v18 != nil {
-		x.MinItems = v18.(int64)
-	}
-	// bool unique_items = 19;
-	v19 := compiler.MapValueForKey(m, "uniqueItems")
-	if v19 != nil {
-		x.UniqueItems = v19.(bool)
-	}
-	// repeated Any enum = 20;
-	v20 := compiler.MapValueForKey(m, "enum")
-	if v20 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v20.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string in = 2;
+		v2 := compiler.MapValueForKey(m, "in")
+		if v2 != nil {
+			x.In, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 			}
 		}
-	}
-	// float multiple_of = 21;
-	v21 := compiler.MapValueForKey(m, "multipleOf")
-	if v21 != nil {
-		x.MultipleOf = v21.(float64)
-	}
-	// repeated NamedAny vendor_extension = 22;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
+		}
+		// string name = 4;
+		v4 := compiler.MapValueForKey(m, "name")
+		if v4 != nil {
+			x.Name, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
+			}
+		}
+		// string type = 5;
+		v5 := compiler.MapValueForKey(m, "type")
+		if v5 != nil {
+			x.Type, ok = v5.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v5)))
+			}
+		}
+		// string format = 6;
+		v6 := compiler.MapValueForKey(m, "format")
+		if v6 != nil {
+			x.Format, ok = v6.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v6)))
+			}
+		}
+		// PrimitivesItems items = 7;
+		v7 := compiler.MapValueForKey(m, "items")
+		if v7 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Items, err = NewPrimitivesItems(v7, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string collection_format = 8;
+		v8 := compiler.MapValueForKey(m, "collectionFormat")
+		if v8 != nil {
+			x.CollectionFormat, ok = v8.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v8)))
+			}
+		}
+		// Any default = 9;
+		v9 := compiler.MapValueForKey(m, "default")
+		if v9 != nil {
+			var err error
+			x.Default, err = NewAny(v9, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// float maximum = 10;
+		v10 := compiler.MapValueForKey(m, "maximum")
+		if v10 != nil {
+			x.Maximum = v10.(float64)
+		}
+		// bool exclusive_maximum = 11;
+		v11 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v11 != nil {
+			x.ExclusiveMaximum = v11.(bool)
+		}
+		// float minimum = 12;
+		v12 := compiler.MapValueForKey(m, "minimum")
+		if v12 != nil {
+			x.Minimum = v12.(float64)
+		}
+		// bool exclusive_minimum = 13;
+		v13 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v13 != nil {
+			x.ExclusiveMinimum = v13.(bool)
+		}
+		// int64 max_length = 14;
+		v14 := compiler.MapValueForKey(m, "maxLength")
+		if v14 != nil {
+			x.MaxLength = v14.(int64)
+		}
+		// int64 min_length = 15;
+		v15 := compiler.MapValueForKey(m, "minLength")
+		if v15 != nil {
+			x.MinLength = v15.(int64)
+		}
+		// string pattern = 16;
+		v16 := compiler.MapValueForKey(m, "pattern")
+		if v16 != nil {
+			x.Pattern, ok = v16.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v16)))
+			}
+		}
+		// int64 max_items = 17;
+		v17 := compiler.MapValueForKey(m, "maxItems")
+		if v17 != nil {
+			x.MaxItems = v17.(int64)
+		}
+		// int64 min_items = 18;
+		v18 := compiler.MapValueForKey(m, "minItems")
+		if v18 != nil {
+			x.MinItems = v18.(int64)
+		}
+		// bool unique_items = 19;
+		v19 := compiler.MapValueForKey(m, "uniqueItems")
+		if v19 != nil {
+			x.UniqueItems = v19.(bool)
+		}
+		// repeated Any enum = 20;
+		v20 := compiler.MapValueForKey(m, "enum")
+		if v20 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v20.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// float multiple_of = 21;
+		v21 := compiler.MapValueForKey(m, "multipleOf")
+		if v21 != nil {
+			x.MultipleOf = v21.(float64)
+		}
+		// repeated NamedAny vendor_extension = 22;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2754,50 +2794,51 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 
 func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	errors := make([]error, 0)
+	x := &Paths{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Paths section: %+v", in)))
-	}
-	allowedKeys := []string{}
-	allowedPatterns := []string{"^x-", "^/"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in () or ('^x-','^/'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Paths{}
-	// repeated NamedAny vendor_extension = 1;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+	} else {
+		allowedKeys := []string{}
+		allowedPatterns := []string{"^x-", "^/"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in () or ('^x-','^/'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// repeated NamedPathItem path = 2;
-	// MAP: PathItem ^/
-	x.Path = make([]*NamedPathItem, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^/", k) {
-			pair := &NamedPathItem{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+		// repeated NamedAny vendor_extension = 1;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
 			}
-			x.Path = append(x.Path, pair)
+		}
+		// repeated NamedPathItem path = 2;
+		// MAP: PathItem ^/
+		x.Path = make([]*NamedPathItem, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^/", k) {
+				pair := &NamedPathItem{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.Path = append(x.Path, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2805,149 +2846,150 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 
 func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesItems, error) {
 	errors := make([]error, 0)
+	x := &PrimitivesItems{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for PrimitivesItems section: %+v", in)))
-	}
-	allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('collectionFormat','default','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &PrimitivesItems{}
-	// string type = 1;
-	v1 := compiler.MapValueForKey(m, "type")
-	if v1 != nil {
-		x.Type, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('collectionFormat','default','enum','exclusiveMaximum','exclusiveMinimum','format','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','pattern','type','uniqueItems') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string format = 2;
-	v2 := compiler.MapValueForKey(m, "format")
-	if v2 != nil {
-		x.Format, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
-		}
-	}
-	// PrimitivesItems items = 3;
-	v3 := compiler.MapValueForKey(m, "items")
-	if v3 != nil {
-		var err error
-		x.Items, err = NewPrimitivesItems(v3, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string collection_format = 4;
-	v4 := compiler.MapValueForKey(m, "collectionFormat")
-	if v4 != nil {
-		x.CollectionFormat, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4)))
-		}
-	}
-	// Any default = 5;
-	v5 := compiler.MapValueForKey(m, "default")
-	if v5 != nil {
-		var err error
-		x.Default, err = NewAny(v5, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float maximum = 6;
-	v6 := compiler.MapValueForKey(m, "maximum")
-	if v6 != nil {
-		x.Maximum = v6.(float64)
-	}
-	// bool exclusive_maximum = 7;
-	v7 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v7 != nil {
-		x.ExclusiveMaximum = v7.(bool)
-	}
-	// float minimum = 8;
-	v8 := compiler.MapValueForKey(m, "minimum")
-	if v8 != nil {
-		x.Minimum = v8.(float64)
-	}
-	// bool exclusive_minimum = 9;
-	v9 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v9 != nil {
-		x.ExclusiveMinimum = v9.(bool)
-	}
-	// int64 max_length = 10;
-	v10 := compiler.MapValueForKey(m, "maxLength")
-	if v10 != nil {
-		x.MaxLength = v10.(int64)
-	}
-	// int64 min_length = 11;
-	v11 := compiler.MapValueForKey(m, "minLength")
-	if v11 != nil {
-		x.MinLength = v11.(int64)
-	}
-	// string pattern = 12;
-	v12 := compiler.MapValueForKey(m, "pattern")
-	if v12 != nil {
-		x.Pattern, ok = v12.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12)))
-		}
-	}
-	// int64 max_items = 13;
-	v13 := compiler.MapValueForKey(m, "maxItems")
-	if v13 != nil {
-		x.MaxItems = v13.(int64)
-	}
-	// int64 min_items = 14;
-	v14 := compiler.MapValueForKey(m, "minItems")
-	if v14 != nil {
-		x.MinItems = v14.(int64)
-	}
-	// bool unique_items = 15;
-	v15 := compiler.MapValueForKey(m, "uniqueItems")
-	if v15 != nil {
-		x.UniqueItems = v15.(bool)
-	}
-	// repeated Any enum = 16;
-	v16 := compiler.MapValueForKey(m, "enum")
-	if v16 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v16.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string type = 1;
+		v1 := compiler.MapValueForKey(m, "type")
+		if v1 != nil {
+			x.Type, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v1)))
 			}
 		}
-	}
-	// float multiple_of = 17;
-	v17 := compiler.MapValueForKey(m, "multipleOf")
-	if v17 != nil {
-		x.MultipleOf = v17.(float64)
-	}
-	// repeated NamedAny vendor_extension = 18;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string format = 2;
+		v2 := compiler.MapValueForKey(m, "format")
+		if v2 != nil {
+			x.Format, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
+			}
+		}
+		// PrimitivesItems items = 3;
+		v3 := compiler.MapValueForKey(m, "items")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Items, err = NewPrimitivesItems(v3, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string collection_format = 4;
+		v4 := compiler.MapValueForKey(m, "collectionFormat")
+		if v4 != nil {
+			x.CollectionFormat, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v4)))
+			}
+		}
+		// Any default = 5;
+		v5 := compiler.MapValueForKey(m, "default")
+		if v5 != nil {
+			var err error
+			x.Default, err = NewAny(v5, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// float maximum = 6;
+		v6 := compiler.MapValueForKey(m, "maximum")
+		if v6 != nil {
+			x.Maximum = v6.(float64)
+		}
+		// bool exclusive_maximum = 7;
+		v7 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v7 != nil {
+			x.ExclusiveMaximum = v7.(bool)
+		}
+		// float minimum = 8;
+		v8 := compiler.MapValueForKey(m, "minimum")
+		if v8 != nil {
+			x.Minimum = v8.(float64)
+		}
+		// bool exclusive_minimum = 9;
+		v9 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v9 != nil {
+			x.ExclusiveMinimum = v9.(bool)
+		}
+		// int64 max_length = 10;
+		v10 := compiler.MapValueForKey(m, "maxLength")
+		if v10 != nil {
+			x.MaxLength = v10.(int64)
+		}
+		// int64 min_length = 11;
+		v11 := compiler.MapValueForKey(m, "minLength")
+		if v11 != nil {
+			x.MinLength = v11.(int64)
+		}
+		// string pattern = 12;
+		v12 := compiler.MapValueForKey(m, "pattern")
+		if v12 != nil {
+			x.Pattern, ok = v12.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v12)))
+			}
+		}
+		// int64 max_items = 13;
+		v13 := compiler.MapValueForKey(m, "maxItems")
+		if v13 != nil {
+			x.MaxItems = v13.(int64)
+		}
+		// int64 min_items = 14;
+		v14 := compiler.MapValueForKey(m, "minItems")
+		if v14 != nil {
+			x.MinItems = v14.(int64)
+		}
+		// bool unique_items = 15;
+		v15 := compiler.MapValueForKey(m, "uniqueItems")
+		if v15 != nil {
+			x.UniqueItems = v15.(bool)
+		}
+		// repeated Any enum = 16;
+		v16 := compiler.MapValueForKey(m, "enum")
+		if v16 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v16.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// float multiple_of = 17;
+		v17 := compiler.MapValueForKey(m, "multipleOf")
+		if v17 != nil {
+			x.MultipleOf = v17.(float64)
+		}
+		// repeated NamedAny vendor_extension = 18;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2955,208 +2997,210 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 
 func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
 	errors := make([]error, 0)
+	x := &Properties{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Properties section: %+v", in)))
-	}
-	x := &Properties{}
-	// repeated NamedSchema additional_properties = 1;
-	// MAP: Schema
-	x.AdditionalProperties = make([]*NamedSchema, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedSchema{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
+	} else {
+		// repeated NamedSchema additional_properties = 1;
+		// MAP: Schema
+		x.AdditionalProperties = make([]*NamedSchema, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedSchema{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*QueryParameterSubSchema, error) {
 	errors := make([]error, 0)
+	x := &QueryParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for QueryParameterSubSchema section: %+v", in)))
-	}
-	allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &QueryParameterSubSchema{}
-	// bool required = 1;
-	v1 := compiler.MapValueForKey(m, "required")
-	if v1 != nil {
-		x.Required = v1.(bool)
-	}
-	// string in = 2;
-	v2 := compiler.MapValueForKey(m, "in")
-	if v2 != nil {
-		x.In, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
+	} else {
+		allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('allowEmptyValue','collectionFormat','default','description','enum','exclusiveMaximum','exclusiveMinimum','format','in','items','maxItems','maxLength','maximum','minItems','minLength','minimum','multipleOf','name','pattern','required','type','uniqueItems') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string description = 3;
-	v3 := compiler.MapValueForKey(m, "description")
-	if v3 != nil {
-		x.Description, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+		// bool required = 1;
+		v1 := compiler.MapValueForKey(m, "required")
+		if v1 != nil {
+			x.Required = v1.(bool)
 		}
-	}
-	// string name = 4;
-	v4 := compiler.MapValueForKey(m, "name")
-	if v4 != nil {
-		x.Name, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
-		}
-	}
-	// bool allow_empty_value = 5;
-	v5 := compiler.MapValueForKey(m, "allowEmptyValue")
-	if v5 != nil {
-		x.AllowEmptyValue = v5.(bool)
-	}
-	// string type = 6;
-	v6 := compiler.MapValueForKey(m, "type")
-	if v6 != nil {
-		x.Type, ok = v6.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
-		}
-	}
-	// string format = 7;
-	v7 := compiler.MapValueForKey(m, "format")
-	if v7 != nil {
-		x.Format, ok = v7.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7)))
-		}
-	}
-	// PrimitivesItems items = 8;
-	v8 := compiler.MapValueForKey(m, "items")
-	if v8 != nil {
-		var err error
-		x.Items, err = NewPrimitivesItems(v8, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// string collection_format = 9;
-	v9 := compiler.MapValueForKey(m, "collectionFormat")
-	if v9 != nil {
-		x.CollectionFormat, ok = v9.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9)))
-		}
-	}
-	// Any default = 10;
-	v10 := compiler.MapValueForKey(m, "default")
-	if v10 != nil {
-		var err error
-		x.Default, err = NewAny(v10, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float maximum = 11;
-	v11 := compiler.MapValueForKey(m, "maximum")
-	if v11 != nil {
-		x.Maximum = v11.(float64)
-	}
-	// bool exclusive_maximum = 12;
-	v12 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v12 != nil {
-		x.ExclusiveMaximum = v12.(bool)
-	}
-	// float minimum = 13;
-	v13 := compiler.MapValueForKey(m, "minimum")
-	if v13 != nil {
-		x.Minimum = v13.(float64)
-	}
-	// bool exclusive_minimum = 14;
-	v14 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v14 != nil {
-		x.ExclusiveMinimum = v14.(bool)
-	}
-	// int64 max_length = 15;
-	v15 := compiler.MapValueForKey(m, "maxLength")
-	if v15 != nil {
-		x.MaxLength = v15.(int64)
-	}
-	// int64 min_length = 16;
-	v16 := compiler.MapValueForKey(m, "minLength")
-	if v16 != nil {
-		x.MinLength = v16.(int64)
-	}
-	// string pattern = 17;
-	v17 := compiler.MapValueForKey(m, "pattern")
-	if v17 != nil {
-		x.Pattern, ok = v17.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17)))
-		}
-	}
-	// int64 max_items = 18;
-	v18 := compiler.MapValueForKey(m, "maxItems")
-	if v18 != nil {
-		x.MaxItems = v18.(int64)
-	}
-	// int64 min_items = 19;
-	v19 := compiler.MapValueForKey(m, "minItems")
-	if v19 != nil {
-		x.MinItems = v19.(int64)
-	}
-	// bool unique_items = 20;
-	v20 := compiler.MapValueForKey(m, "uniqueItems")
-	if v20 != nil {
-		x.UniqueItems = v20.(bool)
-	}
-	// repeated Any enum = 21;
-	v21 := compiler.MapValueForKey(m, "enum")
-	if v21 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v21.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string in = 2;
+		v2 := compiler.MapValueForKey(m, "in")
+		if v2 != nil {
+			x.In, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for in. expected a string, got %+v", v2)))
 			}
 		}
-	}
-	// float multiple_of = 22;
-	v22 := compiler.MapValueForKey(m, "multipleOf")
-	if v22 != nil {
-		x.MultipleOf = v22.(float64)
-	}
-	// repeated NamedAny vendor_extension = 23;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v3)))
+			}
+		}
+		// string name = 4;
+		v4 := compiler.MapValueForKey(m, "name")
+		if v4 != nil {
+			x.Name, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v4)))
+			}
+		}
+		// bool allow_empty_value = 5;
+		v5 := compiler.MapValueForKey(m, "allowEmptyValue")
+		if v5 != nil {
+			x.AllowEmptyValue = v5.(bool)
+		}
+		// string type = 6;
+		v6 := compiler.MapValueForKey(m, "type")
+		if v6 != nil {
+			x.Type, ok = v6.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for type. expected a string, got %+v", v6)))
+			}
+		}
+		// string format = 7;
+		v7 := compiler.MapValueForKey(m, "format")
+		if v7 != nil {
+			x.Format, ok = v7.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v7)))
+			}
+		}
+		// PrimitivesItems items = 8;
+		v8 := compiler.MapValueForKey(m, "items")
+		if v8 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Items, err = NewPrimitivesItems(v8, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// string collection_format = 9;
+		v9 := compiler.MapValueForKey(m, "collectionFormat")
+		if v9 != nil {
+			x.CollectionFormat, ok = v9.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for collectionFormat. expected a string, got %+v", v9)))
+			}
+		}
+		// Any default = 10;
+		v10 := compiler.MapValueForKey(m, "default")
+		if v10 != nil {
+			var err error
+			x.Default, err = NewAny(v10, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// float maximum = 11;
+		v11 := compiler.MapValueForKey(m, "maximum")
+		if v11 != nil {
+			x.Maximum = v11.(float64)
+		}
+		// bool exclusive_maximum = 12;
+		v12 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v12 != nil {
+			x.ExclusiveMaximum = v12.(bool)
+		}
+		// float minimum = 13;
+		v13 := compiler.MapValueForKey(m, "minimum")
+		if v13 != nil {
+			x.Minimum = v13.(float64)
+		}
+		// bool exclusive_minimum = 14;
+		v14 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v14 != nil {
+			x.ExclusiveMinimum = v14.(bool)
+		}
+		// int64 max_length = 15;
+		v15 := compiler.MapValueForKey(m, "maxLength")
+		if v15 != nil {
+			x.MaxLength = v15.(int64)
+		}
+		// int64 min_length = 16;
+		v16 := compiler.MapValueForKey(m, "minLength")
+		if v16 != nil {
+			x.MinLength = v16.(int64)
+		}
+		// string pattern = 17;
+		v17 := compiler.MapValueForKey(m, "pattern")
+		if v17 != nil {
+			x.Pattern, ok = v17.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v17)))
+			}
+		}
+		// int64 max_items = 18;
+		v18 := compiler.MapValueForKey(m, "maxItems")
+		if v18 != nil {
+			x.MaxItems = v18.(int64)
+		}
+		// int64 min_items = 19;
+		v19 := compiler.MapValueForKey(m, "minItems")
+		if v19 != nil {
+			x.MinItems = v19.(int64)
+		}
+		// bool unique_items = 20;
+		v20 := compiler.MapValueForKey(m, "uniqueItems")
+		if v20 != nil {
+			x.UniqueItems = v20.(bool)
+		}
+		// repeated Any enum = 21;
+		v21 := compiler.MapValueForKey(m, "enum")
+		if v21 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v21.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// float multiple_of = 22;
+		v22 := compiler.MapValueForKey(m, "multipleOf")
+		if v22 != nil {
+			x.MultipleOf = v22.(float64)
+		}
+		// repeated NamedAny vendor_extension = 23;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3164,72 +3208,73 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 
 func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 	errors := make([]error, 0)
+	x := &Response{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Response section: %+v", in)))
-	}
-	requiredKeys := []string{"description"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('description')"))
-	}
-	allowedKeys := []string{"description", "examples", "headers", "schema"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','examples','headers','schema') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Response{}
-	// string description = 1;
-	v1 := compiler.MapValueForKey(m, "description")
-	if v1 != nil {
-		x.Description, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"description"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('description')"))
 		}
-	}
-	// SchemaItem schema = 2;
-	v2 := compiler.MapValueForKey(m, "schema")
-	if v2 != nil {
-		var err error
-		x.Schema, err = NewSchemaItem(v2, compiler.NewContext("schema", context))
-		if err != nil {
-			errors = append(errors, err)
+		allowedKeys := []string{"description", "examples", "headers", "schema"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','examples','headers','schema') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// Headers headers = 3;
-	v3 := compiler.MapValueForKey(m, "headers")
-	if v3 != nil {
-		var err error
-		x.Headers, err = NewHeaders(v3, compiler.NewContext("headers", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string description = 1;
+		v1 := compiler.MapValueForKey(m, "description")
+		if v1 != nil {
+			x.Description, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// Examples examples = 4;
-	v4 := compiler.MapValueForKey(m, "examples")
-	if v4 != nil {
-		var err error
-		x.Examples, err = NewExamples(v4, compiler.NewContext("examples", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated NamedAny vendor_extension = 5;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// SchemaItem schema = 2;
+		v2 := compiler.MapValueForKey(m, "schema")
+		if v2 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Schema, err = NewSchemaItem(v2, compiler.NewContext("schema", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// Headers headers = 3;
+		v3 := compiler.MapValueForKey(m, "headers")
+		if v3 != nil {
+			var err error
+			x.Headers, err = NewHeaders(v3, compiler.NewContext("headers", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Examples examples = 4;
+		v4 := compiler.MapValueForKey(m, "examples")
+		if v4 != nil {
+			var err error
+			x.Examples, err = NewExamples(v4, compiler.NewContext("examples", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedAny vendor_extension = 5;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3237,50 +3282,52 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 
 func NewResponseDefinitions(in interface{}, context *compiler.Context) (*ResponseDefinitions, error) {
 	errors := make([]error, 0)
+	x := &ResponseDefinitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ResponseDefinitions section: %+v", in)))
-	}
-	x := &ResponseDefinitions{}
-	// repeated NamedResponse additional_properties = 1;
-	// MAP: Response
-	x.AdditionalProperties = make([]*NamedResponse, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedResponse{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewResponse(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
+	} else {
+		// repeated NamedResponse additional_properties = 1;
+		// MAP: Response
+		x.AdditionalProperties = make([]*NamedResponse, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedResponse{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewResponse(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue, error) {
 	errors := make([]error, 0)
+	x := &ResponseValue{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for ResponseValue section: %+v", in)))
-	}
-	x := &ResponseValue{}
-	// Response response = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewResponse(m, compiler.NewContext("response", context))
-		if safe_errors == nil {
-			x.Oneof = &ResponseValue_Response{Response: t}
+	} else {
+		// Response response = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewResponse(m, compiler.NewContext("response", context))
+			if safe_errors == nil {
+				x.Oneof = &ResponseValue_Response{Response: t}
+			}
 		}
-	}
-	// JsonReference json_reference = 2;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-		if safe_errors == nil {
-			x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
+		// JsonReference json_reference = 2;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+			if safe_errors == nil {
+				x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3288,50 +3335,51 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 
 func NewResponses(in interface{}, context *compiler.Context) (*Responses, error) {
 	errors := make([]error, 0)
+	x := &Responses{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Responses section: %+v", in)))
-	}
-	allowedKeys := []string{}
-	allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in () or ('^([0-9]{3})$|^(default)$','^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Responses{}
-	// repeated NamedResponseValue response_code = 1;
-	// MAP: ResponseValue ^([0-9]{3})$|^(default)$
-	x.ResponseCode = make([]*NamedResponseValue, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
-			pair := &NamedResponseValue{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewResponseValue(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-			x.ResponseCode = append(x.ResponseCode, pair)
+	} else {
+		allowedKeys := []string{}
+		allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in () or ('^([0-9]{3})$|^(default)$','^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// repeated NamedAny vendor_extension = 2;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+		// repeated NamedResponseValue response_code = 1;
+		// MAP: ResponseValue ^([0-9]{3})$|^(default)$
+		x.ResponseCode = make([]*NamedResponseValue, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
+				pair := &NamedResponseValue{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewResponseValue(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.ResponseCode = append(x.ResponseCode, pair)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// repeated NamedAny vendor_extension = 2;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3339,260 +3387,261 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 
 func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	errors := make([]error, 0)
+	x := &Schema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Schema section: %+v", in)))
-	}
-	allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('$ref','additionalProperties','allOf','default','description','discriminator','enum','example','exclusiveMaximum','exclusiveMinimum','externalDocs','format','items','maxItems','maxLength','maxProperties','maximum','minItems','minLength','minProperties','minimum','multipleOf','pattern','properties','readOnly','required','title','type','uniqueItems','xml') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Schema{}
-	// string _ref = 1;
-	v1 := compiler.MapValueForKey(m, "$ref")
-	if v1 != nil {
-		x.XRef, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
+	} else {
+		allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('$ref','additionalProperties','allOf','default','description','discriminator','enum','example','exclusiveMaximum','exclusiveMinimum','externalDocs','format','items','maxItems','maxLength','maxProperties','maximum','minItems','minLength','minProperties','minimum','multipleOf','pattern','properties','readOnly','required','title','type','uniqueItems','xml') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// string format = 2;
-	v2 := compiler.MapValueForKey(m, "format")
-	if v2 != nil {
-		x.Format, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
-		}
-	}
-	// string title = 3;
-	v3 := compiler.MapValueForKey(m, "title")
-	if v3 != nil {
-		x.Title, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v3)))
-		}
-	}
-	// string description = 4;
-	v4 := compiler.MapValueForKey(m, "description")
-	if v4 != nil {
-		x.Description, ok = v4.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4)))
-		}
-	}
-	// Any default = 5;
-	v5 := compiler.MapValueForKey(m, "default")
-	if v5 != nil {
-		var err error
-		x.Default, err = NewAny(v5, compiler.NewContext("default", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// float multiple_of = 6;
-	v6 := compiler.MapValueForKey(m, "multipleOf")
-	if v6 != nil {
-		x.MultipleOf = v6.(float64)
-	}
-	// float maximum = 7;
-	v7 := compiler.MapValueForKey(m, "maximum")
-	if v7 != nil {
-		x.Maximum = v7.(float64)
-	}
-	// bool exclusive_maximum = 8;
-	v8 := compiler.MapValueForKey(m, "exclusiveMaximum")
-	if v8 != nil {
-		x.ExclusiveMaximum = v8.(bool)
-	}
-	// float minimum = 9;
-	v9 := compiler.MapValueForKey(m, "minimum")
-	if v9 != nil {
-		x.Minimum = v9.(float64)
-	}
-	// bool exclusive_minimum = 10;
-	v10 := compiler.MapValueForKey(m, "exclusiveMinimum")
-	if v10 != nil {
-		x.ExclusiveMinimum = v10.(bool)
-	}
-	// int64 max_length = 11;
-	v11 := compiler.MapValueForKey(m, "maxLength")
-	if v11 != nil {
-		x.MaxLength = v11.(int64)
-	}
-	// int64 min_length = 12;
-	v12 := compiler.MapValueForKey(m, "minLength")
-	if v12 != nil {
-		x.MinLength = v12.(int64)
-	}
-	// string pattern = 13;
-	v13 := compiler.MapValueForKey(m, "pattern")
-	if v13 != nil {
-		x.Pattern, ok = v13.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v13)))
-		}
-	}
-	// int64 max_items = 14;
-	v14 := compiler.MapValueForKey(m, "maxItems")
-	if v14 != nil {
-		x.MaxItems = v14.(int64)
-	}
-	// int64 min_items = 15;
-	v15 := compiler.MapValueForKey(m, "minItems")
-	if v15 != nil {
-		x.MinItems = v15.(int64)
-	}
-	// bool unique_items = 16;
-	v16 := compiler.MapValueForKey(m, "uniqueItems")
-	if v16 != nil {
-		x.UniqueItems = v16.(bool)
-	}
-	// int64 max_properties = 17;
-	v17 := compiler.MapValueForKey(m, "maxProperties")
-	if v17 != nil {
-		x.MaxProperties = v17.(int64)
-	}
-	// int64 min_properties = 18;
-	v18 := compiler.MapValueForKey(m, "minProperties")
-	if v18 != nil {
-		x.MinProperties = v18.(int64)
-	}
-	// repeated string required = 19;
-	v19 := compiler.MapValueForKey(m, "required")
-	if v19 != nil {
-		v, ok := v19.([]interface{})
-		if ok {
-			x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
-		} else {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in)))
-		}
-	}
-	// repeated Any enum = 20;
-	v20 := compiler.MapValueForKey(m, "enum")
-	if v20 != nil {
-		// repeated Any
-		x.Enum = make([]*Any, 0)
-		a, ok := v20.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewAny(item, compiler.NewContext("enum", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.Enum = append(x.Enum, y)
+		// string _ref = 1;
+		v1 := compiler.MapValueForKey(m, "$ref")
+		if v1 != nil {
+			x.XRef, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for $ref. expected a string, got %+v", v1)))
 			}
 		}
-	}
-	// AdditionalPropertiesItem additional_properties = 21;
-	v21 := compiler.MapValueForKey(m, "additionalProperties")
-	if v21 != nil {
-		var err error
-		x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, compiler.NewContext("additionalProperties", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// TypeItem type = 22;
-	v22 := compiler.MapValueForKey(m, "type")
-	if v22 != nil {
-		var err error
-		x.Type, err = NewTypeItem(v22, compiler.NewContext("type", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// ItemsItem items = 23;
-	v23 := compiler.MapValueForKey(m, "items")
-	if v23 != nil {
-		var err error
-		x.Items, err = NewItemsItem(v23, compiler.NewContext("items", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated Schema all_of = 24;
-	v24 := compiler.MapValueForKey(m, "allOf")
-	if v24 != nil {
-		// repeated Schema
-		x.AllOf = make([]*Schema, 0)
-		a, ok := v24.([]interface{})
-		if ok {
-			for _, item := range a {
-				y, err := NewSchema(item, compiler.NewContext("allOf", context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.AllOf = append(x.AllOf, y)
+		// string format = 2;
+		v2 := compiler.MapValueForKey(m, "format")
+		if v2 != nil {
+			x.Format, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for format. expected a string, got %+v", v2)))
 			}
 		}
-	}
-	// Properties properties = 25;
-	v25 := compiler.MapValueForKey(m, "properties")
-	if v25 != nil {
-		var err error
-		x.Properties, err = NewProperties(v25, compiler.NewContext("properties", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string title = 3;
+		v3 := compiler.MapValueForKey(m, "title")
+		if v3 != nil {
+			x.Title, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for title. expected a string, got %+v", v3)))
+			}
 		}
-	}
-	// string discriminator = 26;
-	v26 := compiler.MapValueForKey(m, "discriminator")
-	if v26 != nil {
-		x.Discriminator, ok = v26.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for discriminator. expected a string, got %+v", v26)))
+		// string description = 4;
+		v4 := compiler.MapValueForKey(m, "description")
+		if v4 != nil {
+			x.Description, ok = v4.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v4)))
+			}
 		}
-	}
-	// bool read_only = 27;
-	v27 := compiler.MapValueForKey(m, "readOnly")
-	if v27 != nil {
-		x.ReadOnly = v27.(bool)
-	}
-	// Xml xml = 28;
-	v28 := compiler.MapValueForKey(m, "xml")
-	if v28 != nil {
-		var err error
-		x.Xml, err = NewXml(v28, compiler.NewContext("xml", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// ExternalDocs external_docs = 29;
-	v29 := compiler.MapValueForKey(m, "externalDocs")
-	if v29 != nil {
-		var err error
-		x.ExternalDocs, err = NewExternalDocs(v29, compiler.NewContext("externalDocs", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// Any example = 30;
-	v30 := compiler.MapValueForKey(m, "example")
-	if v30 != nil {
-		var err error
-		x.Example, err = NewAny(v30, compiler.NewContext("example", context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	// repeated NamedAny vendor_extension = 31;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// Any default = 5;
+		v5 := compiler.MapValueForKey(m, "default")
+		if v5 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.Default, err = NewAny(v5, compiler.NewContext("default", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// float multiple_of = 6;
+		v6 := compiler.MapValueForKey(m, "multipleOf")
+		if v6 != nil {
+			x.MultipleOf = v6.(float64)
+		}
+		// float maximum = 7;
+		v7 := compiler.MapValueForKey(m, "maximum")
+		if v7 != nil {
+			x.Maximum = v7.(float64)
+		}
+		// bool exclusive_maximum = 8;
+		v8 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v8 != nil {
+			x.ExclusiveMaximum = v8.(bool)
+		}
+		// float minimum = 9;
+		v9 := compiler.MapValueForKey(m, "minimum")
+		if v9 != nil {
+			x.Minimum = v9.(float64)
+		}
+		// bool exclusive_minimum = 10;
+		v10 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v10 != nil {
+			x.ExclusiveMinimum = v10.(bool)
+		}
+		// int64 max_length = 11;
+		v11 := compiler.MapValueForKey(m, "maxLength")
+		if v11 != nil {
+			x.MaxLength = v11.(int64)
+		}
+		// int64 min_length = 12;
+		v12 := compiler.MapValueForKey(m, "minLength")
+		if v12 != nil {
+			x.MinLength = v12.(int64)
+		}
+		// string pattern = 13;
+		v13 := compiler.MapValueForKey(m, "pattern")
+		if v13 != nil {
+			x.Pattern, ok = v13.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for pattern. expected a string, got %+v", v13)))
+			}
+		}
+		// int64 max_items = 14;
+		v14 := compiler.MapValueForKey(m, "maxItems")
+		if v14 != nil {
+			x.MaxItems = v14.(int64)
+		}
+		// int64 min_items = 15;
+		v15 := compiler.MapValueForKey(m, "minItems")
+		if v15 != nil {
+			x.MinItems = v15.(int64)
+		}
+		// bool unique_items = 16;
+		v16 := compiler.MapValueForKey(m, "uniqueItems")
+		if v16 != nil {
+			x.UniqueItems = v16.(bool)
+		}
+		// int64 max_properties = 17;
+		v17 := compiler.MapValueForKey(m, "maxProperties")
+		if v17 != nil {
+			x.MaxProperties = v17.(int64)
+		}
+		// int64 min_properties = 18;
+		v18 := compiler.MapValueForKey(m, "minProperties")
+		if v18 != nil {
+			x.MinProperties = v18.(int64)
+		}
+		// repeated string required = 19;
+		v19 := compiler.MapValueForKey(m, "required")
+		if v19 != nil {
+			v, ok := v19.([]interface{})
+			if ok {
+				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for required property: %+v", in)))
+			}
+		}
+		// repeated Any enum = 20;
+		v20 := compiler.MapValueForKey(m, "enum")
+		if v20 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v20.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// AdditionalPropertiesItem additional_properties = 21;
+		v21 := compiler.MapValueForKey(m, "additionalProperties")
+		if v21 != nil {
+			var err error
+			x.AdditionalProperties, err = NewAdditionalPropertiesItem(v21, compiler.NewContext("additionalProperties", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// TypeItem type = 22;
+		v22 := compiler.MapValueForKey(m, "type")
+		if v22 != nil {
+			var err error
+			x.Type, err = NewTypeItem(v22, compiler.NewContext("type", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// ItemsItem items = 23;
+		v23 := compiler.MapValueForKey(m, "items")
+		if v23 != nil {
+			var err error
+			x.Items, err = NewItemsItem(v23, compiler.NewContext("items", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated Schema all_of = 24;
+		v24 := compiler.MapValueForKey(m, "allOf")
+		if v24 != nil {
+			// repeated Schema
+			x.AllOf = make([]*Schema, 0)
+			a, ok := v24.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewSchema(item, compiler.NewContext("allOf", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.AllOf = append(x.AllOf, y)
+				}
+			}
+		}
+		// Properties properties = 25;
+		v25 := compiler.MapValueForKey(m, "properties")
+		if v25 != nil {
+			var err error
+			x.Properties, err = NewProperties(v25, compiler.NewContext("properties", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// string discriminator = 26;
+		v26 := compiler.MapValueForKey(m, "discriminator")
+		if v26 != nil {
+			x.Discriminator, ok = v26.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for discriminator. expected a string, got %+v", v26)))
+			}
+		}
+		// bool read_only = 27;
+		v27 := compiler.MapValueForKey(m, "readOnly")
+		if v27 != nil {
+			x.ReadOnly = v27.(bool)
+		}
+		// Xml xml = 28;
+		v28 := compiler.MapValueForKey(m, "xml")
+		if v28 != nil {
+			var err error
+			x.Xml, err = NewXml(v28, compiler.NewContext("xml", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// ExternalDocs external_docs = 29;
+		v29 := compiler.MapValueForKey(m, "externalDocs")
+		if v29 != nil {
+			var err error
+			x.ExternalDocs, err = NewExternalDocs(v29, compiler.NewContext("externalDocs", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Any example = 30;
+		v30 := compiler.MapValueForKey(m, "example")
+		if v30 != nil {
+			var err error
+			x.Example, err = NewAny(v30, compiler.NewContext("example", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedAny vendor_extension = 31;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3600,25 +3649,26 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 
 func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, error) {
 	errors := make([]error, 0)
+	x := &SchemaItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for SchemaItem section: %+v", in)))
-	}
-	x := &SchemaItem{}
-	// Schema schema = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
-		if safe_errors == nil {
-			x.Oneof = &SchemaItem_Schema{Schema: t}
+	} else {
+		// Schema schema = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
+			if safe_errors == nil {
+				x.Oneof = &SchemaItem_Schema{Schema: t}
+			}
 		}
-	}
-	// FileSchema file_schema = 2;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewFileSchema(m, compiler.NewContext("fileSchema", context))
-		if safe_errors == nil {
-			x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
+		// FileSchema file_schema = 2;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewFileSchema(m, compiler.NewContext("fileSchema", context))
+			if safe_errors == nil {
+				x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3626,82 +3676,84 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 
 func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*SecurityDefinitions, error) {
 	errors := make([]error, 0)
+	x := &SecurityDefinitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for SecurityDefinitions section: %+v", in)))
-	}
-	x := &SecurityDefinitions{}
-	// repeated NamedSecurityDefinitionsItem additional_properties = 1;
-	// MAP: SecurityDefinitionsItem
-	x.AdditionalProperties = make([]*NamedSecurityDefinitionsItem, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedSecurityDefinitionsItem{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewSecurityDefinitionsItem(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
+	} else {
+		// repeated NamedSecurityDefinitionsItem additional_properties = 1;
+		// MAP: SecurityDefinitionsItem
+		x.AdditionalProperties = make([]*NamedSecurityDefinitionsItem, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedSecurityDefinitionsItem{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewSecurityDefinitionsItem(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*SecurityDefinitionsItem, error) {
 	errors := make([]error, 0)
+	x := &SecurityDefinitionsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for SecurityDefinitionsItem section: %+v", in)))
-	}
-	x := &SecurityDefinitionsItem{}
-	// BasicAuthenticationSecurity basic_authentication_security = 1;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
-		if safe_errors == nil {
-			x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
+	} else {
+		// BasicAuthenticationSecurity basic_authentication_security = 1;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
+			if safe_errors == nil {
+				x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
+			}
 		}
-	}
-	// ApiKeySecurity api_key_security = 2;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
-		if safe_errors == nil {
-			x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
+		// ApiKeySecurity api_key_security = 2;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
+			if safe_errors == nil {
+				x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
+			}
 		}
-	}
-	// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
-		if safe_errors == nil {
-			x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
+		// Oauth2ImplicitSecurity oauth2_implicit_security = 3;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
+			if safe_errors == nil {
+				x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
+			}
 		}
-	}
-	// Oauth2PasswordSecurity oauth2_password_security = 4;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
-		if safe_errors == nil {
-			x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
+		// Oauth2PasswordSecurity oauth2_password_security = 4;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
+			if safe_errors == nil {
+				x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
+			}
 		}
-	}
-	// Oauth2ApplicationSecurity oauth2_application_security = 5;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
-		if safe_errors == nil {
-			x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
+		// Oauth2ApplicationSecurity oauth2_application_security = 5;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
+			if safe_errors == nil {
+				x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
+			}
 		}
-	}
-	// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
-	{
-		// errors are ok here, they mean we just don't have the right subtype
-		t, safe_errors := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
-		if safe_errors == nil {
-			x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
+		// Oauth2AccessCodeSecurity oauth2_access_code_security = 6;
+		{
+			// errors are ok here, they mean we just don't have the right subtype
+			t, safe_errors := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
+			if safe_errors == nil {
+				x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3709,25 +3761,26 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 
 func NewSecurityRequirement(in interface{}, context *compiler.Context) (*SecurityRequirement, error) {
 	errors := make([]error, 0)
+	x := &SecurityRequirement{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for SecurityRequirement section: %+v", in)))
-	}
-	x := &SecurityRequirement{}
-	// repeated NamedStringArray additional_properties = 1;
-	// MAP: StringArray
-	x.AdditionalProperties = make([]*NamedStringArray, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedStringArray{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
+	} else {
+		// repeated NamedStringArray additional_properties = 1;
+		// MAP: StringArray
+		x.AdditionalProperties = make([]*NamedStringArray, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			pair := &NamedStringArray{}
+			pair.Name = k
+			var err error
+			pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3750,62 +3803,63 @@ func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, er
 
 func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 	errors := make([]error, 0)
+	x := &Tag{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Tag section: %+v", in)))
-	}
-	requiredKeys := []string{"name"}
-	if !compiler.MapContainsAllKeys(m, requiredKeys) {
-		errors = append(errors, compiler.NewError(context, "does not contain all required properties ('name')"))
-	}
-	allowedKeys := []string{"description", "externalDocs", "name"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('description','externalDocs','name') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Tag{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+	} else {
+		requiredKeys := []string{"name"}
+		if !compiler.MapContainsAllKeys(m, requiredKeys) {
+			errors = append(errors, compiler.NewError(context, "does not contain all required properties ('name')"))
 		}
-	}
-	// string description = 2;
-	v2 := compiler.MapValueForKey(m, "description")
-	if v2 != nil {
-		x.Description, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2)))
+		allowedKeys := []string{"description", "externalDocs", "name"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('description','externalDocs','name') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
 		}
-	}
-	// ExternalDocs external_docs = 3;
-	v3 := compiler.MapValueForKey(m, "externalDocs")
-	if v3 != nil {
-		var err error
-		x.ExternalDocs, err = NewExternalDocs(v3, compiler.NewContext("externalDocs", context))
-		if err != nil {
-			errors = append(errors, err)
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
 		}
-	}
-	// repeated NamedAny vendor_extension = 4;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
-			pair := &NamedAny{}
-			pair.Name = k
+		// string description = 2;
+		v2 := compiler.MapValueForKey(m, "description")
+		if v2 != nil {
+			x.Description, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for description. expected a string, got %+v", v2)))
+			}
+		}
+		// ExternalDocs external_docs = 3;
+		v3 := compiler.MapValueForKey(m, "externalDocs")
+		if v3 != nil {
 			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+			x.ExternalDocs, err = NewExternalDocs(v3, compiler.NewContext("externalDocs", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+		}
+		// repeated NamedAny vendor_extension = 4;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3815,95 +3869,28 @@ func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
 	errors := make([]error, 0)
 	value, ok := in.(string)
 	x := &TypeItem{}
-	if ok {
+	if !ok {
+		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for string array: %+v", in)))
+	} else {
 		x.Value = make([]string, 0)
 		x.Value = append(x.Value, value)
-	} else {
-		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for string array: %+v", in)))
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExtension, error) {
 	errors := make([]error, 0)
+	x := &VendorExtension{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for VendorExtension section: %+v", in)))
-	}
-	x := &VendorExtension{}
-	// repeated NamedAny additional_properties = 1;
-	// MAP: Any
-	x.AdditionalProperties = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		pair := &NamedAny{}
-		pair.Name = k
-		var err error
-		pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-		if err != nil {
-			errors = append(errors, err)
-		}
-		x.AdditionalProperties = append(x.AdditionalProperties, pair)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
-	errors := make([]error, 0)
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Xml section: %+v", in)))
-	}
-	allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
-	allowedPatterns := []string{"^x-"}
-	if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
-		errors = append(errors, compiler.NewError(context,
-			fmt.Sprintf("includes properties not in ('attribute','name','namespace','prefix','wrapped') or ('^x-'): %+v",
-				compiler.SortedKeysForMap(m))))
-	}
-	x := &Xml{}
-	// string name = 1;
-	v1 := compiler.MapValueForKey(m, "name")
-	if v1 != nil {
-		x.Name, ok = v1.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
-		}
-	}
-	// string namespace = 2;
-	v2 := compiler.MapValueForKey(m, "namespace")
-	if v2 != nil {
-		x.Namespace, ok = v2.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for namespace. expected a string, got %+v", v2)))
-		}
-	}
-	// string prefix = 3;
-	v3 := compiler.MapValueForKey(m, "prefix")
-	if v3 != nil {
-		x.Prefix, ok = v3.(string)
-		if !ok {
-			errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for prefix. expected a string, got %+v", v3)))
-		}
-	}
-	// bool attribute = 4;
-	v4 := compiler.MapValueForKey(m, "attribute")
-	if v4 != nil {
-		x.Attribute = v4.(bool)
-	}
-	// bool wrapped = 5;
-	v5 := compiler.MapValueForKey(m, "wrapped")
-	if v5 != nil {
-		x.Wrapped = v5.(bool)
-	}
-	// repeated NamedAny vendor_extension = 6;
-	// MAP: Any ^x-
-	x.VendorExtension = make([]*NamedAny, 0)
-	for _, item := range m {
-		k := item.Key.(string)
-		v := item.Value
-		if compiler.PatternMatches("^x-", k) {
+	} else {
+		// repeated NamedAny additional_properties = 1;
+		// MAP: Any
+		x.AdditionalProperties = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
 			pair := &NamedAny{}
 			pair.Name = k
 			var err error
@@ -3911,7 +3898,76 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 			if err != nil {
 				errors = append(errors, err)
 			}
-			x.VendorExtension = append(x.VendorExtension, pair)
+			x.AdditionalProperties = append(x.AdditionalProperties, pair)
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
+	errors := make([]error, 0)
+	x := &Xml{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for Xml section: %+v", in)))
+	} else {
+		allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
+		allowedPatterns := []string{"^x-"}
+		if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {
+			errors = append(errors, compiler.NewError(context,
+				fmt.Sprintf("includes properties not in ('attribute','name','namespace','prefix','wrapped') or ('^x-'): %+v",
+					compiler.SortedKeysForMap(m))))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for name. expected a string, got %+v", v1)))
+			}
+		}
+		// string namespace = 2;
+		v2 := compiler.MapValueForKey(m, "namespace")
+		if v2 != nil {
+			x.Namespace, ok = v2.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for namespace. expected a string, got %+v", v2)))
+			}
+		}
+		// string prefix = 3;
+		v3 := compiler.MapValueForKey(m, "prefix")
+		if v3 != nil {
+			x.Prefix, ok = v3.(string)
+			if !ok {
+				errors = append(errors, compiler.NewError(context, fmt.Sprintf("unexpected value for prefix. expected a string, got %+v", v3)))
+			}
+		}
+		// bool attribute = 4;
+		v4 := compiler.MapValueForKey(m, "attribute")
+		if v4 != nil {
+			x.Attribute = v4.(bool)
+		}
+		// bool wrapped = 5;
+		v5 := compiler.MapValueForKey(m, "wrapped")
+		if v5 != nil {
+			x.Wrapped = v5.(bool)
+		}
+		// repeated NamedAny vendor_extension = 6;
+		// MAP: Any ^x-
+		x.VendorExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k := item.Key.(string)
+			v := item.Value
+			if compiler.PatternMatches("^x-", k) {
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.VendorExtension = append(x.VendorExtension, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)

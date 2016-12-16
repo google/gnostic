@@ -72,11 +72,11 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 	if typeModel.IsStringArray {
 		code.Print("value, ok := in.(string)")
 		code.Print("x := &TypeItem{}")
-		code.Print("if ok {")
+		code.Print("if (!ok) {")
+		code.Print("errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for string array: %%+v\", in)))")
+		code.Print("} else {")
 		code.Print("x.Value = make([]string, 0)")
 		code.Print("x.Value = append(x.Value, value)")
-		code.Print("} else {")
-		code.Print("errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for string array: %%+v\", in)))")
 		code.Print("}")
 	} else if typeModel.IsItemArray {
 		code.Print("m, ok := compiler.UnpackMap(in)")
@@ -111,10 +111,11 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("}")
 		code.Print("}")
 	} else {
+		code.Print("x := &%s{}", typeName)
 		code.Print("m, ok := compiler.UnpackMap(in)")
 		code.Print("if (!ok) {")
 		code.Print("errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for %s section: %%+v\", in)))", typeName)
-		code.Print("}")
+		code.Print("} else {")
 		oneOfWrapper := typeModel.OneOfWrapper
 
 		if len(typeModel.Required) > 0 {
@@ -174,8 +175,6 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				strings.Replace(allowedPatternString, "\"", "'", -1))
 			code.Print("}")
 		}
-
-		code.Print("  x := &%s{}", typeName)
 
 		var fieldNumber = 0
 		for _, propertyModel := range typeModel.Properties {
@@ -319,6 +318,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				}
 			}
 		}
+		code.Print("}")
 	}
 	// assumes that the return value is in a variable named "x"
 	code.Print("  return x, compiler.NewErrorGroupOrNil(errors)")
