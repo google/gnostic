@@ -370,7 +370,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 // ResolveReferences() methods
 func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code, typeName string) {
 	code.Print("func (m *%s) ResolveReferences(root string) (interface{}, error) {", typeName)
-	//code.Print("  log.Printf(\"%s.ResolveReferences(%%+v)\", m)", typeName)
+	code.Print("errors := make([]error, 0)")
 
 	typeModel := domain.TypeModels[typeName]
 	if typeModel.OneOfWrapper {
@@ -396,7 +396,10 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 					code.Print("  }")
 					code.Print("}")
 				} else {
-					code.Print("p.%s.ResolveReferences(root)", propertyType)
+					code.Print("_, err := p.%s.ResolveReferences(root)", propertyType)
+					code.Print("if err != nil {")
+					code.Print("	return nil, err")
+					code.Print("}")
 				}
 				code.Print("}")
 				code.Print("}")
@@ -419,7 +422,11 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 				fieldName = "XRef"
 				code.Print("if m.XRef != \"\" {")
 				//code.Print("log.Printf(\"%s reference to resolve %%+v\", m.XRef)", typeName)
-				code.Print("info := compiler.ReadInfoForRef(root, m.XRef)")
+				code.Print("info, err := compiler.ReadInfoForRef(root, m.XRef)")
+
+				code.Print("if err != nil {")
+				code.Print("	return nil, err")
+				code.Print("}")
 				//code.Print("log.Printf(\"%%+v\", info)")
 
 				if len(typeModel.Properties) > 1 {
@@ -428,8 +435,6 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 					code.Print("*m = *replacement")
 					code.Print("return m.ResolveReferences(root)")
 					code.Print("}")
-				} else {
-					code.Print("return info, nil")
 				}
 
 				code.Print("return info, nil")
@@ -441,7 +446,10 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 				typeModel, typeFound := domain.TypeModels[propertyType]
 				if typeFound && !typeModel.IsPair {
 					code.Print("if m.%s != nil {", fieldName)
-					code.Print("m.%s.ResolveReferences(root)", fieldName)
+					code.Print("    _, err := m.%s.ResolveReferences(root)", fieldName)
+					code.Print("    if err != nil {")
+					code.Print("       errors = append(errors, err)")
+					code.Print("    }")
 					code.Print("}")
 				}
 			} else {
@@ -450,7 +458,10 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 				if typeFound {
 					code.Print("for _, item := range m.%s {", fieldName)
 					code.Print("if item != nil {")
-					code.Print("item.ResolveReferences(root)")
+					code.Print("  _, err := item.ResolveReferences(root)")
+					code.Print("  if err != nil {")
+					code.Print("     errors = append(errors, err)")
+					code.Print("  }")
 					code.Print("}")
 					code.Print("}")
 				}
@@ -458,6 +469,6 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 			}
 		}
 	}
-	code.Print("  return nil, nil")
+	code.Print("  return nil, compiler.NewErrorGroupOrNil(errors)")
 	code.Print("}\n")
 }

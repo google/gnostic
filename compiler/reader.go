@@ -15,6 +15,7 @@
 package compiler
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -81,18 +82,18 @@ func ReadFile(filename string) (interface{}, error) {
 }
 
 // read a file and return the fragment needed to resolve a $ref
-func ReadInfoForRef(basefile string, ref string) interface{} {
+func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
 	if info_cache == nil {
 		info_cache = make(map[string]interface{}, 0)
 	}
 	{
 		info, ok := info_cache[ref]
 		if ok {
-			return info
+			return info, nil
 		}
 	}
 
-	log.Printf("%d Resolving %s", count, ref)
+	//log.Printf("%d Resolving %s", count, ref)
 	count = count + 1
 	basedir, _ := filepath.Split(basefile)
 	parts := strings.Split(ref, "#")
@@ -112,10 +113,16 @@ func ReadInfoForRef(basefile string, ref string) interface{} {
 				if i > 0 {
 					m, ok := info.(yaml.MapSlice)
 					if ok {
+						found := false
 						for _, section := range m {
 							if section.Key == key {
 								info = section.Value
+								found = true
 							}
+						}
+						if !found {
+							info_cache[ref] = nil
+							return nil, NewError(nil, fmt.Sprintf("could not resolve %s", ref))
 						}
 					}
 				}
@@ -123,5 +130,5 @@ func ReadInfoForRef(basefile string, ref string) interface{} {
 		}
 	}
 	info_cache[ref] = info
-	return info
+	return info, nil
 }

@@ -26,9 +26,9 @@ func NewError(context *Context, message string) *Error {
 
 func (err *Error) Error() string {
 	if err.Context != nil {
-		return err.Context.Description() + " " + err.Message
+		return "ERROR " + err.Context.Description() + " " + err.Message
 	} else {
-		return err.Message
+		return "ERROR " + err.Message
 	}
 }
 

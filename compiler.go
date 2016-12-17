@@ -60,14 +60,15 @@ func main() {
 
 	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
 	if err != nil {
-		fmt.Printf("Error: Invalid Specification\n%+v\n", err)
+		fmt.Printf("%+v\n", err)
 		os.Exit(-1)
 	}
 
 	if !*keepReferences {
 		_, err = document.ResolveReferences(*input)
 		if err != nil {
-			fmt.Printf("Error %+v\n", err)
+			fmt.Printf("%+v\n", err)
+			os.Exit(-1)
 		}
 	}
 

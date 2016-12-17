@@ -4776,470 +4776,731 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 }
 
 func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*AdditionalPropertiesItem_Schema)
 		if ok {
-			p.Schema.ResolveReferences(root)
+			_, err := p.Schema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Any) ResolveReferences(root string) (interface{}, error) {
-	return nil, nil
+	errors := make([]error, 0)
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ApiKeySecurity) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *BasicAuthenticationSecurity) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *BodyParameter) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Schema != nil {
-		m.Schema.ResolveReferences(root)
+		_, err := m.Schema.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Contact) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Default) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Definitions) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Document) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Info != nil {
-		m.Info.ResolveReferences(root)
+		_, err := m.Info.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Paths != nil {
-		m.Paths.ResolveReferences(root)
+		_, err := m.Paths.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Definitions != nil {
-		m.Definitions.ResolveReferences(root)
+		_, err := m.Definitions.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Parameters != nil {
-		m.Parameters.ResolveReferences(root)
+		_, err := m.Parameters.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Responses != nil {
-		m.Responses.ResolveReferences(root)
+		_, err := m.Responses.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Security {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	if m.SecurityDefinitions != nil {
-		m.SecurityDefinitions.ResolveReferences(root)
+		_, err := m.SecurityDefinitions.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Tags {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	if m.ExternalDocs != nil {
-		m.ExternalDocs.ResolveReferences(root)
+		_, err := m.ExternalDocs.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Examples) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *FileSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.ExternalDocs != nil {
-		m.ExternalDocs.ResolveReferences(root)
+		_, err := m.ExternalDocs.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Example != nil {
-		m.Example.ResolveReferences(root)
+		_, err := m.Example.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *FormDataParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Header) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *HeaderParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Headers) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Info) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Contact != nil {
-		m.Contact.ResolveReferences(root)
+		_, err := m.Contact.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.License != nil {
-		m.License.ResolveReferences(root)
+		_, err := m.License.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.Schema {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *JsonReference) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.XRef != "" {
-		info := compiler.ReadInfoForRef(root, m.XRef)
-		return info, nil
+		info, err := compiler.ReadInfoForRef(root, m.XRef)
+		if err != nil {
+			return nil, err
+		}
 		return info, nil
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *License) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedParameter) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedResponse) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedResponseValue) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedSecurityDefinitionsItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedString) ResolveReferences(root string) (interface{}, error) {
-	return nil, nil
+	errors := make([]error, 0)
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NamedStringArray) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Value != nil {
-		m.Value.ResolveReferences(root)
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *NonBodyParameter) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*NonBodyParameter_HeaderParameterSubSchema)
 		if ok {
-			p.HeaderParameterSubSchema.ResolveReferences(root)
+			_, err := p.HeaderParameterSubSchema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*NonBodyParameter_FormDataParameterSubSchema)
 		if ok {
-			p.FormDataParameterSubSchema.ResolveReferences(root)
+			_, err := p.FormDataParameterSubSchema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*NonBodyParameter_QueryParameterSubSchema)
 		if ok {
-			p.QueryParameterSubSchema.ResolveReferences(root)
+			_, err := p.QueryParameterSubSchema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*NonBodyParameter_PathParameterSubSchema)
 		if ok {
-			p.PathParameterSubSchema.ResolveReferences(root)
+			_, err := p.PathParameterSubSchema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Oauth2AccessCodeSecurity) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Scopes != nil {
-		m.Scopes.ResolveReferences(root)
+		_, err := m.Scopes.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Oauth2ApplicationSecurity) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Scopes != nil {
-		m.Scopes.ResolveReferences(root)
+		_, err := m.Scopes.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Oauth2ImplicitSecurity) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Scopes != nil {
-		m.Scopes.ResolveReferences(root)
+		_, err := m.Scopes.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Oauth2PasswordSecurity) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Scopes != nil {
-		m.Scopes.ResolveReferences(root)
+		_, err := m.Scopes.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Oauth2Scopes) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Operation) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
-		m.ExternalDocs.ResolveReferences(root)
+		_, err := m.ExternalDocs.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Parameters {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	if m.Responses != nil {
-		m.Responses.ResolveReferences(root)
+		_, err := m.Responses.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Security {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*Parameter_BodyParameter)
 		if ok {
-			p.BodyParameter.ResolveReferences(root)
+			_, err := p.BodyParameter.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*Parameter_NonBodyParameter)
 		if ok {
-			p.NonBodyParameter.ResolveReferences(root)
+			_, err := p.NonBodyParameter.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ParameterDefinitions) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*ParametersItem_Parameter)
 		if ok {
-			p.Parameter.ResolveReferences(root)
+			_, err := p.Parameter.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
@@ -5259,12 +5520,16 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.XRef != "" {
-		info := compiler.ReadInfoForRef(root, m.XRef)
+		info, err := compiler.ReadInfoForRef(root, m.XRef)
+		if err != nil {
+			return nil, err
+		}
 		if info != nil {
 			replacement, _ := NewPathItem(info, nil)
 			*m = *replacement
@@ -5273,154 +5538,252 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 		return info, nil
 	}
 	if m.Get != nil {
-		m.Get.ResolveReferences(root)
+		_, err := m.Get.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Put != nil {
-		m.Put.ResolveReferences(root)
+		_, err := m.Put.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Post != nil {
-		m.Post.ResolveReferences(root)
+		_, err := m.Post.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Delete != nil {
-		m.Delete.ResolveReferences(root)
+		_, err := m.Delete.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Options != nil {
-		m.Options.ResolveReferences(root)
+		_, err := m.Options.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Head != nil {
-		m.Head.ResolveReferences(root)
+		_, err := m.Head.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Patch != nil {
-		m.Patch.ResolveReferences(root)
+		_, err := m.Patch.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Parameters {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *PathParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Paths) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.Path {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *PrimitivesItems) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Properties) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *QueryParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Response) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.Schema != nil {
-		m.Schema.ResolveReferences(root)
+		_, err := m.Schema.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Headers != nil {
-		m.Headers.ResolveReferences(root)
+		_, err := m.Headers.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Examples != nil {
-		m.Examples.ResolveReferences(root)
+		_, err := m.Examples.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ResponseDefinitions) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *ResponseValue) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*ResponseValue_Response)
 		if ok {
-			p.Response.ResolveReferences(root)
+			_, err := p.Response.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
@@ -5440,26 +5803,37 @@ func (m *ResponseValue) ResolveReferences(root string) (interface{}, error) {
 			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Responses) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.ResponseCode {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Schema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.XRef != "" {
-		info := compiler.ReadInfoForRef(root, m.XRef)
+		info, err := compiler.ReadInfoForRef(root, m.XRef)
+		if err != nil {
+			return nil, err
+		}
 		if info != nil {
 			replacement, _ := NewSchema(info, nil)
 			*m = *replacement
@@ -5468,155 +5842,239 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 		return info, nil
 	}
 	if m.Default != nil {
-		m.Default.ResolveReferences(root)
+		_, err := m.Default.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.Enum {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	if m.AdditionalProperties != nil {
-		m.AdditionalProperties.ResolveReferences(root)
+		_, err := m.AdditionalProperties.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Type != nil {
-		m.Type.ResolveReferences(root)
+		_, err := m.Type.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Items != nil {
-		m.Items.ResolveReferences(root)
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.AllOf {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	if m.Properties != nil {
-		m.Properties.ResolveReferences(root)
+		_, err := m.Properties.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Xml != nil {
-		m.Xml.ResolveReferences(root)
+		_, err := m.Xml.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.ExternalDocs != nil {
-		m.ExternalDocs.ResolveReferences(root)
+		_, err := m.ExternalDocs.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	if m.Example != nil {
-		m.Example.ResolveReferences(root)
+		_, err := m.Example.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *SchemaItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*SchemaItem_Schema)
 		if ok {
-			p.Schema.ResolveReferences(root)
+			_, err := p.Schema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*SchemaItem_FileSchema)
 		if ok {
-			p.FileSchema.ResolveReferences(root)
+			_, err := p.FileSchema.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *SecurityDefinitions) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *SecurityDefinitionsItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*SecurityDefinitionsItem_BasicAuthenticationSecurity)
 		if ok {
-			p.BasicAuthenticationSecurity.ResolveReferences(root)
+			_, err := p.BasicAuthenticationSecurity.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*SecurityDefinitionsItem_ApiKeySecurity)
 		if ok {
-			p.ApiKeySecurity.ResolveReferences(root)
+			_, err := p.ApiKeySecurity.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2ImplicitSecurity)
 		if ok {
-			p.Oauth2ImplicitSecurity.ResolveReferences(root)
+			_, err := p.Oauth2ImplicitSecurity.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2PasswordSecurity)
 		if ok {
-			p.Oauth2PasswordSecurity.ResolveReferences(root)
+			_, err := p.Oauth2PasswordSecurity.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2ApplicationSecurity)
 		if ok {
-			p.Oauth2ApplicationSecurity.ResolveReferences(root)
+			_, err := p.Oauth2ApplicationSecurity.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	{
 		p, ok := m.Oneof.(*SecurityDefinitionsItem_Oauth2AccessCodeSecurity)
 		if ok {
-			p.Oauth2AccessCodeSecurity.ResolveReferences(root)
+			_, err := p.Oauth2AccessCodeSecurity.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *StringArray) ResolveReferences(root string) (interface{}, error) {
-	return nil, nil
+	errors := make([]error, 0)
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Tag) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
-		m.ExternalDocs.ResolveReferences(root)
+		_, err := m.ExternalDocs.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *TypeItem) ResolveReferences(root string) (interface{}, error) {
-	return nil, nil
+	errors := make([]error, 0)
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *VendorExtension) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 func (m *Xml) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
 		if item != nil {
-			item.ResolveReferences(root)
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return nil, nil
+	return nil, compiler.NewErrorGroupOrNil(errors)
 }
