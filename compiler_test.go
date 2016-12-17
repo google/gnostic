@@ -49,6 +49,12 @@ func TestSeparateYAML(t *testing.T) {
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
+func TestSeparateJSON(t *testing.T) {
+	test_compiler(t,
+		"examples/v2.0/json/petstore-separate/spec/swagger.json",
+		"test/v2.0/yaml/petstore-separate/spec/swagger.text") // yaml and json results should be identical
+}
+
 func TestRemotePetstoreJSON(t *testing.T) {
 	test_compiler(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json",
@@ -64,5 +70,11 @@ func TestRemotePetstoreYAML(t *testing.T) {
 func TestRemoteSeparateYAML(t *testing.T) {
 	test_compiler(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
+		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
+}
+
+func TestRemoteSeparateJSON(t *testing.T) {
+	test_compiler(t,
+		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore-separate/spec/swagger.json",
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
