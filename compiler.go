@@ -46,7 +46,13 @@ func main() {
 
 	fmt.Printf("Compiling %s (%s)\n", *input, openapi_v2.Version())
 
-	raw := compiler.ReadFile(*input)
+	raw, err := compiler.ReadFile(*input)
+	if err != nil {
+		fmt.Printf("Error: No Specification\n%+v\n", err)
+		os.Exit(-1)
+	}
+	fmt.Printf("RAW %+v\n", raw)
+
 	if *rawInput {
 		rawDescription := compiler.DescribeMap(raw, "")
 		rawFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".raw"

@@ -15,57 +15,74 @@
 package compiler
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 )
 
+var file_cache map[string][]byte
+var info_cache map[string]interface{}
+var count int64
+
+func FetchFile(fileurl string) ([]byte, error) {
+	if file_cache == nil {
+		file_cache = make(map[string][]byte, 0)
+	}
+	bytes, ok := file_cache[fileurl]
+	if ok {
+		return bytes, nil
+	}
+	log.Printf("fetching %s", fileurl)
+	response, err := http.Get(fileurl)
+	if err != nil {
+		return nil, err
+	} else {
+		defer response.Body.Close()
+		bytes, err := ioutil.ReadAll(response.Body)
+		if err == nil {
+			file_cache[fileurl] = bytes
+		}
+		return bytes, err
+	}
+}
+
 // read a file and unmarshal it as a yaml.MapSlice
-func ReadFile(filename string) interface{} {
+func ReadFile(filename string) (interface{}, error) {
 	// is the filename a url?
 	fileurl, _ := url.Parse(filename)
 	if fileurl.Scheme != "" {
-		// yes it is, so fetch it
-		log.Printf("fetching %s", filename)
-		response, err := http.Get(filename)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			defer response.Body.Close()
-			bytes, err := ioutil.ReadAll(response.Body)
+		bytes, err := FetchFile(filename)
+		if err == nil {
+			var info yaml.MapSlice
+			err = yaml.Unmarshal(bytes, &info)
 			if err == nil {
-				var info yaml.MapSlice
-				yaml.Unmarshal(bytes, &info)
-				return info
+				return info, nil
+			} else {
+				return nil, err
 			}
+		} else {
+			return nil, err
 		}
 	} else {
 		// no, it's a local filename
-		file, e := ioutil.ReadFile(filename)
-		if e != nil {
-			fmt.Printf("File error: %v\n", e)
-			os.Exit(1)
+		file, err := ioutil.ReadFile(filename)
+		if err != nil {
+			log.Printf("File error: %v\n", err)
+			return nil, err
 		}
 		var info yaml.MapSlice
 		yaml.Unmarshal(file, &info)
-		return info
+		return info, nil
 	}
-	return nil
 }
-
-var info_cache map[string]interface{}
-var count int64
 
 // read a file and return the fragment needed to resolve a $ref
 func ReadInfoForRef(basefile string, ref string) interface{} {
 	if info_cache == nil {
-		log.Printf("making cache")
 		info_cache = make(map[string]interface{}, 0)
 	}
 	{
@@ -85,23 +102,26 @@ func ReadInfoForRef(basefile string, ref string) interface{} {
 	} else {
 		filename = basefile
 	}
-	info := ReadFile(filename)
-	if len(parts) > 1 {
-		path := strings.Split(parts[1], "/")
-		for i, key := range path {
-			if i > 0 {
-				m, ok := info.(yaml.MapSlice)
-				if ok {
-					for _, section := range m {
-						if section.Key == key {
-							info = section.Value
+	info, err := ReadFile(filename)
+	if err != nil {
+		log.Printf("File error: %v\n", err)
+	} else {
+		if len(parts) > 1 {
+			path := strings.Split(parts[1], "/")
+			for i, key := range path {
+				if i > 0 {
+					m, ok := info.(yaml.MapSlice)
+					if ok {
+						for _, section := range m {
+							if section.Key == key {
+								info = section.Value
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-
 	info_cache[ref] = info
 	return info
 }

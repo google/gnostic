@@ -42,7 +42,8 @@ func SortedKeysForMap(m yaml.MapSlice) []string {
 
 func MapHasKey(m yaml.MapSlice, key string) bool {
 	for _, item := range m {
-		if key == item.Key.(string) {
+		itemKey, ok := item.Key.(string)
+		if ok && key == itemKey {
 			return true
 		}
 	}
@@ -51,7 +52,8 @@ func MapHasKey(m yaml.MapSlice, key string) bool {
 
 func MapValueForKey(m yaml.MapSlice, key string) interface{} {
 	for _, item := range m {
-		if key == item.Key.(string) {
+		itemKey, ok := item.Key.(string)
+		if ok && key == itemKey {
 			return item.Value
 		}
 	}
@@ -90,25 +92,28 @@ func MissingKeysInMap(m yaml.MapSlice, requiredKeys []string) []string {
 func InvalidKeysInMap(m yaml.MapSlice, allowedKeys []string, allowedPatterns []string) []string {
 	invalidKeys := make([]string, 0)
 	for _, item := range m {
-		key := item.Key.(string)
-		found := false
-		// does the key match an allowed key?
-		for _, allowedKey := range allowedKeys {
-			if key == allowedKey {
-				found = true
-				break
-			}
-		}
-		if !found {
-			// does the key match an allowed pattern?
-			for _, allowedPattern := range allowedPatterns {
-				if PatternMatches(allowedPattern, key) {
+		itemKey, ok := item.Key.(string)
+		if ok {
+			key := itemKey
+			found := false
+			// does the key match an allowed key?
+			for _, allowedKey := range allowedKeys {
+				if key == allowedKey {
 					found = true
 					break
 				}
 			}
 			if !found {
-				invalidKeys = append(invalidKeys, key)
+				// does the key match an allowed pattern?
+				for _, allowedPattern := range allowedPatterns {
+					if PatternMatches(allowedPattern, key) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					invalidKeys = append(invalidKeys, key)
+				}
 			}
 		}
 	}

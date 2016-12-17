@@ -127,17 +127,19 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -187,17 +189,19 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -274,17 +278,19 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -337,17 +343,19 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -366,16 +374,18 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -393,16 +403,18 @@ func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, er
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedSchema{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedSchema{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -588,17 +600,19 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -617,16 +631,18 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -675,17 +691,19 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -800,17 +818,19 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -1041,17 +1061,19 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -1252,17 +1274,19 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -1484,17 +1508,19 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -1513,16 +1539,18 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 		// MAP: Header
 		x.AdditionalProperties = make([]*NamedHeader, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedHeader{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedHeader{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -1607,17 +1635,19 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -1719,17 +1749,19 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -2235,17 +2267,19 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -2322,17 +2356,19 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -2409,17 +2445,19 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -2496,17 +2534,19 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -2525,12 +2565,14 @@ func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, 
 		// MAP: string
 		x.AdditionalProperties = make([]*NamedString, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedString{}
-			pair.Name = k
-			pair.Value = v.(string)
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedString{}
+				pair.Name = k
+				pair.Value = v.(string)
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2691,17 +2733,19 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -2748,16 +2792,18 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 		// MAP: Parameter
 		x.AdditionalProperties = make([]*NamedParameter, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedParameter{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedParameter{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2898,17 +2944,19 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -3136,17 +3184,19 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -3172,34 +3222,38 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 		// repeated NamedPathItem path = 2;
 		// MAP: PathItem ^/
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^/", k) {
-				pair := &NamedPathItem{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^/", k) {
+					pair := &NamedPathItem{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Path = append(x.Path, pair)
 				}
-				x.Path = append(x.Path, pair)
 			}
 		}
 	}
@@ -3385,17 +3439,19 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -3414,16 +3470,18 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedSchema{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedSchema{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3653,17 +3711,19 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -3731,17 +3791,19 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -3760,16 +3822,18 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 		// MAP: Response
 		x.AdditionalProperties = make([]*NamedResponse, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedResponse{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewResponse(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedResponse{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewResponse(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -3822,34 +3886,38 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: ResponseValue ^([0-9]{3})$|^(default)$
 		x.ResponseCode = make([]*NamedResponseValue, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
-				pair := &NamedResponseValue{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewResponseValue(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
+					pair := &NamedResponseValue{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewResponseValue(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.ResponseCode = append(x.ResponseCode, pair)
 				}
-				x.ResponseCode = append(x.ResponseCode, pair)
 			}
 		}
 		// repeated NamedAny vendor_extension = 2;
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -4161,17 +4229,19 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -4218,16 +4288,18 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 		// MAP: SecurityDefinitionsItem
 		x.AdditionalProperties = make([]*NamedSecurityDefinitionsItem, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedSecurityDefinitionsItem{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewSecurityDefinitionsItem(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedSecurityDefinitionsItem{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewSecurityDefinitionsItem(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -4305,16 +4377,18 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 		// MAP: StringArray
 		x.AdditionalProperties = make([]*NamedStringArray, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedStringArray{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedStringArray{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -4388,17 +4462,19 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
@@ -4431,16 +4507,18 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			pair := &NamedAny{}
-			pair.Name = k
-			var err error
-			pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-			if err != nil {
-				errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedAny{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
-			x.AdditionalProperties = append(x.AdditionalProperties, pair)
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -4510,17 +4588,19 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k := item.Key.(string)
-			v := item.Value
-			if compiler.PatternMatches("^x-", k) {
-				pair := &NamedAny{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedAny{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.VendorExtension = append(x.VendorExtension, pair)
 				}
-				x.VendorExtension = append(x.VendorExtension, pair)
 			}
 		}
 	}
