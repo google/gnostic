@@ -34,6 +34,7 @@ func (domain *Domain) generateCompiler(packageName string, license string) strin
 	imports := []string{
 		"fmt",
 		"encoding/json",
+		"strings",
 		"github.com/googleapis/openapi-compiler/compiler",
 	}
 	code.Print("import (")
@@ -73,7 +74,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("x := &TypeItem{}")
 		code.Print("value, ok := in.(string)")
 		code.Print("if !ok {")
-		code.Print("  errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for string array: %%+v\", in)))")
+		code.Print("  message := fmt.Sprintf(\"has unexpected value for string array: %%+v\", in)")
+		code.Print("  errors = append(errors, compiler.NewError(context, message))")
 		code.Print("} else {")
 		code.Print("  x.Value = make([]string, 0)")
 		code.Print("  x.Value = append(x.Value, value)")
@@ -82,7 +84,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("x := &ItemsItem{}")
 		code.Print("m, ok := compiler.UnpackMap(in)")
 		code.Print("if !ok {")
-		code.Print("  errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for item array: %%+v\", in)))")
+		code.Print("  message := fmt.Sprintf(\"has unexpected value for item array: %%+v\", in)")
+		code.Print("  errors = append(errors, compiler.NewError(context, message))")
 		code.Print("} else {")
 		code.Print("  x.Schema = make([]*Schema, 0)")
 		code.Print("  y, err := NewSchema(m, compiler.NewContext(\"<array>\", context))")
@@ -99,7 +102,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("x := &StringArray{}")
 		code.Print("a, ok := in.([]interface{})")
 		code.Print("if !ok {")
-		code.Print("  errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for StringArray: %%+v\", in)))")
+		code.Print("  message := fmt.Sprintf(\"has unexpected value for StringArray: %%+v\", in)")
+		code.Print("  errors = append(errors, compiler.NewError(context, message))")
 		code.Print("} else {")
 		code.Print("  x.Value = make([]string, 0)")
 		code.Print("  for _, s := range a {")
@@ -110,7 +114,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("x := &%s{}", typeName)
 		code.Print("m, ok := compiler.UnpackMap(in)")
 		code.Print("if !ok {")
-		code.Print("  errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for %s section: %%+v\", in)))", typeName)
+		code.Print("  message := fmt.Sprintf(\"has unexpected value: %%+v\", in)")
+		code.Print("  errors = append(errors, compiler.NewError(context, message))")
 		code.Print("} else {")
 		oneOfWrapper := typeModel.OneOfWrapper
 
@@ -127,9 +132,10 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				keyString += "\""
 			}
 			code.Print("requiredKeys := []string{%s}", keyString)
-			code.Print("if !compiler.MapContainsAllKeys(m, requiredKeys) {")
-			code.Print("  errors = append(errors, compiler.NewError(context, \"does not contain all required properties (%s)\"))",
-				strings.Replace(keyString, "\"", "'", -1))
+			code.Print("missingKeys := compiler.MissingKeysInMap(m, requiredKeys)")
+			code.Print("if len(missingKeys) > 0 {")
+			code.Print("  message := fmt.Sprintf(\"is missing required %%s: %%+v\", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, \", \"))")
+			code.Print("  errors = append(errors, compiler.NewError(context, message))")
 			code.Print("}")
 		}
 
@@ -165,10 +171,10 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			// verify that map includes only allowed keys and patterns
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
 			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
-			code.Print("if !compiler.MapContainsOnlyKeysAndPatterns(m, allowedKeys, allowedPatterns) {")
-			code.Print("  errors = append(errors, compiler.NewError(context,\nfmt.Sprintf(\"includes properties not in (%s) or (%s): %%+v\",\ncompiler.SortedKeysForMap(m))))",
-				strings.Replace(allowedKeyString, "\"", "'", -1),
-				strings.Replace(allowedPatternString, "\"", "'", -1))
+			code.Print("invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)")
+			code.Print("if len(invalidKeys) > 0 {")
+			code.Print("  message := fmt.Sprintf(\"has invalid %%s: %%+v\", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, \", \"))")
+			code.Print("  errors = append(errors, compiler.NewError(context, message))")
 			code.Print("}")
 		}
 
@@ -247,40 +253,61 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("  if ok {")
 					code.Print("    x.%s = compiler.ConvertInterfaceArrayToStringArray(v)", fieldName)
 					code.Print("  } else {")
-					code.Print("    errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for %s property: %%+v\", in)))", propertyName)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("}")
 					code.Print("}")
 				} else {
 					code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("  x.%s, ok = v%d.(string)", fieldName, fieldNumber)
-					code.Print("  if !ok {errors = append(errors, compiler.NewError(context, fmt.Sprintf(\"unexpected value for %s. expected a string, got %%+v\", v%d)))}", propertyName, fieldNumber)
+					code.Print("  if !ok {")
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+					code.Print("    errors = append(errors, compiler.NewError(context, message))")
+					code.Print("  }")
 					code.Print("}")
 				}
 			} else if propertyType == "float" {
 				code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("if (v%d != nil) {", fieldNumber)
-				code.Print("  x.%s = v%d.(float64)", fieldName, fieldNumber)
+				code.Print("  x.%s, ok = v%d.(float64)", fieldName, fieldNumber)
+				code.Print("  if !ok {")
+				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+				code.Print("    errors = append(errors, compiler.NewError(context, message))")
+				code.Print("  }")
 				code.Print("}")
 			} else if propertyType == "int64" {
 				code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("if (v%d != nil) {", fieldNumber)
-				code.Print("  x.%s = v%d.(int64)", fieldName, fieldNumber)
+				code.Print("  x.%s, ok = v%d.(int64)", fieldName, fieldNumber)
+				code.Print("  if !ok {")
+				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+				code.Print("    errors = append(errors, compiler.NewError(context, message))")
+				code.Print("  }")
 				code.Print("}")
 			} else if propertyType == "bool" {
 				code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("  if (v%d != nil) {", fieldNumber)
 				if oneOfWrapper {
 					propertyName := "Boolean"
-					code.Print("x.Oneof = &%s_%s{%s: v%d.(bool)}", parentTypeName, propertyName, propertyName, fieldNumber)
+					code.Print("  boolValue, ok := v%d.(bool)", fieldNumber)
+					code.Print("  if !ok {")
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+					code.Print("    errors = append(errors, compiler.NewError(context, message))")
+					code.Print("  } else {")
+					code.Print("    x.Oneof = &%s_%s{%s: boolValue}", parentTypeName, propertyName, propertyName)
+					code.Print("  }")
 				} else {
-					code.Print("x.%s = v%d.(bool)", fieldName, fieldNumber)
+					code.Print("  x.%s, ok = v%d.(bool)", fieldName, fieldNumber)
+					code.Print("  if !ok {")
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+					code.Print("    errors = append(errors, compiler.NewError(context, message))")
+					code.Print("  }")
 				}
 				code.Print("}")
 			} else {
 				mapTypeName := propertyModel.MapType
-				isMap := mapTypeName != ""
-				if isMap {
+				if mapTypeName != "" {
 					code.Print("// MAP: %s %s", mapTypeName, propertyModel.Pattern)
 					if mapTypeName == "string" {
 						code.Print("x.%s = make([]*NamedString, 0)", fieldName)
@@ -301,7 +328,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("var err error")
 						code.Print("pair.Value, err = New%s(v, compiler.NewContext(k, context))", mapTypeName)
 						code.Print("if err != nil {")
-						code.Print("errors = append(errors, err)")
+						code.Print("  errors = append(errors, err)")
 						code.Print("}")
 					}
 					code.Print("x.%s = append(x.%s, pair)", fieldName, fieldName)

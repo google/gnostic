@@ -53,9 +53,9 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	document, err := openapi_v2.NewDocument(raw, nil)
+	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
 	if err != nil {
-		fmt.Printf("Error(s):\n%+v\n", err)
+		fmt.Printf("Error: Invalid Specification\n%+v\n", err)
 		os.Exit(-1)
 	}
 

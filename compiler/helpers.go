@@ -82,43 +82,42 @@ func PatternMatches(pattern string, value string) bool {
 	return matched
 }
 
-func MapContainsAllKeys(m yaml.MapSlice, keys []string) bool {
-	for _, k := range keys {
+func MissingKeysInMap(m yaml.MapSlice, requiredKeys []string) []string {
+	missingKeys := make([]string, 0)
+	for _, k := range requiredKeys {
 		if !MapHasKey(m, k) {
-			//log.Printf("ERROR: map does not contain required key %s (%+v)", k, m)
-			return false
+			missingKeys = append(missingKeys, k)
 		}
 	}
-	return true
+	return missingKeys
 }
 
-func MapContainsOnlyKeysAndPatterns(m yaml.MapSlice, keys []string, patterns []string) bool {
+func InvalidKeysInMap(m yaml.MapSlice, allowedKeys []string, allowedPatterns []string) []string {
+	invalidKeys := make([]string, 0)
 	for _, item := range m {
-		k := item.Key.(string)
+		key := item.Key.(string)
 		found := false
-		// does the key match an allowed key
-		for _, k2 := range keys {
-			if k == k2 {
+		// does the key match an allowed key?
+		for _, allowedKey := range allowedKeys {
+			if key == allowedKey {
 				found = true
 				break
 			}
 		}
 		if !found {
 			// does the key match an allowed pattern?
-			for _, pattern := range patterns {
-				if PatternMatches(pattern, k) {
-					//log.Printf("pattern %s matched %s", pattern, k)
+			for _, allowedPattern := range allowedPatterns {
+				if PatternMatches(allowedPattern, key) {
 					found = true
 					break
 				}
 			}
 			if !found {
-				//log.Printf("ERROR: map contains unhandled key %s (allowed=%+v) (%+v)", k, keys, m)
-				return false
+				invalidKeys = append(invalidKeys, key)
 			}
 		}
 	}
-	return true
+	return invalidKeys
 }
 
 // read a file and unmarshal it as a yaml.MapSlice
@@ -207,4 +206,12 @@ func DescribeMap(in interface{}, indent string) string {
 	}
 	description += fmt.Sprintf("%s%+v\n", indent, in)
 	return description
+}
+
+func PluralProperties(count int) string {
+	if count == 1 {
+		return "property"
+	} else {
+		return "properties"
+	}
 }

@@ -25,7 +25,7 @@ func NewContext(name string, parent *Context) *Context {
 
 func (context *Context) Description() string {
 	if context.Parent != nil {
-		return context.Parent.Description() + "->" + context.Name
+		return context.Parent.Description() + "." + context.Name
 	} else {
 		return context.Name
 	}
