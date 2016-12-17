@@ -19,6 +19,8 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -122,14 +124,35 @@ func InvalidKeysInMap(m yaml.MapSlice, allowedKeys []string, allowedPatterns []s
 
 // read a file and unmarshal it as a yaml.MapSlice
 func ReadFile(filename string) interface{} {
-	file, e := ioutil.ReadFile(filename)
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
+	// is the filename a url?
+	fileurl, _ := url.Parse(filename)
+	if fileurl.Scheme != "" {
+		// yes it is, so fetch it
+		log.Printf("fetching %s", filename)
+		response, err := http.Get(filename)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			defer response.Body.Close()
+			bytes, err := ioutil.ReadAll(response.Body)
+			if err == nil {
+				var info yaml.MapSlice
+				yaml.Unmarshal(bytes, &info)
+				return info
+			}
+		}
+	} else {
+		// no, it's a local filename
+		file, e := ioutil.ReadFile(filename)
+		if e != nil {
+			fmt.Printf("File error: %v\n", e)
+			os.Exit(1)
+		}
+		var info yaml.MapSlice
+		yaml.Unmarshal(file, &info)
+		return info
 	}
-	var info yaml.MapSlice
-	yaml.Unmarshal(file, &info)
-	return info
+	return nil
 }
 
 var info_cache map[string]interface{}

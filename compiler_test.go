@@ -48,3 +48,21 @@ func TestSeparateYAML(t *testing.T) {
 		"examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
+
+func TestRemotePetstoreJSON(t *testing.T) {
+	test_compiler(t,
+		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json",
+		"test/petstore.text")
+}
+
+func TestRemotePetstoreYAML(t *testing.T) {
+	test_compiler(t,
+		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.yaml",
+		"test/petstore.text")
+}
+
+func TestRemoteSeparateYAML(t *testing.T) {
+	test_compiler(t,
+		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
+		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
+}

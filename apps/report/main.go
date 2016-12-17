@@ -45,11 +45,13 @@ func printDocument(code *printer.Code, document *pb.Document) {
 	code.Print("Consumes: %+v", document.Consumes)
 	code.Print("Definitions:")
 	code.Indent()
-	for _, pair := range document.Definitions.AdditionalProperties {
-		code.Print("%s", pair.Name)
-		code.Indent()
-		printSchema(code, pair.Value)
-		code.Outdent()
+	if document.Definitions != nil && document.Definitions.AdditionalProperties != nil {
+		for _, pair := range document.Definitions.AdditionalProperties {
+			code.Print("%s", pair.Name)
+			code.Indent()
+			printSchema(code, pair.Value)
+			code.Outdent()
+		}
 	}
 	code.Outdent()
 	code.Print("ExternalDocs: %+v", document.ExternalDocs)
