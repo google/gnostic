@@ -1,0 +1,3 @@
+ERROR $root.info is missing required property: version
+ERROR $root.info has invalid property: myproperty
+ERROR $root.paths./pets.post has unexpected value for tags: pets

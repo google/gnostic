@@ -37,6 +37,8 @@ func main() {
 	var jsonProtobuf = flag.Bool("json", false, "Output a json protobuf representation")
 	var binaryProtobuf = flag.Bool("pb", false, "Output a binary protobuf representation")
 	var keepReferences = flag.Bool("keep-refs", false, "Disable resolution of $ref references")
+	var logErrors = flag.Bool("errors", false, "Log errors to a file")
+
 	flag.Parse()
 
 	if *input == "" {
@@ -58,9 +60,14 @@ func main() {
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
+	errorFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".errors"
+
 	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
 	if err != nil {
 		fmt.Printf("%+v\n", err)
+		if *logErrors {
+			ioutil.WriteFile(errorFileName, []byte(err.Error()), 0644)
+		}
 		os.Exit(-1)
 	}
 
@@ -68,6 +75,9 @@ func main() {
 		_, err = document.ResolveReferences(*input)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
+			if *logErrors {
+				ioutil.WriteFile(errorFileName, []byte(err.Error()), 0644)
+			}
 			os.Exit(-1)
 		}
 	}
