@@ -51,7 +51,6 @@ func main() {
 		fmt.Printf("Error: No Specification\n%+v\n", err)
 		os.Exit(-1)
 	}
-	fmt.Printf("RAW %+v\n", raw)
 
 	if *rawInput {
 		rawDescription := compiler.DescribeMap(raw, "")
