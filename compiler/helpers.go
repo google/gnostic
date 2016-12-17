@@ -25,10 +25,18 @@ import (
 
 func UnpackMap(in interface{}) (yaml.MapSlice, bool) {
 	m, ok := in.(yaml.MapSlice)
-	if !ok {
-		return nil, ok
+	if ok {
+		return m, ok
+	} else {
+		// do we have an empty array?
+		a, ok := in.([]interface{})
+		if ok && len(a) == 0 {
+			// if so, return an empty map
+			return yaml.MapSlice{}, ok
+		} else {
+			return nil, ok
+		}
 	}
-	return m, ok
 }
 
 func SortedKeysForMap(m yaml.MapSlice) []string {
