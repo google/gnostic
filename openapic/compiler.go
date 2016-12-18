@@ -31,24 +31,39 @@ import (
 )
 
 func main() {
-	var input = flag.String("in", "", "OpenAPI source file to read")
 	var rawInput = flag.Bool("raw", false, "Output the raw json input")
-	var textProtobuf = flag.Bool("text", false, "Output a text protobuf representation")
-	var jsonProtobuf = flag.Bool("json", false, "Output a json protobuf representation")
-	var binaryProtobuf = flag.Bool("pb", false, "Output a binary protobuf representation")
+	var textProtoFileName = flag.String("text_out", "", "Output location for writing the text proto")
+	var jsonProtoFileName = flag.String("json_out", "", "Output location for writing the json proto")
+	var binaryProtoFileName = flag.String("pb_out", "", "Output location for writing the binary proto")
 	var keepReferences = flag.Bool("keep-refs", false, "Disable resolution of $ref references")
 	var logErrors = flag.Bool("errors", false, "Log errors to a file")
 
 	flag.Parse()
 
-	if *input == "" {
+	flag.Usage = func() {
+		fmt.Printf("Usage: openapi-compiler [OPTION] <INPUT_OPEN_API_FILE>\n")
+		fmt.Printf("INPUT_OPEN_API_FILE is the path to the input swagger " +
+			"file to parse.\n")
+		fmt.Printf("Output is generated based on the options given (default " +
+			"output files are generated in the current directory if no " +
+			"options are provided):\n")
 		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
+	var input string
+
+	if len(flag.Args()) == 1 {
+		input = flag.Arg(0)
+	} else {
+		flag.Usage()
 		return
 	}
 
-	fmt.Printf("Compiling %s (%s)\n", *input, openapi_v2.Version())
+	fmt.Printf("Compiling %s (%s)\n", input, openapi_v2.Version())
 
-	raw, err := compiler.ReadFile(*input)
+	raw, err := compiler.ReadFile(input)
 	if err != nil {
 		fmt.Printf("Error: No Specification\n%+v\n", err)
 		os.Exit(-1)
@@ -56,11 +71,11 @@ func main() {
 
 	if *rawInput {
 		rawDescription := compiler.DescribeMap(raw, "")
-		rawFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".raw"
+		rawFileName := strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".raw"
 		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
-	errorFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".errors"
+	errorFileName := strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".errors"
 
 	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
 	if err != nil {
@@ -72,7 +87,7 @@ func main() {
 	}
 
 	if !*keepReferences {
-		_, err = document.ResolveReferences(*input)
+		_, err = document.ResolveReferences(input)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 			if *logErrors {
@@ -82,20 +97,23 @@ func main() {
 		}
 	}
 
-	if *textProtobuf {
-		textProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".text"
-		ioutil.WriteFile(textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
+	if *textProtoFileName == "" {
+		*textProtoFileName = strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".text"
 	}
+	ioutil.WriteFile(*textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
+	fmt.Printf("Text output file: %s\n", *textProtoFileName)
 
-	if *jsonProtobuf {
-		jsonProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".json"
-		jsonBytes, _ := json.Marshal(document)
-		ioutil.WriteFile(jsonProtoFileName, jsonBytes, 0644)
+	if *jsonProtoFileName == "" {
+		*jsonProtoFileName = strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".json"
 	}
+	jsonBytes, _ := json.Marshal(document)
+	ioutil.WriteFile(*jsonProtoFileName, jsonBytes, 0644)
+	fmt.Printf("Json output file: %s\n", *jsonProtoFileName)
 
-	if *binaryProtobuf {
-		binaryProtoFileName := strings.TrimSuffix(path.Base(*input), path.Ext(*input)) + ".pb"
-		protoBytes, _ := proto.Marshal(document)
-		ioutil.WriteFile(binaryProtoFileName, protoBytes, 0644)
+	if *binaryProtoFileName == "" {
+		*binaryProtoFileName = strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".pb"
 	}
+	protoBytes, _ := proto.Marshal(document)
+	ioutil.WriteFile(*binaryProtoFileName, protoBytes, 0644)
+	fmt.Printf("Protobuf output file: %s\n", *binaryProtoFileName)
 }
