@@ -71,13 +71,13 @@ You can get protoc [here](https://github.com/google/protobuf).
 5. Run the OpenAPI compiler. This will create a file called "petstore.pb" that contains a binary
 Protocol Buffer description of a sample API.
 
-        openapi-compiler -in examples/petstore.json -pb
+        openapi-compiler examples/petstore.json
 
 6. You can also compile files that you specify with a URL. Here's another way to compile the previous 
 example. This time we're creating "petstore.text", which creates a textual representation of the
 Protocol Buffer description. This is mainly for use in testing and debugging.
 
-        openapi-compiler -in https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json -text
+        openapi-compiler https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json
 
 7. For a sample application, see apps/report.
 
