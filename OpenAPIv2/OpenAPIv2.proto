@@ -26,7 +26,7 @@ message AdditionalPropertiesItem {
 }
 
 message Any {
-  string value = 1;
+  string yaml = 1;
 }
 
 message ApiKeySecurity {

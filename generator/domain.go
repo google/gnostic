@@ -544,7 +544,7 @@ func (domain *Domain) build() {
 	anyType.Open = true
 	anyType.IsBlob = true
 	valueProperty := NewTypeProperty()
-	valueProperty.Name = "value"
+	valueProperty.Name = "yaml"
 	valueProperty.Type = "blob"
 	anyType.addProperty(valueProperty)
 	domain.TypeModels[anyType.Name] = anyType

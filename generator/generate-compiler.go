@@ -33,7 +33,7 @@ func (domain *Domain) generateCompiler(packageName string, license string) strin
 	// generate import statements
 	imports := []string{
 		"fmt",
-		"encoding/json",
+		"gopkg.in/yaml.v2",
 		"strings",
 		"github.com/googleapis/openapi-compiler/compiler",
 	}
@@ -96,8 +96,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("}")
 	} else if typeModel.IsBlob {
 		code.Print("x := &Any{}")
-		code.Print("bytes, _ := json.Marshal(in)")
-		code.Print("x.Value = string(bytes)")
+		code.Print("bytes, _ := yaml.Marshal(in)")
+		code.Print("x.Yaml = string(bytes)")
 	} else if typeModel.Name == "StringArray" {
 		code.Print("x := &StringArray{}")
 		code.Print("a, ok := in.([]interface{})")

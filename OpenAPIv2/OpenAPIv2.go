@@ -17,9 +17,9 @@
 package openapi_v2
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/googleapis/openapi-compiler/compiler"
+	"gopkg.in/yaml.v2"
 	"strings"
 )
 
@@ -52,8 +52,8 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	errors := make([]error, 0)
 	x := &Any{}
-	bytes, _ := json.Marshal(in)
-	x.Value = string(bytes)
+	bytes, _ := yaml.Marshal(in)
+	x.Yaml = string(bytes)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
