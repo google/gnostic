@@ -2,5 +2,4 @@ sudo: false
 
 language: go
 
-script: go install -v ./openapic
-
+install: go get github.com/googleapis/openapi-compiler/openapic
