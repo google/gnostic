@@ -52,16 +52,17 @@ that describes the OpenAPI specification and a Go-language file of code that
 will read a JSON or YAML OpenAPI representation into the generated protocol 
 buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
 
-        cd $GOPATH/src/github.com/googleapis/openapi-compiler
-        go build -o generator/generator generator/*.go
-        generator/generator
+        cd $GOPATH/src/github.com/googleapis/openapi-compiler/generator
+        go build
+		cd ..
+        ./generator/generator
 
 3. [Optional] Generate protocol buffer support code. 
 A pre-generated version of this file is checked into the OpenAPIv2 directory.
 This step requires a local installation of protoc, the Protocol Buffer Compiler.
 You can get protoc [here](https://github.com/google/protobuf).
 
-        go generate github.com/googleapis/openapi-compiler
+        ./COMPILE-PROTOS.sh
 
 4. [Optional] Rebuild openapi-compiler. This is only necessary if you've performed steps
 2 or 3 above.
@@ -82,7 +83,7 @@ Protocol Buffer description. This is mainly for use in testing and debugging.
 7. For a sample application, see apps/report.
 
         go install github.com/googleapis/openapi-compiler/apps/report
-	report petstore.pb
+        report petstore.pb
 
 ## Copyright
 
