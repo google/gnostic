@@ -2,5 +2,5 @@ sudo: false
 
 language: go
 
-script: go build -v ./...
+script: go install -v ./openapic
 
