@@ -103,16 +103,16 @@ func main() {
 
 	if *textProtoFileName != "" {
 		ioutil.WriteFile(*textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
-		fmt.Printf("Text output file: %s\n", *textProtoFileName)
+		fmt.Printf("Output protobuf textfile: %s\n", *textProtoFileName)
 	}
 	if *jsonProtoFileName != "" {
 		jsonBytes, _ := json.Marshal(document)
 		ioutil.WriteFile(*jsonProtoFileName, jsonBytes, 0644)
-		fmt.Printf("Json output file: %s\n", *jsonProtoFileName)
+		fmt.Printf("Output protobuf json file: %s\n", *jsonProtoFileName)
 	}
 	if *binaryProtoFileName != "" {
 		protoBytes, _ := proto.Marshal(document)
 		ioutil.WriteFile(*binaryProtoFileName, protoBytes, 0644)
-		fmt.Printf("Protobuf output file: %s\n", *binaryProtoFileName)
+		fmt.Printf("Output protobuf binary file: %s\n", *binaryProtoFileName)
 	}
 }
