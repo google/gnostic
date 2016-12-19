@@ -41,12 +41,10 @@ func main() {
 	flag.Parse()
 
 	flag.Usage = func() {
-		fmt.Printf("Usage: openapi-compiler [OPTION] <INPUT_OPEN_API_FILE>\n")
-		fmt.Printf("INPUT_OPEN_API_FILE is the path to the input swagger " +
+		fmt.Printf("Usage: openapic [OPTION] OPENAPI_FILE\n")
+		fmt.Printf("OPENAPI_FILE is the path to the input openapi " +
 			"file to parse.\n")
-		fmt.Printf("Output is generated based on the options given (default " +
-			"output files are generated in the current directory if no " +
-			"options are provided):\n")
+		fmt.Printf("Output is generated based on the options given:\n")
 		flag.PrintDefaults()
 	}
 
@@ -57,6 +55,12 @@ func main() {
 	if len(flag.Args()) == 1 {
 		input = flag.Arg(0)
 	} else {
+		flag.Usage()
+		return
+	}
+
+	if *textProtoFileName == "" && *jsonProtoFileName == "" && *binaryProtoFileName == "" {
+		fmt.Printf("Missing output directives.\n")
 		flag.Usage()
 		return
 	}
@@ -97,23 +101,18 @@ func main() {
 		}
 	}
 
-	if *textProtoFileName == "" {
-		*textProtoFileName = strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".text"
+	if *textProtoFileName != "" {
+		ioutil.WriteFile(*textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
+		fmt.Printf("Text output file: %s\n", *textProtoFileName)
 	}
-	ioutil.WriteFile(*textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
-	fmt.Printf("Text output file: %s\n", *textProtoFileName)
-
-	if *jsonProtoFileName == "" {
-		*jsonProtoFileName = strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".json"
+	if *jsonProtoFileName != "" {
+		jsonBytes, _ := json.Marshal(document)
+		ioutil.WriteFile(*jsonProtoFileName, jsonBytes, 0644)
+		fmt.Printf("Json output file: %s\n", *jsonProtoFileName)
 	}
-	jsonBytes, _ := json.Marshal(document)
-	ioutil.WriteFile(*jsonProtoFileName, jsonBytes, 0644)
-	fmt.Printf("Json output file: %s\n", *jsonProtoFileName)
-
-	if *binaryProtoFileName == "" {
-		*binaryProtoFileName = strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".pb"
+	if *binaryProtoFileName != "" {
+		protoBytes, _ := proto.Marshal(document)
+		ioutil.WriteFile(*binaryProtoFileName, protoBytes, 0644)
+		fmt.Printf("Protobuf output file: %s\n", *binaryProtoFileName)
 	}
-	protoBytes, _ := proto.Marshal(document)
-	ioutil.WriteFile(*binaryProtoFileName, protoBytes, 0644)
-	fmt.Printf("Protobuf output file: %s\n", *binaryProtoFileName)
 }
