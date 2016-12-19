@@ -24,7 +24,7 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 		t.FailNow()
 	}
 	// run the compiler
-	err = exec.Command("openapi-compiler", "-in", input_file, "-text", "-errors").Run()
+	err = exec.Command("openapic", "-in", input_file, "-text", "-errors").Run()
 	if err != nil && !expect_errors {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
@@ -47,60 +47,60 @@ func test_errors(t *testing.T, input_file string, reference_file string) {
 
 func TestPetstoreJSON(t *testing.T) {
 	test_normal(t,
-		"examples/petstore.json",
-		"test/petstore.text")
+		"../examples/petstore.json",
+		"../test/petstore.text")
 }
 
 func TestPetstoreYAML(t *testing.T) {
 	test_normal(t,
-		"examples/petstore.yaml",
-		"test/petstore.text")
+		"../examples/petstore.yaml",
+		"../test/petstore.text")
 }
 
 func TestSeparateYAML(t *testing.T) {
 	test_normal(t,
-		"examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
-		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
+		"../examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
+		"../test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestSeparateJSON(t *testing.T) {
 	test_normal(t,
-		"examples/v2.0/json/petstore-separate/spec/swagger.json",
-		"test/v2.0/yaml/petstore-separate/spec/swagger.text") // yaml and json results should be identical
+		"../examples/v2.0/json/petstore-separate/spec/swagger.json",
+		"../test/v2.0/yaml/petstore-separate/spec/swagger.text") // yaml and json results should be identical
 }
 
 func TestRemotePetstoreJSON(t *testing.T) {
 	test_normal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json",
-		"test/petstore.text")
+		"../test/petstore.text")
 }
 
 func TestRemotePetstoreYAML(t *testing.T) {
 	test_normal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.yaml",
-		"test/petstore.text")
+		"../test/petstore.text")
 }
 
 func TestRemoteSeparateYAML(t *testing.T) {
 	test_normal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
-		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
+		"../test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestRemoteSeparateJSON(t *testing.T) {
 	test_normal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore-separate/spec/swagger.json",
-		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
+		"../test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestErrorBadProperties(t *testing.T) {
 	test_errors(t,
-		"examples/errors/petstore-badproperties.yaml",
-		"test/errors/petstore-badproperties.errors")
+		"../examples/errors/petstore-badproperties.yaml",
+		"../test/errors/petstore-badproperties.errors")
 }
 
 func TestErrorUnresolvedRefs(t *testing.T) {
 	test_errors(t,
-		"examples/errors/petstore-unresolvedrefs.yaml",
-		"test/errors/petstore-unresolvedrefs.errors")
+		"../examples/errors/petstore-unresolvedrefs.yaml",
+		"../test/errors/petstore-unresolvedrefs.errors")
 }
