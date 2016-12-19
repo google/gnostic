@@ -45,7 +45,7 @@ and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
 1. Get this package by downloading it with `go get`.
 
         go get github.com/googleapis/openapi-compiler/openapic
-	
+  
 2. [Optional] Build and run the compiler generator. 
 This uses the OpenAPI JSON schema to generate a Protocol Buffer language file 
 that describes the OpenAPI specification and a Go-language file of code that 
@@ -54,7 +54,7 @@ buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
 
         cd $GOPATH/src/github.com/googleapis/openapi-compiler/generator
         go build
-		cd ..
+        cd ..
         ./generator/generator
 
 3. [Optional] Generate protocol buffer support code. 
@@ -72,13 +72,13 @@ You can get protoc [here](https://github.com/google/protobuf).
 5. Run the OpenAPI compiler. This will create a file called "petstore.pb" that contains a binary
 Protocol Buffer description of a sample API.
 
-        openapic -in examples/petstore.json -pb
+        openapic -pb_out petstore.pb examples/petstore.json
 
 6. You can also compile files that you specify with a URL. Here's another way to compile the previous 
 example. This time we're creating "petstore.text", which creates a textual representation of the
 Protocol Buffer description. This is mainly for use in testing and debugging.
 
-        openapic -in https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json -text
+        openapic -text_out petstore.pb.text https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json
 
 7. For a sample application, see apps/report.
 

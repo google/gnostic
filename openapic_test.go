@@ -25,7 +25,7 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 		t.FailNow()
 	}
 	// run the compiler
-	err = exec.Command("openapic", "-in", input_file, "-text", "-errors").Run()
+	err = exec.Command("openapic", "-text_out", output_file, "-errors", input_file).Run()
 	if err != nil && !expect_errors {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
