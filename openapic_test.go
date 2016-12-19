@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -34,6 +35,8 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
+	} else {
+		os.Remove(output_file)
 	}
 }
 
