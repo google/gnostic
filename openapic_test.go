@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -105,4 +106,33 @@ func TestErrorUnresolvedRefs(t *testing.T) {
 	test_errors(t,
 		"examples/errors/petstore-unresolvedrefs.yaml",
 		"test/errors/petstore-unresolvedrefs.errors")
+}
+
+func test_plugin(t *testing.T, plugin string, input_file string, output_file string, reference_file string) {
+	// remove any preexisting output files
+	os.Remove(output_file)
+	// run the compiler
+	var err error
+	output, err := exec.Command("openapic", "-plugin", "sample", input_file).Output()
+	if err != nil {
+		t.Logf("Compile failed: %+v", err)
+		t.FailNow()
+	}
+	_ = ioutil.WriteFile(output_file, output, 0644)
+	err = exec.Command("diff", output_file, reference_file).Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	} else {
+		// if the test succeeded, clean up
+		os.Remove(output_file)
+	}
+}
+
+func TestSamplePluginWithPetstore(t *testing.T) {
+	test_plugin(t,
+		"sample",
+		"examples/petstore.yaml",
+		"sample-petstore.out",
+		"test/sample-petstore.out")
 }

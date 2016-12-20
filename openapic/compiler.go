@@ -17,15 +17,18 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/OpenAPIv2"
 	"github.com/googleapis/openapi-compiler/compiler"
+	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
 func main() {
@@ -34,6 +37,8 @@ func main() {
 	var binaryProtoFileName = flag.String("pb_out", "", "Write a binary proto to a file with the specified name.")
 	var errorFileName = flag.String("errors_out", "", "Write compilation errors to a file with the specified name.")
 	var keepReferences = flag.Bool("keep_refs", false, "Disable resolution of $ref references.")
+
+	var pluginName = flag.String("plugin", "", "Run the specified plugin (for development only).")
 
 	flag.Parse()
 
@@ -56,13 +61,15 @@ func main() {
 		return
 	}
 
-	if *textProtoFileName == "" && *jsonProtoFileName == "" && *binaryProtoFileName == "" && *errorFileName == "" {
+	if *textProtoFileName == "" &&
+		*jsonProtoFileName == "" &&
+		*binaryProtoFileName == "" &&
+		*errorFileName == "" &&
+		*pluginName == "" {
 		fmt.Printf("Missing output directives.\n")
 		flag.Usage()
 		return
 	}
-
-	fmt.Printf("Compiling %s (%s)\n", input, openapi_v2.Version())
 
 	raw, err := compiler.ReadFile(input)
 	if err != nil {
@@ -103,5 +110,32 @@ func main() {
 		protoBytes, _ := proto.Marshal(document)
 		ioutil.WriteFile(*binaryProtoFileName, protoBytes, 0644)
 		fmt.Printf("Output protobuf binary file: %s\n", *binaryProtoFileName)
+	}
+
+	if *pluginName != "" {
+		request := &plugins.OpenAPIPluginRequest{}
+		request.SpecificationToProcess = []string{input}
+		request.Parameter = ""
+
+		version := &plugins.Version{}
+		version.Major = 0
+		version.Minor = 1
+		version.Patch = 0
+
+		request.CompilerVersion = version
+		spec := &plugins.Any{}
+		spec.TypeUrl = "OpenAPI v2"
+		protoBytes, _ := proto.Marshal(document)
+		spec.Value = protoBytes
+		request.Specification = []*plugins.Any{spec}
+		requestBytes, _ := proto.Marshal(request)
+
+		cmd := exec.Command("openapi_" + *pluginName)
+		cmd.Stdin = bytes.NewReader(requestBytes)
+		output, err := cmd.Output()
+		if err != nil {
+			fmt.Printf("Error: %+v\n", err)
+		}
+		fmt.Printf("%s\n", string(output))
 	}
 }
