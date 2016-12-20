@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
-	"strings"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/OpenAPIv2"
@@ -31,11 +29,11 @@ import (
 )
 
 func main() {
-	var textProtoFileName = flag.String("text_out", "", "Output location for writing the text proto")
-	var jsonProtoFileName = flag.String("json_out", "", "Output location for writing the json proto")
-	var binaryProtoFileName = flag.String("pb_out", "", "Output location for writing the binary proto")
-	var keepReferences = flag.Bool("keep_refs", false, "Disable resolution of $ref references")
-	var logErrors = flag.Bool("errors", false, "Log errors to a file")
+	var textProtoFileName = flag.String("text_out", "", "Write a text proto to a file with the specified name.")
+	var jsonProtoFileName = flag.String("json_out", "", "Write a json proto to a file with the specified name.")
+	var binaryProtoFileName = flag.String("pb_out", "", "Write a binary proto to a file with the specified name.")
+	var errorFileName = flag.String("errors_out", "", "Write compilation errors to a file with the specified name.")
+	var keepReferences = flag.Bool("keep_refs", false, "Disable resolution of $ref references.")
 
 	flag.Parse()
 
@@ -58,7 +56,7 @@ func main() {
 		return
 	}
 
-	if *textProtoFileName == "" && *jsonProtoFileName == "" && *binaryProtoFileName == "" {
+	if *textProtoFileName == "" && *jsonProtoFileName == "" && *binaryProtoFileName == "" && *errorFileName == "" {
 		fmt.Printf("Missing output directives.\n")
 		flag.Usage()
 		return
@@ -68,17 +66,15 @@ func main() {
 
 	raw, err := compiler.ReadFile(input)
 	if err != nil {
-		fmt.Printf("Error: No Specification\n%+v\n", err)
+		fmt.Printf("Error: No Specification.\n%+v\n", err)
 		os.Exit(-1)
 	}
-
-	errorFileName := strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".errors"
 
 	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
 	if err != nil {
 		fmt.Printf("%+v\n", err)
-		if *logErrors {
-			ioutil.WriteFile(errorFileName, []byte(err.Error()), 0644)
+		if *errorFileName != "" {
+			ioutil.WriteFile(*errorFileName, []byte(err.Error()), 0644)
 		}
 		os.Exit(-1)
 	}
@@ -87,8 +83,8 @@ func main() {
 		_, err = document.ResolveReferences(input)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
-			if *logErrors {
-				ioutil.WriteFile(errorFileName, []byte(err.Error()), 0644)
+			if *errorFileName != "" {
+				ioutil.WriteFile(*errorFileName, []byte(err.Error()), 0644)
 			}
 			os.Exit(-1)
 		}
