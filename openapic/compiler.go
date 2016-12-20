@@ -31,18 +31,17 @@ import (
 )
 
 func main() {
-	var rawInput = flag.Bool("raw", false, "Output the raw json input")
 	var textProtoFileName = flag.String("text_out", "", "Output location for writing the text proto")
 	var jsonProtoFileName = flag.String("json_out", "", "Output location for writing the json proto")
 	var binaryProtoFileName = flag.String("pb_out", "", "Output location for writing the binary proto")
-	var keepReferences = flag.Bool("keep-refs", false, "Disable resolution of $ref references")
+	var keepReferences = flag.Bool("keep_refs", false, "Disable resolution of $ref references")
 	var logErrors = flag.Bool("errors", false, "Log errors to a file")
 
 	flag.Parse()
 
 	flag.Usage = func() {
 		fmt.Printf("Usage: openapic [OPTION] OPENAPI_FILE\n")
-		fmt.Printf("OPENAPI_FILE is the path to the input openapi " +
+		fmt.Printf("OPENAPI_FILE is the path to the input OpenAPI " +
 			"file to parse.\n")
 		fmt.Printf("Output is generated based on the options given:\n")
 		flag.PrintDefaults()
@@ -71,12 +70,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error: No Specification\n%+v\n", err)
 		os.Exit(-1)
-	}
-
-	if *rawInput {
-		rawDescription := compiler.DescribeMap(raw, "")
-		rawFileName := strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".raw"
-		ioutil.WriteFile(rawFileName, []byte(rawDescription), 0644)
 	}
 
 	errorFileName := strings.TrimSuffix(path.Base(input), path.Ext(input)) + ".errors"
