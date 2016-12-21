@@ -63,7 +63,7 @@ message PluginResponse {
   repeated string error = 1;
   
   // text output
-  string text = 2;
+  repeated string text = 2;
 }
 
 message Wrapper {

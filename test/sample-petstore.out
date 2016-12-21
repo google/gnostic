@@ -9,4 +9,3 @@ Paths:
   GET /pets
   POST /pets
   GET /pets/{petId}
-

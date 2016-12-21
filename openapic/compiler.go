@@ -136,6 +136,10 @@ func main() {
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)
 		}
-		fmt.Printf("%s\n", string(output))
+		response := &plugins.PluginResponse{}
+		err = proto.Unmarshal(output, response)
+		for _, text := range response.Text {
+			os.Stdout.Write([]byte(text))
+		}
 	}
 }

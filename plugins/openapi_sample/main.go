@@ -26,8 +26,9 @@ import (
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
-func readDocumentsFromPluginInput() []*openapi.Document {
-	documents := make([]*openapi.Document, 0)
+type documentHandler func(name string, version string, document *openapi.Document)
+
+func foreachDocumentFromPluginInput(handler documentHandler) {
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
@@ -37,14 +38,12 @@ func readDocumentsFromPluginInput() []*openapi.Document {
 	err = proto.Unmarshal(data, request)
 	for _, wrapper := range request.Wrapper {
 		document := &openapi.Document{}
-		fmt.Printf("READING %s (%s)\n", wrapper.Name, wrapper.Version)
 		err = proto.Unmarshal(wrapper.Value, document)
 		if err != nil {
 			panic(err)
 		}
-		documents = append(documents, document)
+		handler(wrapper.Name, wrapper.Version, document)
 	}
-	return documents
 }
 
 func printDocument(code *printer.Code, document *openapi.Document) {
@@ -80,10 +79,17 @@ func printDocument(code *printer.Code, document *openapi.Document) {
 }
 
 func main() {
-	documents := readDocumentsFromPluginInput()
-	for _, document := range documents {
-		code := &printer.Code{}
-		printDocument(code, document)
-		fmt.Printf("%s", code)
-	}
+	response := &plugins.PluginResponse{}
+	response.Text = []string{}
+
+	foreachDocumentFromPluginInput(
+		func(name string, version string, document *openapi.Document) {
+			code := &printer.Code{}
+			code.Print("READING %s (%s)", name, version)
+			printDocument(code, document)
+			response.Text = append(response.Text, code.String())
+		})
+
+	responseBytes, _ := proto.Marshal(response)
+	os.Stdout.Write(responseBytes)
 }
