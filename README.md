@@ -64,7 +64,7 @@ You can get protoc [here](https://github.com/google/protobuf).
 
         ./COMPILE-PROTOS.sh
 
-4. [Optional] Rebuild openapi-compiler. This is only necessary if you've performed steps
+4. [Optional] Rebuild openapic. This is only necessary if you've performed steps
 2 or 3 above.
 
         go install github.com/googleapis/openapi-compiler/openapic
@@ -78,7 +78,7 @@ Protocol Buffer description of a sample API.
 example. This time we're creating "petstore.text", which creates a textual representation of the
 Protocol Buffer description. This is mainly for use in testing and debugging.
 
-        openapic -text_out petstore.pb.text https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json
+        openapic -text_out petstore.text https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json
 
 7. For a sample application, see apps/report.
 
