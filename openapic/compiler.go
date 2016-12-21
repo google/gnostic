@@ -99,7 +99,7 @@ Options:
   --text_out=FILENAME     Write a text proto to a file with the specified name.
   --json_out=FILENAME     Write a json proto to a file with the specified name.
   --errors_out=FILENAME   Write compilation errors to a file with the specified name.
-  --PLUGIN_out=FILENAME   Run the specified plugin and write results to a file with the specified name.
+  --PLUGIN_out=FILENAME   Run the plugin named openapi_PLUGIN and write results to a file with the specified name.
   --keep_refs             Disable resolution of $ref references.
 `
 
