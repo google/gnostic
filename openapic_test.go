@@ -17,7 +17,12 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 	os.Remove(errors_file)
 	// run the compiler
 	var err error
-	err = exec.Command("openapic", input_file, "--text_out="+text_file, "--errors_out="+errors_file).Run()
+	err = exec.Command(
+		"openapic",
+		input_file,
+		"--text_out="+text_file,
+		"--errors_out="+errors_file,
+		"--resolve_refs").Run()
 	if err != nil && !expect_errors {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()

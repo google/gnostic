@@ -103,7 +103,7 @@ Options:
   --text_out=FILENAME     Write a text proto to a file with the specified name.
   --errors_out=FILENAME   Write compilation errors to a file with the specified name.
   --PLUGIN_out=FILENAME   Run the plugin named openapi_PLUGIN and write results to a file with the specified name.
-  --keep_refs             Disable resolution of $ref references.
+  --resolve_refs          Explicitly resolve $ref references (this could have problems with recursive definitions).
 `
 	// default values for all options
 	sourceName := ""
@@ -112,7 +112,7 @@ Options:
 	textProtoFileName := ""
 	errorFileName := ""
 	pluginCalls := make([]*PluginCall, 0)
-	keepReferences := false
+	resolveReferences := false
 
 	// arg processing matches patterns of the form "--PLUGIN_out=PATH"
 	plugin_regex, err := regexp.Compile("--(.+)_out=(.+)")
@@ -138,8 +138,8 @@ Options:
 				pluginCall := &PluginCall{Name: pluginName, Output: outputName}
 				pluginCalls = append(pluginCalls, pluginCall)
 			}
-		} else if arg == "--keep_refs" {
-			keepReferences = true
+		} else if arg == "--resolve_refs" {
+			resolveReferences = true
 		} else if arg[0] == '-' {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
 			os.Exit(-1)
@@ -168,19 +168,19 @@ Options:
 	}
 
 	// read and compile the OpenAPI source
-	raw, err := compiler.ReadFile(sourceName)
+	info, err := compiler.ReadInfoForFile(sourceName)
 	if err != nil {
 		fmt.Printf("Error: %+v\n", err)
 		os.Exit(-1)
 	}
-	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
+	document, err := openapi_v2.NewDocument(info, compiler.NewContext("$root", nil))
 	if err != nil {
 		writeFile(errorFileName, []byte(err.Error()))
 		os.Exit(-1)
 	}
 
 	// optionally resolve internal references
-	if !keepReferences {
+	if resolveReferences {
 		_, err = document.ResolveReferences(sourceName)
 		if err != nil {
 			writeFile(errorFileName, []byte(err.Error()))
