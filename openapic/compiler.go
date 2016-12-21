@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -47,6 +46,9 @@ func writeFile(name string, bytes []byte) {
 		writer = file
 	}
 	writer.Write(bytes)
+	if name == "-" {
+		writer.Write([]byte("\n"))
+	}
 }
 
 func main() {
@@ -134,10 +136,7 @@ Options:
 	if !keepReferences {
 		_, err = document.ResolveReferences(sourceName)
 		if err != nil {
-			fmt.Printf("%+v\n", err)
-			if errorFileName != "" {
-				ioutil.WriteFile(errorFileName, []byte(err.Error()), 0644)
-			}
+			writeFile(errorFileName, []byte(err.Error()))
 			os.Exit(-1)
 		}
 	}
