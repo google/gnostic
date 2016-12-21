@@ -19,11 +19,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"regexp"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/OpenAPIv2"
@@ -31,115 +32,170 @@ import (
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
-func main() {
-	var textProtoFileName = flag.String("text_out", "", "Write a text proto to a file with the specified name.")
-	var jsonProtoFileName = flag.String("json_out", "", "Write a json proto to a file with the specified name.")
-	var binaryProtoFileName = flag.String("pb_out", "", "Write a binary proto to a file with the specified name.")
-	var errorFileName = flag.String("errors_out", "", "Write compilation errors to a file with the specified name.")
-	var keepReferences = flag.Bool("keep_refs", false, "Disable resolution of $ref references.")
+type PluginCall struct {
+	Name   string
+	Output string
+}
 
-	var pluginName = flag.String("plugin", "", "Run the specified plugin (for development only).")
-
-	flag.Parse()
-
-	flag.Usage = func() {
-		fmt.Printf("Usage: openapic [OPTION] OPENAPI_FILE\n")
-		fmt.Printf("OPENAPI_FILE is the path to the input OpenAPI " +
-			"file to parse.\n")
-		fmt.Printf("Output is generated based on the options given:\n")
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	var input string
-
-	if len(flag.Args()) == 1 {
-		input = flag.Arg(0)
+func writeFile(name string, bytes []byte) {
+	var writer io.Writer
+	if name == "-" {
+		writer = os.Stdout
 	} else {
-		flag.Usage()
-		return
+		file, _ := os.Create(name)
+		defer file.Close()
+		writer = file
+	}
+	writer.Write(bytes)
+}
+
+func main() {
+	pb_regex, err := regexp.Compile("--pb_out=(.+)")
+	json_regex, err := regexp.Compile("--json_out=(.+)")
+	text_regex, err := regexp.Compile("--text_out=(.+)")
+	errors_regex, err := regexp.Compile("--errors_out=(.+)")
+	plugin_regex, err := regexp.Compile("--(.+)_out=(.+)")
+
+	sourceName := ""
+	binaryProtoFileName := ""
+	jsonProtoFileName := ""
+	textProtoFileName := ""
+	errorFileName := ""
+	keepReferences := false
+
+	var pluginCalls []*PluginCall
+
+	for i, arg := range os.Args {
+		if i == 0 {
+			continue
+		}
+		argbytes := []byte(arg)
+		var m [][]byte
+		if m = pb_regex.FindSubmatch(argbytes); m != nil {
+			binaryProtoFileName = string(m[1])
+		} else if m = json_regex.FindSubmatch(argbytes); m != nil {
+			jsonProtoFileName = string(m[1])
+		} else if m = text_regex.FindSubmatch(argbytes); m != nil {
+			textProtoFileName = string(m[1])
+		} else if m = errors_regex.FindSubmatch(argbytes); m != nil {
+			errorFileName = string(m[1])
+		} else if m = plugin_regex.FindSubmatch(argbytes); m != nil {
+			pluginCall := &PluginCall{Name: string(m[1]), Output: string(m[2])}
+			pluginCalls = append(pluginCalls, pluginCall)
+		} else if arg == "--keep_refs" {
+			keepReferences = true
+		} else {
+			sourceName = arg
+		}
 	}
 
-	if *textProtoFileName == "" &&
-		*jsonProtoFileName == "" &&
-		*binaryProtoFileName == "" &&
-		*errorFileName == "" &&
-		*pluginName == "" {
-		fmt.Printf("Missing output directives.\n")
-		flag.Usage()
-		return
+	usage := `
+Usage: openapic OPENAPI_SOURCE [OPTIONS]
+  OPENAPI_SOURCE is the filename or URL of the OpenAPI description to read.
+Options:
+  --pb_out=FILENAME       Write a binary proto to a file with the specified name.
+  --text_out=FILENAME     Write a text proto to a file with the specified name.
+  --json_out=FILENAME     Write a json proto to a file with the specified name.
+  --errors_out=FILENAME   Write compilation errors to a file with the specified name.
+  --PLUGIN_out=FILENAME   Run the specified plugin and write results to a file with the specified name.
+  --keep_refs             Disable resolution of $ref references.
+`
+
+	if textProtoFileName == "" &&
+		jsonProtoFileName == "" &&
+		binaryProtoFileName == "" &&
+		errorFileName == "" &&
+		len(pluginCalls) == 0 {
+		fmt.Printf("Missing output directives.\n%s\n", usage)
+		os.Exit(-1)
 	}
 
-	raw, err := compiler.ReadFile(input)
+	if sourceName == "" {
+		fmt.Printf("No input specified.\n%s\n", usage)
+		os.Exit(-1)
+	}
+
+	if errorFileName == "" {
+		errorFileName = "-"
+	}
+
+	raw, err := compiler.ReadFile(sourceName)
 	if err != nil {
-		fmt.Printf("Error: No Specification.\n%+v\n", err)
+		fmt.Printf("Error: %+v\n", err)
 		os.Exit(-1)
 	}
 
 	document, err := openapi_v2.NewDocument(raw, compiler.NewContext("$root", nil))
 	if err != nil {
-		fmt.Printf("%+v\n", err)
-		if *errorFileName != "" {
-			ioutil.WriteFile(*errorFileName, []byte(err.Error()), 0644)
-		}
+		writeFile(errorFileName, []byte(err.Error()))
 		os.Exit(-1)
 	}
 
-	if !*keepReferences {
-		_, err = document.ResolveReferences(input)
+	if !keepReferences {
+		_, err = document.ResolveReferences(sourceName)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
-			if *errorFileName != "" {
-				ioutil.WriteFile(*errorFileName, []byte(err.Error()), 0644)
+			if errorFileName != "" {
+				ioutil.WriteFile(errorFileName, []byte(err.Error()), 0644)
 			}
 			os.Exit(-1)
 		}
 	}
 
-	if *textProtoFileName != "" {
-		ioutil.WriteFile(*textProtoFileName, []byte(proto.MarshalTextString(document)), 0644)
-		fmt.Printf("Output protobuf textfile: %s\n", *textProtoFileName)
+	if textProtoFileName != "" {
+		bytes := []byte(proto.MarshalTextString(document))
+		writeFile(textProtoFileName, bytes)
 	}
-	if *jsonProtoFileName != "" {
+
+	if jsonProtoFileName != "" {
 		jsonBytes, _ := json.Marshal(document)
-		ioutil.WriteFile(*jsonProtoFileName, jsonBytes, 0644)
-		fmt.Printf("Output protobuf json file: %s\n", *jsonProtoFileName)
-	}
-	if *binaryProtoFileName != "" {
-		protoBytes, _ := proto.Marshal(document)
-		ioutil.WriteFile(*binaryProtoFileName, protoBytes, 0644)
-		fmt.Printf("Output protobuf binary file: %s\n", *binaryProtoFileName)
+		writeFile(jsonProtoFileName, jsonBytes)
 	}
 
-	if *pluginName != "" {
-		request := &plugins.PluginRequest{}
-		request.Parameter = ""
-
-		version := &plugins.Version{}
-		version.Major = 0
-		version.Minor = 1
-		version.Patch = 0
-		request.CompilerVersion = version
-
-		wrapper := &plugins.Wrapper{}
-		wrapper.Name = input
-		wrapper.Version = "v2"
+	if binaryProtoFileName != "" {
 		protoBytes, _ := proto.Marshal(document)
-		wrapper.Value = protoBytes
-		request.Wrapper = []*plugins.Wrapper{wrapper}
-		requestBytes, _ := proto.Marshal(request)
+		writeFile(binaryProtoFileName, protoBytes)
+	}
 
-		cmd := exec.Command("openapi_" + *pluginName)
-		cmd.Stdin = bytes.NewReader(requestBytes)
-		output, err := cmd.Output()
-		if err != nil {
-			fmt.Printf("Error: %+v\n", err)
-		}
-		response := &plugins.PluginResponse{}
-		err = proto.Unmarshal(output, response)
-		for _, text := range response.Text {
-			os.Stdout.Write([]byte(text))
+	for _, pluginCall := range pluginCalls {
+		if pluginCall.Name != "" {
+			request := &plugins.PluginRequest{}
+			request.Parameter = ""
+
+			version := &plugins.Version{}
+			version.Major = 0
+			version.Minor = 1
+			version.Patch = 0
+			request.CompilerVersion = version
+
+			wrapper := &plugins.Wrapper{}
+			wrapper.Name = sourceName
+			wrapper.Version = "v2"
+			protoBytes, _ := proto.Marshal(document)
+			wrapper.Value = protoBytes
+			request.Wrapper = []*plugins.Wrapper{wrapper}
+			requestBytes, _ := proto.Marshal(request)
+
+			cmd := exec.Command("openapi_" + pluginCall.Name)
+			cmd.Stdin = bytes.NewReader(requestBytes)
+			output, err := cmd.Output()
+			if err != nil {
+				fmt.Printf("Error: %+v\n", err)
+			}
+			response := &plugins.PluginResponse{}
+			err = proto.Unmarshal(output, response)
+
+			var writer io.Writer
+			if pluginCall.Output == "-" {
+				writer = os.Stdout
+			} else {
+				file, _ := os.Create(pluginCall.Output)
+				defer file.Close()
+				writer = file
+			}
+			for _, text := range response.Text {
+				writer.Write([]byte(text))
+			}
 		}
 	}
 }

@@ -17,7 +17,7 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 	os.Remove(errors_file)
 	// run the compiler
 	var err error
-	err = exec.Command("openapic", "-text_out", text_file, "-errors_out", errors_file, input_file).Run()
+	err = exec.Command("openapic", input_file, "--text_out="+text_file, "--errors_out="+errors_file).Run()
 	if err != nil && !expect_errors {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
@@ -113,7 +113,7 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 	os.Remove(output_file)
 	// run the compiler
 	var err error
-	output, err := exec.Command("openapic", "-plugin", "sample", input_file).Output()
+	output, err := exec.Command("openapic", "--sample_out=-", input_file).Output()
 	if err != nil {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
