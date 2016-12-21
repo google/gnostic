@@ -13,8 +13,8 @@
 // limitations under the License.
 
 // openapic (aka the OpenAPI Compiler) can be extended via plugins.  
-// A plugin is just a program that reads an OpenAPIPluginRequest from stdin 
-// and writes an OpenAPIPluginResponse to stdout.
+// A plugin is just a program that reads a PluginRequest from stdin 
+// and writes a PluginResponse to stdout.
 //
 // A plugin executable needs only to be placed somewhere in the path.  The
 // plugin should be named "openapic-$NAME", and will then be used when the
@@ -34,26 +34,23 @@ message Version {
   string suffix = 4;
 }
 
-// An encoded OpenAPIPluginRequest is written to the plugin's stdin.
-message OpenAPIPluginRequest {
-  // The OpenAPI specifications that were explicitly listed on the command-line.  
-  // The plugin should operate only on these specifications.
-  // The parsed specification will be included in specifications, below.
-  repeated string specification_to_process = 1;
+// An encoded PluginRequest is written to the plugin's stdin.
+message PluginRequest {
 
+  // The OpenAPI descriptions that were explicitly listed on the command line.  
+  // The specifications will appear in the order they are specified to openapic.
+  repeated Wrapper wrapper = 1;
+  
   // The plugin parameter passed on the command-line.
   string parameter = 2;
 
   // The version number of openapi compiler.
   Version compiler_version = 3;
-  
-  // Specifications corresponding to each name in specification_to_process.
-  // The specifications will appear in the order they are specified to openapic.
-  repeated Any specification = 4;
 }
 
-// The plugin writes an encoded OpenAPIPluginResponse to stdout.
-message OpenAPIPluginResponse {
+// The plugin writes an encoded PluginResponse to stdout.
+message PluginResponse {
+
   // Error message.  If non-empty, the plugin failed. 
   // The plugin process should exit with status code zero 
   // even if it reports an error in this way.
@@ -64,33 +61,19 @@ message OpenAPIPluginResponse {
   // reported by writing a message to stderr and exiting with a non-zero 
   // status code.
   repeated string error = 1;
+  
+  // text output
+  string text = 2;
 }
 
-message Any {
-  // A URL/resource name whose content describes the type of the
-  // serialized protocol buffer message.
-  //
-  // For URLs which use the scheme `http`, `https`, or no scheme, the
-  // following restrictions and interpretations apply:
-  //
-  // * If no scheme is provided, `https` is assumed.
-  // * The last segment of the URL's path must represent the fully
-  //   qualified name of the type (as in `path/google.protobuf.Duration`).
-  //   The name should be in a canonical form (e.g., leading "." is
-  //   not accepted).
-  // * An HTTP GET on the URL must yield a [google.protobuf.Type][]
-  //   value in binary format, or produce an error.
-  // * Applications are allowed to cache lookup results based on the
-  //   URL, or have them precompiled into a binary to avoid any
-  //   lookup. Therefore, binary compatibility needs to be preserved
-  //   on changes to types. (Use versioned type names to manage
-  //   breaking changes.)
-  //
-  // Schemes other than `http`, `https` (or the empty scheme) might be
-  // used with implementation specific semantics.
-  //
-  string type_url = 1;
+message Wrapper {
 
-  // Must be a valid serialized protocol buffer of the above specified type.
-  bytes value = 2;
+  // The filename or URL of the wrapped description
+  string name = 1;
+  
+  // The version of the OpenAPI specification that is used by the wrapped description.
+  string version = 2;
+
+  // Must be a valid serialized protocol buffer of the named OpenAPI specification version.
+  bytes value = 3;
 }

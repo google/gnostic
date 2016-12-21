@@ -1,4 +1,4 @@
-READING OpenAPI v2
+READING examples/petstore.yaml (v2)
 Swagger: 2.0
 Host: petstore.swagger.io
 BasePath: /v1

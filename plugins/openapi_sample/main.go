@@ -22,23 +22,23 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/printer"
 
-	pb "github.com/googleapis/openapi-compiler/OpenAPIv2"
+	openapi "github.com/googleapis/openapi-compiler/OpenAPIv2"
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
-func readDocumentsFromPluginInput() []*pb.Document {
-	documents := make([]*pb.Document, 0)
+func readDocumentsFromPluginInput() []*openapi.Document {
+	documents := make([]*openapi.Document, 0)
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
 		os.Exit(1)
 	}
-	request := &plugins.OpenAPIPluginRequest{}
+	request := &plugins.PluginRequest{}
 	err = proto.Unmarshal(data, request)
-	for _, any := range request.Specification {
-		document := &pb.Document{}
-		fmt.Printf("READING %s\n", any.TypeUrl)
-		err = proto.Unmarshal(any.Value, document)
+	for _, wrapper := range request.Wrapper {
+		document := &openapi.Document{}
+		fmt.Printf("READING %s (%s)\n", wrapper.Name, wrapper.Version)
+		err = proto.Unmarshal(wrapper.Value, document)
 		if err != nil {
 			panic(err)
 		}
@@ -47,7 +47,7 @@ func readDocumentsFromPluginInput() []*pb.Document {
 	return documents
 }
 
-func printDocument(code *printer.Code, document *pb.Document) {
+func printDocument(code *printer.Code, document *openapi.Document) {
 	code.Print("Swagger: %+v", document.Swagger)
 	code.Print("Host: %+v", document.Host)
 	code.Print("BasePath: %+v", document.BasePath)

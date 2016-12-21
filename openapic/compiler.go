@@ -113,21 +113,21 @@ func main() {
 	}
 
 	if *pluginName != "" {
-		request := &plugins.OpenAPIPluginRequest{}
-		request.SpecificationToProcess = []string{input}
+		request := &plugins.PluginRequest{}
 		request.Parameter = ""
 
 		version := &plugins.Version{}
 		version.Major = 0
 		version.Minor = 1
 		version.Patch = 0
-
 		request.CompilerVersion = version
-		spec := &plugins.Any{}
-		spec.TypeUrl = "OpenAPI v2"
+
+		wrapper := &plugins.Wrapper{}
+		wrapper.Name = input
+		wrapper.Version = "v2"
 		protoBytes, _ := proto.Marshal(document)
-		spec.Value = protoBytes
-		request.Specification = []*plugins.Any{spec}
+		wrapper.Value = protoBytes
+		request.Wrapper = []*plugins.Wrapper{wrapper}
 		requestBytes, _ := proto.Marshal(request)
 
 		cmd := exec.Command("openapi_" + *pluginName)
