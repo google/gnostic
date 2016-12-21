@@ -24,6 +24,28 @@ syntax = "proto3";
 
 package openapic.v1;
 
+// This option lets the proto compiler generate Java code inside the package
+// name (see below) instead of inside an outer class. It creates a simpler
+// developer experience by reducing one-level of name nesting and be
+// consistent with most programming languages that don't support outer classes.
+option java_multiple_files = true;
+
+// The Java outer classname should be the filename in UpperCamelCase. This
+// class is only used to hold proto descriptor, so developers don't need to
+// work with it directly.
+option java_outer_classname = "OpenAPICompilerPlugin";
+
+// The Java package name must be proto package name with proper prefix.
+option java_package = "org.openapic.v1";
+
+// A reasonable prefix for the Objective-C symbols generated from the package.
+// It should at a minimum be 3 characters long, all uppercase, and convention
+// is to use an abbreviation of the package name. Something short, but
+// hopefully unique enough to not conflict with things that may come along in
+// the future. 'GPB' is reserved for the protocol buffer implementation itself.
+//
+option objc_class_prefix = "OAC"; // "OpenAPI Compiler"
+
 // The version number of OpenAPI compiler.
 message Version {
   int32 major = 1;
