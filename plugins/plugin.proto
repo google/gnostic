@@ -17,7 +17,7 @@
 // and writes a PluginResponse to stdout.
 //
 // A plugin executable needs only to be placed somewhere in the path.  The
-// plugin should be named "openapic-$NAME", and will then be used when the
+// plugin should be named "openapi_$NAME", and will then be used when the
 // flag "--${NAME}_out" is passed to openapic.
 
 syntax = "proto3";
