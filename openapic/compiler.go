@@ -63,6 +63,10 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		}
 		response := &plugins.PluginResponse{}
 		err = proto.Unmarshal(output, response)
+		if err != nil {
+			fmt.Printf("Error: %+v\n", err)
+			fmt.Printf("%s\n", string(output))
+		}
 
 		var writer io.Writer
 		if pluginCall.Output == "-" {
