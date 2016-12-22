@@ -89,8 +89,8 @@ Protocol Buffer description. This is mainly for use in testing and debugging.
 that reports some basic information about an API. The "-" causes the plugin to 
 write its output to stdout.
 
-        go install github.com/googleapis/openapi-compiler/plugins/openapi_sample
-        openapic examples/petstore.json --sample_out=-
+        go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_sample
+        openapic examples/petstore.json --go_sample_out=-
 
 ## Copyright
 

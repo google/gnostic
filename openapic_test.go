@@ -118,7 +118,7 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 	os.Remove(output_file)
 	// run the compiler
 	var err error
-	output, err := exec.Command("openapic", "--sample_out=-", input_file).Output()
+	output, err := exec.Command("openapic", "--"+plugin+"_out=-", input_file).Output()
 	if err != nil {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
@@ -136,7 +136,7 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 
 func TestSamplePluginWithPetstore(t *testing.T) {
 	test_plugin(t,
-		"sample",
+		"go_sample",
 		"examples/petstore.yaml",
 		"sample-petstore.out",
 		"test/sample-petstore.out")
