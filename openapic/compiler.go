@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 
 	"github.com/golang/protobuf/proto"
@@ -82,10 +83,27 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 	}
 }
 
-func writeFile(name string, bytes []byte) {
+func isDirectory(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return fileInfo.IsDir()
+}
+
+func writeFile(name string, bytes []byte, source string, extension string) {
 	var writer io.Writer
 	if name == "-" {
 		writer = os.Stdout
+	} else if isDirectory(name) {
+		base := filepath.Base(source)
+		// remove the original source extension
+		base = base[0 : len(base)-len(filepath.Ext(base))]
+		// build the path that puts the result in the passed-in directory
+		filename := name + "/" + base + "." + extension
+		file, _ := os.Create(filename)
+		defer file.Close()
+		writer = file
 	} else {
 		file, _ := os.Create(name)
 		defer file.Close()
@@ -102,19 +120,19 @@ func main() {
 Usage: openapic OPENAPI_SOURCE [OPTIONS]
   OPENAPI_SOURCE is the filename or URL of an OpenAPI description to read.
 Options:
-  --pb_out=FILENAME       Write a binary proto to a file with the specified name.
-  --json_out=FILENAME     Write a json proto to a file with the specified name.
-  --text_out=FILENAME     Write a text proto to a file with the specified name.
-  --errors_out=FILENAME   Write compilation errors to a file with the specified name.
-  --PLUGIN_out=FILENAME   Run the plugin named openapi_PLUGIN and write results to a file with the specified name.
-  --resolve_refs          Explicitly resolve $ref references (this could have problems with recursive definitions).
+  --pb_out=PATH       Write a binary proto to the specified location.
+  --json_out=PATH     Write a json proto to the specified location.
+  --text_out=PATH     Write a text proto to the specified location.
+  --errors_out=PATH   Write compilation errors to the specified location.
+  --PLUGIN_out=PATH   Run the plugin named openapi_PLUGIN and write results to the specified location.
+  --resolve_refs      Explicitly resolve $ref references (this could have problems with recursive definitions).
 `
 	// default values for all options
 	sourceName := ""
-	binaryProtoFileName := ""
-	jsonProtoFileName := ""
-	textProtoFileName := ""
-	errorFileName := ""
+	binaryProtoPath := ""
+	jsonProtoPath := ""
+	textProtoPath := ""
+	errorPath := ""
 	pluginCalls := make([]*PluginCall, 0)
 	resolveReferences := false
 
@@ -131,13 +149,13 @@ Options:
 			outputName := string(m[2])
 			switch pluginName {
 			case "pb":
-				binaryProtoFileName = outputName
+				binaryProtoPath = outputName
 			case "json":
-				jsonProtoFileName = outputName
+				jsonProtoPath = outputName
 			case "text":
-				textProtoFileName = outputName
+				textProtoPath = outputName
 			case "errors":
-				errorFileName = outputName
+				errorPath = outputName
 			default:
 				pluginCall := &PluginCall{Name: pluginName, Output: outputName}
 				pluginCalls = append(pluginCalls, pluginCall)
@@ -152,10 +170,10 @@ Options:
 		}
 	}
 
-	if binaryProtoFileName == "" &&
-		jsonProtoFileName == "" &&
-		textProtoFileName == "" &&
-		errorFileName == "" &&
+	if binaryProtoPath == "" &&
+		jsonProtoPath == "" &&
+		textProtoPath == "" &&
+		errorPath == "" &&
 		len(pluginCalls) == 0 {
 		fmt.Printf("Missing output directives.\n%s\n", usage)
 		os.Exit(-1)
@@ -167,8 +185,8 @@ Options:
 	}
 
 	// If we get here and the error output is unspecified, write errors to stdout.
-	if errorFileName == "" {
-		errorFileName = "-"
+	if errorPath == "" {
+		errorPath = "-"
 	}
 
 	// read and compile the OpenAPI source
@@ -179,7 +197,7 @@ Options:
 	}
 	document, err := openapi_v2.NewDocument(info, compiler.NewContext("$root", nil))
 	if err != nil {
-		writeFile(errorFileName, []byte(err.Error()))
+		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
 
@@ -187,26 +205,26 @@ Options:
 	if resolveReferences {
 		_, err = document.ResolveReferences(sourceName)
 		if err != nil {
-			writeFile(errorFileName, []byte(err.Error()))
+			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 			os.Exit(-1)
 		}
 	}
 
 	// perform all specified actions
-	if binaryProtoFileName != "" {
+	if binaryProtoPath != "" {
 		// write proto in binary format
 		protoBytes, _ := proto.Marshal(document)
-		writeFile(binaryProtoFileName, protoBytes)
+		writeFile(binaryProtoPath, protoBytes, sourceName, "pb")
 	}
-	if jsonProtoFileName != "" {
+	if jsonProtoPath != "" {
 		// write proto in json format
 		jsonBytes, _ := json.Marshal(document)
-		writeFile(jsonProtoFileName, jsonBytes)
+		writeFile(jsonProtoPath, jsonBytes, sourceName, "json")
 	}
-	if textProtoFileName != "" {
+	if textProtoPath != "" {
 		// write proto in text format
 		bytes := []byte(proto.MarshalTextString(document))
-		writeFile(textProtoFileName, bytes)
+		writeFile(textProtoPath, bytes, sourceName, "text")
 	}
 	for _, pluginCall := range pluginCalls {
 		pluginCall.perform(document, sourceName)

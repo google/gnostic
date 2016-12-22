@@ -69,10 +69,10 @@ You can get protoc [here](https://github.com/google/protobuf).
 
         go install github.com/googleapis/openapi-compiler/openapic
 
-5. Run the OpenAPI compiler. This will create a file called "petstore.pb" that contains a binary
+5. Run the OpenAPI compiler. This will create a file in the current directory called "petstore.pb" that contains a binary
 Protocol Buffer description of a sample API.
 
-        openapic --pb_out=petstore.pb examples/petstore.json
+        openapic --pb_out=. examples/petstore.json
 
 6. You can also compile files that you specify with a URL. Here's another way to compile the previous 
 example. This time we're creating "petstore.text", which creates a textual representation of the
