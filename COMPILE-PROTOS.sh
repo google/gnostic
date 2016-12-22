@@ -21,3 +21,6 @@ protoc \
 --go_out=:. \
 OpenAPIv2/OpenAPIv2.proto 
 
+protoc \
+--go_out=:. \
+plugins/plugin.proto 
