@@ -1,0 +1,13 @@
+
+func init () {
+	var router = mux.NewRouter()
+{{range .Methods}}
+	router.HandleFunc("{{.Path}}", {{.HandlerName}}).Methods("{{.Method}}"){{end}}
+    http.Handle("/", router)
+
+    initialize_service()
+}
+
+func main () {
+	http.ListenAndServe(":8080", nil)
+}

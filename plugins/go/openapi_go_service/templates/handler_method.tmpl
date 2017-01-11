@@ -1,0 +1,49 @@
+
+// {{.Method.Description}}
+func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
+	log.Printf("{{.Method.Name}}");
+	var err error
+	
+	// instantiate the request type
+	var request {{.Method.RequestTypeName}}
+	
+	{{if eq .Method.Method "POST"}}
+	// deserialize request from post data
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&request)
+	if err != nil {
+		fmt.Fprintf(w, "ERROR: %v", err)
+		return
+	}
+	log.Printf("REQUEST %+v", request)	
+	{{end}}
+	
+	// get request fields in path and query parameters
+	vars := mux.Vars(r)
+	r.ParseForm()
+	log.Printf("MUX VARS %+v", vars)
+	log.Printf("QUERY PARMS %+v", r.Form)
+	{{range .Method.RequestType.Fields}}	
+	{{if eq .Type "int64"}}
+	if value, ok := vars["{{.JSONName}}"]; ok {
+		request.{{.Name}} = intValue(value)
+	} else if len(r.Form["{{.JSONName}}"]) > 0 {
+		request.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
+	}
+	{{end}}
+	{{end}}
+		
+	// instantiate the response type
+	var response {{.Method.ResponseTypeName}}
+	
+	// call the processor
+	err = {{.Method.ProcessorName}}(&request, &response)
+	
+	if err == nil {
+		// serialize the response
+		encoder := json.NewEncoder(w)
+		encoder.Encode(response)
+	} else {
+		fmt.Fprintf(w, "ERROR: %v", err)
+	}
+}

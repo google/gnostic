@@ -1,0 +1,16 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"strconv"
+)
+
+func intValue(s string) (v int64) {
+	v, _ = strconv.ParseInt(s, 10, 64)
+	return v
+}
+

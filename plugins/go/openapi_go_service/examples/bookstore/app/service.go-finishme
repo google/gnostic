@@ -1,0 +1,63 @@
+package main
+
+import (
+	"log"
+)
+
+func initialize_service() {
+
+}
+
+// COMPLETE THIS MANUALLY
+func processListShelves(request *Empty, response *ListShelvesResponse) (err error) {
+	log.Printf("ListShelves %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processDeleteShelves(request *Empty, response *Value) (err error) {
+	log.Printf("DeleteShelves %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processCreateShelf(request *CreateShelfRequest, response *Shelf) (err error) {
+	log.Printf("CreateShelf %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processGetShelf(request *GetShelfRequest, response *Shelf) (err error) {
+	log.Printf("GetShelf %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processDeleteShelf(request *DeleteShelfRequest, response *Value) (err error) {
+	log.Printf("DeleteShelf %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processListBooks(request *ListBooksRequest, response *ListBooksResponse) (err error) {
+	log.Printf("ListBooks %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processCreateBook(request *CreateBookRequest, response *Book) (err error) {
+	log.Printf("CreateBook %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processGetBook(request *GetBookRequest, response *Book) (err error) {
+	log.Printf("GetBook %+v", request)
+	return nil
+}
+
+// COMPLETE THIS MANUALLY
+func processDeleteBook(request *DeleteBookRequest, response *Value) (err error) {
+	log.Printf("DeleteBook %+v", request)
+	return nil
+}

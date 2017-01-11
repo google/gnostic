@@ -1,0 +1,4 @@
+type {{.Name}} struct { {{range .Fields}}
+  {{.Name}} {{.Type}} `json:"{{.JSONName}}"` {{end}}
+}
+
