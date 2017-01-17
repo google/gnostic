@@ -15,11 +15,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/exec"
 	"path"
 	"runtime"
 	"strings"
@@ -120,12 +119,45 @@ func (renderer *ServiceRenderer) loadTemplates() (err error) {
 	return err
 }
 
+func (renderer *ServiceRenderer) loadServiceType(name string) (t *ServiceType, err error) {
+	t = &ServiceType{}
+	t.Fields = make([]*ServiceTypeField, 0)
+	/*
+		for _, field := range serviceType.Fields {
+			var f ServiceTypeField
+			f.Name = strings.Title(field.Name)
+			f.Type = typeForField(field)
+			f.JSONName = field.JsonName
+			t.Fields = append(t.Fields, &f)
+		}
+	*/
+	t.Name = name
+	renderer.types = append(renderer.types, t)
+	return t, err
+}
+
+func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method string, path string) (err error) {
+	var m ServiceMethod
+	m.Name = strings.Title(op.OperationId)
+	m.Path = path
+	m.Method = method
+	m.HandlerName = "handle" + m.Name
+	m.ProcessorName = "process" + m.Name
+	m.RequestTypeName = m.Name + "Request"
+	m.ResponseTypeName = m.Name + "Response"
+	m.RequestType, err = renderer.loadServiceType(m.RequestTypeName)
+	m.ResponseType, err = renderer.loadServiceType(m.ResponseTypeName)
+	renderer.methods = append(renderer.methods, &m)
+	return err
+}
+
 // preprocess the types and methods of the API
 func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err error) {
 
+	// collect service type descriptions
+	renderer.types = make([]*ServiceType, 0)
+
 	/*
-		// collect service type descriptions
-		renderer.types = make([]*ServiceType, 0)
 		for _, serviceType := range service.Types {
 			var t ServiceType
 			t.Fields = make([]*ServiceTypeField, 0)
@@ -139,71 +171,26 @@ func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err er
 			t.Name = filteredTypeName(serviceType.Name)
 			renderer.types = append(renderer.types, &t)
 		}
-
-		// collect service method descriptions
-		renderer.methods = make([]*ServiceMethod, 0)
-		for _, api := range service.Apis {
-			for _, method := range api.Methods {
-				var m ServiceMethod
-				m.Name = method.Name
-				m.RequestTypeName = filteredTypeName(method.RequestTypeUrl)
-				m.ResponseTypeName = filteredTypeName(method.ResponseTypeUrl)
-				// look up type matching request and response type names
-				for _, t := range renderer.types {
-					if m.RequestTypeName == t.Name {
-						m.RequestType = t
-					}
-					if m.ResponseTypeName == t.Name {
-						m.ResponseType = t
-					}
-				}
-				if m.RequestType == nil {
-					log.Printf("ERROR: no type %s for %s", m.RequestTypeName, m.Name)
-				}
-				if m.ResponseType == nil {
-					log.Printf("ERROR: no type %s for %s", m.ResponseTypeName, m.Name)
-				}
-				renderer.methods = append(renderer.methods, &m)
-			}
-		}
-
-		// scan http rules to get paths associated with service methods
-		for _, rule := range service.Http.Rules {
-			selector := rule.Selector
-			for _, m := range renderer.methods {
-				if m.Name == selector {
-					m.HandlerName = "handle" + m.Name
-					m.ProcessorName = "process" + m.Name
-					var path string
-					path = rule.GetGet()
-					if path != "" {
-						m.Path = path
-						m.Method = "GET"
-						continue
-					}
-					path = rule.GetPost()
-					if path != "" {
-						m.Path = path
-						m.Method = "POST"
-						continue
-					}
-					path = rule.GetPut()
-					if path != "" {
-						m.Path = path
-						m.Method = "PUT"
-						continue
-					}
-					path = rule.GetDelete()
-					if path != "" {
-						m.Path = path
-						m.Method = "DELETE"
-						continue
-					}
-				}
-			}
-		}
 	*/
-	return
+
+	// collect service method descriptions
+	renderer.methods = make([]*ServiceMethod, 0)
+	for _, pair := range document.Paths.Path {
+		v := pair.Value
+		if v.Get != nil {
+			renderer.loadOperation(v.Get, "GET", pair.Name)
+		}
+		if v.Post != nil {
+			renderer.loadOperation(v.Post, "POST", pair.Name)
+		}
+		if v.Put != nil {
+			renderer.loadOperation(v.Put, "PUT", pair.Name)
+		}
+		if v.Delete != nil {
+			renderer.loadOperation(v.Delete, "DELETE", pair.Name)
+		}
+	}
+	return err
 }
 
 func filteredTypeName(typeName string) (name string) {
@@ -247,17 +234,17 @@ func typeForField(field *protobuf.Field) (typeName string) {
 }
 */
 
-func (renderer *ServiceRenderer) GenerateApp(path string) (err error) {
-	err = os.MkdirAll(path, 0777)
-	renderer.writeAppYaml(path + "/app.yaml")
-	renderer.writeAppGo(path + "/app.go")
-	renderer.writeServiceGo(path + "/service.go-finishme")
+func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (err error) {
+	renderer.writeAppYaml(response, "app.yaml")
+	renderer.writeAppGo(response, "app.go")
+	renderer.writeServiceGo(response, "/service.go-finishme")
 	return err
 }
 
-func (renderer *ServiceRenderer) writeAppYaml(filename string) {
-	f, err := os.Create(filename)
-
+func (renderer *ServiceRenderer) writeAppYaml(response *plugins.PluginResponse, filename string) (err error) {
+	file := &plugins.File{}
+	file.Name = filename
+	f := new(bytes.Buffer)
 	// file header
 	err = renderer.templatedAppYaml.Execute(f, struct {
 		Name string
@@ -265,14 +252,18 @@ func (renderer *ServiceRenderer) writeAppYaml(filename string) {
 		renderer.name,
 	})
 	if err != nil {
-		panic(err)
+		response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 	}
-	f.Close()
+	file.Data = f.Bytes()
+	response.File = append(response.File, file)
+	return err
 }
 
 // write the non-editable app.go
-func (renderer *ServiceRenderer) writeAppGo(filename string) {
-	f, err := os.Create(filename)
+func (renderer *ServiceRenderer) writeAppGo(response *plugins.PluginResponse, filename string) (err error) {
+	file := &plugins.File{}
+	file.Name = filename
+	f := new(bytes.Buffer)
 
 	// file header
 	err = renderer.templatedFileHeader.Execute(f, struct {
@@ -281,7 +272,7 @@ func (renderer *ServiceRenderer) writeAppGo(filename string) {
 		renderer.name,
 	})
 	if err != nil {
-		panic(err)
+		response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 	}
 
 	// type declarations
@@ -294,7 +285,7 @@ func (renderer *ServiceRenderer) writeAppGo(filename string) {
 			tt.Fields,
 		})
 		if err != nil {
-			panic(err)
+			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 		}
 	}
 
@@ -308,7 +299,7 @@ func (renderer *ServiceRenderer) writeAppGo(filename string) {
 			method,
 		})
 		if err != nil {
-			panic(err)
+			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 		}
 	}
 
@@ -321,16 +312,20 @@ func (renderer *ServiceRenderer) writeAppGo(filename string) {
 		renderer.methods,
 	})
 	if err != nil {
-		panic(err)
+		response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 	}
 
-	f.Close()
-	err = exec.Command("/usr/local/go/bin/gofmt", "-w", filename).Run()
+	//err = exec.Command("/usr/local/go/bin/gofmt", "-w", filename).Run()
+	file.Data = f.Bytes()
+	response.File = append(response.File, file)
+	return err
 }
 
 // write the user-editable service.go
-func (renderer *ServiceRenderer) writeServiceGo(filename string) {
-	f, err := os.Create(filename)
+func (renderer *ServiceRenderer) writeServiceGo(response *plugins.PluginResponse, filename string) (err error) {
+	file := &plugins.File{}
+	file.Name = filename
+	f := new(bytes.Buffer)
 
 	err = renderer.templatedServiceHeader.Execute(f, struct {
 		Name string
@@ -338,7 +333,7 @@ func (renderer *ServiceRenderer) writeServiceGo(filename string) {
 		renderer.name,
 	})
 	if err != nil {
-		panic(err)
+		response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 	}
 
 	for _, method := range renderer.methods {
@@ -350,12 +345,14 @@ func (renderer *ServiceRenderer) writeServiceGo(filename string) {
 			method,
 		})
 		if err != nil {
-			panic(err)
+			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 		}
 	}
 
-	f.Close()
-	err = exec.Command("/usr/local/go/bin/gofmt", "-w", filename).Run()
+	//err = exec.Command("/usr/local/go/bin/gofmt", "-w", filename).Run()
+	file.Data = f.Bytes()
+	response.File = append(response.File, file)
+	return err
 }
 
 type documentHandler func(name string, version string, document *openapi.Document)
@@ -424,14 +421,13 @@ func main() {
 
 			renderer, err := NewServiceRenderer(document)
 			if err != nil {
-				panic(err)
+				response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 			}
-			err = renderer.GenerateApp("app")
+			err = renderer.GenerateApp(response)
 			if err != nil {
-				panic(err)
+				response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 			}
-			log.Printf("DONE")
-
+			response.Text = append(response.Text, fmt.Sprintf("DONE"))
 		})
 
 	responseBytes, _ := proto.Marshal(response)

@@ -86,16 +86,27 @@ message PluginResponse {
   
   // text output
   repeated string text = 2;
+
+  // file output
+  repeated File file = 3;
+}
+
+message File {
+  // name of the file
+  string name = 1;
+
+  // data to be written to the file
+  bytes data = 2; 
 }
 
 message Wrapper {
 
-  // The filename or URL of the wrapped description
+  // filename or URL of the wrapped description
   string name = 1;
   
-  // The version of the OpenAPI specification that is used by the wrapped description.
+  // version of the OpenAPI specification that is used by the wrapped description
   string version = 2;
 
-  // Must be a valid serialized protocol buffer of the named OpenAPI specification version.
+  // valid serialized protocol buffer of the named OpenAPI specification version
   bytes value = 3;
 }

@@ -79,6 +79,11 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		}
 		for _, text := range response.Text {
 			writer.Write([]byte(text))
+			writer.Write([]byte("\n"))
+		}
+		for _, file := range response.File {
+			writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
+			writer.Write(file.Data)
 		}
 	}
 }
