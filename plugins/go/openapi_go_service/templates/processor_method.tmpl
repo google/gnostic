@@ -1,6 +1,6 @@
 
 // COMPLETE THIS MANUALLY
-func {{.Method.ProcessorName}}(request *{{.Method.RequestTypeName}}, response *{{.Method.ResponseTypeName}}) (err error) {
+func {{.Method.ProcessorName}}(parameters *{{.Method.RequestTypeName}}, responses *{{.Method.ResponseTypeName}}) (err error) {
 	log.Printf("{{.Method.Name}} %+v", request)
 	return nil
 }

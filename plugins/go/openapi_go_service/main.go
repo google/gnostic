@@ -165,16 +165,26 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 	return t, err
 }
 
+func propertyNameForResponseCode(code string) string {
+	if code == "200" {
+		return "OK"
+	}
+	return code
+}
+
 func (renderer *ServiceRenderer) loadServiceTypeFromResponses(name string, responses *openapi.Responses) (t *ServiceType, err error) {
 	t = &ServiceType{}
 	t.Fields = make([]*ServiceTypeField, 0)
 
 	for _, responseCode := range responses.ResponseCode {
 		var f ServiceTypeField
-		f.Name = "unknown"
-		f.Type = fmt.Sprintf("%+v", responseCode)
+		f.Name = propertyNameForResponseCode(responseCode.Name)
 		f.JSONName = ""
-		t.Fields = append(t.Fields, &f)
+		response := responseCode.Value.GetResponse()
+		if response != nil && response.Schema != nil && response.Schema.GetSchema() != nil {
+			f.Type = "*" + typeForSchema(response.Schema.GetSchema())
+			t.Fields = append(t.Fields, &f)
+		}
 	}
 
 	t.Name = name
