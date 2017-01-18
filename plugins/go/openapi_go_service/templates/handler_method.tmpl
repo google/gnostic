@@ -4,8 +4,8 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	log.Printf("{{.Method.Name}}");
 	var err error
 	
-	// instantiate the request type
-	var request {{.Method.RequestTypeName}}
+	// instantiate the parameters structure
+	var parameters {{.Method.ParametersTypeName}}
 	
 	{{if eq .Method.Method "POST"}}
 	// deserialize request from post data
@@ -33,11 +33,11 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	{{end}}
 	{{end}}
 		
-	// instantiate the response type
-	var response {{.Method.ResponseTypeName}}
+	// instantiate the responses structure
+	var responses {{.Method.ResponsesTypeName}}
 	
 	// call the processor
-	err = {{.Method.ProcessorName}}(&request, &response)
+	err = {{.Method.ProcessorName}}(&parameters, &responses)
 	
 	if err == nil {
 		// serialize the response

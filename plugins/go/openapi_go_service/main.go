@@ -43,11 +43,11 @@ type ServiceTypeField struct {
 }
 
 type ServiceMethod struct {
-	Name             string
-	RequestTypeName  string
-	ResponseTypeName string
-	RequestType      *ServiceType
-	ResponseType     *ServiceType
+	Name               string
+	ParametersTypeName string
+	ResponsesTypeName  string
+	ParametersType     *ServiceType
+	ResponsesType      *ServiceType
 
 	Path        string
 	Method      string
@@ -199,10 +199,10 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Method = method
 	m.HandlerName = "handle" + m.Name
 	m.ProcessorName = "process" + m.Name
-	m.RequestTypeName = m.Name + "Parameters"
-	m.ResponseTypeName = m.Name + "Responses"
-	m.RequestType, err = renderer.loadServiceTypeFromParameters(m.RequestTypeName, op.Parameters)
-	m.ResponseType, err = renderer.loadServiceTypeFromResponses(m.ResponseTypeName, op.Responses)
+	m.ParametersTypeName = m.Name + "Parameters"
+	m.ResponsesTypeName = m.Name + "Responses"
+	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.ParametersTypeName, op.Parameters)
+	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(m.ResponsesTypeName, op.Responses)
 	renderer.methods = append(renderer.methods, &m)
 	return err
 }
