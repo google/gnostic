@@ -69,23 +69,41 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 			fmt.Printf("%s\n", string(output))
 		}
 
+		// always write text messages to stdout
+		for _, text := range response.Text {
+			os.Stdout.Write([]byte(text))
+			os.Stdout.Write([]byte("\n"))
+		}
+		// write files to the specified directory
 		var writer io.Writer
 		if pluginCall.Output == "-" {
 			writer = os.Stdout
+			for _, file := range response.File {
+				writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
+				writer.Write(file.Data)
+			}
+		} else if isFile(pluginCall.Output) {
+			fmt.Printf("Error, unable to overwrite %s\n", pluginCall.Output)
 		} else {
-			file, _ := os.Create(pluginCall.Output)
-			defer file.Close()
-			writer = file
-		}
-		for _, text := range response.Text {
-			writer.Write([]byte(text))
-			writer.Write([]byte("\n"))
-		}
-		for _, file := range response.File {
-			writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
-			writer.Write(file.Data)
+			if !isDirectory(pluginCall.Output) {
+				os.Mkdir(pluginCall.Output, 0755)
+			}
+			for _, file := range response.File {
+				path := pluginCall.Output + "/" + file.Name
+				f, _ := os.Create(path)
+				defer f.Close()
+				f.Write(file.Data)
+			}
 		}
 	}
+}
+
+func isFile(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return !fileInfo.IsDir()
 }
 
 func isDirectory(path string) bool {
