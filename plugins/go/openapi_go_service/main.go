@@ -119,18 +119,64 @@ func (renderer *ServiceRenderer) loadTemplates() (err error) {
 	return err
 }
 
-func (renderer *ServiceRenderer) loadServiceType(name string) (t *ServiceType, err error) {
+func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, parameters []*openapi.ParametersItem) (t *ServiceType, err error) {
 	t = &ServiceType{}
 	t.Fields = make([]*ServiceTypeField, 0)
-	/*
-		for _, field := range serviceType.Fields {
-			var f ServiceTypeField
-			f.Name = strings.Title(field.Name)
-			f.Type = typeForField(field)
-			f.JSONName = field.JsonName
+	for _, parametersItem := range parameters {
+		var f ServiceTypeField
+		f.Type = fmt.Sprintf("%+v", parametersItem)
+		parameter := parametersItem.GetParameter()
+		if parameter != nil {
+			bodyParameter := parameter.GetBodyParameter()
+			if bodyParameter != nil {
+				f.Name = bodyParameter.Name
+				if bodyParameter.Schema != nil {
+					f.Type = typeForSchema(bodyParameter.Schema)
+				}
+			}
+			nonBodyParameter := parameter.GetNonBodyParameter()
+			if nonBodyParameter != nil {
+				headerParameter := nonBodyParameter.GetHeaderParameterSubSchema()
+				if headerParameter != nil {
+					f.Name = headerParameter.Name
+				}
+				formDataParameter := nonBodyParameter.GetFormDataParameterSubSchema()
+				if formDataParameter != nil {
+					f.Name = formDataParameter.Name
+				}
+				queryParameter := nonBodyParameter.GetQueryParameterSubSchema()
+				if queryParameter != nil {
+					f.Name = queryParameter.Name
+				}
+				pathParameter := nonBodyParameter.GetPathParameterSubSchema()
+				if pathParameter != nil {
+					f.Name = pathParameter.Name
+
+					f.Type = pathParameter.Type
+				}
+			}
+			f.Name = strings.Title(f.Name)
+			f.JSONName = ""
 			t.Fields = append(t.Fields, &f)
 		}
-	*/
+	}
+	t.Name = name
+	renderer.types = append(renderer.types, t)
+	return t, err
+}
+
+func (renderer *ServiceRenderer) loadServiceTypeFromResponses(name string, responses *openapi.Responses) (t *ServiceType, err error) {
+	t = &ServiceType{}
+	t.Fields = make([]*ServiceTypeField, 0)
+
+	for _, responseCode := range responses.ResponseCode {
+		var f ServiceTypeField
+		f.Name = "unknown"
+		f.Type = fmt.Sprintf("%+v", responseCode)
+		f.JSONName = ""
+		t.Fields = append(t.Fields, &f)
+	}
+
 	t.Name = name
 	renderer.types = append(renderer.types, t)
 	return t, err
@@ -143,10 +189,10 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Method = method
 	m.HandlerName = "handle" + m.Name
 	m.ProcessorName = "process" + m.Name
-	m.RequestTypeName = m.Name + "Request"
-	m.ResponseTypeName = m.Name + "Response"
-	m.RequestType, err = renderer.loadServiceType(m.RequestTypeName)
-	m.ResponseType, err = renderer.loadServiceType(m.ResponseTypeName)
+	m.RequestTypeName = m.Name + "Parameters"
+	m.ResponseTypeName = m.Name + "Responses"
+	m.RequestType, err = renderer.loadServiceTypeFromParameters(m.RequestTypeName, op.Parameters)
+	m.ResponseType, err = renderer.loadServiceTypeFromResponses(m.ResponseTypeName, op.Responses)
 	renderer.methods = append(renderer.methods, &m)
 	return err
 }
@@ -157,21 +203,25 @@ func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err er
 	// collect service type descriptions
 	renderer.types = make([]*ServiceType, 0)
 
-	/*
-		for _, serviceType := range service.Types {
-			var t ServiceType
-			t.Fields = make([]*ServiceTypeField, 0)
-			for _, field := range serviceType.Fields {
-				var f ServiceTypeField
-				f.Name = strings.Title(field.Name)
-				f.Type = typeForField(field)
-				f.JSONName = field.JsonName
-				t.Fields = append(t.Fields, &f)
-			}
-			t.Name = filteredTypeName(serviceType.Name)
-			renderer.types = append(renderer.types, &t)
+	for _, pair := range document.Definitions.AdditionalProperties {
+
+		var t ServiceType
+		t.Fields = make([]*ServiceTypeField, 0)
+		schema := pair.Value
+
+		for _, pair2 := range schema.Properties.AdditionalProperties {
+			var f ServiceTypeField
+			f.Name = strings.Title(pair2.Name)
+
+			f.Type = typeForSchema(pair2.Value)
+
+			f.JSONName = pair2.Name
+			t.Fields = append(t.Fields, &f)
 		}
-	*/
+
+		t.Name = strings.Title(filteredTypeName(pair.Name))
+		renderer.types = append(renderer.types, &t)
+	}
 
 	// collect service method descriptions
 	renderer.methods = make([]*ServiceMethod, 0)
@@ -203,36 +253,31 @@ func filteredTypeName(typeName string) (name string) {
 	return name
 }
 
-/*
-func typeForField(field *protobuf.Field) (typeName string) {
-	var prefix string
-	if field.Cardinality == protobuf.Field_CARDINALITY_REPEATED {
-		prefix = "[]"
+func typeForSchema(schema *openapi.Schema) (typeName string) {
+	ref := schema.XRef
+	if ref != "" {
+		return typeForRef(ref)
 	}
-
-	name := "unknown"
-	switch field.Kind {
-	case protobuf.Field_TYPE_STRING:
-		name = "string"
-	case protobuf.Field_TYPE_INT64:
-		name = "int64"
-	case protobuf.Field_TYPE_INT32:
-		name = "int32"
-	case protobuf.Field_TYPE_BOOL:
-		name = "bool"
-	case protobuf.Field_TYPE_DOUBLE:
-		name = "float64"
-	case protobuf.Field_TYPE_ENUM:
-		name = "int"
-	case protobuf.Field_TYPE_MESSAGE:
-		name = filteredTypeName(field.TypeUrl)
+	if schema.Type != nil {
+		types := schema.Type.Value
+		if len(types) == 1 && types[0] == "string" {
+			return "string"
+		}
+		if len(types) == 1 && types[0] == "array" && schema.Items != nil {
+			// we have an array.., but of what?
+			items := schema.Items.Schema
+			if len(items) == 1 && items[0].XRef != "" {
+				return "[]" + typeForRef(items[0].XRef)
+			}
+		}
 	}
-	if name == "unknown" {
-		log.Printf(">> UNKNOWN TYPE FOR FIELD %+v", field)
-	}
-	return prefix + name
+	// this function is incomplete... so return a string representing anything that we don't handle
+	return fmt.Sprintf("%v", schema)
 }
-*/
+
+func typeForRef(ref string) (typeName string) {
+	return strings.Title(path.Base(ref))
+}
 
 func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (err error) {
 	renderer.writeAppYaml(response, "app.yaml")
