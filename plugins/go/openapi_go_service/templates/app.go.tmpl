@@ -1,13 +1,39 @@
+package main
 
-// {{.Method.Description}}
-func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
-	log.Printf("{{.Method.Name}}");
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
+)
+
+func intValue(s string) (v int64) {
+	v, _ = strconv.ParseInt(s, 10, 64)
+	return v
+}
+
+// types
+{{range .Renderer.Types}}
+type {{.Name}} struct { {{range .Fields}}
+  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`{{end}}{{end}}
+}
+{{end}}
+
+// handlers
+{{range .Renderer.Methods}}
+
+// {{.Description}}
+func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
+	log.Printf("{{.Name}}");
 	var err error
 	
 	// instantiate the parameters structure
-	var parameters {{.Method.ParametersTypeName}}
+	var parameters {{.ParametersTypeName}}
 	
-	{{if eq .Method.Method "POST"}}
+	{{if eq .Method "POST"}}
 	// deserialize request from post data
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&parameters)
@@ -23,7 +49,7 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	log.Printf("MUX VARS %+v", vars)
 	log.Printf("QUERY PARMS %+v", r.Form)
-	{{range .Method.ParametersType.Fields}}	
+	{{range .ParametersType.Fields}}	
 	// Type: {{.Type}}
 	// Name {{.Name}}
 	// JSONName {{.JSONName}}
@@ -46,10 +72,10 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	
 		
 	// instantiate the responses structure
-	var responses {{.Method.ResponsesTypeName}}
+	var responses {{.ResponsesTypeName}}
 	
 	// call the processor
-	err = {{.Method.ProcessorName}}(&parameters, &responses)
+	err = {{.ProcessorName}}(&parameters, &responses)
 	
 	if err == nil {
 		// write the normal response		
@@ -62,4 +88,21 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 		
 		fmt.Fprintf(w, "ERROR: %v", err)
 	}
+}
+{{end}}
+
+
+
+
+func init () {
+	var router = mux.NewRouter()
+{{range .Renderer.Methods}}
+	router.HandleFunc("{{.Path}}", {{.HandlerName}}).Methods("{{.Method}}"){{end}}
+    http.Handle("/", router)
+
+    initialize_service()
+}
+
+func main () {
+	http.ListenAndServe(":8080", nil)
 }

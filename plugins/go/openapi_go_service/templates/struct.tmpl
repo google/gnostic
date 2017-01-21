@@ -1,4 +1,0 @@
-type {{.Name}} struct { {{range .Fields}}
-  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`{{end}}{{end}}
-}
-
