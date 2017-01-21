@@ -10,12 +10,12 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	{{if eq .Method.Method "POST"}}
 	// deserialize request from post data
 	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&request)
+	err = decoder.Decode(&parameters)
 	if err != nil {
 		fmt.Fprintf(w, "ERROR: %v", err)
 		return
 	}
-	log.Printf("REQUEST %+v", request)	
+	log.Printf("PARAMETERS %+v", parameters)	
 	{{end}}
 	
 	// get request fields in path and query parameters
@@ -23,15 +23,27 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	log.Printf("MUX VARS %+v", vars)
 	log.Printf("QUERY PARMS %+v", r.Form)
-	{{range .Method.RequestType.Fields}}	
-	{{if eq .Type "int64"}}
+	{{range .Method.ParametersType.Fields}}	
+	// Type: {{.Type}}
+	// Name {{.Name}}
+	// JSONName {{.JSONName}}
+	
+	{{if eq .Position 4}}
 	if value, ok := vars["{{.JSONName}}"]; ok {
-		request.{{.Name}} = intValue(value)
-	} else if len(r.Form["{{.JSONName}}"]) > 0 {
-		request.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
+		parameters.{{.Name}} = intValue(value)
+	} 
+	{{end}}
+	
+	{{if eq .Position 5}} // check value
+	if len(r.Form["{{.JSONName}}"]) > 0 {
+			parameters.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
 	}
 	{{end}}
+	
 	{{end}}
+	
+
+	
 		
 	// instantiate the responses structure
 	var responses {{.Method.ResponsesTypeName}}
@@ -40,10 +52,14 @@ func {{.Method.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	err = {{.Method.ProcessorName}}(&parameters, &responses)
 	
 	if err == nil {
-		// serialize the response
+		// write the normal response		
+		{{ if true }} // responses includes an "OK" field 
 		encoder := json.NewEncoder(w)
-		encoder.Encode(response)
+		encoder.Encode(responses.OK)
+		{{ end }}
 	} else {
+		// write an error response...
+		
 		fmt.Fprintf(w, "ERROR: %v", err)
 	}
 }

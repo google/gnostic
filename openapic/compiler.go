@@ -58,6 +58,7 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 
 		cmd := exec.Command("openapi_" + pluginCall.Name)
 		cmd.Stdin = bytes.NewReader(requestBytes)
+		cmd.Stderr = os.Stderr
 		output, err := cmd.Output()
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)

@@ -5,3 +5,6 @@ build:
 
 test: 	build
 	openapic swagger.json --go_service_out=-
+
+app:	build
+	openapic swagger.json --go_service_out=foo

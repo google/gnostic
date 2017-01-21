@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"runtime"
@@ -31,6 +32,16 @@ import (
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
+type FieldPosition int
+
+const (
+	FieldPositionBody     FieldPosition = iota
+	FieldPositionHeader                 = iota
+	FieldPositionFormData               = iota
+	FieldPositionQuery                  = iota
+	FieldPositionPath                   = iota
+)
+
 type ServiceType struct {
 	Name   string
 	Fields []*ServiceTypeField
@@ -40,6 +51,7 @@ type ServiceTypeField struct {
 	Name     string
 	Type     string
 	JSONName string
+	Position FieldPosition
 }
 
 type ServiceMethod struct {
@@ -85,13 +97,39 @@ func NewServiceRenderer(document *openapi.Document) (renderer *ServiceRenderer, 
 	return renderer, nil
 }
 
-// instantiate templates
-func (renderer *ServiceRenderer) loadTemplates() (err error) {
+func truncate(in string) (out string) {
+	limit := 18
+	if len(in) <= limit {
+		return in
+	} else {
+		return in[0:limit]
+	}
+}
+
+func (renderer *ServiceRenderer) loadTemplate(name string) (err error) {
 
 	_, filename, _, _ := runtime.Caller(1)
 	TEMPLATES := path.Join(path.Dir(filename), "templates")
 
 	renderer.templatedAppYaml, err = template.ParseFiles(TEMPLATES + "/app_yaml.tmpl")
+	renderer.templatedAppYaml.Funcs(funcMap)
+	if err != nil {
+		return err
+	}
+}
+
+// instantiate templates
+func (renderer *ServiceRenderer) loadTemplates() (err error) {
+
+	funcMap := template.FuncMap{
+		"truncate": truncate,
+	}
+
+	_, filename, _, _ := runtime.Caller(1)
+	TEMPLATES := path.Join(path.Dir(filename), "templates")
+
+	renderer.templatedAppYaml, err = template.ParseFiles(TEMPLATES + "/app_yaml.tmpl")
+	renderer.templatedAppYaml.Funcs(funcMap)
 	if err != nil {
 		return err
 	}
@@ -132,6 +170,7 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 				f.Name = bodyParameter.Name
 				if bodyParameter.Schema != nil {
 					f.Type = typeForSchema(bodyParameter.Schema)
+					f.Position = FieldPositionBody
 				}
 			}
 			nonBodyParameter := parameter.GetNonBodyParameter()
@@ -139,24 +178,27 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 				headerParameter := nonBodyParameter.GetHeaderParameterSubSchema()
 				if headerParameter != nil {
 					f.Name = headerParameter.Name
+					f.Position = FieldPositionHeader
 				}
 				formDataParameter := nonBodyParameter.GetFormDataParameterSubSchema()
 				if formDataParameter != nil {
 					f.Name = formDataParameter.Name
+					f.Position = FieldPositionFormData
 				}
 				queryParameter := nonBodyParameter.GetQueryParameterSubSchema()
 				if queryParameter != nil {
 					f.Name = queryParameter.Name
+					f.Position = FieldPositionQuery
 				}
 				pathParameter := nonBodyParameter.GetPathParameterSubSchema()
 				if pathParameter != nil {
 					f.Name = pathParameter.Name
-
-					f.Type = pathParameter.Type
+					f.Position = FieldPositionPath
+					f.Type = typeForName(pathParameter.Type, pathParameter.Format)
 				}
 			}
+			f.JSONName = f.Name
 			f.Name = strings.Title(f.Name)
-			f.JSONName = ""
 			t.Fields = append(t.Fields, &f)
 		}
 	}
@@ -261,6 +303,21 @@ func filteredTypeName(typeName string) (name string) {
 	parts = strings.Split(name, ".")
 	name = parts[len(parts)-1]
 	return name
+}
+
+func typeForName(name string, format string) (typeName string) {
+	switch name {
+	case "integer":
+		if format == "int32" {
+			return "int32"
+		} else if format == "int64" {
+			return "int64"
+		} else {
+			return "int32"
+		}
+	default:
+		return name
+	}
 }
 
 func typeForSchema(schema *openapi.Schema) (typeName string) {
@@ -463,6 +520,7 @@ func printDocument(code *printer.Code, document *openapi.Document) {
 }
 
 func main() {
+	log.Printf("OK")
 	response := &plugins.PluginResponse{}
 	response.Text = []string{}
 
@@ -477,10 +535,12 @@ func main() {
 			renderer, err := NewServiceRenderer(document)
 			if err != nil {
 				response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
+				return
 			}
 			err = renderer.GenerateApp(response)
 			if err != nil {
 				response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
+				return
 			}
 			response.Text = append(response.Text, fmt.Sprintf("DONE"))
 		})
