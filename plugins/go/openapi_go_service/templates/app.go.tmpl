@@ -1,4 +1,4 @@
-package main
+package {{.Package}}
 
 import (
 	"encoding/json"
@@ -14,13 +14,6 @@ func intValue(s string) (v int64) {
 	v, _ = strconv.ParseInt(s, 10, 64)
 	return v
 }
-
-// types
-{{range .Renderer.Types}}
-type {{.Name}} struct { {{range .Fields}}
-  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`{{end}}{{end}}
-}
-{{end}}
 
 // handlers
 {{range .Renderer.Methods}}

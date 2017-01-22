@@ -61,6 +61,8 @@ type ServiceMethod struct {
 	Description        string
 	HandlerName        string
 	ProcessorName      string
+	ClientName         string
+	ResultTypeName     string
 	ParametersTypeName string
 	ResponsesTypeName  string
 	ParametersType     *ServiceType
@@ -100,13 +102,25 @@ func hasOKField(s *ServiceType) bool {
 	return s.hasFieldNamed("OK")
 }
 
+func parameterList(m *ServiceMethod) string {
+	result := ""
+	for i, field := range m.ParametersType.Fields {
+		if i > 0 {
+			result += ", "
+		}
+		result += field.JSONName + " " + field.Type
+	}
+	return result
+}
+
 // instantiate templates
 
 func (renderer *ServiceRenderer) loadTemplates() (err error) {
 	renderer.Templates = make([]*ServiceFileTemplate, 0)
 
 	funcMap := template.FuncMap{
-		"HASOK": hasOKField,
+		"HASOK":         hasOKField,
+		"parameterList": parameterList,
 	}
 
 	_, filename, _, _ := runtime.Caller(1)
@@ -116,6 +130,8 @@ func (renderer *ServiceRenderer) loadTemplates() (err error) {
 		"app.yaml",
 		"app.go",
 		"service.go",
+		"types.go",
+		"client.go",
 	}
 	for _, filename := range files {
 		t, err := template.New(filename + ".tmpl").Funcs(funcMap).ParseFiles(TEMPLATES + filename + ".tmpl")
@@ -186,7 +202,7 @@ func propertyNameForResponseCode(code string) string {
 	return code
 }
 
-func (renderer *ServiceRenderer) loadServiceTypeFromResponses(name string, responses *openapi.Responses) (t *ServiceType, err error) {
+func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, name string, responses *openapi.Responses) (t *ServiceType, err error) {
 	t = &ServiceType{}
 	t.Fields = make([]*ServiceTypeField, 0)
 
@@ -198,6 +214,9 @@ func (renderer *ServiceRenderer) loadServiceTypeFromResponses(name string, respo
 		if response != nil && response.Schema != nil && response.Schema.GetSchema() != nil {
 			f.Type = "*" + typeForSchema(response.Schema.GetSchema())
 			t.Fields = append(t.Fields, &f)
+			if f.Name == "OK" {
+				m.ResultTypeName = typeForSchema(response.Schema.GetSchema())
+			}
 		}
 	}
 
@@ -213,10 +232,11 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Method = method
 	m.HandlerName = "handle" + m.Name
 	m.ProcessorName = "process" + m.Name
+	m.ClientName = "call" + m.Name
 	m.ParametersTypeName = m.Name + "Parameters"
 	m.ResponsesTypeName = m.Name + "Responses"
 	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.ParametersTypeName, op.Parameters)
-	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(m.ResponsesTypeName, op.Responses)
+	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(&m, m.ResponsesTypeName, op.Responses)
 	renderer.Methods = append(renderer.Methods, &m)
 	return err
 }
@@ -318,8 +338,10 @@ func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (
 		// file header
 		err = pair.Template.Execute(f, struct {
 			Renderer *ServiceRenderer
+			Package  string
 		}{
 			renderer,
+			"main",
 		})
 		if err != nil {
 			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))

@@ -1,0 +1,42 @@
+package {{.Package}}
+
+import (
+  "encoding/json"
+  "fmt"
+  "net/http"
+  "strings"
+)
+  
+const service = "http://localhost:8080"
+
+{{range .Renderer.Methods}}
+{{if eq .ResultTypeName ""}}
+func {{.ClientName}}({{parameterList .}}) (err error) {
+{{else}}
+func {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err error) {
+{{end}}
+	path := service + "{{.Path}}"
+	
+	{{range .ParametersType.Fields}}	
+	{{if eq .Position "path"}}
+	path = strings.Replace(path, "{" + "{{.JSONName}}" + "}", fmt.Sprintf("%v", {{.JSONName}}), 1)
+	{{end}}
+	{{end}}
+	
+	req, err := http.NewRequest("{{.Method}}", path, nil)
+	if err != nil {
+		return
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return 
+	}
+	defer resp.Body.Close()
+	{{if ne .ResultTypeName ""}}
+	decoder := json.NewDecoder(resp.Body)
+	result = &{{.ResultTypeName}}{}
+	decoder.Decode(result)
+	{{end}}
+	return  
+}
+{{end}}
