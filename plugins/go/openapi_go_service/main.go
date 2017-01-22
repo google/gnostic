@@ -20,7 +20,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"text/template"
@@ -30,8 +32,6 @@ import (
 	openapi "github.com/googleapis/openapi-compiler/OpenAPIv2"
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
-
-type FieldPosition int
 
 type ServiceType struct {
 	Name   string
@@ -324,7 +324,32 @@ func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (
 		if err != nil {
 			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
 		}
-		file.Data = f.Bytes()
+		inputBytes := f.Bytes()
+		if filepath.Ext(file.Name) == ".go" {
+			cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
+			input, _ := cmd.StdinPipe()
+			output, _ := cmd.StdoutPipe()
+			cmderr, _ := cmd.StderrPipe()
+			err := cmd.Start()
+			if err != nil {
+				log.Printf("Error: %+v", err)
+			}
+			input.Write(inputBytes)
+			input.Close()
+			errors, err := ioutil.ReadAll(cmderr)
+			if len(errors) > 0 {
+				log.Printf(string(errors))
+				file.Data = inputBytes
+			} else {
+				file.Data, err = ioutil.ReadAll(output)
+				if err != nil {
+					log.Printf("Error: %+v", err)
+					file.Data = inputBytes
+				}
+			}
+		} else {
+			file.Data = inputBytes
+		}
 		response.File = append(response.File, file)
 	}
 	return

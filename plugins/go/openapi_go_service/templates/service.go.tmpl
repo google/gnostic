@@ -5,13 +5,12 @@ import (
 )
 
 func initialize_service() {
-
 }
 
 {{range .Renderer.Methods}}
-// COMPLETE THIS MANUALLY
 func {{.ProcessorName}}(parameters *{{.ParametersTypeName}}, responses *{{.ResponsesTypeName}}) (err error) {
 	log.Printf("{{.Name}} %+v", parameters)
+	// COMPLETE THIS MANUALLY
 	return nil
 }
 {{end}}
