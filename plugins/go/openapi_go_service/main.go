@@ -33,39 +33,38 @@ import (
 
 type FieldPosition int
 
-const (
-	FieldPositionBody     FieldPosition = iota
-	FieldPositionHeader                 = iota
-	FieldPositionFormData               = iota
-	FieldPositionQuery                  = iota
-	FieldPositionPath                   = iota
-)
-
 type ServiceType struct {
 	Name   string
 	Fields []*ServiceTypeField
+}
+
+func (s *ServiceType) hasFieldNamed(name string) bool {
+	for _, f := range s.Fields {
+		if f.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 type ServiceTypeField struct {
 	Name     string
 	Type     string
 	JSONName string
-	Position FieldPosition
+	Position string // "body", "header", "formdata", "query", or "path"
 }
 
 type ServiceMethod struct {
 	Name               string
+	Path               string
+	Method             string
+	Description        string
+	HandlerName        string
+	ProcessorName      string
 	ParametersTypeName string
 	ResponsesTypeName  string
 	ParametersType     *ServiceType
 	ResponsesType      *ServiceType
-
-	Path        string
-	Method      string
-	Description string
-
-	HandlerName   string
-	ProcessorName string
 }
 
 type ServiceFileTemplate struct {
@@ -97,21 +96,17 @@ func NewServiceRenderer(document *openapi.Document) (renderer *ServiceRenderer, 
 
 // template support functions
 
-func truncate(in string) (out string) {
-	limit := 18
-	if len(in) <= limit {
-		return in
-	} else {
-		return in[0:limit]
-	}
+func hasOKField(s *ServiceType) bool {
+	return s.hasFieldNamed("OK")
 }
 
 // instantiate templates
+
 func (renderer *ServiceRenderer) loadTemplates() (err error) {
 	renderer.Templates = make([]*ServiceFileTemplate, 0)
 
 	funcMap := template.FuncMap{
-		"truncate": truncate,
+		"HASOK": hasOKField,
 	}
 
 	_, filename, _, _ := runtime.Caller(1)
@@ -123,11 +118,11 @@ func (renderer *ServiceRenderer) loadTemplates() (err error) {
 		"service.go",
 	}
 	for _, filename := range files {
-		t, err := template.ParseFiles(TEMPLATES + filename + ".tmpl")
+		t, err := template.New(filename + ".tmpl").Funcs(funcMap).ParseFiles(TEMPLATES + filename + ".tmpl")
 		if err != nil {
+			log.Printf("ERROR: %+v", err)
 			return err
 		} else {
-			t.Funcs(funcMap)
 			renderer.Templates = append(renderer.Templates, &ServiceFileTemplate{FileName: filename, Template: t})
 		}
 	}
@@ -147,7 +142,7 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 				f.Name = bodyParameter.Name
 				if bodyParameter.Schema != nil {
 					f.Type = typeForSchema(bodyParameter.Schema)
-					f.Position = FieldPositionBody
+					f.Position = "body"
 				}
 			}
 			nonBodyParameter := parameter.GetNonBodyParameter()
@@ -155,22 +150,22 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 				headerParameter := nonBodyParameter.GetHeaderParameterSubSchema()
 				if headerParameter != nil {
 					f.Name = headerParameter.Name
-					f.Position = FieldPositionHeader
+					f.Position = "header"
 				}
 				formDataParameter := nonBodyParameter.GetFormDataParameterSubSchema()
 				if formDataParameter != nil {
 					f.Name = formDataParameter.Name
-					f.Position = FieldPositionFormData
+					f.Position = "formdata"
 				}
 				queryParameter := nonBodyParameter.GetQueryParameterSubSchema()
 				if queryParameter != nil {
 					f.Name = queryParameter.Name
-					f.Position = FieldPositionQuery
+					f.Position = "query"
 				}
 				pathParameter := nonBodyParameter.GetPathParameterSubSchema()
 				if pathParameter != nil {
 					f.Name = pathParameter.Name
-					f.Position = FieldPositionPath
+					f.Position = "path"
 					f.Type = typeForName(pathParameter.Type, pathParameter.Format)
 				}
 			}
@@ -228,30 +223,22 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 
 // preprocess the types and methods of the API
 func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err error) {
-
 	// collect service type descriptions
 	renderer.Types = make([]*ServiceType, 0)
-
 	for _, pair := range document.Definitions.AdditionalProperties {
-
 		var t ServiceType
 		t.Fields = make([]*ServiceTypeField, 0)
 		schema := pair.Value
-
 		for _, pair2 := range schema.Properties.AdditionalProperties {
 			var f ServiceTypeField
 			f.Name = strings.Title(pair2.Name)
-
 			f.Type = typeForSchema(pair2.Value)
-
 			f.JSONName = pair2.Name
 			t.Fields = append(t.Fields, &f)
 		}
-
 		t.Name = strings.Title(filteredTypeName(pair.Name))
 		renderer.Types = append(renderer.Types, &t)
 	}
-
 	// collect service method descriptions
 	renderer.Methods = make([]*ServiceMethod, 0)
 	for _, pair := range document.Paths.Path {

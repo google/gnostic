@@ -50,26 +50,19 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	log.Printf("MUX VARS %+v", vars)
 	log.Printf("QUERY PARMS %+v", r.Form)
 	{{range .ParametersType.Fields}}	
-	// Type: {{.Type}}
-	// Name {{.Name}}
-	// JSONName {{.JSONName}}
 	
-	{{if eq .Position 4}}
+	{{if eq .Position "path"}}
 	if value, ok := vars["{{.JSONName}}"]; ok {
 		parameters.{{.Name}} = intValue(value)
 	} 
 	{{end}}
 	
-	{{if eq .Position 5}} // check value
+	{{if eq .Position "formdata"}} // check value
 	if len(r.Form["{{.JSONName}}"]) > 0 {
 			parameters.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
 	}
 	{{end}}
-	
 	{{end}}
-	
-
-	
 		
 	// instantiate the responses structure
 	var responses {{.ResponsesTypeName}}
@@ -79,7 +72,7 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	
 	if err == nil {
 		// write the normal response		
-		{{ if true }} // responses includes an "OK" field 
+		{{ if .ResponsesType | HASOK }} // responses includes an "OK" field 
 		encoder := json.NewEncoder(w)
 		encoder.Encode(responses.OK)
 		{{ end }}
