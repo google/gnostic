@@ -26,7 +26,7 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	var parameters {{.ParametersTypeName}}
 	{{if eq .Method "POST"}}// deserialize request from post data
 	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&parameters)
+	err = decoder.Decode(&parameters.{{bodyParameterFieldName .}})
 	if err != nil {
 		fmt.Fprintf(w, "ERROR: %v", err)
 		return

@@ -112,14 +112,34 @@ func parameterList(m *ServiceMethod) string {
 	return result
 }
 
+func bodyParameterName(m *ServiceMethod) string {
+	for _, field := range m.ParametersType.Fields {
+		if field.Position == "body" {
+			return field.JSONName
+		}
+	}
+	return ""
+}
+
+func bodyParameterFieldName(m *ServiceMethod) string {
+	for _, field := range m.ParametersType.Fields {
+		if field.Position == "body" {
+			return field.Name
+		}
+	}
+	return ""
+}
+
 // instantiate templates
 
 func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err error) {
 	renderer.Templates = make([]*ServiceFileTemplate, 0)
 
 	funcMap := template.FuncMap{
-		"HASOK":         hasOKField,
-		"parameterList": parameterList,
+		"HASOK":                  hasOKField,
+		"parameterList":          parameterList,
+		"bodyParameterName":      bodyParameterName,
+		"bodyParameterFieldName": bodyParameterFieldName,
 	}
 
 	for filename, encoding := range files {
@@ -228,7 +248,7 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Method = method
 	m.HandlerName = "handle" + m.Name
 	m.ProcessorName = "process" + m.Name
-	m.ClientName = "call" + m.Name
+	m.ClientName = m.Name
 	m.ParametersTypeName = m.Name + "Parameters"
 	m.ResponsesTypeName = m.Name + "Responses"
 	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.ParametersTypeName, op.Parameters)
@@ -326,6 +346,26 @@ func typeForRef(ref string) (typeName string) {
 	return strings.Title(path.Base(ref))
 }
 
+func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
+	cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
+	input, _ := cmd.StdinPipe()
+	output, _ := cmd.StdoutPipe()
+	cmderr, _ := cmd.StderrPipe()
+	err = cmd.Start()
+	if err != nil {
+		return
+	}
+	input.Write(inputBytes)
+	input.Close()
+	errors, err := ioutil.ReadAll(cmderr)
+	if len(errors) > 0 {
+		return inputBytes, nil
+	} else {
+		outputBytes, err = ioutil.ReadAll(output)
+	}
+	return
+}
+
 func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (err error) {
 	for _, pair := range renderer.Templates {
 		file := &plugins.File{}
@@ -342,27 +382,7 @@ func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (
 		}
 		inputBytes := f.Bytes()
 		if filepath.Ext(file.Name) == ".go" {
-			cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
-			input, _ := cmd.StdinPipe()
-			output, _ := cmd.StdoutPipe()
-			cmderr, _ := cmd.StderrPipe()
-			err := cmd.Start()
-			if err != nil {
-				log.Printf("Error: %+v", err)
-			}
-			input.Write(inputBytes)
-			input.Close()
-			errors, err := ioutil.ReadAll(cmderr)
-			if len(errors) > 0 {
-				log.Printf(string(errors))
-				file.Data = inputBytes
-			} else {
-				file.Data, err = ioutil.ReadAll(output)
-				if err != nil {
-					log.Printf("Error: %+v", err)
-					file.Data = inputBytes
-				}
-			}
+			file.Data, err = gofmt(inputBytes)
 		} else {
 			file.Data = inputBytes
 		}
@@ -371,10 +391,13 @@ func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (
 	return
 }
 
-// process plugin
-type documentHandler func(name string, version string, document *openapi.Document, parameters []*plugins.Parameter)
+// run the plugin
 
-func foreachDocumentFromPluginInput(handler documentHandler) {
+func Run(files map[string]string) {
+
+	response := &plugins.PluginResponse{}
+	response.Text = []string{}
+
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		log.Printf("File error: %v\n", err)
@@ -389,47 +412,42 @@ func foreachDocumentFromPluginInput(handler documentHandler) {
 		if err != nil {
 			panic(err)
 		}
-		handler(wrapper.Name, wrapper.Version, document, request.Parameters)
+
+		name := wrapper.Name
+		version := wrapper.Version
+		parameters := request.Parameters
+
+		log.Printf("Reading %s (%s)", name, version)
+
+		packageName := "main"
+		for _, parameter := range parameters {
+			if parameter.Name == "package" {
+				packageName = parameter.Value
+			}
+		}
+
+		renderer, err := NewServiceRenderer(document, packageName)
+		if err != nil {
+			log.Printf("ERROR %v", err)
+			return
+		}
+
+		err = renderer.loadTemplates(files)
+		if err != nil {
+			log.Printf("ERROR %v", err)
+			return
+		}
+
+		if err != nil {
+			log.Printf("ERROR %v", err)
+			return
+		}
+		err = renderer.GenerateApp(response)
+		if err != nil {
+			log.Printf("ERROR %v", err)
+			return
+		}
 	}
-}
-
-func Run(files map[string]string) {
-	response := &plugins.PluginResponse{}
-	response.Text = []string{}
-
-	foreachDocumentFromPluginInput(
-		func(name string, version string, document *openapi.Document, parameters []*plugins.Parameter) {
-			log.Printf("Reading %s (%s)", name, version)
-
-			packageName := "main"
-			for _, parameter := range parameters {
-				if parameter.Name == "package" {
-					packageName = parameter.Value
-				}
-			}
-
-			renderer, err := NewServiceRenderer(document, packageName)
-			if err != nil {
-				log.Printf("ERROR %v", err)
-				return
-			}
-
-			err = renderer.loadTemplates(files)
-			if err != nil {
-				log.Printf("ERROR %v", err)
-				return
-			}
-
-			if err != nil {
-				log.Printf("ERROR %v", err)
-				return
-			}
-			err = renderer.GenerateApp(response)
-			if err != nil {
-				log.Printf("ERROR %v", err)
-				return
-			}
-		})
 
 	responseBytes, _ := proto.Marshal(response)
 	os.Stdout.Write(responseBytes)

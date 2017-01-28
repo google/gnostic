@@ -1,6 +1,7 @@
 package {{.Renderer.Package}}
 
 import (
+  "bytes"
   "encoding/json"
   "fmt"
   "net/http"
@@ -23,7 +24,14 @@ func {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err erro
 	{{end}}
 	{{end}}
 	
+	{{if eq .Method "POST"}}
+	body := new(bytes.Buffer)
+	json.NewEncoder(body).Encode({{bodyParameterName .}})
+	req, err := http.NewRequest("{{.Method}}", path, body)
+	{{else}}
 	req, err := http.NewRequest("{{.Method}}", path, nil)
+	{{end}}
+	
 	if err != nil {
 		return
 	}

@@ -8,7 +8,7 @@ import (
 	"text/template"
 )
 
-const MAIN_GO = `
+const MAIN_GO = `// go:generate template_compiler
 package main
 
 import "github.com/googleapis/openapi-compiler/plugins/go/template_plugin"
