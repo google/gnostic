@@ -1,3 +1,5 @@
+// GENERATED FILE: DO NOT EDIT!
+
 package {{.Renderer.Package}}
 
 import (
@@ -61,7 +63,7 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	err = {{.ProcessorName}}(&parameters, &responses)
 	
 	if err == nil {
-		{{ if .ResponsesType | HASOK }}
+		{{ if .ResponsesType | hasFieldNamedOK }}
 		// write the normal response		
 		encoder := json.NewEncoder(w)
 		encoder.Encode(responses.OK)

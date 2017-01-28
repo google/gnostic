@@ -1,3 +1,5 @@
+// PLEASE COMPLETE THE FUNCTIONS IN THIS FILE TO IMPLEMENT YOUR SERVICE
+
 package {{.Renderer.Package}}
 
 import (
@@ -10,7 +12,7 @@ func initialize_service() {
 {{range .Renderer.Methods}}
 func {{.ProcessorName}}(parameters *{{.ParametersTypeName}}, responses *{{.ResponsesTypeName}}) (err error) {
 	log.Printf("{{.Name}} %+v", parameters)
-	// COMPLETE THIS MANUALLY
+	// IMPLEMENT YOUR SERVICE HERE
 	return nil
 }
 {{end}}
