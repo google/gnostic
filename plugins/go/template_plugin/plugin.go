@@ -86,7 +86,7 @@ type ServiceRenderer struct {
 
 func NewServiceRenderer(document *openapi.Document, packageName string) (renderer *ServiceRenderer, err error) {
 	renderer = &ServiceRenderer{}
-	renderer.Name = "myapp"
+	renderer.Name = document.Info.Title
 	renderer.Package = packageName
 	err = renderer.loadService(document)
 	if err != nil {

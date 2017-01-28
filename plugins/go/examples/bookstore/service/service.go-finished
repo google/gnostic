@@ -41,7 +41,6 @@ func processGetShelf(parameters *GetShelfParameters, responses *GetShelfResponse
 
 func processDeleteShelf(parameters *DeleteShelfParameters, responses *DeleteShelfResponses) (err error) {
 	log.Printf("DeleteShelf %+v", parameters)
-
 	return s.DeleteShelf(parameters.Shelf)
 }
 

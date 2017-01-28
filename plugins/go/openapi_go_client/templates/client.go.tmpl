@@ -10,13 +10,23 @@ import (
   
 const service = "http://localhost:8080"
 
+type Client struct {
+	Service string
+} 
+
+func NewClient(service string) *Client {
+	client := &Client{}
+	client.Service = service
+	return client
+}
+
 {{range .Renderer.Methods}}
 {{if eq .ResultTypeName ""}}
-func {{.ClientName}}({{parameterList .}}) (err error) {
+func (client *Client) {{.ClientName}}({{parameterList .}}) (err error) {
 {{else}}
-func {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err error) {
+func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err error) {
 {{end}}
-	path := service + "{{.Path}}"
+	path := client.Service + "{{.Path}}"
 	
 	{{range .ParametersType.Fields}}	
 	{{if eq .Position "path"}}

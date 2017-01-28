@@ -1,10 +1,10 @@
 
 build:	
 	go install github.com/googleapis/openapi-compiler/plugins/go/template_compiler
+	pushd ../../openapi_go_client; template_compiler; popd
+	pushd ../../openapi_go_service; template_compiler; popd
 	go install github.com/googleapis/openapi-compiler/openapic
-	go generate github.com/googleapis/openapi-compiler/plugins/go/openapi_go_service
 	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_service
-	go generate github.com/googleapis/openapi-compiler/plugins/go/openapi_go_client
 	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_client
 
 test: 	build

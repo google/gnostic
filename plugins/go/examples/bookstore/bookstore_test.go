@@ -28,139 +28,147 @@ const service = "http://localhost:8080"
 //const service = "http://generated-bookstore.appspot.com"
 
 func TestBookstore(t *testing.T) {
+	// create a client
+	b := bookstore.NewClient(service)
+	// reset the service by deleting all shelves
 	{
-		err := bookstore.DeleteShelves()
+		err := b.DeleteShelves()
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 	}
+	// verify that the service has no shelves
 	{
-		response, err := bookstore.ListShelves()
+		response, err := b.ListShelves()
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 		if len(response.Shelves) != 0 {
 			t.Fail()
 		}
 	}
+	// add a shelf
 	{
 		var shelf bookstore.Shelf
 		shelf.Theme = "mysteries"
-		response, err := bookstore.CreateShelf(shelf)
+		response, err := b.CreateShelf(shelf)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 	}
+	// add another shelf
 	{
 		var shelf bookstore.Shelf
 		shelf.Theme = "comedies"
-		response, err := bookstore.CreateShelf(shelf)
+		response, err := b.CreateShelf(shelf)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 	}
+	// get the first shelf that was added
 	{
-		response, err := bookstore.GetShelf(1)
+		response, err := b.GetShelf(1)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 	}
+	// list shelves and verify that there are 2
 	{
-		response, err := bookstore.ListShelves()
+		response, err := b.ListShelves()
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 		if len(response.Shelves) != 2 {
 			t.Fail()
 		}
 	}
-
+	// delete a shelf
 	{
-		err := bookstore.DeleteShelf(2)
+		err := b.DeleteShelf(2)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 	}
-
+	// list shelves and verify that there is only 1
 	{
-		response, err := bookstore.ListShelves()
+		response, err := b.ListShelves()
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 		if len(response.Shelves) != 1 {
 			t.Fail()
 		}
 	}
-
+	// list books on a shelf, verify that there are none
 	{
-		response, err := bookstore.ListBooks(1)
+		response, err := b.ListBooks(1)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 		if len(response.Books) != 0 {
 			t.Fail()
 		}
 	}
-
+	// create a book
 	{
 		var book bookstore.Book
 		book.Author = "Agatha Christie"
 		book.Title = "And Then There Were None"
-		response, err := bookstore.CreateBook(1, book)
+		response, err := b.CreateBook(1, book)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 	}
-
+	// create another book
 	{
 		var book bookstore.Book
 		book.Author = "Agatha Christie"
 		book.Title = "Murder on the Orient Express"
-		response, err := bookstore.CreateBook(1, book)
+		response, err := b.CreateBook(1, book)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 	}
-
+	// get the first book that was added
 	{
-		book, err := bookstore.GetBook(1, 1)
+		book, err := b.GetBook(1, 1)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", book)
 	}
-
+	// list the books on a shelf and verify that there are 2
 	{
-		response, err := bookstore.ListBooks(1)
+		response, err := b.ListBooks(1)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 		if len(response.Books) != 2 {
 			t.Fail()
 		}
 	}
-
+	// delete a book
 	{
-		err := bookstore.DeleteBook(1, 2)
+		err := b.DeleteBook(1, 2)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 	}
-
+	// list the books on a shelf and verify that is only 1
 	{
-		response, err := bookstore.ListBooks(1)
+		response, err := b.ListBooks(1)
 		if err != nil {
-			panic(err)
+			t.Fail()
 		}
 		log.Printf("%+v", response)
 		if len(response.Books) != 1 {
