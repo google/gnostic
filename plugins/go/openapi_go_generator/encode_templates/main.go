@@ -8,8 +8,7 @@ import (
 	"text/template"
 )
 
-const MAIN_GO = `// go:generate template_compiler
-package main
+const MAIN_GO = `package main
 
 func templates() map[string]string {
 	return map[string]string{ {{range .TemplateStrings}}

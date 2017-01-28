@@ -1,0 +1,85 @@
+package {{.Renderer.Package}}
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
+)
+
+func intValue(s string) (v int64) {
+	v, _ = strconv.ParseInt(s, 10, 64)
+	return v
+}
+
+// handlers
+{{range .Renderer.Methods}}
+
+// {{.Description}}
+func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
+	log.Printf("{{.Name}}");
+	var err error
+	// instantiate the parameters structure
+	var parameters {{.ParametersTypeName}}
+	{{if eq .Method "POST"}}// deserialize request from post data
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&parameters.{{bodyParameterFieldName .}})
+	if err != nil {
+		fmt.Fprintf(w, "ERROR: %v", err)
+		return
+	}
+	log.Printf("PARAMETERS %+v", parameters){{end}}
+	
+	// get request fields in path and query parameters
+	vars := mux.Vars(r)
+	r.ParseForm()
+	log.Printf("MUX VARS %+v", vars)
+	log.Printf("QUERY PARMS %+v", r.Form)
+	{{range .ParametersType.Fields}}	
+	
+	{{if eq .Position "path"}}
+	if value, ok := vars["{{.JSONName}}"]; ok {
+		parameters.{{.Name}} = intValue(value)
+	}
+	{{end}}
+	
+	{{if eq .Position "formdata"}}
+	if len(r.Form["{{.JSONName}}"]) > 0 {
+		parameters.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
+	}
+	{{end}}
+	
+	{{end}}
+		
+	// instantiate the responses structure
+	var responses {{.ResponsesTypeName}}
+	
+	// call the processor
+	err = {{.ProcessorName}}(&parameters, &responses)
+	
+	if err == nil {
+		{{ if .ResponsesType | HASOK }}
+		// write the normal response		
+		encoder := json.NewEncoder(w)
+		encoder.Encode(responses.OK)
+		{{ end }}
+	} else {
+		// write an error response...
+		fmt.Fprintf(w, "ERROR: %v", err)
+	}
+}
+{{end}}
+
+func init () {
+	var router = mux.NewRouter(){{range .Renderer.Methods}}
+	router.HandleFunc("{{.Path}}", {{.HandlerName}}).Methods("{{.Method}}"){{end}}
+    http.Handle("/", router)
+    initialize_service()
+}
+
+func main () {
+	http.ListenAndServe(":8080", nil)
+}
