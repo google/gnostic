@@ -11,4 +11,4 @@ service:build
 	openapic swagger.json --go_service_out=package=main:service 
 
 client:	build
-	openapic swagger.json --go_client_out=package=bookstore:client
+	openapic swagger.json --go_client_out=package=bookstore:bookstore

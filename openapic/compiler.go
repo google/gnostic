@@ -25,6 +25,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/openapi-compiler/OpenAPIv2"
@@ -33,14 +34,33 @@ import (
 )
 
 type PluginCall struct {
-	Name   string
-	Output string
+	Name       string
+	Invocation string
 }
 
 func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName string) {
 	if pluginCall.Name != "" {
 		request := &plugins.PluginRequest{}
-		request.Parameter = ""
+
+		request.Invocation = pluginCall.Invocation
+		invocationParts := strings.Split(pluginCall.Invocation, ":")
+		var outputLocation string
+		switch len(invocationParts) {
+		case 1:
+			outputLocation = invocationParts[0]
+		case 2:
+			parameters := strings.Split(invocationParts[0], ",")
+			for _, keyvalue := range parameters {
+				pair := strings.Split(keyvalue, "=")
+				if len(pair) == 2 {
+					request.Parameters = append(request.Parameters, &plugins.Parameter{Name: pair[0], Value: pair[1]})
+				}
+			}
+			outputLocation = invocationParts[1]
+		default:
+			// badly-formed request
+			outputLocation = invocationParts[len(invocationParts)-1]
+		}
 
 		version := &plugins.Version{}
 		version.Major = 0
@@ -77,20 +97,20 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		}
 		// write files to the specified directory
 		var writer io.Writer
-		if pluginCall.Output == "-" {
+		if outputLocation == "-" {
 			writer = os.Stdout
 			for _, file := range response.File {
 				writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
 				writer.Write(file.Data)
 			}
-		} else if isFile(pluginCall.Output) {
-			fmt.Printf("Error, unable to overwrite %s\n", pluginCall.Output)
+		} else if isFile(outputLocation) {
+			fmt.Printf("Error, unable to overwrite %s\n", outputLocation)
 		} else {
-			if !isDirectory(pluginCall.Output) {
-				os.Mkdir(pluginCall.Output, 0755)
+			if !isDirectory(outputLocation) {
+				os.Mkdir(outputLocation, 0755)
 			}
 			for _, file := range response.File {
-				path := pluginCall.Output + "/" + file.Name
+				path := outputLocation + "/" + file.Name
 				f, _ := os.Create(path)
 				defer f.Close()
 				f.Write(file.Data)
@@ -170,18 +190,18 @@ Options:
 		var m [][]byte
 		if m = plugin_regex.FindSubmatch([]byte(arg)); m != nil {
 			pluginName := string(m[1])
-			outputName := string(m[2])
+			invocation := string(m[2])
 			switch pluginName {
 			case "pb":
-				binaryProtoPath = outputName
+				binaryProtoPath = invocation
 			case "json":
-				jsonProtoPath = outputName
+				jsonProtoPath = invocation
 			case "text":
-				textProtoPath = outputName
+				textProtoPath = invocation
 			case "errors":
-				errorPath = outputName
+				errorPath = invocation
 			default:
-				pluginCall := &PluginCall{Name: pluginName, Output: outputName}
+				pluginCall := &PluginCall{Name: pluginName, Invocation: invocation}
 				pluginCalls = append(pluginCalls, pluginCall)
 			}
 		} else if arg == "--resolve_refs" {

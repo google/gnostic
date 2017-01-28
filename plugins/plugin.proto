@@ -76,7 +76,7 @@ message PluginRequest {
   string invocation = 2;
 
   // Plugin parameters parsed from the invocation string.
-  repeated Parameter parameter = 3;
+  repeated Parameter parameters = 3;
 
   // The version number of openapi compiler.
   Version compiler_version = 4;
