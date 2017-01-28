@@ -11,12 +11,10 @@ import (
 const MAIN_GO = `// go:generate template_compiler
 package main
 
-import "github.com/googleapis/openapi-compiler/plugins/go/template_plugin"
-
-func main() {
-    template_plugin.Run(map[string]string{ {{range .TemplateStrings}}
+func templates() map[string]string {
+	return map[string]string{ {{range .TemplateStrings}}
         "{{.Name}}": "{{.Encoding}}",{{end}}
-    })
+    }
 }`
 
 type NamedTemplateString struct {
@@ -48,5 +46,5 @@ func main() {
 		templateStrings,
 	})
 
-	ioutil.WriteFile("main.go", f.Bytes(), 0644)
+	ioutil.WriteFile("templates.go", f.Bytes(), 0644)
 }

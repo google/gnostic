@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package template_plugin
+package main
 
 import (
 	"bytes"
@@ -70,13 +70,8 @@ type ServiceMethod struct {
 	ResponsesType      *ServiceType
 }
 
-type ServiceFileTemplate struct {
-	FileName string
-	Template *template.Template
-}
-
 type ServiceRenderer struct {
-	Templates []*ServiceFileTemplate
+	Templates map[string]*template.Template
 
 	Name    string
 	Package string
@@ -133,7 +128,7 @@ func bodyParameterFieldName(m *ServiceMethod) string {
 // instantiate templates
 
 func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err error) {
-	renderer.Templates = make([]*ServiceFileTemplate, 0)
+	renderer.Templates = make(map[string]*template.Template, 0)
 
 	funcMap := template.FuncMap{
 		"HASOK":                  hasOKField,
@@ -155,7 +150,7 @@ func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err err
 			log.Printf("ERROR: %+v", err)
 			return err
 		} else {
-			renderer.Templates = append(renderer.Templates, &ServiceFileTemplate{FileName: filename, Template: t})
+			renderer.Templates[filename] = t
 		}
 	}
 	return err
@@ -366,13 +361,14 @@ func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	return
 }
 
-func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (err error) {
-	for _, pair := range renderer.Templates {
+func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse, files []string) (err error) {
+
+	for _, filename := range files {
 		file := &plugins.File{}
-		file.Name = pair.FileName
+		file.Name = filename
 		f := new(bytes.Buffer)
-		// file header
-		err = pair.Template.Execute(f, struct {
+		t := renderer.Templates[filename]
+		err = t.Execute(f, struct {
 			Renderer *ServiceRenderer
 		}{
 			renderer,
@@ -393,7 +389,19 @@ func (renderer *ServiceRenderer) GenerateApp(response *plugins.PluginResponse) (
 
 // run the plugin
 
-func Run(files map[string]string) {
+func main() {
+
+	log.Printf("RUNNING %s", os.Args[0])
+
+	var files []string
+	switch os.Args[0] {
+	case "openapi_go_client":
+		files = []string{"client.go", "types.go"}
+	case "openapi_go_service":
+		files = []string{"app.go", "app.yaml", "service.go", "types.go"}
+	default:
+		files = []string{}
+	}
 
 	response := &plugins.PluginResponse{}
 	response.Text = []string{}
@@ -432,7 +440,7 @@ func Run(files map[string]string) {
 			return
 		}
 
-		err = renderer.loadTemplates(files)
+		err = renderer.loadTemplates(templates())
 		if err != nil {
 			log.Printf("ERROR %v", err)
 			return
@@ -442,7 +450,7 @@ func Run(files map[string]string) {
 			log.Printf("ERROR %v", err)
 			return
 		}
-		err = renderer.GenerateApp(response)
+		err = renderer.GenerateApp(response, files)
 		if err != nil {
 			log.Printf("ERROR %v", err)
 			return

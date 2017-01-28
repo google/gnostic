@@ -1,11 +1,12 @@
 
 build:	
-	go install github.com/googleapis/openapi-compiler/plugins/go/template_compiler
-	pushd ../../openapi_go_client; template_compiler; popd
-	pushd ../../openapi_go_service; template_compiler; popd
+	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/template_compiler
+	pushd ../../openapi_go_generator; template_compiler; popd
 	go install github.com/googleapis/openapi-compiler/openapic
-	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_service
-	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_client
+	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator
+	rm $(GOPATH)/bin/openapi_go_client $(GOPATH)/bin/openapi_go_service
+	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_client
+	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_service
 
 test: 	build
 	openapic swagger.json --go_service_out=- --go_client_out=-
