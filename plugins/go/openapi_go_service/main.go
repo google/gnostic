@@ -131,7 +131,6 @@ func (renderer *ServiceRenderer) loadTemplates() (err error) {
 		"app.go",
 		"service.go",
 		"types.go",
-		"client.go",
 	}
 	for _, filename := range files {
 		t, err := template.New(filename + ".tmpl").Funcs(funcMap).ParseFiles(TEMPLATES + filename + ".tmpl")

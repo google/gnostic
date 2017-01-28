@@ -56,6 +56,15 @@ message Version {
   string suffix = 4;
 }
 
+// A parameter passed to the plugin from (or through) the OpenAPI compiler.
+message Parameter {
+  // The name of the parameter as specified in the option string
+  string name = 1;
+
+  // The parameter value as specified in the option string
+  string value = 2;
+}
+
 // An encoded PluginRequest is written to the plugin's stdin.
 message PluginRequest {
 
@@ -63,11 +72,14 @@ message PluginRequest {
   // The specifications will appear in the order they are specified to openapic.
   repeated Wrapper wrapper = 1;
   
-  // The plugin parameter passed on the command-line.
-  string parameter = 2;
+  // The plugin invocation string, usually specified as a command-line option to the OpenAPI compiler.
+  string invocation = 2;
+
+  // Plugin parameters parsed from the invocation string.
+  repeated Parameter parameter = 3;
 
   // The version number of openapi compiler.
-  Version compiler_version = 3;
+  Version compiler_version = 4;
 }
 
 // The plugin writes an encoded PluginResponse to stdout.
@@ -84,10 +96,10 @@ message PluginResponse {
   // status code.
   repeated string error = 1;
   
-  // text output
+  // text output, typically written to stdout by openapic.
   repeated string text = 2;
 
-  // file output
+  // file output, each file will be written by openapic to an appropriate location.
   repeated File file = 3;
 }
 

@@ -1,0 +1,16 @@
+package {{.Package}}
+
+import (
+	"log"
+)
+
+func initialize_service() {
+}
+
+{{range .Renderer.Methods}}
+func {{.ProcessorName}}(parameters *{{.ParametersTypeName}}, responses *{{.ResponsesTypeName}}) (err error) {
+	log.Printf("{{.Name}} %+v", parameters)
+	// COMPLETE THIS MANUALLY
+	return nil
+}
+{{end}}

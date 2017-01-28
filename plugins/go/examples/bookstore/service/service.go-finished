@@ -1,0 +1,74 @@
+package main
+
+import (
+	"log"
+)
+
+var s *Store
+
+func initialize_service() {
+	s = &Store{}
+}
+
+func processListShelves(parameters *ListShelvesParameters, responses *ListShelvesResponses) (err error) {
+	log.Printf("ListShelves %+v", parameters)
+	s := s.ListShelves()
+	response := &ListShelvesResponse{}
+	response.Shelves = s.Shelves
+	(*responses).OK = response
+	return nil
+}
+
+func processCreateShelf(parameters *CreateShelfParameters, responses *CreateShelfResponses) (err error) {
+	log.Printf("CreateShelf %+v", parameters)
+	shelf := s.CreateShelf(parameters.Shelf)
+	(*responses).OK = &shelf
+	return nil
+}
+
+func processDeleteShelves(parameters *DeleteShelvesParameters, responses *DeleteShelvesResponses) (err error) {
+	log.Printf("DeleteShelves %+v", parameters)
+	s = &Store{}
+	return nil
+}
+
+func processGetShelf(parameters *GetShelfParameters, responses *GetShelfResponses) (err error) {
+	log.Printf("GetShelf %+v", parameters)
+	shelf, err := s.GetShelf(parameters.Shelf)
+	(*responses).OK = &shelf
+	return nil
+}
+
+func processDeleteShelf(parameters *DeleteShelfParameters, responses *DeleteShelfResponses) (err error) {
+	log.Printf("DeleteShelf %+v", parameters)
+
+	return s.DeleteShelf(parameters.Shelf)
+}
+
+func processListBooks(parameters *ListBooksParameters, responses *ListBooksResponses) (err error) {
+	log.Printf("ListBooks %+v", parameters)
+	bl, err := s.ListBooks(parameters.Shelf)
+	response := &ListBooksResponse{}
+	response.Books = bl.Books
+	(*responses).OK = response
+	return nil
+}
+
+func processCreateBook(parameters *CreateBookParameters, responses *CreateBookResponses) (err error) {
+	log.Printf("CreateBook %+v", parameters)
+	book, err := s.CreateBook(parameters.Shelf, parameters.Book)
+	(*responses).OK = &book
+	return err
+}
+
+func processGetBook(parameters *GetBookParameters, responses *GetBookResponses) (err error) {
+	log.Printf("GetBook %+v", parameters)
+	book, err := s.GetBook(parameters.Shelf, parameters.Book)
+	(*responses).OK = &book
+	return nil
+}
+
+func processDeleteBook(parameters *DeleteBookParameters, responses *DeleteBookResponses) (err error) {
+	log.Printf("DeleteBook %+v", parameters)
+	return s.DeleteBook(parameters.Shelf, parameters.Book)
+}

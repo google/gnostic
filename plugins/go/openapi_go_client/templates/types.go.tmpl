@@ -1,0 +1,11 @@
+package {{.Package}}
+
+import (
+)
+
+// types
+{{range .Renderer.Types}}
+type {{.Name}} struct { {{range .Fields}}
+  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`{{end}}{{end}}
+}
+{{end}}
