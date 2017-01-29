@@ -33,6 +33,24 @@ func hasResponses(m *ServiceMethod) bool {
 	return m.ResponsesType != nil
 }
 
+func hasPathParameters(m *ServiceMethod) bool {
+	for _, field := range m.ParametersType.Fields {
+		if field.Position == "path" {
+			return true
+		}
+	}
+	return false
+}
+
+func hasFormParameters(m *ServiceMethod) bool {
+	for _, field := range m.ParametersType.Fields {
+		if field.Position == "formdata" {
+			return true
+		}
+	}
+	return false
+}
+
 func parameterList(m *ServiceMethod) string {
 	result := ""
 	if m.ParametersType != nil {
@@ -68,6 +86,8 @@ func helpers() template.FuncMap {
 	return template.FuncMap{
 		"hasFieldNamedOK":        hasFieldNamedOK,
 		"hasParameters":          hasParameters,
+		"hasPathParameters":      hasPathParameters,
+		"hasFormParameters":      hasFormParameters,
 		"hasResponses":           hasResponses,
 		"parameterList":          parameterList,
 		"bodyParameterName":      bodyParameterName,

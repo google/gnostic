@@ -39,10 +39,13 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	{{end}}
 	
 	// get request fields in path and query parameters
+	{{if hasPathParameters .}}
 	vars := mux.Vars(r)
+	{{end}}
+	{{if hasFormParameters .}}
 	r.ParseForm()
-	log.Printf("MUX VARS %+v", vars)
-	log.Printf("QUERY PARMS %+v", r.Form)
+	{{end}}
+	
 	{{range .ParametersType.Fields}}	
 	
 	{{if eq .Position "path"}}
