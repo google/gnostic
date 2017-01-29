@@ -149,15 +149,12 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 		}
 	}
 	t.Name = name
-	renderer.Types = append(renderer.Types, t)
-	return t, err
-}
-
-func propertyNameForResponseCode(code string) string {
-	if code == "200" {
-		return "OK"
+	if len(t.Fields) > 0 {
+		renderer.Types = append(renderer.Types, t)
+		return t, err
+	} else {
+		return nil, err
 	}
-	return code
 }
 
 func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, name string, responses *openapi.Responses) (t *ServiceType, err error) {
@@ -179,8 +176,12 @@ func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, 
 	}
 
 	t.Name = name
-	renderer.Types = append(renderer.Types, t)
-	return t, err
+	if len(t.Fields) > 0 {
+		renderer.Types = append(renderer.Types, t)
+		return t, err
+	} else {
+		return nil, err
+	}
 }
 
 func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method string, path string) (err error) {
@@ -191,10 +192,14 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.HandlerName = "handle" + m.Name
 	m.ProcessorName = "process" + m.Name
 	m.ClientName = m.Name
-	m.ParametersTypeName = m.Name + "Parameters"
-	m.ResponsesTypeName = m.Name + "Responses"
-	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.ParametersTypeName, op.Parameters)
-	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(&m, m.ResponsesTypeName, op.Responses)
+	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.Name+"Parameters", op.Parameters)
+	if m.ParametersType != nil {
+		m.ParametersTypeName = m.ParametersType.Name
+	}
+	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(&m, m.Name+"Responses", op.Responses)
+	if m.ResponsesType != nil {
+		m.ResponsesTypeName = m.ResponsesType.Name
+	}
 	renderer.Methods = append(renderer.Methods, &m)
 	return err
 }
@@ -215,7 +220,9 @@ func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err er
 			t.Fields = append(t.Fields, &f)
 		}
 		t.Name = strings.Title(filteredTypeName(pair.Name))
-		renderer.Types = append(renderer.Types, &t)
+		if len(t.Fields) > 0 {
+			renderer.Types = append(renderer.Types, &t)
+		}
 	}
 	// collect service method descriptions
 	renderer.Methods = make([]*ServiceMethod, 0)
@@ -312,4 +319,11 @@ func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, file
 		response.File = append(response.File, file)
 	}
 	return
+}
+
+func propertyNameForResponseCode(code string) string {
+	if code == "200" {
+		return "OK"
+	}
+	return code
 }

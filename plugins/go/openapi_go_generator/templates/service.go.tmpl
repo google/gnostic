@@ -10,8 +10,24 @@ func initialize_service() {
 }
 
 {{range .Renderer.Methods}}
+{{if hasParameters .}}
+{{if hasResponses .}}
 func {{.ProcessorName}}(parameters *{{.ParametersTypeName}}, responses *{{.ResponsesTypeName}}) (err error) {
+{{else}}
+func {{.ProcessorName}}(parameters *{{.ParametersTypeName}}) (err error) {
+{{end}}
+{{else}}
+{{if hasResponses .}}
+func {{.ProcessorName}}(responses *{{.ResponsesTypeName}}) (err error) {
+{{else}}
+func {{.ProcessorName}}() (err error) {
+{{end}}
+{{end}}	
+	{{if hasParameters .}}
 	log.Printf("{{.Name}} %+v", parameters)
+	{{else}}
+	log.Printf("{{.Name}}")
+	{{end}}
 	// IMPLEMENT YOUR SERVICE HERE
 	return nil
 }

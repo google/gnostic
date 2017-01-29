@@ -10,8 +10,8 @@ func initialize_service() {
 	s = &Store{}
 }
 
-func processListShelves(parameters *ListShelvesParameters, responses *ListShelvesResponses) (err error) {
-	log.Printf("ListShelves %+v", parameters)
+func processListShelves(responses *ListShelvesResponses) (err error) {
+	log.Printf("ListShelves")
 	s := s.ListShelves()
 	response := &ListShelvesResponse{}
 	response.Shelves = s.Shelves
@@ -26,8 +26,8 @@ func processCreateShelf(parameters *CreateShelfParameters, responses *CreateShel
 	return nil
 }
 
-func processDeleteShelves(parameters *DeleteShelvesParameters, responses *DeleteShelvesResponses) (err error) {
-	log.Printf("DeleteShelves %+v", parameters)
+func processDeleteShelves() (err error) {
+	log.Printf("DeleteShelves")
 	s = &Store{}
 	return nil
 }
@@ -39,7 +39,7 @@ func processGetShelf(parameters *GetShelfParameters, responses *GetShelfResponse
 	return nil
 }
 
-func processDeleteShelf(parameters *DeleteShelfParameters, responses *DeleteShelfResponses) (err error) {
+func processDeleteShelf(parameters *DeleteShelfParameters) (err error) {
 	log.Printf("DeleteShelf %+v", parameters)
 	return s.DeleteShelf(parameters.Shelf)
 }
@@ -67,7 +67,7 @@ func processGetBook(parameters *GetBookParameters, responses *GetBookResponses) 
 	return nil
 }
 
-func processDeleteBook(parameters *DeleteBookParameters, responses *DeleteBookResponses) (err error) {
+func processDeleteBook(parameters *DeleteBookParameters) (err error) {
 	log.Printf("DeleteBook %+v", parameters)
 	return s.DeleteBook(parameters.Shelf, parameters.Book)
 }

@@ -30,9 +30,11 @@ func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTyp
 {{end}}
 	path := client.Service + "{{.Path}}"
 	
+	{{if hasParameters .}}
 	{{range .ParametersType.Fields}}	
 	{{if eq .Position "path"}}
 	path = strings.Replace(path, "{" + "{{.JSONName}}" + "}", fmt.Sprintf("%v", {{.JSONName}}), 1)
+	{{end}}
 	{{end}}
 	{{end}}
 	

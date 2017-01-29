@@ -25,13 +25,23 @@ func hasFieldNamedOK(s *ServiceType) bool {
 	return s.hasFieldNamed("OK")
 }
 
+func hasParameters(m *ServiceMethod) bool {
+	return m.ParametersType != nil
+}
+
+func hasResponses(m *ServiceMethod) bool {
+	return m.ResponsesType != nil
+}
+
 func parameterList(m *ServiceMethod) string {
 	result := ""
-	for i, field := range m.ParametersType.Fields {
-		if i > 0 {
-			result += ", "
+	if m.ParametersType != nil {
+		for i, field := range m.ParametersType.Fields {
+			if i > 0 {
+				result += ", "
+			}
+			result += field.JSONName + " " + field.Type
 		}
-		result += field.JSONName + " " + field.Type
 	}
 	return result
 }
@@ -57,6 +67,8 @@ func bodyParameterFieldName(m *ServiceMethod) string {
 func helpers() template.FuncMap {
 	return template.FuncMap{
 		"hasFieldNamedOK":        hasFieldNamedOK,
+		"hasParameters":          hasParameters,
+		"hasResponses":           hasResponses,
 		"parameterList":          parameterList,
 		"bodyParameterName":      bodyParameterName,
 		"bodyParameterFieldName": bodyParameterFieldName,
