@@ -91,9 +91,11 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		}
 
 		// always write text messages to stdout
-		for _, text := range response.Text {
+		for i, text := range response.Text {
+			if i > 0 {
+				os.Stdout.Write([]byte("\n"))
+			}
 			os.Stdout.Write([]byte(text))
-			os.Stdout.Write([]byte("\n"))
 		}
 		// write files to the specified directory
 		var writer io.Writer
