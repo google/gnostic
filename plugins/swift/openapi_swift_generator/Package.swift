@@ -15,8 +15,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "openapi_swift_generator",
-    dependencies: [
-        .Package(url: "https://github.com/apple/swift-protobuf.git", Version(0,9,24))
-    ]
+  name: "SwiftOpenAPIPlugin",
+  targets: [
+    Target(name: "openapi_swift_generator",
+           dependencies: [
+            "TemplateEncoder",
+            ]),
+    Target(name: "TemplateEncoder")
+  ],
+  dependencies: [
+    .Package(url: "https://github.com/apple/swift-protobuf.git", Version(0,9,24)),
+    .Package(url: "https://github.com/timburks/Stencil.git", Version(9,9,9)) // temporary fork
+  ]
 )
