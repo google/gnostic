@@ -20,7 +20,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/googleapis/openapi-compiler/plugins/go/examples/bookstore/bookstore"
+	"github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/examples/bookstore/bookstore"
 )
 
 const service = "http://localhost:8080"
