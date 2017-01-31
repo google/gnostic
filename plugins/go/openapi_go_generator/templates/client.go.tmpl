@@ -22,30 +22,27 @@ func NewClient(service string) *Client {
 	return client
 }
 
-{{range .Renderer.Methods}}
-{{if eq .ResultTypeName ""}}
+//-{{range .Renderer.Methods}}
+//-{{if eq .ResultTypeName ""}}
 func (client *Client) {{.ClientName}}({{parameterList .}}) (err error) {
-{{else}}
+//-{{else}}
 func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err error) {
-{{end}}
+//-{{end}}
 	path := client.Service + "{{.Path}}"
-	
-	{{if hasParameters .}}
-	{{range .ParametersType.Fields}}	
-	{{if eq .Position "path"}}
+	//-{{if hasParameters .}}
+	//-{{range .ParametersType.Fields}}	
+	//-{{if eq .Position "path"}}
 	path = strings.Replace(path, "{" + "{{.JSONName}}" + "}", fmt.Sprintf("%v", {{.JSONName}}), 1)
-	{{end}}
-	{{end}}
-	{{end}}
-	
-	{{if eq .Method "POST"}}
+	//-{{end}}
+	//-{{end}}
+	//-{{end}}
+	//-{{if eq .Method "POST"}}
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode({{bodyParameterName .}})
 	req, err := http.NewRequest("{{.Method}}", path, body)
-	{{else}}
+	//-{{else}}
 	req, err := http.NewRequest("{{.Method}}", path, nil)
-	{{end}}
-	
+	//-{{end}}
 	if err != nil {
 		return
 	}
@@ -54,11 +51,12 @@ func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTyp
 		return 
 	}
 	defer resp.Body.Close()
-	{{if ne .ResultTypeName ""}}
+	//-{{if ne .ResultTypeName ""}}
 	decoder := json.NewDecoder(resp.Body)
 	result = &{{.ResultTypeName}}{}
 	decoder.Decode(result)
-	{{end}}
+	//-{{end}}
 	return  
 }
-{{end}}
+
+//-{{end}}

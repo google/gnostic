@@ -189,8 +189,8 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Name = strings.Title(op.OperationId)
 	m.Path = path
 	m.Method = method
-	m.HandlerName = "handle" + m.Name
-	m.ProcessorName = "process" + m.Name
+	m.HandlerName = "Handle" + m.Name
+	m.ProcessorName = "" + m.Name
 	m.ClientName = m.Name
 	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.Name+"Parameters", op.Parameters)
 	if m.ParametersType != nil {

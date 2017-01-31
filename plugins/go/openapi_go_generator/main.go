@@ -35,8 +35,8 @@ func main() {
 	switch os.Args[0] {
 	case "openapi_go_client":
 		files = []string{"client.go", "types.go"}
-	case "openapi_go_service":
-		files = []string{"app.go", "app.yaml", "service.go", "types.go"}
+	case "openapi_go_server":
+		files = []string{"server.go", "provider.go", "types.go", "app.yaml"}
 	default:
 		files = []string{}
 	}

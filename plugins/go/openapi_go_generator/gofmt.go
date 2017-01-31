@@ -16,9 +16,33 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os/exec"
 	"runtime"
+	"strings"
 )
+
+// Code templates use "//-" prefixes to comment-out template operators
+// that otherwise would add gratuitous blank lines.
+// Use this to remove these lines after templates have been expanded.
+func stripMarkers(inputBytes []byte) (outputBytes []byte) {
+	inputString := string(inputBytes)
+	inputLines := strings.Split(inputString, "\n")
+	outputLines := make([]string, 0)
+	for _, line := range inputLines {
+		if strings.Contains(line, "//-") {
+			removed := strings.TrimSpace(strings.Replace(line, "//-", "", 1))
+			if removed != "" {
+				log.Printf("keeping |%s|", removed)
+				outputLines = append(outputLines, removed)
+			}
+		} else {
+			outputLines = append(outputLines, line)
+		}
+	}
+	outputString := strings.Join(outputLines, "\n")
+	return []byte(outputString)
+}
 
 func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
@@ -29,10 +53,11 @@ func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	if err != nil {
 		return
 	}
-	input.Write(inputBytes)
+	input.Write(stripMarkers(inputBytes))
 	input.Close()
 	errors, err := ioutil.ReadAll(cmderr)
 	if len(errors) > 0 {
+		log.Printf("ERRORS %s", errors)
 		return inputBytes, nil
 	} else {
 		outputBytes, err = ioutil.ReadAll(output)

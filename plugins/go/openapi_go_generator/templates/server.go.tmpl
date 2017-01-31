@@ -17,18 +17,20 @@ func intValue(s string) (v int64) {
 	return v
 }
 
+var provider Provider
+
 // handlers
-{{range .Renderer.Methods}}
+//-{{range .Renderer.Methods}}
 
 // {{.Description}}
 func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	log.Printf("{{.Name}}");
 	var err error
-	{{if hasParameters .}}
+	//-{{if hasParameters .}}
 	// instantiate the parameters structure
 	var parameters {{.ParametersTypeName}}
-	
-	{{if eq .Method "POST"}}// deserialize request from post data
+	//-{{if eq .Method "POST"}}
+	// deserialize request from post data
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&parameters.{{bodyParameterFieldName .}})
 	if err != nil {
@@ -36,75 +38,67 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("PARAMETERS %+v", parameters)
-	{{end}}
-	
+	//-{{end}}
 	// get request fields in path and query parameters
-	{{if hasPathParameters .}}
+	//-{{if hasPathParameters .}}
 	vars := mux.Vars(r)
-	{{end}}
-	{{if hasFormParameters .}}
+	//-{{end}}
+	//-{{if hasFormParameters .}}
 	r.ParseForm()
-	{{end}}
-	
-	{{range .ParametersType.Fields}}	
-	
-	{{if eq .Position "path"}}
+	//-{{end}}
+	//-{{range .ParametersType.Fields}}	
+	//-{{if eq .Position "path"}}
 	if value, ok := vars["{{.JSONName}}"]; ok {
 		parameters.{{.Name}} = intValue(value)
 	}
-	{{end}}
-	
-	{{if eq .Position "formdata"}}
+	//-{{end}}	
+	//-{{if eq .Position "formdata"}}
 	if len(r.Form["{{.JSONName}}"]) > 0 {
 		parameters.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
 	}
-	{{end}}
-	
-	{{end}}
-	{{end}}
-	
-	{{if hasResponses .}}	
+	//-{{end}}
+	//-{{end}}
+	//-{{end}}
+	//-{{if hasResponses .}}	
 	// instantiate the responses structure
 	var responses {{.ResponsesTypeName}}
-	{{end}}
-
+	//-{{end}}
 	// call the processor	
-	{{if hasParameters .}}
-	{{if hasResponses .}}
-	err = {{.ProcessorName}}(&parameters, &responses)
-	{{else}}
-	err = {{.ProcessorName}}(&parameters)
-	{{end}}
-	{{else}}
-	{{if hasResponses .}}
-	err = {{.ProcessorName}}(&responses)
-	{{else}}
-	err = {{.ProcessorName}}()
-	{{end}}
-	{{end}}
-	
+	//-{{if hasParameters .}}
+	//-{{if hasResponses .}}
+	err = provider.{{.ProcessorName}}(&parameters, &responses)
+	//-{{else}}
+	err = provider.{{.ProcessorName}}(&parameters)
+	//-{{end}}
+	//-{{else}}
+	//-{{if hasResponses .}}
+	err = provider.{{.ProcessorName}}(&responses)
+	//-{{else}}
+	err = provider.{{.ProcessorName}}()
+	//-{{end}}
+	//-{{end}}	
 	if err == nil {
-	{{ if hasResponses .}}
-		{{ if .ResponsesType | hasFieldNamedOK }}
+	//-{{ if hasResponses .}}
+		//-{{ if .ResponsesType | hasFieldNamedOK }}
 		// write the normal response		
 		encoder := json.NewEncoder(w)
 		encoder.Encode(responses.OK)
-		{{ end }}
-	{{end}}
+		//-{{end}}
+	//-{{end}}
 	} else {
 		// write an error response...
 		fmt.Fprintf(w, "ERROR: %v", err)
 	}
 }
-{{end}}
+//-{{end}}
 
-func init () {
+func Initialize(p Provider) {
+	provider = p
 	var router = mux.NewRouter(){{range .Renderer.Methods}}
 	router.HandleFunc("{{.Path}}", {{.HandlerName}}).Methods("{{.Method}}"){{end}}
     http.Handle("/", router)
-    initialize_service()
 }
 
-func main () {
+func Run() {
 	http.ListenAndServe(":8080", nil)
 }

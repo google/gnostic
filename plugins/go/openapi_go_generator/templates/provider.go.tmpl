@@ -1,0 +1,21 @@
+// GENERATED FILE: DO NOT EDIT!
+
+package {{.Renderer.Package}}
+
+type Provider interface {
+//-{{range .Renderer.Methods}}
+//-{{if hasParameters .}}
+//-{{if hasResponses .}}
+  {{.ProcessorName}}(parameters *{{.ParametersTypeName}}, responses *{{.ResponsesTypeName}}) (err error)
+//-{{else}}
+  {{.ProcessorName}}(parameters *{{.ParametersTypeName}}) (err error)
+//-{{end}}
+//-{{else}}
+//-{{if hasResponses .}}
+  {{.ProcessorName}}(responses *{{.ResponsesTypeName}}) (err error)
+//-{{else}}
+  {{.ProcessorName}}() (err error)
+//-{{end}}
+//-{{end}}	
+//-{{end}}
+}

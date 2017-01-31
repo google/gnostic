@@ -23,32 +23,34 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/examples/bookstore/bookstore"
 )
 
-func (s Shelf) Id() int64 {
+func shelf_id(s *bookstore.Shelf) int64 {
 	parts := strings.Split(s.Name, "/")
 	id, _ := strconv.ParseInt(parts[len(parts)-1], 10, 64)
 	return id
 }
 
-func (b Book) Id() int64 {
+func book_id(b *bookstore.Book) int64 {
 	parts := strings.Split(b.Name, "/")
 	id, _ := strconv.ParseInt(parts[len(parts)-1], 10, 64)
 	return id
 }
 
 type ShelfList struct {
-	Shelves []Shelf
+	Shelves []bookstore.Shelf
 }
 
 type BookList struct {
-	Books []Book
+	Books []bookstore.Book
 }
 
 // Store holds the contents of a bookstore.
 type Store struct {
-	Shelves     map[int64]*Shelf
-	BookMaps    map[int64]map[int64]*Book
+	Shelves     map[int64]*bookstore.Shelf
+	BookMaps    map[int64]map[int64]*bookstore.Book
 	LastShelfID int64
 	LastBookID  int64
 	Mutex       sync.Mutex
@@ -56,12 +58,12 @@ type Store struct {
 
 func (s *Store) checkShelvesLocked() {
 	if s.Shelves == nil {
-		s.Shelves = make(map[int64]*Shelf)
-		s.BookMaps = make(map[int64]map[int64]*Book)
+		s.Shelves = make(map[int64]*bookstore.Shelf)
+		s.BookMaps = make(map[int64]map[int64]*bookstore.Book)
 	}
 }
 
-func (s *Store) getShelfLocked(sid int64) (*Shelf, error) {
+func (s *Store) getShelfLocked(sid int64) (*bookstore.Shelf, error) {
 	s.checkShelvesLocked()
 	shelf, ok := s.Shelves[sid]
 	if !ok {
@@ -70,13 +72,13 @@ func (s *Store) getShelfLocked(sid int64) (*Shelf, error) {
 	return shelf, nil
 }
 
-func (s *Store) checkBooksLocked(shelf *Shelf) {
-	if s.BookMaps[shelf.Id()] == nil {
-		s.BookMaps[shelf.Id()] = make(map[int64]*Book)
+func (s *Store) checkBooksLocked(shelf *bookstore.Shelf) {
+	if s.BookMaps[shelf_id(shelf)] == nil {
+		s.BookMaps[shelf_id(shelf)] = make(map[int64]*bookstore.Book)
 	}
 }
 
-func getBookLocked(s *Store, sid int64, bid int64) (*Shelf, *Book, error) {
+func getBookLocked(s *Store, sid int64, bid int64) (*bookstore.Shelf, *bookstore.Book, error) {
 	shelf, err := s.getShelfLocked(sid)
 	if err != nil {
 		return nil, nil, err
@@ -94,7 +96,7 @@ func (s *Store) ListShelves() ShelfList {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
-	sl := ShelfList{Shelves: make([]Shelf, 0, len(s.Shelves))}
+	sl := ShelfList{Shelves: make([]bookstore.Shelf, 0, len(s.Shelves))}
 	for _, shelf := range s.Shelves {
 		sl.Shelves = append(sl.Shelves, *shelf)
 	}
@@ -103,7 +105,7 @@ func (s *Store) ListShelves() ShelfList {
 }
 
 // Creates a new bookstore shelf.
-func (s *Store) CreateShelf(shelf Shelf) Shelf {
+func (s *Store) CreateShelf(shelf bookstore.Shelf) bookstore.Shelf {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
@@ -116,13 +118,13 @@ func (s *Store) CreateShelf(shelf Shelf) Shelf {
 }
 
 // Returns an existing bookstore shelf.
-func (s *Store) GetShelf(sid int64) (Shelf, error) {
+func (s *Store) GetShelf(sid int64) (bookstore.Shelf, error) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
 	shelf, err := s.getShelfLocked(sid)
 	if err != nil {
-		return Shelf{}, err
+		return bookstore.Shelf{}, err
 	}
 	return *shelf, nil
 }
@@ -149,9 +151,9 @@ func (s *Store) ListBooks(sid int64) (BookList, error) {
 		return BookList{}, err
 	}
 
-	shelfBooks := s.BookMaps[shelf.Id()]
+	shelfBooks := s.BookMaps[shelf_id(shelf)]
 
-	bl := BookList{Books: make([]Book, 0, len(shelfBooks))}
+	bl := BookList{Books: make([]bookstore.Book, 0, len(shelfBooks))}
 	for _, book := range shelfBooks {
 		bl.Books = append(bl.Books, *book)
 	}
@@ -160,13 +162,13 @@ func (s *Store) ListBooks(sid int64) (BookList, error) {
 }
 
 // Creates a new book on a bookstore shelf.
-func (s *Store) CreateBook(sid int64, book Book) (Book, error) {
+func (s *Store) CreateBook(sid int64, book bookstore.Book) (bookstore.Book, error) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
 	shelf, err := s.getShelfLocked(sid)
 	if err != nil {
-		return Book{}, err
+		return bookstore.Book{}, err
 	}
 
 	s.LastBookID++
@@ -175,18 +177,18 @@ func (s *Store) CreateBook(sid int64, book Book) (Book, error) {
 	s.checkBooksLocked(shelf)
 	s.BookMaps[sid][bid] = &book
 
-	log.Printf("CREATED AND SAVED BOOK %+v in shelf %+v", book, s.BookMaps[shelf.Id()])
+	log.Printf("CREATED AND SAVED BOOK %+v in shelf %+v", book, s.BookMaps[shelf_id(shelf)])
 	return book, nil
 }
 
 // Returns an existing book from a bookstore shelf.
-func (s *Store) GetBook(sid int64, bid int64) (Book, error) {
+func (s *Store) GetBook(sid int64, bid int64) (bookstore.Book, error) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
 	_, book, err := getBookLocked(s, sid, bid)
 	if err != nil {
-		return Book{}, err
+		return bookstore.Book{}, err
 	}
 
 	return *book, nil
