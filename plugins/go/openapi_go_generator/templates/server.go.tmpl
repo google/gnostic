@@ -1,9 +1,9 @@
 // GENERATED FILE: DO NOT EDIT!
-
 package {{.Renderer.Package}}
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,12 +17,14 @@ func intValue(s string) (v int64) {
 	return v
 }
 
+// This package-global variable holds the user-written Provider for API services.
+// See the Provider interface for details.
 var provider Provider
 
-// handlers
+// These handlers serve API methods.
 //-{{range .Renderer.Methods}}
 
-// {{.Description}}
+// Handler: {{.Description}}
 func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	log.Printf("{{.Name}}");
 	var err error
@@ -37,7 +39,6 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "ERROR: %v", err)
 		return
 	}
-	log.Printf("PARAMETERS %+v", parameters)
 	//-{{end}}
 	// get request fields in path and query parameters
 	//-{{if hasPathParameters .}}
@@ -63,7 +64,7 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	// instantiate the responses structure
 	var responses {{.ResponsesTypeName}}
 	//-{{end}}
-	// call the processor	
+	// call the service provider	
 	//-{{if hasParameters .}}
 	//-{{if hasResponses .}}
 	err = provider.{{.ProcessorName}}(&parameters, &responses)
@@ -92,13 +93,18 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 }
 //-{{end}}
 
+// Initialize the API service.
 func Initialize(p Provider) {
 	provider = p
 	var router = mux.NewRouter(){{range .Renderer.Methods}}
 	router.HandleFunc("{{.Path}}", {{.HandlerName}}).Methods("{{.Method}}"){{end}}
-    http.Handle("/", router)
+	http.Handle("/", router)
 }
 
-func Run() {
-	http.ListenAndServe(":8080", nil)
+// Provide the API service over HTTP.
+func ServeHTTP(address string) error {
+	if provider == nil {
+		return errors.New("Use {{.Renderer.Package}}.Initialize() to set a service provider.")
+	}
+	return http.ListenAndServe(address, nil)
 }

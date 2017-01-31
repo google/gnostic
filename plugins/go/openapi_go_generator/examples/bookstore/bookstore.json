@@ -19,7 +19,7 @@
   "paths": {
     "/shelves": {
       "get": {
-        "description": "Returns all shelves in the bookstore.",
+        "description": "Return all shelves in the bookstore.",
         "operationId": "listShelves",
         "produces": [
           "application/json"
@@ -35,7 +35,7 @@
         "security": []
       },
       "post": {
-        "description": "Creates a new shelf in the bookstore.",
+        "description": "Create a new shelf in the bookstore.",
         "operationId": "createShelf",
         "parameters": [
           {
@@ -61,7 +61,7 @@
         }
       },
       "delete": {
-        "description": "Deletes all shelves.",
+        "description": "Delete all shelves.",
         "operationId": "deleteShelves",
         "responses": {
           "default": {
@@ -97,7 +97,7 @@
         }
       },
       "delete": {
-        "description": "Deletes a single shelf with the given ID.",
+        "description": "Delete a single shelf with the given ID.",
         "operationId": "deleteShelf",
         "parameters": [
           {
@@ -118,7 +118,7 @@
     },
     "/shelves/{shelf}/books": {
       "get": {
-        "description": "Returns all books in a shelf with the given ID.",
+        "description": "Return all books in a shelf with the given ID.",
         "operationId": "listBooks",
         "parameters": [
           {
@@ -143,7 +143,7 @@
         }
       },
       "post": {
-        "description": "Creates a new book on the shelf.",
+        "description": "Create a new book on the shelf.",
         "operationId": "createBook",
         "parameters": [
           {

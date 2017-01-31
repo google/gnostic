@@ -8,11 +8,8 @@ build:
 	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_client
 	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_server
 
-test: 	build
-	openapic bookstore.json --go_server_out=- --go_client_out=-
-
 all:	build
 	openapic bookstore.json --go_server_out=package=bookstore:bookstore --go_client_out=package=bookstore:bookstore
 
 clean:  
-	rm -rf bookstore bookstore.text
+	rm -rf bookstore bookstore.text service/service

@@ -17,6 +17,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/examples/bookstore/bookstore"
 )
 
@@ -25,5 +27,8 @@ func init() {
 }
 
 func main() {
-	bookstore.Run()
+	err := bookstore.ServeHTTP(":8080")
+	if err != nil {
+		log.Printf("%v", err)
+	}
 }

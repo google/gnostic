@@ -189,6 +189,7 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Name = strings.Title(op.OperationId)
 	m.Path = path
 	m.Method = method
+	m.Description = op.Description
 	m.HandlerName = "Handle" + m.Name
 	m.ProcessorName = "" + m.Name
 	m.ClientName = m.Name

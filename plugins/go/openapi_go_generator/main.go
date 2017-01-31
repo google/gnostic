@@ -27,23 +27,25 @@ import (
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
-// run the plugin
-
+// This is the main function for the code generation plugin.
 func main() {
 
+	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
 	switch os.Args[0] {
 	case "openapi_go_client":
 		files = []string{"client.go", "types.go"}
 	case "openapi_go_server":
-		files = []string{"server.go", "provider.go", "types.go", "app.yaml"}
+		files = []string{"server.go", "provider.go", "types.go"}
 	default:
-		files = []string{}
+		files = []string{"client.go", "server.go", "provider.go", "types.go"}
 	}
 
+	// Initialize the plugin response.
 	response := &plugins.PluginResponse{}
 	response.Text = []string{}
 
+	// Read the plugin input.
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		log.Printf("File error: %v\n", err)
@@ -52,6 +54,7 @@ func main() {
 	request := &plugins.PluginRequest{}
 	err = proto.Unmarshal(data, request)
 
+	// Loop over OpenAPI documents sent by the plugin and use them to generate client/server code.
 	for _, wrapper := range request.Wrapper {
 		document := &openapi.Document{}
 		err = proto.Unmarshal(wrapper.Value, document)
@@ -60,8 +63,8 @@ func main() {
 			os.Exit(1)
 		}
 
+		// Collect parameters passed to the plugin.
 		invocation := os.Args[0]
-
 		parameters := request.Parameters
 		packageName := "main"
 		for _, parameter := range parameters {
@@ -70,21 +73,23 @@ func main() {
 				packageName = parameter.Value
 			}
 		}
-
 		log.Printf("Running %s", invocation)
 
+		// Create the renderer.
 		renderer, err := NewServiceRenderer(document, packageName)
 		if err != nil {
 			log.Printf("ERROR %v", err)
 			os.Exit(1)
 		}
 
+		// Load templates.
 		err = renderer.loadTemplates(templates())
 		if err != nil {
 			log.Printf("ERROR %v", err)
 			os.Exit(1)
 		}
 
+		// Run the renderer to generate files and add them to the response object.
 		err = renderer.Generate(response, files)
 		if err != nil {
 			log.Printf("ERROR %v", err)
