@@ -13,3 +13,9 @@ all:	build
 
 clean:  
 	rm -rf bookstore bookstore.text service/service
+
+test:	all
+	cd service; go get .; go build; ./service &
+	go test
+	killall service
+
