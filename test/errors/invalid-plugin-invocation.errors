@@ -1,0 +1,6 @@
+Invalid invocation of openapi_plugin: foo=bar,:abc
+Invalid invocation of openapi_plugin: ,foo=bar:abc
+Invalid invocation of openapi_plugin: foo=:abc
+Invalid invocation of openapi_plugin: =bar:abc
+Invalid invocation of openapi_plugin: ,,:abc
+Invalid invocation of openapi_plugin: foo=bar=baz:abc

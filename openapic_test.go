@@ -144,3 +144,60 @@ func TestSamplePluginWithPetstore(t *testing.T) {
 		"sample-petstore.out",
 		"test/sample-petstore.out")
 }
+
+func TestErrorInvalidPluginInvocations(t *testing.T) {
+	var err error
+	output, err := exec.Command(
+		"openapic",
+		"examples/petstore.yaml",
+		"--errors_out=-",
+		"--plugin_out=foo=bar,:abc",
+		"--plugin_out=,foo=bar:abc",
+		"--plugin_out=foo=:abc",
+		"--plugin_out==bar:abc",
+		"--plugin_out=,,:abc",
+		"--plugin_out=foo=bar=baz:abc",
+	).Output()
+	if err == nil {
+		t.Logf("Invalid invocations were accepted")
+		t.FailNow()
+	}
+	output_file := "invalid-plugin-invocation.errors"
+	_ = ioutil.WriteFile(output_file, output, 0644)
+	err = exec.Command("diff", output_file, "test/errors/invalid-plugin-invocation.errors").Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	} else {
+		// if the test succeeded, clean up
+		os.Remove(output_file)
+	}
+}
+
+func TestValidPluginInvocations(t *testing.T) {
+	var err error
+	output, err := exec.Command(
+		"openapic",
+		"examples/petstore.yaml",
+		"--errors_out=-",
+		// verify an invocation with no parameters
+		"--go_sample_out=!", // "!" indicates that no output should be generated
+		// verify single pair of parameters
+		"--go_sample_out=a=b:!",
+		// verify multiple parameters
+		"--go_sample_out=a=b,c=123,xyz=alphabetagammadelta:!",
+		// verify that special characters / . - _ can be included in parameter keys and values
+		"--go_sample_out=a/b/c=x/y/z:!",
+		"--go_sample_out=a.b.c=x.y.z:!",
+		"--go_sample_out=a-b-c=x-y-z:!",
+		"--go_sample_out=a_b_c=x_y_z:!",
+	).Output()
+	if len(output) != 0 {
+		t.Logf("Valid invocations generated invalid errors\n%s", string(output))
+		t.FailNow()
+	}
+	if err != nil {
+		t.Logf("Valid invocations were not accepted")
+		t.FailNow()
+	}
+}
