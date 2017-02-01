@@ -27,6 +27,21 @@ import (
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
+// if error is not nil, record it, serialize and return the response, and exit
+func sendAndExitIfError(err error, response *plugins.Response) {
+	if err != nil {
+		response.Errors = append(response.Errors, err.Error())
+		sendAndExit(response)
+	}
+}
+
+// serialize and return the response
+func sendAndExit(response *plugins.Response) {
+	responseBytes, _ := proto.Marshal(response)
+	os.Stdout.Write(responseBytes)
+	os.Exit(0)
+}
+
 // This is the main function for the code generation plugin.
 func main() {
 
@@ -42,61 +57,47 @@ func main() {
 	}
 
 	// Initialize the plugin response.
-	response := &plugins.PluginResponse{}
-	response.Text = []string{}
+	response := &plugins.Response{}
 
 	// Read the plugin input.
 	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		log.Printf("File error: %v\n", err)
-		os.Exit(1)
-	}
-	request := &plugins.PluginRequest{}
+	sendAndExitIfError(err, response)
+
+	// Deserialize the input
+	request := &plugins.Request{}
 	err = proto.Unmarshal(data, request)
+	sendAndExitIfError(err, response)
 
-	// Loop over OpenAPI documents sent by the plugin and use them to generate client/server code.
-	for _, wrapper := range request.Wrapper {
-		document := &openapi.Document{}
-		err = proto.Unmarshal(wrapper.Value, document)
-		if err != nil {
-			log.Printf("ERROR %v", err)
-			os.Exit(1)
-		}
+	// Read the document sent by the plugin and use it to generate client/server code.
+	wrapper := request.Wrapper
+	document := &openapi.Document{}
+	err = proto.Unmarshal(wrapper.Value, document)
+	sendAndExitIfError(err, response)
 
-		// Collect parameters passed to the plugin.
-		invocation := os.Args[0]
-		parameters := request.Parameters
-		packageName := "main"
-		for _, parameter := range parameters {
-			invocation += " " + parameter.Name + "=" + parameter.Value
-			if parameter.Name == "package" {
-				packageName = parameter.Value
-			}
-		}
-		log.Printf("Running %s", invocation)
-
-		// Create the renderer.
-		renderer, err := NewServiceRenderer(document, packageName)
-		if err != nil {
-			log.Printf("ERROR %v", err)
-			os.Exit(1)
-		}
-
-		// Load templates.
-		err = renderer.loadTemplates(templates())
-		if err != nil {
-			log.Printf("ERROR %v", err)
-			os.Exit(1)
-		}
-
-		// Run the renderer to generate files and add them to the response object.
-		err = renderer.Generate(response, files)
-		if err != nil {
-			log.Printf("ERROR %v", err)
-			os.Exit(1)
+	// Collect parameters passed to the plugin.
+	invocation := os.Args[0]
+	parameters := request.Parameters
+	packageName := "main"
+	for _, parameter := range parameters {
+		invocation += " " + parameter.Name + "=" + parameter.Value
+		if parameter.Name == "package" {
+			packageName = parameter.Value
 		}
 	}
+	log.Printf("Running %s", invocation)
 
-	responseBytes, _ := proto.Marshal(response)
-	os.Stdout.Write(responseBytes)
+	// Create the renderer.
+	renderer, err := NewServiceRenderer(document, packageName)
+	sendAndExitIfError(err, response)
+
+	// Load templates.
+	err = renderer.loadTemplates(templates())
+	sendAndExitIfError(err, response)
+
+	// Run the renderer to generate files and add them to the response object.
+	err = renderer.Generate(response, files)
+	sendAndExitIfError(err, response)
+
+	// Return with success.
+	sendAndExit(response)
 }

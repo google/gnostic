@@ -15,7 +15,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -26,26 +25,7 @@ import (
 	plugins "github.com/googleapis/openapi-compiler/plugins"
 )
 
-type documentHandler func(name string, version string, document *openapi.Document)
-
-func foreachDocumentFromPluginInput(handler documentHandler) {
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		fmt.Printf("File error: %v\n", err)
-		os.Exit(1)
-	}
-	request := &plugins.PluginRequest{}
-	err = proto.Unmarshal(data, request)
-	for _, wrapper := range request.Wrapper {
-		document := &openapi.Document{}
-		err = proto.Unmarshal(wrapper.Value, document)
-		if err != nil {
-			panic(err)
-		}
-		handler(wrapper.Name, wrapper.Version, document)
-	}
-}
-
+// generate a simple report of an OpenAPI document's contents
 func printDocument(code *printer.Code, document *openapi.Document) {
 	code.Print("Swagger: %+v", document.Swagger)
 	code.Print("Host: %+v", document.Host)
@@ -78,18 +58,47 @@ func printDocument(code *printer.Code, document *openapi.Document) {
 	code.Outdent()
 }
 
-func main() {
-	response := &plugins.PluginResponse{}
-	response.Text = []string{}
+// record an error, then serialize and return the response
+func sendAndExitIfError(err error, response *plugins.Response) {
+	if err != nil {
+		response.Errors = append(response.Errors, err.Error())
+		sendAndExit(response)
+	}
+}
 
-	foreachDocumentFromPluginInput(
-		func(name string, version string, document *openapi.Document) {
-			code := &printer.Code{}
-			code.Print("READING %s (%s)", name, version)
-			printDocument(code, document)
-			response.Text = append(response.Text, code.String())
-		})
-
+// serialize and return the response
+func sendAndExit(response *plugins.Response) {
 	responseBytes, _ := proto.Marshal(response)
 	os.Stdout.Write(responseBytes)
+	os.Exit(0)
+}
+
+func main() {
+	// initialize the response
+	response := &plugins.Response{}
+
+	// read and deserialize the request
+	data, err := ioutil.ReadAll(os.Stdin)
+	sendAndExitIfError(err, response)
+
+	request := &plugins.Request{}
+	err = proto.Unmarshal(data, request)
+	sendAndExitIfError(err, response)
+
+	wrapper := request.Wrapper
+	document := &openapi.Document{}
+	err = proto.Unmarshal(wrapper.Value, document)
+	sendAndExitIfError(err, response)
+
+	// generate report
+	code := &printer.Code{}
+	code.Print("READING %s (%s)", wrapper.Name, wrapper.Version)
+	printDocument(code, document)
+	file := &plugins.File{}
+	file.Name = "report.txt"
+	file.Data = []byte(code.String())
+	response.Files = append(response.Files, file)
+
+	// send with success
+	sendAndExit(response)
 }

@@ -40,7 +40,7 @@ type PluginCall struct {
 
 func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName string) {
 	if pluginCall.Name != "" {
-		request := &plugins.PluginRequest{}
+		request := &plugins.Request{}
 
 		request.Invocation = pluginCall.Invocation
 		invocationParts := strings.Split(pluginCall.Invocation, ":")
@@ -73,7 +73,7 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		wrapper.Version = "v2"
 		protoBytes, _ := proto.Marshal(document)
 		wrapper.Value = protoBytes
-		request.Wrapper = []*plugins.Wrapper{wrapper}
+		request.Wrapper = wrapper
 		requestBytes, _ := proto.Marshal(request)
 
 		cmd := exec.Command("openapi_" + pluginCall.Name)
@@ -83,25 +83,18 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)
 		}
-		response := &plugins.PluginResponse{}
+		response := &plugins.Response{}
 		err = proto.Unmarshal(output, response)
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)
 			fmt.Printf("%s\n", string(output))
 		}
 
-		// always write text messages to stdout
-		for i, text := range response.Text {
-			if i > 0 {
-				os.Stdout.Write([]byte("\n"))
-			}
-			os.Stdout.Write([]byte(text))
-		}
 		// write files to the specified directory
 		var writer io.Writer
 		if outputLocation == "-" {
 			writer = os.Stdout
-			for _, file := range response.File {
+			for _, file := range response.Files {
 				writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
 				writer.Write(file.Data)
 			}
@@ -111,7 +104,7 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 			if !isDirectory(outputLocation) {
 				os.Mkdir(outputLocation, 0755)
 			}
-			for _, file := range response.File {
+			for _, file := range response.Files {
 				path := outputLocation + "/" + file.Name
 				f, _ := os.Create(path)
 				defer f.Close()

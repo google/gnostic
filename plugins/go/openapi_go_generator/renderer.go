@@ -296,7 +296,7 @@ func typeForRef(ref string) (typeName string) {
 	return strings.Title(path.Base(ref))
 }
 
-func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, files []string) (err error) {
+func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
 
 	for _, filename := range files {
 		file := &plugins.File{}
@@ -309,7 +309,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, file
 			renderer,
 		})
 		if err != nil {
-			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
+			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
 		inputBytes := f.Bytes()
 		if filepath.Ext(file.Name) == ".go" {
@@ -317,7 +317,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, file
 		} else {
 			file.Data = inputBytes
 		}
-		response.File = append(response.File, file)
+		response.Files = append(response.Files, file)
 	}
 	return
 }
