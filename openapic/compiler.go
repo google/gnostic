@@ -62,8 +62,6 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 			return errors.New(fmt.Sprintf("Invalid invocation of %s: %s", executableName, invocation))
 		}
 
-		request.Invocation = invocation
-
 		invocationParts := strings.Split(pluginCall.Invocation, ":")
 		var outputLocation string
 		switch len(invocationParts) {

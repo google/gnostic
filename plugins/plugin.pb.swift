@@ -184,21 +184,18 @@ public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
   public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
     "wrapper": 1,
-    "invocation": 2,
-    "parameters": 3,
-    "compilerVersion": 4,
+    "parameters": 2,
+    "compilerVersion": 3,
   ]}
   public var protoFieldNames: [String: Int] {return [
     "wrapper": 1,
-    "invocation": 2,
-    "parameters": 3,
-    "compiler_version": 4,
+    "parameters": 2,
+    "compiler_version": 3,
   ]}
 
   private class _StorageClass {
     typealias ProtobufExtendedMessage = Openapi_Plugin_V1_Request
     var _wrapper: Openapi_Plugin_V1_Wrapper? = nil
-    var _invocation: String = ""
     var _parameters: [Openapi_Plugin_V1_Parameter] = []
     var _compilerVersion: Openapi_Plugin_V1_Version? = nil
 
@@ -208,9 +205,8 @@ public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
       let handled: Bool
       switch protoFieldNumber {
       case 1: handled = try setter.decodeSingularMessageField(fieldType: Openapi_Plugin_V1_Wrapper.self, value: &_wrapper)
-      case 2: handled = try setter.decodeSingularField(fieldType: ProtobufString.self, value: &_invocation)
-      case 3: handled = try setter.decodeRepeatedMessageField(fieldType: Openapi_Plugin_V1_Parameter.self, value: &_parameters)
-      case 4: handled = try setter.decodeSingularMessageField(fieldType: Openapi_Plugin_V1_Version.self, value: &_compilerVersion)
+      case 2: handled = try setter.decodeRepeatedMessageField(fieldType: Openapi_Plugin_V1_Parameter.self, value: &_parameters)
+      case 3: handled = try setter.decodeSingularMessageField(fieldType: Openapi_Plugin_V1_Version.self, value: &_compilerVersion)
       default:
         handled = false
       }
@@ -221,20 +217,16 @@ public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
       if let v = _wrapper {
         try visitor.visitSingularMessageField(value: v, protoFieldNumber: 1, protoFieldName: "wrapper", jsonFieldName: "wrapper", swiftFieldName: "wrapper")
       }
-      if _invocation != "" {
-        try visitor.visitSingularField(fieldType: ProtobufString.self, value: _invocation, protoFieldNumber: 2, protoFieldName: "invocation", jsonFieldName: "invocation", swiftFieldName: "invocation")
-      }
       if !_parameters.isEmpty {
-        try visitor.visitRepeatedMessageField(value: _parameters, protoFieldNumber: 3, protoFieldName: "parameters", jsonFieldName: "parameters", swiftFieldName: "parameters")
+        try visitor.visitRepeatedMessageField(value: _parameters, protoFieldNumber: 2, protoFieldName: "parameters", jsonFieldName: "parameters", swiftFieldName: "parameters")
       }
       if let v = _compilerVersion {
-        try visitor.visitSingularMessageField(value: v, protoFieldNumber: 4, protoFieldName: "compiler_version", jsonFieldName: "compilerVersion", swiftFieldName: "compilerVersion")
+        try visitor.visitSingularMessageField(value: v, protoFieldNumber: 3, protoFieldName: "compiler_version", jsonFieldName: "compilerVersion", swiftFieldName: "compilerVersion")
       }
     }
 
     func isEqualTo(other: _StorageClass) -> Bool {
       if _wrapper != other._wrapper {return false}
-      if _invocation != other._invocation {return false}
       if _parameters != other._parameters {return false}
       if _compilerVersion != other._compilerVersion {return false}
       return true
@@ -243,7 +235,6 @@ public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
     func copy() -> _StorageClass {
       let clone = _StorageClass()
       clone._wrapper = _wrapper
-      clone._invocation = _invocation
       clone._parameters = _parameters
       clone._compilerVersion = _compilerVersion
       return clone
@@ -256,12 +247,6 @@ public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
   public var wrapper: Openapi_Plugin_V1_Wrapper {
     get {return _storage._wrapper ?? Openapi_Plugin_V1_Wrapper()}
     set {_uniqueStorage()._wrapper = newValue}
-  }
-
-  ///   The plugin invocation string, usually specified as a command-line option to the OpenAPI compiler.
-  public var invocation: String {
-    get {return _storage._invocation}
-    set {_uniqueStorage()._invocation = newValue}
   }
 
   ///   Plugin parameters parsed from the invocation string.
@@ -279,15 +264,11 @@ public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
   public init() {}
 
   public init(wrapper: Openapi_Plugin_V1_Wrapper? = nil,
-    invocation: String? = nil,
     parameters: [Openapi_Plugin_V1_Parameter] = [],
     compilerVersion: Openapi_Plugin_V1_Version? = nil)
   {
     let storage = _uniqueStorage()
     storage._wrapper = wrapper
-    if let v = invocation {
-      storage._invocation = v
-    }
     if !parameters.isEmpty {
       storage._parameters = parameters
     }
