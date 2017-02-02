@@ -19,7 +19,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"sync"
 
@@ -146,7 +145,6 @@ func (service *Service) CreateBook(parameters *bookstore.CreateBookParameters, r
 		service.Books[parameters.Shelf] = make(map[int64]*bookstore.Book)
 	}
 	service.Books[parameters.Shelf][bid] = &book
-	log.Printf("CREATED AND SAVED BOOK %+v in shelf %+v", book, service.Books[parameters.Shelf])
 	(*responses).OK = &book
 	return err
 }

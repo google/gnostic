@@ -17,6 +17,8 @@
 package test
 
 import (
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/examples/bookstore/bookstore"
@@ -187,5 +189,22 @@ func TestBookstore(t *testing.T) {
 		if len(response.Books) != 1 {
 			t.Fail()
 		}
+	}
+	// verify the handling of a badly-formed request
+	{
+		req, err := http.NewRequest("POST", service+"/shelves", strings.NewReader(""))
+		if err != nil {
+			return
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return
+		}
+		// we expect a 400 (Bad Request) code
+		if resp.StatusCode != 400 {
+			t.Fail()
+		}
+		return
+
 	}
 }

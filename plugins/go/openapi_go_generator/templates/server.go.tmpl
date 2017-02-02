@@ -4,8 +4,6 @@ package {{.Renderer.Package}}
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -26,7 +24,6 @@ var provider Provider
 
 // Handler: {{.Description}}
 func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
-	log.Printf("{{.Name}}");
 	var err error
 	//-{{if hasParameters .}}
 	// instantiate the parameters structure
@@ -36,7 +33,8 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&parameters.{{bodyParameterFieldName .}})
 	if err != nil {
-		fmt.Fprintf(w, "ERROR: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error() + "\n"))
 		return
 	}
 	//-{{end}}
