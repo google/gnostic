@@ -3,6 +3,7 @@ package {{.Renderer.Package}}
 
 import (
   "bytes"
+  "errors"
   "encoding/json"
   "fmt"
   "net/http"
@@ -48,15 +49,19 @@ func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTyp
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return 
+		return
 	}
-	defer resp.Body.Close()
-	//-{{if ne .ResultTypeName ""}}
-	decoder := json.NewDecoder(resp.Body)
-	result = &{{.ResultTypeName}}{}
-	decoder.Decode(result)
-	//-{{end}}
-	return  
+	if resp.StatusCode == 200 {
+		defer resp.Body.Close()
+		//-{{if ne .ResultTypeName ""}}
+		decoder := json.NewDecoder(resp.Body)
+		result = &{{.ResultTypeName}}{}
+		decoder.Decode(result)
+		//-{{end}}
+	} else {
+		err = errors.New(resp.Status)
+	}
+	return
 }
 
 //-{{end}}

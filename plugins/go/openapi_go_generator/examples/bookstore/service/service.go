@@ -177,7 +177,7 @@ func (service *Service) DeleteBook(parameters *bookstore.DeleteBookParameters) (
 func (service *Service) getShelf(sid int64) (shelf *bookstore.Shelf, err error) {
 	shelf, ok := service.Shelves[sid]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("Couldn't find shelf %q", sid))
+		return nil, errors.New(fmt.Sprintf("Couldn't find shelf %d", sid))
 	} else {
 		return shelf, nil
 	}
@@ -190,7 +190,7 @@ func (service *Service) getBook(sid int64, bid int64) (book *bookstore.Book, err
 	}
 	book, ok := service.Books[sid][bid]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("Couldn't find book %q on shelf %q", bid, sid))
+		return nil, errors.New(fmt.Sprintf("Couldn't find book %d on shelf %d", bid, sid))
 	} else {
 		return book, nil
 	}

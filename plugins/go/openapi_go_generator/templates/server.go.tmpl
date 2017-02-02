@@ -80,15 +80,26 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	//-{{end}}	
 	if err == nil {
 	//-{{ if hasResponses .}}
-		//-{{ if .ResponsesType | hasFieldNamedOK }}
-		// write the normal response		
-		encoder := json.NewEncoder(w)
-		encoder.Encode(responses.OK)
+		//-{{ if .ResponsesType | hasFieldNamedOK }}		
+		if responses.OK != nil {
+			// write the normal response
+			encoder := json.NewEncoder(w)
+			encoder.Encode(responses.OK)
+			return
+		} 
+		//-{{end}}
+		//-{{ if .ResponsesType | hasFieldNamedDefault }}		
+		if responses.Default != nil {
+			w.WriteHeader(int(responses.Default.Code))
+			w.Write([]byte(responses.Default.Message + "\n"))
+			return
+		}
 		//-{{end}}
 	//-{{end}}
 	} else {
-		// write an error response...
-		fmt.Fprintf(w, "ERROR: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error() + "\n"))
+		return
 	}
 }
 //-{{end}}
