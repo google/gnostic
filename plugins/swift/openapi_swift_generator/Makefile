@@ -3,11 +3,9 @@ build:
 	swift build
 	.build/debug/TemplateEncoder > Sources/openapi_swift_generator/Templates.swift
 	swift build
-	cp .build/debug/openapi_swift_generator openapi_swift_client
-	cp .build/debug/openapi_swift_generator openapi_swift_service
+	cp .build/debug/openapi_swift_generator openapi_swift_generator
 	openapic examples/bookstore/bookstore.json \
-		--swift_client_out=examples/bookstore/client \
-		--swift_service_out=examples/bookstore/service
+		--swift_generator_out=examples/bookstore/Bookstore 
 
 
 clean:

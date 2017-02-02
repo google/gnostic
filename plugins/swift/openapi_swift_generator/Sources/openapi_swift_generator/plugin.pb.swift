@@ -20,8 +20,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //  openapic (aka the OpenAPI Compiler) can be extended via plugins.  
-//  A plugin is just a program that reads a PluginRequest from stdin 
-//  and writes a PluginResponse to stdout.
+//  A plugin is just a program that reads a Request from stdin 
+//  and writes a Response to stdout.
 // 
 //  A plugin executable needs only to be placed somewhere in the path.  The
 //  plugin should be named "openapi_$NAME", and will then be used when the
@@ -32,10 +32,10 @@ import SwiftProtobuf
 
 
 ///   The version number of OpenAPI compiler.
-public struct Openapic_V1_Version: ProtobufGeneratedMessage {
-  public var swiftClassName: String {return "Openapic_V1_Version"}
+public struct Openapi_Plugin_V1_Version: ProtobufGeneratedMessage {
+  public var swiftClassName: String {return "Openapi_Plugin_V1_Version"}
   public var protoMessageName: String {return "Version"}
-  public var protoPackageName: String {return "openapic.v1"}
+  public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
     "major": 1,
     "minor": 2,
@@ -108,7 +108,7 @@ public struct Openapic_V1_Version: ProtobufGeneratedMessage {
     }
   }
 
-  public func _protoc_generated_isEqualTo(other: Openapic_V1_Version) -> Bool {
+  public func _protoc_generated_isEqualTo(other: Openapi_Plugin_V1_Version) -> Bool {
     if major != other.major {return false}
     if minor != other.minor {return false}
     if patch != other.patch {return false}
@@ -118,10 +118,10 @@ public struct Openapic_V1_Version: ProtobufGeneratedMessage {
 }
 
 ///   A parameter passed to the plugin from (or through) the OpenAPI compiler.
-public struct Openapic_V1_Parameter: ProtobufGeneratedMessage {
-  public var swiftClassName: String {return "Openapic_V1_Parameter"}
+public struct Openapi_Plugin_V1_Parameter: ProtobufGeneratedMessage {
+  public var swiftClassName: String {return "Openapi_Plugin_V1_Parameter"}
   public var protoMessageName: String {return "Parameter"}
-  public var protoPackageName: String {return "openapic.v1"}
+  public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
     "name": 1,
     "value": 2,
@@ -170,47 +170,47 @@ public struct Openapic_V1_Parameter: ProtobufGeneratedMessage {
     }
   }
 
-  public func _protoc_generated_isEqualTo(other: Openapic_V1_Parameter) -> Bool {
+  public func _protoc_generated_isEqualTo(other: Openapi_Plugin_V1_Parameter) -> Bool {
     if name != other.name {return false}
     if value != other.value {return false}
     return true
   }
 }
 
-///   An encoded PluginRequest is written to the plugin's stdin.
-public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
-  public var swiftClassName: String {return "Openapic_V1_PluginRequest"}
-  public var protoMessageName: String {return "PluginRequest"}
-  public var protoPackageName: String {return "openapic.v1"}
+///   An encoded Request is written to the plugin's stdin.
+public struct Openapi_Plugin_V1_Request: ProtobufGeneratedMessage {
+  public var swiftClassName: String {return "Openapi_Plugin_V1_Request"}
+  public var protoMessageName: String {return "Request"}
+  public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
     "wrapper": 1,
-    "invocation": 2,
+    "outputPath": 2,
     "parameters": 3,
     "compilerVersion": 4,
   ]}
   public var protoFieldNames: [String: Int] {return [
     "wrapper": 1,
-    "invocation": 2,
+    "output_path": 2,
     "parameters": 3,
     "compiler_version": 4,
   ]}
 
   private class _StorageClass {
-    typealias ProtobufExtendedMessage = Openapic_V1_PluginRequest
-    var _wrapper: [Openapic_V1_Wrapper] = []
-    var _invocation: String = ""
-    var _parameters: [Openapic_V1_Parameter] = []
-    var _compilerVersion: Openapic_V1_Version? = nil
+    typealias ProtobufExtendedMessage = Openapi_Plugin_V1_Request
+    var _wrapper: Openapi_Plugin_V1_Wrapper? = nil
+    var _outputPath: String = ""
+    var _parameters: [Openapi_Plugin_V1_Parameter] = []
+    var _compilerVersion: Openapi_Plugin_V1_Version? = nil
 
     init() {}
 
     func decodeField(setter: inout ProtobufFieldDecoder, protoFieldNumber: Int) throws -> Bool {
       let handled: Bool
       switch protoFieldNumber {
-      case 1: handled = try setter.decodeRepeatedMessageField(fieldType: Openapic_V1_Wrapper.self, value: &_wrapper)
-      case 2: handled = try setter.decodeSingularField(fieldType: ProtobufString.self, value: &_invocation)
-      case 3: handled = try setter.decodeRepeatedMessageField(fieldType: Openapic_V1_Parameter.self, value: &_parameters)
-      case 4: handled = try setter.decodeSingularMessageField(fieldType: Openapic_V1_Version.self, value: &_compilerVersion)
+      case 1: handled = try setter.decodeSingularMessageField(fieldType: Openapi_Plugin_V1_Wrapper.self, value: &_wrapper)
+      case 2: handled = try setter.decodeSingularField(fieldType: ProtobufString.self, value: &_outputPath)
+      case 3: handled = try setter.decodeRepeatedMessageField(fieldType: Openapi_Plugin_V1_Parameter.self, value: &_parameters)
+      case 4: handled = try setter.decodeSingularMessageField(fieldType: Openapi_Plugin_V1_Version.self, value: &_compilerVersion)
       default:
         handled = false
       }
@@ -218,11 +218,11 @@ public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
     }
 
     func traverse(visitor: inout ProtobufVisitor) throws {
-      if !_wrapper.isEmpty {
-        try visitor.visitRepeatedMessageField(value: _wrapper, protoFieldNumber: 1, protoFieldName: "wrapper", jsonFieldName: "wrapper", swiftFieldName: "wrapper")
+      if let v = _wrapper {
+        try visitor.visitSingularMessageField(value: v, protoFieldNumber: 1, protoFieldName: "wrapper", jsonFieldName: "wrapper", swiftFieldName: "wrapper")
       }
-      if _invocation != "" {
-        try visitor.visitSingularField(fieldType: ProtobufString.self, value: _invocation, protoFieldNumber: 2, protoFieldName: "invocation", jsonFieldName: "invocation", swiftFieldName: "invocation")
+      if _outputPath != "" {
+        try visitor.visitSingularField(fieldType: ProtobufString.self, value: _outputPath, protoFieldNumber: 2, protoFieldName: "output_path", jsonFieldName: "outputPath", swiftFieldName: "outputPath")
       }
       if !_parameters.isEmpty {
         try visitor.visitRepeatedMessageField(value: _parameters, protoFieldNumber: 3, protoFieldName: "parameters", jsonFieldName: "parameters", swiftFieldName: "parameters")
@@ -234,7 +234,7 @@ public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
 
     func isEqualTo(other: _StorageClass) -> Bool {
       if _wrapper != other._wrapper {return false}
-      if _invocation != other._invocation {return false}
+      if _outputPath != other._outputPath {return false}
       if _parameters != other._parameters {return false}
       if _compilerVersion != other._compilerVersion {return false}
       return true
@@ -243,7 +243,7 @@ public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
     func copy() -> _StorageClass {
       let clone = _StorageClass()
       clone._wrapper = _wrapper
-      clone._invocation = _invocation
+      clone._outputPath = _outputPath
       clone._parameters = _parameters
       clone._compilerVersion = _compilerVersion
       return clone
@@ -252,44 +252,41 @@ public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
 
   private var _storage = _StorageClass()
 
-  ///   The OpenAPI descriptions that were explicitly listed on the command line.  
-  ///   The specifications will appear in the order they are specified to openapic.
-  public var wrapper: [Openapic_V1_Wrapper] {
-    get {return _storage._wrapper}
+  ///   A wrapped OpenAPI document to process.
+  public var wrapper: Openapi_Plugin_V1_Wrapper {
+    get {return _storage._wrapper ?? Openapi_Plugin_V1_Wrapper()}
     set {_uniqueStorage()._wrapper = newValue}
   }
 
-  ///   The plugin invocation string, usually specified as a command-line option to the OpenAPI compiler.
-  public var invocation: String {
-    get {return _storage._invocation}
-    set {_uniqueStorage()._invocation = newValue}
+  ///   Output path specified in the plugin invocation.
+  public var outputPath: String {
+    get {return _storage._outputPath}
+    set {_uniqueStorage()._outputPath = newValue}
   }
 
   ///   Plugin parameters parsed from the invocation string.
-  public var parameters: [Openapic_V1_Parameter] {
+  public var parameters: [Openapi_Plugin_V1_Parameter] {
     get {return _storage._parameters}
     set {_uniqueStorage()._parameters = newValue}
   }
 
   ///   The version number of openapi compiler.
-  public var compilerVersion: Openapic_V1_Version {
-    get {return _storage._compilerVersion ?? Openapic_V1_Version()}
+  public var compilerVersion: Openapi_Plugin_V1_Version {
+    get {return _storage._compilerVersion ?? Openapi_Plugin_V1_Version()}
     set {_uniqueStorage()._compilerVersion = newValue}
   }
 
   public init() {}
 
-  public init(wrapper: [Openapic_V1_Wrapper] = [],
-    invocation: String? = nil,
-    parameters: [Openapic_V1_Parameter] = [],
-    compilerVersion: Openapic_V1_Version? = nil)
+  public init(wrapper: Openapi_Plugin_V1_Wrapper? = nil,
+    outputPath: String? = nil,
+    parameters: [Openapi_Plugin_V1_Parameter] = [],
+    compilerVersion: Openapi_Plugin_V1_Version? = nil)
   {
     let storage = _uniqueStorage()
-    if !wrapper.isEmpty {
-      storage._wrapper = wrapper
-    }
-    if let v = invocation {
-      storage._invocation = v
+    storage._wrapper = wrapper
+    if let v = outputPath {
+      storage._outputPath = v
     }
     if !parameters.isEmpty {
       storage._parameters = parameters
@@ -305,7 +302,7 @@ public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
     try _storage.traverse(visitor: &visitor)
   }
 
-  public func _protoc_generated_isEqualTo(other: Openapic_V1_PluginRequest) -> Bool {
+  public func _protoc_generated_isEqualTo(other: Openapi_Plugin_V1_Request) -> Bool {
     return _storage === other._storage || _storage.isEqualTo(other: other._storage)
   }
 
@@ -317,20 +314,18 @@ public struct Openapic_V1_PluginRequest: ProtobufGeneratedMessage {
   }
 }
 
-///   The plugin writes an encoded PluginResponse to stdout.
-public struct Openapic_V1_PluginResponse: ProtobufGeneratedMessage {
-  public var swiftClassName: String {return "Openapic_V1_PluginResponse"}
-  public var protoMessageName: String {return "PluginResponse"}
-  public var protoPackageName: String {return "openapic.v1"}
+///   The plugin writes an encoded Response to stdout.
+public struct Openapi_Plugin_V1_Response: ProtobufGeneratedMessage {
+  public var swiftClassName: String {return "Openapi_Plugin_V1_Response"}
+  public var protoMessageName: String {return "Response"}
+  public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
-    "error": 1,
-    "text": 2,
-    "file": 3,
+    "errors": 1,
+    "files": 2,
   ]}
   public var protoFieldNames: [String: Int] {return [
-    "error": 1,
-    "text": 2,
-    "file": 3,
+    "errors": 1,
+    "files": 2,
   ]}
 
   ///   Error message.  If non-empty, the plugin failed. 
@@ -342,37 +337,29 @@ public struct Openapic_V1_PluginResponse: ProtobufGeneratedMessage {
   ///   itself -- such as the input Document being unparseable -- should be 
   ///   reported by writing a message to stderr and exiting with a non-zero 
   ///   status code.
-  public var error: [String] = []
-
-  ///   text output, typically written to stdout by openapic.
-  public var text: [String] = []
+  public var errors: [String] = []
 
   ///   file output, each file will be written by openapic to an appropriate location.
-  public var file: [Openapic_V1_File] = []
+  public var files: [Openapi_Plugin_V1_File] = []
 
   public init() {}
 
-  public init(error: [String] = [],
-    text: [String] = [],
-    file: [Openapic_V1_File] = [])
+  public init(errors: [String] = [],
+    files: [Openapi_Plugin_V1_File] = [])
   {
-    if !error.isEmpty {
-      self.error = error
+    if !errors.isEmpty {
+      self.errors = errors
     }
-    if !text.isEmpty {
-      self.text = text
-    }
-    if !file.isEmpty {
-      self.file = file
+    if !files.isEmpty {
+      self.files = files
     }
   }
 
   public mutating func _protoc_generated_decodeField(setter: inout ProtobufFieldDecoder, protoFieldNumber: Int) throws -> Bool {
     let handled: Bool
     switch protoFieldNumber {
-    case 1: handled = try setter.decodeRepeatedField(fieldType: ProtobufString.self, value: &error)
-    case 2: handled = try setter.decodeRepeatedField(fieldType: ProtobufString.self, value: &text)
-    case 3: handled = try setter.decodeRepeatedMessageField(fieldType: Openapic_V1_File.self, value: &file)
+    case 1: handled = try setter.decodeRepeatedField(fieldType: ProtobufString.self, value: &errors)
+    case 2: handled = try setter.decodeRepeatedMessageField(fieldType: Openapi_Plugin_V1_File.self, value: &files)
     default:
       handled = false
     }
@@ -380,29 +367,26 @@ public struct Openapic_V1_PluginResponse: ProtobufGeneratedMessage {
   }
 
   public func _protoc_generated_traverse(visitor: inout ProtobufVisitor) throws {
-    if !error.isEmpty {
-      try visitor.visitRepeatedField(fieldType: ProtobufString.self, value: error, protoFieldNumber: 1, protoFieldName: "error", jsonFieldName: "error", swiftFieldName: "error")
+    if !errors.isEmpty {
+      try visitor.visitRepeatedField(fieldType: ProtobufString.self, value: errors, protoFieldNumber: 1, protoFieldName: "errors", jsonFieldName: "errors", swiftFieldName: "errors")
     }
-    if !text.isEmpty {
-      try visitor.visitRepeatedField(fieldType: ProtobufString.self, value: text, protoFieldNumber: 2, protoFieldName: "text", jsonFieldName: "text", swiftFieldName: "text")
-    }
-    if !file.isEmpty {
-      try visitor.visitRepeatedMessageField(value: file, protoFieldNumber: 3, protoFieldName: "file", jsonFieldName: "file", swiftFieldName: "file")
+    if !files.isEmpty {
+      try visitor.visitRepeatedMessageField(value: files, protoFieldNumber: 2, protoFieldName: "files", jsonFieldName: "files", swiftFieldName: "files")
     }
   }
 
-  public func _protoc_generated_isEqualTo(other: Openapic_V1_PluginResponse) -> Bool {
-    if error != other.error {return false}
-    if text != other.text {return false}
-    if file != other.file {return false}
+  public func _protoc_generated_isEqualTo(other: Openapi_Plugin_V1_Response) -> Bool {
+    if errors != other.errors {return false}
+    if files != other.files {return false}
     return true
   }
 }
 
-public struct Openapic_V1_File: ProtobufGeneratedMessage {
-  public var swiftClassName: String {return "Openapic_V1_File"}
+///   File describes a file generated by a plugin.
+public struct Openapi_Plugin_V1_File: ProtobufGeneratedMessage {
+  public var swiftClassName: String {return "Openapi_Plugin_V1_File"}
   public var protoMessageName: String {return "File"}
-  public var protoPackageName: String {return "openapic.v1"}
+  public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
     "name": 1,
     "data": 2,
@@ -451,17 +435,18 @@ public struct Openapic_V1_File: ProtobufGeneratedMessage {
     }
   }
 
-  public func _protoc_generated_isEqualTo(other: Openapic_V1_File) -> Bool {
+  public func _protoc_generated_isEqualTo(other: Openapi_Plugin_V1_File) -> Bool {
     if name != other.name {return false}
     if data != other.data {return false}
     return true
   }
 }
 
-public struct Openapic_V1_Wrapper: ProtobufGeneratedMessage {
-  public var swiftClassName: String {return "Openapic_V1_Wrapper"}
+///   Wrapper wraps an OpenAPI document with its version.
+public struct Openapi_Plugin_V1_Wrapper: ProtobufGeneratedMessage {
+  public var swiftClassName: String {return "Openapi_Plugin_V1_Wrapper"}
   public var protoMessageName: String {return "Wrapper"}
-  public var protoPackageName: String {return "openapic.v1"}
+  public var protoPackageName: String {return "openapi.plugin.v1"}
   public var jsonFieldNames: [String: Int] {return [
     "name": 1,
     "version": 2,
@@ -473,10 +458,10 @@ public struct Openapic_V1_Wrapper: ProtobufGeneratedMessage {
     "value": 3,
   ]}
 
-  ///   filename or URL of the wrapped description
+  ///   filename or URL of the wrapped document
   public var name: String = ""
 
-  ///   version of the OpenAPI specification that is used by the wrapped description
+  ///   version of the OpenAPI specification that is used by the wrapped document
   public var version: String = ""
 
   ///   valid serialized protocol buffer of the named OpenAPI specification version
@@ -523,7 +508,7 @@ public struct Openapic_V1_Wrapper: ProtobufGeneratedMessage {
     }
   }
 
-  public func _protoc_generated_isEqualTo(other: Openapic_V1_Wrapper) -> Bool {
+  public func _protoc_generated_isEqualTo(other: Openapi_Plugin_V1_Wrapper) -> Bool {
     if name != other.name {return false}
     if version != other.version {return false}
     if value != other.value {return false}

@@ -47,60 +47,27 @@ func main() throws {
   let templateEnvironment = Environment(loader: InternalLoader(),
                                         extensions:[ext])
 
-  var response = Openapic_V1_PluginResponse()
+  var response = Openapi_Plugin_V1_Response()
   let rawRequest = try Stdin.readall()
-  let request = try Openapic_V1_PluginRequest(protobuf: rawRequest)
-  for wrapper in request.wrapper {
-    let document = try Openapi_V2_Document(protobuf:wrapper.value)
-    let name = wrapper.name
-    let version = wrapper.version
-    var code = CodePrinter()
-    code.print("READING \(name) (\(version))\n")
-    code.print("Swagger: \(document.swagger)\n")
-    code.print("Host: \(document.host)\n")
-    code.print("BasePath: \(document.basePath)\n")
-    if document.hasInfo {
-      code.print("Info:\n")
-      code.indent()
-      if document.info.title != "" {
-        code.print("Title: \(document.info.title)\n")
-      }
-      if document.info.description_p != "" {
-        code.print("Description: \(document.info.description_p)\n")
-      }
-      if document.info.version != "" {
-        code.print("Version: \(document.info.version)\n")
-      }
-      code.outdent()
-    }
-    code.print("Paths:\n")
-    code.indent()
-    for pair in document.paths.path {
-      let v = pair.value
-      if v.hasGet {
-        code.print("GET \(pair.name)\n")
-      }
-      if v.hasPost {
-        code.print("POST \(pair.name)\n")
-      }
-    }
-    code.outdent()
-    response.text.append(code.content)
+  let request = try Openapi_Plugin_V1_Request(protobuf: rawRequest)
+  let wrapper = request.wrapper
+  let document = try Openapi_V2_Document(protobuf:wrapper.value)
+  let name = wrapper.name
+  let version = wrapper.version
 
-    let context = ["123": 123]
+  let context = ["123": 123]
 
-    for filename in filenames {
-      let clientcode = try templateEnvironment.renderTemplate(name:filename,
-                                                              context: context)
-      if let data = stripMarkers(clientcode).data(using:.utf8) {
-        var clientfile = Openapic_V1_File()
-        clientfile.name = filename
-        clientfile.data = data
-        response.file.append(clientfile)
-      }
+  for filename in filenames {
+    let clientcode = try templateEnvironment.renderTemplate(name:filename,
+                                                            context: context)
+    if let data = stripMarkers(clientcode).data(using:.utf8) {
+      var clientfile = Openapi_Plugin_V1_File()
+      clientfile.name = filename
+      clientfile.data = data
+      response.files.append(clientfile)
     }
-
   }
+
   let serializedResponse = try response.serializeProtobuf()
   Stdout.write(bytes: serializedResponse)
 }
