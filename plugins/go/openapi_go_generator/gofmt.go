@@ -53,12 +53,13 @@ func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	if err != nil {
 		return
 	}
-	input.Write(stripMarkers(inputBytes))
+	strippedBytes := stripMarkers(inputBytes)
+	input.Write(strippedBytes)
 	input.Close()
 	errors, err := ioutil.ReadAll(cmderr)
 	if len(errors) > 0 {
 		log.Printf("gofmt errors: %s", errors)
-		return inputBytes, nil
+		return strippedBytes, nil
 	} else {
 		outputBytes, err = ioutil.ReadAll(output)
 	}

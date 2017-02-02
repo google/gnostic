@@ -32,18 +32,18 @@ func NewService() *Service {
 
 func (service *Service) ListShelves(responses *bookstore.ListShelvesResponses) (err error) {
 	log.Printf("ListShelves")
-	shelfList := service.store.ListShelves()
+	shelfList, _, err := service.store.ListShelves()
 	response := &bookstore.ListShelvesResponse{}
 	response.Shelves = shelfList.Shelves
 	(*responses).OK = response
-	return nil
+	return err
 }
 
 func (service *Service) CreateShelf(parameters *bookstore.CreateShelfParameters, responses *bookstore.CreateShelfResponses) (err error) {
 	log.Printf("CreateShelf %+v", parameters)
-	shelf := service.store.CreateShelf(parameters.Shelf)
-	(*responses).OK = &shelf
-	return nil
+	shelf, _, err := service.store.CreateShelf(parameters.Shelf)
+	(*responses).OK = shelf
+	return err
 }
 
 func (service *Service) DeleteShelves() (err error) {
@@ -54,19 +54,28 @@ func (service *Service) DeleteShelves() (err error) {
 
 func (service *Service) GetShelf(parameters *bookstore.GetShelfParameters, responses *bookstore.GetShelfResponses) (err error) {
 	log.Printf("GetShelf %+v", parameters)
-	shelf, err := service.store.GetShelf(parameters.Shelf)
-	(*responses).OK = &shelf
-	return nil
+	shelf, status, err := service.store.GetShelf(parameters.Shelf)
+	if err != nil {
+		handlerError := &bookstore.Error{}
+		handlerError.Code = int32(status)
+		handlerError.Message = err.Error()
+		(*responses).Default = handlerError
+		return nil
+	} else {
+		(*responses).OK = shelf
+		return nil
+	}
 }
 
 func (service *Service) DeleteShelf(parameters *bookstore.DeleteShelfParameters) (err error) {
 	log.Printf("DeleteShelf %+v", parameters)
-	return service.store.DeleteShelf(parameters.Shelf)
+	_, err = service.store.DeleteShelf(parameters.Shelf)
+	return err
 }
 
 func (service *Service) ListBooks(parameters *bookstore.ListBooksParameters, responses *bookstore.ListBooksResponses) (err error) {
 	log.Printf("ListBooks %+v", parameters)
-	bl, err := service.store.ListBooks(parameters.Shelf)
+	bl, _, err := service.store.ListBooks(parameters.Shelf)
 	response := &bookstore.ListBooksResponse{}
 	response.Books = bl.Books
 	(*responses).OK = response
@@ -75,19 +84,28 @@ func (service *Service) ListBooks(parameters *bookstore.ListBooksParameters, res
 
 func (service *Service) CreateBook(parameters *bookstore.CreateBookParameters, responses *bookstore.CreateBookResponses) (err error) {
 	log.Printf("CreateBook %+v", parameters)
-	book, err := service.store.CreateBook(parameters.Shelf, parameters.Book)
+	book, _, err := service.store.CreateBook(parameters.Shelf, parameters.Book)
 	(*responses).OK = &book
 	return err
 }
 
 func (service *Service) GetBook(parameters *bookstore.GetBookParameters, responses *bookstore.GetBookResponses) (err error) {
 	log.Printf("GetBook %+v", parameters)
-	book, err := service.store.GetBook(parameters.Shelf, parameters.Book)
-	(*responses).OK = &book
-	return nil
+	book, status, err := service.store.GetBook(parameters.Shelf, parameters.Book)
+	if err != nil {
+		handlerError := &bookstore.Error{}
+		handlerError.Code = int32(status)
+		handlerError.Message = err.Error()
+		(*responses).Default = handlerError
+		return nil
+	} else {
+		(*responses).OK = book
+		return nil
+	}
 }
 
 func (service *Service) DeleteBook(parameters *bookstore.DeleteBookParameters) (err error) {
 	log.Printf("DeleteBook %+v", parameters)
-	return service.store.DeleteBook(parameters.Shelf, parameters.Book)
+	_, err = service.store.DeleteBook(parameters.Shelf, parameters.Book)
+	return err
 }

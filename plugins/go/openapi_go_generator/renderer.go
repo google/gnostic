@@ -277,8 +277,12 @@ func typeForSchema(schema *openapi.Schema) (typeName string) {
 	}
 	if schema.Type != nil {
 		types := schema.Type.Value
+                format := schema.Format
 		if len(types) == 1 && types[0] == "string" {
 			return "string"
+		}
+		if len(types) == 1 && types[0] == "integer" && format == "int32" {
+			return "int32"
 		}
 		if len(types) == 1 && types[0] == "array" && schema.Items != nil {
 			// we have an array.., but of what?
@@ -325,6 +329,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 func propertyNameForResponseCode(code string) string {
 	if code == "200" {
 		return "OK"
+	} else {
+		return strings.Title(code)
 	}
-	return code
 }
