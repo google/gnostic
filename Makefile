@@ -1,6 +1,8 @@
 
 build:	
 	go install github.com/googleapis/openapi-compiler/openapic
+	go install github.com/googleapis/openapi-compiler/apps/report
+	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_sample
 	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/encode_templates
 	go generate github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator
 	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator

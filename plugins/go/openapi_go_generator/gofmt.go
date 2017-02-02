@@ -16,10 +16,34 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os/exec"
 	"runtime"
+	"strings"
 )
 
+// Remove lines containing only "//-" after templates have been expanded.
+// Code templates use "//-" prefixes to mark template operators
+// that otherwise would add unnecessary blank lines.
+func stripMarkers(inputBytes []byte) (outputBytes []byte) {
+	inputString := string(inputBytes)
+	inputLines := strings.Split(inputString, "\n")
+	outputLines := make([]string, 0)
+	for _, line := range inputLines {
+		if strings.Contains(line, "//-") {
+			removed := strings.TrimSpace(strings.Replace(line, "//-", "", 1))
+			if removed != "" {
+				outputLines = append(outputLines, removed)
+			}
+		} else {
+			outputLines = append(outputLines, line)
+		}
+	}
+	outputString := strings.Join(outputLines, "\n")
+	return []byte(outputString)
+}
+
+// Run the gofmt tool to format generated code.
 func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
 	input, _ := cmd.StdinPipe()
@@ -29,11 +53,13 @@ func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	if err != nil {
 		return
 	}
-	input.Write(inputBytes)
+	strippedBytes := stripMarkers(inputBytes)
+	input.Write(strippedBytes)
 	input.Close()
 	errors, err := ioutil.ReadAll(cmderr)
 	if len(errors) > 0 {
-		return inputBytes, nil
+		log.Printf("gofmt errors: %s", errors)
+		return strippedBytes, nil
 	} else {
 		outputBytes, err = ioutil.ReadAll(output)
 	}

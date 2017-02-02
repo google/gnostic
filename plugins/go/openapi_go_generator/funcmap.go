@@ -25,6 +25,10 @@ func hasFieldNamedOK(s *ServiceType) bool {
 	return s.hasFieldNamed("OK")
 }
 
+func hasFieldNamedDefault(s *ServiceType) bool {
+	return s.hasFieldNamed("Default")
+}
+
 func hasParameters(m *ServiceMethod) bool {
 	return m.ParametersType != nil
 }
@@ -85,6 +89,7 @@ func bodyParameterFieldName(m *ServiceMethod) string {
 func helpers() template.FuncMap {
 	return template.FuncMap{
 		"hasFieldNamedOK":        hasFieldNamedOK,
+		"hasFieldNamedDefault":   hasFieldNamedDefault,
 		"hasParameters":          hasParameters,
 		"hasPathParameters":      hasPathParameters,
 		"hasFormParameters":      hasFormParameters,

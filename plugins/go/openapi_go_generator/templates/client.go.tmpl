@@ -1,64 +1,67 @@
 // GENERATED FILE: DO NOT EDIT!
-
 package {{.Renderer.Package}}
 
 import (
   "bytes"
+  "errors"
   "encoding/json"
   "fmt"
   "net/http"
   "strings"
 )
   
-const service = "http://localhost:8080"
-
+// API client representation.
 type Client struct {
-	Service string
+	service string
 } 
 
+// Create an API client.
 func NewClient(service string) *Client {
 	client := &Client{}
-	client.Service = service
+	client.service = service
 	return client
 }
 
-{{range .Renderer.Methods}}
-{{if eq .ResultTypeName ""}}
+//-{{range .Renderer.Methods}}
+// {{.Description}}
+//-{{if eq .ResultTypeName ""}}
 func (client *Client) {{.ClientName}}({{parameterList .}}) (err error) {
-{{else}}
+//-{{else}}
 func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err error) {
-{{end}}
-	path := client.Service + "{{.Path}}"
-	
-	{{if hasParameters .}}
-	{{range .ParametersType.Fields}}	
-	{{if eq .Position "path"}}
+//-{{end}}
+	path := client.service + "{{.Path}}"
+	//-{{if hasParameters .}}
+	//-{{range .ParametersType.Fields}}	
+	//-{{if eq .Position "path"}}
 	path = strings.Replace(path, "{" + "{{.JSONName}}" + "}", fmt.Sprintf("%v", {{.JSONName}}), 1)
-	{{end}}
-	{{end}}
-	{{end}}
-	
-	{{if eq .Method "POST"}}
+	//-{{end}}
+	//-{{end}}
+	//-{{end}}
+	//-{{if eq .Method "POST"}}
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode({{bodyParameterName .}})
 	req, err := http.NewRequest("{{.Method}}", path, body)
-	{{else}}
+	//-{{else}}
 	req, err := http.NewRequest("{{.Method}}", path, nil)
-	{{end}}
-	
+	//-{{end}}
 	if err != nil {
 		return
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return 
+		return
 	}
-	defer resp.Body.Close()
-	{{if ne .ResultTypeName ""}}
-	decoder := json.NewDecoder(resp.Body)
-	result = &{{.ResultTypeName}}{}
-	decoder.Decode(result)
-	{{end}}
-	return  
+	if resp.StatusCode == 200 {
+		defer resp.Body.Close()
+		//-{{if ne .ResultTypeName ""}}
+		decoder := json.NewDecoder(resp.Body)
+		result = &{{.ResultTypeName}}{}
+		decoder.Decode(result)
+		//-{{end}}
+	} else {
+		err = errors.New(resp.Status)
+	}
+	return
 }
-{{end}}
+
+//-{{end}}

@@ -4,21 +4,18 @@ build:
 	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/encode_templates
 	go generate github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator
 	go install github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator
-	rm -f $(GOPATH)/bin/openapi_go_client $(GOPATH)/bin/openapi_go_service
+	rm -f $(GOPATH)/bin/openapi_go_client $(GOPATH)/bin/openapi_go_server
 	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_client
-	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_service
-
-test: 	build
-	openapic bookstore.json --go_service_out=- --go_client_out=-
-
-service:build
-	openapic bookstore.json --go_service_out=package=main:service 
-
-client:	build
-	openapic bookstore.json --go_client_out=package=bookstore:bookstore
+	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_server
 
 all:	build
-	openapic bookstore.json --go_service_out=package=main:service --go_client_out=package=bookstore:bookstore
+	openapic bookstore.json --go_generator_out=bookstore
 
 clean:  
-	rm -rf bookstore service/app.go service/app.yaml service/service service/service.go service/types.go bookstore.text
+	rm -rf bookstore bookstore.text service/service
+
+test:	all
+	cd service; go get .; go build; ./service &
+	go test
+	killall service
+

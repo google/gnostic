@@ -189,8 +189,9 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Name = strings.Title(op.OperationId)
 	m.Path = path
 	m.Method = method
-	m.HandlerName = "handle" + m.Name
-	m.ProcessorName = "process" + m.Name
+	m.Description = op.Description
+	m.HandlerName = "Handle" + m.Name
+	m.ProcessorName = "" + m.Name
 	m.ClientName = m.Name
 	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.Name+"Parameters", op.Parameters)
 	if m.ParametersType != nil {
@@ -276,8 +277,12 @@ func typeForSchema(schema *openapi.Schema) (typeName string) {
 	}
 	if schema.Type != nil {
 		types := schema.Type.Value
+                format := schema.Format
 		if len(types) == 1 && types[0] == "string" {
 			return "string"
+		}
+		if len(types) == 1 && types[0] == "integer" && format == "int32" {
+			return "int32"
 		}
 		if len(types) == 1 && types[0] == "array" && schema.Items != nil {
 			// we have an array.., but of what?
@@ -295,7 +300,7 @@ func typeForRef(ref string) (typeName string) {
 	return strings.Title(path.Base(ref))
 }
 
-func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, files []string) (err error) {
+func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
 
 	for _, filename := range files {
 		file := &plugins.File{}
@@ -308,7 +313,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, file
 			renderer,
 		})
 		if err != nil {
-			response.Text = append(response.Text, fmt.Sprintf("ERROR %v", err))
+			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
 		inputBytes := f.Bytes()
 		if filepath.Ext(file.Name) == ".go" {
@@ -316,7 +321,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, file
 		} else {
 			file.Data = inputBytes
 		}
-		response.File = append(response.File, file)
+		response.Files = append(response.Files, file)
 	}
 	return
 }
@@ -324,6 +329,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.PluginResponse, file
 func propertyNameForResponseCode(code string) string {
 	if code == "200" {
 		return "OK"
+	} else {
+		return strings.Title(code)
 	}
-	return code
 }

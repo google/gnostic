@@ -6,4 +6,7 @@ install:
   - go get github.com/googleapis/openapi-compiler/openapic
   - go get github.com/googleapis/openapi-compiler/plugins/go/openapi_go_sample
 
-script: go test . -v
+script:
+  - go test . -v
+  - cd plugins/go/openapi_go_generator/examples/bookstore
+  - make test

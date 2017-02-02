@@ -52,12 +52,17 @@ func printDocument(document:Openapi_V2_Document,
 }
 
 func main() throws {
-  var response = Openapic_V1_PluginResponse()
+  var response = Openapi_Plugin_V1_Response()
   let rawRequest = try Stdin.readall()
-  let request = try Openapic_V1_PluginRequest(protobuf: rawRequest)
-  for wrapper in request.wrapper {
-    let document = try Openapi_V2_Document(protobuf:wrapper.value)
-    response.text.append(printDocument(document:document, name:wrapper.name, version:wrapper.version))
+  let request = try Openapi_Plugin_V1_Request(protobuf: rawRequest)
+  let wrapper = request.wrapper 
+  let document = try Openapi_V2_Document(protobuf:wrapper.value)
+  let report = printDocument(document:document, name:wrapper.name, version:wrapper.version)
+  if let reportData = report.data(using:.utf8) {
+    var file = Openapi_Plugin_V1_File()
+    file.name = "report.txt"
+    file.data = reportData
+    response.files.append(file)
   }
   let serializedResponse = try response.serializeProtobuf()
   Stdout.write(bytes: serializedResponse)

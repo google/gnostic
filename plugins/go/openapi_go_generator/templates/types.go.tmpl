@@ -2,9 +2,13 @@
 
 package {{.Renderer.Package}}
 
-// types
-{{range .Renderer.Types}}
-type {{.Name}} struct { {{range .Fields}}
-  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`{{end}}{{end}}
+// Types used by the API.
+//-{{range .Renderer.Types}}
+
+type {{.Name}} struct { 
+//-{{range .Fields}}
+  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`
+//-{{end}}
+//-{{end}}
 }
-{{end}}
+//-{{end}}

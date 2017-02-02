@@ -17,10 +17,11 @@
 package test
 
 import (
-	"log"
+	"net/http"
+	"strings"
 	"testing"
 
-	"github.com/googleapis/openapi-compiler/plugins/go/examples/bookstore/bookstore"
+	"github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/examples/bookstore/bookstore"
 )
 
 const service = "http://localhost:8080"
@@ -43,8 +44,21 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 		if len(response.Shelves) != 0 {
+			t.Fail()
+		}
+	}
+	// attempting to get a shelf should return an error
+	{
+		_, err := b.GetShelf(1)
+		if err == nil {
+			t.Fail()
+		}
+	}
+	// attempting to get a book should return an error
+	{
+		_, err := b.GetBook(1, 2)
+		if err == nil {
 			t.Fail()
 		}
 	}
@@ -56,7 +70,10 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
+		if (response.Name != "shelves/1") ||
+			(response.Theme != "mysteries") {
+			t.Fail()
+		}
 	}
 	// add another shelf
 	{
@@ -66,7 +83,10 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
+		if (response.Name != "shelves/2") ||
+			(response.Theme != "comedies") {
+			t.Fail()
+		}
 	}
 	// get the first shelf that was added
 	{
@@ -74,7 +94,10 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
+		if (response.Name != "shelves/1") ||
+			(response.Theme != "mysteries") {
+			t.Fail()
+		}
 	}
 	// list shelves and verify that there are 2
 	{
@@ -82,7 +105,6 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 		if len(response.Shelves) != 2 {
 			t.Fail()
 		}
@@ -100,7 +122,6 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 		if len(response.Shelves) != 1 {
 			t.Fail()
 		}
@@ -111,7 +132,6 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 		if len(response.Books) != 0 {
 			t.Fail()
 		}
@@ -121,30 +141,27 @@ func TestBookstore(t *testing.T) {
 		var book bookstore.Book
 		book.Author = "Agatha Christie"
 		book.Title = "And Then There Were None"
-		response, err := b.CreateBook(1, book)
+		_, err := b.CreateBook(1, book)
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 	}
 	// create another book
 	{
 		var book bookstore.Book
 		book.Author = "Agatha Christie"
 		book.Title = "Murder on the Orient Express"
-		response, err := b.CreateBook(1, book)
+		_, err := b.CreateBook(1, book)
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 	}
 	// get the first book that was added
 	{
-		book, err := b.GetBook(1, 1)
+		_, err := b.GetBook(1, 1)
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", book)
 	}
 	// list the books on a shelf and verify that there are 2
 	{
@@ -152,7 +169,6 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 		if len(response.Books) != 2 {
 			t.Fail()
 		}
@@ -170,9 +186,25 @@ func TestBookstore(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		log.Printf("%+v", response)
 		if len(response.Books) != 1 {
 			t.Fail()
 		}
+	}
+	// verify the handling of a badly-formed request
+	{
+		req, err := http.NewRequest("POST", service+"/shelves", strings.NewReader(""))
+		if err != nil {
+			return
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return
+		}
+		// we expect a 400 (Bad Request) code
+		if resp.StatusCode != 400 {
+			t.Fail()
+		}
+		return
+
 	}
 }

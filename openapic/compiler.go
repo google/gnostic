@@ -19,6 +19,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -38,11 +39,29 @@ type PluginCall struct {
 	Invocation string
 }
 
-func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName string) {
+func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName string) error {
 	if pluginCall.Name != "" {
-		request := &plugins.PluginRequest{}
+		request := &plugins.Request{}
 
-		request.Invocation = pluginCall.Invocation
+		// Infer the name of the executable by adding the prefix.
+		executableName := "openapi_" + pluginCall.Name
+
+		// validate invocation string with regular expression
+		invocation := pluginCall.Invocation
+
+		//
+		// Plugin invocations must consist of
+		// zero or more comma-separated key=value pairs followed by a path.
+		// If pairs are present, a colon separates them from the path.
+		// Keys and values must be alphanumeric strings and may contain
+		// dashes, underscores, periods, or forward slashes.
+		// A path can contain any characters other than the separators ',', ':', and '='.
+		//
+		invocation_regex := regexp.MustCompile(`^([\w-_\/\.]+=[\w-_\/\.]+(,[\w-_\/\.]+=[\w-_\/\.]+)*:)?[^,:=]+$`)
+		if !invocation_regex.Match([]byte(pluginCall.Invocation)) {
+			return errors.New(fmt.Sprintf("Invalid invocation of %s: %s", executableName, invocation))
+		}
+
 		invocationParts := strings.Split(pluginCall.Invocation, ":")
 		var outputLocation string
 		switch len(invocationParts) {
@@ -68,50 +87,46 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		version.Patch = 0
 		request.CompilerVersion = version
 
+		request.OutputPath = outputLocation
+
 		wrapper := &plugins.Wrapper{}
 		wrapper.Name = sourceName
 		wrapper.Version = "v2"
 		protoBytes, _ := proto.Marshal(document)
 		wrapper.Value = protoBytes
-		request.Wrapper = []*plugins.Wrapper{wrapper}
+		request.Wrapper = wrapper
 		requestBytes, _ := proto.Marshal(request)
 
-		cmd := exec.Command("openapi_" + pluginCall.Name)
+		cmd := exec.Command(executableName)
 		cmd.Stdin = bytes.NewReader(requestBytes)
 		cmd.Stderr = os.Stderr
 		output, err := cmd.Output()
 		if err != nil {
-			fmt.Printf("Error: %+v\n", err)
+			return err
 		}
-		response := &plugins.PluginResponse{}
+		response := &plugins.Response{}
 		err = proto.Unmarshal(output, response)
 		if err != nil {
-			fmt.Printf("Error: %+v\n", err)
-			fmt.Printf("%s\n", string(output))
+			return err
 		}
 
-		// always write text messages to stdout
-		for i, text := range response.Text {
-			if i > 0 {
-				os.Stdout.Write([]byte("\n"))
-			}
-			os.Stdout.Write([]byte(text))
-		}
 		// write files to the specified directory
 		var writer io.Writer
-		if outputLocation == "-" {
+		if outputLocation == "!" {
+			// write nothing
+		} else if outputLocation == "-" {
 			writer = os.Stdout
-			for _, file := range response.File {
+			for _, file := range response.Files {
 				writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
 				writer.Write(file.Data)
 			}
 		} else if isFile(outputLocation) {
-			fmt.Printf("Error, unable to overwrite %s\n", outputLocation)
+			return errors.New(fmt.Sprintf("Error, unable to overwrite %s\n", outputLocation))
 		} else {
 			if !isDirectory(outputLocation) {
 				os.Mkdir(outputLocation, 0755)
 			}
-			for _, file := range response.File {
+			for _, file := range response.Files {
 				path := outputLocation + "/" + file.Name
 				f, _ := os.Create(path)
 				defer f.Close()
@@ -119,6 +134,7 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 			}
 		}
 	}
+	return nil
 }
 
 func isFile(path string) bool {
@@ -139,8 +155,12 @@ func isDirectory(path string) bool {
 
 func writeFile(name string, bytes []byte, source string, extension string) {
 	var writer io.Writer
-	if name == "-" {
+	if name == "!" {
+		return
+	} else if name == "-" {
 		writer = os.Stdout
+	} else if name == "=" {
+		writer = os.Stderr
 	} else if isDirectory(name) {
 		base := filepath.Base(source)
 		// remove the original source extension
@@ -156,7 +176,7 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = file
 	}
 	writer.Write(bytes)
-	if name == "-" {
+	if name == "-" || name == "=" {
 		writer.Write([]byte("\n"))
 	}
 }
@@ -183,7 +203,7 @@ Options:
 	resolveReferences := false
 
 	// arg processing matches patterns of the form "--PLUGIN_out=PATH"
-	plugin_regex, err := regexp.Compile("--(.+)_out=(.+)")
+	plugin_regex := regexp.MustCompile("--(.+)_out=(.+)")
 
 	for i, arg := range os.Args {
 		if i == 0 {
@@ -209,7 +229,7 @@ Options:
 		} else if arg == "--resolve_refs" {
 			resolveReferences = true
 		} else if arg[0] == '-' {
-			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+			fmt.Fprintf(os.Stderr, "Unknown option: %s.\n%s\n", arg, usage)
 			os.Exit(-1)
 		} else {
 			sourceName = arg
@@ -221,24 +241,24 @@ Options:
 		textProtoPath == "" &&
 		errorPath == "" &&
 		len(pluginCalls) == 0 {
-		fmt.Printf("Missing output directives.\n%s\n", usage)
+		fmt.Fprintf(os.Stderr, "Missing output directives.\n%s\n", usage)
 		os.Exit(-1)
 	}
 
 	if sourceName == "" {
-		fmt.Printf("No input specified.\n%s\n", usage)
+		fmt.Fprintf(os.Stderr, "No input specified.\n%s\n", usage)
 		os.Exit(-1)
 	}
 
-	// If we get here and the error output is unspecified, write errors to stdout.
+	// If we get here and the error output is unspecified, write errors to stderr.
 	if errorPath == "" {
-		errorPath = "-"
+		errorPath = "="
 	}
 
 	// read and compile the OpenAPI source
 	info, err := compiler.ReadInfoForFile(sourceName)
 	if err != nil {
-		fmt.Printf("Error: %+v\n", err)
+		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
 	document, err := openapi_v2.NewDocument(info, compiler.NewContext("$root", nil))
@@ -273,6 +293,10 @@ Options:
 		writeFile(textProtoPath, bytes, sourceName, "text")
 	}
 	for _, pluginCall := range pluginCalls {
-		pluginCall.perform(document, sourceName)
+		err = pluginCall.perform(document, sourceName)
+		if err != nil {
+			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			defer os.Exit(-1)
+		}
 	}
 }
