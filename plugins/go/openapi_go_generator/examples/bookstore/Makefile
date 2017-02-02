@@ -9,7 +9,7 @@ build:
 	ln -s $(GOPATH)/bin/openapi_go_generator $(GOPATH)/bin/openapi_go_server
 
 all:	build
-	openapic bookstore.json --go_server_out=package=bookstore:bookstore --go_client_out=package=bookstore:bookstore
+	openapic bookstore.json --go_generator_out=bookstore
 
 clean:  
 	rm -rf bookstore bookstore.text service/service

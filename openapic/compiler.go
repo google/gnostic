@@ -87,6 +87,8 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		version.Patch = 0
 		request.CompilerVersion = version
 
+		request.OutputPath = outputLocation
+
 		wrapper := &plugins.Wrapper{}
 		wrapper.Name = sourceName
 		wrapper.Version = "v2"

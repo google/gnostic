@@ -71,11 +71,14 @@ message Request {
   // A wrapped OpenAPI document to process.
   Wrapper wrapper = 1;
   
+  // Output path specified in the plugin invocation.
+  string output_path = 2;
+
   // Plugin parameters parsed from the invocation string.
-  repeated Parameter parameters = 2;
+  repeated Parameter parameters = 3;
 
   // The version number of openapi compiler.
-  Version compiler_version = 3;
+  Version compiler_version = 4;
 }
 
 // The plugin writes an encoded Response to stdout.

@@ -77,7 +77,7 @@ func main() {
 	// Collect parameters passed to the plugin.
 	invocation := os.Args[0]
 	parameters := request.Parameters
-	packageName := "main"
+	packageName := request.OutputPath
 	for _, parameter := range parameters {
 		invocation += " " + parameter.Name + "=" + parameter.Value
 		if parameter.Name == "package" {
