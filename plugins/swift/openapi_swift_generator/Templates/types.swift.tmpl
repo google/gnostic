@@ -3,7 +3,7 @@
 //-{% for serviceType in renderer.types %}
 class {{ serviceType.name }} {
 //-{% for serviceTypeField in serviceType.fields %}
-  public var {{serviceTypeField.name}} : {{serviceTypeField.typeName}}
+  public var {{serviceTypeField.name}} : {{serviceTypeField.typeName}} = {{serviceTypeField.initialValue}}
 //-{% endfor %}
 }
 

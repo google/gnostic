@@ -2,4 +2,8 @@
 .checkstyle
 .project
 .settings
-
+# Swift
+.build
+Packages
+# vi
+*.swp

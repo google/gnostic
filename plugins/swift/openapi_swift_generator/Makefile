@@ -5,7 +5,7 @@ build:
 	swift build
 	cp .build/debug/openapi_swift_generator openapi_swift_generator
 	openapic examples/bookstore/bookstore.json \
-		--swift_generator_out=examples/bookstore/Bookstore 
+		--swift_generator_out=examples/bookstore/Sources/Bookstore 
 
 
 clean:

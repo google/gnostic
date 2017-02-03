@@ -25,6 +25,62 @@ class ServiceTypeField {
   var typeName : String = ""
   var jsonName : String = ""
   var position: String = "" // "body", "header", "formdata", "query", or "path"
+  var initialValue : String = ""
+
+
+  func setTypeForName(_ name : String, _ format : String) {
+    switch name {
+    case "integer":
+      if format == "int32" {
+        self.typeName = "Int32"
+      } else if format == "int64" {
+         self.typeName =  "Int64"
+      } else {
+         self.typeName =  "Int"
+      }
+      self.initialValue = "0"
+    default:
+      self.typeName = name.capitalizingFirstLetter()
+      self.initialValue = self.typeName + "()"
+    }
+  }
+
+
+  func setTypeForSchema(_ schema : Openapi_V2_Schema, optional : Bool = false) {
+    let ref = schema.ref
+    if ref != "" {
+      self.typeName = typeForRef(ref)
+      self.initialValue = self.typeName + "()"
+    }
+    if schema.hasType {
+      let types = schema.type.value
+      let format = schema.format
+      if types.count == 1 && types[0] == "string" {
+        self.typeName = "String"
+        self.initialValue = "\"\""
+      }
+      if types.count == 1 && types[0] == "integer" && format == "int32" {
+        self.typeName = "Int32"
+        self.initialValue = "0"
+      }
+      if types.count == 1 && types[0] == "array" && schema.hasItems {
+        // we have an array.., but of what?
+        let items = schema.items.schema
+        if items.count == 1 && items[0].ref != "" {
+          self.typeName = "[" + typeForRef(items[0].ref) + "]"
+          self.initialValue = "[]"
+        }
+      }
+    }
+    // this function is incomplete... so return a string representing anything that we don't handle
+    if self.typeName == "" {
+      self.typeName = "\(schema)"
+    }
+    if optional {
+      self.typeName += "?"
+      self.initialValue = "nil"
+    }
+  }
 }
 
 class ServiceMethod {
@@ -58,46 +114,7 @@ func typeForRef(_ ref : String) -> String {
   return parts.last!.capitalizingFirstLetter()
 }
 
-func typeForSchema(_ schema : Openapi_V2_Schema) -> String {
-  let ref = schema.ref
-  if ref != "" {
-    return typeForRef(ref)
-  }
-  if schema.hasType {
-    let types = schema.type.value
-    let format = schema.format
-    if types.count == 1 && types[0] == "string" {
-      return "String"
-    }
-    if types.count == 1 && types[0] == "integer" && format == "int32" {
-      return "Int32"
-    }
-    if types.count == 1 && types[0] == "array" && schema.hasItems {
-      // we have an array.., but of what?
-      let items = schema.items.schema
-      if items.count == 1 && items[0].ref != "" {
-        return "[]" + typeForRef(items[0].ref)
-      }
-    }
-  }
-  // this function is incomplete... so return a string representing anything that we don't handle
-  return "\(schema)"
-}
 
-func typeForName(_ name : String, _ format : String) -> String {
-  switch name {
-  case "integer":
-    if format == "int32" {
-      return "Int32"
-    } else if format == "int64" {
-      return "Int64"
-    } else {
-      return "Int"
-    }
-  default:
-    return name.capitalizingFirstLetter()
-  }
-}
 
 class ServiceRenderer {
   private var templateEnvironment : Environment
@@ -128,7 +145,7 @@ class ServiceRenderer {
           case .bodyParameter(let bodyParameter):
             f.name = bodyParameter.name
             if bodyParameter.hasSchema {
-              f.typeName = typeForSchema(bodyParameter.schema)
+              f.setTypeForSchema(bodyParameter.schema)
               f.position = "body"
             }
           case .nonBodyParameter(let nonBodyParameter):
@@ -145,7 +162,7 @@ class ServiceRenderer {
             case .pathParameterSubSchema(let pathParameter):
               f.name = pathParameter.name
               f.position = "path"
-              f.typeName = typeForName(pathParameter.type, pathParameter.format)
+              f.setTypeForName(pathParameter.type, pathParameter.format)
             default:
               Log("?")
             }
@@ -180,10 +197,10 @@ class ServiceRenderer {
           let schema = response.schema
           switch schema.oneof {
           case .schema(let schema):
-            f.typeName = typeForSchema(schema) + "?"
+            f.setTypeForSchema(schema, optional:true)
             t.fields.append(f)
             if f.name == "ok" {
-              m.resultTypeName = typeForSchema(schema)
+              m.resultTypeName = f.typeName
             }
           default:
             Log("unknown")
@@ -228,7 +245,7 @@ class ServiceRenderer {
       for pair2 in schema.properties.additionalProperties {
         let f = ServiceTypeField()
         f.name = pair2.name
-        f.typeName = typeForSchema(pair2.value)
+        f.setTypeForSchema(pair2.value)
         f.jsonName = pair2.name
         t.fields.append(f)
       }
