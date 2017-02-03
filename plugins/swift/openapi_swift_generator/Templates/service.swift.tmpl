@@ -1,1 +1,15 @@
 // Service code
+
+protocol Service {
+//-{% for serviceMethod in renderer.methods %}
+  func {{ serviceMethod.name }} () 
+//-{% endfor %}
+}
+
+class Server {
+	private var service : Service
+	
+	init(service : Service) {
+		self.service = service
+	}
+}
