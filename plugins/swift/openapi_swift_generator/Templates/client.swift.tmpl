@@ -12,17 +12,48 @@ public class Client {
 
   // {{ serviceMethod.description }}
   public func {{ serviceMethod.name }}({{ .|clientParametersDeclaration:serviceMethod }}) throws {{ .|clientReturnDeclaration:serviceMethod }} {
-	  var path = self.service + "{{ serviceMethod.path }}"
+	  var path = self.service 
+	  path = path + "{{ serviceMethod.path }}"
 	  //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
 	  //-{% if serviceTypeField.position == "path" %}
 	  path = path.replacingOccurrences(of:"{"+"{{ serviceTypeField.name }}"+"}", with:"\({{ serviceTypeField.name }})")
 	  //-{% endif %}
 	  //-{% endfor %}
+	  let url = URL(string:path)
+	  var request = URLRequest(url:url!)
+	  request.httpMethod = "{{ serviceMethod.method }}"
+	  let (data, response, error) = URLSession.shared.fetch(request)
+	  print("\(String(data:data!, encoding:.utf8)!)")
+	  print("\(response)")
+	  
 	  // there's more to do...
-	  print(path)
+	  
 	  //-{% if .|hasResponses:serviceMethod %}
 	  return {{ serviceMethod.resultTypeName }}()
 	  //-{% endif %}
   }
 //-{% endfor %}
+}
+
+extension URLSession {
+  func fetch(_ urlRequest: URLRequest) -> (Data?, URLResponse?, Error?) {
+    var data: Data?
+    var response: URLResponse?
+    var error: Error?
+    let sem = DispatchSemaphore(value: 0)
+    let task = self.dataTask(with: urlRequest, completionHandler: {
+      data = $0
+      response = $1
+      error = $2 as! Error?
+      sem.signal()
+    })
+    task.resume()
+    let result = sem.wait(timeout: DispatchTime.distantFuture)
+    switch result {
+    case .success:
+      return (data, response, error)
+    case .timedOut:
+      return (data, response, nil)
+    }
+  }
 }
