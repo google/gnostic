@@ -1,10 +1,28 @@
 // Client code 
 
-class Client {
+import Foundation
+
+public class Client {
+  var service : String
+  
+  public init(service: String) {
+  	self.service = service
+  }	
 //-{% for serviceMethod in renderer.methods %}
 
-  func {{ serviceMethod.name }} () {
-
+  // {{ serviceMethod.description }}
+  public func {{ serviceMethod.name }}({{ .|clientParametersDeclaration:serviceMethod }}) throws {{ .|clientReturnDeclaration:serviceMethod }} {
+	  var path = self.service + "{{ serviceMethod.path }}"
+	  //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
+	  //-{% if serviceTypeField.position == "path" %}
+	  path = path.replacingOccurrences(of:"{"+"{{ serviceTypeField.name }}"+"}", with:"\({{ serviceTypeField.name }})")
+	  //-{% endif %}
+	  //-{% endfor %}
+	  // there's more to do...
+	  print(path)
+	  //-{% if .|hasResponses:serviceMethod %}
+	  return {{ serviceMethod.resultTypeName }}()
+	  //-{% endif %}
   }
 //-{% endfor %}
 }

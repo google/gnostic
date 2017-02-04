@@ -2,7 +2,8 @@
 
 protocol Service {
 //-{% for serviceMethod in renderer.methods %}
-  func {{ serviceMethod.name }} () 
+  // {{ serviceMethod.description }}
+  func {{ serviceMethod.name }} ({{ .|protocolParametersDeclaration:serviceMethod }}) throws {{ .|protocolReturnDeclaration:serviceMethod  }}
 //-{% endfor %}
 }
 

@@ -34,9 +34,9 @@ class ServiceTypeField {
       if format == "int32" {
         self.typeName = "Int32"
       } else if format == "int64" {
-         self.typeName =  "Int64"
+        self.typeName =  "Int64"
       } else {
-         self.typeName =  "Int"
+        self.typeName =  "Int"
       }
       self.initialValue = "0"
     default:
@@ -91,9 +91,9 @@ class ServiceMethod {
   var handlerName        : String = ""
   var processorName      : String = ""
   var clientName         : String = ""
-  var resultTypeName     : String = ""
-  var parametersTypeName : String = ""
-  var responsesTypeName  : String = ""
+  var resultTypeName     : String?
+  var parametersTypeName : String?
+  var responsesTypeName  : String?
   var parametersType     : ServiceType?
   var responsesType      : ServiceType?
 }
@@ -125,14 +125,13 @@ class ServiceRenderer {
   private var methods : [ServiceMethod] = []
 
   public init(document : Openapi_V2_Document) {
-    let ext = Extension()
-    templateEnvironment = Environment(loader:InternalLoader(), extensions:[ext])
+    templateEnvironment = Environment(loader:InternalLoader(), extensions:[TemplateExtensions()])
     loadService(document:document)
   }
 
   private func loadServiceTypeFromParameters(_ name:String,
                                              _ parameters:[Openapi_V2_ParametersItem])
-    -> ServiceType {
+    -> ServiceType? {
       let t = ServiceType()
       t.name = name.capitalizingFirstLetter() + "Parameters"
       for parametersItem in parameters {
@@ -178,14 +177,16 @@ class ServiceRenderer {
       }
       if t.fields.count > 0 {
         self.types.append(t)
+        return t
+      } else {
+        return nil
       }
-      return t
   }
 
   private func loadServiceTypeFromResponses(_ m:ServiceMethod,
                                             _ name:String,
                                             _ responses:Openapi_V2_Responses)
-    -> ServiceType {
+    -> ServiceType? {
       let t = ServiceType()
       t.name = name.capitalizingFirstLetter() + "Responses"
       for responseCode in responses.responseCode {
@@ -200,7 +201,7 @@ class ServiceRenderer {
             f.setTypeForSchema(schema, optional:true)
             t.fields.append(f)
             if f.name == "ok" {
-              m.resultTypeName = f.typeName
+              m.resultTypeName = f.typeName.replacingOccurrences(of:"?", with:"")
             }
           default:
             Log("unknown")
@@ -211,8 +212,10 @@ class ServiceRenderer {
       }
       if t.fields.count > 0 {
         self.types.append(t)
+        return t
+      } else {
+        return nil
       }
-      return t
   }
 
   private func loadOperation(_ operation : Openapi_V2_Operation,
