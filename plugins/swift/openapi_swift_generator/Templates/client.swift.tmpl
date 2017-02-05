@@ -22,6 +22,12 @@ public class Client {
 	  let url = URL(string:path)
 	  var request = URLRequest(url:url!)
 	  request.httpMethod = "{{ serviceMethod.method }}"
+	  //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
+	  //-{% if serviceTypeField.position == "body" %}
+	  let jsonObject = {{ serviceTypeField.name }}.jsonObject()
+	  request.httpBody = try JSONSerialization.data(withJSONObject:jsonObject)
+	  //-{% endif %}
+	  //-{% endfor %}
 	  let (data, response, error) = URLSession.shared.fetch(request)
 	  print("response: \(response)")
 	  //-{% if .|hasResponses:serviceMethod %}	  

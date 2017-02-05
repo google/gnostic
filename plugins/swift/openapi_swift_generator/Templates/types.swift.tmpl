@@ -8,10 +8,11 @@ public class {{ serviceType.name }} : CustomStringConvertible {
 
   public init() {}
 
+//-{% if serviceType.isInterfaceType %}
   public init?(jsonObject: Any) {
     if let jsonDictionary = jsonObject as? [String:Any] {  
       //-{% for serviceTypeField in serviceType.fields %}
-      if let value : Any? = jsonDictionary["{{ serviceTypeField.jsonName }}"] {
+      if let value : Any = jsonDictionary["{{ serviceTypeField.jsonName }}"] {
         //-{% if serviceTypeField.isArrayType %}
         var outArray : [{{ serviceTypeField.elementType }}] = []
         let array = value as! [Any]
@@ -30,6 +31,8 @@ public class {{ serviceType.name }} : CustomStringConvertible {
         //-{% endif %}
       }
       //-{% endfor %}   
+    } else {
+      return nil
     }
   }
     
@@ -53,6 +56,7 @@ public class {{ serviceType.name }} : CustomStringConvertible {
     return result
   }
   
+//-{% endif %}
   public var description: String{
     return "[{{ serviceType.name }}" +
     //-{% for serviceTypeField in serviceType.fields %}

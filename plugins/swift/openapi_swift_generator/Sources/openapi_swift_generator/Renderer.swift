@@ -18,6 +18,7 @@ extension String {
 class ServiceType {
   var name : String = ""
   var fields : [ServiceTypeField] = []
+  var isInterfaceType : Bool = false
 }
 
 class ServiceTypeField {
@@ -253,6 +254,7 @@ class ServiceRenderer {
     // collect service type descriptions
     for pair in document.definitions.additionalProperties {
       let t = ServiceType()
+      t.isInterfaceType = true
       let schema = pair.value
       for pair2 in schema.properties.additionalProperties {
         let f = ServiceTypeField()
