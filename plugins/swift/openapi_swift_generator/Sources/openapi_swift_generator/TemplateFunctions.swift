@@ -57,5 +57,19 @@ func TemplateExtensions() -> Extension {
       return []
     }
   }
+  ext.registerFilter("kituraPath") { (value: Any?, arguments: [Any?]) in
+    let method : ServiceMethod = value as! ServiceMethod
+    var path = method.path
+    if let parametersType = method.parametersType {
+      for field in parametersType.fields {
+        if field.position == "path" {
+          let original = "{" + field.jsonName + "}"
+          let replacement = ":" + field.jsonName
+          path = path.replacingOccurrences(of:original, with:replacement)
+        }
+      }
+    }
+    return path
+  }
   return ext
 }

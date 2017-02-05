@@ -15,7 +15,7 @@ public func server(service : Service) -> Router {
 
 //-{% for serviceMethod in renderer.methods %}
   // {{ serviceMethod.description }}
-  router.{{ serviceMethod.method|lowercase }}("{{ serviceMethod.path }}") { req, res, next in	  
+  router.{{ serviceMethod.method|lowercase }}("{{ serviceMethod|kituraPath }}") { req, res, next in	  
       // /shelves/:shelf/books/:book
       //let shelf = req.parameters["shelf"] ?? ""
       //let book = req.parameters["book"] ?? ""

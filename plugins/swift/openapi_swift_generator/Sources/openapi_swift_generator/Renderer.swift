@@ -170,6 +170,7 @@ class ServiceRenderer {
               f.position = "query"
             case .pathParameterSubSchema(let pathParameter):
               f.name = pathParameter.name
+              f.jsonName = pathParameter.name
               f.position = "path"
               f.setTypeForName(pathParameter.type, pathParameter.format)
             default:
