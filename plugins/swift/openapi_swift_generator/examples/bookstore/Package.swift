@@ -39,5 +39,9 @@ let package = Package(
            dependencies: ["Bookstore"]),
     Target(name: "Client",
            dependencies: ["Bookstore"]),
+  ],
+  dependencies: [
+    .Package(url: "https://github.com/IBM-Swift/Kitura.git", majorVersion: 1, minor: 4)
   ]
 )
+

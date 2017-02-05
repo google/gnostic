@@ -1,16 +1,41 @@
 // Service code
 
-protocol Service {
+import Kitura
+
+public protocol Service {
 //-{% for serviceMethod in renderer.methods %}
   // {{ serviceMethod.description }}
   func {{ serviceMethod.name }} ({{ .|protocolParametersDeclaration:serviceMethod }}) throws {{ .|protocolReturnDeclaration:serviceMethod  }}
 //-{% endfor %}
 }
 
-class Server {
-	private var service : Service
-	
-	init(service : Service) {
-		self.service = service
-	}
+public func server(service : Service) -> Router {
+  // Create a new router
+  let router = Router()
+
+//-{% for serviceMethod in renderer.methods %}
+  // {{ serviceMethod.description }}
+  router.{{ serviceMethod.method|lowercase }}("{{ serviceMethod.path }}") { req, res, next in	  
+      // /shelves/:shelf/books/:book
+      //let shelf = req.parameters["shelf"] ?? ""
+      //let book = req.parameters["book"] ?? ""
+      //try res.send("Hello world to \(shelf) \(book)").end()
+	  
+	  try res.send("{{ serviceMethod.name }}").end()
+  }
+
+//-{% endfor %}
+  return router
+}
+
+public func initialize(service: Service, port:Int) {
+  // Create a new router
+  let router = server(service:service)
+  // Add an HTTP server and connect it to the router
+  Kitura.addHTTPServer(onPort:port, with: router)
+}
+
+public func run() {
+  // Start the Kitura runloop (this call never returns)
+  Kitura.run()
 }
