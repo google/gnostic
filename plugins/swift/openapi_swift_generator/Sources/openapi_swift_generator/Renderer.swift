@@ -23,6 +23,10 @@ class ServiceType {
 class ServiceTypeField {
   var name : String = ""
   var typeName : String = ""
+  var isArrayType : Bool = false
+  var isCastableType : Bool = false
+  var isConvertibleType : Bool = false
+  var elementType : String = ""
   var jsonName : String = ""
   var position: String = "" // "body", "header", "formdata", "query", or "path"
   var initialValue : String = ""
@@ -39,9 +43,11 @@ class ServiceTypeField {
         self.typeName =  "Int"
       }
       self.initialValue = "0"
+      self.isCastableType = true
     default:
       self.typeName = name.capitalizingFirstLetter()
       self.initialValue = self.typeName + "()"
+      self.isConvertibleType = true
     }
   }
 
@@ -50,6 +56,7 @@ class ServiceTypeField {
     let ref = schema.ref
     if ref != "" {
       self.typeName = typeForRef(ref)
+      self.isConvertibleType = true
       self.initialValue = self.typeName + "()"
     }
     if schema.hasType {
@@ -57,17 +64,21 @@ class ServiceTypeField {
       let format = schema.format
       if types.count == 1 && types[0] == "string" {
         self.typeName = "String"
+        self.isCastableType = true
         self.initialValue = "\"\""
       }
       if types.count == 1 && types[0] == "integer" && format == "int32" {
         self.typeName = "Int32"
+        self.isCastableType = true
         self.initialValue = "0"
       }
       if types.count == 1 && types[0] == "array" && schema.hasItems {
         // we have an array.., but of what?
         let items = schema.items.schema
         if items.count == 1 && items[0].ref != "" {
-          self.typeName = "[" + typeForRef(items[0].ref) + "]"
+          self.isArrayType = true
+          self.elementType = typeForRef(items[0].ref)
+          self.typeName = "[" + self.elementType + "]"
           self.initialValue = "[]"
         }
       }
@@ -113,8 +124,6 @@ func typeForRef(_ ref : String) -> String {
   let parts = ref.components(separatedBy:"/")
   return parts.last!.capitalizingFirstLetter()
 }
-
-
 
 class ServiceRenderer {
   private var templateEnvironment : Environment

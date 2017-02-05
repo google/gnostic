@@ -23,12 +23,16 @@ public class Client {
 	  var request = URLRequest(url:url!)
 	  request.httpMethod = "{{ serviceMethod.method }}"
 	  let (data, response, error) = URLSession.shared.fetch(request)
-	  print("\(String(data:data!, encoding:.utf8)!)")
-	  print("\(response)")
-	  
-	  // there's more to do...
-	  
-	  //-{% if .|hasResponses:serviceMethod %}
+	  print("response: \(response)")
+	  //-{% if .|hasResponses:serviceMethod %}	  
+	  if let data = data {
+	    let jsonObject = try JSONSerialization.jsonObject(with:data)
+ 	    print("json object: \(jsonObject)")
+		if let value = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject) {	      
+		  print("value: \(value)")
+		  return value
+		}
+	  }
 	  return {{ serviceMethod.resultTypeName }}()
 	  //-{% endif %}
   }
