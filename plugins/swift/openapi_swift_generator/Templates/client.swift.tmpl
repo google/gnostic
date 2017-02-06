@@ -2,6 +2,7 @@
 
 import Foundation
 import Dispatch
+import KituraNet
 
 enum ClientError: Swift.Error {
   case errorWithCode(Int)
@@ -34,14 +35,16 @@ public class Client {
 	  //-{% endif %}
 	  //-{% endfor %}
       //-{% if serviceMethod|hasResponses %}	  	  
-	  let (data, response, error) = URLSession.shared.fetch(request)
+	  let (data, response, error) = fetch(request)
 	  //-{% else %}
-	  let (_, response, error) = URLSession.shared.fetch(request)
+	  let (_, response, error) = fetch(request)
 	  //-{% endif %}
 	  if error != nil {
 	  	throw ClientError.errorWithCode(0)
 	  }
-	  let httpResponse = response as! HTTPURLResponse
+	  guard let httpResponse = response else {
+	  	throw ClientError.errorWithCode(0)
+	  }
 	  if httpResponse.statusCode == 200 {
 	    //-{% if serviceMethod|hasResponses %}	  
 	    if let data = data {
@@ -59,25 +62,67 @@ public class Client {
 //-{% endfor %}
 }
 
-extension URLSession {
-  func fetch(_ urlRequest: URLRequest) -> (Data?, URLResponse?, Error?) {
-    var data: Data?
-    var response: URLResponse?
-    var error: Error?
-    let sem = DispatchSemaphore(value: 0)
-    let task = self.dataTask(with: urlRequest, completionHandler: {
-      data = $0
-      response = $1
-      error = $2 as! Error?
+// fetch makes a synchronous request using KituraNet's ClientRequest class
+// https://github.com/IBM-Swift/Kitura-net/blob/master/Sources/KituraNet/ClientRequest.swift
+public func fetch(_ urlRequest: URLRequest) -> (Data?, HTTPURLResponse?, Error?) {
+  var data: Data?
+  var urlResponse: HTTPURLResponse?
+  let error: Error? = nil // make this mutable when we start using it
+  let sem = DispatchSemaphore(value: 0)
+  guard let method = urlRequest.httpMethod else {
+    return (data, urlResponse, error)
+  }
+  guard let url = urlRequest.url else {
+    return (data, urlResponse, error)
+  }
+  guard let scheme = url.scheme else {
+    return (data, urlResponse, error)
+  }
+  guard let host = url.host else {
+    return (data, urlResponse, error)
+  }
+  guard let port = url.port else {
+    return (data, urlResponse, error)
+  }
+  let options : [ClientRequest.Options] = [
+    .method(method),
+    .schema(scheme),
+    .hostname(host),
+    .port(Int16(port)),
+    .path(url.path),
+    // headers, etc
+  ]
+  let request = HTTP.request(options) { (response) in
+    guard let response = response else {
       sem.signal()
-    })
-    task.resume()
-    let result = sem.wait(timeout: DispatchTime.distantFuture)
-    switch result {
-    case .success:
-      return (data, response, error)
-    case .timedOut:
-      return (data, response, nil)
+      return
     }
+    var responseData = Data()
+    do {
+      let code = response.httpStatusCode
+      try response.readAllData(into: &responseData)
+      data = responseData
+      urlResponse = HTTPURLResponse(url:url,
+                                    statusCode:code.rawValue,
+                                    httpVersion:"HTTP/1.1",
+                                    headerFields:[:])
+      sem.signal()
+      return
+    } catch {
+      sem.signal()
+      return
+    }
+  }
+  if let requestData = urlRequest.httpBody {
+    request.write(from:requestData)
+  }
+  request.end() // send the request
+  // now wait on the semaphore for a response
+  let result = sem.wait(timeout: DispatchTime.distantFuture)
+  switch result {
+  case .success:
+    return (data, urlResponse, error)
+  default: // includes .timeout
+    return (data, urlResponse, error)
   }
 }

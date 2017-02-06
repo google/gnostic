@@ -22,8 +22,8 @@ class Server : Service {
 
   // Return all shelves in the bookstore.
   func listShelves () throws -> ListShelvesResponses {
-    var responses = ListShelvesResponses()
-    var response = ListShelvesResponse()
+    let responses = ListShelvesResponses()
+    let response = ListShelvesResponse()
     var shelves : [Shelf] = []
     for pair in self.shelves {
       shelves.append(pair.value)
@@ -35,10 +35,10 @@ class Server : Service {
   // Create a new shelf in the bookstore.
   func createShelf (_ parameters : CreateShelfParameters) throws -> CreateShelfResponses {
     lastShelfIndex += 1
-    var shelf = parameters.shelf
+    let shelf = parameters.shelf
     shelf.name = "shelves/\(lastShelfIndex)"
     shelves[lastShelfIndex] = shelf
-    var responses = CreateShelfResponses()
+    let responses = CreateShelfResponses()
     responses.ok = shelf
     return responses
   }
@@ -51,11 +51,11 @@ class Server : Service {
   }
   // Get a single shelf resource with the given ID.
   func getShelf (_ parameters : GetShelfParameters) throws -> GetShelfResponses {
-    var responses =  GetShelfResponses()
+    let responses =  GetShelfResponses()
     if let shelf : Shelf = shelves[parameters.shelf] {
       responses.ok = shelf
     } else {
-      var err = Error()
+      let err = Error()
       err.code = 404
       err.message = "not found"
       responses.error = err
@@ -69,8 +69,8 @@ class Server : Service {
   }
   // Return all books in a shelf with the given ID.
   func listBooks (_ parameters : ListBooksParameters) throws -> ListBooksResponses {
-    var responses = ListBooksResponses()
-    var response = ListBooksResponse()
+    let responses = ListBooksResponses()
+    let response = ListBooksResponse()
     var books : [Book] = []
     if let shelfBooks = self.books[parameters.shelf] {
       for pair in shelfBooks {
@@ -83,10 +83,10 @@ class Server : Service {
   }
   // Create a new book on the shelf.
   func createBook (_ parameters : CreateBookParameters) throws -> CreateBookResponses {
-    var responses = CreateBookResponses()
+    let responses = CreateBookResponses()
     lastBookIndex += 1
     let shelf = parameters.shelf
-    var book = parameters.book
+    let book = parameters.book
     book.name = "shelves/\(shelf)/books/\(lastBookIndex)"
     if var shelfBooks = self.books[shelf] {
       shelfBooks[lastBookIndex] = book
@@ -101,12 +101,12 @@ class Server : Service {
   }
   // Get a single book with a given ID from a shelf.
   func getBook (_ parameters : GetBookParameters) throws -> GetBookResponses {
-    var responses = GetBookResponses()
+    let responses = GetBookResponses()
     if let shelfBooks = self.books[parameters.shelf],
       let book = shelfBooks[parameters.book] {
       responses.ok = book
     } else {
-      var err = Error()
+      let err = Error()
       err.code = 404
       err.message = "not found"
       responses.error = err
