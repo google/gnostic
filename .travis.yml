@@ -1,12 +1,43 @@
+# Travis CI build file for OpenAPI Compiler, including Go and Swift plugins
+
+# Use Ubuntu 14.04
+dist: trusty
+
 sudo: false
 
 language: go
 
+addons:
+  apt:
+    packages:
+    - clang-3.8 
+    - lldb-3.8 
+    - libicu-dev 
+    - libtool 
+    - libcurl4-openssl-dev 
+    - libbsd-dev 
+    - build-essential 
+    - libssl-dev 
+    - uuid-dev
+    - curl
+    - unzip
+
 install: 
   - go get github.com/googleapis/openapi-compiler/openapic
   - go get github.com/googleapis/openapi-compiler/plugins/go/openapi_go_sample
+  - ./.travis-install.sh
 
 script:
   - go test . -v
-  - cd plugins/go/openapi_go_generator/examples/bookstore
+  - pushd plugins/go/openapi_go_generator/examples/bookstore
   - make test
+  - popd
+  - export PATH=.:$HOME/local/bin:$PATH
+  - export LD_LIBRARY_PATH=$HOME/local/lib
+  - pushd plugins/swift/openapi_swift_generator
+  - make
+  - cd examples/bookstore
+  - make
+  - .build/debug/Server &
+  - make test
+  
