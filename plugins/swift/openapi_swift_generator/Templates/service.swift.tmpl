@@ -1,6 +1,8 @@
 // Service code
 
 import Kitura
+import KituraNet
+import Foundation
 
 public protocol Service {
 //-{% for serviceMethod in renderer.methods %}
@@ -9,19 +11,72 @@ public protocol Service {
 //-{% endfor %}
 }
 
+func intValue(_ s:String?) -> Int64 {
+  return Int64(s!)!
+}
+
 public func server(service : Service) -> Router {
   // Create a new router
   let router = Router()
 
 //-{% for serviceMethod in renderer.methods %}
   // {{ serviceMethod.description }}
-  router.{{ serviceMethod.method|lowercase }}("{{ serviceMethod|kituraPath }}") { req, res, next in	  
-      // /shelves/:shelf/books/:book
-      //let shelf = req.parameters["shelf"] ?? ""
-      //let book = req.parameters["book"] ?? ""
-      //try res.send("Hello world to \(shelf) \(book)").end()
-	  
-	  try res.send("{{ serviceMethod.name }}").end()
+  router.{{ serviceMethod.method|lowercase }}("{{ serviceMethod|kituraPath }}") { req, res, next in      
+      //-{% if serviceMethod|hasParameters %}
+      // instantiate the parameters structure
+      var parameters = {{ serviceMethod.parametersTypeName }}()
+      //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
+      //-{% if serviceTypeField.position == "path" %}
+      parameters.{{ serviceTypeField.name }} = intValue(req.parameters["{{ serviceTypeField.name }}"])
+      //-{% endif %}
+      //-{% endfor %}     
+      //-{% if serviceMethod.method == "POST" %}
+      // deserialize request from post data
+      let bodyString = try req.readString() ?? ""
+      let bodyData = bodyString.data(using:.utf8)!
+	  var jsonObject : Any? = nil
+	  do {
+      	jsonObject = try JSONSerialization.jsonObject(with:bodyData)
+	  } catch (let error) {
+		try res.send(status:.badRequest).end()
+		return
+	  }
+      parameters.{{ serviceMethod|bodyParameterFieldName }} = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject)!
+      //-{% endif %}
+      //-{% endif %}
+      //-{% if serviceMethod|hasParameters %}
+      //-{% if serviceMethod|hasResponses %}
+      let responses = try! service.{{ serviceMethod.name }}(parameters)
+      //-{% else %}
+      try! service.{{ serviceMethod.name }}(parameters)
+      //-{% endif %}
+      //-{% else %}
+      //-{% if serviceMethod|hasResponses %}
+      let responses = try! service.{{ serviceMethod.name }}()
+      //-{% else %}
+      try! service.{{ serviceMethod.name }}()
+      //-{% endif %}
+      //-{% endif %}
+      //-{% if serviceMethod|hasResponses %}
+        //-{% if serviceMethod|responsesHasFieldNamedOK %}            
+        if let ok = responses.ok {
+          let jsonObject = ok.jsonObject()
+          let responseData = try JSONSerialization.data(withJSONObject:jsonObject)
+          let responseString = String(data:responseData, encoding:.utf8)!
+          try res.send(responseString).end() 
+		  return                          
+        } 
+        //-{% endif %}
+        //-{% if serviceMethod|responsesHasFieldNamedError %}               
+        if let errorResponse = responses.error {
+          try res.send(status:HTTPStatusCode(rawValue:Int(errorResponse.code))!).end()
+		  return               
+        }
+        //-{% endif %}
+        try res.send(status:.internalServerError).end()
+      //-{% else %}
+      try res.send(status:.OK).end()
+      //-{% endif %}
   }
 
 //-{% endfor %}

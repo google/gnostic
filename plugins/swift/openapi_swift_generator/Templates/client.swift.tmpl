@@ -2,6 +2,10 @@
 
 import Foundation
 
+enum ClientError: Swift.Error {
+  case errorWithCode(Int)
+}
+
 public class Client {
   var service : String
   
@@ -29,18 +33,20 @@ public class Client {
 	  //-{% endif %}
 	  //-{% endfor %}
 	  let (data, response, error) = URLSession.shared.fetch(request)
-	  print("response: \(response)")
-	  //-{% if .|hasResponses:serviceMethod %}	  
-	  if let data = data {
-	    let jsonObject = try JSONSerialization.jsonObject(with:data)
- 	    print("json object: \(jsonObject)")
-		if let value = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject) {	      
-		  print("value: \(value)")
-		  return value
-		}
+	  let httpResponse = response as! HTTPURLResponse
+	  if httpResponse.statusCode == 200 {
+	    //-{% if serviceMethod|hasResponses %}	  
+	    if let data = data {
+	      let jsonObject = try JSONSerialization.jsonObject(with:data)
+		  if let value = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject) {	      
+		    return value
+	  	  }
+	    }
+	    return {{ serviceMethod.resultTypeName }}()
+	    //-{% endif %}
+	  } else {
+	  	throw ClientError.errorWithCode(httpResponse.statusCode)
 	  }
-	  return {{ serviceMethod.resultTypeName }}()
-	  //-{% endif %}
   }
 //-{% endfor %}
 }

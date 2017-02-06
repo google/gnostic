@@ -5,11 +5,11 @@ func TemplateExtensions() -> Extension {
   let ext = Extension()
 
   ext.registerFilter("hasParameters") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     return method.parametersType != nil
   }
   ext.registerFilter("hasResponses") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     return method.responsesType != nil
   }
   ext.registerFilter("clientParametersDeclaration") { (value: Any?, arguments: [Any?]) in
@@ -37,7 +37,7 @@ func TemplateExtensions() -> Extension {
     let method : ServiceMethod = arguments[0] as! ServiceMethod
     var result = ""
     if let parametersTypeName = method.parametersTypeName {
-      result = "parameters : " + parametersTypeName
+      result = "_ parameters : " + parametersTypeName
     }
     return result
   }
@@ -71,5 +71,39 @@ func TemplateExtensions() -> Extension {
     }
     return path
   }
+  ext.registerFilter("bodyParameterFieldName") { (value: Any?, arguments: [Any?]) in
+    let method : ServiceMethod = value as! ServiceMethod
+    if let parametersType = method.parametersType {
+      for field in parametersType.fields {
+        if field.position == "body" {
+          return field.name
+        }
+      }
+    }
+    return ""
+  }
+  ext.registerFilter("responsesHasFieldNamedOK") { (value: Any?, arguments: [Any?]) in
+    let method : ServiceMethod = value as! ServiceMethod
+    if let responsesType = method.responsesType {
+      for field in responsesType.fields {
+        if field.name == "ok" {
+          return true
+        }
+      }
+    }
+    return false
+  }
+  ext.registerFilter("responsesHasFieldNamedError") { (value: Any?, arguments: [Any?]) in
+    let method : ServiceMethod = value as! ServiceMethod
+    if let responsesType = method.responsesType {
+      for field in responsesType.fields {
+        if field.name == "error" {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   return ext
 }

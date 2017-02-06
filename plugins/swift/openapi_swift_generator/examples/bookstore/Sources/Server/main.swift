@@ -1,41 +1,110 @@
 import Bookstore
 
 class Server : Service {
+  private var shelves : [Int64:Shelf] = [:]
+  private var books : [Int64:[Int64:Book]] = [:]
+  private var lastShelfIndex : Int64 = 0
+  private var lastBookIndex : Int64 = 0
+
   // Return all shelves in the bookstore.
   func listShelves () throws -> ListShelvesResponses {
-	  return ListShelvesResponses()
+    var responses = ListShelvesResponses()
+    var response = ListShelvesResponse()
+    var shelves : [Shelf] = []
+    for pair in self.shelves {
+      shelves.append(pair.value)
+    }
+    response.shelves = shelves
+    responses.ok = response
+    return responses
   }
   // Create a new shelf in the bookstore.
-  func createShelf (parameters : CreateShelfParameters) throws -> CreateShelfResponses {
-	  return CreateShelfResponses()
+  func createShelf (_ parameters : CreateShelfParameters) throws -> CreateShelfResponses {
+    lastShelfIndex += 1
+    var shelf = parameters.shelf
+    shelf.name = "shelves/\(lastShelfIndex)"
+    shelves[lastShelfIndex] = shelf
+    var responses = CreateShelfResponses()
+    responses.ok = shelf
+    return responses
   }
   // Delete all shelves.
   func deleteShelves () throws {
-  	
+    shelves = [:]
+    books = [:]
+    lastShelfIndex = 0
+    lastBookIndex = 0
   }
   // Get a single shelf resource with the given ID.
-  func getShelf (parameters : GetShelfParameters) throws -> GetShelfResponses {
-  	return GetShelfResponses()
+  func getShelf (_ parameters : GetShelfParameters) throws -> GetShelfResponses {
+    var responses =  GetShelfResponses()
+    if let shelf : Shelf = shelves[parameters.shelf] {
+      responses.ok = shelf
+    } else {
+      var err = Error()
+      err.code = 404
+      err.message = "not found"
+      responses.error = err
+    }
+    return responses
   }
   // Delete a single shelf with the given ID.
-  func deleteShelf (parameters : DeleteShelfParameters) throws {
-  	
+  func deleteShelf (_ parameters : DeleteShelfParameters) throws {
+    shelves[parameters.shelf] = nil
+    books[parameters.shelf] = nil
   }
   // Return all books in a shelf with the given ID.
-  func listBooks (parameters : ListBooksParameters) throws -> ListBooksResponses {
-	  return ListBooksResponses()
+  func listBooks (_ parameters : ListBooksParameters) throws -> ListBooksResponses {
+    var responses = ListBooksResponses()
+    var response = ListBooksResponse()
+    var books : [Book] = []
+    if let shelfBooks = self.books[parameters.shelf] {
+      for pair in shelfBooks {
+        books.append(pair.value)
+      }
+    }
+    response.books = books
+    responses.ok = response
+    return responses
   }
   // Create a new book on the shelf.
-  func createBook (parameters : CreateBookParameters) throws -> CreateBookResponses {
-	  return CreateBookResponses()
+  func createBook (_ parameters : CreateBookParameters) throws -> CreateBookResponses {
+    var responses = CreateBookResponses()
+    lastBookIndex += 1
+    let shelf = parameters.shelf
+    var book = parameters.book
+    book.name = "shelves/\(shelf)/books/\(lastBookIndex)"
+    if var shelfBooks = self.books[shelf] {
+      shelfBooks[lastBookIndex] = book
+      self.books[shelf] = shelfBooks
+    } else {
+	  var shelfBooks : [Int64:Book] = [:]
+      shelfBooks[lastBookIndex] = book
+      self.books[shelf] = shelfBooks
+    }
+    responses.ok = book
+    return responses
   }
   // Get a single book with a given ID from a shelf.
-  func getBook (parameters : GetBookParameters) throws -> GetBookResponses {
-	  return GetBookResponses()
+  func getBook (_ parameters : GetBookParameters) throws -> GetBookResponses {
+    var responses = GetBookResponses()
+    if let shelfBooks = self.books[parameters.shelf],
+      let book = shelfBooks[parameters.book] {
+      responses.ok = book
+    } else {
+      var err = Error()
+      err.code = 404
+      err.message = "not found"
+      responses.error = err
+    }
+    return responses
   }
   // Delete a single book with a given ID from a shelf.
-  func deleteBook (parameters : DeleteBookParameters) throws {
-  	
+  func deleteBook (_ parameters : DeleteBookParameters) throws {
+    if var shelfBooks = self.books[parameters.shelf] {
+      shelfBooks[parameters.book] = nil
+	  self.books[parameters.shelf] = shelfBooks
+    }
   }
 }
 

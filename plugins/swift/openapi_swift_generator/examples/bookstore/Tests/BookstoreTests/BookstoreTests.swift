@@ -6,40 +6,38 @@ func Log(_ message : String) {
   FileHandle.standardError.write((message + "\n").data(using:.utf8)!)
 }
 
-let service = "http://localhost:8080"
+let service = "http://localhost:8090"
 
 class BookstoreTests: XCTestCase {
   
   func testBasic() {
     // create a client
     let b = Bookstore.Client(service:service)    
-    // reset the service by deleting all shelves
+    Log("// reset the service by deleting all shelves")
     do {
         try b.deleteShelves()       
     } catch (let error) {
         XCTFail("\(error)")                 
     }    
-    // verify that the service has no shelves
+    Log("// verify that the service has no shelves")
     do {
         let response = try b.listShelves()  
         XCTAssertEqual(response.shelves.count, 0)
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // attempting to get a shelf should return an error
+    Log("// attempting to get a shelf should return an error")
     do {
         let _ = try b.getShelf(shelf:1)
         XCTFail("server error")             
     } catch (let error) {
-        print("\(error)")   
     }
-    // attempting to get a book should return an error
+    Log("// attempting to get a book should return an error")
     do { 
         let _ = try b.getBook(shelf:1, book:2)
     } catch (let error) {
-        print("\(error)")   
     }       
-    // add a shelf
+    Log("// add a shelf")
     do {
         var shelf = Shelf()
         shelf.theme = "mysteries"
@@ -51,7 +49,7 @@ class BookstoreTests: XCTestCase {
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-   // add another shelf
+   Log("// add another shelf")
    do {
        var shelf = Shelf()
        shelf.theme = "comedies"
@@ -63,7 +61,7 @@ class BookstoreTests: XCTestCase {
    } catch (let error) {
        XCTFail("\(error)")                 
    }
-    // get the first shelf that was added
+    Log("// get the first shelf that was added")
     do {
         let response = try b.getShelf(shelf:1)
         if (response.name != "shelves/1") ||
@@ -73,34 +71,34 @@ class BookstoreTests: XCTestCase {
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // list shelves and verify that there are 2
+    Log("// list shelves and verify that there are 2")
     do {
         let response = try b.listShelves()  
         XCTAssertEqual(response.shelves.count, 2)
     } catch (let error) {
         XCTFail("\(error)")                 
     }	
-    // delete a shelf
+    Log("// delete a shelf")
     do {
         try b.deleteShelf(shelf:2)       
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // list shelves and verify that there is only 1
+    Log("// list shelves and verify that there is only 1")
     do {
         let response = try b.listShelves()  
         XCTAssertEqual(response.shelves.count, 1)
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // list books on a shelf, verify that there are none
+    Log("// list books on a shelf, verify that there are none")
     do {
         let response = try b.listBooks(shelf:1)  
         XCTAssertEqual(response.books.count, 0)
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // create a book
+    Log("// create a book")
     do {
         var book = Book()
         book.author = "Agatha Christie"
@@ -109,7 +107,7 @@ class BookstoreTests: XCTestCase {
     } catch (let error) {
         XCTFail("\(error)")                 
     }	
-    // create another book
+    Log("// create another book")
     do {
         var book = Book()
         book.author = "Agatha Christie"
@@ -118,7 +116,7 @@ class BookstoreTests: XCTestCase {
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // get the first book that was added
+    Log("// get the first book that was added")
     do {
         let response = try b.getBook(shelf:1, book:1)
         if (response.author != "Agatha Christie") ||
@@ -128,27 +126,27 @@ class BookstoreTests: XCTestCase {
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // list the books on a shelf and verify that there are 2
+    Log("// list the books on a shelf and verify that there are 2")
     do {
         let response = try b.listBooks(shelf:1)  
         XCTAssertEqual(response.books.count, 2)
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // delete a book
+    Log("// delete a book")
     do {
         try b.deleteBook(shelf:1, book:2)       
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // list the books on a shelf and verify that is only 1
+    Log("// list the books on a shelf and verify that is only 1")
     do {
         let response = try b.listBooks(shelf:1)  
         XCTAssertEqual(response.books.count, 1)
     } catch (let error) {
         XCTFail("\(error)")                 
     }
-    // verify the handling of a badly-formed request
+    Log("// verify the handling of a badly-formed request")
     do {
   	  var path = service 
   	  path = path + "/shelves"
