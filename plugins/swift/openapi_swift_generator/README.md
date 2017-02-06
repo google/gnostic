@@ -1,7 +1,5 @@
 # OpenAPI Swift Generator Plugin
 
-WORK IN PROGRESS - currently incomplete
-
 This directory contains an `openapic` plugin that can be used to generate a Swift client library and scaffolding for a Swift server for an API with an OpenAPI description.
 
 The plugin can be invoked like this:
