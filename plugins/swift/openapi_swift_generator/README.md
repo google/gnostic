@@ -8,14 +8,8 @@ The plugin can be invoked like this:
 
 Where `Bookstore` is the name of a directory where the generated code will be written.
 
-By default, both client and server code will be generated. If the `openapi_swift_generator` binary is also linked from the names `openapi_swift_client` and `openapi_swift_server`, then only client or only server code can be generated as follows:
-
-	openapic bookstore.json --swift_client_out=package=bookstore:bookstore
-
-	openapic bookstore.json --swift_server_out=package=bookstore:bookstore
+Both client and server code will be generated.
 
 For example usage, see the [examples/bookstore](examples/bookstore) directory.
 
-## Notes
-
-- When debugging plugins, remember that plugin output is written to stdout, so any print statements that you add must print to stderr to avoid breaking the plugin interface..
+HTTP services are provided by the Kitura library.
