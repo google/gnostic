@@ -12,52 +12,54 @@ public class Client {
   var service : String
   
   public init(service: String) {
-  	self.service = service
-  }	
+    self.service = service
+  } 
 //-{% for serviceMethod in renderer.methods %}
 
   // {{ serviceMethod.description }}
   public func {{ serviceMethod.name }}({{ .|clientParametersDeclaration:serviceMethod }}) throws {{ .|clientReturnDeclaration:serviceMethod }} {
-	  var path = self.service 
-	  path = path + "{{ serviceMethod.path }}"
-	  //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
-	  //-{% if serviceTypeField.position == "path" %}
-	  path = path.replacingOccurrences(of:"{"+"{{ serviceTypeField.name }}"+"}", with:"\({{ serviceTypeField.name }})")
-	  //-{% endif %}
-	  //-{% endfor %}
-	  let url = URL(string:path)
-	  var request = URLRequest(url:url!)
-	  request.httpMethod = "{{ serviceMethod.method }}"
-	  //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
-	  //-{% if serviceTypeField.position == "body" %}
-	  let jsonObject = {{ serviceTypeField.name }}.jsonObject()
-	  request.httpBody = try JSONSerialization.data(withJSONObject:jsonObject)
-	  //-{% endif %}
-	  //-{% endfor %}
-      //-{% if serviceMethod|hasResponses %}	  	  
-	  let (data, response, error) = fetch(request)
-	  //-{% else %}
-	  let (_, response, error) = fetch(request)
-	  //-{% endif %}
-	  if error != nil {
-	  	throw ClientError.errorWithCode(0)
-	  }
-	  guard let httpResponse = response else {
-	  	throw ClientError.errorWithCode(0)
-	  }
-	  if httpResponse.statusCode == 200 {
-	    //-{% if serviceMethod|hasResponses %}	  
-	    if let data = data {
-	      let jsonObject = try JSONSerialization.jsonObject(with:data)
-		  if let value = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject) {	      
-		    return value
-	  	  }
-	    }
-	    return {{ serviceMethod.resultTypeName }}()
-	    //-{% endif %}
-	  } else {
-	  	throw ClientError.errorWithCode(httpResponse.statusCode)
-	  }
+      var path = self.service 
+      path = path + "{{ serviceMethod.path }}"
+      //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
+      //-{% if serviceTypeField.position == "path" %}
+      path = path.replacingOccurrences(of:"{"+"{{ serviceTypeField.name }}"+"}", with:"\({{ serviceTypeField.name }})")
+      //-{% endif %}
+      //-{% endfor %}
+      guard let url = URL(string:path) else {
+        throw ClientError.errorWithCode(0)
+      }
+      var request = URLRequest(url:url)
+      request.httpMethod = "{{ serviceMethod.method }}"
+      //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
+      //-{% if serviceTypeField.position == "body" %}
+      let jsonObject = {{ serviceTypeField.name }}.jsonObject()
+      request.httpBody = try JSONSerialization.data(withJSONObject:jsonObject)
+      //-{% endif %}
+      //-{% endfor %}
+      //-{% if serviceMethod|hasResponses %}          
+      let (data, response, error) = fetch(request)
+      //-{% else %}
+      let (_, response, error) = fetch(request)
+      //-{% endif %}
+      if error != nil {
+        throw ClientError.errorWithCode(0)
+      }
+      guard let httpResponse = response else {
+        throw ClientError.errorWithCode(0)
+      }
+      if httpResponse.statusCode == 200 {
+        //-{% if serviceMethod|hasResponses %}    
+        if let data = data {
+          let jsonObject = try JSONSerialization.jsonObject(with:data)
+          if let value = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject) {          
+            return value
+          }
+        }
+        return {{ serviceMethod.resultTypeName }}()
+        //-{% endif %}
+      } else {
+        throw ClientError.errorWithCode(httpResponse.statusCode)
+      }
   }
 //-{% endfor %}
 }
