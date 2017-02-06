@@ -32,7 +32,14 @@ public class Client {
 	  request.httpBody = try JSONSerialization.data(withJSONObject:jsonObject)
 	  //-{% endif %}
 	  //-{% endfor %}
+      //-{% if serviceMethod|hasResponses %}	  	  
 	  let (data, response, error) = URLSession.shared.fetch(request)
+	  //-{% else %}
+	  let (_, response, error) = URLSession.shared.fetch(request)
+	  //-{% endif %}
+	  if error != nil {
+	  	throw ClientError.errorWithCode(0)
+	  }
 	  let httpResponse = response as! HTTPURLResponse
 	  if httpResponse.statusCode == 200 {
 	    //-{% if serviceMethod|hasResponses %}	  

@@ -4,6 +4,7 @@ import Kitura
 import KituraNet
 import Foundation
 
+// A server requires an instance of an implementation of this protocol.
 public protocol Service {
 //-{% for serviceMethod in renderer.methods %}
   // {{ serviceMethod.description }}
@@ -24,7 +25,7 @@ public func server(service : Service) -> Router {
   router.{{ serviceMethod.method|lowercase }}("{{ serviceMethod|kituraPath }}") { req, res, next in      
       //-{% if serviceMethod|hasParameters %}
       // instantiate the parameters structure
-      var parameters = {{ serviceMethod.parametersTypeName }}()
+      let parameters = {{ serviceMethod.parametersTypeName }}()
       //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
       //-{% if serviceTypeField.position == "path" %}
       parameters.{{ serviceTypeField.name }} = intValue(req.parameters["{{ serviceTypeField.name }}"])
@@ -37,7 +38,7 @@ public func server(service : Service) -> Router {
 	  var jsonObject : Any? = nil
 	  do {
       	jsonObject = try JSONSerialization.jsonObject(with:bodyData)
-	  } catch (let error) {
+	  } catch {
 		try res.send(status:.badRequest).end()
 		return
 	  }

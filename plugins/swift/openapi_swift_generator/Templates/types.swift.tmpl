@@ -9,7 +9,7 @@ public class {{ serviceType.name }} : CustomStringConvertible {
   public init() {}
 
 //-{% if serviceType.isInterfaceType %}
-  public init?(jsonObject: Any) {
+  public init?(jsonObject: Any?) {
     if let jsonDictionary = jsonObject as? [String:Any] {  
       //-{% for serviceTypeField in serviceType.fields %}
       if let value : Any = jsonDictionary["{{ serviceTypeField.jsonName }}"] {
