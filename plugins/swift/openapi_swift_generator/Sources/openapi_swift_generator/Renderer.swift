@@ -226,10 +226,10 @@ class ServiceRenderer {
               m.resultTypeName = f.typeName.replacingOccurrences(of:"?", with:"")
             }
           default:
-            Log("unknown")
+            break
           }
         default:
-          Log("unknown")
+          break
         }
       }
       if t.fields.count > 0 {
