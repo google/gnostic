@@ -31,7 +31,16 @@ func main() throws {
 
   // generate the desired files
   var response = Openapi_Plugin_V1_Response()
-  let filenames = ["client.swift", "service.swift", "types.swift"]
+
+  var filenames : [String]
+  switch CommandLine.arguments[0] {
+  case "openapi_swift_client":
+    filenames = ["client.swift", "types.swift"]
+  case "openapi_swift_server":
+    filenames = ["server.swift", "types.swift"]
+  default:
+    filenames = ["client.swift", "server.swift", "types.swift"]
+  }
   try renderer.generate(filenames:filenames, response:&response)
 
   // return the results
