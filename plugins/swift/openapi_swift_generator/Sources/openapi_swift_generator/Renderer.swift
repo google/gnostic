@@ -146,7 +146,7 @@ class ServiceRenderer {
   private var methods : [ServiceMethod] = []
 
   public init(document : Openapi_V2_Document) {
-    templateEnvironment = Environment(loader:InternalLoader(), extensions:[TemplateExtensions()])
+    templateEnvironment = Environment(loader:TemplateLoader(), extensions:[TemplateExtensions()])
     loadService(document:document)
   }
 

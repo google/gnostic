@@ -17,7 +17,7 @@ import Foundation
 
 // A class for loading Stencil templates from compiled-in representations
 
-public class InternalLoader: Loader {
+public class TemplateLoader: Loader {
   private var templates: [String:String]
 
   public init() {
