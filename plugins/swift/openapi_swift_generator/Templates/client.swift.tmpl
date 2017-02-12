@@ -16,7 +16,7 @@ public class Client {
 //-{% for serviceMethod in renderer.methods %}
 
   // {{ serviceMethod.description }} Asynchronous.
-  public func {{ serviceMethod.name }}({{ .|asyncClientParametersDeclaration:serviceMethod }}) throws {
+  public func {{ serviceMethod.name }}({{ serviceMethod|asyncClientParametersDeclaration }}) throws {
       var path = self.service 
       path = path + "{{ serviceMethod.path }}"
       //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
@@ -78,7 +78,7 @@ public class Client {
   }
   
   // {{ serviceMethod.description }} Synchronous.
-  public func {{ serviceMethod.name }}({{ .|syncClientParametersDeclaration:serviceMethod }}) throws {{ .|syncClientReturnDeclaration:serviceMethod }} {
+  public func {{ serviceMethod.name }}({{ serviceMethod|syncClientParametersDeclaration }}) throws {{ serviceMethod|syncClientReturnDeclaration }} {
 	  let sem = DispatchSemaphore(value: 0)
 	  //-{% if serviceMethod|hasResponses %}
 	  var response : {{ serviceMethod.resultTypeName }}?

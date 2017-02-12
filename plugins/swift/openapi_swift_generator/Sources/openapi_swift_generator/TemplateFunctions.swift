@@ -26,7 +26,7 @@ func TemplateExtensions() -> Extension {
     return method.responsesType != nil
   }
   ext.registerFilter("syncClientParametersDeclaration") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     var result = ""
     if let parametersType = method.parametersType {
       for field in parametersType.fields {
@@ -39,7 +39,7 @@ func TemplateExtensions() -> Extension {
     return result
   }
   ext.registerFilter("syncClientReturnDeclaration") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     var result = ""
     if let resultTypeName = method.resultTypeName {
       result = " -> " + resultTypeName
@@ -47,7 +47,7 @@ func TemplateExtensions() -> Extension {
     return result
   }
   ext.registerFilter("asyncClientParametersDeclaration") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     var result = ""
     if let parametersType = method.parametersType {
       for field in parametersType.fields {
@@ -69,7 +69,7 @@ func TemplateExtensions() -> Extension {
     return result
   }
   ext.registerFilter("protocolParametersDeclaration") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     var result = ""
     if let parametersTypeName = method.parametersTypeName {
       result = "_ parameters : " + parametersTypeName
@@ -77,7 +77,7 @@ func TemplateExtensions() -> Extension {
     return result
   }
   ext.registerFilter("protocolReturnDeclaration") { (value: Any?, arguments: [Any?]) in
-    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    let method : ServiceMethod = value as! ServiceMethod
     var result = ""
     if let responsesTypeName = method.responsesTypeName {
       result = "-> " + responsesTypeName

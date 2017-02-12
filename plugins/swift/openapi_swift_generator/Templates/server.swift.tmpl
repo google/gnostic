@@ -8,7 +8,7 @@ import Foundation
 public protocol Service {
 //-{% for serviceMethod in renderer.methods %}
   // {{ serviceMethod.description }}
-  func {{ serviceMethod.name }} ({{ .|protocolParametersDeclaration:serviceMethod }}) throws {{ .|protocolReturnDeclaration:serviceMethod  }}
+  func {{ serviceMethod.name }} ({{ serviceMethod|protocolParametersDeclaration }}) throws {{ serviceMethod|protocolReturnDeclaration }}
 //-{% endfor %}
 }
 
