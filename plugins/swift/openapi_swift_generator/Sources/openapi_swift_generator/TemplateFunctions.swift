@@ -25,7 +25,7 @@ func TemplateExtensions() -> Extension {
     let method : ServiceMethod = value as! ServiceMethod
     return method.responsesType != nil
   }
-  ext.registerFilter("clientParametersDeclaration") { (value: Any?, arguments: [Any?]) in
+  ext.registerFilter("syncClientParametersDeclaration") { (value: Any?, arguments: [Any?]) in
     let method : ServiceMethod = arguments[0] as! ServiceMethod
     var result = ""
     if let parametersType = method.parametersType {
@@ -38,11 +38,33 @@ func TemplateExtensions() -> Extension {
     }
     return result
   }
-  ext.registerFilter("clientReturnDeclaration") { (value: Any?, arguments: [Any?]) in
+  ext.registerFilter("syncClientReturnDeclaration") { (value: Any?, arguments: [Any?]) in
     let method : ServiceMethod = arguments[0] as! ServiceMethod
     var result = ""
     if let resultTypeName = method.resultTypeName {
       result = " -> " + resultTypeName
+    }
+    return result
+  }
+  ext.registerFilter("asyncClientParametersDeclaration") { (value: Any?, arguments: [Any?]) in
+    let method : ServiceMethod = arguments[0] as! ServiceMethod
+    var result = ""
+    if let parametersType = method.parametersType {
+      for field in parametersType.fields {
+        if result != "" {
+          result += ", "
+        }
+        result += field.name + " : " + field.typeName
+      }
+    }
+    // add callback
+    if result != "" {
+      result += ", "
+    }
+    if let resultTypeName = method.resultTypeName {
+      result += "callback : @escaping (" + resultTypeName + "?, Swift.Error?)->()"
+    } else {
+      result += "callback : @escaping (Swift.Error?)->()"
     }
     return result
   }
@@ -59,6 +81,19 @@ func TemplateExtensions() -> Extension {
     var result = ""
     if let responsesTypeName = method.responsesTypeName {
       result = "-> " + responsesTypeName
+    }
+    return result
+  }
+  ext.registerFilter("parameterFieldNames") { (value: Any?, arguments: [Any?]) in
+    let method : ServiceMethod = value as! ServiceMethod
+    var result = ""
+    if let parametersType = method.parametersType {
+      for field in parametersType.fields {
+        if result != "" {
+          result += ", "
+        }
+        result += field.name + ":" + field.name
+      }
     }
     return result
   }

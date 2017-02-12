@@ -2,7 +2,6 @@
 
 import Foundation
 import Dispatch
-import KituraNet
 
 enum ClientError: Swift.Error {
   case errorWithCode(Int)
@@ -16,8 +15,8 @@ public class Client {
   } 
 //-{% for serviceMethod in renderer.methods %}
 
-  // {{ serviceMethod.description }}
-  public func {{ serviceMethod.name }}({{ .|clientParametersDeclaration:serviceMethod }}) throws {{ .|clientReturnDeclaration:serviceMethod }} {
+  // {{ serviceMethod.description }} Asynchronous.
+  public func {{ serviceMethod.name }}({{ .|asyncClientParametersDeclaration:serviceMethod }}) throws {
       var path = self.service 
       path = path + "{{ serviceMethod.path }}"
       //-{% for serviceTypeField in serviceMethod|parametersTypeFields %}
@@ -36,95 +35,75 @@ public class Client {
       request.httpBody = try JSONSerialization.data(withJSONObject:jsonObject)
       //-{% endif %}
       //-{% endfor %}
-      //-{% if serviceMethod|hasResponses %}          
-      let (data, response, error) = fetch(request)
-      //-{% else %}
-      let (_, response, error) = fetch(request)
-      //-{% endif %}
-      if error != nil {
-        throw ClientError.errorWithCode(0)
-      }
-      guard let httpResponse = response else {
-        throw ClientError.errorWithCode(0)
-      }
-      if httpResponse.statusCode == 200 {
-        //-{% if serviceMethod|hasResponses %}    
-        if let data = data {
-          let jsonObject = try JSONSerialization.jsonObject(with:data)
-          if let value = {{ serviceMethod.resultTypeName }}(jsonObject:jsonObject) {          
-            return value
-          }
+	  //-{% if serviceMethod|hasResponses %}
+      fetch(request) {(data, response, error) in
+        if error != nil {
+          callback(nil, ClientError.errorWithCode(0))
+	  	  return
         }
-        return {{ serviceMethod.resultTypeName }}()
-        //-{% endif %}
-      } else {
-        throw ClientError.errorWithCode(httpResponse.statusCode)
-      }
+        guard let httpResponse = response else {
+          callback(nil, ClientError.errorWithCode(0))
+		  return
+        }
+        if httpResponse.statusCode == 200 {
+          if let data = data {
+            let jsonObject = try! JSONSerialization.jsonObject(with:data)
+            if let value = {{ serviceMethod.resultTypeName  }}(jsonObject:jsonObject) {          
+              callback(value, nil)
+			  return
+            }
+          }
+		  callback(nil, nil)
+	    } else {
+          callback(nil, ClientError.errorWithCode(httpResponse.statusCode))
+        }
+	  }
+	  //-{% else %}
+      fetch(request) {(data, response, error) in
+        if error != nil {
+          callback(ClientError.errorWithCode(0))
+	  	  return
+        }
+        guard let httpResponse = response else {
+          callback(ClientError.errorWithCode(0))
+		  return
+        }
+        if httpResponse.statusCode == 200 {
+		  callback(nil)
+	    } else {
+          callback(ClientError.errorWithCode(httpResponse.statusCode))
+        }
+	  }	  	  
+	  //-{% endif %}	  
+  }
+  
+  // {{ serviceMethod.description }} Synchronous.
+  public func {{ serviceMethod.name }}({{ .|syncClientParametersDeclaration:serviceMethod }}) throws {{ .|syncClientReturnDeclaration:serviceMethod }} {
+	  let sem = DispatchSemaphore(value: 0)
+	  //-{% if serviceMethod|hasResponses %}
+	  var response : {{ serviceMethod.resultTypeName }}?
+	  //-{% endif %}
+	  var error : Swift.Error?
+	  //-{% if serviceMethod|hasResponses %}	  
+	  try {{ serviceMethod.name }}({{ serviceMethod|parameterFieldNames }}) {r, e in
+	  	  response = r 
+	  //-{% else %}
+	  try {{ serviceMethod.name }}({{ serviceMethod|parameterFieldNames }}) {e in	  
+	  //-{% endif %}	  	  
+		  error = e 
+		  sem.signal()
+	  }
+	  sem.wait()
+	  if let actualError = error {
+		  throw actualError
+	  }
+	  //-{% if serviceMethod|hasResponses %}	  
+	  if let actualResponse = response {
+		  return actualResponse
+	  } else {
+		  throw ClientError.errorWithCode(0)
+	  }
+	  //-{% endif %}
   }
 //-{% endfor %}
-}
-
-// fetch makes a synchronous request using KituraNet's ClientRequest class
-// https://github.com/IBM-Swift/Kitura-net/blob/master/Sources/KituraNet/ClientRequest.swift
-public func fetch(_ urlRequest: URLRequest) -> (Data?, HTTPURLResponse?, Error?) {
-  var data: Data?
-  var urlResponse: HTTPURLResponse?
-  let error: Error? = nil // make this mutable when we start using it
-  let sem = DispatchSemaphore(value: 0)
-  guard let method = urlRequest.httpMethod else {
-    return (data, urlResponse, error)
-  }
-  guard let url = urlRequest.url else {
-    return (data, urlResponse, error)
-  }
-  guard let scheme = url.scheme else {
-    return (data, urlResponse, error)
-  }
-  guard let host = url.host else {
-    return (data, urlResponse, error)
-  }
-  guard let port = url.port else {
-    return (data, urlResponse, error)
-  }
-  let options : [ClientRequest.Options] = [
-    .method(method),
-    .schema(scheme),
-    .hostname(host),
-    .port(Int16(port)),
-    .path(url.path),
-    // headers, etc
-  ]
-  let request = HTTP.request(options) { (response) in
-    guard let response = response else {
-      sem.signal()
-      return
-    }
-    var responseData = Data()
-    do {
-      let code = response.httpStatusCode
-      try response.readAllData(into: &responseData)
-      data = responseData
-      urlResponse = HTTPURLResponse(url:url,
-                                    statusCode:code.rawValue,
-                                    httpVersion:"HTTP/1.1",
-                                    headerFields:[:])
-      sem.signal()
-      return
-    } catch {
-      sem.signal()
-      return
-    }
-  }
-  if let requestData = urlRequest.httpBody {
-    request.write(from:requestData)
-  }
-  request.end() // send the request
-  // now wait on the semaphore for a response
-  let result = sem.wait(timeout: DispatchTime.distantFuture)
-  switch result {
-  case .success:
-    return (data, urlResponse, error)
-  default: // includes .timeout
-    return (data, urlResponse, error)
-  }
 }
