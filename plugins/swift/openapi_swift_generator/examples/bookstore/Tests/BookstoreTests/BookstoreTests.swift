@@ -38,7 +38,7 @@ func Log(_ message : String) {
   FileHandle.standardError.write((message + "\n").data(using:.utf8)!)
 }
 
-let service = "http://localhost:8090"
+let service = "http://localhost:8080"
 
 class BookstoreTests: XCTestCase {
 
