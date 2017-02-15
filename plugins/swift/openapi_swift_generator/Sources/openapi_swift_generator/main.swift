@@ -35,11 +35,11 @@ func main() throws {
   var filenames : [String]
   switch CommandLine.arguments[0] {
   case "openapi_swift_client":
-    filenames = ["client.swift", "types.swift"]
+    filenames = ["client.swift", "types.swift", "fetch.swift"]
   case "openapi_swift_server":
     filenames = ["server.swift", "types.swift"]
   default:
-    filenames = ["client.swift", "server.swift", "types.swift"]
+    filenames = ["client.swift", "server.swift", "types.swift", "fetch.swift"]
   }
   try renderer.generate(filenames:filenames, response:&response)
 

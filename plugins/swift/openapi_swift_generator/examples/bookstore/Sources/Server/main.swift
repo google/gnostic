@@ -122,7 +122,7 @@ class Server : Service {
   }
 }
 
-initialize(service:Server(), port:8090)
+initialize(service:Server(), port:8080)
 
 run()
 
