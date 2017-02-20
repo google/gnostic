@@ -25,6 +25,6 @@ let package = Package(
   ],
   dependencies: [
     .Package(url: "https://github.com/apple/swift-protobuf.git", Version(0,9,24)),
-    .Package(url: "https://github.com/timburks/Stencil.git", Version(9,9,9)) // temporary fork
+    .Package(url: "https://github.com/kylef/Stencil.git", Version(0,8,0))
   ]
 )
