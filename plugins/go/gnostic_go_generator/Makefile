@@ -1,8 +1,6 @@
 
 build:	
 	go install github.com/googleapis/gnostic
-	go install github.com/googleapis/gnostic/apps/report
-	go install github.com/googleapis/gnostic/plugins/go/gnostic_go_sample
 	go install github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/encode_templates
 	go generate github.com/googleapis/gnostic/plugins/go/gnostic_go_generator
 	go install github.com/googleapis/gnostic/plugins/go/gnostic_go_generator

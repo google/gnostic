@@ -23,8 +23,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	openapi "github.com/googleapis/openapi-compiler/OpenAPIv2"
-	plugins "github.com/googleapis/openapi-compiler/plugins"
+	openapi "github.com/googleapis/gnostic/OpenAPIv2"
+	plugins "github.com/googleapis/gnostic/plugins"
 )
 
 // if error is not nil, record it, serialize and return the response, and exit

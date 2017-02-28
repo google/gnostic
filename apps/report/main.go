@@ -21,9 +21,9 @@ import (
 	"os"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/openapi-compiler/printer"
+	"github.com/googleapis/gnostic/printer"
 
-	pb "github.com/googleapis/openapi-compiler/OpenAPIv2"
+	pb "github.com/googleapis/gnostic/OpenAPIv2"
 )
 
 func readDocumentFromFileWithName(filename string) *pb.Document {
