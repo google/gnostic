@@ -11,7 +11,7 @@ equivalent Protocol Buffer representations.
 are a language-neutral, platform-neutral extensible mechanism 
 for serializing structured data.
 
-Gnostic reads OpenAPI descriptions into 
+**Gnostic** reads OpenAPI descriptions into 
 Protocol Buffer representations and reports errors,
 resolves internal dependencies, and writes the results in
 in a binary form that can be used in any language that is 
@@ -24,7 +24,7 @@ with OpenAPI descriptions in type-safe ways. This is
 particularly useful in strongly-typed languages like
 Go and Swift.
 
-Gnostic compiler code and the OpenAPI Protocol Buffer
+Gnostic support code and the OpenAPI Protocol Buffer
 representation are automatically generated from the 
 [OpenAPI JSON Schema](https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v2.0/schema.json).
 Source code for the generator is in the [generator](generator) directory.
@@ -94,7 +94,7 @@ write its output to stdout.
 
 ## Copyright
 
-Copyright 2016, Google Inc.
+Copyright 2017, Google Inc.
 
 ## License
 
