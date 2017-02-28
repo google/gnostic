@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/googleapis/openapi-compiler.svg?branch=master)](https://travis-ci.org/googleapis/openapi-compiler)
+[![Build Status](https://travis-ci.org/googleapis/gnostic.svg?branch=master)](https://travis-ci.org/googleapis/gnostic)
 
 # Gnostic
 
@@ -89,7 +89,7 @@ Protocol Buffer description. This is mainly for use in testing and debugging.
 that reports some basic information about an API. The "-" causes the plugin to 
 write its output to stdout.
 
-        go install github.com/googleapis/gnostic/plugins/go/openapi_go_sample
+        go install github.com/googleapis/gnostic/plugins/go/gnostic_go_sample
         gnostic examples/petstore.json --go_sample_out=-
 
 ## Copyright
