@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/googleapis/openapi-compiler/plugins/go/openapi_go_generator/examples/bookstore/bookstore"
+	"github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/bookstore/bookstore"
 )
 
 //

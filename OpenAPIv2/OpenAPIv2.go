@@ -18,7 +18,7 @@ package openapi_v2
 
 import (
 	"fmt"
-	"github.com/googleapis/openapi-compiler/compiler"
+	"github.com/googleapis/gnostic/compiler"
 	"gopkg.in/yaml.v2"
 	"strings"
 )

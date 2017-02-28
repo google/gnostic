@@ -29,9 +29,9 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/openapi-compiler/OpenAPIv2"
-	"github.com/googleapis/openapi-compiler/compiler"
-	plugins "github.com/googleapis/openapi-compiler/plugins"
+	"github.com/googleapis/gnostic/OpenAPIv2"
+	"github.com/googleapis/gnostic/compiler"
+	plugins "github.com/googleapis/gnostic/plugins"
 )
 
 type PluginCall struct {
@@ -44,7 +44,7 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 		request := &plugins.Request{}
 
 		// Infer the name of the executable by adding the prefix.
-		executableName := "openapi_" + pluginCall.Name
+		executableName := "gnostic_" + pluginCall.Name
 
 		// validate invocation string with regular expression
 		invocation := pluginCall.Invocation
@@ -183,14 +183,14 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 
 func main() {
 	usage := `
-Usage: openapic OPENAPI_SOURCE [OPTIONS]
+Usage: gnostic OPENAPI_SOURCE [OPTIONS]
   OPENAPI_SOURCE is the filename or URL of an OpenAPI description to read.
 Options:
   --pb_out=PATH       Write a binary proto to the specified location.
   --json_out=PATH     Write a json proto to the specified location.
   --text_out=PATH     Write a text proto to the specified location.
   --errors_out=PATH   Write compilation errors to the specified location.
-  --PLUGIN_out=PATH   Run the plugin named openapi_PLUGIN and write results to the specified location.
+  --PLUGIN_out=PATH   Run the plugin named gnostic_PLUGIN and write results to the specified location.
   --resolve_refs      Explicitly resolve $ref references (this could have problems with recursive definitions).
 `
 	// default values for all options
