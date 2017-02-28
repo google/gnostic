@@ -23,8 +23,8 @@ import (
 	"strings"
 	"text/template"
 
-	openapi "github.com/googleapis/openapi-compiler/OpenAPIv2"
-	plugins "github.com/googleapis/openapi-compiler/plugins"
+	openapi "github.com/googleapis/gnostic/OpenAPIv2"
+	plugins "github.com/googleapis/gnostic/plugins"
 )
 
 type ServiceType struct {
