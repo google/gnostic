@@ -89,6 +89,7 @@ func main() {
 	input := "openapi-2.0.json"
 	filename := "OpenAPIv2"
 	proto_packagename := "openapi.v2"
+	extension_name := "vendorExtension"
 
 	for i, arg := range os.Args {
 		if i == 0 {
@@ -97,10 +98,12 @@ func main() {
 			input = "openapi-2.0.json"
 			filename = "OpenAPIv2"
 			proto_packagename = "openapi.v2"
+			extension_name = "vendorExtension"
 		} else if arg == "--v3" {
 			input = "openapi-3.0.json"
 			filename = "OpenAPIv3"
 			proto_packagename = "openapi.v3"
+			extension_name = "specificationExtension"
 		}
 	}
 
@@ -119,7 +122,7 @@ func main() {
 	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 	cc.PatternNames = map[string]string{
-		"^x-": "vendorExtension",
+		"^x-": extension_name,
 		"^/":  "path",
 		"^([0-9]{3})$|^(default)$": "responseCode",
 	}

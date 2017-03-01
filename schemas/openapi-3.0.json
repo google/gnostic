@@ -11,7 +11,7 @@
   "additionalProperties": false,
   "patternProperties": {
     "^x-": {
-      "$ref": "#/definitions/vendorExtension"
+      "$ref": "#/definitions/specificationExtension"
     }
   },
   "properties": {
@@ -24,6 +24,34 @@
     },
     "info": {
       "$ref": "#/definitions/info"
+    },
+	"servers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/server"
+      },
+      "uniqueItems": true
+	},
+    "paths": {
+      "$ref": "#/definitions/paths"
+    },
+	"components": {
+      "$ref": "#/definitions/components"
+	},
+    "security": {
+      "$ref": "#/definitions/security"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/tag"
+      },
+      "uniqueItems": true
+    },
+	
+	
+    "externalDocs": {
+      "$ref": "#/definitions/externalDocs"
     },
     "host": {
       "type": "string",
@@ -54,9 +82,6 @@
         }
       ]
     },
-    "paths": {
-      "$ref": "#/definitions/paths"
-    },
     "definitions": {
       "$ref": "#/definitions/definitions"
     },
@@ -66,21 +91,8 @@
     "responses": {
       "$ref": "#/definitions/responseDefinitions"
     },
-    "security": {
-      "$ref": "#/definitions/security"
-    },
     "securityDefinitions": {
       "$ref": "#/definitions/securityDefinitions"
-    },
-    "tags": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/tag"
-      },
-      "uniqueItems": true
-    },
-    "externalDocs": {
-      "$ref": "#/definitions/externalDocs"
     }
   },
   "definitions": {
@@ -94,7 +106,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -144,7 +156,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -167,16 +179,73 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
+	"server": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A URL to the target host.",
+            "format": "uri"
+          },
+          "description": {
+            "type": "string",
+            "description": "An optional string describing the host designated by the URL."
+          }
+        },
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }		
+	},
+	"serverVariables": {
+		"type": "object",
+		"description": "",
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/serverVariable"
+        },
+	},
+	"serverVariable": {
+        "type": "object",
+        "required": [
+          "default"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "The name of the license type. It's encouraged to use an OSI compatible license."
+          },
+          "default": {
+            "type": "primitive",
+            "description": "The default value to use for substitution if an alternate value is not specified",
+          }
+        },
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }
+	},
+	"components": {
+		
+	},
     "paths": {
       "type": "object",
       "description": "Relative paths to the individual endpoints. They must be relative to the 'basePath'.",
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         },
         "^/": {
           "$ref": "#/definitions/pathItem"
@@ -223,7 +292,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -243,7 +312,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -308,7 +377,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -351,7 +420,7 @@
           "$ref": "#/definitions/responseValue"
         },
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "not": {
@@ -359,7 +428,7 @@
         "additionalProperties": false,
         "patternProperties": {
           "^x-": {
-            "$ref": "#/definitions/vendorExtension"
+            "$ref": "#/definitions/specificationExtension"
           }
         }
       }
@@ -403,7 +472,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -484,11 +553,11 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
-    "vendorExtension": {
+    "specificationExtension": {
       "description": "Any property starting with x- is valid.",
       "additionalProperties": true,
       "additionalItems": true
@@ -502,7 +571,7 @@
       ],
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -536,7 +605,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -624,7 +693,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -717,7 +786,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -811,7 +880,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "required": [
@@ -937,7 +1006,7 @@
       "description": "A deterministic version of a JSON Schema object.",
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "properties": {
@@ -1066,7 +1135,7 @@
       "description": "A deterministic version of a JSON Schema object.",
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       },
       "required": [
@@ -1170,7 +1239,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1215,7 +1284,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1238,7 +1307,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1286,7 +1355,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1321,7 +1390,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1359,7 +1428,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1397,7 +1466,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1435,7 +1504,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
@@ -1478,7 +1547,7 @@
       },
       "patternProperties": {
         "^x-": {
-          "$ref": "#/definitions/vendorExtension"
+          "$ref": "#/definitions/specificationExtension"
         }
       }
     },
