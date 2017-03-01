@@ -17,6 +17,7 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -45,46 +46,64 @@ type ProtoOption struct {
 	Comment string
 }
 
-var PROTO_OPTIONS = []ProtoOption{
-	ProtoOption{
-		Name:  "java_multiple_files",
-		Value: "true",
-		Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
-			"// name (see below) instead of inside an outer class. It creates a simpler\n" +
-			"// developer experience by reducing one-level of name nesting and be\n" +
-			"// consistent with most programming languages that don't support outer classes.",
-	},
+func protoOptions(packageName string) []ProtoOption {
+	return []ProtoOption{
+		ProtoOption{
+			Name:  "java_multiple_files",
+			Value: "true",
+			Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
+				"// name (see below) instead of inside an outer class. It creates a simpler\n" +
+				"// developer experience by reducing one-level of name nesting and be\n" +
+				"// consistent with most programming languages that don't support outer classes.",
+		},
 
-	ProtoOption{
-		Name:  "java_outer_classname",
-		Value: "OpenAPIProto",
-		Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
-			"// class is only used to hold proto descriptor, so developers don't need to\n" +
-			"// work with it directly.",
-	},
+		ProtoOption{
+			Name:  "java_outer_classname",
+			Value: "OpenAPIProto",
+			Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
+				"// class is only used to hold proto descriptor, so developers don't need to\n" +
+				"// work with it directly.",
+		},
 
-	ProtoOption{
-		Name:    "java_package",
-		Value:   "org.openapi.v2",
-		Comment: "// The Java package name must be proto package name with proper prefix.",
-	},
+		ProtoOption{
+			Name:    "java_package",
+			Value:   "org." + packageName,
+			Comment: "// The Java package name must be proto package name with proper prefix.",
+		},
 
-	ProtoOption{
-		Name:  "objc_class_prefix",
-		Value: "OAS",
-		Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
-			"// It should at a minimum be 3 characters long, all uppercase, and convention\n" +
-			"// is to use an abbreviation of the package name. Something short, but\n" +
-			"// hopefully unique enough to not conflict with things that may come along in\n" +
-			"// the future. 'GPB' is reserved for the protocol buffer implementation itself.",
-	},
+		ProtoOption{
+			Name:  "objc_class_prefix",
+			Value: "OAS",
+			Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
+				"// It should at a minimum be 3 characters long, all uppercase, and convention\n" +
+				"// is to use an abbreviation of the package name. Something short, but\n" +
+				"// hopefully unique enough to not conflict with things that may come along in\n" +
+				"// the future. 'GPB' is reserved for the protocol buffer implementation itself.",
+		},
+	}
 }
 
 func main() {
-	// the OpenAPI schema file and API version are hard-coded for now
+
+	// We'll generate a v2 model by default, but don't count on this working in the future.
 	input := "openapi-2.0.json"
 	filename := "OpenAPIv2"
 	proto_packagename := "openapi.v2"
+
+	for i, arg := range os.Args {
+		if i == 0 {
+			continue // skip the tool name
+		} else if arg == "--v2" {
+			input = "openapi-2.0.json"
+			filename = "OpenAPIv2"
+			proto_packagename = "openapi.v2"
+		} else if arg == "--v3" {
+			input = "openapi-3.0.json"
+			filename = "OpenAPIv3"
+			proto_packagename = "openapi.v3"
+		}
+	}
+
 	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
 
 	base_schema := jsonschema.NewSchemaFromFile("schema.json")
@@ -109,8 +128,14 @@ func main() {
 
 	var err error
 
+	// ensure that the target directory exists
+	err = os.MkdirAll(filename, 0755)
+	if err != nil {
+		panic(err)
+	}
+
 	// generate the protocol buffer description
-	proto := cc.generateProto(proto_packagename, LICENSE, PROTO_OPTIONS)
+	proto := cc.generateProto(proto_packagename, LICENSE, protoOptions(proto_packagename))
 	proto_filename := filename + "/" + filename + ".proto"
 	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
