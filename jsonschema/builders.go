@@ -28,7 +28,7 @@ var schemas map[string]*Schema
 // Reads a schema from a file.
 // Currently this assumes that schemas are stored in the source distribution of this project.
 func NewSchemaFromFile(filename string) *Schema {
-	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/openapi-compiler/schemas"
+	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/schemas"
 	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)

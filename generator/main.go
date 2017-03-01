@@ -21,7 +21,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/googleapis/openapi-compiler/jsonschema"
+	"github.com/googleapis/gnostic/jsonschema"
 )
 
 const LICENSE = "" +

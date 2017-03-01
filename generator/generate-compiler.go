@@ -19,7 +19,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/googleapis/openapi-compiler/printer"
+	"github.com/googleapis/gnostic/printer"
 )
 
 func (domain *Domain) generateCompiler(packageName string, license string) string {
@@ -35,7 +35,7 @@ func (domain *Domain) generateCompiler(packageName string, license string) strin
 		"fmt",
 		"gopkg.in/yaml.v2",
 		"strings",
-		"github.com/googleapis/openapi-compiler/compiler",
+		"github.com/googleapis/gnostic/compiler",
 	}
 	code.Print("import (")
 	for _, filename := range imports {

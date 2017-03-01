@@ -20,7 +20,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/googleapis/openapi-compiler/jsonschema"
+	"github.com/googleapis/gnostic/jsonschema"
 )
 
 // models a collection of types that is defined by a schema

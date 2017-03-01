@@ -17,7 +17,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/googleapis/openapi-compiler/jsonschema"
+	"github.com/googleapis/gnostic/jsonschema"
 )
 
 /// Type Modeling

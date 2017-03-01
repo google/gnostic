@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/openapi-compiler/printer"
+	"github.com/googleapis/gnostic/printer"
 )
 
 func (domain *Domain) generateProto(packageName string, license string, options []ProtoOption) string {
