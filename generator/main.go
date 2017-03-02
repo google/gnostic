@@ -84,6 +84,7 @@ func protoOptions(packageName string) []ProtoOption {
 }
 
 func main() {
+	var err error
 
 	// We'll generate a v2 model by default, but don't count on this working in the future.
 	input := "openapi-2.0.json"
@@ -109,11 +110,17 @@ func main() {
 
 	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
 
-	base_schema := jsonschema.NewSchemaFromFile("schema.json")
+	base_schema, err := jsonschema.NewSchemaFromFile("schema.json")
+	if err != nil {
+		panic(err)
+	}
 	base_schema.ResolveRefs()
 	base_schema.ResolveAllOfs()
 
-	openapi_schema := jsonschema.NewSchemaFromFile(input)
+	openapi_schema, err := jsonschema.NewSchemaFromFile(input)
+	if err != nil {
+		panic(err)
+	}
 	openapi_schema.ResolveRefs()
 	openapi_schema.ResolveAllOfs()
 
@@ -126,10 +133,14 @@ func main() {
 		"^/":  "path",
 		"^([0-9]{3})$|^(default)$": "responseCode",
 	}
-	cc.build()
-	log.Printf("Type Model:\n%s", cc.description())
+	err = cc.build()
+	if err != nil {
+		panic(err)
+	}
 
-	var err error
+	if false {
+		log.Printf("Type Model:\n%s", cc.description())
+	}
 
 	// ensure that the target directory exists
 	err = os.MkdirAll(filename, 0755)

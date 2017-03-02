@@ -24,7 +24,7 @@ import (
 // The following methods display Schemas.
 //
 
-func (s *StringOrStringArray) description() string {
+func (s *StringOrStringArray) Description() string {
 	if s.String != nil {
 		return *s.String
 	}
@@ -172,7 +172,7 @@ func (schema *Schema) describeSchema(indent string) string {
 		}
 	}
 	if schema.Type != nil {
-		result += indent + fmt.Sprintf("type: %+v\n", schema.Type.description())
+		result += indent + fmt.Sprintf("type: %+v\n", schema.Type.Description())
 	}
 	if schema.AllOf != nil {
 		result += indent + "allOf:\n"

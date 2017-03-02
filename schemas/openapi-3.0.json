@@ -48,51 +48,8 @@
       },
       "uniqueItems": true
     },
-	
-	
     "externalDocs": {
       "$ref": "#/definitions/externalDocs"
-    },
-    "host": {
-      "type": "string",
-      "pattern": "^[^{}/ :\\\\]+(?::\\d+)?$",
-      "description": "The host (name or ip) of the API. Example: 'swagger.io'"
-    },
-    "basePath": {
-      "type": "string",
-      "pattern": "^/",
-      "description": "The base path to the API. Example: '/api'."
-    },
-    "schemes": {
-      "$ref": "#/definitions/schemesList"
-    },
-    "consumes": {
-      "description": "A list of MIME types accepted by the API.",
-      "allOf": [
-        {
-          "$ref": "#/definitions/mediaTypeList"
-        }
-      ]
-    },
-    "produces": {
-      "description": "A list of MIME types the API can produce.",
-      "allOf": [
-        {
-          "$ref": "#/definitions/mediaTypeList"
-        }
-      ]
-    },
-    "definitions": {
-      "$ref": "#/definitions/definitions"
-    },
-    "parameters": {
-      "$ref": "#/definitions/parameterDefinitions"
-    },
-    "responses": {
-      "$ref": "#/definitions/responseDefinitions"
-    },
-    "securityDefinitions": {
-      "$ref": "#/definitions/securityDefinitions"
     }
   },
   "definitions": {
@@ -114,10 +71,6 @@
           "type": "string",
           "description": "A unique and precise title of the API."
         },
-        "version": {
-          "type": "string",
-          "description": "A semantic version number of the API."
-        },
         "description": {
           "type": "string",
           "description": "A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed."
@@ -131,6 +84,10 @@
         },
         "license": {
           "$ref": "#/definitions/license"
+        },
+        "version": {
+          "type": "string",
+          "description": "A semantic version number of the API."
         }
       }
     },
@@ -195,7 +152,10 @@
           "description": {
             "type": "string",
             "description": "An optional string describing the host designated by the URL."
-          }
+          },
+		  "variables": {
+			"$ref": "#/definitions/serverVariables"
+		  }
         },
         "patternProperties": {
           "^x-": {
@@ -222,13 +182,20 @@
         ],
         "additionalProperties": false,
         "properties": {
-          "description": {
-            "type": "string",
-            "description": "The name of the license type. It's encouraged to use an OSI compatible license."
-          },
+		  "enum": {
+			  "type": "array",
+		      "items": {
+		        "type": "primitive"
+		      },
+		      "uniqueItems": true
+		  },
           "default": {
             "type": "primitive",
             "description": "The default value to use for substitution if an alternate value is not specified",
+          },
+          "description": {
+            "type": "string",
+            "description": "The name of the license type. It's encouraged to use an OSI compatible license."
           }
         },
         "patternProperties": {
