@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"os"
 )
 
 // This is a global map of all known Schemas.
@@ -28,8 +27,7 @@ var schemas map[string]*Schema
 // Reads a schema from a file.
 // Currently this assumes that schemas are stored in the source distribution of this project.
 func NewSchemaFromFile(filename string) (schema *Schema, err error) {
-	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/schemas"
-	file, err := ioutil.ReadFile(schemasDir + "/" + filename)
+	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

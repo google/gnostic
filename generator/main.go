@@ -110,14 +110,16 @@ func main() {
 
 	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
 
-	base_schema, err := jsonschema.NewSchemaFromFile("schema.json")
+	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/schemas/"
+
+	base_schema, err := jsonschema.NewSchemaFromFile(schemasDir + "schema.json")
 	if err != nil {
 		panic(err)
 	}
 	base_schema.ResolveRefs()
 	base_schema.ResolveAllOfs()
 
-	openapi_schema, err := jsonschema.NewSchemaFromFile(input)
+	openapi_schema, err := jsonschema.NewSchemaFromFile(schemasDir + input)
 	if err != nil {
 		panic(err)
 	}
