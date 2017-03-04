@@ -15,7 +15,9 @@
 package jsonschema
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -283,8 +285,10 @@ func (schema *Schema) ResolveRefs() {
 		schema.applyToSchemas(
 			func(schema *Schema, context string) {
 				if schema.Ref != nil {
-					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
-					if resolvedRef.TypeIs("object") {
+					resolvedRef, err := rootSchema.resolveJSONPointer(*(schema.Ref))
+					if err != nil {
+						log.Printf("%+v", err)
+					} else if resolvedRef.TypeIs("object") {
 						// don't substitute for objects, we'll model the referenced schema with a class
 					} else if context == "OneOf" {
 						// don't substitute for references inside oneOf declarations
@@ -303,7 +307,7 @@ func (schema *Schema) ResolveRefs() {
 // Resolves JSON pointers.
 // This current implementation is very crude and custom for OpenAPI 2.0 schemas.
 // It panics for any pointer that it is unable to resolve.
-func (root *Schema) resolveJSONPointer(ref string) *Schema {
+func (root *Schema) resolveJSONPointer(ref string) (schema *Schema, err error) {
 	var result *Schema
 
 	parts := strings.Split(ref, "#")
@@ -318,7 +322,7 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 
 		// we currently do a very limited (hard-coded) resolution of certain paths and log errors for missed cases
 		if len(pathParts) == 1 {
-			return document
+			return document, nil
 		} else if len(pathParts) == 3 {
 			switch pathParts[1] {
 			case "definitions":
@@ -341,9 +345,9 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 		}
 	}
 	if result == nil {
-		panic(fmt.Sprintf("UNRESOLVED POINTER: %+v", ref))
+		return nil, errors.New(fmt.Sprintf("UNRESOLVED POINTER: %+v", ref))
 	}
-	return result
+	return result, nil
 }
 
 // Replaces "allOf" elements by merging their properties into the parent Schema.

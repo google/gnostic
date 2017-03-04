@@ -1,6 +1,6 @@
 {
-  "title": "A JSON Schema for Swagger 2.0 API.",
-  "id": "http://swagger.io/v2/schema.json#",
+  "title": "A JSON Schema for the OpenAPI 3.0 Specification.",
+  "id": "http://openapis.org/v3/schema.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "required": [
@@ -55,7 +55,7 @@
   "definitions": {
     "info": {
       "type": "object",
-      "description": "General information about the API.",
+      "description": "The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.",
       "required": [
         "version",
         "title"
@@ -73,7 +73,7 @@
         },
         "description": {
           "type": "string",
-          "description": "A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed."
+          "description": "A longer description of the API. Should be different from the title. GitHub Flavored Markdown is allowed."
         },
         "termsOfService": {
           "type": "string",
@@ -93,7 +93,7 @@
     },
     "contact": {
       "type": "object",
-      "description": "Contact information for the owners of the API.",
+      "description": "Contact information for the exposed API.",
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -119,6 +119,7 @@
     },
     "license": {
       "type": "object",
+	  "description": "License information for the exposed API.",
       "required": [
         "name"
       ],
@@ -142,6 +143,7 @@
     },
 	"server": {
         "type": "object",
+		"description": "An object representing a Server.",
         "additionalProperties": false,
         "properties": {
           "url": {
@@ -177,17 +179,19 @@
 	},
 	"serverVariable": {
         "type": "object",
+		"description": "An object representing a Server Variable for server URL template substituion.",
         "required": [
           "default"
         ],
         "additionalProperties": false,
         "properties": {
 		  "enum": {
-			  "type": "array",
-		      "items": {
-		        "type": "primitive"
-		      },
-		      "uniqueItems": true
+			"type": "array",
+		    "items": {
+		      "type": "primitive"
+		    },
+		    "uniqueItems": true,
+			"description": "An enumeration of primitive type values to be used if the substitution options are from a limited set."
 		  },
           "default": {
             "type": "primitive",
@@ -195,7 +199,7 @@
           },
           "description": {
             "type": "string",
-            "description": "The name of the license type. It's encouraged to use an OSI compatible license."
+            "description": "An optional description for the server variable."
           }
         },
         "patternProperties": {
@@ -205,11 +209,46 @@
         }
 	},
 	"components": {
-		
+        "type": "object",
+        "description": "Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.",
+		"properties": {
+			"schemas": {
+		        "$ref": "#/definitions/schemas"
+			},
+			"responses": {
+		        "$ref": "#/definitions/responses"
+			},
+			"parameters": {
+		        "$ref": "#/definitions/parameters"
+			},
+			"examples": {
+		        "$ref": "#/definitions/examples"
+			},
+			"requestBodies": {
+		        "$ref": "#/definitions/requestBodies"
+			},
+			"headers": {
+		        "$ref": "#/definitions/headers"
+			},
+			"securitySchemes": {
+		        "$ref": "#/definitions/securitySchemes"
+			},
+			"links": {
+		        "$ref": "#/definitions/links"
+			},
+			"callbacks": {
+		        "$ref": "#/definitions/callbacks"
+			},
+		},
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }
 	},
     "paths": {
       "type": "object",
-      "description": "Relative paths to the individual endpoints. They must be relative to the 'basePath'.",
+      "description": "Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the Server Object in order to construct the full URL. The Paths MAY be empty, due to ACL constraints.",
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -220,59 +259,60 @@
       },
       "additionalProperties": false
     },
-    "definitions": {
+    "pathItem": {
       "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/schema"
-      },
-      "description": "One or more JSON objects describing the schemas being consumed and produced by the API."
-    },
-    "parameterDefinitions": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/parameter"
-      },
-      "description": "One or more JSON representations for parameters"
-    },
-    "responseDefinitions": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/response"
-      },
-      "description": "One or more JSON representations for parameters"
-    },
-    "externalDocs": {
-      "type": "object",
+	  "description": "Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.",
       "additionalProperties": false,
-      "description": "information about external documentation",
-      "required": [
-        "url"
-      ],
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string",
-          "format": "uri"
-        }
-      },
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
         }
+      },
+      "properties": {
+        "$ref": {
+          "type": "string"
+        },
+		"summary": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+        "get": {
+          "$ref": "#/definitions/operation"
+        },
+        "put": {
+          "$ref": "#/definitions/operation"
+        },
+        "post": {
+          "$ref": "#/definitions/operation"
+        },
+        "delete": {
+          "$ref": "#/definitions/operation"
+        },
+        "options": {
+          "$ref": "#/definitions/operation"
+        },
+        "head": {
+          "$ref": "#/definitions/operation"
+        },
+        "patch": {
+          "$ref": "#/definitions/operation"
+        },
+		"trace": {
+          "$ref": "#/definitions/operation"
+		},
+		"servers": {
+          "$ref": "#/definitions/server"
+		},
+        "parameters": {
+          "$ref": "#/definitions/parametersList"
+        }
       }
-    },
-    "examples": {
-      "type": "object",
-      "additionalProperties": true
-    },
-    "mimeType": {
-      "type": "string",
-      "description": "The MIME type of the HTTP message."
     },
     "operation": {
       "type": "object",
+	  "description": "Describes a single API operation on a path.",
       "required": [
         "responses"
       ],
@@ -305,81 +345,92 @@
           "type": "string",
           "description": "A unique identifier of the operation."
         },
-        "produces": {
-          "description": "A list of MIME types the API can produce.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/mediaTypeList"
-            }
-          ]
-        },
-        "consumes": {
-          "description": "A list of MIME types the API can consume.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/mediaTypeList"
-            }
-          ]
-        },
         "parameters": {
           "$ref": "#/definitions/parametersList"
         },
+		"requestBody": {
+		},
         "responses": {
           "$ref": "#/definitions/responses"
         },
-        "schemes": {
-          "$ref": "#/definitions/schemesList"
-        },
+		"callbacks": {
+          "$ref": "#/definitions/callbacks"
+		},
         "deprecated": {
           "type": "boolean",
           "default": false
         },
         "security": {
           "$ref": "#/definitions/security"
-        }
+        },
+		"servers": {
+          "$ref": "#/definitions/server"
+		}
       }
     },
-    "pathItem": {
+    "externalDocs": {
       "type": "object",
+      "description": "Allows referencing an external resource for extended documentation.",
+      "required": [
+        "url"
+      ],
       "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
         }
-      },
-      "properties": {
-        "$ref": {
-          "type": "string"
-        },
-        "get": {
-          "$ref": "#/definitions/operation"
-        },
-        "put": {
-          "$ref": "#/definitions/operation"
-        },
-        "post": {
-          "$ref": "#/definitions/operation"
-        },
-        "delete": {
-          "$ref": "#/definitions/operation"
-        },
-        "options": {
-          "$ref": "#/definitions/operation"
-        },
-        "head": {
-          "$ref": "#/definitions/operation"
-        },
-        "patch": {
-          "$ref": "#/definitions/operation"
-        },
-        "parameters": {
-          "$ref": "#/definitions/parametersList"
-        }
       }
     },
+    "parameter": {
+	  "type": "object",
+	  "description": "Describes a single operation parameter.
+
+A unique parameter is defined by a combination of a [name](#parameterName) and [location](#parameterIn).
+
+There are four possible parameter locations (as specified with the `in` field):
+* path - Used together with [Path Templating](#pathTemplating), where the parameter value is actually part of the operation's URL. This does not include the host or base path of the API. For example, in `/items/{itemId}`, the path parameter is `itemId`.
+* query - Parameters that are appended to the URL. For example, in `/items?id=###`, the query parameter is `id`.
+* header - Custom headers that are expected as part of the request. Note that [RFC 7230](https://tools.ietf.org/html/rfc7230#page-22) states header names are case insensitive.
+* cookie - Used to pass a specific cookie value to the API.",
+
+    },
+	"requestBody": {
+		"type": "object",
+		"description": "Describes a single request body.",
+		
+	}, 
+	"content": {
+		"type": "object",
+		"description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects. Each key in the Content Object is the media type of the Media Type Object.",
+		
+	}, 
+	"mediaType": {
+		"type": "object",
+		"description": "Each Media Type Object provides schema and examples for a the media type identified by its key. Media Type Objects can be used in a Content Object.",
+		
+	},
+	"encoding": {
+		"type": "object",
+		"description": "An object representing multipart region encoding for requestBody objects.",
+		
+	},
+	"encodingProperty": {
+		"type": "object",
+		"description": "A single encoding definition applied to a single schema property.",
+		
+	},
     "responses": {
       "type": "object",
-      "description": "Response objects names can either be any valid HTTP status code or 'default'.",
+      "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response. It is not expected from the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected from the documentation to cover a successful operation response and any known errors. The default MAY be used as a default response object for all HTTP codes that are not covered individually by the specification. The Responses Object MUST contain at least one response code, and it SHOULD be the response for a successful operation call.",
       "minProperties": 1,
       "additionalProperties": false,
       "patternProperties": {
@@ -400,21 +451,13 @@
         }
       }
     },
-    "responseValue": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/response"
-        },
-        {
-          "$ref": "#/definitions/jsonReference"
-        }
-      ]
-    },
     "response": {
       "type": "object",
+	  "description": "Describes a single response from an API Operation, including design-time, static links to operations based on the response.",
       "required": [
         "description"
       ],
+      "additionalProperties": false,
       "properties": {
         "description": {
           "type": "string"
@@ -436,25 +479,99 @@
           "$ref": "#/definitions/examples"
         }
       },
-      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
         }
       }
     },
+	"callbacks": {
+		"type": "object",
+		"description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
+		
+	},
+	"callback": {
+		"type": "object",
+		"description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
+		
+	},
     "headers": {
       "type": "object",
+	  "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.",
       "additionalProperties": {
         "$ref": "#/definitions/header"
       }
     },
+	"example": {
+		"type": "object",
+		"description": "Allows sharing examples for operation requests and responses. This object can either be a freeform object, array or primitive value. To represent examples of media types that cannot naturally represented in the OpenAPI definition, a string value can be used to contain the example with escaping where necessary.",
+		
+		
+	},
+	"links": {
+		"type": "object",
+		"description": "The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.
+
+As opposed to dynamic links (links provided in the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.
+
+For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.",
+		"additionalProperties": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/link"
+              },
+              {
+                "$ref": "#/definitions/reference"
+              }
+		    ]			
+      	}
+	},
+	"link": {
+		"type": "object",
+		"description": "The Link Object is responsible for defining a possible operation based on a single response.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "operationId": {
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/definitions/linkParameters"
+          },
+          "headers": {
+            "$ref": "#/definitions/headers"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }
+	},
+	"linkParameters": {
+		"type": "object",
+		"description": "Using the operationId to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.
+
+To specify parameters required by the operation, we can use a Link Parameters Object. This object contains parameter names along with static or dynamic values.",
+		
+	},
     "header": {
       "type": "object",
-      "additionalProperties": false,
+	  "description": "The Header Object follows the structure of the Parameter Object, with the following changes:
+1. name MUST NOT be specified, it is given in the Headers Object.
+2. in MUST NOT be specified, it is implicitly in header.
+3. All traits that are affected by the location MUST follow the location of header (for example, style).",
       "required": [
         "type"
       ],
+      "additionalProperties": false,
       "properties": {
         "type": {
           "type": "string",
@@ -523,6 +640,434 @@
           "$ref": "#/definitions/specificationExtension"
         }
       }
+    },
+    "tag": {
+      "type": "object",
+	  "description": "Allows adding meta data to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag used there.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "externalDocs": {
+          "$ref": "#/definitions/externalDocs"
+        }
+      },
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      }
+    },
+    "examples": {
+      "type": "object",
+	  "description": "Anywhere an example may be given, a JSON Reference MAY be used, with the explicit restriction that examples having a JSON format with object named $ref are not allowed. This does mean that example, structurally, can be either a string primitive or an object, similar to additionalProperties.
+
+In all cases, the payload is expected to be compatible with the type schema for the value that it is accompanying. Tooling implementations MAY choose to validate compatibility automatically, and reject the example value(s) if they are not compatible.",
+      "additionalProperties": true
+    },
+	"reference": {
+		"type": "object",
+		"description": "A simple object to allow referencing other components in the specification, internally and externally.
+
+The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.
+
+For this specification, reference resolution is done as defined by the JSON Reference specification and not by the JSON Schema specification.",
+        "required": [
+           "$ref"
+        ],
+        "additionalProperties": false,
+        "properties": {
+           "$ref": {
+               "type": "string"
+           }
+        }
+	},
+    "schema": {
+      "type": "object",
+      "description": "The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.
+
+Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.",
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
+      "properties": {
+        "$ref": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "title": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/title"
+        },
+        "description": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/description"
+        },
+        "default": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/default"
+        },
+        "multipleOf": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/multipleOf"
+        },
+        "maximum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/maximum"
+        },
+        "exclusiveMaximum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"
+        },
+        "minimum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/minimum"
+        },
+        "exclusiveMinimum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"
+        },
+        "maxLength": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+        },
+        "minLength": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
+        },
+        "pattern": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/pattern"
+        },
+        "maxItems": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+        },
+        "minItems": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
+        },
+        "uniqueItems": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/uniqueItems"
+        },
+        "maxProperties": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+        },
+        "minProperties": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
+        },
+        "required": {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/stringArray"
+        },
+        "enum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
+        },
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/schema"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "default": {}
+        },
+        "type": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/type"
+        },
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/schema"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/schema"
+              }
+            }
+          ],
+          "default": {}
+        },
+        "allOf": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/schema"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/schema"
+          },
+          "default": {}
+        },
+        "discriminator": {
+          "type": "string"
+        },
+        "readOnly": {
+          "type": "boolean",
+          "default": false
+        },
+        "xml": {
+          "$ref": "#/definitions/xml"
+        },
+        "externalDocs": {
+          "$ref": "#/definitions/externalDocs"
+        },
+        "example": {}
+      },
+      "additionalProperties": false
+    },
+    "xml": {
+      "type": "object",
+	  "description": "A metadata object that allows for more fine-tuned XML model definitions.
+
+When using arrays, XML element names are not inferred (for singular/plural forms) and the name property SHOULD be used to add that information. See examples for expected behavior.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "attribute": {
+          "type": "boolean",
+          "default": false
+        },
+        "wrapped": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      }
+    },
+	"securityScheme": {
+		"type": "object",
+		"description": "Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
+        "required": [
+          "type",
+          "name",
+		  "in",
+		  "scheme",
+		  "flow",
+		  "openIdConnectUrl"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+	          "type": "string"
+          },
+          "description": {
+	          "type": "string"
+          },
+          "name": {
+	          "type": "string"
+          },
+          "in": {
+	          "type": "string"
+          },
+          "scheme": {
+	          "type": "string"
+          },
+          "bearerFormat": {
+	          "type": "string"
+          },
+          "flow": {
+              "$ref": "#/definitions/oauthFlows"
+          },
+          "openIdConnectUrl": {
+	          "type": "string"
+          },
+        },
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }
+	},
+	"oauthFlows": {
+		"type": "object",
+		"description": "Allows configuration of the supported OAuth Flows.",
+        "additionalProperties": false,
+        "properties": {
+          "implicit": {
+              "$ref": "#/definitions/oauthFlow"
+          },
+          "password": {
+              "$ref": "#/definitions/oauthFlow"
+          },
+          "clientCredentials": {
+              "$ref": "#/definitions/oauthFlow"
+          },
+          "authorizationCode": {
+            "$ref": "#/definitions/oauthFlow"
+          }
+        },
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }
+	},
+	"oauthFlow": {
+		"type": "object",
+		"description": "Configuration details for a supported OAuth Flow",
+        "required": [
+          "authorizationUrl",
+          "tokenUrl",
+          "scopes"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "authorizationUrl": {
+            "type": "string"
+          },
+          "tokenUrl": {
+            "type": "string"
+          },
+          "refreshUrl": {
+            "type": "string"
+          },
+          "scopes": {
+            "$ref": "#/definitions/scopes"
+          }
+        },
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        }
+	},
+	"scopes": {
+		"type": "object",
+		"description": "Lists the available scopes for an OAuth2 security scheme.",
+        "additionalProperties": {
+          "type": "string"
+        }
+	},
+	"securityRequirement": {
+		"type": "object",
+		"description": "Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.
+
+Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.
+
+When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+	},
+	
+	
+	"schemas": {
+		"type": "object",
+		"description": "A collection of named schemas.",
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/schema"
+        },
+	},
+	"callbacks": {
+		"type": "object",
+		"description": "A collection of named callbacks.",
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/callback"
+        },
+	},
+	"parameters": {
+		"type": "object",
+		"description": "A collection of named parameters.",
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/parameter"
+        },
+	},
+	"requestBodies": {
+		"type": "object",
+		"description": "A collection of named request bodies.",
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/requestBody"
+        },
+	},
+	"securitySchemes": {
+		"type": "object",
+		"description": "A collection of named security schemes.",
+        "patternProperties": {
+          "^x-": {
+            "$ref": "#/definitions/specificationExtension"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/securityScheme"
+        },
+	},
+	
+	
+	
+    "definitions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/schema"
+      },
+      "description": "One or more JSON objects describing the schemas being consumed and produced by the API."
+    },
+    "parameterDefinitions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/parameter"
+      },
+      "description": "One or more JSON representations for parameters"
+    },
+    "responseDefinitions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/response"
+      },
+      "description": "One or more JSON representations for parameters"
+    },
+    "mimeType": {
+      "type": "string",
+      "description": "The MIME type of the HTTP message."
+    },
+    "responseValue": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/response"
+        },
+        {
+          "$ref": "#/definitions/jsonReference"
+        }
+      ]
     },
     "specificationExtension": {
       "description": "Any property starting with x- is valid.",
@@ -958,145 +1503,6 @@
         }
       ]
     },
-    "parameter": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/bodyParameter"
-        },
-        {
-          "$ref": "#/definitions/nonBodyParameter"
-        }
-      ]
-    },
-    "schema": {
-      "type": "object",
-      "description": "A deterministic version of a JSON Schema object.",
-      "patternProperties": {
-        "^x-": {
-          "$ref": "#/definitions/specificationExtension"
-        }
-      },
-      "properties": {
-        "$ref": {
-          "type": "string"
-        },
-        "format": {
-          "type": "string"
-        },
-        "title": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/title"
-        },
-        "description": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/description"
-        },
-        "default": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/default"
-        },
-        "multipleOf": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/multipleOf"
-        },
-        "maximum": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/maximum"
-        },
-        "exclusiveMaximum": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"
-        },
-        "minimum": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/minimum"
-        },
-        "exclusiveMinimum": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"
-        },
-        "maxLength": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
-        },
-        "minLength": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
-        },
-        "pattern": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/pattern"
-        },
-        "maxItems": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
-        },
-        "minItems": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
-        },
-        "uniqueItems": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/uniqueItems"
-        },
-        "maxProperties": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
-        },
-        "minProperties": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
-        },
-        "required": {
-          "$ref": "http://json-schema.org/draft-04/schema#/definitions/stringArray"
-        },
-        "enum": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
-        },
-        "additionalProperties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/schema"
-            },
-            {
-              "type": "boolean"
-            }
-          ],
-          "default": {}
-        },
-        "type": {
-          "$ref": "http://json-schema.org/draft-04/schema#/properties/type"
-        },
-        "items": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/schema"
-            },
-            {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "$ref": "#/definitions/schema"
-              }
-            }
-          ],
-          "default": {}
-        },
-        "allOf": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/schema"
-          }
-        },
-        "properties": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/schema"
-          },
-          "default": {}
-        },
-        "discriminator": {
-          "type": "string"
-        },
-        "readOnly": {
-          "type": "boolean",
-          "default": false
-        },
-        "xml": {
-          "$ref": "#/definitions/xml"
-        },
-        "externalDocs": {
-          "$ref": "#/definitions/externalDocs"
-        },
-        "example": {}
-      },
-      "additionalProperties": false
-    },
     "fileSchema": {
       "type": "object",
       "description": "A deterministic version of a JSON Schema object.",
@@ -1225,57 +1631,6 @@
           "type": "string"
         },
         "uniqueItems": true
-      }
-    },
-    "xml": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "namespace": {
-          "type": "string"
-        },
-        "prefix": {
-          "type": "string"
-        },
-        "attribute": {
-          "type": "boolean",
-          "default": false
-        },
-        "wrapped": {
-          "type": "boolean",
-          "default": false
-        }
-      },
-      "patternProperties": {
-        "^x-": {
-          "$ref": "#/definitions/specificationExtension"
-        }
-      }
-    },
-    "tag": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "externalDocs": {
-          "$ref": "#/definitions/externalDocs"
-        }
-      },
-      "patternProperties": {
-        "^x-": {
-          "$ref": "#/definitions/specificationExtension"
-        }
       }
     },
     "securityDefinitions": {
