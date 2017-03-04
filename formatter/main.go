@@ -17,20 +17,13 @@ package main
 import (
 	"fmt"
 	"github.com/googleapis/gnostic/jsonschema"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 func main() {
-	file, err := ioutil.ReadFile("../schemas/openapi-3.0.json")
+	schema, err := jsonschema.NewSchemaFromFile("../schemas/openapi-3.0.json")
 	if err != nil {
 		panic(err)
 	}
-	var info yaml.MapSlice
-	err = yaml.Unmarshal(file, &info)
-	if err != nil {
-		panic(err)
-	}
-	output := jsonschema.Render(info)
+	output := schema.JSONString()
 	fmt.Printf("%s\n", output)
 }
