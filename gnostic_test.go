@@ -18,7 +18,7 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 	// run the compiler
 	var err error
 	err = exec.Command(
-		"openapic",
+		"gnostic",
 		input_file,
 		"--text_out=.",
 		"--errors_out=.",
@@ -119,7 +119,7 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 	// run the compiler
 	var err error
 	output, err := exec.Command(
-		"openapic",
+		"gnostic",
 		"--"+plugin+"_out=-",
 		input_file).Output()
 	if err != nil {
@@ -148,7 +148,7 @@ func TestSamplePluginWithPetstore(t *testing.T) {
 func TestErrorInvalidPluginInvocations(t *testing.T) {
 	var err error
 	output, err := exec.Command(
-		"openapic",
+		"gnostic",
 		"examples/petstore.yaml",
 		"--errors_out=-",
 		"--plugin_out=foo=bar,:abc",
@@ -177,7 +177,7 @@ func TestErrorInvalidPluginInvocations(t *testing.T) {
 func TestValidPluginInvocations(t *testing.T) {
 	var err error
 	output, err := exec.Command(
-		"openapic",
+		"gnostic",
 		"examples/petstore.yaml",
 		"--errors_out=-",
 		// verify an invocation with no parameters
