@@ -14,12 +14,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"regexp"
 	"strings"
 )
 
+// model a section of the OpenAPI specification text document
 type Section struct {
 	Level    int
 	Text     string
@@ -27,33 +29,36 @@ type Section struct {
 	Children []*Section
 }
 
-// read a section of the OpenAPI Specification, dividing it into subsections
-func ReadSection(text string, level int) (section *Section, err error) {
+// read a section of the OpenAPI Specification, recursively dividing it into subsections
+func ReadSection(text string, level int) (section *Section) {
 	titlePattern := regexp.MustCompile("^" + strings.Repeat("#", level) + " .*$")
 	subtitlePattern := regexp.MustCompile("^" + strings.Repeat("#", level+1) + " .*$")
 
-	section = &Section{Level: level}
+	section = &Section{Level: level, Text: text}
 	lines := strings.Split(string(text), "\n")
 	subsection := ""
 	for i, line := range lines {
 		if i == 0 && titlePattern.Match([]byte(line)) {
 			section.Title = line
 		} else if subtitlePattern.Match([]byte(line)) {
+			// we've found a subsection title.
+			// if there's a subsection that we've already been reading, save it
 			if len(subsection) != 0 {
-				child, _ := ReadSection(subsection, level+1)
+				child := ReadSection(subsection, level+1)
 				section.Children = append(section.Children, child)
 			}
+			// start a new subsection
 			subsection = line + "\n"
 		} else {
+			// add to the subsection we've been reading
 			subsection += line + "\n"
 		}
 	}
+	// if this section has subsections, save the last one
 	if len(section.Children) > 0 {
-		child, _ := ReadSection(subsection, level+1)
+		child := ReadSection(subsection, level+1)
 		section.Children = append(section.Children, child)
 	}
-	// save the text
-	section.Text = text
 	return
 }
 
@@ -89,7 +94,7 @@ func stripLink(input string) (output string) {
 	}
 }
 
-// return a nice-to-display title for a section that removes the opening "###" and any links
+// return a nice-to-display title for a section by removing the opening "###" and any links
 func (s *Section) NiceTitle() string {
 	titlePattern := regexp.MustCompile("^#+ (.*)$")
 	titleWithLinkPattern := regexp.MustCompile("^#+ <a .*</a>(.*)$")
@@ -102,7 +107,7 @@ func (s *Section) NiceTitle() string {
 	}
 }
 
-// replace markdown links with their link text (removing the URLs)
+// replace markdown links with their link text (removing the URL part)
 func removeMarkdownLinks(input string) (output string) {
 	markdownLink := regexp.MustCompile("\\[([^\\]]*)\\]\\(([^\\)]*)\\)") // matches [link title](link url)
 	output = string(markdownLink.ReplaceAll([]byte(input), []byte("$1")))
@@ -110,8 +115,7 @@ func removeMarkdownLinks(input string) (output string) {
 }
 
 // extract the fixed fields from a table in a section
-func parseFixedFields(input string) {
-	fmt.Printf("- FIXED FIELDS:\n")
+func parseFixedFields(input string, schemaObject *SchemaObject) {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 		parts := strings.Split(line, "|")
@@ -125,15 +129,16 @@ func parseFixedFields(input string) {
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
-				fmt.Printf("%-20s %s\n", fieldName, typeName)
+				description := parts[len(parts)-1]
+				schemaField := SchemaObjectField{Name: fieldName, Type: typeName, Description: description}
+				schemaObject.FixedFields = append(schemaObject.FixedFields, schemaField)
 			}
 		}
 	}
 }
 
 // extract the patterned fields from a table in a section
-func parsePatternedFields(input string) {
-	fmt.Printf("- PATTERNED FIELDS:\n")
+func parsePatternedFields(input string, schemaObject *SchemaObject) {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 		parts := strings.Split(line, "|")
@@ -148,56 +153,100 @@ func parsePatternedFields(input string) {
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
-				fmt.Printf("%-20s %s\n", fieldName, typeName)
+				description := parts[len(parts)-1]
+				schemaField := SchemaObjectField{Name: fieldName, Type: typeName, Description: description}
+				schemaObject.PatternedFields = append(schemaObject.PatternedFields, schemaField)
 			}
 		}
 	}
 }
 
-func main() {
+type SchemaObjectField struct {
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+}
+
+type SchemaObject struct {
+	Name            string              `json:"name"`
+	Id              string              `json:"id"`
+	Description     string              `json:"description"`
+	Extendable      bool                `json:"extendable"`
+	FixedFields     []SchemaObjectField `json:"fixed"`
+	PatternedFields []SchemaObjectField `json:"patterned"`
+}
+
+type SchemaModel struct {
+	Objects []SchemaObject
+}
+
+func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
+
 	b, err := ioutil.ReadFile("3.0.md")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// divide the specification into sections
-	document, err := ReadSection(string(b), 1)
+	document := ReadSection(string(b), 1)
 	document.Display("")
 
 	// read object names and their details
-	specification := document.Children[4]
-	schema := specification.Children[5]
+	specification := document.Children[4] // fragile!
+	schema := specification.Children[5]   // fragile!
 	anchor := regexp.MustCompile("^#### <a name=\"(.*)Object\"")
+	schemaObjects := make([]SchemaObject, 0)
 	for _, section := range schema.Children {
 		if matches := anchor.FindSubmatch([]byte(section.Title)); matches != nil {
-			//name := string(matches[1])
-			fmt.Printf("\n%s\n", section.NiceTitle())
+
+			id := string(matches[1])
+
+			schemaObject := SchemaObject{Name: section.NiceTitle(), Id: id}
 
 			if len(section.Children) > 0 {
 				details := section.Children[0].Text
 				details = removeMarkdownLinks(details)
 				details = strings.Trim(details, " \t\n")
-				fmt.Printf("- DESCRIPTION: {%s}\n", details)
+				schemaObject.Description = details
 			}
 
 			// is the object extendable?
 			if strings.Contains(section.Text, "Specification Extensions") {
-				fmt.Printf("- EXTENDABLE\n")
+				schemaObject.Extendable = true
 			}
 
 			// look for fixed fields
 			for _, child := range section.Children {
 				if child.NiceTitle() == "Fixed Fields" {
-					parseFixedFields(child.Text)
+					parseFixedFields(child.Text, &schemaObject)
 				}
 			}
 
 			// look for patterned fields
 			for _, child := range section.Children {
 				if child.NiceTitle() == "Patterned Fields" {
-					parsePatternedFields(child.Text)
+					parsePatternedFields(child.Text, &schemaObject)
 				}
 			}
+
+			schemaObjects = append(schemaObjects, schemaObject)
 		}
+	}
+
+	return &SchemaModel{Objects: schemaObjects}, nil
+}
+
+func main() {
+	// read and parse the text specification into a structure
+	model, err := NewSchemaModel("3.0.md")
+	if err != nil {
+		panic(err)
+	}
+
+	modelJSON, _ := json.MarshalIndent(model, "", "  ")
+	fmt.Print("%s\n", string(modelJSON))
+	err = ioutil.WriteFile("model.json", modelJSON, 0644)
+	if err != nil {
+		panic(err)
 	}
 }
