@@ -129,8 +129,22 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
-				description := parts[len(parts)-1]
-				schemaField := SchemaObjectField{Name: fieldName, Type: typeName, Description: description}
+				isArray := false
+				if typeName[0] == '[' && typeName[len(typeName)-1] == ']' {
+					typeName = typeName[1 : len(typeName)-1]
+					isArray = true
+				}
+				description := strings.Trim(parts[len(parts)-1], " ")
+				description = removeMarkdownLinks(description)
+				if strings.Contains(description, "Required.") {
+					schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
+				}
+				schemaField := SchemaObjectField{
+					Name:        fieldName,
+					Type:        typeName,
+					IsArray:     isArray,
+					Description: description,
+				}
 				schemaObject.FixedFields = append(schemaObject.FixedFields, schemaField)
 			}
 		}
@@ -153,8 +167,19 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
-				description := parts[len(parts)-1]
-				schemaField := SchemaObjectField{Name: fieldName, Type: typeName, Description: description}
+				isArray := false
+				if typeName[0] == '[' && typeName[len(typeName)-1] == ']' {
+					typeName = typeName[1 : len(typeName)-1]
+					isArray = true
+				}
+				description := strings.Trim(parts[len(parts)-1], " ")
+				description = removeMarkdownLinks(description)
+				schemaField := SchemaObjectField{
+					Name:        fieldName,
+					Type:        typeName,
+					IsArray:     isArray,
+					Description: description,
+				}
 				schemaObject.PatternedFields = append(schemaObject.PatternedFields, schemaField)
 			}
 		}
@@ -164,6 +189,7 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 type SchemaObjectField struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
+	IsArray     bool   `json:"is_array"`
 	Description string `json:"description"`
 }
 
@@ -172,6 +198,7 @@ type SchemaObject struct {
 	Id              string              `json:"id"`
 	Description     string              `json:"description"`
 	Extendable      bool                `json:"extendable"`
+	RequiredFields  []string            `json:"required"`
 	FixedFields     []SchemaObjectField `json:"fixed"`
 	PatternedFields []SchemaObjectField `json:"patterned"`
 }
@@ -201,7 +228,11 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 			id := string(matches[1])
 
-			schemaObject := SchemaObject{Name: section.NiceTitle(), Id: id}
+			schemaObject := SchemaObject{
+				Name:           section.NiceTitle(),
+				Id:             id,
+				RequiredFields: make([]string, 0),
+			}
 
 			if len(section.Children) > 0 {
 				details := section.Children[0].Text
