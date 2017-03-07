@@ -1,0 +1,38 @@
+        {
+            "definitions": {
+                "Book": {
+                    "type": "object",
+                    "id": "x-google-book",
+                    "required": [
+                        "code",
+                        "message"
+                    ],
+                    "properties": {
+                        "code": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "message": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "Shelve": {
+                    "type": "object",
+                    "id": "x-google-shelve",
+                    "required": [
+                        "foo1",
+                        "bar"
+                    ],
+                    "properties": {
+                        "foo1": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "bar": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }

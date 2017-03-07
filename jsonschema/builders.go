@@ -16,9 +16,10 @@ package jsonschema
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
 // This is a global map of all known Schemas.
@@ -31,8 +32,11 @@ func NewSchemaFromFile(filename string) *Schema {
 	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/schemas"
 	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
 	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
+		file, e = ioutil.ReadFile(filename)
+		if e != nil {
+			fmt.Printf("File error: %v\n", e)
+			os.Exit(1)
+		}
 	}
 	var info yaml.MapSlice
 	yaml.Unmarshal(file, &info)

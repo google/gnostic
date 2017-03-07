@@ -192,6 +192,7 @@ Options:
   --errors_out=PATH   Write compilation errors to the specified location.
   --PLUGIN_out=PATH   Run the plugin named gnostic_PLUGIN and write results to the specified location.
   --resolve_refs      Explicitly resolve $ref references (this could have problems with recursive definitions).
+  --extension         GENERATOR_NAME  TODO.
 `
 	// default values for all options
 	sourceName := ""
@@ -201,10 +202,14 @@ Options:
 	errorPath := ""
 	pluginCalls := make([]*PluginCall, 0)
 	resolveReferences := false
+	customAnyProtoGenerator := make([]compiler.CustomAnyProtoGenerator, 0)
 
 	// arg processing matches patterns of the form "--PLUGIN_out=PATH"
 	plugin_regex := regexp.MustCompile("--(.+)_out=(.+)")
 
+	// arg processing matches patterns of the form "--extension=GENERATOR_NAME"
+	customAnyProtoGenerator_regex, err := regexp.Compile("--extension=(.+)")
+	defaultPrefixForExtensions := "openapi_extensions_"
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue // skip the tool name
@@ -226,6 +231,8 @@ Options:
 				pluginCall := &PluginCall{Name: pluginName, Invocation: invocation}
 				pluginCalls = append(pluginCalls, pluginCall)
 			}
+		} else if m = customAnyProtoGenerator_regex.FindSubmatch([]byte(arg)); m != nil {
+			customAnyProtoGenerator = append(customAnyProtoGenerator, compiler.CustomAnyProtoGenerator{GeneratorName: defaultPrefixForExtensions + string(m[1])})
 		} else if arg == "--resolve_refs" {
 			resolveReferences = true
 		} else if arg[0] == '-' {
@@ -261,7 +268,7 @@ Options:
 		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
-	document, err := openapi_v2.NewDocument(info, compiler.NewContext("$root", nil))
+	document, err := openapi_v2.NewDocument(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, &customAnyProtoGenerator))
 	if err != nil {
 		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)

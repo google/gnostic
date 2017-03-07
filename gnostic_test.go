@@ -201,3 +201,66 @@ func TestValidPluginInvocations(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func test_extensions(t *testing.T, extensions []string, input_file string, output_file string, reference_file string) {
+	// remove any preexisting output files
+	os.Remove(output_file)
+	// run the compiler
+	var err error
+	var extension_args string
+	for _, extension_name := range extensions {
+		extension_args += "--extension=" + extension_name
+	}
+	command := exec.Command(
+		"gnostic",
+		extension_args,
+		"--text_out="+output_file,
+		input_file)
+
+	_, err = command.Output()
+	if err != nil {
+		t.Logf("Compile failed for command %v: %+v", command, err)
+		t.FailNow()
+	}
+	//_ = ioutil.WriteFile(output_file, output, 0644)
+	err = exec.Command("diff", output_file, reference_file).Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	} else {
+		// if the test succeeded, clean up
+		os.Remove(output_file)
+	}
+}
+
+func TestExtensionHandlerWithLibraryExample(t *testing.T) {
+	output_file := "library-example-with-ext.text.out"
+	input_file := "test/library-example-with-ext.json"
+	reference_file := "test/library-example-with-ext.text.out"
+
+	os.Remove(output_file)
+	// run the compiler
+	var err error
+
+	command := exec.Command(
+		"gnostic",
+		"--extension=google",
+		"--extension=ibm",
+		"--text_out="+output_file,
+		input_file)
+
+	_, err = command.Output()
+	if err != nil {
+		t.Logf("Compile failed for command %v: %+v", command, err)
+		t.FailNow()
+	}
+	//_ = ioutil.WriteFile(output_file, output, 0644)
+	err = exec.Command("diff", output_file, reference_file).Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	} else {
+		// if the test succeeded, clean up
+		os.Remove(output_file)
+	}
+}

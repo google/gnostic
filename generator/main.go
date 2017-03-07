@@ -21,6 +21,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/googleapis/gnostic/generator/util"
 	"github.com/googleapis/gnostic/jsonschema"
 )
 
@@ -39,14 +40,8 @@ const LICENSE = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
 
-type ProtoOption struct {
-	Name    string
-	Value   string
-	Comment string
-}
-
-var PROTO_OPTIONS = []ProtoOption{
-	ProtoOption{
+var PROTO_OPTIONS = []util.ProtoOption{
+	util.ProtoOption{
 		Name:  "java_multiple_files",
 		Value: "true",
 		Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
@@ -55,7 +50,7 @@ var PROTO_OPTIONS = []ProtoOption{
 			"// consistent with most programming languages that don't support outer classes.",
 	},
 
-	ProtoOption{
+	util.ProtoOption{
 		Name:  "java_outer_classname",
 		Value: "OpenAPIProto",
 		Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
@@ -63,13 +58,13 @@ var PROTO_OPTIONS = []ProtoOption{
 			"// work with it directly.",
 	},
 
-	ProtoOption{
+	util.ProtoOption{
 		Name:    "java_package",
 		Value:   "org.openapi.v2",
 		Comment: "// The Java package name must be proto package name with proper prefix.",
 	},
 
-	ProtoOption{
+	util.ProtoOption{
 		Name:  "objc_class_prefix",
 		Value: "OAS",
 		Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
@@ -96,7 +91,7 @@ func main() {
 	openapi_schema.ResolveAllOfs()
 
 	// build a simplified model of the types described by the schema
-	cc := NewDomain(openapi_schema)
+	cc := util.NewDomain(openapi_schema)
 	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 	cc.PatternNames = map[string]string{
@@ -104,13 +99,13 @@ func main() {
 		"^/":  "path",
 		"^([0-9]{3})$|^(default)$": "responseCode",
 	}
-	cc.build()
-	log.Printf("Type Model:\n%s", cc.description())
+	cc.Build()
+	log.Printf("Type Model:\n%s", cc.Description())
 
 	var err error
 
 	// generate the protocol buffer description
-	proto := cc.generateProto(proto_packagename, LICENSE, PROTO_OPTIONS)
+	proto := cc.GenerateProto(proto_packagename, LICENSE, PROTO_OPTIONS, []string{"google/protobuf/any.proto"})
 	proto_filename := filename + "/" + filename + ".proto"
 	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
@@ -118,7 +113,13 @@ func main() {
 	}
 
 	// generate the compiler
-	compiler := cc.generateCompiler(go_packagename, LICENSE)
+	compiler := cc.GenerateCompiler(go_packagename, LICENSE, []string{
+		"fmt",
+		"gopkg.in/yaml.v2",
+		"strings",
+		"github.com/googleapis/gnostic/compiler",
+	})
+
 	go_filename := filename + "/" + filename + ".go"
 	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {

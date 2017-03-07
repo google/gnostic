@@ -18,6 +18,8 @@ syntax = "proto3";
 
 package openapi.v2;
 
+import "google/protobuf/any.proto";
+
 // This option lets the proto compiler generate Java code inside the package
 // name (see below) instead of inside an outer class. It creates a simpler
 // developer experience by reducing one-level of name nesting and be
@@ -47,7 +49,8 @@ message AdditionalPropertiesItem {
 }
 
 message Any {
-  string yaml = 1;
+  google.protobuf.Any value = 1;
+  string yaml = 2;
 }
 
 message ApiKeySecurity {

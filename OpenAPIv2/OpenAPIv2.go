@@ -125,9 +125,34 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -187,9 +212,34 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -276,9 +326,34 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -341,9 +416,34 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -371,9 +471,34 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 				pair := &NamedAny{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				handled := false
+				if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+					for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+						result := &Any{}
+						// ADD error handling here
+						outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+						if errFromPlugin != nil {
+							errors = append(errors, errFromPlugin)
+							handled = true
+							break
+						}
+						if outFromPlugin == nil {
+							continue
+						} else {
+							handled = true
+							result.Value = outFromPlugin
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							pair.Value = result
+							break
+						}
+					}
+				}
+				if !handled {
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
@@ -598,9 +723,34 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -628,9 +778,34 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 				pair := &NamedAny{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				handled := false
+				if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+					for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+						result := &Any{}
+						// ADD error handling here
+						outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+						if errFromPlugin != nil {
+							errors = append(errors, errFromPlugin)
+							handled = true
+							break
+						}
+						if outFromPlugin == nil {
+							continue
+						} else {
+							handled = true
+							result.Value = outFromPlugin
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							pair.Value = result
+							break
+						}
+					}
+				}
+				if !handled {
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
@@ -689,9 +864,34 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -816,9 +1016,34 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -1082,9 +1307,34 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -1318,9 +1568,34 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -1575,9 +1850,34 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -1702,9 +2002,34 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -1816,9 +2141,34 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -2334,9 +2684,34 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -2423,9 +2798,34 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -2512,9 +2912,34 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -2601,9 +3026,34 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -2800,9 +3250,34 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -3011,9 +3486,34 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -3274,9 +3774,34 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -3312,9 +3837,34 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -3552,9 +4102,34 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -3847,9 +4422,34 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -3927,9 +4527,34 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -4041,9 +4666,34 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -4392,9 +5042,34 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -4637,9 +5312,34 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
@@ -4681,9 +5381,34 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 				pair := &NamedAny{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				handled := false
+				if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+					for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+						result := &Any{}
+						// ADD error handling here
+						outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+						if errFromPlugin != nil {
+							errors = append(errors, errFromPlugin)
+							handled = true
+							break
+						}
+						if outFromPlugin == nil {
+							continue
+						} else {
+							handled = true
+							result.Value = outFromPlugin
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							pair.Value = result
+							break
+						}
+					}
+				}
+				if !handled {
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
@@ -4763,9 +5488,34 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					handled := false
+					if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
+						for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+							result := &Any{}
+							// ADD error handling here
+							outFromPlugin, errFromPlugin := customAnyProtoGenerator.Perform(v, k)
+							if errFromPlugin != nil {
+								errors = append(errors, errFromPlugin)
+								handled = true
+								break
+							}
+							if outFromPlugin == nil {
+								continue
+							} else {
+								handled = true
+								result.Value = outFromPlugin
+								bytes, _ := yaml.Marshal(v)
+								result.Yaml = string(bytes)
+								pair.Value = result
+								break
+							}
+						}
+					}
+					if !handled {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.VendorExtension = append(x.VendorExtension, pair)
 				}
