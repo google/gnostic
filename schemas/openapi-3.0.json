@@ -181,6 +181,9 @@ The metadata can be used by the clients if needed, and can be presented in editi
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
+        },
+        "{name}": {
+          "$ref": "#/definitions/serverVariable"
         }
       }
     },
@@ -263,7 +266,7 @@ The path is appended to the URL from the `Server Object` in order to construct t
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
         },
-        "^/": {
+        "/{path}": {
           "$ref": "#/definitions/pathItem"
         }
       }
@@ -427,6 +430,11 @@ A unique parameter is defined by a combination of a name and location.",
         "name",
         "in"
       ],
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
       "properties": {
         "name": {
           "type": "string"
@@ -476,6 +484,11 @@ A unique parameter is defined by a combination of a name and location.",
     "requestBody": {
       "type": "object",
       "description": "Describes a single request body.",
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
       "properties": {
         "description": {
           "type": "string"
@@ -498,6 +511,11 @@ Each key in the Content Object is the media type of the Media Type Object."
     "mediaType": {
       "type": "object",
       "description": "Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.",
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
       "properties": {
         "schema": {
           "$ref": "#/definitions/schemaOrReference"
@@ -519,11 +537,21 @@ Each key in the Content Object is the media type of the Media Type Object."
     },
     "encoding": {
       "type": "object",
-      "description": "An object representing multipart region encoding for `requestBody` objects."
+      "description": "An object representing multipart region encoding for `requestBody` objects.",
+      "patternProperties": {
+        "{property}": {
+          "$ref": "#/definitions/encodingProperty"
+        }
+      }
     },
     "encodingProperty": {
       "type": "object",
       "description": "A single encoding definition applied to a single schema property.",
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
       "properties": {
         "contentType": {
           "type": "string"
@@ -555,7 +583,7 @@ SHOULD be the response for a successful operation call.",
       "additionalProperties": false,
       "patternProperties": {
         "^([0-9]{3})$|^(default)$": {
-          "$ref": "#/definitions/responseValue"
+          "$ref": "#/definitions/responseOrReference"
         },
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -622,19 +650,40 @@ SHOULD be the response for a successful operation call.",
       "type": "object",
       "description": "A map of possible out-of band callbacks related to the parent operation.
 Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses.
-The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation."
+The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
+      "patternProperties": {
+        "{name}": {
+          "$ref": "#/definitions/callbackOrReference"
+        },
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      }
     },
     "callback": {
       "type": "object",
       "description": "A map of possible out-of band callbacks related to the parent operation.
 Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses.
-The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation."
+The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
+      "patternProperties": {
+        "{expression}": {
+          "$ref": "#/definitions/pathItem"
+        },
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      }
     },
     "headers": {
       "type": "object",
       "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.",
       "additionalProperties": {
         "$ref": "#/definitions/header"
+      },
+      "patternProperties": {
+        "{name}": {
+          "$ref": "#/definitions/headerOrReference"
+        }
       }
     },
     "example": {
@@ -658,6 +707,11 @@ For computing links, and providing instructions to execute them, variable substi
             "$ref": "#/definitions/reference"
           }
         ]
+      },
+      "patternProperties": {
+        "{name}": {
+          "$ref": "#/definitions/linkOrReference"
+        }
       }
     },
     "link": {
@@ -695,7 +749,12 @@ For computing links, and providing instructions to execute them, variable substi
 Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.
 
 To specify parameters required by the operation, we can use a **Link Parameters Object**.
-This object contains parameter names along with static or dynamic values:"
+This object contains parameter names along with static or dynamic values:",
+      "patternProperties": {
+        "{name}": {
+          "$ref": "#/definitions/anyOr{expression}"
+        }
+      }
     },
     "header": {
       "type": "object",
@@ -1109,6 +1168,14 @@ Supported schemes are HTTP authentication, an API key (either as a header or as 
       "description": "Lists the available scopes for an OAuth2 security scheme.",
       "additionalProperties": {
         "type": "string"
+      },
+      "patternProperties": {
+        "{name}": {
+          "type": "string"
+        },
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
       }
     },
     "securityRequirement": {
@@ -1126,6 +1193,15 @@ When a list of Security Requirement Objects is defined on the Open API object or
           "type": "string"
         },
         "uniqueItems": true
+      },
+      "patternProperties": {
+        "{name}": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
       }
     },
     "schemas": {
@@ -1151,6 +1227,9 @@ The key value used to identify the callback object is an expression, evaluated a
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
+        },
+        "{name}": {
+          "$ref": "#/definitions/callbackOrReference"
         }
       }
     },
@@ -1405,6 +1484,15 @@ When a list of Security Requirement Objects is defined on the Open API object or
           "type": "string"
         },
         "uniqueItems": true
+      },
+      "patternProperties": {
+        "{name}": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
       }
     },
     "securityDefinitions": {

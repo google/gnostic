@@ -151,7 +151,7 @@ func (schema *Schema) applyToSchemas(operation SchemaOperation, context string) 
 }
 
 // Copies all non-nil properties from the source Schema to the destination Schema.
-func (destination *Schema) copyProperties(source *Schema) {
+func (destination *Schema) CopyProperties(source *Schema) {
 	if source.Schema != nil {
 		destination.Schema = source.Schema
 	}
@@ -296,7 +296,7 @@ func (schema *Schema) ResolveRefs() {
 						// don't substitute for references that contain oneOf declarations
 					} else {
 						schema.Ref = nil
-						schema.copyProperties(resolvedRef)
+						schema.CopyProperties(resolvedRef)
 						count += 1
 					}
 				}
@@ -356,7 +356,7 @@ func (schema *Schema) ResolveAllOfs() {
 		func(schema *Schema, context string) {
 			if schema.AllOf != nil {
 				for _, allOf := range *(schema.AllOf) {
-					schema.copyProperties(allOf)
+					schema.CopyProperties(allOf)
 				}
 				schema.AllOf = nil
 			}
