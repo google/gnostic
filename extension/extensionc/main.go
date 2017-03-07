@@ -111,7 +111,7 @@ const additionalCompilerCodeWithMain = "" +
 
 const caseString = "\n" +
 	"case \"%s\":\n" +
-	"newObject, err = %s.New%s(info, compiler.NewContextWithCustomAnyProtoGenerators(\"$root\", nil, nil))\n"
+	"newObject, err = %s.New%s(info, compiler.NewContextWithExtensionHandlers(\"$root\", nil, nil))\n"
 
 var PROTO_OPTIONS = []util.ProtoOption{
 	util.ProtoOption{

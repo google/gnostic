@@ -65,10 +65,10 @@ func main() {
 			// All supported extensions
 
 			case "x-google-book":
-				newObject, err = google.NewBook(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
+				newObject, err = google.NewBook(info, compiler.NewContextWithExtensionHandlers("$root", nil, nil))
 
 			case "x-google-shelve":
-				newObject, err = google.NewShelve(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
+				newObject, err = google.NewShelve(info, compiler.NewContextWithExtensionHandlers("$root", nil, nil))
 
 			default:
 				responseBytes, _ := proto.Marshal(response)

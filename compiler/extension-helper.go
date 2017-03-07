@@ -21,8 +21,8 @@ func HandleExtension(context *Context, in interface{}, extensionName string) (bo
 	var errFromPlugin error
 	var outFromPlugin *any.Any
 
-	if context.CustomAnyProtoGenerators != nil && len(*(context.CustomAnyProtoGenerators)) != 0 {
-		for _, customAnyProtoGenerator := range *(context.CustomAnyProtoGenerators) {
+	if context.ExtensionHandlers != nil && len(*(context.ExtensionHandlers)) != 0 {
+		for _, customAnyProtoGenerator := range *(context.ExtensionHandlers) {
 			outFromPlugin, errFromPlugin = customAnyProtoGenerator.Perform(in, extensionName)
 			if outFromPlugin == nil {
 				continue

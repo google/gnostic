@@ -65,10 +65,10 @@ func main() {
 			// All supported extensions
 
 			case "x-ibm-book":
-				newObject, err = ibm.NewIbmBook(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
+				newObject, err = ibm.NewIbmBook(info, compiler.NewContextWithExtensionHandlers("$root", nil, nil))
 
 			case "x-ibm-shelve":
-				newObject, err = ibm.NewIbmShelve(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
+				newObject, err = ibm.NewIbmShelve(info, compiler.NewContextWithExtensionHandlers("$root", nil, nil))
 
 			default:
 				responseBytes, _ := proto.Marshal(response)

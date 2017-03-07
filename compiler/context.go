@@ -29,32 +29,28 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type CustomAnyProtoGenerator struct {
-	GeneratorName string
+type ExtensionHandler struct {
+	Name string
 }
 
-func (customAnyProtoGenerator *CustomAnyProtoGenerator) Perform(in interface{}, extensionName string) (*any.Any, error) {
-	if customAnyProtoGenerator.GeneratorName != "" {
+func (extensionHandlers *ExtensionHandler) Perform(in interface{}, extensionName string) (*any.Any, error) {
+	if extensionHandlers.Name != "" {
 		binary, _ := yaml.Marshal(in)
 
 		request := &ext_plugin.VendorExtensionHandlerRequest{}
 		request.Parameter = ""
 
 		version := &ext_plugin.Version{}
-		version.Major = 0
-		version.Minor = 1
-		version.Patch = 0
+		// TODO : Add correct version
 		request.CompilerVersion = version
 
 		request.Wrapper = &ext_plugin.Wrapper{}
-		request.Wrapper.Name = "TESTETEST"
-		request.Wrapper.Version = "v2"
 
 		request.Wrapper.Yaml = string(binary)
 		request.Wrapper.ExtensionName = extensionName
 		requestBytes, _ := proto.Marshal(request)
 
-		cmd := exec.Command(customAnyProtoGenerator.GeneratorName)
+		cmd := exec.Command(extensionHandlers.Name)
 		cmd.Stdin = bytes.NewReader(requestBytes)
 		output, err := cmd.Output()
 		if err != nil {
@@ -72,7 +68,7 @@ func (customAnyProtoGenerator *CustomAnyProtoGenerator) Perform(in interface{}, 
 			return nil, nil
 		}
 		if len(response.Error) != 0 {
-			message := fmt.Sprintf("Errors when parsing: %+v for field %s by vendor extension handler %s. Details %+v", in, extensionName, customAnyProtoGenerator.GeneratorName, strings.Join(response.Error, ","))
+			message := fmt.Sprintf("Errors when parsing: %+v for field %s by vendor extension handler %s. Details %+v", in, extensionName, extensionHandlers.Name, strings.Join(response.Error, ","))
 			return nil, errors.New(message)
 		}
 		return response.Value, nil
@@ -84,16 +80,16 @@ type Context struct {
 	Parent *Context
 	Name   string
 
-	// TODO: Figure out a better way to pass the CustomAnyProtoGenerator to the generated compiler.
-	CustomAnyProtoGenerators *[]CustomAnyProtoGenerator
+	// TODO: Figure out a better way to pass the ExtensionHandlers to the generated compiler.
+	ExtensionHandlers *[]ExtensionHandler
 }
 
-func NewContextWithCustomAnyProtoGenerators(name string, parent *Context, customAnyProtoGenerators *[]CustomAnyProtoGenerator) *Context {
-	return &Context{Name: name, Parent: parent, CustomAnyProtoGenerators: customAnyProtoGenerators}
+func NewContextWithExtensionHandlers(name string, parent *Context, extensionHandlers *[]ExtensionHandler) *Context {
+	return &Context{Name: name, Parent: parent, ExtensionHandlers: extensionHandlers}
 }
 
 func NewContext(name string, parent *Context) *Context {
-	return &Context{Name: name, Parent: parent, CustomAnyProtoGenerators: parent.CustomAnyProtoGenerators}
+	return &Context{Name: name, Parent: parent, ExtensionHandlers: parent.ExtensionHandlers}
 }
 
 func (context *Context) Description() string {
