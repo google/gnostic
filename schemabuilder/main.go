@@ -134,15 +134,24 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 					typeName = typeName[1 : len(typeName)-1]
 					isArray = true
 				}
+				isMap := false
+				mapPattern := regexp.MustCompile("^Mapstring,\\[(.*)\\]$")
+				if matches := mapPattern.FindSubmatch([]byte(typeName)); matches != nil {
+					typeName = string(matches[1])
+					isMap = true
+				}
 				description := strings.Trim(parts[len(parts)-1], " ")
 				description = removeMarkdownLinks(description)
-				if strings.Contains(description, "Required.") {
+				requiredLabel := "**Required.** "
+				if strings.Contains(description, requiredLabel) {
 					schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
+					description = strings.Replace(description, requiredLabel, "", -1)
 				}
 				schemaField := SchemaObjectField{
 					Name:        fieldName,
 					Type:        typeName,
 					IsArray:     isArray,
+					IsMap:       isMap,
 					Description: description,
 				}
 				schemaObject.FixedFields = append(schemaObject.FixedFields, schemaField)
@@ -172,12 +181,19 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 					typeName = typeName[1 : len(typeName)-1]
 					isArray = true
 				}
+				isMap := false
+				mapPattern := regexp.MustCompile("^Mapstring,\\[(.*)\\]$")
+				if matches := mapPattern.FindSubmatch([]byte(typeName)); matches != nil {
+					typeName = string(matches[1])
+					isMap = true
+				}
 				description := strings.Trim(parts[len(parts)-1], " ")
 				description = removeMarkdownLinks(description)
 				schemaField := SchemaObjectField{
 					Name:        fieldName,
 					Type:        typeName,
 					IsArray:     isArray,
+					IsMap:       isMap,
 					Description: description,
 				}
 				schemaObject.PatternedFields = append(schemaObject.PatternedFields, schemaField)
@@ -190,6 +206,7 @@ type SchemaObjectField struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
 	IsArray     bool   `json:"is_array"`
+	IsMap       bool   `json:"is_map"`
 	Description string `json:"description"`
 }
 
@@ -275,7 +292,7 @@ func main() {
 	}
 
 	modelJSON, _ := json.MarshalIndent(model, "", "  ")
-	fmt.Print("%s\n", string(modelJSON))
+	fmt.Printf("%s\n", string(modelJSON))
 	err = ioutil.WriteFile("model.json", modelJSON, 0644)
 	if err != nil {
 		panic(err)
