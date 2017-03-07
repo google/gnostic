@@ -28,6 +28,8 @@ import (
 
 	"path"
 
+	"sort"
+
 	"github.com/googleapis/gnostic/generator/util"
 	"github.com/googleapis/gnostic/jsonschema"
 	"github.com/googleapis/gnostic/printer"
@@ -330,9 +332,15 @@ Usage: TODO
 		"github.com/googleapis/gnostic/compiler",
 		outDirRelativeToGoPathSrc + "/" + "proto",
 	}
+	var extensionNameKeys []string
+	for k := range extensionToMessage {
+		extensionNameKeys = append(extensionNameKeys, k)
+	}
+	sort.Strings(extensionNameKeys)
+
 	var cases string
-	for extensionName, messagType := range extensionToMessage {
-		cases += fmt.Sprintf(caseString, extensionName, goPackageName, messagType)
+	for _, extensionName := range extensionNameKeys {
+		cases += fmt.Sprintf(caseString, extensionName, goPackageName, extensionToMessage[extensionName])
 	}
 	mainExtPluginCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
 

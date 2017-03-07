@@ -19,6 +19,7 @@ go install
 
 # ensure tool to generate the vendor extension compiler is installed.
 pushd $GOPATH/src/github.com/googleapis/gnostic/extension/extensionc
+go build
 go install
 
 ####################################################################################33
@@ -36,7 +37,7 @@ pushd $GOPATH/src/github.com/googleapis/gnostic/extension
     #
     GOOGLE_EXTENSION_SCHEMA="sample/x-google.json"
 
-    openapivendorextc $GOOGLE_EXTENSION_SCHEMA --out_dir_relative_to_gopath_src=$EXTENSION_OUT_DIR
+    extensionc $GOOGLE_EXTENSION_SCHEMA --out_dir_relative_to_gopath_src=$EXTENSION_OUT_DIR
 
     pushd $GOPATH/src/$EXTENSION_OUT_DIR/openapi_extensions_google/proto
         protoc --go_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any:. *.proto
@@ -52,7 +53,7 @@ pushd $GOPATH/src/github.com/googleapis/gnostic/extension
     #
     IBM_EXTENSION_SCHEMA="sample/x-ibm.json"
 
-    openapivendorextc $IBM_EXTENSION_SCHEMA --out_dir_relative_to_gopath_src=$EXTENSION_OUT_DIR
+    extensionc $IBM_EXTENSION_SCHEMA --out_dir_relative_to_gopath_src=$EXTENSION_OUT_DIR
 
     pushd $GOPATH/src/$EXTENSION_OUT_DIR/openapi_extensions_ibm/proto
         protoc --go_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any:. *.proto

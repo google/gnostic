@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/googleapis/gnostic/compiler"
+	"github.com/googleapis/gnostic/extension/extension_data"
 	"github.com/googleapis/gnostic/extension/sample/generated/openapi_extensions_google/proto"
-	"github.com/googleapis/openapi-compiler/compiler"
-	"github.com/googleapis/openapi-compiler/openapivendorext/plugin"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -64,11 +64,11 @@ func main() {
 			switch extensionName {
 			// All supported extensions
 
-			case "x-google-shelve":
-				newObject, err = google.NewShelve(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
-
 			case "x-google-book":
 				newObject, err = google.NewBook(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
+
+			case "x-google-shelve":
+				newObject, err = google.NewShelve(info, compiler.NewContextWithCustomAnyProtoGenerators("$root", nil, nil))
 
 			default:
 				responseBytes, _ := proto.Marshal(response)

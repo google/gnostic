@@ -18,7 +18,7 @@ package google
 
 import (
 	"fmt"
-	"github.com/googleapis/openapi-compiler/compiler"
+	"github.com/googleapis/gnostic/compiler"
 	"strings"
 )
 
