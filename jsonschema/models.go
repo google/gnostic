@@ -115,3 +115,41 @@ type NamedSchemaOrStringArray struct {
 	Name  string
 	Value *SchemaOrStringArray
 }
+
+// Access named subschemas by name
+
+func namedSchemaArrayElementWithName(array *[]*NamedSchema, name string) *Schema {
+	if array == nil {
+		return nil
+	}
+	for _, pair := range *array {
+		if pair.Name == name {
+			return pair.Value
+		}
+	}
+	return nil
+}
+
+func (s *Schema) PropertyWithName(name string) *Schema {
+	return namedSchemaArrayElementWithName(s.Properties, name)
+}
+
+func (s *Schema) PatternPropertyWithName(name string) *Schema {
+	return namedSchemaArrayElementWithName(s.PatternProperties, name)
+}
+
+func (s *Schema) DefinitionWithName(name string) *Schema {
+	return namedSchemaArrayElementWithName(s.Definitions, name)
+}
+
+func NewStringOrStringArrayWithString(s string) *StringOrStringArray {
+	result := &StringOrStringArray{}
+	result.String = &s
+	return result
+}
+
+func NewSchemaOrSchemaArrayWithSchema(s *Schema) *SchemaOrSchemaArray {
+	result := &SchemaOrSchemaArray{}
+	result.Schema = s
+	return result
+}

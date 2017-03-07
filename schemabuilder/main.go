@@ -19,7 +19,19 @@ import (
 	"io/ioutil"
 	"regexp"
 	"strings"
+	"unicode"
+	"unicode/utf8"
+
+	"github.com/googleapis/gnostic/jsonschema"
 )
+
+func lowerFirst(s string) string {
+	if s == "" {
+		return ""
+	}
+	r, n := utf8.DecodeRuneInString(s)
+	return string(unicode.ToLower(r)) + s[n:]
+}
 
 // model a section of the OpenAPI specification text document
 type Section struct {
@@ -224,6 +236,15 @@ type SchemaModel struct {
 	Objects []SchemaObject
 }
 
+func (m *SchemaModel) objectWithId(id string) *SchemaObject {
+	for _, object := range m.Objects {
+		if object.Id == id {
+			return &object
+		}
+	}
+	return nil
+}
+
 func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	b, err := ioutil.ReadFile("3.0.md")
@@ -233,7 +254,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	// divide the specification into sections
 	document := ReadSection(string(b), 1)
-	document.Display("")
+	//document.Display("")
 
 	// read object names and their details
 	specification := document.Children[4] // fragile!
@@ -248,7 +269,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 			schemaObject := SchemaObject{
 				Name:           section.NiceTitle(),
 				Id:             id,
-				RequiredFields: make([]string, 0),
+				RequiredFields: nil,
 			}
 
 			if len(section.Children) > 0 {
@@ -284,6 +305,148 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 	return &SchemaModel{Objects: schemaObjects}, nil
 }
 
+func definitionNameForType(typeName string) string {
+	name := typeName
+	switch typeName {
+	case "OAuthFlows":
+		name = "oauthFlows"
+	case "OAuthFlow":
+		name = "oauthFlow"
+	case "XML":
+		name = "xml"
+	case "ExternalDocumentation":
+		name = "externalDocs"
+	default:
+		// does the name contain a "|"
+		if parts := strings.Split(typeName, "|"); len(parts) > 1 {
+			name = lowerFirst(parts[0]) + "Or" + parts[1]
+		} else {
+			name = lowerFirst(typeName)
+		}
+	}
+	return "#/definitions/" + name
+}
+
+func definitionNameForMapOfType(typeName string) string {
+	// pluralize the type name to get the name of an object representing a map of them
+	name := lowerFirst(typeName)
+	if name[len(name)-1] == 'y' {
+		name = name[0:len(name)-1] + "ies"
+	} else {
+		name = name + "s"
+	}
+	return "#/definitions/" + name
+}
+
+func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *SchemaObject) {
+	if modelObject.RequiredFields != nil {
+		schema.Required = &modelObject.RequiredFields
+	}
+
+	schema.Description = &modelObject.Description
+
+	// handle fixed fields
+	if modelObject.FixedFields != nil {
+		newNamedSchemas := make([]*jsonschema.NamedSchema, 0)
+		for _, modelField := range modelObject.FixedFields {
+			schemaField := schema.PropertyWithName(modelField.Name)
+			if schemaField != nil {
+
+			} else {
+				fmt.Printf("FIXED PROPERTY NOT FOUND %s:%+v\n", name, modelField)
+				// create and add the schema field
+				schemaField = &jsonschema.Schema{}
+				namedSchema := &jsonschema.NamedSchema{Name: modelField.Name, Value: schemaField}
+				newNamedSchemas = append(newNamedSchemas, namedSchema)
+			}
+			// fmt.Printf("IN %s:%+v\n", name, schemaField)
+			// update the attributes of the schema field
+			if modelField.IsArray {
+				// is array
+				itemSchema := &jsonschema.Schema{}
+				switch modelField.Type {
+				case "string":
+					itemSchema.Type = jsonschema.NewStringOrStringArrayWithString("string")
+				case "boolean":
+					itemSchema.Type = jsonschema.NewStringOrStringArrayWithString("boolean")
+				case "primitive":
+					itemSchema.Type = jsonschema.NewStringOrStringArrayWithString("primitive")
+				default:
+					ref := definitionNameForType(modelField.Type)
+					itemSchema.Ref = &ref
+				}
+				schemaField.Items = jsonschema.NewSchemaOrSchemaArrayWithSchema(itemSchema)
+				schemaField.Type = jsonschema.NewStringOrStringArrayWithString("array")
+				boolValue := true // not sure about this
+				schemaField.UniqueItems = &boolValue
+			} else if modelField.IsMap {
+				ref := definitionNameForMapOfType(modelField.Type)
+				schemaField.Ref = &ref
+			} else {
+				// is scalar
+				switch modelField.Type {
+				case "string":
+					schemaField.Type = jsonschema.NewStringOrStringArrayWithString("string")
+				case "boolean":
+					schemaField.Type = jsonschema.NewStringOrStringArrayWithString("boolean")
+				case "primitive":
+					schemaField.Type = jsonschema.NewStringOrStringArrayWithString("primitive")
+				default:
+					ref := definitionNameForType(modelField.Type)
+					schemaField.Ref = &ref
+				}
+
+			}
+		}
+		for _, pair := range newNamedSchemas {
+			if schema.Properties == nil {
+				properties := make([]*jsonschema.NamedSchema, 0)
+				schema.Properties = &properties
+			}
+			*(schema.Properties) = append(*(schema.Properties), pair)
+		}
+
+	} else {
+		if schema.Properties != nil {
+			fmt.Printf("SCHEMA SHOULD NOT HAVE PROPERTIES %s\n", name)
+		}
+	}
+
+	// handle patterned fields
+	if modelObject.PatternedFields != nil {
+		for _, modelField := range modelObject.PatternedFields {
+			fmt.Printf("PATTERN %+v\n", modelField)
+
+			schemaField := schema.PatternPropertyWithName(modelField.Name)
+			if schemaField != nil {
+				fmt.Printf("IN %s:%+v\n", name, schemaField)
+			} else {
+				fmt.Printf("PATTERN PROPERTY NOT FOUND %s:%+v\n", name, modelField)
+			}
+		}
+	} else {
+		if schema.PatternProperties != nil && !modelObject.Extendable {
+			fmt.Printf("SCHEMA SHOULD NOT HAVE PATTERN PROPERTIES %s\n", name)
+		}
+	}
+
+	if modelObject.Extendable {
+		schemaField := schema.PatternPropertyWithName("^x-")
+		if schemaField != nil {
+			path := "#/definitions/specificationExtension"
+			schemaField.Ref = &path
+		} else {
+			fmt.Printf("NOT FOUND %s:%s\n", name, "^x-")
+		}
+	} else {
+		schemaField := schema.PatternPropertyWithName("^x-")
+		if schemaField != nil {
+			fmt.Printf("INVALID EXTENSION SUPPORT %s:%s\n", name, "^x-")
+		}
+	}
+
+}
+
 func main() {
 	// read and parse the text specification into a structure
 	model, err := NewSchemaModel("3.0.md")
@@ -292,8 +455,36 @@ func main() {
 	}
 
 	modelJSON, _ := json.MarshalIndent(model, "", "  ")
-	fmt.Printf("%s\n", string(modelJSON))
+	//fmt.Printf("%s\n", string(modelJSON))
 	err = ioutil.WriteFile("model.json", modelJSON, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	// now read our local copy of the draft schema
+	schema, err := jsonschema.NewSchemaFromFile("../schemas/openapi-3.0.json")
+	if err != nil {
+		panic(err)
+	}
+
+	// update the schema with the "oas" model
+	updateSchemaWithModel("OAS", schema, model.objectWithId("oas"))
+
+	// loop over all schema definitions and update them with their models
+	for _, pair := range *schema.Definitions {
+		schemaName := pair.Name
+		schemaObject := pair.Value
+		modelObject := model.objectWithId(schemaName)
+		if modelObject != nil {
+			updateSchemaWithModel(schemaName, schemaObject, modelObject)
+		} else {
+			fmt.Printf("SCHEMA OBJECT WITH NO MODEL OBJECT: %s\n", schemaName)
+		}
+	}
+
+	// write the updated schema
+	output := schema.JSONString()
+	err = ioutil.WriteFile("schema.json", []byte(output), 0644)
 	if err != nil {
 		panic(err)
 	}

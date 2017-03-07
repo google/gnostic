@@ -3,6 +3,8 @@
   "id": "http://openapis.org/v3/schema.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
+  "description": "This is the root document object for the API specification.
+It combines what previously was the Resource Listing and API Declaration (version 1.2 and earlier) together into one document.",
   "required": [
     "openapi",
     "info",
@@ -39,7 +41,11 @@
       "$ref": "#/definitions/components"
     },
     "security": {
-      "$ref": "#/definitions/security"
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/securityRequirement"
+      },
+      "uniqueItems": true
     },
     "tags": {
       "type": "array",
@@ -55,10 +61,11 @@
   "definitions": {
     "info": {
       "type": "object",
-      "description": "The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.",
+      "description": "The object provides metadata about the API.
+The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.",
       "required": [
-        "version",
-        "title"
+        "title",
+        "version"
       ],
       "additionalProperties": false,
       "patternProperties": {
@@ -179,7 +186,7 @@
     },
     "serverVariable": {
       "type": "object",
-      "description": "An object representing a Server Variable for server URL template substituion.",
+      "description": "An object representing a Server Variable for server URL template substitution.",
       "required": [
         "default"
       ],
@@ -210,7 +217,8 @@
     },
     "components": {
       "type": "object",
-      "description": "Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.",
+      "description": "Holds a set of reusable objects for different aspects of the OAS.
+All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.",
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -248,7 +256,8 @@
     },
     "paths": {
       "type": "object",
-      "description": "Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the Server Object in order to construct the full URL. The Paths MAY be empty, due to ACL constraints.",
+      "description": "Holds the relative paths to the individual endpoints and their operations.
+The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.",
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
@@ -261,7 +270,9 @@
     },
     "pathItem": {
       "type": "object",
-      "description": "Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.",
+      "description": "Describes the operations available on a single path.
+A Path Item MAY be empty, due to ACL constraints.
+The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.",
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
@@ -306,7 +317,11 @@
           "$ref": "#/definitions/server"
         },
         "parameters": {
-          "$ref": "#/definitions/parametersList"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/parameterOrReference"
+          },
+          "uniqueItems": true
         }
       }
     },
@@ -346,9 +361,18 @@
           "description": "A unique identifier of the operation."
         },
         "parameters": {
-          "$ref": "#/definitions/parametersList"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/parameterOrReference"
+          },
+          "uniqueItems": true
         },
         "requestBody": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/requestBodyOrReference"
+          },
+          "uniqueItems": true
         },
         "responses": {
           "$ref": "#/definitions/responses"
@@ -361,7 +385,11 @@
           "default": false
         },
         "security": {
-          "$ref": "#/definitions/security"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/securityRequirement"
+          },
+          "uniqueItems": true
         },
         "servers": {
           "$ref": "#/definitions/server"
@@ -392,31 +420,138 @@
     },
     "parameter": {
       "type": "object",
-      "description": "Describes a single operation parameter. A unique parameter is defined by a combination of a [name](#parameterName) and [location](#parameterIn). There are four possible parameter locations (as specified with the `in` field): * path - Used together with [Path Templating](#pathTemplating), where the parameter value is actually part of the operation's URL. This does not include the host or base path of the API. For example, in `/items/{itemId}`, the path parameter is `itemId`. * query - Parameters that are appended to the URL. For example, in `/items?id=###`, the query parameter is `id`. * header - Custom headers that are expected as part of the request. Note that [RFC 7230](https://tools.ietf.org/html/rfc7230#page-22) states header names are case insensitive. * cookie - Used to pass a specific cookie value to the API."
+      "description": "Describes a single operation parameter.
+
+A unique parameter is defined by a combination of a name and location.",
+      "required": [
+        "name",
+        "in"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "in": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "deprecated": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": {
+          "type": "boolean"
+        },
+        "style": {
+          "type": "string"
+        },
+        "explode": {
+          "type": "boolean"
+        },
+        "allowReserved": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/schemaOrReference"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleOrReference"
+          },
+          "uniqueItems": true
+        },
+        "example": {
+          "$ref": "#/definitions/exampleOrReference"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        }
+      }
     },
     "requestBody": {
       "type": "object",
-      "description": "Describes a single request body."
+      "description": "Describes a single request body.",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
     },
     "content": {
       "type": "object",
-      "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects. Each key in the Content Object is the media type of the Media Type Object."
+      "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object,
+Parameter Objects, Header Objects, and Response Objects.
+
+Each key in the Content Object is the media type of the Media Type Object."
     },
     "mediaType": {
       "type": "object",
-      "description": "Each Media Type Object provides schema and examples for a the media type identified by its key. Media Type Objects can be used in a Content Object."
+      "description": "Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.",
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/schemaOrReference"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleOrReference"
+          },
+          "uniqueItems": true
+        },
+        "example": {
+          "$ref": "#/definitions/exampleOrReference"
+        },
+        "encoding": {
+          "$ref": "#/definitions/encoding"
+        }
+      }
     },
     "encoding": {
       "type": "object",
-      "description": "An object representing multipart region encoding for requestBody objects."
+      "description": "An object representing multipart region encoding for `requestBody` objects."
     },
     "encodingProperty": {
       "type": "object",
-      "description": "A single encoding definition applied to a single schema property."
+      "description": "A single encoding definition applied to a single schema property.",
+      "properties": {
+        "contentType": {
+          "type": "string"
+        },
+        "Headers": {
+          "$ref": "#/definitions/object"
+        },
+        "style": {
+          "type": "string"
+        },
+        "explode": {
+          "type": "boolean"
+        }
+      }
     },
     "responses": {
       "type": "object",
-      "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response. It is not expected from the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected from the documentation to cover a successful operation response and any known errors. The default MAY be used as a default response object for all HTTP codes that are not covered individually by the specification. The Responses Object MUST contain at least one response code, and it SHOULD be the response for a successful operation call.",
+      "description": "A container for the expected responses of an operation.
+The container maps a HTTP response code to the expected response.
+It is not expected from the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected 
+from the documentation to cover a successful operation response and any 
+known errors.
+
+The `default` MAY be used as a default response object for all HTTP codes 
+that are not covered individually by the specification.
+
+The `Responses Object` MUST contain at least one response code, and it 
+SHOULD be the response for a successful operation call.",
       "additionalProperties": false,
       "patternProperties": {
         "^([0-9]{3})$|^(default)$": {
@@ -424,6 +559,11 @@
         },
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
+        }
+      },
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/responseOrReference"
         }
       },
       "minProperties": 1,
@@ -439,7 +579,8 @@
     },
     "response": {
       "type": "object",
-      "description": "Describes a single response from an API Operation, including design-time, static links to operations based on the response.",
+      "description": "Describes a single response from an API Operation, including design-time, static 
+`links` to operations based on the response.",
       "required": [
         "description"
       ],
@@ -468,16 +609,26 @@
         },
         "examples": {
           "$ref": "#/definitions/examples"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        },
+        "links": {
+          "$ref": "#/definitions/links"
         }
       }
     },
     "callbacks": {
       "type": "object",
-      "description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation."
+      "description": "A map of possible out-of band callbacks related to the parent operation.
+Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses.
+The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation."
     },
     "callback": {
       "type": "object",
-      "description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation."
+      "description": "A map of possible out-of band callbacks related to the parent operation.
+Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses.
+The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation."
     },
     "headers": {
       "type": "object",
@@ -488,11 +639,16 @@
     },
     "example": {
       "type": "object",
-      "description": "Allows sharing examples for operation requests and responses. This object can either be a freeform object, array or primitive value. To represent examples of media types that cannot naturally represented in the OpenAPI definition, a string value can be used to contain the example with escaping where necessary."
+      "description": "Allows sharing examples for operation requests and responses. This object can either be a freeform object, array or primitive value.  To represent examples of media types that cannot naturally represented in the OpenAPI definition, a string value can be used to contain the example with escaping where necessary."
     },
     "links": {
       "type": "object",
-      "description": "The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations. As opposed to dynamic links (links provided in the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime. For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.",
+      "description": "The links object represents a set of possible design-time links for a response.
+The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.
+
+As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.
+
+For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.",
       "additionalProperties": {
         "oneOf": [
           {
@@ -506,7 +662,7 @@
     },
     "link": {
       "type": "object",
-      "description": "The Link Object is responsible for defining a possible operation based on a single response.",
+      "description": "The `Link Object` is responsible for defining a possible operation based on a single response.",
       "required": [
         "name"
       ],
@@ -535,11 +691,19 @@
     },
     "linkParameters": {
       "type": "object",
-      "description": "Using the operationId to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself. To specify parameters required by the operation, we can use a Link Parameters Object. This object contains parameter names along with static or dynamic values."
+      "description": "Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads.
+Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.
+
+To specify parameters required by the operation, we can use a **Link Parameters Object**.
+This object contains parameter names along with static or dynamic values:"
     },
     "header": {
       "type": "object",
-      "description": "The Header Object follows the structure of the Parameter Object, with the following changes: 1. name MUST NOT be specified, it is given in the Headers Object. 2. in MUST NOT be specified, it is implicitly in header. 3. All traits that are affected by the location MUST follow the location of header (for example, style).",
+      "description": "The Header Object follows the structure of the Parameter Object, with the following changes:
+
+1. `name` MUST NOT be specified, it is given in the Headers Object.
+1. `in` MUST NOT be specified, it is implicitly in `header`.
+1. All traits that are affected by the location MUST follow the location of `header` (for example, `style`).",
       "required": [
         "type"
       ],
@@ -615,7 +779,8 @@
     },
     "tag": {
       "type": "object",
-      "description": "Allows adding meta data to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag used there.",
+      "description": "Allows adding meta data to a single tag that is used by the Operation Object.
+It is not mandatory to have a Tag Object per tag used there.",
       "required": [
         "name"
       ],
@@ -638,12 +803,16 @@
     },
     "examples": {
       "type": "object",
-      "description": "Anywhere an example may be given, a JSON Reference MAY be used, with the explicit restriction that examples having a JSON format with object named $ref are not allowed. This does mean that example, structurally, can be either a string primitive or an object, similar to additionalProperties. In all cases, the payload is expected to be compatible with the type schema for the value that it is accompanying. Tooling implementations MAY choose to validate compatibility automatically, and reject the example value(s) if they are not compatible.",
+      "description": "",
       "additionalProperties": true
     },
     "reference": {
       "type": "object",
-      "description": "A simple object to allow referencing other components in the specification, internally and externally. The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules. For this specification, reference resolution is done as defined by the JSON Reference specification and not by the JSON Schema specification.",
+      "description": "A simple object to allow referencing other components in the specification, internally and externally.
+
+The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules. 
+
+For this specification, reference resolution is done as defined by the JSON Reference specification and not by the JSON Schema specification.",
       "required": [
         "$ref"
       ],
@@ -656,7 +825,12 @@
     },
     "schema": {
       "type": "object",
-      "description": "The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00. Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.",
+      "description": "The Schema Object allows the definition of input and output data types.
+These types can be objects, but also primitives and arrays.
+This object is an extended subset of the JSON Schema Specification Wright Draft 00.
+
+Further information about the properties can be found in JSON Schema Core and JSON Schema Validation.
+Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.",
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
@@ -784,12 +958,28 @@
           "$ref": "#/definitions/externalDocs"
         },
         "example": {
+          "$ref": "#/definitions/any"
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "writeOnly": {
+          "type": "boolean"
+        },
+        "examples": {
+          "$ref": "#/definitions/any"
+        },
+        "deprecated": {
+          "type": "boolean"
         }
       }
     },
     "xml": {
       "type": "object",
-      "description": "A metadata object that allows for more fine-tuned XML model definitions. When using arrays, XML element names are not inferred (for singular/plural forms) and the name property SHOULD be used to add that information. See examples for expected behavior.",
+      "description": "A metadata object that allows for more fine-tuned XML model definitions.
+
+When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information.
+See examples for expected behavior.",
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
@@ -818,7 +1008,8 @@
     },
     "securityScheme": {
       "type": "object",
-      "description": "Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
+      "description": "Allows the definition of a security scheme that can be used by the operations.
+Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
       "required": [
         "type",
         "name",
@@ -922,7 +1113,13 @@
     },
     "securityRequirement": {
       "type": "object",
-      "description": "Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object. Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information. When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.",
+      "description": "Lists the required security schemes to execute this operation.
+The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.
+
+Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized.
+This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.
+
+When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.",
       "additionalProperties": {
         "type": "array",
         "items": {
@@ -945,7 +1142,9 @@
     },
     "callbacks": {
       "type": "object",
-      "description": "A collection of named callbacks.",
+      "description": "A map of possible out-of band callbacks related to the parent operation.
+Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses.
+The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
       "additionalProperties": {
         "$ref": "#/definitions/callback"
       },
@@ -1193,6 +1392,13 @@
     },
     "securityRequirement": {
       "type": "object",
+      "description": "Lists the required security schemes to execute this operation.
+The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.
+
+Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized.
+This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.
+
+When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.",
       "additionalProperties": {
         "type": "array",
         "items": {
@@ -1564,4 +1770,3 @@
     }
   }
 }
-
