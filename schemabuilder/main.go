@@ -308,6 +308,42 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 	return &SchemaModel{Objects: schemaObjects}, nil
 }
 
+type UnionType struct {
+	Name        string
+	ObjectType1 string
+	ObjectType2 string
+}
+
+var unionTypes map[string]*UnionType
+
+func noteUnionType(typeName, objectType1, objectType2 string) {
+	if unionTypes == nil {
+		unionTypes = make(map[string]*UnionType, 0)
+	}
+	unionTypes[typeName] = &UnionType{
+		Name:        typeName,
+		ObjectType1: objectType1,
+		ObjectType2: objectType2,
+	}
+}
+
+type MapType struct {
+	Name       string
+	ObjectType string
+}
+
+var mapTypes map[string]*MapType
+
+func noteMapType(typeName, objectType string) {
+	if mapTypes == nil {
+		mapTypes = make(map[string]*MapType, 0)
+	}
+	mapTypes[typeName] = &MapType{
+		Name:       typeName,
+		ObjectType: objectType,
+	}
+}
+
 func definitionNameForType(typeName string) string {
 	name := typeName
 	switch typeName {
@@ -323,6 +359,7 @@ func definitionNameForType(typeName string) string {
 		// does the name contain a "|"
 		if parts := strings.Split(typeName, "|"); len(parts) > 1 {
 			name = lowerFirst(parts[0]) + "Or" + parts[1]
+			noteUnionType(name, parts[0], parts[1])
 		} else {
 			name = lowerFirst(typeName)
 		}
@@ -338,6 +375,7 @@ func definitionNameForMapOfType(typeName string) string {
 	} else {
 		name = name + "s"
 	}
+	noteMapType(name, typeName)
 	return "#/definitions/" + name
 }
 
@@ -511,7 +549,15 @@ func main() {
 				parameterObject = schemaObject
 			}
 			updateSchemaWithModel(schemaName, schemaObject, modelObject)
-		} else {
+		}
+	}
+
+	for _, pair := range *schema.Definitions {
+		schemaName := pair.Name
+		modelObject := model.objectWithId(schemaName)
+		if modelObject == nil &&
+			unionTypes[schemaName] == nil &&
+			mapTypes[schemaName] == nil {
 			fmt.Printf("SCHEMA OBJECT WITH NO MODEL OBJECT: %s\n", schemaName)
 		}
 	}
@@ -523,6 +569,13 @@ func main() {
 	newArray := append(emptyArray, *(parameterObject.Properties)...)
 	headerObject.Properties = &newArray
 
+	// generate implied types
+	for _, unionType := range unionTypes {
+		fmt.Printf("Union Type: %+v\n", unionType)
+	}
+	for _, mapType := range mapTypes {
+		fmt.Printf("Map Type: %+v\n", mapType)
+	}
 	// write the updated schema
 	output := schema.JSONString()
 	err = ioutil.WriteFile("schema.json", []byte(output), 0644)
