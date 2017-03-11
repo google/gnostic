@@ -141,6 +141,7 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
+				typeName = strings.Replace(typeName, "{expression}", "Expression", -1)
 				isArray := false
 				if typeName[0] == '[' && typeName[len(typeName)-1] == ']' {
 					typeName = typeName[1 : len(typeName)-1]
@@ -154,6 +155,8 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				}
 				description := strings.Trim(parts[len(parts)-1], " ")
 				description = removeMarkdownLinks(description)
+				description = strings.Replace(description, "\n", " ", -1)
+
 				requiredLabel := "**Required.** "
 				if strings.Contains(description, requiredLabel) {
 					schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
@@ -191,6 +194,7 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
+				typeName = strings.Replace(typeName, "{expression}", "Expression", -1)
 				isArray := false
 				if typeName[0] == '[' && typeName[len(typeName)-1] == ']' {
 					typeName = typeName[1 : len(typeName)-1]
@@ -204,6 +208,8 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 				}
 				description := strings.Trim(parts[len(parts)-1], " ")
 				description = removeMarkdownLinks(description)
+				description = strings.Replace(description, "\n", " ", -1)
+
 				schemaField := SchemaObjectField{
 					Name:        fieldName,
 					Type:        typeName,
@@ -276,10 +282,11 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 			}
 
 			if len(section.Children) > 0 {
-				details := section.Children[0].Text
-				details = removeMarkdownLinks(details)
-				details = strings.Trim(details, " \t\n")
-				schemaObject.Description = details
+				description := section.Children[0].Text
+				description = removeMarkdownLinks(description)
+				description = strings.Trim(description, " \t\n")
+				description = strings.Replace(description, "\n", " ", -1)
+				schemaObject.Description = description
 			}
 
 			// is the object extendable?
@@ -393,16 +400,14 @@ func updateSchemaFieldWithModelField(schemaField *jsonschema.Schema, modelField 
 		case "primitive":
 			itemSchema.Type = jsonschema.NewStringOrStringArrayWithString("primitive")
 		default:
-			ref := definitionNameForType(modelField.Type)
-			itemSchema.Ref = &ref
+			itemSchema.Ref = stringptr(definitionNameForType(modelField.Type))
 		}
 		schemaField.Items = jsonschema.NewSchemaOrSchemaArrayWithSchema(itemSchema)
 		schemaField.Type = jsonschema.NewStringOrStringArrayWithString("array")
 		boolValue := true // not sure about this
 		schemaField.UniqueItems = &boolValue
 	} else if modelField.IsMap {
-		ref := definitionNameForMapOfType(modelField.Type)
-		schemaField.Ref = &ref
+		schemaField.Ref = stringptr(definitionNameForMapOfType(modelField.Type))
 	} else {
 		// is scalar
 		switch modelField.Type {
@@ -413,19 +418,21 @@ func updateSchemaFieldWithModelField(schemaField *jsonschema.Schema, modelField 
 		case "primitive":
 			schemaField.Type = jsonschema.NewStringOrStringArrayWithString("primitive")
 		default:
-			ref := definitionNameForType(modelField.Type)
-			schemaField.Ref = &ref
+			schemaField.Ref = stringptr(definitionNameForType(modelField.Type))
 		}
-
 	}
 }
 
-func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *SchemaObject) {
+func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema) {
+
+	schema = &jsonschema.Schema{}
+	schema.Type = jsonschema.NewStringOrStringArrayWithString("object")
+
 	if modelObject.RequiredFields != nil {
 		schema.Required = &modelObject.RequiredFields
 	}
 
-	schema.Description = &modelObject.Description
+	schema.Description = stringptr(modelObject.Description)
 
 	// handle fixed fields
 	if modelObject.FixedFields != nil {
@@ -433,7 +440,6 @@ func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *
 		for _, modelField := range modelObject.FixedFields {
 			schemaField := schema.PropertyWithName(modelField.Name)
 			if schemaField == nil {
-				fmt.Printf("FIXED PROPERTY NOT FOUND %s:%+v\n", name, modelField)
 				// create and add the schema field
 				schemaField = &jsonschema.Schema{}
 				namedSchema := &jsonschema.NamedSchema{Name: modelField.Name, Value: schemaField}
@@ -451,7 +457,7 @@ func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *
 
 	} else {
 		if schema.Properties != nil {
-			fmt.Printf("SCHEMA SHOULD NOT HAVE PROPERTIES %s\n", name)
+			fmt.Printf("SCHEMA SHOULD NOT HAVE PROPERTIES %s\n", modelObject.Id)
 		}
 	}
 
@@ -462,7 +468,6 @@ func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *
 		for _, modelField := range modelObject.PatternedFields {
 			schemaField := schema.PatternPropertyWithName(modelField.Name)
 			if schemaField == nil {
-				fmt.Printf("PATTERN PROPERTY NOT FOUND %s:%+v\n", name, modelField)
 				// create and add the schema field
 				schemaField = &jsonschema.Schema{}
 				namedSchema := &jsonschema.NamedSchema{Name: modelField.Name, Value: schemaField}
@@ -481,20 +486,17 @@ func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *
 
 	} else {
 		if schema.PatternProperties != nil && !modelObject.Extendable {
-			fmt.Printf("SCHEMA SHOULD NOT HAVE PATTERN PROPERTIES %s\n", name)
+			fmt.Printf("SCHEMA SHOULD NOT HAVE PATTERN PROPERTIES %s\n", modelObject.Id)
 		}
 	}
 
 	if modelObject.Extendable {
 		schemaField := schema.PatternPropertyWithName("^x-")
 		if schemaField != nil {
-			path := "#/definitions/specificationExtension"
-			schemaField.Ref = &path
+			schemaField.Ref = stringptr("#/definitions/specificationExtension")
 		} else {
-			fmt.Printf("NOT FOUND %s:%s\n", name, "^x-")
-			path := "#/definitions/specificationExtension"
 			schemaField = &jsonschema.Schema{}
-			schemaField.Ref = &path
+			schemaField.Ref = stringptr("#/definitions/specificationExtension")
 			namedSchema := &jsonschema.NamedSchema{Name: "^x-", Value: schemaField}
 			if schema.PatternProperties == nil {
 				properties := make([]*jsonschema.NamedSchema, 0)
@@ -505,77 +507,138 @@ func updateSchemaWithModel(name string, schema *jsonschema.Schema, modelObject *
 	} else {
 		schemaField := schema.PatternPropertyWithName("^x-")
 		if schemaField != nil {
-			fmt.Printf("INVALID EXTENSION SUPPORT %s:%s\n", name, "^x-")
+			fmt.Printf("INVALID EXTENSION SUPPORT %s:%s\n", modelObject.Id, "^x-")
 		}
 	}
 
+	return schema
+}
+
+func stringptr(input string) (output *string) {
+	return &input
 }
 
 func main() {
-	// read and parse the text specification into a structure
+	// read and parse the text specification into a model structure
 	model, err := NewSchemaModel("3.0.md")
 	if err != nil {
 		panic(err)
 	}
 
+	// write the model as JSON (for debugging)
 	modelJSON, _ := json.MarshalIndent(model, "", "  ")
-	//fmt.Printf("%s\n", string(modelJSON))
 	err = ioutil.WriteFile("model.json", modelJSON, 0644)
 	if err != nil {
 		panic(err)
 	}
 
-	// now read our local copy of the draft schema
-	schema, err := jsonschema.NewSchemaFromFile("../schemas/openapi-3.0.json")
-	if err != nil {
-		panic(err)
-	}
+	// build the top-level schema using the "OAS" model
+	schema := buildSchemaWithModel(model.objectWithId("oas"))
 
-	// update the schema with the "oas" model
-	updateSchemaWithModel("OAS", schema, model.objectWithId("oas"))
+	// manually set a few fields
+	schema.Title = stringptr("A JSON Schema for OpenAPI 3.0.")
+	schema.Id = stringptr("http://openapis.org/v3/schema.json#")
+	schema.Schema = stringptr("http://json-schema.org/draft-04/schema#")
+
+	// loop over all models and create the corresponding schema objects
+	definitions := make([]*jsonschema.NamedSchema, 0)
+	schema.Definitions = &definitions
 
 	var headerObject *jsonschema.Schema
 	var parameterObject *jsonschema.Schema
 
-	// loop over all schema definitions and update them with their models
-	for _, pair := range *schema.Definitions {
-		schemaName := pair.Name
-		schemaObject := pair.Value
-		modelObject := model.objectWithId(schemaName)
-		if schemaName == "header" {
-			headerObject = schemaObject
-		} else if modelObject != nil {
-			if schemaName == "parameter" {
-				parameterObject = schemaObject
+	for _, modelObject := range model.Objects {
+		if modelObject.Id != "oas" {
+			definitionSchema := buildSchemaWithModel(&modelObject)
+			name := modelObject.Id
+			if name == "externalDocumentation" {
+				name = "externalDocs"
 			}
-			updateSchemaWithModel(schemaName, schemaObject, modelObject)
+			pair := &jsonschema.NamedSchema{Name: name, Value: definitionSchema}
+			*schema.Definitions = append(*schema.Definitions, pair)
+			if modelObject.Id == "parameter" {
+				parameterObject = definitionSchema
+			}
+			if modelObject.Id == "header" {
+				headerObject = definitionSchema
+			}
 		}
 	}
 
-	for _, pair := range *schema.Definitions {
-		schemaName := pair.Name
-		modelObject := model.objectWithId(schemaName)
-		if modelObject == nil &&
-			unionTypes[schemaName] == nil &&
-			mapTypes[schemaName] == nil {
-			fmt.Printf("SCHEMA OBJECT WITH NO MODEL OBJECT: %s\n", schemaName)
-		}
-	}
-
-	// So a shorthand for copying array arr would be tmp := append([]int{}, arr...)
-
+	// "So a shorthand for copying array arr would be tmp := append([]int{}, arr...)"
 	// copy the properties of headerObject from parameterObject
 	emptyArray := make([]*jsonschema.NamedSchema, 0)
-	newArray := append(emptyArray, *(parameterObject.Properties)...)
-	headerObject.Properties = &newArray
+	if parameterObject != nil {
+		parameterObjectProperties := make([]*jsonschema.NamedSchema, 0)
+		parameterObject.Properties = &parameterObjectProperties
+		newArray := append(emptyArray, *(parameterObject.Properties)...)
+		headerObject.Properties = &newArray
+	}
 
-	// generate implied types
+	// generate implied union types
 	for _, unionType := range unionTypes {
-		fmt.Printf("Union Type: %+v\n", unionType)
+		objectSchema := schema.DefinitionWithName(unionType.Name)
+		if objectSchema == nil {
+			objectSchema = &jsonschema.Schema{}
+			oneOf := make([]*jsonschema.Schema, 0)
+			oneOf = append(oneOf, &jsonschema.Schema{Ref: stringptr("#/definitions/" + lowerFirst(unionType.ObjectType1))})
+			oneOf = append(oneOf, &jsonschema.Schema{Ref: stringptr("#/definitions/" + lowerFirst(unionType.ObjectType2))})
+			objectSchema.OneOf = &oneOf
+			pair := &jsonschema.NamedSchema{Name: unionType.Name, Value: objectSchema}
+			*schema.Definitions = append(*schema.Definitions, pair)
+		}
 	}
+
+	// generate implied map types
 	for _, mapType := range mapTypes {
-		fmt.Printf("Map Type: %+v\n", mapType)
+		objectSchema := schema.DefinitionWithName(mapType.Name)
+		if objectSchema == nil {
+			objectSchema = &jsonschema.Schema{}
+			objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
+			additionalPropertiesSchema := &jsonschema.Schema{}
+			additionalPropertiesSchema.Ref = stringptr("#/definitions/" + lowerFirst(mapType.ObjectType))
+			objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(additionalPropertiesSchema)
+			pair := &jsonschema.NamedSchema{Name: mapType.Name, Value: objectSchema}
+			*schema.Definitions = append(*schema.Definitions, pair)
+		}
 	}
+
+	// add schema objects for "object", "any", and "expression"
+	if true {
+		objectSchema := &jsonschema.Schema{}
+		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
+		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		pair := &jsonschema.NamedSchema{Name: "object", Value: objectSchema}
+		*schema.Definitions = append(*schema.Definitions, pair)
+	}
+	if true {
+		objectSchema := &jsonschema.Schema{}
+		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
+		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		pair := &jsonschema.NamedSchema{Name: "any", Value: objectSchema}
+		*schema.Definitions = append(*schema.Definitions, pair)
+	}
+	if true {
+		objectSchema := &jsonschema.Schema{}
+		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
+		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		pair := &jsonschema.NamedSchema{Name: "expression", Value: objectSchema}
+		*schema.Definitions = append(*schema.Definitions, pair)
+	}
+	// add schema objects for "specificationExtension"
+	if true {
+		objectSchema := &jsonschema.Schema{}
+		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
+		objectSchema.Description = stringptr("Any property starting with x- is valid.")
+		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		pair := &jsonschema.NamedSchema{Name: "specificationExtension", Value: objectSchema}
+		*schema.Definitions = append(*schema.Definitions, pair)
+	}
+
 	// write the updated schema
 	output := schema.JSONString()
 	err = ioutil.WriteFile("schema.json", []byte(output), 0644)

@@ -134,13 +134,18 @@ func main() {
 		"^x-": extension_name,
 		"^/":  "path",
 		"^([0-9]{3})$|^(default)$": "responseCode",
+
+		"{property}":   "property",
+		"{name}":       "name",
+		"{expression}": "expression",
+		"/{path}":      "path",
 	}
 	err = cc.build()
 	if err != nil {
 		panic(err)
 	}
 
-	if false {
+	if true {
 		log.Printf("Type Model:\n%s", cc.description())
 	}
 

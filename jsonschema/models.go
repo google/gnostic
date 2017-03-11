@@ -79,30 +79,89 @@ type SchemaNumber struct {
 	Float   *float64
 }
 
+func NewSchemaNumberWithInteger(i int64) *SchemaNumber {
+	result := &SchemaNumber{}
+	result.Integer = &i
+	return result
+}
+func NewSchemaNumberWithFloat(f float64) *SchemaNumber {
+	result := &SchemaNumber{}
+	result.Float = &f
+	return result
+}
+
+///
+
 type SchemaOrBoolean struct {
 	Schema  *Schema
 	Boolean *bool
 }
+
+func NewSchemaOrBooleanWithSchema(s *Schema) *SchemaOrBoolean {
+	result := &SchemaOrBoolean{}
+	result.Schema = s
+	return result
+}
+
+func NewSchemaOrBooleanWithBoolean(b bool) *SchemaOrBoolean {
+	result := &SchemaOrBoolean{}
+	result.Boolean = &b
+	return result
+}
+
+///
 
 type StringOrStringArray struct {
 	String      *string
 	StringArray *[]string
 }
 
+func NewStringOrStringArrayWithString(s string) *StringOrStringArray {
+	result := &StringOrStringArray{}
+	result.String = &s
+	return result
+}
+
+func NewStringOrStringArrayWithStringArray(a []string) *StringOrStringArray {
+	result := &StringOrStringArray{}
+	result.StringArray = &a
+	return result
+}
+
+///
+
 type SchemaOrStringArray struct {
 	Schema      *Schema
 	StringArray *[]string
 }
+
+///
 
 type SchemaOrSchemaArray struct {
 	Schema      *Schema
 	SchemaArray *[]*Schema
 }
 
+func NewSchemaOrSchemaArrayWithSchema(s *Schema) *SchemaOrSchemaArray {
+	result := &SchemaOrSchemaArray{}
+	result.Schema = s
+	return result
+}
+
+func NewSchemaOrSchemaArrayWithSchemaArray(a []*Schema) *SchemaOrSchemaArray {
+	result := &SchemaOrSchemaArray{}
+	result.SchemaArray = &a
+	return result
+}
+
+///
+
 type SchemaEnumValue struct {
 	String *string
 	Bool   *bool
 }
+
+///
 
 // These structs provide key-value pairs that are kept in slices.
 // They are used to emulate maps with ordered keys.
@@ -110,6 +169,8 @@ type NamedSchema struct {
 	Name  string
 	Value *Schema
 }
+
+///
 
 type NamedSchemaOrStringArray struct {
 	Name  string
@@ -142,14 +203,4 @@ func (s *Schema) DefinitionWithName(name string) *Schema {
 	return namedSchemaArrayElementWithName(s.Definitions, name)
 }
 
-func NewStringOrStringArrayWithString(s string) *StringOrStringArray {
-	result := &StringOrStringArray{}
-	result.String = &s
-	return result
-}
-
-func NewSchemaOrSchemaArrayWithSchema(s *Schema) *SchemaOrSchemaArray {
-	result := &SchemaOrSchemaArray{}
-	result.Schema = s
-	return result
-}
+// Create Schema helper objects

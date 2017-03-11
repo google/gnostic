@@ -313,7 +313,7 @@ func (root *Schema) resolveJSONPointer(ref string) (schema *Schema, err error) {
 	parts := strings.Split(ref, "#")
 	if len(parts) == 2 {
 		documentName := parts[0] + "#"
-		if documentName == "#" {
+		if documentName == "#" && root.Id != nil {
 			documentName = *(root.Id)
 		}
 		path := parts[1]
