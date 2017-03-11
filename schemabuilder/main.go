@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
+	"sort"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -25,6 +26,7 @@ import (
 	"github.com/googleapis/gnostic/jsonschema"
 )
 
+// convert the first character of a string to lower case
 func lowerFirst(s string) string {
 	if s == "" {
 		return ""
@@ -514,6 +516,7 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 	return schema
 }
 
+// return a pointer to a copy of a passed-in string
 func stringptr(input string) (output *string) {
 	return &input
 }
@@ -548,20 +551,19 @@ func main() {
 	var parameterObject *jsonschema.Schema
 
 	for _, modelObject := range model.Objects {
-		if modelObject.Id != "oas" {
-			definitionSchema := buildSchemaWithModel(&modelObject)
-			name := modelObject.Id
-			if name == "externalDocumentation" {
-				name = "externalDocs"
-			}
-			pair := &jsonschema.NamedSchema{Name: name, Value: definitionSchema}
-			*schema.Definitions = append(*schema.Definitions, pair)
-			if modelObject.Id == "parameter" {
-				parameterObject = definitionSchema
-			}
-			if modelObject.Id == "header" {
-				headerObject = definitionSchema
-			}
+		if modelObject.Id == "oas" {
+			continue
+		}
+		definitionSchema := buildSchemaWithModel(&modelObject)
+		name := modelObject.Id
+		if name == "externalDocumentation" {
+			name = "externalDocs"
+		}
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema(name, definitionSchema))
+		if modelObject.Id == "parameter" {
+			parameterObject = definitionSchema
+		} else if modelObject.Id == "header" {
+			headerObject = definitionSchema
 		}
 	}
 
@@ -576,7 +578,13 @@ func main() {
 	}
 
 	// generate implied union types
-	for _, unionType := range unionTypes {
+	unionTypeKeys := make([]string, 0, len(unionTypes))
+	for key := range unionTypes {
+		unionTypeKeys = append(unionTypeKeys, key)
+	}
+	sort.Strings(unionTypeKeys)
+	for _, unionTypeKey := range unionTypeKeys {
+		unionType := unionTypes[unionTypeKey]
 		objectSchema := schema.DefinitionWithName(unionType.Name)
 		if objectSchema == nil {
 			objectSchema = &jsonschema.Schema{}
@@ -584,13 +592,18 @@ func main() {
 			oneOf = append(oneOf, &jsonschema.Schema{Ref: stringptr("#/definitions/" + lowerFirst(unionType.ObjectType1))})
 			oneOf = append(oneOf, &jsonschema.Schema{Ref: stringptr("#/definitions/" + lowerFirst(unionType.ObjectType2))})
 			objectSchema.OneOf = &oneOf
-			pair := &jsonschema.NamedSchema{Name: unionType.Name, Value: objectSchema}
-			*schema.Definitions = append(*schema.Definitions, pair)
+			*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema(unionType.Name, objectSchema))
 		}
 	}
 
 	// generate implied map types
-	for _, mapType := range mapTypes {
+	mapTypeKeys := make([]string, 0, len(mapTypes))
+	for key := range mapTypes {
+		mapTypeKeys = append(mapTypeKeys, key)
+	}
+	sort.Strings(mapTypeKeys)
+	for _, mapTypeKey := range mapTypeKeys {
+		mapType := mapTypes[mapTypeKey]
 		objectSchema := schema.DefinitionWithName(mapType.Name)
 		if objectSchema == nil {
 			objectSchema = &jsonschema.Schema{}
@@ -598,8 +611,7 @@ func main() {
 			additionalPropertiesSchema := &jsonschema.Schema{}
 			additionalPropertiesSchema.Ref = stringptr("#/definitions/" + lowerFirst(mapType.ObjectType))
 			objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(additionalPropertiesSchema)
-			pair := &jsonschema.NamedSchema{Name: mapType.Name, Value: objectSchema}
-			*schema.Definitions = append(*schema.Definitions, pair)
+			*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema(mapType.Name, objectSchema))
 		}
 	}
 
@@ -609,25 +621,23 @@ func main() {
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		pair := &jsonschema.NamedSchema{Name: "object", Value: objectSchema}
-		*schema.Definitions = append(*schema.Definitions, pair)
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("object", objectSchema))
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		pair := &jsonschema.NamedSchema{Name: "any", Value: objectSchema}
-		*schema.Definitions = append(*schema.Definitions, pair)
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("any", objectSchema))
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		pair := &jsonschema.NamedSchema{Name: "expression", Value: objectSchema}
-		*schema.Definitions = append(*schema.Definitions, pair)
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("expression", objectSchema))
 	}
+
 	// add schema objects for "specificationExtension"
 	if true {
 		objectSchema := &jsonschema.Schema{}
@@ -635,8 +645,7 @@ func main() {
 		objectSchema.Description = stringptr("Any property starting with x- is valid.")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		pair := &jsonschema.NamedSchema{Name: "specificationExtension", Value: objectSchema}
-		*schema.Definitions = append(*schema.Definitions, pair)
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("specificationExtension", objectSchema))
 	}
 
 	// write the updated schema

@@ -170,6 +170,10 @@ type NamedSchema struct {
 	Value *Schema
 }
 
+func NewNamedSchema(name string, value *Schema) *NamedSchema {
+	return &NamedSchema{Name: name, Value: value}
+}
+
 ///
 
 type NamedSchemaOrStringArray struct {

@@ -805,30 +805,20 @@
         }
       }
     },
-    "headerOrReference": {
+    "anyOrExpression": {
       "oneOf": [
         {
-          "$ref": "#/definitions/header"
+          "$ref": "#/definitions/any"
         },
         {
-          "$ref": "#/definitions/reference"
+          "$ref": "#/definitions/expression"
         }
       ]
     },
-    "parameterOrReference": {
+    "callbackOrReference": {
       "oneOf": [
         {
-          "$ref": "#/definitions/parameter"
-        },
-        {
-          "$ref": "#/definitions/reference"
-        }
-      ]
-    },
-    "schemaOrReference": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/schema"
+          "$ref": "#/definitions/callback"
         },
         {
           "$ref": "#/definitions/reference"
@@ -845,6 +835,16 @@
         }
       ]
     },
+    "headerOrReference": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/header"
+        },
+        {
+          "$ref": "#/definitions/reference"
+        }
+      ]
+    },
     "linkOrReference": {
       "oneOf": [
         {
@@ -855,13 +855,13 @@
         }
       ]
     },
-    "anyOrExpression": {
+    "parameterOrReference": {
       "oneOf": [
         {
-          "$ref": "#/definitions/any"
+          "$ref": "#/definitions/parameter"
         },
         {
-          "$ref": "#/definitions/expression"
+          "$ref": "#/definitions/reference"
         }
       ]
     },
@@ -885,10 +885,10 @@
         }
       ]
     },
-    "callbackOrReference": {
+    "schemaOrReference": {
       "oneOf": [
         {
-          "$ref": "#/definitions/callback"
+          "$ref": "#/definitions/schema"
         },
         {
           "$ref": "#/definitions/reference"
@@ -907,16 +907,16 @@
         "$ref": "#/definitions/requestBody"
       }
     },
-    "securitySchemes": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/securityScheme"
-      }
-    },
     "schemas": {
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/schema"
+      }
+    },
+    "securitySchemes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/securityScheme"
       }
     },
     "object": {
