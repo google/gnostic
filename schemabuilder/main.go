@@ -430,8 +430,10 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 	schema = &jsonschema.Schema{}
 	schema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 
-	if modelObject.RequiredFields != nil {
-		schema.Required = &modelObject.RequiredFields
+	if modelObject.RequiredFields != nil && len(modelObject.RequiredFields) > 0 {
+		// copy array
+		arrayCopy := modelObject.RequiredFields
+		schema.Required = &arrayCopy
 	}
 
 	schema.Description = stringptr(modelObject.Description)
