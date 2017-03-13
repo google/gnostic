@@ -57,6 +57,8 @@
       "type": "object",
       "description": "The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.",
       "required": [
+        "title",
+        "version"
       ],
       "patternProperties": {
         "^x-": {
@@ -108,6 +110,7 @@
       "type": "object",
       "description": "License information for the exposed API.",
       "required": [
+        "name"
       ],
       "patternProperties": {
         "^x-": {
@@ -159,6 +162,7 @@
       "type": "object",
       "description": "An object representing a Server Variable for server URL template substitution.",
       "required": [
+        "default"
       ],
       "patternProperties": {
         "^x-": {
@@ -169,12 +173,12 @@
         "enum": {
           "type": "array",
           "items": {
-            "type": "primitive"
+            "$ref": "#/definitions/primitive"
           },
           "uniqueItems": true
         },
         "default": {
-          "type": "primitive"
+          "$ref": "#/definitions/primitive"
         },
         "description": {
           "type": "string"
@@ -289,6 +293,7 @@
       "type": "object",
       "description": "Describes a single API operation on a path.",
       "required": [
+        "responses"
       ],
       "patternProperties": {
         "^x-": {
@@ -354,6 +359,7 @@
       "type": "object",
       "description": "Allows referencing an external resource for extended documentation.",
       "required": [
+        "url"
       ],
       "patternProperties": {
         "^x-": {
@@ -373,6 +379,8 @@
       "type": "object",
       "description": "Describes a single operation parameter.  A unique parameter is defined by a combination of a name and location.",
       "required": [
+        "name",
+        "in"
       ],
       "patternProperties": {
         "^x-": {
@@ -486,6 +494,7 @@
       "type": "object",
       "description": "Describes a single response from an API Operation, including design-time, static  `links` to operations based on the response.",
       "required": [
+        "description"
       ],
       "patternProperties": {
         "^x-": {
@@ -598,6 +607,7 @@
       "type": "object",
       "description": "Allows adding meta data to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag used there.",
       "required": [
+        "name"
       ],
       "patternProperties": {
         "^x-": {
@@ -624,6 +634,7 @@
       "type": "object",
       "description": "A simple object to allow referencing other components in the specification, internally and externally.  The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.   For this specification, reference resolution is done as defined by the JSON Reference specification and not by the JSON Schema specification.",
       "required": [
+        "$ref"
       ],
       "properties": {
         "$ref": {
@@ -699,6 +710,12 @@
       "type": "object",
       "description": "Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
       "required": [
+        "type",
+        "name",
+        "in",
+        "scheme",
+        "flow",
+        "openIdConnectUrl"
       ],
       "patternProperties": {
         "^x-": {
@@ -759,6 +776,9 @@
       "type": "object",
       "description": "Configuration details for a supported OAuth Flow",
       "required": [
+        "authorizationUrl",
+        "tokenUrl",
+        "scopes"
       ],
       "patternProperties": {
         "^x-": {
@@ -939,6 +959,22 @@
       "description": "Any property starting with x- is valid.",
       "additionalProperties": true,
       "additionalItems": true
+    },
+    "primitive": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ]
     }
   }
 }

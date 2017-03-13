@@ -30,16 +30,39 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/gnostic/OpenAPIv2"
+	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"
 	plugins "github.com/googleapis/gnostic/plugins"
 )
+
+const ( // OpenAPI Version
+	OpenAPIvUnknown = 0
+	OpenAPIv2       = 2
+	OpenAPIv3       = 3
+)
+
+func openapi_version(info interface{}) int {
+	m, ok := compiler.UnpackMap(info)
+	if !ok {
+		return OpenAPIvUnknown
+	}
+	swagger, ok := compiler.MapValueForKey(m, "swagger").(string)
+	if ok && swagger == "2.0" {
+		return OpenAPIv2
+	}
+	openapi, ok := compiler.MapValueForKey(m, "openapi").(string)
+	if ok && openapi == "3.0" {
+		return OpenAPIv3
+	}
+	return OpenAPIvUnknown
+}
 
 type PluginCall struct {
 	Name       string
 	Invocation string
 }
 
-func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName string) error {
+func (pluginCall *PluginCall) perform(document proto.Message, openapi_version int, sourceName string) error {
 	if pluginCall.Name != "" {
 		request := &plugins.Request{}
 
@@ -91,7 +114,14 @@ func (pluginCall *PluginCall) perform(document *openapi_v2.Document, sourceName 
 
 		wrapper := &plugins.Wrapper{}
 		wrapper.Name = sourceName
-		wrapper.Version = "v2"
+		switch openapi_version {
+		case OpenAPIv2:
+			wrapper.Version = "v2"
+		case OpenAPIv3:
+			wrapper.Version = "v3"
+		default:
+			wrapper.Version = "unknown"
+		}
 		protoBytes, _ := proto.Marshal(document)
 		wrapper.Value = protoBytes
 		request.Wrapper = wrapper
@@ -255,45 +285,71 @@ Options:
 		errorPath = "="
 	}
 
-	// read and compile the OpenAPI source
+	// Read the OpenAPI source.
 	info, err := compiler.ReadInfoForFile(sourceName)
 	if err != nil {
 		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
-	document, err := openapi_v2.NewDocument(info, compiler.NewContext("$root", nil))
-	if err != nil {
-		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+
+	// Determine the OpenAPI version.
+	openapi_version := openapi_version(info)
+	if openapi_version == OpenAPIvUnknown {
+		fmt.Fprintf(os.Stderr, "Unknown OpenAPI Version\n")
 		os.Exit(-1)
 	}
 
-	// optionally resolve internal references
-	if resolveReferences {
-		_, err = document.ResolveReferences(sourceName)
+	var message proto.Message
+	if openapi_version == OpenAPIv2 {
+		document, err := openapi_v2.NewDocument(info, compiler.NewContext("$root", nil))
 		if err != nil {
 			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 			os.Exit(-1)
 		}
+		// optionally resolve internal references
+		if resolveReferences {
+			_, err = document.ResolveReferences(sourceName)
+			if err != nil {
+				writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+				os.Exit(-1)
+			}
+		}
+		message = document
+	} else if openapi_version == OpenAPIv3 {
+		document, err := openapi_v3.NewDocument(info, compiler.NewContext("$root", nil))
+		if err != nil {
+			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			os.Exit(-1)
+		}
+		// optionally resolve internal references
+		if resolveReferences {
+			_, err = document.ResolveReferences(sourceName)
+			if err != nil {
+				writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+				os.Exit(-1)
+			}
+		}
+		message = document
 	}
 
 	// perform all specified actions
 	if binaryProtoPath != "" {
 		// write proto in binary format
-		protoBytes, _ := proto.Marshal(document)
+		protoBytes, _ := proto.Marshal(message)
 		writeFile(binaryProtoPath, protoBytes, sourceName, "pb")
 	}
 	if jsonProtoPath != "" {
 		// write proto in json format
-		jsonBytes, _ := json.Marshal(document)
+		jsonBytes, _ := json.Marshal(message)
 		writeFile(jsonProtoPath, jsonBytes, sourceName, "json")
 	}
 	if textProtoPath != "" {
 		// write proto in text format
-		bytes := []byte(proto.MarshalTextString(document))
+		bytes := []byte(proto.MarshalTextString(message))
 		writeFile(textProtoPath, bytes, sourceName, "text")
 	}
 	for _, pluginCall := range pluginCalls {
-		err = pluginCall.perform(document, sourceName)
+		err = pluginCall.perform(message, openapi_version, sourceName)
 		if err != nil {
 			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 			defer os.Exit(-1)

@@ -400,7 +400,7 @@ func updateSchemaFieldWithModelField(schemaField *jsonschema.Schema, modelField 
 		case "boolean":
 			itemSchema.Type = jsonschema.NewStringOrStringArrayWithString("boolean")
 		case "primitive":
-			itemSchema.Type = jsonschema.NewStringOrStringArrayWithString("primitive")
+			itemSchema.Ref = stringptr(definitionNameForType("Primitive"))
 		default:
 			itemSchema.Ref = stringptr(definitionNameForType(modelField.Type))
 		}
@@ -418,7 +418,7 @@ func updateSchemaFieldWithModelField(schemaField *jsonschema.Schema, modelField 
 		case "boolean":
 			schemaField.Type = jsonschema.NewStringOrStringArrayWithString("boolean")
 		case "primitive":
-			schemaField.Type = jsonschema.NewStringOrStringArrayWithString("primitive")
+			schemaField.Ref = stringptr(definitionNameForType("Primitive"))
 		default:
 			schemaField.Ref = stringptr(definitionNameForType(modelField.Type))
 		}
@@ -648,6 +648,18 @@ func main() {
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("specificationExtension", objectSchema))
+	}
+
+	// add schema objects for "primitive"
+	if true {
+		objectSchema := &jsonschema.Schema{}
+		oneOf := make([]*jsonschema.Schema, 0)
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+		objectSchema.OneOf = &oneOf
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("primitive", objectSchema))
 	}
 
 	// write the updated schema
