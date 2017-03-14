@@ -148,6 +148,19 @@ message ExternalDocs {
 
 // The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST follow the location of `header` (for example, `style`).
 message Header {
+  string name = 1;
+  string in = 2;
+  string description = 3;
+  bool required = 4;
+  bool deprecated = 5;
+  bool allow_empty_value = 6;
+  string style = 7;
+  bool explode = 8;
+  bool allow_reserved = 9;
+  SchemaOrReference schema = 10;
+  repeated ExampleOrReference examples = 11;
+  ExampleOrReference example = 12;
+  Content content = 13;
 }
 
 message HeaderOrReference {
@@ -373,7 +386,20 @@ message Operation {
 
 // Describes a single operation parameter.  A unique parameter is defined by a combination of a name and location.
 message Parameter {
-  repeated NamedSpecificationExtension specification_extension = 1;
+  string name = 1;
+  string in = 2;
+  string description = 3;
+  bool required = 4;
+  bool deprecated = 5;
+  bool allow_empty_value = 6;
+  string style = 7;
+  bool explode = 8;
+  bool allow_reserved = 9;
+  SchemaOrReference schema = 10;
+  repeated ExampleOrReference examples = 11;
+  ExampleOrReference example = 12;
+  Content content = 13;
+  repeated NamedSpecificationExtension specification_extension = 14;
 }
 
 message ParameterOrReference {

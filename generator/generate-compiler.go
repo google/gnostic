@@ -115,6 +115,10 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 
 		code.Print("x := &%s{}", typeName)
 
+		if oneOfWrapper {
+			code.Print("matched := false")
+		}
+
 		unpackAtTop := !oneOfWrapper || len(typeModel.Required) > 0
 		if unpackAtTop {
 			code.Print("m, ok := compiler.UnpackMap(in)")
@@ -235,10 +239,11 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 							code.Print("  m, ok := compiler.UnpackMap(in)")
 							code.Print("  if ok {")
 						}
-						code.Print("    // errors are ok here, they mean we just don't have the right subtype")
-						code.Print("    t, safe_errors := New%s(m, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
-						code.Print("    if safe_errors == nil {")
+						code.Print("    // errors might be ok here, they mean we just don't have the right subtype")
+						code.Print("    t, matching_error := New%s(m, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
+						code.Print("    if matching_error == nil {")
 						code.Print("      x.Oneof = &%s_%s{%s: t}", parentTypeName, typeModel.Name, typeModel.Name)
+						code.Print("      matched = true")
 						code.Print("    }")
 						if !unpackAtTop {
 							code.Print("  }")
@@ -361,7 +366,14 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		if unpackAtTop {
 			code.Print("}")
 		}
+		if oneOfWrapper {
+			code.Print("if matched {")
+			code.Print("    // since the oneof matched one of its possibilities, discard any matching errors")
+			code.Print("	errors = make([]error, 0)")
+			code.Print("}")
+		}
 	}
+
 	// assumes that the return value is in a variable named "x"
 	code.Print("  return x, compiler.NewErrorGroupOrNil(errors)")
 	code.Print("}\n")

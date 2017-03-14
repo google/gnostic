@@ -822,12 +822,136 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		message := fmt.Sprintf("has unexpected value: %+v", in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{}
+		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "example", "examples", "explode", "in", "name", "required", "schema", "style"}
 		allowedPatterns := []string{}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string in = 2;
+		v2 := compiler.MapValueForKey(m, "in")
+		if v2 != nil {
+			x.In, ok = v2.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for in: %+v", v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool required = 4;
+		v4 := compiler.MapValueForKey(m, "required")
+		if v4 != nil {
+			x.Required, ok = v4.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for required: %+v", v4)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool deprecated = 5;
+		v5 := compiler.MapValueForKey(m, "deprecated")
+		if v5 != nil {
+			x.Deprecated, ok = v5.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for deprecated: %+v", v5)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool allow_empty_value = 6;
+		v6 := compiler.MapValueForKey(m, "allowEmptyValue")
+		if v6 != nil {
+			x.AllowEmptyValue, ok = v6.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v", v6)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string style = 7;
+		v7 := compiler.MapValueForKey(m, "style")
+		if v7 != nil {
+			x.Style, ok = v7.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for style: %+v", v7)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool explode = 8;
+		v8 := compiler.MapValueForKey(m, "explode")
+		if v8 != nil {
+			x.Explode, ok = v8.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for explode: %+v", v8)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool allow_reserved = 9;
+		v9 := compiler.MapValueForKey(m, "allowReserved")
+		if v9 != nil {
+			x.AllowReserved, ok = v9.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for allowReserved: %+v", v9)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// SchemaOrReference schema = 10;
+		v10 := compiler.MapValueForKey(m, "schema")
+		if v10 != nil {
+			var err error
+			x.Schema, err = NewSchemaOrReference(v10, compiler.NewContext("schema", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated ExampleOrReference examples = 11;
+		v11 := compiler.MapValueForKey(m, "examples")
+		if v11 != nil {
+			// repeated ExampleOrReference
+			x.Examples = make([]*ExampleOrReference, 0)
+			a, ok := v11.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewExampleOrReference(item, compiler.NewContext("examples", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Examples = append(x.Examples, y)
+				}
+			}
+		}
+		// ExampleOrReference example = 12;
+		v12 := compiler.MapValueForKey(m, "example")
+		if v12 != nil {
+			var err error
+			x.Example, err = NewExampleOrReference(v12, compiler.NewContext("example", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Content content = 13;
+		v13 := compiler.MapValueForKey(m, "content")
+		if v13 != nil {
+			var err error
+			x.Content, err = NewContent(v13, compiler.NewContext("content", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2235,14 +2359,138 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{}
+		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "example", "examples", "explode", "in", "name", "required", "schema", "style"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		// repeated NamedSpecificationExtension specification_extension = 1;
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string in = 2;
+		v2 := compiler.MapValueForKey(m, "in")
+		if v2 != nil {
+			x.In, ok = v2.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for in: %+v", v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string description = 3;
+		v3 := compiler.MapValueForKey(m, "description")
+		if v3 != nil {
+			x.Description, ok = v3.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool required = 4;
+		v4 := compiler.MapValueForKey(m, "required")
+		if v4 != nil {
+			x.Required, ok = v4.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for required: %+v", v4)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool deprecated = 5;
+		v5 := compiler.MapValueForKey(m, "deprecated")
+		if v5 != nil {
+			x.Deprecated, ok = v5.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for deprecated: %+v", v5)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool allow_empty_value = 6;
+		v6 := compiler.MapValueForKey(m, "allowEmptyValue")
+		if v6 != nil {
+			x.AllowEmptyValue, ok = v6.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v", v6)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string style = 7;
+		v7 := compiler.MapValueForKey(m, "style")
+		if v7 != nil {
+			x.Style, ok = v7.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for style: %+v", v7)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool explode = 8;
+		v8 := compiler.MapValueForKey(m, "explode")
+		if v8 != nil {
+			x.Explode, ok = v8.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for explode: %+v", v8)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool allow_reserved = 9;
+		v9 := compiler.MapValueForKey(m, "allowReserved")
+		if v9 != nil {
+			x.AllowReserved, ok = v9.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for allowReserved: %+v", v9)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// SchemaOrReference schema = 10;
+		v10 := compiler.MapValueForKey(m, "schema")
+		if v10 != nil {
+			var err error
+			x.Schema, err = NewSchemaOrReference(v10, compiler.NewContext("schema", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated ExampleOrReference examples = 11;
+		v11 := compiler.MapValueForKey(m, "examples")
+		if v11 != nil {
+			// repeated ExampleOrReference
+			x.Examples = make([]*ExampleOrReference, 0)
+			a, ok := v11.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewExampleOrReference(item, compiler.NewContext("examples", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Examples = append(x.Examples, y)
+				}
+			}
+		}
+		// ExampleOrReference example = 12;
+		v12 := compiler.MapValueForKey(m, "example")
+		if v12 != nil {
+			var err error
+			x.Example, err = NewExampleOrReference(v12, compiler.NewContext("example", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Content content = 13;
+		v13 := compiler.MapValueForKey(m, "content")
+		if v13 != nil {
+			var err error
+			x.Content, err = NewContent(v13, compiler.NewContext("content", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedSpecificationExtension specification_extension = 14;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -2268,27 +2516,35 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 func NewParameterOrReference(in interface{}, context *compiler.Context) (*ParameterOrReference, error) {
 	errors := make([]error, 0)
 	x := &ParameterOrReference{}
+	matched := false
 	// Parameter parameter = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewParameter(m, compiler.NewContext("parameter", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewParameter(m, compiler.NewContext("parameter", context))
+			if matching_error == nil {
 				x.Oneof = &ParameterOrReference_Parameter{Parameter: t}
+				matched = true
 			}
+			errors = append(errors, matching_error)
 		}
 	}
 	// Reference reference = 2;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &ParameterOrReference_Reference{Reference: t}
+				matched = true
 			}
+			errors = append(errors, matching_error)
 		}
+	}
+	if matched {
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4349,6 +4605,32 @@ func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Header) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	if m.Schema != nil {
+		_, err := m.Schema.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	for _, item := range m.Examples {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	if m.Example != nil {
+		_, err := m.Example.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if m.Content != nil {
+		_, err := m.Content.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -4838,6 +5120,32 @@ func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	if m.Schema != nil {
+		_, err := m.Schema.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	for _, item := range m.Examples {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	if m.Example != nil {
+		_, err := m.Example.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if m.Content != nil {
+		_, err := m.Content.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
 			_, err := item.ResolveReferences(root)

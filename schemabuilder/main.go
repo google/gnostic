@@ -577,12 +577,11 @@ func main() {
 	headerObject := schema.DefinitionWithName("header")
 	parameterObject := schema.DefinitionWithName("parameter")
 	if parameterObject != nil {
-		parameterObjectProperties := make([]*jsonschema.NamedSchema, 0)
-		parameterObject.Properties = &parameterObjectProperties
 		// "So a shorthand for copying array arr would be tmp := append([]int{}, arr...)"
 		newArray := make([]*jsonschema.NamedSchema, 0)
 		newArray = append(newArray, *(parameterObject.Properties)...)
 		headerObject.Properties = &newArray
+		// we need to remove a few properties...
 	}
 
 	// generate implied union types

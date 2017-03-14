@@ -30,14 +30,16 @@ func Version() string {
 func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*AdditionalPropertiesItem, error) {
 	errors := make([]error, 0)
 	x := &AdditionalPropertiesItem{}
+	matched := false
 	// Schema schema = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewSchema(m, compiler.NewContext("schema", context))
+			if matching_error == nil {
 				x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
+				matched = true
 			}
 		}
 	}
@@ -45,6 +47,10 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 	boolValue, ok := in.(bool)
 	if ok {
 		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: boolValue}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -2201,6 +2207,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyParameter, error) {
 	errors := make([]error, 0)
 	x := &NonBodyParameter{}
+	matched := false
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v", in)
@@ -2214,36 +2221,44 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 		}
 		// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 		{
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
+			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
+				matched = true
 			}
 		}
 		// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 		{
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
+			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
+				matched = true
 			}
 		}
 		// QueryParameterSubSchema query_parameter_sub_schema = 3;
 		{
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
+			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
+				matched = true
 			}
 		}
 		// PathParameterSubSchema path_parameter_sub_schema = 4;
 		{
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
+			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
+				matched = true
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -2815,14 +2830,16 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error) {
 	errors := make([]error, 0)
 	x := &Parameter{}
+	matched := false
 	// BodyParameter body_parameter = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
+			if matching_error == nil {
 				x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
+				matched = true
 			}
 		}
 	}
@@ -2830,12 +2847,17 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
+			if matching_error == nil {
 				x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
+				matched = true
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -2872,14 +2894,16 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersItem, error) {
 	errors := make([]error, 0)
 	x := &ParametersItem{}
+	matched := false
 	// Parameter parameter = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewParameter(m, compiler.NewContext("parameter", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewParameter(m, compiler.NewContext("parameter", context))
+			if matching_error == nil {
 				x.Oneof = &ParametersItem_Parameter{Parameter: t}
+				matched = true
 			}
 		}
 	}
@@ -2887,12 +2911,17 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+			if matching_error == nil {
 				x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
+				matched = true
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3971,14 +4000,16 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue, error) {
 	errors := make([]error, 0)
 	x := &ResponseValue{}
+	matched := false
 	// Response response = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewResponse(m, compiler.NewContext("response", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewResponse(m, compiler.NewContext("response", context))
+			if matching_error == nil {
 				x.Oneof = &ResponseValue_Response{Response: t}
+				matched = true
 			}
 		}
 	}
@@ -3986,12 +4017,17 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+			if matching_error == nil {
 				x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
+				matched = true
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4407,14 +4443,16 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, error) {
 	errors := make([]error, 0)
 	x := &SchemaItem{}
+	matched := false
 	// Schema schema = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewSchema(m, compiler.NewContext("schema", context))
+			if matching_error == nil {
 				x.Oneof = &SchemaItem_Schema{Schema: t}
+				matched = true
 			}
 		}
 	}
@@ -4422,12 +4460,17 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewFileSchema(m, compiler.NewContext("fileSchema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewFileSchema(m, compiler.NewContext("fileSchema", context))
+			if matching_error == nil {
 				x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
+				matched = true
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4464,14 +4507,16 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*SecurityDefinitionsItem, error) {
 	errors := make([]error, 0)
 	x := &SecurityDefinitionsItem{}
+	matched := false
 	// BasicAuthenticationSecurity basic_authentication_security = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
+			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
+				matched = true
 			}
 		}
 	}
@@ -4479,10 +4524,11 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
+			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
+				matched = true
 			}
 		}
 	}
@@ -4490,10 +4536,11 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
+			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
+				matched = true
 			}
 		}
 	}
@@ -4501,10 +4548,11 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
+			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
+				matched = true
 			}
 		}
 	}
@@ -4512,10 +4560,11 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
+			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
+				matched = true
 			}
 		}
 	}
@@ -4523,12 +4572,17 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
+			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
+				matched = true
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }

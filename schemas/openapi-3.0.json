@@ -388,6 +388,49 @@
         }
       },
       "properties": {
+        "name": {
+          "type": "string"
+        },
+        "in": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "deprecated": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": {
+          "type": "boolean"
+        },
+        "style": {
+          "type": "string"
+        },
+        "explode": {
+          "type": "boolean"
+        },
+        "allowReserved": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/schemaOrReference"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleOrReference"
+          },
+          "uniqueItems": true
+        },
+        "example": {
+          "$ref": "#/definitions/exampleOrReference"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        }
       }
     },
     "requestBody": {
@@ -601,6 +644,49 @@
       "type": "object",
       "description": "The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST follow the location of `header` (for example, `style`).",
       "properties": {
+        "name": {
+          "type": "string"
+        },
+        "in": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "deprecated": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": {
+          "type": "boolean"
+        },
+        "style": {
+          "type": "string"
+        },
+        "explode": {
+          "type": "boolean"
+        },
+        "allowReserved": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/schemaOrReference"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleOrReference"
+          },
+          "uniqueItems": true
+        },
+        "example": {
+          "$ref": "#/definitions/exampleOrReference"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        }
       }
     },
     "tag": {
