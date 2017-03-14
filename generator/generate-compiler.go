@@ -244,6 +244,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("    if matching_error == nil {")
 						code.Print("      x.Oneof = &%s_%s{%s: t}", parentTypeName, typeModel.Name, typeModel.Name)
 						code.Print("      matched = true")
+						code.Print("    } else {")
+						code.Print("      errors = append(errors, matching_error)")
 						code.Print("    }")
 						if !unpackAtTop {
 							code.Print("  }")

@@ -38,14 +38,18 @@ func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpression, error) {
 	errors := make([]error, 0)
 	x := &AnyOrExpression{}
+	matched := false
 	// Any any = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewAny(m, compiler.NewContext("any", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewAny(m, compiler.NewContext("any", context))
+			if matching_error == nil {
 				x.Oneof = &AnyOrExpression_Any{Any: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -53,12 +57,19 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewExpression(m, compiler.NewContext("expression", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewExpression(m, compiler.NewContext("expression", context))
+			if matching_error == nil {
 				x.Oneof = &AnyOrExpression_Expression{Expression: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -123,14 +134,18 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 func NewCallbackOrReference(in interface{}, context *compiler.Context) (*CallbackOrReference, error) {
 	errors := make([]error, 0)
 	x := &CallbackOrReference{}
+	matched := false
 	// Callback callback = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewCallback(m, compiler.NewContext("callback", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewCallback(m, compiler.NewContext("callback", context))
+			if matching_error == nil {
 				x.Oneof = &CallbackOrReference_Callback{Callback: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -138,12 +153,19 @@ func NewCallbackOrReference(in interface{}, context *compiler.Context) (*Callbac
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &CallbackOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -397,12 +419,22 @@ func NewContent(in interface{}, context *compiler.Context) (*Content, error) {
 		message := fmt.Sprintf("has unexpected value: %+v", in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
+		// repeated NamedMediaType additional_properties = 1;
+		// MAP: MediaType
+		x.AdditionalProperties = make([]*NamedMediaType, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedMediaType{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewMediaType(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -679,14 +711,18 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleOrReference, error) {
 	errors := make([]error, 0)
 	x := &ExampleOrReference{}
+	matched := false
 	// Example example = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewExample(m, compiler.NewContext("example", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewExample(m, compiler.NewContext("example", context))
+			if matching_error == nil {
 				x.Oneof = &ExampleOrReference_Example{Example: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -694,12 +730,19 @@ func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleO
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &ExampleOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -960,14 +1003,18 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrReference, error) {
 	errors := make([]error, 0)
 	x := &HeaderOrReference{}
+	matched := false
 	// Header header = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewHeader(m, compiler.NewContext("header", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewHeader(m, compiler.NewContext("header", context))
+			if matching_error == nil {
 				x.Oneof = &HeaderOrReference_Header{Header: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -975,12 +1022,19 @@ func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrR
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &HeaderOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -1287,14 +1341,18 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrReference, error) {
 	errors := make([]error, 0)
 	x := &LinkOrReference{}
+	matched := false
 	// Link link = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewLink(m, compiler.NewContext("link", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewLink(m, compiler.NewContext("link", context))
+			if matching_error == nil {
 				x.Oneof = &LinkOrReference_Link{Link: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -1302,12 +1360,19 @@ func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrRefer
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &LinkOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -1683,6 +1748,43 @@ func NewNamedLinkOrReference(in interface{}, context *compiler.Context) (*NamedL
 		if v2 != nil {
 			var err error
 			x.Value, err = NewLinkOrReference(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaType, error) {
+	errors := make([]error, 0)
+	x := &NamedMediaType{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v", in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// MediaType value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewMediaType(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2526,8 +2628,9 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 			if matching_error == nil {
 				x.Oneof = &ParameterOrReference_Parameter{Parameter: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
-			errors = append(errors, matching_error)
 		}
 	}
 	// Reference reference = 2;
@@ -2539,11 +2642,13 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 			if matching_error == nil {
 				x.Oneof = &ParameterOrReference_Reference{Reference: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
-			errors = append(errors, matching_error)
 		}
 	}
 	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -2800,10 +2905,15 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 func NewPrimitive(in interface{}, context *compiler.Context) (*Primitive, error) {
 	errors := make([]error, 0)
 	x := &Primitive{}
+	matched := false
 	// bool boolean = 1;
 	boolValue, ok := in.(bool)
 	if ok {
 		x.Oneof = &Primitive_Boolean{Boolean: boolValue}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -2968,14 +3078,18 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*RequestBodyOrReference, error) {
 	errors := make([]error, 0)
 	x := &RequestBodyOrReference{}
+	matched := false
 	// RequestBody request_body = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewRequestBody(m, compiler.NewContext("requestBody", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewRequestBody(m, compiler.NewContext("requestBody", context))
+			if matching_error == nil {
 				x.Oneof = &RequestBodyOrReference_RequestBody{RequestBody: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -2983,12 +3097,19 @@ func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*Requ
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &RequestBodyOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3076,14 +3197,18 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 func NewResponseOrReference(in interface{}, context *compiler.Context) (*ResponseOrReference, error) {
 	errors := make([]error, 0)
 	x := &ResponseOrReference{}
+	matched := false
 	// Response response = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewResponse(m, compiler.NewContext("response", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewResponse(m, compiler.NewContext("response", context))
+			if matching_error == nil {
 				x.Oneof = &ResponseOrReference_Response{Response: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -3091,12 +3216,19 @@ func NewResponseOrReference(in interface{}, context *compiler.Context) (*Respons
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &ResponseOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3580,14 +3712,18 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrReference, error) {
 	errors := make([]error, 0)
 	x := &SchemaOrReference{}
+	matched := false
 	// Schema schema = 1;
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewSchema(m, compiler.NewContext("schema", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewSchema(m, compiler.NewContext("schema", context))
+			if matching_error == nil {
 				x.Oneof = &SchemaOrReference_Schema{Schema: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -3595,12 +3731,19 @@ func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrR
 	{
 		m, ok := compiler.UnpackMap(in)
 		if ok {
-			// errors are ok here, they mean we just don't have the right subtype
-			t, safe_errors := NewReference(m, compiler.NewContext("reference", context))
-			if safe_errors == nil {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
 				x.Oneof = &SchemaOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4448,6 +4591,14 @@ func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Content) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -4890,6 +5041,17 @@ func (m *NamedHeaderOrReference) ResolveReferences(root string) (interface{}, er
 }
 
 func (m *NamedLinkOrReference) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Value != nil {
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *NamedMediaType) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)

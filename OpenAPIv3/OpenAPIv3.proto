@@ -93,6 +93,7 @@ message Contact {
 
 // Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.
 message Content {
+  repeated NamedMediaType additional_properties = 1;
 }
 
 message Document {
@@ -279,6 +280,14 @@ message NamedLinkOrReference {
   string name = 1;
   // Mapped value
   LinkOrReference value = 2;
+}
+
+// Automatically-generated message used to represent maps of MediaType as ordered (name,value) pairs.
+message NamedMediaType {
+  // Map key
+  string name = 1;
+  // Mapped value
+  MediaType value = 2;
 }
 
 // Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.

@@ -707,6 +707,11 @@ func main() {
 	schemaObject.AddProperty("format", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	fmt.Printf("SCHEMA\n%s\n", schemaObject.String())
 
+	// fix the content object
+	contentObject := schema.DefinitionWithName("content")
+	contentObject.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(
+		&jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")})
+
 	// write the updated schema
 	output := schema.JSONString()
 	err = ioutil.WriteFile("schema.json", []byte(output), 0644)

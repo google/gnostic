@@ -455,7 +455,10 @@
     },
     "content": {
       "type": "object",
-      "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object."
+      "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.",
+      "additionalProperties": {
+        "$ref": "#/definitions/mediaType"
+      }
     },
     "mediaType": {
       "type": "object",

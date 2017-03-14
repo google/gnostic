@@ -40,6 +40,8 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 			if matching_error == nil {
 				x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -2226,6 +2228,8 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 		// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
@@ -2235,6 +2239,8 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 		// QueryParameterSubSchema query_parameter_sub_schema = 3;
@@ -2244,6 +2250,8 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 		// PathParameterSubSchema path_parameter_sub_schema = 4;
@@ -2253,6 +2261,8 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 			if matching_error == nil {
 				x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -2840,6 +2850,8 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 			if matching_error == nil {
 				x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -2852,6 +2864,8 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 			if matching_error == nil {
 				x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -2904,6 +2918,8 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 			if matching_error == nil {
 				x.Oneof = &ParametersItem_Parameter{Parameter: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -2916,6 +2932,8 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 			if matching_error == nil {
 				x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4010,6 +4028,8 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 			if matching_error == nil {
 				x.Oneof = &ResponseValue_Response{Response: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4022,6 +4042,8 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 			if matching_error == nil {
 				x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4453,6 +4475,8 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 			if matching_error == nil {
 				x.Oneof = &SchemaItem_Schema{Schema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4465,6 +4489,8 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 			if matching_error == nil {
 				x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4517,6 +4543,8 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4529,6 +4557,8 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4541,6 +4571,8 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4553,6 +4585,8 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4565,6 +4599,8 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
@@ -4577,6 +4613,8 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 			if matching_error == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 				matched = true
+			} else {
+				errors = append(errors, matching_error)
 			}
 		}
 	}
