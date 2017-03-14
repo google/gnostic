@@ -19,6 +19,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"regexp"
 	"sort"
+	"strings"
 )
 
 // compiler helper functions, usually called from generated code
@@ -80,6 +81,14 @@ func ConvertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
 }
 
 func PatternMatches(pattern string, value string) bool {
+
+	// if pattern contains a subpattern like "{path}", replace it with ".*"
+	subpatternPattern := regexp.MustCompile("^.*({.*}).*$")
+	if matches := subpatternPattern.FindSubmatch([]byte(pattern)); matches != nil {
+		match := string(matches[1])
+		pattern = strings.Replace(pattern, match, ".*", -1)
+	}
+
 	matched, err := regexp.Match(pattern, []byte(value))
 	if err != nil {
 		panic(err)
