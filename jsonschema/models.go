@@ -207,4 +207,6 @@ func (s *Schema) DefinitionWithName(name string) *Schema {
 	return namedSchemaArrayElementWithName(s.Definitions, name)
 }
 
-// Create Schema helper objects
+func (s *Schema) AddProperty(name string, property *Schema) {
+	*s.Properties = append(*s.Properties, NewNamedSchema(name, property))
+}

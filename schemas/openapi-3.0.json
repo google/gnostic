@@ -677,6 +677,110 @@
         },
         "deprecated": {
           "type": "boolean"
+        },
+        "title": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/title"
+        },
+        "multipleOf": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/multipleOf"
+        },
+        "maximum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/maximum"
+        },
+        "exclusiveMaximum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"
+        },
+        "minimum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/minimum"
+        },
+        "exclusiveMinimum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"
+        },
+        "maxLength": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/maxLength"
+        },
+        "minLength": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/minLength"
+        },
+        "pattern": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/pattern"
+        },
+        "maxItems": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/maxItems"
+        },
+        "minItems": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/minItems"
+        },
+        "uniqueItems": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/uniqueItems"
+        },
+        "maxProperties": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/maxProperties"
+        },
+        "minProperties": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/minProperties"
+        },
+        "required": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/required"
+        },
+        "enum": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
+        },
+        "$ref": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "allOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/schema"
+          },
+          "minItems": 1
+        },
+        "oneOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/schema"
+          },
+          "minItems": 1
+        },
+        "anyOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/schema"
+          },
+          "minItems": 1
+        },
+        "not": {
+          "$ref": "#/definitions/schema"
+        },
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/schema"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/schema"
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/schema"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
         }
       }
     },

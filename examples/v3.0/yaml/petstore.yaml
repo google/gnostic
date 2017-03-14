@@ -4,14 +4,9 @@ info:
   title: OpenAPI Petstore
   license:
     name: MIT
-host: petstore.openapis.org
-basePath: /v1
-schemes:
-  - http
-consumes:
-  - application/json
-produces:
-  - application/json
+servers:
+  - url: https://petstore.openapis.org/v1
+    description: Development server
 paths:
   /pets:
     get:
@@ -34,11 +29,11 @@ paths:
               type: string
               description: A link to the next page of responses
           schema:
-            $ref: '#/definitions/Pets'
+            $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/components/schemas/Error'
     post:
       summary: Create a pet
       operationId: createPets
@@ -50,7 +45,7 @@ paths:
         default:
           description: unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/components/schemas/Error'
   /pets/{petId}:
     get:
       summary: Info for a specific pet
@@ -67,35 +62,36 @@ paths:
         "200":
           description: Expected response to a valid request
           schema:
-            $ref: '#/definitions/Pets'
+            $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           schema:
-            $ref: '#/definitions/Error'
-definitions:
-  Pet:
-    required:
-      - id
-      - name
-    properties:
-      id:
-        type: integer
-        format: int64
-      name:
-        type: string
-      tag:
-        type: string
-  Pets:
-    type: array
-    items:
-      $ref: '#/definitions/Pet'
-  Error:
-    required:
-      - code
-      - message
-    properties:
-      code:
-        type: integer
-        format: int32
-      message:
-        type: string
+            $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Pet:
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        tag:
+          type: string
+    Pets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Pet'
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

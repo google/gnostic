@@ -523,6 +523,18 @@ func stringptr(input string) (output *string) {
 	return &input
 }
 
+func int64ptr(input int64) (output *int64) {
+	return &input
+}
+
+func arrayOfSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type:     jsonschema.NewStringOrStringArrayWithString("array"),
+		MinItems: int64ptr(1),
+		Items:    jsonschema.NewSchemaOrSchemaArrayWithSchema(&jsonschema.Schema{Ref: stringptr("#/definitions/schema")}),
+	}
+}
+
 func main() {
 	// read and parse the text specification into a model structure
 	model, err := NewSchemaModel("3.0.md")
@@ -549,9 +561,6 @@ func main() {
 	definitions := make([]*jsonschema.NamedSchema, 0)
 	schema.Definitions = &definitions
 
-	var headerObject *jsonschema.Schema
-	var parameterObject *jsonschema.Schema
-
 	for _, modelObject := range model.Objects {
 		if modelObject.Id == "oas" {
 			continue
@@ -562,20 +571,17 @@ func main() {
 			name = "externalDocs"
 		}
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema(name, definitionSchema))
-		if modelObject.Id == "parameter" {
-			parameterObject = definitionSchema
-		} else if modelObject.Id == "header" {
-			headerObject = definitionSchema
-		}
 	}
 
-	// "So a shorthand for copying array arr would be tmp := append([]int{}, arr...)"
 	// copy the properties of headerObject from parameterObject
-	emptyArray := make([]*jsonschema.NamedSchema, 0)
+	headerObject := schema.DefinitionWithName("header")
+	parameterObject := schema.DefinitionWithName("parameter")
 	if parameterObject != nil {
 		parameterObjectProperties := make([]*jsonschema.NamedSchema, 0)
 		parameterObject.Properties = &parameterObjectProperties
-		newArray := append(emptyArray, *(parameterObject.Properties)...)
+		// "So a shorthand for copying array arr would be tmp := append([]int{}, arr...)"
+		newArray := make([]*jsonschema.NamedSchema, 0)
+		newArray = append(newArray, *(parameterObject.Properties)...)
 		headerObject.Properties = &newArray
 	}
 
@@ -661,6 +667,46 @@ func main() {
 		objectSchema.OneOf = &oneOf
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("primitive", objectSchema))
 	}
+
+	// force a few more things into the "schema" schema
+	schemaObject := schema.DefinitionWithName("schema")
+	schemaObject.CopyOfficialSchemaProperties(
+		[]string{
+			"title",
+			"multipleOf",
+			"maximum",
+			"exclusiveMaximum",
+			"minimum",
+			"exclusiveMinimum",
+			"maxLength",
+			"minLength",
+			"pattern",
+			"maxItems",
+			"minItems",
+			"uniqueItems",
+			"maxProperties",
+			"minProperties",
+			"required",
+			"enum",
+		})
+	schemaObject.AddProperty("$ref", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+	schemaObject.AddProperty("type", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+	schemaObject.AddProperty("allOf", arrayOfSchema())
+	schemaObject.AddProperty("oneOf", arrayOfSchema())
+	schemaObject.AddProperty("anyOf", arrayOfSchema())
+	schemaObject.AddProperty("not", &jsonschema.Schema{Ref: stringptr("#/definitions/schema")})
+	anyOf := make([]*jsonschema.Schema, 0)
+	anyOf = append(anyOf, &jsonschema.Schema{Ref: stringptr("#/definitions/schema")})
+	anyOf = append(anyOf, arrayOfSchema())
+	schemaObject.AddProperty("items",
+		&jsonschema.Schema{AnyOf: &anyOf})
+	schemaObject.AddProperty("properties", &jsonschema.Schema{
+		Type: jsonschema.NewStringOrStringArrayWithString("object"),
+		AdditionalProperties: jsonschema.NewSchemaOrBooleanWithSchema(
+			&jsonschema.Schema{Ref: stringptr("#/definitions/schema")})})
+	schemaObject.AddProperty("description", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+	schemaObject.AddProperty("format", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+	fmt.Printf("SCHEMA\n%s\n", schemaObject.String())
 
 	// write the updated schema
 	output := schema.JSONString()

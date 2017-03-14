@@ -173,6 +173,10 @@ message Info {
   repeated NamedSpecificationExtension specification_extension = 7;
 }
 
+message ItemsItem {
+  repeated Schema schema = 1;
+}
+
 // License information for the exposed API.
 message License {
   string name = 1;
@@ -413,6 +417,10 @@ message Primitive {
   }
 }
 
+message Properties {
+  repeated NamedSchema additional_properties = 1;
+}
+
 // A simple object to allow referencing other components in the specification, internally and externally.  The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.   For this specification, reference resolution is done as defined by the JSON Reference specification and not by the JSON Schema specification.
 message Reference {
   string _ref = 1;
@@ -471,7 +479,33 @@ message Schema {
   Any example = 7;
   Any examples = 8;
   bool deprecated = 9;
-  repeated NamedSpecificationExtension specification_extension = 10;
+  string title = 10;
+  double multiple_of = 11;
+  double maximum = 12;
+  bool exclusive_maximum = 13;
+  double minimum = 14;
+  bool exclusive_minimum = 15;
+  int64 max_length = 16;
+  int64 min_length = 17;
+  string pattern = 18;
+  int64 max_items = 19;
+  int64 min_items = 20;
+  bool unique_items = 21;
+  int64 max_properties = 22;
+  int64 min_properties = 23;
+  repeated string required = 24;
+  repeated Any enum = 25;
+  string _ref = 26;
+  string type = 27;
+  repeated Schema all_of = 28;
+  repeated Schema one_of = 29;
+  repeated Schema any_of = 30;
+  Schema not = 31;
+  ItemsItem items = 32;
+  Properties properties = 33;
+  string description = 34;
+  string format = 35;
+  repeated NamedSpecificationExtension specification_extension = 36;
 }
 
 message SchemaOrReference {

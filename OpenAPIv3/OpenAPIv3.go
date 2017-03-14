@@ -997,6 +997,24 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
+	errors := make([]error, 0)
+	x := &ItemsItem{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value for item array: %+v", in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		x.Schema = make([]*Schema, 0)
+		y, err := NewSchema(m, compiler.NewContext("<array>", context))
+		if err != nil {
+			return nil, err
+		}
+		x.Schema = append(x.Schema, y)
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	errors := make([]error, 0)
 	x := &License{}
@@ -2534,6 +2552,35 @@ func NewPrimitive(in interface{}, context *compiler.Context) (*Primitive, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
+	errors := make([]error, 0)
+	x := &Properties{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v", in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedSchema additional_properties = 1;
+		// MAP: Schema
+		x.AdditionalProperties = make([]*NamedSchema, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedSchema{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewReference(in interface{}, context *compiler.Context) (*Reference, error) {
 	errors := make([]error, 0)
 	x := &Reference{}
@@ -2872,7 +2919,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		message := fmt.Sprintf("has unexpected value: %+v", in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"deprecated", "discriminator", "example", "examples", "externalDocs", "nullable", "readOnly", "writeOnly", "xml"}
+		allowedKeys := []string{"$ref", "allOf", "anyOf", "deprecated", "description", "discriminator", "enum", "example", "examples", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "not", "nullable", "oneOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "writeOnly", "xml"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -2960,7 +3007,298 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 10;
+		// string title = 10;
+		v10 := compiler.MapValueForKey(m, "title")
+		if v10 != nil {
+			x.Title, ok = v10.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for title: %+v", v10)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// float multiple_of = 11;
+		v11 := compiler.MapValueForKey(m, "multipleOf")
+		if v11 != nil {
+			x.MultipleOf, ok = v11.(float64)
+			if !ok {
+				t, ok := v11.(int)
+				if ok {
+					x.MultipleOf = float64(t)
+				} else {
+					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v11)
+					errors = append(errors, compiler.NewError(context, message))
+				}
+			}
+		}
+		// float maximum = 12;
+		v12 := compiler.MapValueForKey(m, "maximum")
+		if v12 != nil {
+			x.Maximum, ok = v12.(float64)
+			if !ok {
+				t, ok := v12.(int)
+				if ok {
+					x.Maximum = float64(t)
+				} else {
+					message := fmt.Sprintf("has unexpected value for maximum: %+v", v12)
+					errors = append(errors, compiler.NewError(context, message))
+				}
+			}
+		}
+		// bool exclusive_maximum = 13;
+		v13 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v13 != nil {
+			x.ExclusiveMaximum, ok = v13.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v13)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// float minimum = 14;
+		v14 := compiler.MapValueForKey(m, "minimum")
+		if v14 != nil {
+			x.Minimum, ok = v14.(float64)
+			if !ok {
+				t, ok := v14.(int)
+				if ok {
+					x.Minimum = float64(t)
+				} else {
+					message := fmt.Sprintf("has unexpected value for minimum: %+v", v14)
+					errors = append(errors, compiler.NewError(context, message))
+				}
+			}
+		}
+		// bool exclusive_minimum = 15;
+		v15 := compiler.MapValueForKey(m, "exclusiveMinimum")
+		if v15 != nil {
+			x.ExclusiveMinimum, ok = v15.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v15)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// int64 max_length = 16;
+		v16 := compiler.MapValueForKey(m, "maxLength")
+		if v16 != nil {
+			t, ok := v16.(int)
+			if ok {
+				x.MaxLength = int64(t)
+			} else {
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v16)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// int64 min_length = 17;
+		v17 := compiler.MapValueForKey(m, "minLength")
+		if v17 != nil {
+			t, ok := v17.(int)
+			if ok {
+				x.MinLength = int64(t)
+			} else {
+				message := fmt.Sprintf("has unexpected value for minLength: %+v", v17)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string pattern = 18;
+		v18 := compiler.MapValueForKey(m, "pattern")
+		if v18 != nil {
+			x.Pattern, ok = v18.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for pattern: %+v", v18)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// int64 max_items = 19;
+		v19 := compiler.MapValueForKey(m, "maxItems")
+		if v19 != nil {
+			t, ok := v19.(int)
+			if ok {
+				x.MaxItems = int64(t)
+			} else {
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v19)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// int64 min_items = 20;
+		v20 := compiler.MapValueForKey(m, "minItems")
+		if v20 != nil {
+			t, ok := v20.(int)
+			if ok {
+				x.MinItems = int64(t)
+			} else {
+				message := fmt.Sprintf("has unexpected value for minItems: %+v", v20)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool unique_items = 21;
+		v21 := compiler.MapValueForKey(m, "uniqueItems")
+		if v21 != nil {
+			x.UniqueItems, ok = v21.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v21)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// int64 max_properties = 22;
+		v22 := compiler.MapValueForKey(m, "maxProperties")
+		if v22 != nil {
+			t, ok := v22.(int)
+			if ok {
+				x.MaxProperties = int64(t)
+			} else {
+				message := fmt.Sprintf("has unexpected value for maxProperties: %+v", v22)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// int64 min_properties = 23;
+		v23 := compiler.MapValueForKey(m, "minProperties")
+		if v23 != nil {
+			t, ok := v23.(int)
+			if ok {
+				x.MinProperties = int64(t)
+			} else {
+				message := fmt.Sprintf("has unexpected value for minProperties: %+v", v23)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated string required = 24;
+		v24 := compiler.MapValueForKey(m, "required")
+		if v24 != nil {
+			v, ok := v24.([]interface{})
+			if ok {
+				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				message := fmt.Sprintf("has unexpected value for required: %+v", v24)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated Any enum = 25;
+		v25 := compiler.MapValueForKey(m, "enum")
+		if v25 != nil {
+			// repeated Any
+			x.Enum = make([]*Any, 0)
+			a, ok := v25.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewAny(item, compiler.NewContext("enum", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Enum = append(x.Enum, y)
+				}
+			}
+		}
+		// string _ref = 26;
+		v26 := compiler.MapValueForKey(m, "$ref")
+		if v26 != nil {
+			x.XRef, ok = v26.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for $ref: %+v", v26)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string type = 27;
+		v27 := compiler.MapValueForKey(m, "type")
+		if v27 != nil {
+			x.Type, ok = v27.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for type: %+v", v27)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated Schema all_of = 28;
+		v28 := compiler.MapValueForKey(m, "allOf")
+		if v28 != nil {
+			// repeated Schema
+			x.AllOf = make([]*Schema, 0)
+			a, ok := v28.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewSchema(item, compiler.NewContext("allOf", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.AllOf = append(x.AllOf, y)
+				}
+			}
+		}
+		// repeated Schema one_of = 29;
+		v29 := compiler.MapValueForKey(m, "oneOf")
+		if v29 != nil {
+			// repeated Schema
+			x.OneOf = make([]*Schema, 0)
+			a, ok := v29.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewSchema(item, compiler.NewContext("oneOf", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.OneOf = append(x.OneOf, y)
+				}
+			}
+		}
+		// repeated Schema any_of = 30;
+		v30 := compiler.MapValueForKey(m, "anyOf")
+		if v30 != nil {
+			// repeated Schema
+			x.AnyOf = make([]*Schema, 0)
+			a, ok := v30.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewSchema(item, compiler.NewContext("anyOf", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.AnyOf = append(x.AnyOf, y)
+				}
+			}
+		}
+		// Schema not = 31;
+		v31 := compiler.MapValueForKey(m, "not")
+		if v31 != nil {
+			var err error
+			x.Not, err = NewSchema(v31, compiler.NewContext("not", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// ItemsItem items = 32;
+		v32 := compiler.MapValueForKey(m, "items")
+		if v32 != nil {
+			var err error
+			x.Items, err = NewItemsItem(v32, compiler.NewContext("items", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Properties properties = 33;
+		v33 := compiler.MapValueForKey(m, "properties")
+		if v33 != nil {
+			var err error
+			x.Properties, err = NewProperties(v33, compiler.NewContext("properties", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// string description = 34;
+		v34 := compiler.MapValueForKey(m, "description")
+		if v34 != nil {
+			x.Description, ok = v34.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for description: %+v", v34)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string format = 35;
+		v35 := compiler.MapValueForKey(m, "format")
+		if v35 != nil {
+			x.Format, ok = v35.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for format: %+v", v35)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated NamedSpecificationExtension specification_extension = 36;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -4075,6 +4413,19 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.Schema {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *License) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -4647,6 +4998,19 @@ func (m *Primitive) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *Properties) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Reference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
@@ -4817,6 +5181,68 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	}
 	if m.Examples != nil {
 		_, err := m.Examples.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	for _, item := range m.Enum {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	if m.XRef != "" {
+		info, err := compiler.ReadInfoForRef(root, m.XRef)
+		if err != nil {
+			return nil, err
+		}
+		if info != nil {
+			replacement, _ := NewSchema(info, nil)
+			*m = *replacement
+			return m.ResolveReferences(root)
+		}
+		return info, nil
+	}
+	for _, item := range m.AllOf {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	for _, item := range m.OneOf {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	for _, item := range m.AnyOf {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	if m.Not != nil {
+		_, err := m.Not.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if m.Items != nil {
+		_, err := m.Items.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if m.Properties != nil {
+		_, err := m.Properties.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}

@@ -373,3 +373,22 @@ func (schema *Schema) ResolveAnyOfs() {
 			}
 		}, "resolveAnyOfs")
 }
+
+// return a pointer to a copy of a passed-in string
+func stringptr(input string) (output *string) {
+	return &input
+}
+
+// Copy a named property from the official JSON Schema definition
+func (schema *Schema) CopyOfficialSchemaProperty(name string) {
+	*schema.Properties = append(*schema.Properties,
+		NewNamedSchema(name,
+			&Schema{Ref: stringptr("http://json-schema.org/draft-04/schema#/properties/" + name)}))
+}
+
+// Copy named properties from the official JSON Schema definition
+func (schema *Schema) CopyOfficialSchemaProperties(names []string) {
+	for _, name := range names {
+		schema.CopyOfficialSchemaProperty(name)
+	}
+}
