@@ -23,7 +23,7 @@ func NewClient(service string) *Client {
 }
 
 //-{{range .Renderer.Methods}}
-// {{.Description}}
+{{commentForText .Description}}
 //-{{if eq .ResultTypeName ""}}
 func (client *Client) {{.ClientName}}({{parameterList .}}) (err error) {
 //-{{else}}
@@ -65,3 +65,10 @@ func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTyp
 }
 
 //-{{end}}
+
+// refer to imported packages that may or may not be used in generated code
+func forced_package_references() {
+	_ = new(bytes.Buffer)
+	_ = fmt.Sprintf("")
+	_ = strings.Split("","")
+}

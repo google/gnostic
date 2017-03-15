@@ -6,7 +6,8 @@ package {{.Renderer.Package}}
 type Provider interface {
 //-{{range .Renderer.Methods}}
 
-// Provider: {{.Description}}
+// Provider
+{{commentForText .Description}}
 //-{{if hasParameters .}}
 //-{{if hasResponses .}}
   {{.ProcessorName}}(parameters *{{.ParametersTypeName}}, responses *{{.ResponsesTypeName}}) (err error)

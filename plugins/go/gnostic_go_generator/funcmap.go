@@ -15,6 +15,7 @@
 package main
 
 import (
+	"strings"
 	"text/template"
 )
 
@@ -86,6 +87,18 @@ func bodyParameterFieldName(m *ServiceMethod) string {
 	return ""
 }
 
+func commentForText(text string) string {
+	result := ""
+	lines := strings.Split(text, "\n")
+	for i, line := range lines {
+		if i > 0 {
+			result += "\n"
+		}
+		result += "// " + line
+	}
+	return result
+}
+
 func helpers() template.FuncMap {
 	return template.FuncMap{
 		"hasFieldNamedOK":        hasFieldNamedOK,
@@ -97,5 +110,6 @@ func helpers() template.FuncMap {
 		"parameterList":          parameterList,
 		"bodyParameterName":      bodyParameterName,
 		"bodyParameterFieldName": bodyParameterFieldName,
+		"commentForText":         commentForText,
 	}
 }

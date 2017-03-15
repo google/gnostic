@@ -5,10 +5,15 @@ package {{.Renderer.Package}}
 // Types used by the API.
 //-{{range .Renderer.Types}}
 
+//-{{if eq .Kind "struct"}}
 type {{.Name}} struct { 
 //-{{range .Fields}}
   {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`
 //-{{end}}
 //-{{end}}
 }
+//-{{else}}
+type {{.Name}} {{.Kind}}
+//-{{end}}
+
 //-{{end}}

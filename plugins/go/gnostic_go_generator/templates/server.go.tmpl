@@ -22,7 +22,8 @@ var provider Provider
 // These handlers serve API methods.
 //-{{range .Renderer.Methods}}
 
-// Handler: {{.Description}}
+// Handler
+{{commentForText .Description}}
 func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	var err error
 	//-{{if hasParameters .}}

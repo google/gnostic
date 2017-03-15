@@ -18,6 +18,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	_ "log"
+	_ "os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -29,6 +31,7 @@ import (
 
 type ServiceType struct {
 	Name   string
+	Kind   string
 	Fields []*ServiceTypeField
 }
 
@@ -105,6 +108,7 @@ func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err err
 
 func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, parameters []*openapi.ParametersItem) (t *ServiceType, err error) {
 	t = &ServiceType{}
+	t.Kind = "struct"
 	t.Fields = make([]*ServiceTypeField, 0)
 	for _, parametersItem := range parameters {
 		var f ServiceTypeField
@@ -159,6 +163,7 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 
 func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, name string, responses *openapi.Responses) (t *ServiceType, err error) {
 	t = &ServiceType{}
+	t.Kind = "struct"
 	t.Fields = make([]*ServiceTypeField, 0)
 
 	for _, responseCode := range responses.ResponseCode {
@@ -207,25 +212,34 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 
 // preprocess the types and methods of the API
 func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err error) {
-	// collect service type descriptions
+	// collect service type descriptions from Definitions section
 	renderer.Types = make([]*ServiceType, 0)
 	for _, pair := range document.Definitions.AdditionalProperties {
 		var t ServiceType
 		t.Fields = make([]*ServiceTypeField, 0)
 		schema := pair.Value
-		for _, pair2 := range schema.Properties.AdditionalProperties {
-			var f ServiceTypeField
-			f.Name = strings.Title(pair2.Name)
-			f.Type = typeForSchema(pair2.Value)
-			f.JSONName = pair2.Name
-			t.Fields = append(t.Fields, &f)
+		if schema.Properties != nil {
+			if len(schema.Properties.AdditionalProperties) > 0 {
+				t.Kind = "struct"
+			}
+			for _, pair2 := range schema.Properties.AdditionalProperties {
+				var f ServiceTypeField
+				f.Name = strings.Title(pair2.Name)
+				f.Type = typeForSchema(pair2.Value)
+				f.JSONName = pair2.Name
+				t.Fields = append(t.Fields, &f)
+			}
 		}
 		t.Name = strings.Title(filteredTypeName(pair.Name))
-		if len(t.Fields) > 0 {
-			renderer.Types = append(renderer.Types, &t)
+		if len(t.Fields) == 0 {
+			if schema.AdditionalProperties != nil {
+				mapType := typeForRef(schema.AdditionalProperties.GetSchema().XRef)
+				t.Kind = "map[string]" + mapType
+			}
 		}
+		renderer.Types = append(renderer.Types, &t)
 	}
-	// collect service method descriptions
+	// collect service method descriptions from Paths section
 	renderer.Methods = make([]*ServiceMethod, 0)
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
@@ -277,18 +291,32 @@ func typeForSchema(schema *openapi.Schema) (typeName string) {
 	}
 	if schema.Type != nil {
 		types := schema.Type.Value
-                format := schema.Format
+		format := schema.Format
 		if len(types) == 1 && types[0] == "string" {
 			return "string"
 		}
 		if len(types) == 1 && types[0] == "integer" && format == "int32" {
 			return "int32"
 		}
+		if len(types) == 1 && types[0] == "integer" {
+			return "int"
+		}
 		if len(types) == 1 && types[0] == "array" && schema.Items != nil {
 			// we have an array.., but of what?
 			items := schema.Items.Schema
 			if len(items) == 1 && items[0].XRef != "" {
 				return "[]" + typeForRef(items[0].XRef)
+			}
+		}
+		if len(types) == 1 && types[0] == "object" && schema.AdditionalProperties == nil {
+			return "map[string]interface{}"
+		}
+	}
+	if schema.AdditionalProperties != nil {
+		additionalProperties := schema.AdditionalProperties
+		if propertySchema := additionalProperties.GetSchema(); propertySchema != nil {
+			if ref := propertySchema.XRef; ref != "" {
+				return "map[string]" + typeForRef(ref)
 			}
 		}
 	}
@@ -317,7 +345,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 		}
 		inputBytes := f.Bytes()
 		if filepath.Ext(file.Name) == ".go" {
-			file.Data, err = gofmt(inputBytes)
+			file.Data, err = gofmt(file.Name, inputBytes)
 		} else {
 			file.Data = inputBytes
 		}
