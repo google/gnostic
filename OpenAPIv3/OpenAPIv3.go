@@ -3242,7 +3242,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"default"}
-		allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
+		allowedPatterns := []string{"^([0-9]{3})$", "^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -3258,13 +3258,13 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 			}
 		}
 		// repeated NamedResponseOrReference response_code = 2;
-		// MAP: ResponseOrReference ^([0-9]{3})$|^(default)$
+		// MAP: ResponseOrReference ^([0-9]{3})$
 		x.ResponseCode = make([]*NamedResponseOrReference, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
+				if compiler.PatternMatches("^([0-9]{3})$", k) {
 					pair := &NamedResponseOrReference{}
 					pair.Name = k
 					var err error

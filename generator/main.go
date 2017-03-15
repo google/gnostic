@@ -132,9 +132,11 @@ func main() {
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 	cc.PatternNames = map[string]string{
 		"^x-": extension_name,
-		"^/":  "path",
+		// v2
+		"^/": "path",
 		"^([0-9]{3})$|^(default)$": "responseCode",
-
+		// v3
+		"^([0-9]{3})$": "responseCode",
 		"{property}":   "property",
 		"{name}":       "name",
 		"{expression}": "expression",
