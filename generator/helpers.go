@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compiler
+package main
 
-import "github.com/golang/protobuf/ptypes/any"
+// Returns a "snake case" form of a camel-cased string.
+func camelCaseToSnakeCase(input string) string {
+	var out = ""
 
-func HandleExtension(context *Context, in interface{}, extensionName string) (bool, *any.Any, error) {
-	handled := false
-	var errFromPlugin error
-	var outFromPlugin *any.Any
-
-	if context.ExtensionHandlers != nil && len(*(context.ExtensionHandlers)) != 0 {
-		for _, customAnyProtoGenerator := range *(context.ExtensionHandlers) {
-			outFromPlugin, errFromPlugin = customAnyProtoGenerator.Perform(in, extensionName)
-			if outFromPlugin == nil {
-				continue
-			} else {
-				handled = true
-				break
+	for index, runeValue := range input {
+		//fmt.Printf("%#U starts at byte position %d\n", runeValue, index)
+		if runeValue >= 'A' && runeValue <= 'Z' {
+			if index > 0 {
+				out += "_"
 			}
+			out += string(runeValue - 'A' + 'a')
+		} else {
+			out += string(runeValue)
 		}
+
 	}
-	return handled, outFromPlugin, errFromPlugin
+	return out
 }

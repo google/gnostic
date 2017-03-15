@@ -16,7 +16,7 @@
 
 syntax = "proto3";
 
-package ibm;
+package insourcetech;
 
 // This option lets the proto compiler generate Java code inside the package
 // name (see below) instead of inside an outer class. It creates a simpler
@@ -29,22 +29,12 @@ option java_multiple_files = true;
 // work with it directly.
 option java_outer_classname = "VendorExtensionProto";
 
-// The Java package name must be proto package name with proper prefix.
-option java_package = "org.openapi.extension.ibm";
-
-// A reasonable prefix for the Objective-C symbols generated from the package.
-// It should at a minimum be 3 characters long, all uppercase, and convention
-// is to use an abbreviation of the package name. Something short, but
-// hopefully unique enough to not conflict with things that may come along in
-// the future. 'GPB' is reserved for the protocol buffer implementation itself.
-option objc_class_prefix = "ibm";
-
-message IbmBook {
+message InSourceBook {
   int64 code = 1;
   int64 message = 2;
 }
 
-message IbmShelve {
+message InSourceShelve {
   int64 foo1 = 1;
   int64 bar = 2;
 }

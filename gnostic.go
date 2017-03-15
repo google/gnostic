@@ -268,7 +268,7 @@ Options:
 		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
-	document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensionHandlers("$root", nil, &extensionHandlers))
+	document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
 	if err != nil {
 		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
 		os.Exit(-1)

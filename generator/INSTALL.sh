@@ -3,7 +3,12 @@ go get github.com/golang/protobuf/protoc-gen-go
 pushd $GOPATH/src/github.com/googleapis/gnostic/generator 
 go build
 cd ..
-generator/generator
+./generator/generator
+popd
+
+pushd $GOPATH/src/github.com/googleapis/gnostic/generator
+go install
+popd
 
 pushd $GOPATH/src/github.com/googleapis/gnostic/OpenAPIv2
 protoc \

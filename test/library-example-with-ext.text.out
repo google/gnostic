@@ -45,8 +45,17 @@ paths: <
           >
         >
         parameters: <
-          json_reference: <
-            _ref: "#/parameters/paramAtSwaggerScope"
+          parameter: <
+            non_body_parameter: <
+              path_parameter_sub_schema: <
+                required: true
+                in: "query"
+                description: "test"
+                name: "paramAtSwaggerScope"
+                type: "integer"
+                format: "int32"
+              >
+            >
           >
         >
         responses: <
@@ -57,7 +66,16 @@ paths: <
                 description: "successful operation"
                 schema: <
                   schema: <
-                    _ref: "#/definitions/SimpleDef"
+                    properties: <
+                      additional_properties: <
+                        name: "myStringA"
+                        value: <
+                          type: <
+                            value: "string"
+                          >
+                        >
+                      >
+                    >
                   >
                 >
               >
@@ -129,40 +147,40 @@ parameters: <
   >
 >
 vendor_extension: <
-  name: "x-google-book"
+  name: "x-insourcetech-book"
   value: <
     value: <
-      type_url: "type.googleapis.com/google.Book"
+      type_url: "type.googleapis.com/insourcetech.InSourceBook"
       value: "\010{\020\347\007"
     >
     yaml: "code: 123\nmessage: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-google-shelve"
+  name: "x-insourcetech-shelve"
   value: <
     value: <
-      type_url: "type.googleapis.com/google.Shelve"
+      type_url: "type.googleapis.com/insourcetech.InSourceShelve"
       value: "\010{\020\347\007"
     >
     yaml: "foo1: 123\nbar: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-ibm-book"
+  name: "x-nerdwaretech-book"
   value: <
     value: <
-      type_url: "type.googleapis.com/ibm.IbmBook"
+      type_url: "type.googleapis.com/nerdwaretech.NerdwareBook"
       value: "\010{\020\347\007"
     >
     yaml: "code: 123\nmessage: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-ibm-shelve"
+  name: "x-nerdwaretech-shelve"
   value: <
     value: <
-      type_url: "type.googleapis.com/ibm.IbmShelve"
+      type_url: "type.googleapis.com/nerdwaretech.NerdwareShelve"
       value: "\010{\020\347\007"
     >
     yaml: "foo1: 123\nbar: 999\n"

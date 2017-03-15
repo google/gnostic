@@ -1,8 +1,8 @@
         {
             "definitions": {
-                "IbmBook": {
+                "NerdwareBook": {
                     "type": "object",
-                    "id": "x-ibm-book",
+                    "id": "x-nerdwaretech-book",
                     "required": [
                         "code",
                         "message"
@@ -17,9 +17,9 @@
                         }
                     }
                 },
-                "IbmShelve": {
+                "NerdwareShelve": {
                     "type": "object",
-                    "id": "x-ibm-shelve",
+                    "id": "x-nerdwaretech-shelve",
                     "required": [
                         "foo1",
                         "bar"

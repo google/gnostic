@@ -15,13 +15,14 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 
-	"github.com/googleapis/gnostic/generator/util"
 	"github.com/googleapis/gnostic/jsonschema"
 )
 
@@ -40,8 +41,8 @@ const LICENSE = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
 
-var PROTO_OPTIONS = []util.ProtoOption{
-	util.ProtoOption{
+var PROTO_OPTIONS = []ProtoOption{
+	ProtoOption{
 		Name:  "java_multiple_files",
 		Value: "true",
 		Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
@@ -50,7 +51,7 @@ var PROTO_OPTIONS = []util.ProtoOption{
 			"// consistent with most programming languages that don't support outer classes.",
 	},
 
-	util.ProtoOption{
+	ProtoOption{
 		Name:  "java_outer_classname",
 		Value: "OpenAPIProto",
 		Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
@@ -58,13 +59,13 @@ var PROTO_OPTIONS = []util.ProtoOption{
 			"// work with it directly.",
 	},
 
-	util.ProtoOption{
+	ProtoOption{
 		Name:    "java_package",
 		Value:   "org.openapi.v2",
 		Comment: "// The Java package name must be proto package name with proper prefix.",
 	},
 
-	util.ProtoOption{
+	ProtoOption{
 		Name:  "objc_class_prefix",
 		Value: "OAS",
 		Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
@@ -75,7 +76,7 @@ var PROTO_OPTIONS = []util.ProtoOption{
 	},
 }
 
-func main() {
+func GenerateOpenAPIV1() {
 	// the OpenAPI schema file and API version are hard-coded for now
 	input := "openapi-2.0.json"
 	filename := "OpenAPIv2"
@@ -91,7 +92,7 @@ func main() {
 	openapi_schema.ResolveAllOfs()
 
 	// build a simplified model of the types described by the schema
-	cc := util.NewDomain(openapi_schema)
+	cc := NewDomain(openapi_schema)
 	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 	cc.PatternNames = map[string]string{
@@ -119,7 +120,6 @@ func main() {
 		"strings",
 		"github.com/googleapis/gnostic/compiler",
 	})
-
 	go_filename := filename + "/" + filename + ".go"
 	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {
@@ -127,5 +127,35 @@ func main() {
 	}
 	// format the compiler
 	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+}
 
+func main() {
+	var ext_gen = false
+	var v1_gen = true
+
+	usage := `
+Usage: generator [OPTIONS]
+Options:
+  --v1       Generates the  Protocol Buffer representation and Go-language support code for OpenAPI v1
+  --ext EXTENSION_SCHEMA_SOURCE [OPTIONS_FOR_EXTENSION_GENERATOR] Generates the compiler extensions that convert extensions found by gnostic into compiled protocol buffers. 
+    EXTENSION_SCHEMA_SOURCE is the json schema for the supported vendor extension names.
+    OPTIONS_FOR_EXTENSION_GENERATOR:
+	  --out_dir=PATH: For the given EXTENSION_SCHEMA_SOURCE, write the Protocol Buffer representation and the Go-language support code to the specified location.
+`
+	if len(os.Args) > 1 {
+		if os.Args[1] == "--v1" {
+			v1_gen = true
+		} else if os.Args[1] == "--ext" {
+			ext_gen = true
+		} else {
+			fmt.Printf("Unknown option: %s.\n%s\n", os.Args[1], usage)
+			os.Exit(-1)
+		}
+	}
+
+	if ext_gen {
+		ProcessExtensionGenCommandline(usage)
+	} else if v1_gen {
+		GenerateOpenAPIV1()
+	}
 }

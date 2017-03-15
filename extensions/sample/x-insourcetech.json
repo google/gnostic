@@ -1,8 +1,8 @@
         {
             "definitions": {
-                "Book": {
+                "InSourceBook": {
                     "type": "object",
-                    "id": "x-google-book",
+                    "id": "x-insourcetech-book",
                     "required": [
                         "code",
                         "message"
@@ -17,9 +17,9 @@
                         }
                     }
                 },
-                "Shelve": {
+                "InSourceShelve": {
                     "type": "object",
-                    "id": "x-google-shelve",
+                    "id": "x-insourcetech-shelve",
                     "required": [
                         "foo1",
                         "bar"

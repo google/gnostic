@@ -14,82 +14,22 @@
 
 package compiler
 
-import (
-	"bytes"
-	"fmt"
-	"os/exec"
-
-	"strings"
-
-	"errors"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/any"
-	ext_plugin "github.com/googleapis/gnostic/extension/extension_data"
-	yaml "gopkg.in/yaml.v2"
-)
-
-type ExtensionHandler struct {
-	Name string
-}
-
-func (extensionHandlers *ExtensionHandler) Perform(in interface{}, extensionName string) (*any.Any, error) {
-	if extensionHandlers.Name != "" {
-		binary, _ := yaml.Marshal(in)
-
-		request := &ext_plugin.VendorExtensionHandlerRequest{}
-		request.Parameter = ""
-
-		version := &ext_plugin.Version{}
-		// TODO : Add correct version
-		request.CompilerVersion = version
-
-		request.Wrapper = &ext_plugin.Wrapper{}
-
-		request.Wrapper.Yaml = string(binary)
-		request.Wrapper.ExtensionName = extensionName
-		requestBytes, _ := proto.Marshal(request)
-
-		cmd := exec.Command(extensionHandlers.Name)
-		cmd.Stdin = bytes.NewReader(requestBytes)
-		output, err := cmd.Output()
-		if err != nil {
-			fmt.Printf("Error: %+v\n", err)
-			return nil, err
-		}
-		response := &ext_plugin.VendorExtensionHandlerResponse{}
-		err = proto.Unmarshal(output, response)
-		if err != nil {
-			fmt.Printf("Error: %+v\n", err)
-			fmt.Printf("%s\n", string(output))
-			return nil, err
-		}
-		if !response.Handled {
-			return nil, nil
-		}
-		if len(response.Error) != 0 {
-			message := fmt.Sprintf("Errors when parsing: %+v for field %s by vendor extension handler %s. Details %+v", in, extensionName, extensionHandlers.Name, strings.Join(response.Error, ","))
-			return nil, errors.New(message)
-		}
-		return response.Value, nil
-	}
-	return nil, nil
-}
-
 type Context struct {
-	Parent *Context
-	Name   string
-
-	// TODO: Figure out a better way to pass the ExtensionHandlers to the generated compiler.
+	Parent            *Context
+	Name              string
 	ExtensionHandlers *[]ExtensionHandler
 }
 
-func NewContextWithExtensionHandlers(name string, parent *Context, extensionHandlers *[]ExtensionHandler) *Context {
+func NewContextWithExtensions(name string, parent *Context, extensionHandlers *[]ExtensionHandler) *Context {
 	return &Context{Name: name, Parent: parent, ExtensionHandlers: extensionHandlers}
 }
 
 func NewContext(name string, parent *Context) *Context {
-	return &Context{Name: name, Parent: parent, ExtensionHandlers: parent.ExtensionHandlers}
+	if parent != nil {
+		return &Context{Name: name, Parent: parent, ExtensionHandlers: parent.ExtensionHandlers}
+	} else {
+		return &Context{Name: name, Parent: parent, ExtensionHandlers: nil}
+	}
 }
 
 func (context *Context) Description() string {
