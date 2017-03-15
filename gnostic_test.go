@@ -201,3 +201,12 @@ func TestValidPluginInvocations(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+
+// OpenAPI 3.0 tests
+
+func TestPetstoreYAML_30(t *testing.T) {
+	test_normal(t,
+		"examples/v3.0/yaml/petstore.yaml",
+		"test/v3.0/yaml/petstore.text")
+}
