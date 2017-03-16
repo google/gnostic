@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,21 @@
 package compiler
 
 type Context struct {
-	Parent *Context
-	Name   string
+	Parent            *Context
+	Name              string
+	ExtensionHandlers *[]ExtensionHandler
+}
+
+func NewContextWithExtensions(name string, parent *Context, extensionHandlers *[]ExtensionHandler) *Context {
+	return &Context{Name: name, Parent: parent, ExtensionHandlers: extensionHandlers}
 }
 
 func NewContext(name string, parent *Context) *Context {
-	return &Context{Name: name, Parent: parent}
+	if parent != nil {
+		return &Context{Name: name, Parent: parent, ExtensionHandlers: parent.ExtensionHandlers}
+	} else {
+		return &Context{Name: name, Parent: parent, ExtensionHandlers: nil}
+	}
 }
 
 func (context *Context) Description() string {
