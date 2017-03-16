@@ -28,35 +28,35 @@ go install
 pushd $GOPATH/src/github.com/googleapis/gnostic/extensions
 
     EXTENSION_OUT_DIR=$GOPATH/src/"github.com/googleapis/gnostic/extensions/sample/generated"
-    # For Google Extension Example
+    # For SAMPLE_ONE Extension Example
     #
     #
-    GOOGLE_EXTENSION_SCHEMA="sample/x-insourcetech.json"
+    SAMPLE_ONE_EXTENSION_SCHEMA="sample/x-samplecompanyone.json"
 
-    generator --ext $GOOGLE_EXTENSION_SCHEMA --out_dir=$EXTENSION_OUT_DIR
+    generator --extension $SAMPLE_ONE_EXTENSION_SCHEMA --out_dir=$EXTENSION_OUT_DIR
 
-    pushd $EXTENSION_OUT_DIR/openapi_extensions_insourcetech/proto
+    pushd $EXTENSION_OUT_DIR/openapi_extensions_samplecompanyone/proto
         protoc --go_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any:. *.proto
         go install
     popd
 
-    pushd  $EXTENSION_OUT_DIR/openapi_extensions_insourcetech
+    pushd  $EXTENSION_OUT_DIR/openapi_extensions_samplecompanyone
         go install
     popd
 
-    # For IBM Extension Example
+    # For SAMPLE_TWO Extension Example
     #
     #
-    IBM_EXTENSION_SCHEMA="sample/x-nerdwaretech.json"
+    SAMPLE_TWO_EXTENSION_SCHEMA="sample/x-samplecompanytwo.json"
 
-    generator --ext $IBM_EXTENSION_SCHEMA --out_dir=$EXTENSION_OUT_DIR
+    generator --extension $SAMPLE_TWO_EXTENSION_SCHEMA --out_dir=$EXTENSION_OUT_DIR
 
-    pushd $EXTENSION_OUT_DIR/openapi_extensions_nerdwaretech/proto
+    pushd $EXTENSION_OUT_DIR/openapi_extensions_samplecompanytwo/proto
         protoc --go_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any:. *.proto
         go install
     popd
 
-    pushd $EXTENSION_OUT_DIR/openapi_extensions_nerdwaretech
+    pushd $EXTENSION_OUT_DIR/openapi_extensions_samplecompanytwo
         go install
     popd
 popd

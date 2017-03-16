@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ message Version {
 }
 
 // An encoded Request is written to the ExtensionHandler's stdin.
-message VendorExtensionHandlerRequest {
+message ExtensionHandlerRequest {
 
   // The OpenAPI descriptions that were explicitly listed on the command line.
   // The specifications will appear in the order they are specified to openapic.
@@ -60,8 +60,8 @@ message VendorExtensionHandlerRequest {
   Version compiler_version = 3;
 }
 
-// The extensions writes an encoded VendorExtensionHandlerResponse to stdout.
-message VendorExtensionHandlerResponse {
+// The extensions writes an encoded ExtensionHandlerResponse to stdout.
+message ExtensionHandlerResponse {
 
   // true if the extension is handled by the extension handler; false otherwise
   bool handled = 1;

@@ -1,8 +1,8 @@
         {
             "definitions": {
-                "InSourceBook": {
+                "SampleCompanyTwoBook": {
                     "type": "object",
-                    "id": "x-insourcetech-book",
+                    "id": "x-samplecompanytwo-book",
                     "required": [
                         "code",
                         "message"
@@ -17,9 +17,9 @@
                         }
                     }
                 },
-                "InSourceShelve": {
+                "SampleCompanyTwoShelve": {
                     "type": "object",
-                    "id": "x-insourcetech-shelve",
+                    "id": "x-samplecompanytwo-shelve",
                     "required": [
                         "foo1",
                         "bar"

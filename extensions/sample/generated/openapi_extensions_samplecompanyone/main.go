@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/gnostic/compiler"
 	"github.com/googleapis/gnostic/extensions"
-	"github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_insourcetech/proto"
+	"github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_samplecompanyone/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,11 +28,11 @@ func handleExtension(extensionName string, info yaml.MapSlice) (bool, proto.Mess
 	switch extensionName {
 	// All supported extensions
 
-	case "x-insourcetech-book":
-		newObject, err := insourcetech.NewInSourceBook(info, compiler.NewContext("$root", nil))
+	case "x-samplecompanyone-book":
+		newObject, err := samplecompanyone.NewSampleCompanyOneBook(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
-	case "x-insourcetech-shelve":
-		newObject, err := insourcetech.NewInSourceShelve(info, compiler.NewContext("$root", nil))
+	case "x-samplecompanyone-shelve":
+		newObject, err := samplecompanyone.NewSampleCompanyOneShelve(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
 	default:
 		return false, nil, nil

@@ -147,40 +147,40 @@ parameters: <
   >
 >
 vendor_extension: <
-  name: "x-insourcetech-book"
+  name: "x-samplecompanyone-book"
   value: <
     value: <
-      type_url: "type.googleapis.com/insourcetech.InSourceBook"
+      type_url: "type.googleapis.com/samplecompanyone.SampleCompanyOneBook"
       value: "\010{\020\347\007"
     >
     yaml: "code: 123\nmessage: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-insourcetech-shelve"
+  name: "x-samplecompanyone-shelve"
   value: <
     value: <
-      type_url: "type.googleapis.com/insourcetech.InSourceShelve"
+      type_url: "type.googleapis.com/samplecompanyone.SampleCompanyOneShelve"
       value: "\010{\020\347\007"
     >
     yaml: "foo1: 123\nbar: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-nerdwaretech-book"
+  name: "x-samplecompanytwo-book"
   value: <
     value: <
-      type_url: "type.googleapis.com/nerdwaretech.NerdwareBook"
+      type_url: "type.googleapis.com/samplecompanytwo.SampleCompanyTwoBook"
       value: "\010{\020\347\007"
     >
     yaml: "code: 123\nmessage: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-nerdwaretech-shelve"
+  name: "x-samplecompanytwo-shelve"
   value: <
     value: <
-      type_url: "type.googleapis.com/nerdwaretech.NerdwareShelve"
+      type_url: "type.googleapis.com/samplecompanytwo.SampleCompanyTwoShelve"
       value: "\010{\020\347\007"
     >
     yaml: "foo1: 123\nbar: 999\n"

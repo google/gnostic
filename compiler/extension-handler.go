@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ func (extensionHandlers *ExtensionHandler) handle(in interface{}, extensionName 
 	if extensionHandlers.Name != "" {
 		binary, _ := yaml.Marshal(in)
 
-		request := &ext_plugin.VendorExtensionHandlerRequest{}
+		request := &ext_plugin.ExtensionHandlerRequest{}
 
 		version := &ext_plugin.Version{}
 		version.Major = 0
@@ -79,7 +79,7 @@ func (extensionHandlers *ExtensionHandler) handle(in interface{}, extensionName 
 			fmt.Printf("Error: %+v\n", err)
 			return nil, err
 		}
-		response := &ext_plugin.VendorExtensionHandlerResponse{}
+		response := &ext_plugin.ExtensionHandlerResponse{}
 		err = proto.Unmarshal(output, response)
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)

@@ -1,8 +1,8 @@
         {
             "definitions": {
-                "NerdwareBook": {
+                "SampleCompanyOneBook": {
                     "type": "object",
-                    "id": "x-nerdwaretech-book",
+                    "id": "x-samplecompanyone-book",
                     "required": [
                         "code",
                         "message"
@@ -17,9 +17,9 @@
                         }
                     }
                 },
-                "NerdwareShelve": {
+                "SampleCompanyOneShelve": {
                     "type": "object",
-                    "id": "x-nerdwaretech-shelve",
+                    "id": "x-samplecompanyone-shelve",
                     "required": [
                         "foo1",
                         "bar"

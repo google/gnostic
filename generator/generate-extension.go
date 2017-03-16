@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -259,7 +259,7 @@ func ProcessExtensionGenCommandline(usage string) {
 				fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
 				os.Exit(-1)
 			}
-		} else if arg == "--ext" {
+		} else if arg == "--extension" {
 			continue
 		} else if arg[0] == '-' {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)

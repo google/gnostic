@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import (
 )
 
 const LICENSE = "" +
-	"// Copyright 2016 Google Inc. All Rights Reserved.\n" +
+	"// Copyright 2017 Google Inc. All Rights Reserved.\n" +
 	"//\n" +
 	"// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
 	"// you may not use this file except in compliance with the License.\n" +
@@ -76,7 +76,7 @@ var PROTO_OPTIONS = []ProtoOption{
 	},
 }
 
-func GenerateOpenAPIV1() {
+func GenerateOpenAPIV2() {
 	// the OpenAPI schema file and API version are hard-coded for now
 	input := "openapi-2.0.json"
 	filename := "OpenAPIv2"
@@ -131,21 +131,21 @@ func GenerateOpenAPIV1() {
 
 func main() {
 	var ext_gen = false
-	var v1_gen = true
+	var v2_gen = true
 
 	usage := `
 Usage: generator [OPTIONS]
 Options:
   --v1       Generates the  Protocol Buffer representation and Go-language support code for OpenAPI v1
-  --ext EXTENSION_SCHEMA_SOURCE [OPTIONS_FOR_EXTENSION_GENERATOR] Generates the compiler extensions that convert extensions found by gnostic into compiled protocol buffers. 
+  --extension EXTENSION_SCHEMA_SOURCE [OPTIONS_FOR_EXTENSION_GENERATOR] Generates the compiler extensions that convert extensions found by gnostic into compiled protocol buffers. 
     EXTENSION_SCHEMA_SOURCE is the json schema for the supported vendor extension names.
     OPTIONS_FOR_EXTENSION_GENERATOR:
 	  --out_dir=PATH: For the given EXTENSION_SCHEMA_SOURCE, write the Protocol Buffer representation and the Go-language support code to the specified location.
 `
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--v1" {
-			v1_gen = true
-		} else if os.Args[1] == "--ext" {
+			v2_gen = true
+		} else if os.Args[1] == "--extension" {
 			ext_gen = true
 		} else {
 			fmt.Printf("Unknown option: %s.\n%s\n", os.Args[1], usage)
@@ -155,7 +155,7 @@ Options:
 
 	if ext_gen {
 		ProcessExtensionGenCommandline(usage)
-	} else if v1_gen {
-		GenerateOpenAPIV1()
+	} else if v2_gen {
+		GenerateOpenAPIV2()
 	}
 }

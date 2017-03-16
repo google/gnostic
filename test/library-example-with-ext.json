@@ -7,11 +7,11 @@
     },
     "host": "library-example.googleapis.com",
     
-    "x-insourcetech-book" : {"code": 123, "message": 999},
-    "x-insourcetech-shelve" : {"foo1": 123, "bar": 999},
+    "x-samplecompanyone-book" : {"code": 123, "message": 999},
+    "x-samplecompanyone-shelve" : {"foo1": 123, "bar": 999},
     
-    "x-nerdwaretech-book" : {"code": 123, "message": 999},
-    "x-nerdwaretech-shelve" : {"foo1": 123, "bar": 999},
+    "x-samplecompanytwo-book" : {"code": 123, "message": 999},
+    "x-samplecompanytwo-shelve" : {"foo1": 123, "bar": 999},
 
     "x-unhandled" : {"code": 123, "message": 999},
 

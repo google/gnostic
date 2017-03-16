@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 syntax = "proto3";
 
-package insourcetech;
+package samplecompanytwo;
 
 // This option lets the proto compiler generate Java code inside the package
 // name (see below) instead of inside an outer class. It creates a simpler
@@ -29,12 +29,12 @@ option java_multiple_files = true;
 // work with it directly.
 option java_outer_classname = "VendorExtensionProto";
 
-message InSourceBook {
+message SampleCompanyTwoBook {
   int64 code = 1;
   int64 message = 2;
 }
 
-message InSourceShelve {
+message SampleCompanyTwoShelve {
   int64 foo1 = 1;
   int64 bar = 2;
 }
