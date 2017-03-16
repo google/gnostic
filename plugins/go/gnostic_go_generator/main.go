@@ -48,9 +48,9 @@ func main() {
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
 	switch os.Args[0] {
-	case "openapi_go_client":
+	case "gnostic_go_client":
 		files = []string{"client.go", "types.go"}
-	case "openapi_go_server":
+	case "gnostic_go_server":
 		files = []string{"server.go", "provider.go", "types.go"}
 	default:
 		files = []string{"client.go", "server.go", "provider.go", "types.go"}
