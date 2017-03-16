@@ -17,6 +17,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -27,7 +29,7 @@ import (
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
-// if error is not nil, record it, serialize and return the response, and exit
+// Helper: if error is not nil, record it, serializes and returns the response and exits
 func sendAndExitIfError(err error, response *plugins.Response) {
 	if err != nil {
 		response.Errors = append(response.Errors, err.Error())
@@ -35,7 +37,7 @@ func sendAndExitIfError(err error, response *plugins.Response) {
 	}
 }
 
-// serialize and return the response
+// Helper: serializes and returns the response
 func sendAndExit(response *plugins.Response) {
 	responseBytes, _ := proto.Marshal(response)
 	os.Stdout.Write(responseBytes)
@@ -63,35 +65,36 @@ func main() {
 	data, err := ioutil.ReadAll(os.Stdin)
 	sendAndExitIfError(err, response)
 
-	// Deserialize the input
+	// Deserialize the input.
 	request := &plugins.Request{}
 	err = proto.Unmarshal(data, request)
-	sendAndExitIfError(err, response)
-
-	// Read the document sent by the plugin and use it to generate client/server code.
-	wrapper := request.Wrapper
-	document := &openapi.Document{}
-	err = proto.Unmarshal(wrapper.Value, document)
 	sendAndExitIfError(err, response)
 
 	// Collect parameters passed to the plugin.
 	invocation := os.Args[0]
 	parameters := request.Parameters
-	packageName := request.OutputPath
+	packageName := request.OutputPath // the default package name is the output directory
 	for _, parameter := range parameters {
 		invocation += " " + parameter.Name + "=" + parameter.Value
 		if parameter.Name == "package" {
 			packageName = parameter.Value
 		}
 	}
-	log.Printf("Running %s", invocation)
+
+	// Log the invocation.
+	log.Printf("Running %s(input:%s)", invocation, request.Wrapper.Version)
+
+	// Read the document sent by the plugin and use it to generate client/server code.
+	if request.Wrapper.Version != "v2" {
+		err = errors.New(fmt.Sprintf("Unsupported OpenAPI version %s", request.Wrapper.Version))
+		sendAndExitIfError(err, response)
+	}
+	document := &openapi.Document{}
+	err = proto.Unmarshal(request.Wrapper.Value, document)
+	sendAndExitIfError(err, response)
 
 	// Create the renderer.
 	renderer, err := NewServiceRenderer(document, packageName)
-	sendAndExitIfError(err, response)
-
-	// Load templates.
-	err = renderer.loadTemplates(templates())
 	sendAndExitIfError(err, response)
 
 	// Run the renderer to generate files and add them to the response object.

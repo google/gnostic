@@ -99,7 +99,7 @@ func commentForText(text string) string {
 	return result
 }
 
-func helpers() template.FuncMap {
+func templateHelpers() template.FuncMap {
 	return template.FuncMap{
 		"hasFieldNamedOK":        hasFieldNamedOK,
 		"hasFieldNamedDefault":   hasFieldNamedDefault,

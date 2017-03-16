@@ -29,6 +29,8 @@ import (
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
+// A service type typically corresponds to a definition, parameter,
+// or response in the API and is represented by a type in generated code.
 type ServiceType struct {
 	Name   string
 	Kind   string
@@ -44,6 +46,8 @@ func (s *ServiceType) hasFieldNamed(name string) bool {
 	return false
 }
 
+// A service type field is a field in a definition and can be
+// associated with a position in a request structure.
 type ServiceTypeField struct {
 	Name     string
 	Type     string
@@ -51,13 +55,15 @@ type ServiceTypeField struct {
 	Position string // "body", "header", "formdata", "query", or "path"
 }
 
+// A service method is an operation of an API and typically
+// has associated client and server code.
 type ServiceMethod struct {
 	Name               string
 	Path               string
 	Method             string
 	Description        string
-	HandlerName        string
-	ProcessorName      string
+	HandlerName        string // name of the generated handler
+	ProcessorName      string // name of the processing function in the service interface
 	ClientName         string
 	ResultTypeName     string
 	ParametersTypeName string
@@ -66,6 +72,7 @@ type ServiceMethod struct {
 	ResponsesType      *ServiceType
 }
 
+// A renderer reads an OpenAPI document and generates code.
 type ServiceRenderer struct {
 	Templates map[string]*template.Template
 
@@ -75,10 +82,19 @@ type ServiceRenderer struct {
 	Methods []*ServiceMethod
 }
 
+// Create a renderer.
 func NewServiceRenderer(document *openapi.Document, packageName string) (renderer *ServiceRenderer, err error) {
 	renderer = &ServiceRenderer{}
+	// Load templates.
+	err = renderer.loadTemplates(templates())
+	if err != nil {
+		return nil, err
+	}
+	// Set renderer properties from passed-in document.
 	renderer.Name = document.Info.Title
-	renderer.Package = packageName
+	renderer.Package = packageName // Set package name from argument.
+	renderer.Types = make([]*ServiceType, 0)
+	renderer.Methods = make([]*ServiceMethod, 0)
 	err = renderer.loadService(document)
 	if err != nil {
 		return nil, err
@@ -86,11 +102,10 @@ func NewServiceRenderer(document *openapi.Document, packageName string) (rendere
 	return renderer, nil
 }
 
-// instantiate templates
-
+// Load templates that will be used by the renderer.
 func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err error) {
+	helpers := templateHelpers()
 	renderer.Templates = make(map[string]*template.Template, 0)
-	helpers := helpers()
 	for filename, encoding := range files {
 		templateData, err := base64.StdEncoding.DecodeString(encoding)
 		if err != nil {
@@ -103,6 +118,79 @@ func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err err
 			renderer.Templates[filename] = t
 		}
 	}
+	return err
+}
+
+// Preprocess the types and methods of the API.
+func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err error) {
+	// Collect service type descriptions from Definitions section.
+	if document.Definitions != nil {
+		for _, pair := range document.Definitions.AdditionalProperties {
+			var t ServiceType
+			t.Fields = make([]*ServiceTypeField, 0)
+			schema := pair.Value
+			if schema.Properties != nil {
+				if len(schema.Properties.AdditionalProperties) > 0 {
+					// If the schema has properties, generate a struct.
+					t.Kind = "struct"
+				}
+				for _, pair2 := range schema.Properties.AdditionalProperties {
+					var f ServiceTypeField
+					f.Name = strings.Title(pair2.Name)
+					f.Type = typeForSchema(pair2.Value)
+					f.JSONName = pair2.Name
+					t.Fields = append(t.Fields, &f)
+				}
+			}
+			t.Name = strings.Title(filteredTypeName(pair.Name))
+			if len(t.Fields) == 0 {
+				if schema.AdditionalProperties != nil {
+					// If the schema has no fixed properties and additional properties of a specified type,
+					// generate a map pointing to objects of that type.
+					mapType := typeForRef(schema.AdditionalProperties.GetSchema().XRef)
+					t.Kind = "map[string]" + mapType
+				}
+			}
+			renderer.Types = append(renderer.Types, &t)
+		}
+	}
+	// Collect service method descriptions from Paths section.
+	for _, pair := range document.Paths.Path {
+		v := pair.Value
+		if v.Get != nil {
+			renderer.loadOperation(v.Get, "GET", pair.Name)
+		}
+		if v.Post != nil {
+			renderer.loadOperation(v.Post, "POST", pair.Name)
+		}
+		if v.Put != nil {
+			renderer.loadOperation(v.Put, "PUT", pair.Name)
+		}
+		if v.Delete != nil {
+			renderer.loadOperation(v.Delete, "DELETE", pair.Name)
+		}
+	}
+	return err
+}
+
+func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method string, path string) (err error) {
+	var m ServiceMethod
+	m.Name = strings.Title(op.OperationId)
+	m.Path = path
+	m.Method = method
+	m.Description = op.Description
+	m.HandlerName = "Handle" + m.Name
+	m.ProcessorName = m.Name
+	m.ClientName = m.Name
+	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.Name+"Parameters", op.Parameters)
+	if m.ParametersType != nil {
+		m.ParametersTypeName = m.ParametersType.Name
+	}
+	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(&m, m.Name+"Responses", op.Responses)
+	if m.ResponsesType != nil {
+		m.ResponsesTypeName = m.ResponsesType.Name
+	}
+	renderer.Methods = append(renderer.Methods, &m)
 	return err
 }
 
@@ -189,76 +277,6 @@ func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, 
 	}
 }
 
-func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method string, path string) (err error) {
-	var m ServiceMethod
-	m.Name = strings.Title(op.OperationId)
-	m.Path = path
-	m.Method = method
-	m.Description = op.Description
-	m.HandlerName = "Handle" + m.Name
-	m.ProcessorName = "" + m.Name
-	m.ClientName = m.Name
-	m.ParametersType, err = renderer.loadServiceTypeFromParameters(m.Name+"Parameters", op.Parameters)
-	if m.ParametersType != nil {
-		m.ParametersTypeName = m.ParametersType.Name
-	}
-	m.ResponsesType, err = renderer.loadServiceTypeFromResponses(&m, m.Name+"Responses", op.Responses)
-	if m.ResponsesType != nil {
-		m.ResponsesTypeName = m.ResponsesType.Name
-	}
-	renderer.Methods = append(renderer.Methods, &m)
-	return err
-}
-
-// preprocess the types and methods of the API
-func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err error) {
-	// collect service type descriptions from Definitions section
-	renderer.Types = make([]*ServiceType, 0)
-	for _, pair := range document.Definitions.AdditionalProperties {
-		var t ServiceType
-		t.Fields = make([]*ServiceTypeField, 0)
-		schema := pair.Value
-		if schema.Properties != nil {
-			if len(schema.Properties.AdditionalProperties) > 0 {
-				t.Kind = "struct"
-			}
-			for _, pair2 := range schema.Properties.AdditionalProperties {
-				var f ServiceTypeField
-				f.Name = strings.Title(pair2.Name)
-				f.Type = typeForSchema(pair2.Value)
-				f.JSONName = pair2.Name
-				t.Fields = append(t.Fields, &f)
-			}
-		}
-		t.Name = strings.Title(filteredTypeName(pair.Name))
-		if len(t.Fields) == 0 {
-			if schema.AdditionalProperties != nil {
-				mapType := typeForRef(schema.AdditionalProperties.GetSchema().XRef)
-				t.Kind = "map[string]" + mapType
-			}
-		}
-		renderer.Types = append(renderer.Types, &t)
-	}
-	// collect service method descriptions from Paths section
-	renderer.Methods = make([]*ServiceMethod, 0)
-	for _, pair := range document.Paths.Path {
-		v := pair.Value
-		if v.Get != nil {
-			renderer.loadOperation(v.Get, "GET", pair.Name)
-		}
-		if v.Post != nil {
-			renderer.loadOperation(v.Post, "POST", pair.Name)
-		}
-		if v.Put != nil {
-			renderer.loadOperation(v.Put, "PUT", pair.Name)
-		}
-		if v.Delete != nil {
-			renderer.loadOperation(v.Delete, "DELETE", pair.Name)
-		}
-	}
-	return err
-}
-
 func filteredTypeName(typeName string) (name string) {
 	// first take the last path segment
 	parts := strings.Split(typeName, "/")
@@ -328,8 +346,16 @@ func typeForRef(ref string) (typeName string) {
 	return strings.Title(path.Base(ref))
 }
 
-func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
+func propertyNameForResponseCode(code string) string {
+	if code == "200" {
+		return "OK"
+	} else {
+		return strings.Title(code)
+	}
+}
 
+// Run the renderer to generate the named files.
+func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
 	for _, filename := range files {
 		file := &plugins.File{}
 		file.Name = filename
@@ -344,6 +370,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
 		inputBytes := f.Bytes()
+		// run generated Go files through gofmt
 		if filepath.Ext(file.Name) == ".go" {
 			file.Data, err = gofmt(file.Name, inputBytes)
 		} else {
@@ -352,12 +379,4 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 		response.Files = append(response.Files, file)
 	}
 	return
-}
-
-func propertyNameForResponseCode(code string) string {
-	if code == "200" {
-		return "OK"
-	} else {
-		return strings.Title(code)
-	}
 }
