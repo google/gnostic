@@ -25,6 +25,8 @@ addons:
 install: 
   - go get github.com/googleapis/gnostic
   - go get github.com/googleapis/gnostic/plugins/go/gnostic_go_sample
+  - go get github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_samplecompanyone
+  - go get github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_samplecompanytwo
   - ./.travis-install.sh
 
 script:

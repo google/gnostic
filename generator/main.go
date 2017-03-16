@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -25,7 +27,7 @@ import (
 )
 
 const LICENSE = "" +
-	"// Copyright 2016 Google Inc. All Rights Reserved.\n" +
+	"// Copyright 2017 Google Inc. All Rights Reserved.\n" +
 	"//\n" +
 	"// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
 	"// you may not use this file except in compliance with the License.\n" +
@@ -38,12 +40,6 @@ const LICENSE = "" +
 	"// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
-
-type ProtoOption struct {
-	Name    string
-	Value   string
-	Comment string
-}
 
 var PROTO_OPTIONS = []ProtoOption{
 	ProtoOption{
@@ -80,7 +76,7 @@ var PROTO_OPTIONS = []ProtoOption{
 	},
 }
 
-func main() {
+func GenerateOpenAPIV2() {
 	// the OpenAPI schema file and API version are hard-coded for now
 	input := "openapi-2.0.json"
 	filename := "OpenAPIv2"
@@ -104,13 +100,13 @@ func main() {
 		"^/":  "path",
 		"^([0-9]{3})$|^(default)$": "responseCode",
 	}
-	cc.build()
-	log.Printf("Type Model:\n%s", cc.description())
+	cc.Build()
+	log.Printf("Type Model:\n%s", cc.Description())
 
 	var err error
 
 	// generate the protocol buffer description
-	proto := cc.generateProto(proto_packagename, LICENSE, PROTO_OPTIONS)
+	proto := cc.GenerateProto(proto_packagename, LICENSE, PROTO_OPTIONS, []string{"google/protobuf/any.proto"})
 	proto_filename := filename + "/" + filename + ".proto"
 	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
@@ -118,7 +114,12 @@ func main() {
 	}
 
 	// generate the compiler
-	compiler := cc.generateCompiler(go_packagename, LICENSE)
+	compiler := cc.GenerateCompiler(go_packagename, LICENSE, []string{
+		"fmt",
+		"gopkg.in/yaml.v2",
+		"strings",
+		"github.com/googleapis/gnostic/compiler",
+	})
 	go_filename := filename + "/" + filename + ".go"
 	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {
@@ -126,5 +127,35 @@ func main() {
 	}
 	// format the compiler
 	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+}
 
+func main() {
+	var ext_gen = false
+	var v2_gen = true
+
+	usage := `
+Usage: generator [OPTIONS]
+Options:
+  --v1       Generates the  Protocol Buffer representation and Go-language support code for OpenAPI v1
+  --extension EXTENSION_SCHEMA_SOURCE [OPTIONS_FOR_EXTENSION_GENERATOR] Generates the compiler extensions that convert extensions found by gnostic into compiled protocol buffers. 
+    EXTENSION_SCHEMA_SOURCE is the json schema for the supported vendor extension names.
+    OPTIONS_FOR_EXTENSION_GENERATOR:
+	  --out_dir=PATH: For the given EXTENSION_SCHEMA_SOURCE, write the Protocol Buffer representation and the Go-language support code to the specified location.
+`
+	if len(os.Args) > 1 {
+		if os.Args[1] == "--v1" {
+			v2_gen = true
+		} else if os.Args[1] == "--extension" {
+			ext_gen = true
+		} else {
+			fmt.Printf("Unknown option: %s.\n%s\n", os.Args[1], usage)
+			os.Exit(-1)
+		}
+	}
+
+	if ext_gen {
+		ProcessExtensionGenCommandline(usage)
+	} else if v2_gen {
+		GenerateOpenAPIV2()
+	}
 }
