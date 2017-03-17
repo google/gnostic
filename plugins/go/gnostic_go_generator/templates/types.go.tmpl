@@ -8,7 +8,7 @@ package {{.Renderer.Package}}
 //-{{if eq .Kind "struct"}}
 type {{.Name}} struct { 
 //-{{range .Fields}}
-  {{.Name}} {{.Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`
+  {{.Name}} {{goType .Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`
 //-{{end}}
 //-{{end}}
 }

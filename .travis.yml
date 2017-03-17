@@ -31,7 +31,7 @@ install:
 
 script:
   - go test . -v
-  - pushd plugins/go/gnostic_go_generator/examples/bookstore
+  - pushd plugins/go/gnostic_go_generator/examples/v2.0/bookstore
   - make test
   - popd
   - export PATH=.:$HOME/local/bin:$PATH

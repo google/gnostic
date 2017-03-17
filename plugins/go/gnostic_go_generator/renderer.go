@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"unicode"
+	"unicode/utf8"
 
 	openapi "github.com/googleapis/gnostic/OpenAPIv2"
 	plugins "github.com/googleapis/gnostic/plugins"
@@ -173,11 +175,33 @@ func (renderer *ServiceRenderer) loadService(document *openapi.Document) (err er
 	return err
 }
 
+// convert the first character of a string to upper case
+func upperFirst(s string) string {
+	if s == "" {
+		return ""
+	}
+	r, n := utf8.DecodeRuneInString(s)
+	return string(unicode.ToUpper(r)) + strings.ToLower(s[n:])
+}
+
+func generate_operation_name(method, path string) string {
+
+	filteredPath := strings.Replace(path, "/", "_", -1)
+	filteredPath = strings.Replace(filteredPath, ".", "_", -1)
+	filteredPath = strings.Replace(filteredPath, "{", "", -1)
+	filteredPath = strings.Replace(filteredPath, "}", "", -1)
+
+	return upperFirst(method) + filteredPath
+}
+
 func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method string, path string) (err error) {
 	var m ServiceMethod
 	m.Name = strings.Title(op.OperationId)
 	m.Path = path
 	m.Method = method
+	if m.Name == "" {
+		m.Name = generate_operation_name(method, path)
+	}
 	m.Description = op.Description
 	m.HandlerName = "Handle" + m.Name
 	m.ProcessorName = m.Name
@@ -317,6 +341,9 @@ func typeForSchema(schema *openapi.Schema) (typeName string) {
 			return "int32"
 		}
 		if len(types) == 1 && types[0] == "integer" {
+			return "int"
+		}
+		if len(types) == 1 && types[0] == "number" {
 			return "int"
 		}
 		if len(types) == 1 && types[0] == "array" && schema.Items != nil {

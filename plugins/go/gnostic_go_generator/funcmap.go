@@ -56,6 +56,15 @@ func hasFormParameters(m *ServiceMethod) bool {
 	return false
 }
 
+func goType(openapi_type string) string {
+	switch openapi_type {
+	case "number":
+		return "int"
+	default:
+		return openapi_type
+	}
+}
+
 func parameterList(m *ServiceMethod) string {
 	result := ""
 	if m.ParametersType != nil {
@@ -63,7 +72,7 @@ func parameterList(m *ServiceMethod) string {
 			if i > 0 {
 				result += ", "
 			}
-			result += field.JSONName + " " + field.Type
+			result += field.JSONName + " " + goType(field.Type)
 		}
 	}
 	return result
@@ -107,6 +116,7 @@ func templateHelpers() template.FuncMap {
 		"hasPathParameters":      hasPathParameters,
 		"hasFormParameters":      hasFormParameters,
 		"hasResponses":           hasResponses,
+		"goType":                 goType,
 		"parameterList":          parameterList,
 		"bodyParameterName":      bodyParameterName,
 		"bodyParameterFieldName": bodyParameterFieldName,
