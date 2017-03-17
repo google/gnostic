@@ -140,6 +140,10 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 			return err
 		}
 
+		if response.Errors != nil {
+			return errors.New(fmt.Sprintf("Plugin error: %+v", response.Errors))
+		}
+
 		// write files to the specified directory
 		var writer io.Writer
 		if outputLocation == "!" {
