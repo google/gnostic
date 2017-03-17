@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,7 +28,7 @@ import (
 )
 
 const LICENSE = "" +
-	"// Copyright 2016 Google Inc. All Rights Reserved.\n" +
+	"// Copyright 2017 Google Inc. All Rights Reserved.\n" +
 	"//\n" +
 	"// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
 	"// you may not use this file except in compliance with the License.\n" +
@@ -40,13 +42,7 @@ const LICENSE = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
 
-type ProtoOption struct {
-	Name    string
-	Value   string
-	Comment string
-}
-
-func protoOptions(packageName string) []ProtoOption {
+func proto_options(packageName string) []ProtoOption {
 	return []ProtoOption{
 		ProtoOption{
 			Name:  "java_multiple_files",
@@ -83,29 +79,25 @@ func protoOptions(packageName string) []ProtoOption {
 	}
 }
 
-func main() {
-	var err error
+func GenerateOpenAPIModel(version string) error {
+	var input string
+	var filename string
+	var proto_packagename string
+	var extension_name string
 
-	// We'll generate a v2 model by default, but don't count on this working in the future.
-	input := "openapi-2.0.json"
-	filename := "OpenAPIv2"
-	proto_packagename := "openapi.v2"
-	extension_name := "vendorExtension"
-
-	for i, arg := range os.Args {
-		if i == 0 {
-			continue // skip the tool name
-		} else if arg == "--v2" {
-			input = "openapi-2.0.json"
-			filename = "OpenAPIv2"
-			proto_packagename = "openapi.v2"
-			extension_name = "vendorExtension"
-		} else if arg == "--v3" {
-			input = "openapi-3.0.json"
-			filename = "OpenAPIv3"
-			proto_packagename = "openapi.v3"
-			extension_name = "specificationExtension"
-		}
+	switch version {
+	case "v2":
+		input = "openapi-2.0.json"
+		filename = "OpenAPIv2"
+		proto_packagename = "openapi.v2"
+		extension_name = "vendorExtension"
+	case "v3":
+		input = "openapi-3.0.json"
+		filename = "OpenAPIv3"
+		proto_packagename = "openapi.v3"
+		extension_name = "specificationExtension"
+	default:
+		return errors.New(fmt.Sprintf("Unknown OpenAPI version %s", version))
 	}
 
 	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
@@ -114,14 +106,14 @@ func main() {
 
 	base_schema, err := jsonschema.NewSchemaFromFile(schemasDir + "schema.json")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	base_schema.ResolveRefs()
 	base_schema.ResolveAllOfs()
 
 	openapi_schema, err := jsonschema.NewSchemaFromFile(schemasDir + input)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	openapi_schema.ResolveRefs()
 	openapi_schema.ResolveAllOfs()
@@ -142,37 +134,78 @@ func main() {
 		"{expression}": "expression",
 		"/{path}":      "path",
 	}
-	err = cc.build()
+	err = cc.Build()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if true {
-		log.Printf("Type Model:\n%s", cc.description())
+		log.Printf("Type Model:\n%s", cc.Description())
 	}
 
 	// ensure that the target directory exists
 	err = os.MkdirAll(filename, 0755)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// generate the protocol buffer description
-	proto := cc.generateProto(proto_packagename, LICENSE, protoOptions(proto_packagename))
+	proto := cc.GenerateProto(proto_packagename, LICENSE, proto_options(go_packagename), []string{"google/protobuf/any.proto"})
 	proto_filename := filename + "/" + filename + ".proto"
 	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// generate the compiler
-	compiler := cc.generateCompiler(go_packagename, LICENSE)
+	compiler := cc.GenerateCompiler(go_packagename, LICENSE, []string{
+		"fmt",
+		"gopkg.in/yaml.v2",
+		"strings",
+		"github.com/googleapis/gnostic/compiler",
+	})
 	go_filename := filename + "/" + filename + ".go"
 	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	// format the compiler
-	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+}
 
+func main() {
+	var generate_extensions = false
+	var openapi_version = ""
+
+	usage := `
+Usage: generator [OPTIONS]
+Options:
+  --v2  Generate Protocol Buffer representation and support code for OpenAPI v2
+  --v3  Generate Protocol Buffer representation and support code for OpenAPI v3
+  --extension EXTENSION_SCHEMA [OPTIONS] Generate a gnostic extension that reads a set of OpenAPI extensions.
+    EXTENSION_SCHEMA is the json schema for the OpenAPI extensions to be supported.
+    OPTIONS
+	  --out_dir=PATH: Specifies location for writing extension models and support code.
+`
+	for i, arg := range os.Args {
+		if i == 0 {
+			continue // skip the tool name
+		}
+		if arg == "--v2" {
+			openapi_version = "v2"
+		} else if arg == "--v3" {
+			openapi_version = "v3"
+		} else if arg == "--extension" {
+			generate_extensions = true
+		} else {
+			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+			os.Exit(-1)
+		}
+	}
+
+	if generate_extensions {
+		ProcessExtensionGenCommandline(usage)
+	} else {
+		GenerateOpenAPIModel(openapi_version)
+	}
 }

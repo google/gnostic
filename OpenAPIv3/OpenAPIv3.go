@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -783,10 +783,22 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 				v := item.Value
 				pair := &NamedAny{}
 				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				result := &Any{}
+				handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+				if handled {
+					if err != nil {
+						errors = append(errors, err)
+					} else {
+						bytes, _ := yaml.Marshal(v)
+						result.Yaml = string(bytes)
+						result.Value = resultFromExt
+						pair.Value = result
+					}
+				} else {
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
@@ -2260,10 +2272,22 @@ func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 				v := item.Value
 				pair := &NamedAny{}
 				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				result := &Any{}
+				handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+				if handled {
+					if err != nil {
+						errors = append(errors, err)
+					} else {
+						bytes, _ := yaml.Marshal(v)
+						result.Yaml = string(bytes)
+						result.Value = resultFromExt
+						pair.Value = result
+					}
+				} else {
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
@@ -3802,10 +3826,22 @@ func NewScopes(in interface{}, context *compiler.Context) (*Scopes, error) {
 				if compiler.PatternMatches("{name}", k) {
 					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.Name = append(x.Name, pair)
 				}
@@ -3859,10 +3895,22 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 				if compiler.PatternMatches("{name}", k) {
 					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.Name = append(x.Name, pair)
 				}
@@ -4234,10 +4282,22 @@ func NewSpecificationExtension(in interface{}, context *compiler.Context) (*Spec
 				v := item.Value
 				pair := &NamedAny{}
 				pair.Name = k
-				var err error
-				pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				result := &Any{}
+				handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+				if handled {
+					if err != nil {
+						errors = append(errors, err)
+					} else {
+						bytes, _ := yaml.Marshal(v)
+						result.Yaml = string(bytes)
+						result.Value = resultFromExt
+						pair.Value = result
+					}
+				} else {
+					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
