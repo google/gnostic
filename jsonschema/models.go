@@ -79,30 +79,89 @@ type SchemaNumber struct {
 	Float   *float64
 }
 
+func NewSchemaNumberWithInteger(i int64) *SchemaNumber {
+	result := &SchemaNumber{}
+	result.Integer = &i
+	return result
+}
+func NewSchemaNumberWithFloat(f float64) *SchemaNumber {
+	result := &SchemaNumber{}
+	result.Float = &f
+	return result
+}
+
+///
+
 type SchemaOrBoolean struct {
 	Schema  *Schema
 	Boolean *bool
 }
+
+func NewSchemaOrBooleanWithSchema(s *Schema) *SchemaOrBoolean {
+	result := &SchemaOrBoolean{}
+	result.Schema = s
+	return result
+}
+
+func NewSchemaOrBooleanWithBoolean(b bool) *SchemaOrBoolean {
+	result := &SchemaOrBoolean{}
+	result.Boolean = &b
+	return result
+}
+
+///
 
 type StringOrStringArray struct {
 	String      *string
 	StringArray *[]string
 }
 
+func NewStringOrStringArrayWithString(s string) *StringOrStringArray {
+	result := &StringOrStringArray{}
+	result.String = &s
+	return result
+}
+
+func NewStringOrStringArrayWithStringArray(a []string) *StringOrStringArray {
+	result := &StringOrStringArray{}
+	result.StringArray = &a
+	return result
+}
+
+///
+
 type SchemaOrStringArray struct {
 	Schema      *Schema
 	StringArray *[]string
 }
+
+///
 
 type SchemaOrSchemaArray struct {
 	Schema      *Schema
 	SchemaArray *[]*Schema
 }
 
+func NewSchemaOrSchemaArrayWithSchema(s *Schema) *SchemaOrSchemaArray {
+	result := &SchemaOrSchemaArray{}
+	result.Schema = s
+	return result
+}
+
+func NewSchemaOrSchemaArrayWithSchemaArray(a []*Schema) *SchemaOrSchemaArray {
+	result := &SchemaOrSchemaArray{}
+	result.SchemaArray = &a
+	return result
+}
+
+///
+
 type SchemaEnumValue struct {
 	String *string
 	Bool   *bool
 }
+
+///
 
 // These structs provide key-value pairs that are kept in slices.
 // They are used to emulate maps with ordered keys.
@@ -111,7 +170,43 @@ type NamedSchema struct {
 	Value *Schema
 }
 
+func NewNamedSchema(name string, value *Schema) *NamedSchema {
+	return &NamedSchema{Name: name, Value: value}
+}
+
+///
+
 type NamedSchemaOrStringArray struct {
 	Name  string
 	Value *SchemaOrStringArray
+}
+
+// Access named subschemas by name
+
+func namedSchemaArrayElementWithName(array *[]*NamedSchema, name string) *Schema {
+	if array == nil {
+		return nil
+	}
+	for _, pair := range *array {
+		if pair.Name == name {
+			return pair.Value
+		}
+	}
+	return nil
+}
+
+func (s *Schema) PropertyWithName(name string) *Schema {
+	return namedSchemaArrayElementWithName(s.Properties, name)
+}
+
+func (s *Schema) PatternPropertyWithName(name string) *Schema {
+	return namedSchemaArrayElementWithName(s.PatternProperties, name)
+}
+
+func (s *Schema) DefinitionWithName(name string) *Schema {
+	return namedSchemaArrayElementWithName(s.Definitions, name)
+}
+
+func (s *Schema) AddProperty(name string, property *Schema) {
+	*s.Properties = append(*s.Properties, NewNamedSchema(name, property))
 }

@@ -17,7 +17,6 @@ package jsonschema
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -28,19 +27,17 @@ var schemas map[string]*Schema
 
 // Reads a schema from a file.
 // Currently this assumes that schemas are stored in the source distribution of this project.
-func NewSchemaFromFile(filename string) *Schema {
-	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/schemas"
-	file, e := ioutil.ReadFile(schemasDir + "/" + filename)
-	if e != nil {
-		file, e = ioutil.ReadFile(filename)
-		if e != nil {
-			fmt.Printf("File error: %v\n", e)
-			os.Exit(1)
-		}
+func NewSchemaFromFile(filename string) (schema *Schema, err error) {
+	file, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
 	}
 	var info yaml.MapSlice
-	yaml.Unmarshal(file, &info)
-	return NewSchemaFromObject(info)
+	err = yaml.Unmarshal(file, &info)
+	if err != nil {
+		return nil, err
+	}
+	return NewSchemaFromObject(info), nil
 }
 
 // Constructs a schema from a parsed JSON object.

@@ -15,7 +15,9 @@
 package jsonschema
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -149,7 +151,7 @@ func (schema *Schema) applyToSchemas(operation SchemaOperation, context string) 
 }
 
 // Copies all non-nil properties from the source Schema to the destination Schema.
-func (destination *Schema) copyProperties(source *Schema) {
+func (destination *Schema) CopyProperties(source *Schema) {
 	if source.Schema != nil {
 		destination.Schema = source.Schema
 	}
@@ -283,8 +285,10 @@ func (schema *Schema) ResolveRefs() {
 		schema.applyToSchemas(
 			func(schema *Schema, context string) {
 				if schema.Ref != nil {
-					resolvedRef := rootSchema.resolveJSONPointer(*(schema.Ref))
-					if resolvedRef.TypeIs("object") {
+					resolvedRef, err := rootSchema.resolveJSONPointer(*(schema.Ref))
+					if err != nil {
+						log.Printf("%+v", err)
+					} else if resolvedRef.TypeIs("object") {
 						// don't substitute for objects, we'll model the referenced schema with a class
 					} else if context == "OneOf" {
 						// don't substitute for references inside oneOf declarations
@@ -292,7 +296,7 @@ func (schema *Schema) ResolveRefs() {
 						// don't substitute for references that contain oneOf declarations
 					} else {
 						schema.Ref = nil
-						schema.copyProperties(resolvedRef)
+						schema.CopyProperties(resolvedRef)
 						count += 1
 					}
 				}
@@ -303,13 +307,13 @@ func (schema *Schema) ResolveRefs() {
 // Resolves JSON pointers.
 // This current implementation is very crude and custom for OpenAPI 2.0 schemas.
 // It panics for any pointer that it is unable to resolve.
-func (root *Schema) resolveJSONPointer(ref string) *Schema {
+func (root *Schema) resolveJSONPointer(ref string) (schema *Schema, err error) {
 	var result *Schema
 
 	parts := strings.Split(ref, "#")
 	if len(parts) == 2 {
 		documentName := parts[0] + "#"
-		if documentName == "#" {
+		if documentName == "#" && root.Id != nil {
 			documentName = *(root.Id)
 		}
 		path := parts[1]
@@ -318,7 +322,7 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 
 		// we currently do a very limited (hard-coded) resolution of certain paths and log errors for missed cases
 		if len(pathParts) == 1 {
-			return document
+			return document, nil
 		} else if len(pathParts) == 3 {
 			switch pathParts[1] {
 			case "definitions":
@@ -341,9 +345,9 @@ func (root *Schema) resolveJSONPointer(ref string) *Schema {
 		}
 	}
 	if result == nil {
-		panic(fmt.Sprintf("UNRESOLVED POINTER: %+v", ref))
+		return nil, errors.New(fmt.Sprintf("UNRESOLVED POINTER: %+v", ref))
 	}
-	return result
+	return result, nil
 }
 
 // Replaces "allOf" elements by merging their properties into the parent Schema.
@@ -352,7 +356,7 @@ func (schema *Schema) ResolveAllOfs() {
 		func(schema *Schema, context string) {
 			if schema.AllOf != nil {
 				for _, allOf := range *(schema.AllOf) {
-					schema.copyProperties(allOf)
+					schema.CopyProperties(allOf)
 				}
 				schema.AllOf = nil
 			}
@@ -368,4 +372,23 @@ func (schema *Schema) ResolveAnyOfs() {
 				schema.AnyOf = nil
 			}
 		}, "resolveAnyOfs")
+}
+
+// return a pointer to a copy of a passed-in string
+func stringptr(input string) (output *string) {
+	return &input
+}
+
+// Copy a named property from the official JSON Schema definition
+func (schema *Schema) CopyOfficialSchemaProperty(name string) {
+	*schema.Properties = append(*schema.Properties,
+		NewNamedSchema(name,
+			&Schema{Ref: stringptr("http://json-schema.org/draft-04/schema#/properties/" + name)}))
+}
+
+// Copy named properties from the official JSON Schema definition
+func (schema *Schema) CopyOfficialSchemaProperties(names []string) {
+	for _, name := range names {
+		schema.CopyOfficialSchemaProperty(name)
+	}
 }

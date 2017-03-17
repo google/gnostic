@@ -121,11 +121,11 @@ func GenerateExtension(schameFile string, outDir string) {
 	protoOutDirectory := outDir + "/" + "proto"
 	var err error
 
-	baseSchema := jsonschema.NewSchemaFromFile("schema.json")
+	baseSchema, _ := jsonschema.NewSchemaFromFile("schema.json")
 	baseSchema.ResolveRefs()
 	baseSchema.ResolveAllOfs()
 
-	openapiSchema := jsonschema.NewSchemaFromFile(schameFile)
+	openapiSchema, _ := jsonschema.NewSchemaFromFile(schameFile)
 	openapiSchema.ResolveRefs()
 	openapiSchema.ResolveAllOfs()
 
@@ -173,7 +173,7 @@ func GenerateExtension(schameFile string, outDir string) {
 	}
 
 	// generate the protocol buffer description
-	PROTO_OPTIONS = append(PROTO_OPTIONS_FOR_EXTENSION,
+	PROTO_OPTIONS := append(PROTO_OPTIONS_FOR_EXTENSION,
 		ProtoOption{Name: "java_package", Value: "org.openapi.extension." + strings.ToLower(protoPackage), Comment: "// The Java package name must be proto package name with proper prefix."},
 		ProtoOption{Name: "objc_class_prefix", Value: strings.ToLower(protoPackage),
 			Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
@@ -183,7 +183,7 @@ func GenerateExtension(schameFile string, outDir string) {
 				"// the future. 'GPB' is reserved for the protocol buffer implementation itself.",
 		})
 
-	proto := cc.GenerateProto(protoPackageName, LICENSE, PROTO_OPTIONS_FOR_EXTENSION, nil)
+	proto := cc.GenerateProto(protoPackageName, LICENSE, PROTO_OPTIONS, nil)
 	protoFilename := path.Join(protoOutDirectory, outFileBaseName+".proto")
 
 	err = ioutil.WriteFile(protoFilename, []byte(proto), 0644)
