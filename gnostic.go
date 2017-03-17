@@ -220,9 +220,12 @@ Options:
   --json_out=PATH     Write a json proto to the specified location.
   --text_out=PATH     Write a text proto to the specified location.
   --errors_out=PATH   Write compilation errors to the specified location.
-  --PLUGIN_out=PATH   Run the plugin named gnostic_PLUGIN and write results to the specified location.
-  --resolve_refs      Explicitly resolve $ref references (this could have problems with recursive definitions).
-  --extension=NAME    Name of the installed extension handler that will accept vendor extensions values and construct a strongly typed google.protobuf.Any proto.
+  --PLUGIN_out=PATH   Run the plugin named gnostic_PLUGIN and write results
+                      to the specified location.
+  --resolve_refs      Explicitly resolve $ref references.
+                      This could have problems with recursive definitions.
+  --extension=NAME    Run the specified gnostic extension to process
+                      extensions found in OpenAPI descriptions.
 `
 	// default values for all options
 	sourceName := ""
@@ -240,6 +243,7 @@ Options:
 	// arg processing matches patterns of the form "--extension=GENERATOR_NAME"
 	extensionHandler_regex, err := regexp.Compile("--extension=(.+)")
 	defaultPrefixForExtensions := "openapi_extensions_"
+
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue // skip the tool name
