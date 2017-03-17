@@ -32,7 +32,7 @@ option java_multiple_files = true;
 option java_outer_classname = "OpenAPIProto";
 
 // The Java package name must be proto package name with proper prefix.
-option java_package = "org.openapi.v2";
+option java_package = "org.openapi_v2";
 
 // A reasonable prefix for the Objective-C symbols generated from the package.
 // It should at a minimum be 3 characters long, all uppercase, and convention

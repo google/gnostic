@@ -1,0 +1,3 @@
+This directory contains a program that reads the OpenAPI specification
+and extracts information that can be used to build or update a
+corresponding JSON schema.

@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"sort"
@@ -188,7 +189,7 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 					}
 					typeModel.addProperty(typeProperty)
 				} else {
-					log.Printf("ignoring %+v, which has an unsupported property type '%+v'", propertyName, propertySchema.Type)
+					log.Printf("ignoring %+v, which has an unsupported property type '%s'", propertyName, propertySchema.Type.Description())
 				}
 			} else if propertySchema.IsEmpty() {
 				// an empty schema can contain anything, so add an accessor for a generic object
@@ -392,11 +393,11 @@ func (domain *Domain) buildAnyOfAccessors(typeModel *TypeModel, schema *jsonsche
 	}
 	if len(*anyOfs) == 2 {
 		if schemaIsContainedInArray((*anyOfs)[0], (*anyOfs)[1]) {
-			log.Printf("ARRAY OF %+v", (*anyOfs)[0].String())
+			//log.Printf("ARRAY OF %+v", (*anyOfs)[0].String())
 			schema := (*anyOfs)[0]
 			domain.addAnonymousAccessorForSchema(typeModel, schema, true)
 		} else if schemaIsContainedInArray((*anyOfs)[1], (*anyOfs)[0]) {
-			log.Printf("ARRAY OF %+v", (*anyOfs)[1].String())
+			//log.Printf("ARRAY OF %+v", (*anyOfs)[1].String())
 			schema := (*anyOfs)[1]
 			domain.addAnonymousAccessorForSchema(typeModel, schema, true)
 		} else {
@@ -466,7 +467,10 @@ func (domain *Domain) buildTypeForDefinitionObject(
 	return typeModel
 }
 
-func (domain *Domain) Build() {
+func (domain *Domain) Build() (err error) {
+	if (domain.Schema == nil) || (domain.Schema.Definitions == nil) {
+		return errors.New("missing definitions section")
+	}
 	// create a type for the top-level schema
 	typeName := domain.Prefix + "Document"
 	typeModel := NewTypeModel()
@@ -555,6 +559,7 @@ func (domain *Domain) Build() {
 	yamlProperty.Type = "string"
 	anyType.addProperty(yamlProperty)
 	domain.TypeModels[anyType.Name] = anyType
+	return err
 }
 
 func (domain *Domain) sortedTypeNames() []string {
