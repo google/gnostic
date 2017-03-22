@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 
@@ -102,16 +103,16 @@ func GenerateOpenAPIModel(version string) error {
 
 	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
 
-	schemasDir := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/schemas/"
+	project_root := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/"
 
-	base_schema, err := jsonschema.NewSchemaFromFile(schemasDir + "schema.json")
+	base_schema, err := jsonschema.NewSchemaFromFile(project_root + "jsonschema/schema.json")
 	if err != nil {
 		return err
 	}
 	base_schema.ResolveRefs()
 	base_schema.ResolveAllOfs()
 
-	openapi_schema, err := jsonschema.NewSchemaFromFile(schemasDir + input)
+	openapi_schema, err := jsonschema.NewSchemaFromFile(project_root + filename + "/" + input)
 	if err != nil {
 		return err
 	}
@@ -150,8 +151,9 @@ func GenerateOpenAPIModel(version string) error {
 	}
 
 	// generate the protocol buffer description
-	proto := cc.GenerateProto(proto_packagename, LICENSE, proto_options(go_packagename), []string{"google/protobuf/any.proto"})
-	proto_filename := filename + "/" + filename + ".proto"
+	proto := cc.GenerateProto(proto_packagename, LICENSE,
+		proto_options(go_packagename), []string{"google/protobuf/any.proto"})
+	proto_filename := project_root + filename + "/" + filename + ".proto"
 	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
 	if err != nil {
 		return err
@@ -164,7 +166,7 @@ func GenerateOpenAPIModel(version string) error {
 		"strings",
 		"github.com/googleapis/gnostic/compiler",
 	})
-	go_filename := filename + "/" + filename + ".go"
+	go_filename := project_root + filename + "/" + filename + ".go"
 	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
 	if err != nil {
 		return err
@@ -173,20 +175,28 @@ func GenerateOpenAPIModel(version string) error {
 	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
 }
 
-func main() {
-	var generate_extensions = false
-	var openapi_version = ""
-
-	usage := `
-Usage: generator [OPTIONS]
+func usage() string {
+	return fmt.Sprintf(`
+Usage: %s [OPTIONS]
 Options:
-  --v2  Generate Protocol Buffer representation and support code for OpenAPI v2
-  --v3  Generate Protocol Buffer representation and support code for OpenAPI v3
-  --extension EXTENSION_SCHEMA [OPTIONS] Generate a gnostic extension that reads a set of OpenAPI extensions.
+  --v2
+    Generate Protocol Buffer representation and support code for OpenAPI v2.
+    Files are read from and written to appropriate locations in the gnostic project directory.
+  --v3  
+    Generate Protocol Buffer representation and support code for OpenAPI v3
+    Files are read from and written to appropriate locations in the gnostic project directory.
+  --extension EXTENSION_SCHEMA [EXTENSIONOPTIONS] 
+    Generate a gnostic extension that reads a set of OpenAPI extensions.
     EXTENSION_SCHEMA is the json schema for the OpenAPI extensions to be supported.
-    OPTIONS
-	  --out_dir=PATH: Specifies location for writing extension models and support code.
-`
+    EXTENSION_OPTIONS
+      --out_dir=PATH: Location for writing extension models and support code.
+`, path.Base(os.Args[0]))
+}
+
+func main() {
+	var openapi_version = ""
+	var generate_extensions = false
+
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue // skip the tool name
@@ -198,14 +208,16 @@ Options:
 		} else if arg == "--extension" {
 			generate_extensions = true
 		} else {
-			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 			os.Exit(-1)
 		}
 	}
 
-	if generate_extensions {
-		ProcessExtensionGenCommandline(usage)
-	} else {
+	if openapi_version != "" {
 		GenerateOpenAPIModel(openapi_version)
+	} else if generate_extensions {
+		ProcessExtensionGenCommandline(usage())
+	} else {
+		fmt.Printf("%s\n", usage())
 	}
 }

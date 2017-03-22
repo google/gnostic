@@ -17,10 +17,17 @@ package main
 import (
 	"fmt"
 	"github.com/googleapis/gnostic/jsonschema"
+	"os"
+	"path"
 )
 
 func main() {
-	schema, err := jsonschema.NewSchemaFromFile("../schemas/openapi-3.0.json")
+	if len(os.Args) != 2 {
+		fmt.Printf("Usage: %s [filename]\n", path.Base(os.Args[0]))
+		fmt.Printf("where [filename] is a path to a JSON schema to format.\n")
+		os.Exit(0)
+	}
+	schema, err := jsonschema.NewSchemaFromFile(os.Args[1])
 	if err != nil {
 		panic(err)
 	}

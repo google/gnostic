@@ -57,14 +57,14 @@ func test_errors(t *testing.T, input_file string, reference_file string) {
 
 func TestPetstoreJSON(t *testing.T) {
 	test_normal(t,
-		"examples/petstore.json",
-		"test/petstore.text")
+		"examples/v2.0/json/petstore.json",
+		"test/v2.0/petstore.text")
 }
 
 func TestPetstoreYAML(t *testing.T) {
 	test_normal(t,
-		"examples/petstore.yaml",
-		"test/petstore.text")
+		"examples/v2.0/yaml/petstore.yaml",
+		"test/v2.0/petstore.text")
 }
 
 func TestSeparateYAML(t *testing.T) {
@@ -81,14 +81,14 @@ func TestSeparateJSON(t *testing.T) {
 
 func TestRemotePetstoreJSON(t *testing.T) {
 	test_normal(t,
-		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.json",
-		"test/petstore.text")
+		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore.json",
+		"test/v2.0/petstore.text")
 }
 
 func TestRemotePetstoreYAML(t *testing.T) {
 	test_normal(t,
-		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/petstore.yaml",
-		"test/petstore.text")
+		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore.yaml",
+		"test/v2.0/petstore.text")
 }
 
 func TestRemoteSeparateYAML(t *testing.T) {
@@ -142,16 +142,16 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 func TestSamplePluginWithPetstore(t *testing.T) {
 	test_plugin(t,
 		"go_sample",
-		"examples/petstore.yaml",
+		"examples/v2.0/yaml/petstore.yaml",
 		"sample-petstore.out",
-		"test/sample-petstore.out")
+		"test/v2.0/yaml/sample-petstore.out")
 }
 
 func TestErrorInvalidPluginInvocations(t *testing.T) {
 	var err error
 	output, err := exec.Command(
 		"gnostic",
-		"examples/petstore.yaml",
+		"examples/v2.0/yaml/petstore.yaml",
 		"--errors_out=-",
 		"--plugin_out=foo=bar,:abc",
 		"--plugin_out=,foo=bar:abc",
@@ -180,7 +180,7 @@ func TestValidPluginInvocations(t *testing.T) {
 	var err error
 	output, err := exec.Command(
 		"gnostic",
-		"examples/petstore.yaml",
+		"examples/v2.0/yaml/petstore.yaml",
 		"--errors_out=-",
 		// verify an invocation with no parameters
 		"--go_sample_out=!", // "!" indicates that no output should be generated
@@ -242,5 +242,11 @@ func TestExtensionHandlerWithLibraryExample(t *testing.T) {
 func TestPetstoreYAML_30(t *testing.T) {
 	test_normal(t,
 		"examples/v3.0/yaml/petstore.yaml",
-		"test/v3.0/yaml/petstore.text")
+		"test/v3.0/petstore.text")
+}
+
+func TestPetstoreJSON_30(t *testing.T) {
+	test_normal(t,
+		"examples/v3.0/json/petstore.json",
+		"test/v3.0/petstore.text")
 }

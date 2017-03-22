@@ -1,7 +1,7 @@
 
 
 report.txt -------------------- 
-READING examples/petstore.yaml (v2)
+READING examples/v2.0/yaml/petstore.yaml (v2)
 Swagger: 2.0
 Host: petstore.swagger.io
 BasePath: /v1
