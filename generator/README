@@ -1,7 +1,0 @@
-This directory contains code that generates a protocol buffer
-representation and supporting code for a JSON schema.
-
-While it is mainly intended for generating models of OpenAPI 
-specifications, it may be useful for modeling other JSON schemas.
-
-
