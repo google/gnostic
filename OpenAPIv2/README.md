@@ -3,11 +3,8 @@
 This directory contains a Protocol Buffer-language model
 and related code for supporting OpenAPI v2.
 
-Everything here is automatically generated.
-
 Gnostic applications and plugins can use OpenAPIv2.proto
-to generate Protocol Buffer support code for their preferred
-languages.
+to generate Protocol Buffer support code for their preferred languages.
 
 OpenAPIv2.go is used by Gnostic to read JSON and YAML OpenAPI 
 descriptions into the Protocol Buffer-based datastructures 

@@ -3,8 +3,6 @@
 This directory contains a Protocol Buffer-language model
 and related code for supporting OpenAPI v3.
 
-Everything here is automatically generated.
-
 Gnostic applications and plugins can use OpenAPIv3.proto
 to generate Protocol Buffer support code for their preferred
 languages.
