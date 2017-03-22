@@ -1,6 +1,6 @@
-# Gnostic utilities
+# tools
 
-This directory contains general utilities used by Gnostic and related tools.
+This directory contains general utilities used by Gnostic and related programs.
 
 ## j2y2j 
 
