@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -26,6 +27,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/googleapis/gnostic/compiler"
 	"github.com/googleapis/gnostic/jsonschema"
 	"github.com/googleapis/gnostic/printer"
 )
@@ -109,9 +111,9 @@ func toProtoPackageName(input string) string {
 	return out
 }
 
-func GenerateExtension(schameFile string, outDir string) {
+func GenerateExtension(schemaFile string, outDir string) error {
 
-	outFileBaseName := getBaseFileNameWithoutExt(schameFile)
+	outFileBaseName := getBaseFileNameWithoutExt(schemaFile)
 	extensionNameWithoutXDashPrefix := outFileBaseName[len("x-"):]
 	outDir = path.Join(outDir, "openapi_extensions_"+extensionNameWithoutXDashPrefix)
 	protoPackage := toProtoPackageName(extensionNameWithoutXDashPrefix)
@@ -121,11 +123,18 @@ func GenerateExtension(schameFile string, outDir string) {
 	protoOutDirectory := outDir + "/" + "proto"
 	var err error
 
-	baseSchema, _ := jsonschema.NewSchemaFromFile("schema.json")
+	project_root := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/"
+	baseSchema, err := jsonschema.NewSchemaFromFile(project_root + "jsonschema/schema.json")
+	if err != nil {
+		return err
+	}
 	baseSchema.ResolveRefs()
 	baseSchema.ResolveAllOfs()
 
-	openapiSchema, _ := jsonschema.NewSchemaFromFile(schameFile)
+	openapiSchema, err := jsonschema.NewSchemaFromFile(schemaFile)
+	if err != nil {
+		return err
+	}
 	openapiSchema.ResolveRefs()
 	openapiSchema.ResolveAllOfs()
 
@@ -134,19 +143,22 @@ func GenerateExtension(schameFile string, outDir string) {
 
 	// create a type for each object defined in the schema
 	extensionToMessage := make(map[string]string)
-	hasErrors := false
+	schemaErrors := make([]error, 0)
 	if cc.Schema.Definitions != nil {
 		for _, pair := range *(cc.Schema.Definitions) {
 			definitionName := pair.Name
 			definitionSchema := pair.Value
 			// ensure the id field is set
 			if definitionSchema.Id == nil || len(*(definitionSchema.Id)) == 0 {
-				fmt.Printf("Schema for %s does not contain the required 'id' field. Value of the 'id' field should be the name of the OpenAPI extension that the schema represents\n", definitionName)
-				hasErrors = true
+				schemaErrors = append(schemaErrors,
+					errors.New(
+						fmt.Sprintf("Schema %s has no 'id' field, which must match the name of the OpenAPI extension that the schema represents.\n", definitionName)))
 			} else {
 				if _, ok := extensionToMessage[*(definitionSchema.Id)]; ok {
-					fmt.Printf("Schema %s and %s has the same 'id' field value\n", definitionName, extensionToMessage[*(definitionSchema.Id)])
-					hasErrors = true
+					schemaErrors = append(schemaErrors,
+						errors.New(
+							fmt.Sprintf("Schema %s and %s have the same 'id' field value.\n",
+								definitionName, extensionToMessage[*(definitionSchema.Id)])))
 				}
 				extensionToMessage[*(definitionSchema.Id)] = definitionName
 			}
@@ -157,19 +169,19 @@ func GenerateExtension(schameFile string, outDir string) {
 			}
 		}
 	}
-	if hasErrors {
+	if len(schemaErrors) > 0 {
 		// error has been reported.
-		os.Exit(-1)
+		return compiler.NewErrorGroupOrNil(schemaErrors)
 	}
 
 	err = os.MkdirAll(outDir, os.ModePerm)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = os.MkdirAll(protoOutDirectory, os.ModePerm)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// generate the protocol buffer description
@@ -188,7 +200,7 @@ func GenerateExtension(schameFile string, outDir string) {
 
 	err = ioutil.WriteFile(protoFilename, []byte(proto), 0644)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// generate the compiler
@@ -200,7 +212,7 @@ func GenerateExtension(schameFile string, outDir string) {
 	goFilename := path.Join(protoOutDirectory, outFileBaseName+".go")
 	err = ioutil.WriteFile(goFilename, []byte(compiler), 0644)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", goFilename).Run()
 
@@ -229,18 +241,17 @@ func GenerateExtension(schameFile string, outDir string) {
 	mainFileName := path.Join(outDir, "main.go")
 	err = ioutil.WriteFile(mainFileName, []byte(main), 0644)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// format the compiler
-	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", mainFileName).Run()
+	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", mainFileName).Run()
 }
 
-func ProcessExtensionGenCommandline(usage string) {
+func ProcessExtensionGenCommandline(usage string) error {
 
 	outDir := ""
 	schameFile := ""
-	goPathWithSrcDir := path.Join(os.Getenv("GOPATH"), "src")
 
 	extParamRegex, _ := regexp.Compile("--(.+)=(.+)")
 
@@ -281,10 +292,6 @@ func ProcessExtensionGenCommandline(usage string) {
 		fmt.Printf("Schema file name has to start with 'x-'.\n%s\n", usage)
 		os.Exit(-1)
 	}
-	if !strings.HasPrefix(outDir, goPathWithSrcDir) {
-		fmt.Printf("--out_dir should be inside $GOPATH '%s'.\n%s\n", goPathWithSrcDir, usage)
-		os.Exit(-1)
-	}
 
-	GenerateExtension(schameFile, outDir)
+	return GenerateExtension(schameFile, outDir)
 }
