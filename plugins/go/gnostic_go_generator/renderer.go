@@ -280,6 +280,9 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 			f.ParameterName = replaceReservedWords(f.FieldName)
 			f.Name = strings.Title(f.Name)
 			t.Fields = append(t.Fields, &f)
+			if f.NativeType == "integer" {
+				f.NativeType = "int64"
+			}
 		}
 	}
 	t.Name = name
