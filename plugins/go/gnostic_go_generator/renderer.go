@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	_ "log"
+	"log"
 	_ "os"
 	"path"
 	"path/filepath"
@@ -51,27 +51,30 @@ func (s *ServiceType) hasFieldNamed(name string) bool {
 // A service type field is a field in a definition and can be
 // associated with a position in a request structure.
 type ServiceTypeField struct {
-	Name     string
-	Type     string
-	JSONName string
-	Position string // "body", "header", "formdata", "query", or "path"
+	Name          string // the name as specified
+	Type          string // the specified type of the field
+	NativeType    string // the programming-language native type of the field
+	FieldName     string // the name to use for data structure fields
+	ParameterName string // the name to use for parameters
+	JSONName      string // the name to use in JSON serialization
+	Position      string // "body", "header", "formdata", "query", or "path"
 }
 
 // A service method is an operation of an API and typically
 // has associated client and server code.
 type ServiceMethod struct {
-	Name               string
-	Path               string
-	Method             string
-	Description        string
-	HandlerName        string // name of the generated handler
-	ProcessorName      string // name of the processing function in the service interface
-	ClientName         string
-	ResultTypeName     string
-	ParametersTypeName string
-	ResponsesTypeName  string
-	ParametersType     *ServiceType
-	ResponsesType      *ServiceType
+	Name               string       // Operation name, possibly generated from method and path
+	Path               string       // HTTP path
+	Method             string       // HTTP method name
+	Description        string       // description of method
+	HandlerName        string       // name of the generated handler
+	ProcessorName      string       // name of the processing function in the service interface
+	ClientName         string       // name of client
+	ResultTypeName     string       // native type name for the result structure
+	ParametersTypeName string       // native type name for the input parameters structure
+	ResponsesTypeName  string       // native type name for the responses
+	ParametersType     *ServiceType // parameters (input)
+	ResponsesType      *ServiceType // responses (output)
 }
 
 // A renderer reads an OpenAPI document and generates code.
@@ -230,8 +233,10 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 			bodyParameter := parameter.GetBodyParameter()
 			if bodyParameter != nil {
 				f.Name = bodyParameter.Name
+				f.FieldName = strings.Replace(f.Name, "-", "_", -1)
 				if bodyParameter.Schema != nil {
 					f.Type = typeForSchema(bodyParameter.Schema)
+					f.NativeType = f.Type
 					f.Position = "body"
 				}
 			}
@@ -240,26 +245,39 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 				headerParameter := nonBodyParameter.GetHeaderParameterSubSchema()
 				if headerParameter != nil {
 					f.Name = headerParameter.Name
+					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
+					f.Type = headerParameter.Type
+					f.NativeType = f.Type
 					f.Position = "header"
 				}
 				formDataParameter := nonBodyParameter.GetFormDataParameterSubSchema()
 				if formDataParameter != nil {
 					f.Name = formDataParameter.Name
+					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
+					f.Type = formDataParameter.Type
+					f.NativeType = f.Type
 					f.Position = "formdata"
 				}
 				queryParameter := nonBodyParameter.GetQueryParameterSubSchema()
 				if queryParameter != nil {
 					f.Name = queryParameter.Name
+					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
+					f.Type = queryParameter.Type
+					f.NativeType = f.Type
 					f.Position = "query"
 				}
 				pathParameter := nonBodyParameter.GetPathParameterSubSchema()
 				if pathParameter != nil {
 					f.Name = pathParameter.Name
+					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
+					f.Type = pathParameter.Type
+					f.NativeType = f.Type
 					f.Position = "path"
 					f.Type = typeForName(pathParameter.Type, pathParameter.Format)
 				}
 			}
 			f.JSONName = f.Name
+			f.ParameterName = replaceReservedWords(f.FieldName)
 			f.Name = strings.Title(f.Name)
 			t.Fields = append(t.Fields, &f)
 		}
@@ -370,7 +388,7 @@ func typeForSchema(schema *openapi.Schema) (typeName string) {
 }
 
 func typeForRef(ref string) (typeName string) {
-	return strings.Title(path.Base(ref))
+	return strings.Replace(strings.Title(path.Base(ref)), "-", "_", -1)
 }
 
 func propertyNameForResponseCode(code string) string {
@@ -388,6 +406,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 		file.Name = filename
 		f := new(bytes.Buffer)
 		t := renderer.Templates[filename]
+		log.Printf("Generating %s", filename)
 		err = t.Execute(f, struct {
 			Renderer *ServiceRenderer
 		}{
@@ -399,11 +418,21 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 		inputBytes := f.Bytes()
 		// run generated Go files through gofmt
 		if filepath.Ext(file.Name) == ".go" {
-			file.Data, err = gofmt(file.Name, inputBytes)
+			strippedBytes := stripMarkers(inputBytes)
+			file.Data, err = gofmt(file.Name, strippedBytes)
 		} else {
 			file.Data = inputBytes
 		}
 		response.Files = append(response.Files, file)
 	}
 	return
+}
+
+func replaceReservedWords(name string) string {
+	log.Printf("replacing %s\n", name)
+	if name == "type" {
+		return "ttttype"
+	}
+	return name
+
 }

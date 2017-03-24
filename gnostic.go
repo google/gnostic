@@ -14,6 +14,21 @@
 
 //go:generate ./COMPILE-PROTOS.sh
 
+// Gnostic is a tool for building better REST APIs through knowledge.
+//
+// Gnostic reads declarative descriptions of REST APIs that conform
+// to the OpenAPI Specification, reports errors, resolves internal
+// dependencies, and puts the results in a binary form that can
+// be used in any language that is supported by the Protocol Buffer
+// tools.
+//
+// Gnostic models are validated and typed. This allows API tool
+// developers to focus on their product and not worry about input
+// validation and type checking.
+//
+// Gnostic calls plugins that implement a variety of API implementation
+// and support features including generation of client and server
+// support code.
 package main
 
 import (

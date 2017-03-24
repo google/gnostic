@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This tool reads files from a "templates" directory, and generates
+// encode-templates is a support tool for building text templates
+// directly into an application binary.
+//
+// It reads files from a "templates" directory, and generates
 // a Go source file containing base64-encoded representations of those
 // files. This allows these files to be directly compiled into the
 // executable.
-
 package main
 
 import (

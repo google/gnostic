@@ -14,6 +14,8 @@
 
 //go:generate encode_templates
 
+// gnostic_go_generator is a sample Gnostic plugin that generates Go
+// code that supports an API.
 package main
 
 import (

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// report is a demo application that displays information about an
+// OpenAPI description.
 package main
 
 import (

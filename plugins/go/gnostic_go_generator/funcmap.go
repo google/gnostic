@@ -72,7 +72,7 @@ func parameterList(m *ServiceMethod) string {
 			if i > 0 {
 				result += ", "
 			}
-			result += field.JSONName + " " + goType(field.Type)
+			result += field.ParameterName + " " + field.NativeType
 		}
 	}
 	return result

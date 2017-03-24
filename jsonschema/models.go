@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package jsonschema supports the reading, writing, and manipulation
+// of JSON Schemas.
 package jsonschema
 
-// This struct models a JSON Schema and, because schemas are defined
-// hierarchically, contains many references to itself.
+// The Schema struct models a JSON Schema and, because schemas are
+// defined hierarchically, contains many references to itself.
 // All fields are pointers and are nil if the associated values
 // are not specified.
 type Schema struct {
@@ -70,10 +72,11 @@ type Schema struct {
 	Format *string
 }
 
-// These helper structs model "combination" types that generally can
+// These helper structs represent "combination" types that generally can
 // have values of one type or another. All are used to represent parts
 // of Schemas.
 
+// SchemaNumber represents a value that can be either an Integer or a Float.
 type SchemaNumber struct {
 	Integer *int64
 	Float   *float64
@@ -90,8 +93,7 @@ func NewSchemaNumberWithFloat(f float64) *SchemaNumber {
 	return result
 }
 
-///
-
+// SchemaOrBoolean represents a value that can be either a Schema or a Boolean.
 type SchemaOrBoolean struct {
 	Schema  *Schema
 	Boolean *bool
@@ -109,8 +111,8 @@ func NewSchemaOrBooleanWithBoolean(b bool) *SchemaOrBoolean {
 	return result
 }
 
-///
-
+// StringOrStringArray represents a value that can be either
+// a String or an Array of Strings.
 type StringOrStringArray struct {
 	String      *string
 	StringArray *[]string
@@ -128,15 +130,15 @@ func NewStringOrStringArrayWithStringArray(a []string) *StringOrStringArray {
 	return result
 }
 
-///
-
+// SchemaOrStringArray represents a value that can be either
+// a Schema or an Array of Strings.
 type SchemaOrStringArray struct {
 	Schema      *Schema
 	StringArray *[]string
 }
 
-///
-
+// SchemaOrSchemaArray represents a value that can be either
+// a Schema or an Array of Schemas.
 type SchemaOrSchemaArray struct {
 	Schema      *Schema
 	SchemaArray *[]*Schema
@@ -154,17 +156,15 @@ func NewSchemaOrSchemaArrayWithSchemaArray(a []*Schema) *SchemaOrSchemaArray {
 	return result
 }
 
-///
-
+// SchemaEnumValue represents a value that can be part of an
+// enumeration in a Schema.
 type SchemaEnumValue struct {
 	String *string
 	Bool   *bool
 }
 
-///
-
-// These structs provide key-value pairs that are kept in slices.
-// They are used to emulate maps with ordered keys.
+// NamedSchema is a name-value pair that is used to emulate maps
+// with ordered keys.
 type NamedSchema struct {
 	Name  string
 	Value *Schema
@@ -174,8 +174,8 @@ func NewNamedSchema(name string, value *Schema) *NamedSchema {
 	return &NamedSchema{Name: name, Value: value}
 }
 
-///
-
+// NamedSchemaOrSringArray is a name-value pair that is used
+// to emulate maps with ordered keys.
 type NamedSchemaOrStringArray struct {
 	Name  string
 	Value *SchemaOrStringArray
