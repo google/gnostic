@@ -190,6 +190,8 @@ func typeForSchema(schema *openapi.Schema) string {
 				itemSchema := items.Schema[0]
 				itemType := typeForSchema(itemSchema)
 				return "array-of-" + itemType
+			} else if schema.XRef != "" {
+				return "array-of-reference"
 			} else {
 				return fmt.Sprintf("array-of-%+v", schema)
 			}
@@ -207,5 +209,22 @@ func typeForSchema(schema *openapi.Schema) string {
 }
 
 func typeForFileSchema(schema *openapi.FileSchema) string {
+	if schema.Type != "" {
+		value := schema.Type
+		switch value {
+		case "boolean":
+			return "fileschema-" + value
+		case "string":
+			return "fileschema-" + value
+		case "file":
+			return "fileschema-" + value
+		case "number":
+			return "fileschema-" + value
+		case "integer":
+			return "fileschema-" + value
+		case "object":
+			return "fileschema-" + value
+		}
+	}
 	return fmt.Sprintf("FILE SCHEMA %+v", schema)
 }

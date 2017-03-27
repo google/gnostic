@@ -23,6 +23,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 )
 
 // Results are collected in this global slice.
@@ -47,6 +48,34 @@ func walker(p string, info os.FileInfo, err error) error {
 	return nil
 }
 
+func printFrequencies(m map[string]int) {
+	for _, pair := range rankByCount(m) {
+		fmt.Printf("%6d %s\n", pair.Value, pair.Key)
+	}
+}
+
+func rankByCount(frequencies map[string]int) PairList {
+	pl := make(PairList, len(frequencies))
+	i := 0
+	for k, v := range frequencies {
+		pl[i] = Pair{k, v}
+		i++
+	}
+	sort.Sort(sort.Reverse(pl))
+	return pl
+}
+
+type Pair struct {
+	Key   string
+	Value int
+}
+
+type PairList []Pair
+
+func (p PairList) Len() int           { return len(p) }
+func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
 func main() {
 	// Collect all statistics in the current directory and its subdirectories.
 	stats = make([]statistics.DocumentStatistics, 0)
@@ -63,6 +92,10 @@ func main() {
 	for _, api := range stats {
 		if api.Operations["anonymous"] != 0 {
 			apis_with_anonymous_ops += 1
+			fmt.Printf("%s has anonymous operations %d/%d\n",
+				api.Name,
+				api.Operations["anonymous"],
+				api.Operations["total"])
 		}
 		for k, v := range api.Operations {
 			op_frequencies[k] += v
@@ -82,18 +115,17 @@ func main() {
 	}
 
 	// Report the results.
-	fmt.Printf("Collected information on %d APIs.\n\n",
-		len(stats))
-	fmt.Printf("apis with anonymous ops: %d\n\n",
-		apis_with_anonymous_ops)
-	fmt.Printf("op frequencies: %+v\n\n",
-		op_frequencies)
-	fmt.Printf("parameter type frequencies: %+v\n\n",
-		parameter_type_frequencies)
-	fmt.Printf("result type frequencies: %+v\n\n",
-		result_type_frequencies)
-	fmt.Printf("definition field type frequencies: %+v\n\n",
-		definition_field_type_frequencies)
-	fmt.Printf("definition array type frequencies: %+v\n\n",
-		definition_array_type_frequencies)
+	fmt.Printf("\n")
+	fmt.Printf("Collected information on %d APIs.\n\n", len(stats))
+	fmt.Printf("apis with anonymous ops: %d\n", apis_with_anonymous_ops)
+	fmt.Printf("\nop frequencies:\n")
+	printFrequencies(op_frequencies)
+	fmt.Printf("\nparameter type frequencies:\n")
+	printFrequencies(parameter_type_frequencies)
+	fmt.Printf("\nresult type frequencies:\n")
+	printFrequencies(result_type_frequencies)
+	fmt.Printf("\ndefinition field type frequencies:\n")
+	printFrequencies(definition_field_type_frequencies)
+	fmt.Printf("\ndefinition array type frequencies:\n")
+	printFrequencies(definition_array_type_frequencies)
 }

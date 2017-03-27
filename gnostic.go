@@ -313,6 +313,8 @@ Options:
 		os.Exit(-1)
 	}
 
+	errorPrefix := "Errors reading " + sourceName + "\n"
+
 	// If we get here and the error output is unspecified, write errors to stderr.
 	if errorPath == "" {
 		errorPath = "="
@@ -321,7 +323,7 @@ Options:
 	// Read the OpenAPI source.
 	info, err := compiler.ReadInfoForFile(sourceName)
 	if err != nil {
-		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+		writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
 
@@ -336,14 +338,14 @@ Options:
 	if openapi_version == OpenAPIv2 {
 		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
 		if err != nil {
-			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 			os.Exit(-1)
 		}
 		// optionally resolve internal references
 		if resolveReferences {
 			_, err = document.ResolveReferences(sourceName)
 			if err != nil {
-				writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 				os.Exit(-1)
 			}
 		}
@@ -351,14 +353,14 @@ Options:
 	} else if openapi_version == OpenAPIv3 {
 		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
 		if err != nil {
-			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 			os.Exit(-1)
 		}
 		// optionally resolve internal references
 		if resolveReferences {
 			_, err = document.ResolveReferences(sourceName)
 			if err != nil {
-				writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 				os.Exit(-1)
 			}
 		}
@@ -384,7 +386,7 @@ Options:
 	for _, pluginCall := range pluginCalls {
 		err = pluginCall.perform(message, openapi_version, sourceName)
 		if err != nil {
-			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 			defer os.Exit(-1)
 		}
 	}
