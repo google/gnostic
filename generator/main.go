@@ -211,6 +211,7 @@ func main() {
 			openapi_version = "v3"
 		} else if arg == "--extension" {
 			generate_extensions = true
+			break
 		} else {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 			os.Exit(-1)
@@ -218,9 +219,15 @@ func main() {
 	}
 
 	if openapi_version != "" {
-		GenerateOpenAPIModel(openapi_version)
+		err := GenerateOpenAPIModel(openapi_version)
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+		}
 	} else if generate_extensions {
-		ProcessExtensionGenCommandline(usage())
+		err := ProcessExtensionGenCommandline(usage())
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+		}
 	} else {
 		fmt.Printf("%s\n", usage())
 	}

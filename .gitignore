@@ -9,3 +9,4 @@ Packages
 *.swp
 # vscode
 .vscode
+.DS_Store
