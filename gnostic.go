@@ -39,6 +39,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -176,8 +177,10 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 				os.Mkdir(outputLocation, 0755)
 			}
 			for _, file := range response.Files {
-				path := outputLocation + "/" + file.Name
-				f, _ := os.Create(path)
+				p := outputLocation + "/" + file.Name
+				dir := path.Dir(p)
+				os.MkdirAll(dir, 0755)
+				f, _ := os.Create(p)
 				defer f.Close()
 				f.Write(file.Data)
 			}
