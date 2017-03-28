@@ -3433,7 +3433,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v11 != nil {
 			x.MultipleOf, ok = v11.(float64)
 			if !ok {
-				t, ok := v11.(int)
+				t, ok := v11.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -3447,7 +3447,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v12 != nil {
 			x.Maximum, ok = v12.(float64)
 			if !ok {
-				t, ok := v12.(int)
+				t, ok := v12.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -3470,7 +3470,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v14 != nil {
 			x.Minimum, ok = v14.(float64)
 			if !ok {
-				t, ok := v14.(int)
+				t, ok := v14.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {

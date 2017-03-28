@@ -1054,7 +1054,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v11 != nil {
 			x.Maximum, ok = v11.(float64)
 			if !ok {
-				t, ok := v11.(int)
+				t, ok := v11.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -1077,7 +1077,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v13 != nil {
 			x.Minimum, ok = v13.(float64)
 			if !ok {
-				t, ok := v13.(int)
+				t, ok := v13.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {
@@ -1178,7 +1178,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v22 != nil {
 			x.MultipleOf, ok = v22.(float64)
 			if !ok {
-				t, ok := v22.(int)
+				t, ok := v22.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -1293,7 +1293,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v6 != nil {
 			x.Maximum, ok = v6.(float64)
 			if !ok {
-				t, ok := v6.(int)
+				t, ok := v6.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -1316,7 +1316,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v8 != nil {
 			x.Minimum, ok = v8.(float64)
 			if !ok {
-				t, ok := v8.(int)
+				t, ok := v8.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {
@@ -1417,7 +1417,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v17 != nil {
 			x.MultipleOf, ok = v17.(float64)
 			if !ok {
-				t, ok := v17.(int)
+				t, ok := v17.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -1571,7 +1571,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v10 != nil {
 			x.Maximum, ok = v10.(float64)
 			if !ok {
-				t, ok := v10.(int)
+				t, ok := v10.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -1594,7 +1594,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v12 != nil {
 			x.Minimum, ok = v12.(float64)
 			if !ok {
-				t, ok := v12.(int)
+				t, ok := v12.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {
@@ -1695,7 +1695,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v21 != nil {
 			x.MultipleOf, ok = v21.(float64)
 			if !ok {
-				t, ok := v21.(int)
+				t, ok := v21.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -3417,7 +3417,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v10 != nil {
 			x.Maximum, ok = v10.(float64)
 			if !ok {
-				t, ok := v10.(int)
+				t, ok := v10.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -3440,7 +3440,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v12 != nil {
 			x.Minimum, ok = v12.(float64)
 			if !ok {
-				t, ok := v12.(int)
+				t, ok := v12.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {
@@ -3541,7 +3541,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v21 != nil {
 			x.MultipleOf, ok = v21.(float64)
 			if !ok {
-				t, ok := v21.(int)
+				t, ok := v21.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -3719,7 +3719,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v6 != nil {
 			x.Maximum, ok = v6.(float64)
 			if !ok {
-				t, ok := v6.(int)
+				t, ok := v6.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -3742,7 +3742,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v8 != nil {
 			x.Minimum, ok = v8.(float64)
 			if !ok {
-				t, ok := v8.(int)
+				t, ok := v8.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {
@@ -3843,7 +3843,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v17 != nil {
 			x.MultipleOf, ok = v17.(float64)
 			if !ok {
-				t, ok := v17.(int)
+				t, ok := v17.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -4026,7 +4026,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v11 != nil {
 			x.Maximum, ok = v11.(float64)
 			if !ok {
-				t, ok := v11.(int)
+				t, ok := v11.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -4049,7 +4049,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v13 != nil {
 			x.Minimum, ok = v13.(float64)
 			if !ok {
-				t, ok := v13.(int)
+				t, ok := v13.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {
@@ -4150,7 +4150,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v22 != nil {
 			x.MultipleOf, ok = v22.(float64)
 			if !ok {
-				t, ok := v22.(int)
+				t, ok := v22.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -4488,7 +4488,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v6 != nil {
 			x.MultipleOf, ok = v6.(float64)
 			if !ok {
-				t, ok := v6.(int)
+				t, ok := v6.(int64)
 				if ok {
 					x.MultipleOf = float64(t)
 				} else {
@@ -4502,7 +4502,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v7 != nil {
 			x.Maximum, ok = v7.(float64)
 			if !ok {
-				t, ok := v7.(int)
+				t, ok := v7.(int64)
 				if ok {
 					x.Maximum = float64(t)
 				} else {
@@ -4525,7 +4525,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v9 != nil {
 			x.Minimum, ok = v9.(float64)
 			if !ok {
-				t, ok := v9.(int)
+				t, ok := v9.(int64)
 				if ok {
 					x.Minimum = float64(t)
 				} else {

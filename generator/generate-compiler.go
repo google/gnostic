@@ -283,7 +283,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				code.Print("if (v%d != nil) {", fieldNumber)
 				code.Print("  x.%s, ok = v%d.(float64)", fieldName, fieldNumber)
 				code.Print("  if !ok {")
-				code.Print("    t, ok := v%d.(int)", fieldNumber)
+				code.Print("    t, ok := v%d.(int64)", fieldNumber)
 				code.Print("    if ok {")
 				code.Print("      x.%s = float64(t)", fieldName)
 				code.Print("    } else {")

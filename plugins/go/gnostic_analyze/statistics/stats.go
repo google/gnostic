@@ -14,6 +14,7 @@
 package statistics
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -55,6 +56,9 @@ func (s *DocumentStatistics) addResultType(name string) {
 }
 
 func (s *DocumentStatistics) addDefinitionFieldType(name string) {
+	if name == "array" {
+		panic(errors.New("hih?"))
+	}
 	s.DefinitionFieldTypes[name] = s.DefinitionFieldTypes[name] + 1
 }
 
@@ -79,19 +83,52 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 			if n != nil {
 				hp := n.GetHeaderParameterSubSchema()
 				if hp != nil {
-					s.addParameterType(hp.Type)
+					t := hp.Type
+					if t == "array" {
+						if hp.Items.Type != "" {
+							t += "-of-" + hp.Items.Type
+						} else {
+							t += "-of-" + fmt.Sprintf("(%+v)", hp)
+						}
+					}
+					s.addParameterType(t)
 				}
 				fp := n.GetFormDataParameterSubSchema()
 				if fp != nil {
-					s.addParameterType(fp.Type)
+					t := fp.Type
+					if t == "array" {
+						if fp.Items.Type != "" {
+							t += "-of-" + fp.Items.Type
+						} else {
+							t += "-of-" + fmt.Sprintf("(%+v)", fp)
+						}
+					}
+					s.addParameterType(t)
 				}
 				qp := n.GetQueryParameterSubSchema()
 				if qp != nil {
-					s.addParameterType(qp.Type)
+					t := qp.Type
+					if t == "array" {
+						t += "-of-" + qp.Items.Type
+						if qp.Items.Type != "" {
+							t += "-of-" + qp.Items.Type
+						} else {
+							t += "-of-" + fmt.Sprintf("(%+v)", qp)
+						}
+					}
+					s.addParameterType(t)
 				}
 				pp := n.GetPathParameterSubSchema()
 				if pp != nil {
-					s.addParameterType(pp.Type)
+					t := pp.Type
+					if t == "array" {
+						if pp.Items.Type != "" {
+							t += "-of-" + pp.Items.Type
+						} else {
+							t += "-of-" + fmt.Sprintf("(%+v)", pp)
+						}
+					}
+					s.addParameterType(t)
 				}
 			}
 		}
