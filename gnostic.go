@@ -14,6 +14,21 @@
 
 //go:generate ./COMPILE-PROTOS.sh
 
+// Gnostic is a tool for building better REST APIs through knowledge.
+//
+// Gnostic reads declarative descriptions of REST APIs that conform
+// to the OpenAPI Specification, reports errors, resolves internal
+// dependencies, and puts the results in a binary form that can
+// be used in any language that is supported by the Protocol Buffer
+// tools.
+//
+// Gnostic models are validated and typed. This allows API tool
+// developers to focus on their product and not worry about input
+// validation and type checking.
+//
+// Gnostic calls plugins that implement a variety of API implementation
+// and support features including generation of client and server
+// support code.
 package main
 
 import (
@@ -24,6 +39,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -140,6 +156,10 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 			return err
 		}
 
+		if response.Errors != nil {
+			return errors.New(fmt.Sprintf("Plugin error: %+v", response.Errors))
+		}
+
 		// write files to the specified directory
 		var writer io.Writer
 		if outputLocation == "!" {
@@ -157,8 +177,10 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 				os.Mkdir(outputLocation, 0755)
 			}
 			for _, file := range response.Files {
-				path := outputLocation + "/" + file.Name
-				f, _ := os.Create(path)
+				p := outputLocation + "/" + file.Name
+				dir := path.Dir(p)
+				os.MkdirAll(dir, 0755)
+				f, _ := os.Create(p)
 				defer f.Close()
 				f.Write(file.Data)
 			}
@@ -291,6 +313,8 @@ Options:
 		os.Exit(-1)
 	}
 
+	errorPrefix := "Errors reading " + sourceName + "\n"
+
 	// If we get here and the error output is unspecified, write errors to stderr.
 	if errorPath == "" {
 		errorPath = "="
@@ -299,7 +323,7 @@ Options:
 	// Read the OpenAPI source.
 	info, err := compiler.ReadInfoForFile(sourceName)
 	if err != nil {
-		writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+		writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 		os.Exit(-1)
 	}
 
@@ -314,14 +338,14 @@ Options:
 	if openapi_version == OpenAPIv2 {
 		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
 		if err != nil {
-			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 			os.Exit(-1)
 		}
 		// optionally resolve internal references
 		if resolveReferences {
 			_, err = document.ResolveReferences(sourceName)
 			if err != nil {
-				writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 				os.Exit(-1)
 			}
 		}
@@ -329,14 +353,14 @@ Options:
 	} else if openapi_version == OpenAPIv3 {
 		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
 		if err != nil {
-			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 			os.Exit(-1)
 		}
 		// optionally resolve internal references
 		if resolveReferences {
 			_, err = document.ResolveReferences(sourceName)
 			if err != nil {
-				writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 				os.Exit(-1)
 			}
 		}
@@ -362,7 +386,7 @@ Options:
 	for _, pluginCall := range pluginCalls {
 		err = pluginCall.perform(message, openapi_version, sourceName)
 		if err != nil {
-			writeFile(errorPath, []byte(err.Error()), sourceName, "errors")
+			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
 			defer os.Exit(-1)
 		}
 	}

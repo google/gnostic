@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// generator generates Protocol Buffer models and support code from
+// JSON Schemas. It is used to generate representations of the
+// OpenAPI Specification and vendor and specification extensions
+// that are added by third-party OpenAPI authors.
 package main
 
 import (

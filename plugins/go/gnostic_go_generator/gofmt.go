@@ -44,7 +44,10 @@ func stripMarkers(inputBytes []byte) (outputBytes []byte) {
 }
 
 // Run the gofmt tool to format generated code.
-func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
+func gofmt(filename string, inputBytes []byte) (outputBytes []byte, err error) {
+	if false {
+		return inputBytes, nil
+	}
 	cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
 	input, _ := cmd.StdinPipe()
 	output, _ := cmd.StdoutPipe()
@@ -53,15 +56,16 @@ func gofmt(inputBytes []byte) (outputBytes []byte, err error) {
 	if err != nil {
 		return
 	}
-	strippedBytes := stripMarkers(inputBytes)
-	input.Write(strippedBytes)
+	input.Write(inputBytes)
 	input.Close()
-	errors, err := ioutil.ReadAll(cmderr)
+
+	outputBytes, _ = ioutil.ReadAll(output)
+	errors, _ := ioutil.ReadAll(cmderr)
 	if len(errors) > 0 {
-		log.Printf("gofmt errors: %s", errors)
-		return strippedBytes, nil
-	} else {
-		outputBytes, err = ioutil.ReadAll(output)
+		errors := strings.Replace(string(errors), "<standard input>", filename, -1)
+		log.Printf("Syntax errors in generated code:\n%s", errors)
+		return inputBytes, nil
 	}
+
 	return
 }

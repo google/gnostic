@@ -10,3 +10,4 @@ Packages
 # vscode
 .vscode
 .DS_Store
+*~

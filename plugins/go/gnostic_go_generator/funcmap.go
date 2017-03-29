@@ -15,6 +15,7 @@
 package main
 
 import (
+	"strings"
 	"text/template"
 )
 
@@ -55,6 +56,15 @@ func hasFormParameters(m *ServiceMethod) bool {
 	return false
 }
 
+func goType(openapi_type string) string {
+	switch openapi_type {
+	case "number":
+		return "int"
+	default:
+		return openapi_type
+	}
+}
+
 func parameterList(m *ServiceMethod) string {
 	result := ""
 	if m.ParametersType != nil {
@@ -62,7 +72,7 @@ func parameterList(m *ServiceMethod) string {
 			if i > 0 {
 				result += ", "
 			}
-			result += field.JSONName + " " + field.Type
+			result += field.ParameterName + " " + field.NativeType
 		}
 	}
 	return result
@@ -86,7 +96,19 @@ func bodyParameterFieldName(m *ServiceMethod) string {
 	return ""
 }
 
-func helpers() template.FuncMap {
+func commentForText(text string) string {
+	result := ""
+	lines := strings.Split(text, "\n")
+	for i, line := range lines {
+		if i > 0 {
+			result += "\n"
+		}
+		result += "// " + line
+	}
+	return result
+}
+
+func templateHelpers() template.FuncMap {
 	return template.FuncMap{
 		"hasFieldNamedOK":        hasFieldNamedOK,
 		"hasFieldNamedDefault":   hasFieldNamedDefault,
@@ -94,8 +116,10 @@ func helpers() template.FuncMap {
 		"hasPathParameters":      hasPathParameters,
 		"hasFormParameters":      hasFormParameters,
 		"hasResponses":           hasResponses,
+		"goType":                 goType,
 		"parameterList":          parameterList,
 		"bodyParameterName":      bodyParameterName,
 		"bodyParameterFieldName": bodyParameterFieldName,
+		"commentForText":         commentForText,
 	}
 }

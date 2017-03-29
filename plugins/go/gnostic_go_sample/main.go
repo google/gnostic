@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// gnostic_go_sample is a sample Gnostic plugin written in Go.
 package main
 
 import (

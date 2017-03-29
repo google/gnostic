@@ -1,3 +1,7 @@
+// +build !appengine
+
+// This file is omitted when the app is built for Google App Engine
+
 /*
  Copyright 2017 Google Inc. All Rights Reserved.
 
@@ -17,11 +21,14 @@
 package main
 
 import (
-	"github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/bookstore/bookstore"
+	"log"
+
+	"github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/v2.0/bookstore/bookstore"
 )
 
-// init() is called when the package is loaded
-// this allows this app to be trivially deployed to Google App Engine, which does not call main()
-func init() {
-	bookstore.Initialize(NewService())
+func main() {
+	err := bookstore.ServeHTTP(":8080")
+	if err != nil {
+		log.Printf("%v", err)
+	}
 }
