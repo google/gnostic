@@ -88,7 +88,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 						if hp.Items.Type != "" {
 							t += "-of-" + hp.Items.Type
 						} else {
-							t += "-of-" + fmt.Sprintf("(%+v)", hp)
+							t += "-of-? " + fmt.Sprintf("(%+v)", hp)
 						}
 					}
 					s.addParameterType(t)
@@ -113,7 +113,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 						if qp.Items.Type != "" {
 							t += "-of-" + qp.Items.Type
 						} else {
-							t += "-of-" + fmt.Sprintf("(%+v)", qp)
+							t += "-of-? " + fmt.Sprintf("(%+v)", qp)
 						}
 					}
 					s.addParameterType(t)
@@ -125,7 +125,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 						if pp.Items.Type != "" {
 							t += "-of-" + pp.Items.Type
 						} else {
-							t += "-of-" + fmt.Sprintf("(%+v)", pp)
+							t += "-of-? " + fmt.Sprintf("(%+v)", pp)
 						}
 					}
 					s.addParameterType(t)
@@ -180,6 +180,8 @@ func (s *DocumentStatistics) analyzeDefinition(definition *openapi.Schema) {
 			// seems ok
 		case "integer":
 			// seems ok
+		case "null":
+			// ...a null definition?
 		default:
 			log.Printf("type %s", typeName)
 		}
@@ -260,6 +262,8 @@ func typeForFileSchema(schema *openapi.FileSchema) string {
 		case "integer":
 			return "fileschema-" + value
 		case "object":
+			return "fileschema-" + value
+		case "null":
 			return "fileschema-" + value
 		}
 	}

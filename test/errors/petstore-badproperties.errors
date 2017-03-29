@@ -8,5 +8,5 @@ ERROR $root.paths./pets.get.parameters.parameter.nonBodyParameter.formDataParame
 ERROR $root.paths./pets.get.parameters.parameter.nonBodyParameter.queryParameterSubSchema has invalid property: myproperty
 ERROR $root.paths./pets.get.parameters.parameter.nonBodyParameter.pathParameterSubSchema has invalid property: myproperty
 ERROR $root.paths./pets.get.parameters.jsonReference is missing required property: $ref
-ERROR $root.paths./pets.get.parameters.jsonReference has invalid properties: name, in, description, required, type, format, myproperty
-ERROR $root.paths./pets.post has unexpected value for tags: pets
+ERROR $root.paths./pets.get.parameters.jsonReference has invalid properties: name, in, required, type, format, myproperty
+ERROR $root.paths./pets.post has unexpected value for tags: pets (string)

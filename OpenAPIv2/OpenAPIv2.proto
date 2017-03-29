@@ -257,6 +257,7 @@ message ItemsItem {
 
 message JsonReference {
   string _ref = 1;
+  string description = 2;
 }
 
 message License {

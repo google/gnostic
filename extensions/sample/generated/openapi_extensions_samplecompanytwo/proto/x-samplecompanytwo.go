@@ -31,7 +31,7 @@ func NewSampleCompanyTwoBook(in interface{}, context *compiler.Context) (*Sample
 	x := &SampleCompanyTwoBook{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"code", "message"}
@@ -54,7 +54,7 @@ func NewSampleCompanyTwoBook(in interface{}, context *compiler.Context) (*Sample
 			if ok {
 				x.Code = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for code: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for code: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -65,7 +65,7 @@ func NewSampleCompanyTwoBook(in interface{}, context *compiler.Context) (*Sample
 			if ok {
 				x.Message = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for message: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for message: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -78,7 +78,7 @@ func NewSampleCompanyTwoShelve(in interface{}, context *compiler.Context) (*Samp
 	x := &SampleCompanyTwoShelve{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"bar", "foo1"}
@@ -101,7 +101,7 @@ func NewSampleCompanyTwoShelve(in interface{}, context *compiler.Context) (*Samp
 			if ok {
 				x.Foo1 = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for foo1: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for foo1: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -112,7 +112,7 @@ func NewSampleCompanyTwoShelve(in interface{}, context *compiler.Context) (*Samp
 			if ok {
 				x.Bar = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for bar: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for bar: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}

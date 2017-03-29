@@ -70,7 +70,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 	x := &ApiKeySecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"in", "name", "type"}
@@ -91,7 +91,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -100,7 +100,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v2 != nil {
 			x.Name, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -109,7 +109,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v3 != nil {
 			x.In, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -118,7 +118,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v4 != nil {
 			x.Description, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -162,7 +162,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 	x := &BasicAuthenticationSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"type"}
@@ -183,7 +183,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -192,7 +192,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		if v2 != nil {
 			x.Description, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -236,7 +236,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 	x := &BodyParameter{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"in", "name", "schema"}
@@ -257,7 +257,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v1 != nil {
 			x.Description, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -266,7 +266,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v2 != nil {
 			x.Name, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -275,7 +275,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v3 != nil {
 			x.In, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -284,7 +284,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v4 != nil {
 			x.Required, ok = v4.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -337,7 +337,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 	x := &Contact{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"email", "name", "url"}
@@ -352,7 +352,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -361,7 +361,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v2 != nil {
 			x.Url, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -370,7 +370,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v3 != nil {
 			x.Email, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for email: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for email: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -414,7 +414,7 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 	x := &Default{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedAny additional_properties = 1;
@@ -455,7 +455,7 @@ func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, er
 	x := &Definitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedSchema additional_properties = 1;
@@ -484,7 +484,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	x := &Document{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"info", "paths", "swagger"}
@@ -505,7 +505,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v1 != nil {
 			x.Swagger, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for swagger: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for swagger: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -523,7 +523,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v3 != nil {
 			x.Host, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for host: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for host: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -532,7 +532,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v4 != nil {
 			x.BasePath, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for basePath: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for basePath: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -543,7 +543,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if ok {
 				x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for schemes: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for schemes: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -554,7 +554,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if ok {
 				x.Consumes = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for consumes: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for consumes: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -565,7 +565,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if ok {
 				x.Produces = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for produces: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for produces: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -695,7 +695,7 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 	x := &Examples{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedAny additional_properties = 1;
@@ -736,7 +736,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 	x := &ExternalDocs{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"url"}
@@ -757,7 +757,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		if v1 != nil {
 			x.Description, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -766,7 +766,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		if v2 != nil {
 			x.Url, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -810,7 +810,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 	x := &FileSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"type"}
@@ -831,7 +831,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v1 != nil {
 			x.Format, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -840,7 +840,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v2 != nil {
 			x.Title, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -849,7 +849,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -869,7 +869,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 			if ok {
 				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -878,7 +878,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v6 != nil {
 			x.Type, ok = v6.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -887,7 +887,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v7 != nil {
 			x.ReadOnly, ok = v7.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for readOnly: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -949,7 +949,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 	x := &FormDataParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
@@ -964,7 +964,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v1 != nil {
 			x.Required, ok = v1.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -973,7 +973,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v2 != nil {
 			x.In, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -982,7 +982,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -991,7 +991,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v4 != nil {
 			x.Name, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1000,7 +1000,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v5 != nil {
 			x.AllowEmptyValue, ok = v5.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1009,7 +1009,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v6 != nil {
 			x.Type, ok = v6.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1018,7 +1018,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v7 != nil {
 			x.Format, ok = v7.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1036,7 +1036,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v9 != nil {
 			x.CollectionFormat, ok = v9.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v", v9)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1052,15 +1052,24 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		// float maximum = 11;
 		v11 := compiler.MapValueForKey(m, "maximum")
 		if v11 != nil {
-			x.Maximum, ok = v11.(float64)
-			if !ok {
-				t, ok := v11.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v11)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v11 := v11.(type) {
+			case float64:
+				x.Maximum = v11
+			case float32:
+				x.Maximum = float64(v11)
+			case uint64:
+				x.Maximum = float64(v11)
+			case uint32:
+				x.Maximum = float64(v11)
+			case int64:
+				x.Maximum = float64(v11)
+			case int32:
+				x.Maximum = float64(v11)
+			case int:
+				x.Maximum = float64(v11)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v11, v11)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 12;
@@ -1068,22 +1077,31 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v12 != nil {
 			x.ExclusiveMaximum, ok = v12.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v12)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 13;
 		v13 := compiler.MapValueForKey(m, "minimum")
 		if v13 != nil {
-			x.Minimum, ok = v13.(float64)
-			if !ok {
-				t, ok := v13.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v13)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v13 := v13.(type) {
+			case float64:
+				x.Minimum = v13
+			case float32:
+				x.Minimum = float64(v13)
+			case uint64:
+				x.Minimum = float64(v13)
+			case uint32:
+				x.Minimum = float64(v13)
+			case int64:
+				x.Minimum = float64(v13)
+			case int32:
+				x.Minimum = float64(v13)
+			case int:
+				x.Minimum = float64(v13)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v13, v13)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 14;
@@ -1091,7 +1109,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v14 != nil {
 			x.ExclusiveMinimum, ok = v14.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1102,7 +1120,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1113,7 +1131,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v16)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1122,7 +1140,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v17 != nil {
 			x.Pattern, ok = v17.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v17)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1133,7 +1151,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v18)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1144,7 +1162,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v19)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1153,7 +1171,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v20 != nil {
 			x.UniqueItems, ok = v20.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v20)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v20, v20)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1176,15 +1194,24 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		// float multiple_of = 22;
 		v22 := compiler.MapValueForKey(m, "multipleOf")
 		if v22 != nil {
-			x.MultipleOf, ok = v22.(float64)
-			if !ok {
-				t, ok := v22.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v22)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v22 := v22.(type) {
+			case float64:
+				x.MultipleOf = v22
+			case float32:
+				x.MultipleOf = float64(v22)
+			case uint64:
+				x.MultipleOf = float64(v22)
+			case uint32:
+				x.MultipleOf = float64(v22)
+			case int64:
+				x.MultipleOf = float64(v22)
+			case int32:
+				x.MultipleOf = float64(v22)
+			case int:
+				x.MultipleOf = float64(v22)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v22, v22)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// repeated NamedAny vendor_extension = 23;
@@ -1227,7 +1254,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	x := &Header{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"type"}
@@ -1248,7 +1275,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1257,7 +1284,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v2 != nil {
 			x.Format, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1275,7 +1302,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v4 != nil {
 			x.CollectionFormat, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1291,15 +1318,24 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// float maximum = 6;
 		v6 := compiler.MapValueForKey(m, "maximum")
 		if v6 != nil {
-			x.Maximum, ok = v6.(float64)
-			if !ok {
-				t, ok := v6.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v6)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v6 := v6.(type) {
+			case float64:
+				x.Maximum = v6
+			case float32:
+				x.Maximum = float64(v6)
+			case uint64:
+				x.Maximum = float64(v6)
+			case uint32:
+				x.Maximum = float64(v6)
+			case int64:
+				x.Maximum = float64(v6)
+			case int32:
+				x.Maximum = float64(v6)
+			case int:
+				x.Maximum = float64(v6)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v6, v6)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 7;
@@ -1307,22 +1343,31 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v7 != nil {
 			x.ExclusiveMaximum, ok = v7.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 8;
 		v8 := compiler.MapValueForKey(m, "minimum")
 		if v8 != nil {
-			x.Minimum, ok = v8.(float64)
-			if !ok {
-				t, ok := v8.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v8)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v8 := v8.(type) {
+			case float64:
+				x.Minimum = v8
+			case float32:
+				x.Minimum = float64(v8)
+			case uint64:
+				x.Minimum = float64(v8)
+			case uint32:
+				x.Minimum = float64(v8)
+			case int64:
+				x.Minimum = float64(v8)
+			case int32:
+				x.Minimum = float64(v8)
+			case int:
+				x.Minimum = float64(v8)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v8, v8)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 9;
@@ -1330,7 +1375,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v9 != nil {
 			x.ExclusiveMinimum, ok = v9.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v9)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1341,7 +1386,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v10)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1352,7 +1397,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v11)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1361,7 +1406,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v12 != nil {
 			x.Pattern, ok = v12.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v12)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1372,7 +1417,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v13)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1383,7 +1428,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1392,7 +1437,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v15 != nil {
 			x.UniqueItems, ok = v15.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1415,15 +1460,24 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// float multiple_of = 17;
 		v17 := compiler.MapValueForKey(m, "multipleOf")
 		if v17 != nil {
-			x.MultipleOf, ok = v17.(float64)
-			if !ok {
-				t, ok := v17.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v17)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v17 := v17.(type) {
+			case float64:
+				x.MultipleOf = v17
+			case float32:
+				x.MultipleOf = float64(v17)
+			case uint64:
+				x.MultipleOf = float64(v17)
+			case uint32:
+				x.MultipleOf = float64(v17)
+			case int64:
+				x.MultipleOf = float64(v17)
+			case int32:
+				x.MultipleOf = float64(v17)
+			case int:
+				x.MultipleOf = float64(v17)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v17, v17)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// string description = 18;
@@ -1431,7 +1485,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v18 != nil {
 			x.Description, ok = v18.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v18)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1475,7 +1529,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 	x := &HeaderParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
@@ -1490,7 +1544,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v1 != nil {
 			x.Required, ok = v1.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1499,7 +1553,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v2 != nil {
 			x.In, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1508,7 +1562,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1517,7 +1571,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v4 != nil {
 			x.Name, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1526,7 +1580,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v5 != nil {
 			x.Type, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1535,7 +1589,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v6 != nil {
 			x.Format, ok = v6.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1553,7 +1607,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v8 != nil {
 			x.CollectionFormat, ok = v8.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v", v8)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1569,15 +1623,24 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		// float maximum = 10;
 		v10 := compiler.MapValueForKey(m, "maximum")
 		if v10 != nil {
-			x.Maximum, ok = v10.(float64)
-			if !ok {
-				t, ok := v10.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v10)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v10 := v10.(type) {
+			case float64:
+				x.Maximum = v10
+			case float32:
+				x.Maximum = float64(v10)
+			case uint64:
+				x.Maximum = float64(v10)
+			case uint32:
+				x.Maximum = float64(v10)
+			case int64:
+				x.Maximum = float64(v10)
+			case int32:
+				x.Maximum = float64(v10)
+			case int:
+				x.Maximum = float64(v10)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v10, v10)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 11;
@@ -1585,22 +1648,31 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v11 != nil {
 			x.ExclusiveMaximum, ok = v11.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v11)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 12;
 		v12 := compiler.MapValueForKey(m, "minimum")
 		if v12 != nil {
-			x.Minimum, ok = v12.(float64)
-			if !ok {
-				t, ok := v12.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v12)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v12 := v12.(type) {
+			case float64:
+				x.Minimum = v12
+			case float32:
+				x.Minimum = float64(v12)
+			case uint64:
+				x.Minimum = float64(v12)
+			case uint32:
+				x.Minimum = float64(v12)
+			case int64:
+				x.Minimum = float64(v12)
+			case int32:
+				x.Minimum = float64(v12)
+			case int:
+				x.Minimum = float64(v12)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v12, v12)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 13;
@@ -1608,7 +1680,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v13 != nil {
 			x.ExclusiveMinimum, ok = v13.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v13)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1619,7 +1691,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1630,7 +1702,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1639,7 +1711,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v16 != nil {
 			x.Pattern, ok = v16.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v16)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1650,7 +1722,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v17)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1661,7 +1733,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v18)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1670,7 +1742,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v19 != nil {
 			x.UniqueItems, ok = v19.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v19)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1693,15 +1765,24 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		// float multiple_of = 21;
 		v21 := compiler.MapValueForKey(m, "multipleOf")
 		if v21 != nil {
-			x.MultipleOf, ok = v21.(float64)
-			if !ok {
-				t, ok := v21.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v21)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v21 := v21.(type) {
+			case float64:
+				x.MultipleOf = v21
+			case float32:
+				x.MultipleOf = float64(v21)
+			case uint64:
+				x.MultipleOf = float64(v21)
+			case uint32:
+				x.MultipleOf = float64(v21)
+			case int64:
+				x.MultipleOf = float64(v21)
+			case int32:
+				x.MultipleOf = float64(v21)
+			case int:
+				x.MultipleOf = float64(v21)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v21, v21)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// repeated NamedAny vendor_extension = 22;
@@ -1744,7 +1825,7 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	x := &Headers{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedHeader additional_properties = 1;
@@ -1773,7 +1854,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	x := &Info{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"title", "version"}
@@ -1794,7 +1875,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v1 != nil {
 			x.Title, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1803,7 +1884,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v2 != nil {
 			x.Version, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for version: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for version: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1812,7 +1893,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1821,7 +1902,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v4 != nil {
 			x.TermsOfService, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for termsOfService: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for termsOfService: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1883,7 +1964,7 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 	x := &ItemsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value for item array: %+v", in)
+		message := fmt.Sprintf("has unexpected value for item array: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		x.Schema = make([]*Schema, 0)
@@ -1901,7 +1982,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 	x := &JsonReference{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"$ref"}
@@ -1910,7 +1991,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"$ref"}
+		allowedKeys := []string{"$ref", "description"}
 		allowedPatterns := []string{}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1922,7 +2003,16 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 		if v1 != nil {
 			x.XRef, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string description = 2;
+		v2 := compiler.MapValueForKey(m, "description")
+		if v2 != nil {
+			x.Description, ok = v2.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1935,7 +2025,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	x := &License{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"name"}
@@ -1956,7 +2046,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1965,7 +2055,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		if v2 != nil {
 			x.Url, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2009,7 +2099,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	x := &NamedAny{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2024,7 +2114,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2046,7 +2136,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 	x := &NamedHeader{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2061,7 +2151,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2083,7 +2173,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 	x := &NamedParameter{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2098,7 +2188,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2120,7 +2210,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 	x := &NamedPathItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2135,7 +2225,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2157,7 +2247,7 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 	x := &NamedResponse{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2172,7 +2262,7 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2194,7 +2284,7 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 	x := &NamedResponseValue{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2209,7 +2299,7 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2231,7 +2321,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 	x := &NamedSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2246,7 +2336,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2268,7 +2358,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 	x := &NamedSecurityDefinitionsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2283,7 +2373,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2305,7 +2395,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 	x := &NamedString{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2320,7 +2410,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2329,7 +2419,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		if v2 != nil {
 			x.Value, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for value: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for value: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2342,7 +2432,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 	x := &NamedStringArray{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
@@ -2357,7 +2447,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2380,7 +2470,7 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 	matched := false
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"in", "name", "type"}
@@ -2446,7 +2536,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 	x := &Oauth2AccessCodeSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"authorizationUrl", "flow", "tokenUrl", "type"}
@@ -2467,7 +2557,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2476,7 +2566,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2494,7 +2584,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v4 != nil {
 			x.AuthorizationUrl, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2503,7 +2593,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v5 != nil {
 			x.TokenUrl, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2512,7 +2602,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v6 != nil {
 			x.Description, ok = v6.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2556,7 +2646,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 	x := &Oauth2ApplicationSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"flow", "tokenUrl", "type"}
@@ -2577,7 +2667,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2586,7 +2676,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2604,7 +2694,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v4 != nil {
 			x.TokenUrl, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2613,7 +2703,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v5 != nil {
 			x.Description, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2657,7 +2747,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 	x := &Oauth2ImplicitSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"authorizationUrl", "flow", "type"}
@@ -2678,7 +2768,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2687,7 +2777,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2705,7 +2795,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v4 != nil {
 			x.AuthorizationUrl, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2714,7 +2804,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v5 != nil {
 			x.Description, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2758,7 +2848,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 	x := &Oauth2PasswordSecurity{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"flow", "tokenUrl", "type"}
@@ -2779,7 +2869,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2788,7 +2878,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2806,7 +2896,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v4 != nil {
 			x.TokenUrl, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2815,7 +2905,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v5 != nil {
 			x.Description, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2859,7 +2949,7 @@ func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, 
 	x := &Oauth2Scopes{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedString additional_properties = 1;
@@ -2884,7 +2974,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 	x := &Operation{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"responses"}
@@ -2907,7 +2997,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Tags = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for tags: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for tags: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2916,7 +3006,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v2 != nil {
 			x.Summary, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for summary: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2925,7 +3015,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2943,7 +3033,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v5 != nil {
 			x.OperationId, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for operationId: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for operationId: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2954,7 +3044,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Produces = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for produces: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for produces: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2965,7 +3055,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Consumes = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for consumes: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for consumes: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3001,7 +3091,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for schemes: %+v", v10)
+				message := fmt.Sprintf("has unexpected value for schemes: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3010,7 +3100,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v11 != nil {
 			x.Deprecated, ok = v11.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v", v11)
+				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3109,7 +3199,7 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 	x := &ParameterDefinitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedParameter additional_properties = 1;
@@ -3177,7 +3267,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	x := &PathItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
@@ -3192,7 +3282,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		if v1 != nil {
 			x.XRef, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3315,7 +3405,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 	x := &PathParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"required"}
@@ -3336,7 +3426,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v1 != nil {
 			x.Required, ok = v1.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3345,7 +3435,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v2 != nil {
 			x.In, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3354,7 +3444,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3363,7 +3453,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v4 != nil {
 			x.Name, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3372,7 +3462,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v5 != nil {
 			x.Type, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3381,7 +3471,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v6 != nil {
 			x.Format, ok = v6.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3399,7 +3489,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v8 != nil {
 			x.CollectionFormat, ok = v8.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v", v8)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3415,15 +3505,24 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		// float maximum = 10;
 		v10 := compiler.MapValueForKey(m, "maximum")
 		if v10 != nil {
-			x.Maximum, ok = v10.(float64)
-			if !ok {
-				t, ok := v10.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v10)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v10 := v10.(type) {
+			case float64:
+				x.Maximum = v10
+			case float32:
+				x.Maximum = float64(v10)
+			case uint64:
+				x.Maximum = float64(v10)
+			case uint32:
+				x.Maximum = float64(v10)
+			case int64:
+				x.Maximum = float64(v10)
+			case int32:
+				x.Maximum = float64(v10)
+			case int:
+				x.Maximum = float64(v10)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v10, v10)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 11;
@@ -3431,22 +3530,31 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v11 != nil {
 			x.ExclusiveMaximum, ok = v11.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v11)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 12;
 		v12 := compiler.MapValueForKey(m, "minimum")
 		if v12 != nil {
-			x.Minimum, ok = v12.(float64)
-			if !ok {
-				t, ok := v12.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v12)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v12 := v12.(type) {
+			case float64:
+				x.Minimum = v12
+			case float32:
+				x.Minimum = float64(v12)
+			case uint64:
+				x.Minimum = float64(v12)
+			case uint32:
+				x.Minimum = float64(v12)
+			case int64:
+				x.Minimum = float64(v12)
+			case int32:
+				x.Minimum = float64(v12)
+			case int:
+				x.Minimum = float64(v12)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v12, v12)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 13;
@@ -3454,7 +3562,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v13 != nil {
 			x.ExclusiveMinimum, ok = v13.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v13)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3465,7 +3573,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3476,7 +3584,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3485,7 +3593,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v16 != nil {
 			x.Pattern, ok = v16.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v16)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3496,7 +3604,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v17)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3507,7 +3615,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v18)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3516,7 +3624,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v19 != nil {
 			x.UniqueItems, ok = v19.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v19)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3539,15 +3647,24 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		// float multiple_of = 21;
 		v21 := compiler.MapValueForKey(m, "multipleOf")
 		if v21 != nil {
-			x.MultipleOf, ok = v21.(float64)
-			if !ok {
-				t, ok := v21.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v21)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v21 := v21.(type) {
+			case float64:
+				x.MultipleOf = v21
+			case float32:
+				x.MultipleOf = float64(v21)
+			case uint64:
+				x.MultipleOf = float64(v21)
+			case uint32:
+				x.MultipleOf = float64(v21)
+			case int64:
+				x.MultipleOf = float64(v21)
+			case int32:
+				x.MultipleOf = float64(v21)
+			case int:
+				x.MultipleOf = float64(v21)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v21, v21)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// repeated NamedAny vendor_extension = 22;
@@ -3590,7 +3707,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	x := &Paths{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{}
@@ -3659,7 +3776,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 	x := &PrimitivesItems{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
@@ -3674,7 +3791,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3683,7 +3800,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v2 != nil {
 			x.Format, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3701,7 +3818,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v4 != nil {
 			x.CollectionFormat, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3717,15 +3834,24 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		// float maximum = 6;
 		v6 := compiler.MapValueForKey(m, "maximum")
 		if v6 != nil {
-			x.Maximum, ok = v6.(float64)
-			if !ok {
-				t, ok := v6.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v6)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v6 := v6.(type) {
+			case float64:
+				x.Maximum = v6
+			case float32:
+				x.Maximum = float64(v6)
+			case uint64:
+				x.Maximum = float64(v6)
+			case uint32:
+				x.Maximum = float64(v6)
+			case int64:
+				x.Maximum = float64(v6)
+			case int32:
+				x.Maximum = float64(v6)
+			case int:
+				x.Maximum = float64(v6)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v6, v6)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 7;
@@ -3733,22 +3859,31 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v7 != nil {
 			x.ExclusiveMaximum, ok = v7.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 8;
 		v8 := compiler.MapValueForKey(m, "minimum")
 		if v8 != nil {
-			x.Minimum, ok = v8.(float64)
-			if !ok {
-				t, ok := v8.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v8)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v8 := v8.(type) {
+			case float64:
+				x.Minimum = v8
+			case float32:
+				x.Minimum = float64(v8)
+			case uint64:
+				x.Minimum = float64(v8)
+			case uint32:
+				x.Minimum = float64(v8)
+			case int64:
+				x.Minimum = float64(v8)
+			case int32:
+				x.Minimum = float64(v8)
+			case int:
+				x.Minimum = float64(v8)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v8, v8)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 9;
@@ -3756,7 +3891,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v9 != nil {
 			x.ExclusiveMinimum, ok = v9.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v9)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3767,7 +3902,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v10)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3778,7 +3913,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v11)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3787,7 +3922,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v12 != nil {
 			x.Pattern, ok = v12.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v12)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3798,7 +3933,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v13)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3809,7 +3944,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3818,7 +3953,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v15 != nil {
 			x.UniqueItems, ok = v15.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3841,15 +3976,24 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		// float multiple_of = 17;
 		v17 := compiler.MapValueForKey(m, "multipleOf")
 		if v17 != nil {
-			x.MultipleOf, ok = v17.(float64)
-			if !ok {
-				t, ok := v17.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v17)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v17 := v17.(type) {
+			case float64:
+				x.MultipleOf = v17
+			case float32:
+				x.MultipleOf = float64(v17)
+			case uint64:
+				x.MultipleOf = float64(v17)
+			case uint32:
+				x.MultipleOf = float64(v17)
+			case int64:
+				x.MultipleOf = float64(v17)
+			case int32:
+				x.MultipleOf = float64(v17)
+			case int:
+				x.MultipleOf = float64(v17)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v17, v17)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// repeated NamedAny vendor_extension = 18;
@@ -3892,7 +4036,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 	x := &Properties{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedSchema additional_properties = 1;
@@ -3921,7 +4065,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 	x := &QueryParameterSubSchema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
@@ -3936,7 +4080,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v1 != nil {
 			x.Required, ok = v1.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3945,7 +4089,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v2 != nil {
 			x.In, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3954,7 +4098,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v3 != nil {
 			x.Description, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3963,7 +4107,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v4 != nil {
 			x.Name, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3972,7 +4116,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v5 != nil {
 			x.AllowEmptyValue, ok = v5.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3981,7 +4125,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v6 != nil {
 			x.Type, ok = v6.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v", v6)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3990,7 +4134,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v7 != nil {
 			x.Format, ok = v7.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v7)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4008,7 +4152,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v9 != nil {
 			x.CollectionFormat, ok = v9.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v", v9)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4024,15 +4168,24 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		// float maximum = 11;
 		v11 := compiler.MapValueForKey(m, "maximum")
 		if v11 != nil {
-			x.Maximum, ok = v11.(float64)
-			if !ok {
-				t, ok := v11.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v11)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v11 := v11.(type) {
+			case float64:
+				x.Maximum = v11
+			case float32:
+				x.Maximum = float64(v11)
+			case uint64:
+				x.Maximum = float64(v11)
+			case uint32:
+				x.Maximum = float64(v11)
+			case int64:
+				x.Maximum = float64(v11)
+			case int32:
+				x.Maximum = float64(v11)
+			case int:
+				x.Maximum = float64(v11)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v11, v11)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 12;
@@ -4040,22 +4193,31 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v12 != nil {
 			x.ExclusiveMaximum, ok = v12.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v12)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 13;
 		v13 := compiler.MapValueForKey(m, "minimum")
 		if v13 != nil {
-			x.Minimum, ok = v13.(float64)
-			if !ok {
-				t, ok := v13.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v13)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v13 := v13.(type) {
+			case float64:
+				x.Minimum = v13
+			case float32:
+				x.Minimum = float64(v13)
+			case uint64:
+				x.Minimum = float64(v13)
+			case uint32:
+				x.Minimum = float64(v13)
+			case int64:
+				x.Minimum = float64(v13)
+			case int32:
+				x.Minimum = float64(v13)
+			case int:
+				x.Minimum = float64(v13)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v13, v13)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 14;
@@ -4063,7 +4225,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v14 != nil {
 			x.ExclusiveMinimum, ok = v14.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4074,7 +4236,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4085,7 +4247,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v16)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4094,7 +4256,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v17 != nil {
 			x.Pattern, ok = v17.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v17)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4105,7 +4267,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v18)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4116,7 +4278,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v19)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4125,7 +4287,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v20 != nil {
 			x.UniqueItems, ok = v20.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v20)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v20, v20)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4148,15 +4310,24 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		// float multiple_of = 22;
 		v22 := compiler.MapValueForKey(m, "multipleOf")
 		if v22 != nil {
-			x.MultipleOf, ok = v22.(float64)
-			if !ok {
-				t, ok := v22.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v22)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v22 := v22.(type) {
+			case float64:
+				x.MultipleOf = v22
+			case float32:
+				x.MultipleOf = float64(v22)
+			case uint64:
+				x.MultipleOf = float64(v22)
+			case uint32:
+				x.MultipleOf = float64(v22)
+			case int64:
+				x.MultipleOf = float64(v22)
+			case int32:
+				x.MultipleOf = float64(v22)
+			case int:
+				x.MultipleOf = float64(v22)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v22, v22)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// repeated NamedAny vendor_extension = 23;
@@ -4199,7 +4370,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 	x := &Response{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"description"}
@@ -4220,7 +4391,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		if v1 != nil {
 			x.Description, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4291,7 +4462,7 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 	x := &ResponseDefinitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedResponse additional_properties = 1;
@@ -4359,7 +4530,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 	x := &Responses{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{}
@@ -4428,7 +4599,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	x := &Schema{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
@@ -4443,7 +4614,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v1 != nil {
 			x.XRef, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4452,7 +4623,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v2 != nil {
 			x.Format, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4461,7 +4632,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v3 != nil {
 			x.Title, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4470,7 +4641,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v4 != nil {
 			x.Description, ok = v4.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4486,29 +4657,47 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// float multiple_of = 6;
 		v6 := compiler.MapValueForKey(m, "multipleOf")
 		if v6 != nil {
-			x.MultipleOf, ok = v6.(float64)
-			if !ok {
-				t, ok := v6.(int64)
-				if ok {
-					x.MultipleOf = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for multipleOf: %+v", v6)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v6 := v6.(type) {
+			case float64:
+				x.MultipleOf = v6
+			case float32:
+				x.MultipleOf = float64(v6)
+			case uint64:
+				x.MultipleOf = float64(v6)
+			case uint32:
+				x.MultipleOf = float64(v6)
+			case int64:
+				x.MultipleOf = float64(v6)
+			case int32:
+				x.MultipleOf = float64(v6)
+			case int:
+				x.MultipleOf = float64(v6)
+			default:
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v6, v6)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float maximum = 7;
 		v7 := compiler.MapValueForKey(m, "maximum")
 		if v7 != nil {
-			x.Maximum, ok = v7.(float64)
-			if !ok {
-				t, ok := v7.(int64)
-				if ok {
-					x.Maximum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for maximum: %+v", v7)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v7 := v7.(type) {
+			case float64:
+				x.Maximum = v7
+			case float32:
+				x.Maximum = float64(v7)
+			case uint64:
+				x.Maximum = float64(v7)
+			case uint32:
+				x.Maximum = float64(v7)
+			case int64:
+				x.Maximum = float64(v7)
+			case int32:
+				x.Maximum = float64(v7)
+			case int:
+				x.Maximum = float64(v7)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v7, v7)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_maximum = 8;
@@ -4516,22 +4705,31 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v8 != nil {
 			x.ExclusiveMaximum, ok = v8.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v", v8)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// float minimum = 9;
 		v9 := compiler.MapValueForKey(m, "minimum")
 		if v9 != nil {
-			x.Minimum, ok = v9.(float64)
-			if !ok {
-				t, ok := v9.(int64)
-				if ok {
-					x.Minimum = float64(t)
-				} else {
-					message := fmt.Sprintf("has unexpected value for minimum: %+v", v9)
-					errors = append(errors, compiler.NewError(context, message))
-				}
+			switch v9 := v9.(type) {
+			case float64:
+				x.Minimum = v9
+			case float32:
+				x.Minimum = float64(v9)
+			case uint64:
+				x.Minimum = float64(v9)
+			case uint32:
+				x.Minimum = float64(v9)
+			case int64:
+				x.Minimum = float64(v9)
+			case int32:
+				x.Minimum = float64(v9)
+			case int:
+				x.Minimum = float64(v9)
+			default:
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v9, v9)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// bool exclusive_minimum = 10;
@@ -4539,7 +4737,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v10 != nil {
 			x.ExclusiveMinimum, ok = v10.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v", v10)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4550,7 +4748,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v", v11)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4561,7 +4759,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v", v12)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4570,7 +4768,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v13 != nil {
 			x.Pattern, ok = v13.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v", v13)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4581,7 +4779,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v", v14)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4592,7 +4790,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v", v15)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4601,7 +4799,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v16 != nil {
 			x.UniqueItems, ok = v16.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v", v16)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4612,7 +4810,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxProperties: %+v", v17)
+				message := fmt.Sprintf("has unexpected value for maxProperties: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4623,7 +4821,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minProperties: %+v", v18)
+				message := fmt.Sprintf("has unexpected value for minProperties: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4634,7 +4832,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for required: %+v", v19)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4711,7 +4909,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v26 != nil {
 			x.Discriminator, ok = v26.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for discriminator: %+v", v26)
+				message := fmt.Sprintf("has unexpected value for discriminator: %+v (%T)", v26, v26)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4720,7 +4918,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v27 != nil {
 			x.ReadOnly, ok = v27.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for readOnly: %+v", v27)
+				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v27, v27)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4830,7 +5028,7 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 	x := &SecurityDefinitions{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedSecurityDefinitionsItem additional_properties = 1;
@@ -4954,7 +5152,7 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 	x := &SecurityRequirement{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedStringArray additional_properties = 1;
@@ -4983,7 +5181,7 @@ func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, er
 	x := &StringArray{}
 	a, ok := in.([]interface{})
 	if !ok {
-		message := fmt.Sprintf("has unexpected value for StringArray: %+v", in)
+		message := fmt.Sprintf("has unexpected value for StringArray: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		x.Value = make([]string, 0)
@@ -4999,7 +5197,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 	x := &Tag{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		requiredKeys := []string{"name"}
@@ -5020,7 +5218,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5029,7 +5227,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		if v2 != nil {
 			x.Description, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5080,13 +5278,24 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
 	errors := make([]error, 0)
 	x := &TypeItem{}
-	value, ok := in.(string)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value for string array: %+v", in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
+	switch in := in.(type) {
+	case string:
 		x.Value = make([]string, 0)
-		x.Value = append(x.Value, value)
+		x.Value = append(x.Value, in)
+	case []interface{}:
+		x.Value = make([]string, 0)
+		for _, v := range in {
+			value, ok := v.(string)
+			if ok {
+				x.Value = append(x.Value, value)
+			} else {
+				message := fmt.Sprintf("has unexpected value for string array element: %+v (%T)", value, value)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+	default:
+		message := fmt.Sprintf("has unexpected value for string array: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -5096,7 +5305,7 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 	x := &VendorExtension{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		// repeated NamedAny additional_properties = 1;
@@ -5137,7 +5346,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 	x := &Xml{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v", in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
@@ -5152,7 +5361,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v1 != nil {
 			x.Name, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v", v1)
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5161,7 +5370,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v2 != nil {
 			x.Namespace, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for namespace: %+v", v2)
+				message := fmt.Sprintf("has unexpected value for namespace: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5170,7 +5379,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v3 != nil {
 			x.Prefix, ok = v3.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for prefix: %+v", v3)
+				message := fmt.Sprintf("has unexpected value for prefix: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5179,7 +5388,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v4 != nil {
 			x.Attribute, ok = v4.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for attribute: %+v", v4)
+				message := fmt.Sprintf("has unexpected value for attribute: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5188,7 +5397,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v5 != nil {
 			x.Wrapped, ok = v5.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for wrapped: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for wrapped: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5615,6 +5824,13 @@ func (m *JsonReference) ResolveReferences(root string) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
+		if info != nil {
+			replacement, err := NewJsonReference(info, nil)
+			if err == nil {
+				*m = *replacement
+				return m.ResolveReferences(root)
+			}
+		}
 		return info, nil
 	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
@@ -5959,6 +6175,7 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 		p, ok := m.Oneof.(*ParametersItem_JsonReference)
 		if ok {
 			info, err := p.JsonReference.ResolveReferences(root)
+			fmt.Printf("resoved parametersitem jsonreference %+v, %+v\n", info, err)
 			if err != nil {
 				return nil, err
 			} else if info != nil {

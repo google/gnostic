@@ -18,12 +18,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/googleapis/gnostic/plugins/go/gnostic_analyze/statistics"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
+
+	"github.com/googleapis/gnostic/plugins/go/gnostic_analyze/statistics"
 )
 
 // Results are collected in this global slice.
@@ -117,15 +118,15 @@ func main() {
 	// Report the results.
 	fmt.Printf("\n")
 	fmt.Printf("Collected information on %d APIs.\n\n", len(stats))
-	fmt.Printf("apis with anonymous ops: %d\n", apis_with_anonymous_ops)
-	fmt.Printf("\nop frequencies:\n")
+	fmt.Printf("APIs with anonymous operations: %d\n", apis_with_anonymous_ops)
+	fmt.Printf("\nOperation frequencies:\n")
 	printFrequencies(op_frequencies)
-	fmt.Printf("\nparameter type frequencies:\n")
+	fmt.Printf("\nParameter type frequencies:\n")
 	printFrequencies(parameter_type_frequencies)
-	fmt.Printf("\nresult type frequencies:\n")
+	fmt.Printf("\nResult type frequencies:\n")
 	printFrequencies(result_type_frequencies)
-	fmt.Printf("\ndefinition field type frequencies:\n")
+	fmt.Printf("\nDefinition object field type frequencies:\n")
 	printFrequencies(definition_field_type_frequencies)
-	fmt.Printf("\ndefinition array type frequencies:\n")
+	fmt.Printf("\nDefinition array type frequencies:\n")
 	printFrequencies(definition_array_type_frequencies)
 }
