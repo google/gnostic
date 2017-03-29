@@ -109,7 +109,6 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 				if qp != nil {
 					t := qp.Type
 					if t == "array" {
-						t += "-of-" + qp.Items.Type
 						if qp.Items.Type != "" {
 							t += "-of-" + qp.Items.Type
 						} else {
