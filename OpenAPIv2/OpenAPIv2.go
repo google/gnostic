@@ -5825,11 +5825,9 @@ func (m *JsonReference) ResolveReferences(root string) (interface{}, error) {
 			return nil, err
 		}
 		if info != nil {
-			replacement, err := NewJsonReference(info, nil)
-			if err == nil {
-				*m = *replacement
-				return m.ResolveReferences(root)
-			}
+			replacement, _ := NewJsonReference(info, nil)
+			*m = *replacement
+			return m.ResolveReferences(root)
 		}
 		return info, nil
 	}
@@ -6175,7 +6173,6 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 		p, ok := m.Oneof.(*ParametersItem_JsonReference)
 		if ok {
 			info, err := p.JsonReference.ResolveReferences(root)
-			fmt.Printf("resoved parametersitem jsonreference %+v, %+v\n", info, err)
 			if err != nil {
 				return nil, err
 			} else if info != nil {

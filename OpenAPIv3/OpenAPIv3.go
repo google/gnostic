@@ -108,20 +108,32 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 2;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 2;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -204,20 +216,32 @@ func NewCallbacks(in interface{}, context *compiler.Context) (*Callbacks, error)
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 2;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 2;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -323,20 +347,32 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 10;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 10;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -388,20 +424,32 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 4;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 4;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -419,21 +467,30 @@ func NewContent(in interface{}, context *compiler.Context) (*Content, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		// repeated NamedMediaType additional_properties = 1;
-		// MAP: MediaType
-		x.AdditionalProperties = make([]*NamedMediaType, 0)
+		allowedKeys := []string{}
+		allowedPatterns := []string{"{media-type}"}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// repeated NamedMediaType media_type = 1;
+		// MAP: MediaType {media-type}
+		x.MediaType = make([]*NamedMediaType, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				pair := &NamedMediaType{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewMediaType(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
+				if compiler.PatternMatches("{media-type}", k) {
+					pair := &NamedMediaType{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewMediaType(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.MediaType = append(x.MediaType, pair)
 				}
-				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
 		}
 	}
@@ -554,20 +611,32 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 9;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 9;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -666,20 +735,32 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 5;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -846,20 +927,32 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 3;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 3;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -1164,20 +1257,32 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 7;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 7;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -1244,20 +1349,32 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 3;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 3;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -1327,20 +1444,32 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 6;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 6;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -1523,20 +1652,32 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 5;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2064,43 +2205,6 @@ func NewNamedServerVariable(in interface{}, context *compiler.Context) (*NamedSe
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewNamedSpecificationExtension(in interface{}, context *compiler.Context) (*NamedSpecificationExtension, error) {
-	errors := make([]error, 0)
-	x := &NamedSpecificationExtension{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// string name = 1;
-		v1 := compiler.MapValueForKey(m, "name")
-		if v1 != nil {
-			x.Name, ok = v1.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// SpecificationExtension value = 2;
-		v2 := compiler.MapValueForKey(m, "value")
-		if v2 != nil {
-			var err error
-			x.Value, err = NewSpecificationExtension(v2, compiler.NewContext("value", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error) {
 	errors := make([]error, 0)
 	x := &OauthFlow{}
@@ -2109,12 +2213,6 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		requiredKeys := []string{"authorizationUrl", "scopes", "tokenUrl"}
-		missingKeys := compiler.MissingKeysInMap(m, requiredKeys)
-		if len(missingKeys) > 0 {
-			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
 		allowedKeys := []string{"authorizationUrl", "refreshUrl", "scopes", "tokenUrl"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
@@ -2158,20 +2256,32 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 5;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2232,20 +2342,32 @@ func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, erro
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 5;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2448,20 +2570,32 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 13;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 13;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2616,20 +2750,32 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 14;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 14;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2846,20 +2992,32 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 14;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 14;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2903,20 +3061,32 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 2;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 2;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -2930,10 +3100,53 @@ func NewPrimitive(in interface{}, context *compiler.Context) (*Primitive, error)
 	errors := make([]error, 0)
 	x := &Primitive{}
 	matched := false
-	// bool boolean = 1;
+	// int64 integer = 1;
+	v1 := compiler.MapValueForKey(m, "integer")
+	if v1 != nil {
+		t, ok := v1.(int)
+		if ok {
+			x.Integer = int64(t)
+		} else {
+			message := fmt.Sprintf("has unexpected value for integer: %+v (%T)", v1, v1)
+			errors = append(errors, compiler.NewError(context, message))
+		}
+	}
+	// float number = 2;
+	v2 := compiler.MapValueForKey(m, "number")
+	if v2 != nil {
+		switch v2 := v2.(type) {
+		case float64:
+			x.Number = v2
+		case float32:
+			x.Number = float64(v2)
+		case uint64:
+			x.Number = float64(v2)
+		case uint32:
+			x.Number = float64(v2)
+		case int64:
+			x.Number = float64(v2)
+		case int32:
+			x.Number = float64(v2)
+		case int:
+			x.Number = float64(v2)
+		default:
+			message := fmt.Sprintf("has unexpected value for number: %+v (%T)", v2, v2)
+			errors = append(errors, compiler.NewError(context, message))
+		}
+	}
+	// bool boolean = 3;
 	boolValue, ok := in.(bool)
 	if ok {
 		x.Oneof = &Primitive_Boolean{Boolean: boolValue}
+	}
+	// string string = 4;
+	v4 := compiler.MapValueForKey(m, "string")
+	if v4 != nil {
+		x.String, ok = v4.(string)
+		if !ok {
+			message := fmt.Sprintf("has unexpected value for string: %+v (%T)", v4, v4)
+			errors = append(errors, compiler.NewError(context, message))
+		}
 	}
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
@@ -3076,20 +3289,32 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 4;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 4;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -3195,20 +3420,32 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 5;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -3300,20 +3537,32 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 3;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 3;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -3331,7 +3580,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"$ref", "allOf", "anyOf", "deprecated", "description", "discriminator", "enum", "example", "examples", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "not", "nullable", "oneOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "writeOnly", "xml"}
+		allowedKeys := []string{"allOf", "anyOf", "deprecated", "description", "discriminator", "enum", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "not", "nullable", "oneOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "writeOnly", "xml"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -3392,230 +3641,212 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, err)
 			}
 		}
-		// Any example = 7;
-		v7 := compiler.MapValueForKey(m, "example")
+		// bool deprecated = 7;
+		v7 := compiler.MapValueForKey(m, "deprecated")
 		if v7 != nil {
-			var err error
-			x.Example, err = NewAny(v7, compiler.NewContext("example", context))
-			if err != nil {
-				errors = append(errors, err)
+			x.Deprecated, ok = v7.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v7, v7)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Any examples = 8;
-		v8 := compiler.MapValueForKey(m, "examples")
+		// string title = 8;
+		v8 := compiler.MapValueForKey(m, "title")
 		if v8 != nil {
-			var err error
-			x.Examples, err = NewAny(v8, compiler.NewContext("examples", context))
-			if err != nil {
-				errors = append(errors, err)
+			x.Title, ok = v8.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v8, v8)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool deprecated = 9;
-		v9 := compiler.MapValueForKey(m, "deprecated")
+		// float multiple_of = 9;
+		v9 := compiler.MapValueForKey(m, "multipleOf")
 		if v9 != nil {
-			x.Deprecated, ok = v9.(bool)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v9, v9)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// string title = 10;
-		v10 := compiler.MapValueForKey(m, "title")
-		if v10 != nil {
-			x.Title, ok = v10.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v10, v10)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// float multiple_of = 11;
-		v11 := compiler.MapValueForKey(m, "multipleOf")
-		if v11 != nil {
-			switch v11 := v11.(type) {
+			switch v9 := v9.(type) {
 			case float64:
-				x.MultipleOf = v11
+				x.MultipleOf = v9
 			case float32:
-				x.MultipleOf = float64(v11)
+				x.MultipleOf = float64(v9)
 			case uint64:
-				x.MultipleOf = float64(v11)
+				x.MultipleOf = float64(v9)
 			case uint32:
-				x.MultipleOf = float64(v11)
+				x.MultipleOf = float64(v9)
 			case int64:
-				x.MultipleOf = float64(v11)
+				x.MultipleOf = float64(v9)
 			case int32:
-				x.MultipleOf = float64(v11)
+				x.MultipleOf = float64(v9)
 			case int:
-				x.MultipleOf = float64(v11)
+				x.MultipleOf = float64(v9)
 			default:
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// float maximum = 12;
-		v12 := compiler.MapValueForKey(m, "maximum")
+		// float maximum = 10;
+		v10 := compiler.MapValueForKey(m, "maximum")
+		if v10 != nil {
+			switch v10 := v10.(type) {
+			case float64:
+				x.Maximum = v10
+			case float32:
+				x.Maximum = float64(v10)
+			case uint64:
+				x.Maximum = float64(v10)
+			case uint32:
+				x.Maximum = float64(v10)
+			case int64:
+				x.Maximum = float64(v10)
+			case int32:
+				x.Maximum = float64(v10)
+			case int:
+				x.Maximum = float64(v10)
+			default:
+				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v10, v10)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool exclusive_maximum = 11;
+		v11 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		if v11 != nil {
+			x.ExclusiveMaximum, ok = v11.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v11, v11)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// float minimum = 12;
+		v12 := compiler.MapValueForKey(m, "minimum")
 		if v12 != nil {
 			switch v12 := v12.(type) {
 			case float64:
-				x.Maximum = v12
+				x.Minimum = v12
 			case float32:
-				x.Maximum = float64(v12)
+				x.Minimum = float64(v12)
 			case uint64:
-				x.Maximum = float64(v12)
+				x.Minimum = float64(v12)
 			case uint32:
-				x.Maximum = float64(v12)
+				x.Minimum = float64(v12)
 			case int64:
-				x.Maximum = float64(v12)
+				x.Minimum = float64(v12)
 			case int32:
-				x.Maximum = float64(v12)
+				x.Minimum = float64(v12)
 			case int:
-				x.Maximum = float64(v12)
+				x.Minimum = float64(v12)
 			default:
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool exclusive_maximum = 13;
-		v13 := compiler.MapValueForKey(m, "exclusiveMaximum")
+		// bool exclusive_minimum = 13;
+		v13 := compiler.MapValueForKey(m, "exclusiveMinimum")
 		if v13 != nil {
-			x.ExclusiveMaximum, ok = v13.(bool)
+			x.ExclusiveMinimum, ok = v13.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// float minimum = 14;
-		v14 := compiler.MapValueForKey(m, "minimum")
+		// int64 max_length = 14;
+		v14 := compiler.MapValueForKey(m, "maxLength")
 		if v14 != nil {
-			switch v14 := v14.(type) {
-			case float64:
-				x.Minimum = v14
-			case float32:
-				x.Minimum = float64(v14)
-			case uint64:
-				x.Minimum = float64(v14)
-			case uint32:
-				x.Minimum = float64(v14)
-			case int64:
-				x.Minimum = float64(v14)
-			case int32:
-				x.Minimum = float64(v14)
-			case int:
-				x.Minimum = float64(v14)
-			default:
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v14, v14)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// bool exclusive_minimum = 15;
-		v15 := compiler.MapValueForKey(m, "exclusiveMinimum")
-		if v15 != nil {
-			x.ExclusiveMinimum, ok = v15.(bool)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v15, v15)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// int64 max_length = 16;
-		v16 := compiler.MapValueForKey(m, "maxLength")
-		if v16 != nil {
-			t, ok := v16.(int)
+			t, ok := v14.(int)
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// int64 min_length = 17;
-		v17 := compiler.MapValueForKey(m, "minLength")
-		if v17 != nil {
-			t, ok := v17.(int)
+		// int64 min_length = 15;
+		v15 := compiler.MapValueForKey(m, "minLength")
+		if v15 != nil {
+			t, ok := v15.(int)
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string pattern = 18;
-		v18 := compiler.MapValueForKey(m, "pattern")
-		if v18 != nil {
-			x.Pattern, ok = v18.(string)
+		// string pattern = 16;
+		v16 := compiler.MapValueForKey(m, "pattern")
+		if v16 != nil {
+			x.Pattern, ok = v16.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// int64 max_items = 19;
-		v19 := compiler.MapValueForKey(m, "maxItems")
-		if v19 != nil {
-			t, ok := v19.(int)
+		// int64 max_items = 17;
+		v17 := compiler.MapValueForKey(m, "maxItems")
+		if v17 != nil {
+			t, ok := v17.(int)
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// int64 min_items = 20;
-		v20 := compiler.MapValueForKey(m, "minItems")
-		if v20 != nil {
-			t, ok := v20.(int)
+		// int64 min_items = 18;
+		v18 := compiler.MapValueForKey(m, "minItems")
+		if v18 != nil {
+			t, ok := v18.(int)
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v20, v20)
+				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v18, v18)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool unique_items = 21;
-		v21 := compiler.MapValueForKey(m, "uniqueItems")
-		if v21 != nil {
-			x.UniqueItems, ok = v21.(bool)
+		// bool unique_items = 19;
+		v19 := compiler.MapValueForKey(m, "uniqueItems")
+		if v19 != nil {
+			x.UniqueItems, ok = v19.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v21, v21)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// int64 max_properties = 22;
-		v22 := compiler.MapValueForKey(m, "maxProperties")
-		if v22 != nil {
-			t, ok := v22.(int)
+		// int64 max_properties = 20;
+		v20 := compiler.MapValueForKey(m, "maxProperties")
+		if v20 != nil {
+			t, ok := v20.(int)
 			if ok {
 				x.MaxProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxProperties: %+v (%T)", v22, v22)
+				message := fmt.Sprintf("has unexpected value for maxProperties: %+v (%T)", v20, v20)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// int64 min_properties = 23;
-		v23 := compiler.MapValueForKey(m, "minProperties")
-		if v23 != nil {
-			t, ok := v23.(int)
+		// int64 min_properties = 21;
+		v21 := compiler.MapValueForKey(m, "minProperties")
+		if v21 != nil {
+			t, ok := v21.(int)
 			if ok {
 				x.MinProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minProperties: %+v (%T)", v23, v23)
+				message := fmt.Sprintf("has unexpected value for minProperties: %+v (%T)", v21, v21)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated string required = 24;
-		v24 := compiler.MapValueForKey(m, "required")
-		if v24 != nil {
-			v, ok := v24.([]interface{})
+		// repeated string required = 22;
+		v22 := compiler.MapValueForKey(m, "required")
+		if v22 != nil {
+			v, ok := v22.([]interface{})
 			if ok {
 				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v24, v24)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v22, v22)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated Any enum = 25;
-		v25 := compiler.MapValueForKey(m, "enum")
-		if v25 != nil {
+		// repeated Any enum = 23;
+		v23 := compiler.MapValueForKey(m, "enum")
+		if v23 != nil {
 			// repeated Any
 			x.Enum = make([]*Any, 0)
-			a, ok := v25.([]interface{})
+			a, ok := v23.([]interface{})
 			if ok {
 				for _, item := range a {
 					y, err := NewAny(item, compiler.NewContext("enum", context))
@@ -3626,30 +3857,21 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				}
 			}
 		}
-		// string _ref = 26;
-		v26 := compiler.MapValueForKey(m, "$ref")
-		if v26 != nil {
-			x.XRef, ok = v26.(string)
+		// string type = 24;
+		v24 := compiler.MapValueForKey(m, "type")
+		if v24 != nil {
+			x.Type, ok = v24.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v26, v26)
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v24, v24)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string type = 27;
-		v27 := compiler.MapValueForKey(m, "type")
-		if v27 != nil {
-			x.Type, ok = v27.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v27, v27)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// repeated Schema all_of = 28;
-		v28 := compiler.MapValueForKey(m, "allOf")
-		if v28 != nil {
+		// repeated Schema all_of = 25;
+		v25 := compiler.MapValueForKey(m, "allOf")
+		if v25 != nil {
 			// repeated Schema
 			x.AllOf = make([]*Schema, 0)
-			a, ok := v28.([]interface{})
+			a, ok := v25.([]interface{})
 			if ok {
 				for _, item := range a {
 					y, err := NewSchema(item, compiler.NewContext("allOf", context))
@@ -3660,12 +3882,12 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				}
 			}
 		}
-		// repeated Schema one_of = 29;
-		v29 := compiler.MapValueForKey(m, "oneOf")
-		if v29 != nil {
+		// repeated Schema one_of = 26;
+		v26 := compiler.MapValueForKey(m, "oneOf")
+		if v26 != nil {
 			// repeated Schema
 			x.OneOf = make([]*Schema, 0)
-			a, ok := v29.([]interface{})
+			a, ok := v26.([]interface{})
 			if ok {
 				for _, item := range a {
 					y, err := NewSchema(item, compiler.NewContext("oneOf", context))
@@ -3676,12 +3898,12 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				}
 			}
 		}
-		// repeated Schema any_of = 30;
-		v30 := compiler.MapValueForKey(m, "anyOf")
-		if v30 != nil {
+		// repeated Schema any_of = 27;
+		v27 := compiler.MapValueForKey(m, "anyOf")
+		if v27 != nil {
 			// repeated Schema
 			x.AnyOf = make([]*Schema, 0)
-			a, ok := v30.([]interface{})
+			a, ok := v27.([]interface{})
 			if ok {
 				for _, item := range a {
 					y, err := NewSchema(item, compiler.NewContext("anyOf", context))
@@ -3692,65 +3914,77 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				}
 			}
 		}
-		// Schema not = 31;
-		v31 := compiler.MapValueForKey(m, "not")
+		// Schema not = 28;
+		v28 := compiler.MapValueForKey(m, "not")
+		if v28 != nil {
+			var err error
+			x.Not, err = NewSchema(v28, compiler.NewContext("not", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// ItemsItem items = 29;
+		v29 := compiler.MapValueForKey(m, "items")
+		if v29 != nil {
+			var err error
+			x.Items, err = NewItemsItem(v29, compiler.NewContext("items", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// Properties properties = 30;
+		v30 := compiler.MapValueForKey(m, "properties")
+		if v30 != nil {
+			var err error
+			x.Properties, err = NewProperties(v30, compiler.NewContext("properties", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// string description = 31;
+		v31 := compiler.MapValueForKey(m, "description")
 		if v31 != nil {
-			var err error
-			x.Not, err = NewSchema(v31, compiler.NewContext("not", context))
-			if err != nil {
-				errors = append(errors, err)
+			x.Description, ok = v31.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v31, v31)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// ItemsItem items = 32;
-		v32 := compiler.MapValueForKey(m, "items")
+		// string format = 32;
+		v32 := compiler.MapValueForKey(m, "format")
 		if v32 != nil {
-			var err error
-			x.Items, err = NewItemsItem(v32, compiler.NewContext("items", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// Properties properties = 33;
-		v33 := compiler.MapValueForKey(m, "properties")
-		if v33 != nil {
-			var err error
-			x.Properties, err = NewProperties(v33, compiler.NewContext("properties", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// string description = 34;
-		v34 := compiler.MapValueForKey(m, "description")
-		if v34 != nil {
-			x.Description, ok = v34.(string)
+			x.Format, ok = v32.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v34, v34)
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v32, v32)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string format = 35;
-		v35 := compiler.MapValueForKey(m, "format")
-		if v35 != nil {
-			x.Format, ok = v35.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v35, v35)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// repeated NamedSpecificationExtension specification_extension = 36;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 33;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -3874,20 +4108,32 @@ func NewScopes(in interface{}, context *compiler.Context) (*Scopes, error) {
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 2;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 2;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -3955,7 +4201,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		requiredKeys := []string{"flow", "in", "name", "openIdConnectUrl", "scheme", "type"}
+		requiredKeys := []string{"type"}
 		missingKeys := compiler.MissingKeysInMap(m, requiredKeys)
 		if len(missingKeys) > 0 {
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
@@ -4040,20 +4286,32 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 9;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 9;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -4134,20 +4392,32 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 4;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 4;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -4212,20 +4482,32 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 4;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 4;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -4269,20 +4551,32 @@ func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVaria
 				}
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 2;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 2;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -4397,20 +4691,32 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 				errors = append(errors, err)
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 4;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 4;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -4480,20 +4786,32 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 6;
-		// MAP: SpecificationExtension ^x-
-		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		// repeated NamedAny specification_extension = 6;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedSpecificationExtension{}
+					pair := &NamedAny{}
 					pair.Name = k
-					var err error
-					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
@@ -4678,7 +4996,7 @@ func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Content) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	for _, item := range m.AdditionalProperties {
+	for _, item := range m.MediaType {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -5226,17 +5544,6 @@ func (m *NamedServerVariable) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *NamedSpecificationExtension) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	if m.Value != nil {
-		_, err := m.Value.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 func (m *OauthFlow) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
@@ -5730,18 +6037,6 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	if m.Example != nil {
-		_, err := m.Example.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	if m.Examples != nil {
-		_, err := m.Examples.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
 	for _, item := range m.Enum {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
@@ -5749,18 +6044,6 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 				errors = append(errors, err)
 			}
 		}
-	}
-	if m.XRef != "" {
-		info, err := compiler.ReadInfoForRef(root, m.XRef)
-		if err != nil {
-			return nil, err
-		}
-		if info != nil {
-			replacement, _ := NewSchema(info, nil)
-			*m = *replacement
-			return m.ResolveReferences(root)
-		}
-		return info, nil
 	}
 	for _, item := range m.AllOf {
 		if item != nil {

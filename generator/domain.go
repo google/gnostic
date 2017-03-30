@@ -336,9 +336,23 @@ func (domain *Domain) buildOneOfAccessors(typeModel *TypeModel, schema *jsonsche
 				typeProperty := NewTypePropertyWithNameAndType(*propertyName, typeName)
 				typeModel.addProperty(typeProperty)
 			}
-		} else if oneOf.Type != nil && oneOf.Type.String != nil && *oneOf.Type.String == "boolean" {
-			typeProperty := NewTypePropertyWithNameAndType("boolean", "bool")
-			typeModel.addProperty(typeProperty)
+		} else if oneOf.Type != nil && oneOf.Type.String != nil {
+			switch *oneOf.Type.String {
+			case "boolean":
+				typeProperty := NewTypePropertyWithNameAndType("boolean", "bool")
+				typeModel.addProperty(typeProperty)
+			case "integer":
+				typeProperty := NewTypePropertyWithNameAndType("integer", "int")
+				typeModel.addProperty(typeProperty)
+			case "number":
+				typeProperty := NewTypePropertyWithNameAndType("number", "float")
+				typeModel.addProperty(typeProperty)
+			case "string":
+				typeProperty := NewTypePropertyWithNameAndType("string", "string")
+				typeModel.addProperty(typeProperty)
+			default:
+				log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
+			}
 		} else {
 			log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
 		}

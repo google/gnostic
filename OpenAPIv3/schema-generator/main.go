@@ -163,7 +163,19 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 
 				requiredLabel := "**Required.** "
 				if strings.Contains(description, requiredLabel) {
-					schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
+					// only include required values if their "Validity" is "Any" or if no validity is specified
+					valid := true
+					if len(parts) == 4 {
+						validity := parts[2]
+						if strings.Contains(validity, "Any") {
+							valid = true
+						} else {
+							valid = false
+						}
+					}
+					if valid {
+						schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
+					}
 					description = strings.Replace(description, requiredLabel, "", -1)
 				}
 				schemaField := SchemaObjectField{
@@ -634,7 +646,6 @@ func main() {
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
-		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("any", objectSchema))
@@ -650,7 +661,6 @@ func main() {
 	// add schema objects for "specificationExtension"
 	if true {
 		objectSchema := &jsonschema.Schema{}
-		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.Description = stringptr("Any property starting with x- is valid.")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
@@ -690,7 +700,6 @@ func main() {
 			"required",
 			"enum",
 		})
-	schemaObject.AddProperty("$ref", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("type", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("allOf", arrayOfSchema())
 	schemaObject.AddProperty("oneOf", arrayOfSchema())
@@ -711,8 +720,10 @@ func main() {
 
 	// fix the content object
 	contentObject := schema.DefinitionWithName("content")
-	contentObject.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(
-		&jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")})
+	pairs := make([]*jsonschema.NamedSchema, 0)
+	contentObject.PatternProperties = &pairs
+	namedSchema := &jsonschema.NamedSchema{Name: "{media-type}", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
+	*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
 
 	// write the updated schema
 	output := schema.JSONString()

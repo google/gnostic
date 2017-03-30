@@ -138,6 +138,7 @@ func GenerateOpenAPIModel(version string) error {
 		"{name}":       "name",
 		"{expression}": "expression",
 		"/{path}":      "path",
+		"{media-type}": "mediaType",
 	}
 	err = cc.Build()
 	if err != nil {

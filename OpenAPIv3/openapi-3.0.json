@@ -456,8 +456,10 @@
     "content": {
       "type": "object",
       "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.",
-      "additionalProperties": {
-        "$ref": "#/definitions/mediaType"
+      "patternProperties": {
+        "{media-type}": {
+          "$ref": "#/definitions/mediaType"
+        }
       }
     },
     "mediaType": {
@@ -815,9 +817,6 @@
         "enum": {
           "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
         },
-        "$ref": {
-          "type": "string"
-        },
         "type": {
           "type": "string"
         },
@@ -903,12 +902,7 @@
       "type": "object",
       "description": "Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
       "required": [
-        "type",
-        "name",
-        "in",
-        "scheme",
-        "flow",
-        "openIdConnectUrl"
+        "type"
       ],
       "patternProperties": {
         "^x-": {
@@ -968,11 +962,6 @@
     "oauthFlow": {
       "type": "object",
       "description": "Configuration details for a supported OAuth Flow",
-      "required": [
-        "authorizationUrl",
-        "tokenUrl",
-        "scopes"
-      ],
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -1138,7 +1127,6 @@
       "additionalItems": true
     },
     "any": {
-      "type": "object",
       "additionalProperties": true,
       "additionalItems": true
     },
@@ -1148,7 +1136,6 @@
       "additionalItems": true
     },
     "specificationExtension": {
-      "type": "object",
       "description": "Any property starting with x- is valid.",
       "additionalProperties": true,
       "additionalItems": true
