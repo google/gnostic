@@ -823,21 +823,21 @@
         "allOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           },
           "minItems": 1
         },
         "oneOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           },
           "minItems": 1
         },
         "anyOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           },
           "minItems": 1
         },
@@ -852,7 +852,7 @@
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/schema"
+                "$ref": "#/definitions/schemaOrReference"
               },
               "minItems": 1
             }

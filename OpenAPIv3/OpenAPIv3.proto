@@ -191,7 +191,8 @@ message Info {
 }
 
 message ItemsItem {
-  repeated Schema schema = 1;
+  Schema schema = 1;
+  bool boolean = 2;
 }
 
 // License information for the exposed API.
@@ -527,9 +528,9 @@ message Schema {
   repeated string required = 22;
   repeated Any enum = 23;
   string type = 24;
-  repeated Schema all_of = 25;
-  repeated Schema one_of = 26;
-  repeated Schema any_of = 27;
+  repeated SchemaOrReference all_of = 25;
+  repeated SchemaOrReference one_of = 26;
+  repeated SchemaOrReference any_of = 27;
   Schema not = 28;
   ItemsItem items = 29;
   Properties properties = 30;

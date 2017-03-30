@@ -1297,15 +1297,34 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 	x := &ItemsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value for item array: %+v (%T)", in, in)
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		x.Schema = make([]*Schema, 0)
-		y, err := NewSchema(m, compiler.NewContext("<array>", context))
-		if err != nil {
-			return nil, err
+		allowedKeys := []string{"boolean", "schema"}
+		allowedPatterns := []string{}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
 		}
-		x.Schema = append(x.Schema, y)
+		// Schema schema = 1;
+		v1 := compiler.MapValueForKey(m, "schema")
+		if v1 != nil {
+			var err error
+			x.Schema, err = NewSchema(v1, compiler.NewContext("schema", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// bool boolean = 2;
+		v2 := compiler.MapValueForKey(m, "boolean")
+		if v2 != nil {
+			x.Boolean, ok = v2.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for boolean: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3836,15 +3855,15 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated Schema all_of = 25;
+		// repeated SchemaOrReference all_of = 25;
 		v25 := compiler.MapValueForKey(m, "allOf")
 		if v25 != nil {
-			// repeated Schema
-			x.AllOf = make([]*Schema, 0)
+			// repeated SchemaOrReference
+			x.AllOf = make([]*SchemaOrReference, 0)
 			a, ok := v25.([]interface{})
 			if ok {
 				for _, item := range a {
-					y, err := NewSchema(item, compiler.NewContext("allOf", context))
+					y, err := NewSchemaOrReference(item, compiler.NewContext("allOf", context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -3852,15 +3871,15 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				}
 			}
 		}
-		// repeated Schema one_of = 26;
+		// repeated SchemaOrReference one_of = 26;
 		v26 := compiler.MapValueForKey(m, "oneOf")
 		if v26 != nil {
-			// repeated Schema
-			x.OneOf = make([]*Schema, 0)
+			// repeated SchemaOrReference
+			x.OneOf = make([]*SchemaOrReference, 0)
 			a, ok := v26.([]interface{})
 			if ok {
 				for _, item := range a {
-					y, err := NewSchema(item, compiler.NewContext("oneOf", context))
+					y, err := NewSchemaOrReference(item, compiler.NewContext("oneOf", context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -3868,15 +3887,15 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				}
 			}
 		}
-		// repeated Schema any_of = 27;
+		// repeated SchemaOrReference any_of = 27;
 		v27 := compiler.MapValueForKey(m, "anyOf")
 		if v27 != nil {
-			// repeated Schema
-			x.AnyOf = make([]*Schema, 0)
+			// repeated SchemaOrReference
+			x.AnyOf = make([]*SchemaOrReference, 0)
 			a, ok := v27.([]interface{})
 			if ok {
 				for _, item := range a {
-					y, err := NewSchema(item, compiler.NewContext("anyOf", context))
+					y, err := NewSchemaOrReference(item, compiler.NewContext("anyOf", context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -5223,12 +5242,10 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 
 func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	for _, item := range m.Schema {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
+	if m.Schema != nil {
+		_, err := m.Schema.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
 		}
 	}
 	return nil, compiler.NewErrorGroupOrNil(errors)

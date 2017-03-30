@@ -545,7 +545,7 @@ func arrayOfSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type:     jsonschema.NewStringOrStringArrayWithString("array"),
 		MinItems: int64ptr(1),
-		Items:    jsonschema.NewSchemaOrSchemaArrayWithSchema(&jsonschema.Schema{Ref: stringptr("#/definitions/schema")}),
+		Items:    jsonschema.NewSchemaOrSchemaArrayWithSchema(&jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")}),
 	}
 }
 
