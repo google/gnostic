@@ -6175,7 +6175,6 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 		p, ok := m.Oneof.(*ParametersItem_JsonReference)
 		if ok {
 			info, err := p.JsonReference.ResolveReferences(root)
-			fmt.Printf("resoved parametersitem jsonreference %+v, %+v\n", info, err)
 			if err != nil {
 				return nil, err
 			} else if info != nil {
@@ -6200,9 +6199,11 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 			return nil, err
 		}
 		if info != nil {
-			replacement, _ := NewPathItem(info, nil)
-			*m = *replacement
-			return m.ResolveReferences(root)
+			replacement, err := NewPathItem(info, nil)
+			if err == nil {
+				*m = *replacement
+				return m.ResolveReferences(root)
+			}
 		}
 		return info, nil
 	}
@@ -6504,9 +6505,11 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 			return nil, err
 		}
 		if info != nil {
-			replacement, _ := NewSchema(info, nil)
-			*m = *replacement
-			return m.ResolveReferences(root)
+			replacement, err := NewSchema(info, nil)
+			if err == nil {
+				*m = *replacement
+				return m.ResolveReferences(root)
+			}
 		}
 		return info, nil
 	}

@@ -479,9 +479,11 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 
 				if len(typeModel.Properties) > 1 {
 					code.Print("if info != nil {")
-					code.Print("replacement, _ := New%s(info, nil)", typeName)
-					code.Print("*m = *replacement")
-					code.Print("return m.ResolveReferences(root)")
+					code.Print("  replacement, err := New%s(info, nil)", typeName)
+					code.Print("  if err == nil {")
+					code.Print("    *m = *replacement")
+					code.Print("    return m.ResolveReferences(root)")
+					code.Print("  }")
 					code.Print("}")
 				}
 
