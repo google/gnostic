@@ -3099,59 +3099,29 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 func NewPrimitive(in interface{}, context *compiler.Context) (*Primitive, error) {
 	errors := make([]error, 0)
 	x := &Primitive{}
-	matched := false
 	// int64 integer = 1;
-	v1 := compiler.MapValueForKey(m, "integer")
-	if v1 != nil {
-		t, ok := v1.(int)
-		if ok {
-			x.Integer = int64(t)
-		} else {
-			message := fmt.Sprintf("has unexpected value for integer: %+v (%T)", v1, v1)
-			errors = append(errors, compiler.NewError(context, message))
-		}
-	}
-	// float number = 2;
-	v2 := compiler.MapValueForKey(m, "number")
-	if v2 != nil {
-		switch v2 := v2.(type) {
-		case float64:
-			x.Number = v2
-		case float32:
-			x.Number = float64(v2)
-		case uint64:
-			x.Number = float64(v2)
-		case uint32:
-			x.Number = float64(v2)
-		case int64:
-			x.Number = float64(v2)
-		case int32:
-			x.Number = float64(v2)
-		case int:
-			x.Number = float64(v2)
-		default:
-			message := fmt.Sprintf("has unexpected value for number: %+v (%T)", v2, v2)
-			errors = append(errors, compiler.NewError(context, message))
-		}
-	}
-	// bool boolean = 3;
-	boolValue, ok := in.(bool)
+	v1, ok := in.(int64)
 	if ok {
-		x.Oneof = &Primitive_Boolean{Boolean: boolValue}
+		x.Oneof = &Primitive_Integer{Integer: v1}
+		return x, nil
 	}
-	// string string = 4;
-	v4 := compiler.MapValueForKey(m, "string")
-	if v4 != nil {
-		x.String, ok = v4.(string)
-		if !ok {
-			message := fmt.Sprintf("has unexpected value for string: %+v (%T)", v4, v4)
-			errors = append(errors, compiler.NewError(context, message))
-		}
+	v2, ok := in.(float64)
+	if ok {
+		x.Oneof = &Primitive_Number{Number: v2}
+		return x, nil
 	}
-	if matched {
-		// since the oneof matched one of its possibilities, discard any matching errors
-		errors = make([]error, 0)
+	v3, ok := in.(bool)
+	if ok {
+		x.Oneof = &Primitive_Boolean{Boolean: v3}
+		return x, nil
 	}
+	v4, ok := in.(string)
+	if ok {
+		x.Oneof = &Primitive_String_{String_: v4}
+		return x, nil
+	}
+	message := fmt.Sprintf("has unexpected value for primitive: %+v (%T)", in, in)
+	errors = append(errors, compiler.NewError(context, message))
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
