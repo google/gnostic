@@ -692,7 +692,7 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"Headers", "contentType", "explode", "style"}
+		allowedKeys := []string{"contentType", "explode", "headers", "style"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -709,10 +709,10 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 			}
 		}
 		// Object headers = 2;
-		v2 := compiler.MapValueForKey(m, "Headers")
+		v2 := compiler.MapValueForKey(m, "headers")
 		if v2 != nil {
 			var err error
-			x.Headers, err = NewObject(v2, compiler.NewContext("Headers", context))
+			x.Headers, err = NewObject(v2, compiler.NewContext("headers", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1297,34 +1297,15 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 	x := &ItemsItem{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		message := fmt.Sprintf("has unexpected value for item array: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"boolean", "schema"}
-		allowedPatterns := []string{}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
+		x.SchemaOrReference = make([]*SchemaOrReference, 0)
+		y, err := NewSchemaOrReference(m, compiler.NewContext("<array>", context))
+		if err != nil {
+			return nil, err
 		}
-		// Schema schema = 1;
-		v1 := compiler.MapValueForKey(m, "schema")
-		if v1 != nil {
-			var err error
-			x.Schema, err = NewSchema(v1, compiler.NewContext("schema", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// bool boolean = 2;
-		v2 := compiler.MapValueForKey(m, "boolean")
-		if v2 != nil {
-			x.Boolean, ok = v2.(bool)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for boolean: %+v (%T)", v2, v2)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
+		x.SchemaOrReference = append(x.SchemaOrReference, y)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -2521,20 +2502,13 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 				}
 			}
 		}
-		// repeated RequestBodyOrReference request_body = 7;
+		// RequestBodyOrReference request_body = 7;
 		v7 := compiler.MapValueForKey(m, "requestBody")
 		if v7 != nil {
-			// repeated RequestBodyOrReference
-			x.RequestBody = make([]*RequestBodyOrReference, 0)
-			a, ok := v7.([]interface{})
-			if ok {
-				for _, item := range a {
-					y, err := NewRequestBodyOrReference(item, compiler.NewContext("requestBody", context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.RequestBody = append(x.RequestBody, y)
-				}
+			var err error
+			x.RequestBody, err = NewRequestBodyOrReference(v7, compiler.NewContext("requestBody", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
 		// Responses responses = 8;
@@ -3118,29 +3092,34 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 func NewPrimitive(in interface{}, context *compiler.Context) (*Primitive, error) {
 	errors := make([]error, 0)
 	x := &Primitive{}
-	// int64 integer = 1;
-	v1, ok := in.(int64)
-	if ok {
-		x.Oneof = &Primitive_Integer{Integer: v1}
-		return x, nil
+	matched := false
+	switch in := in.(type) {
+	case bool:
+		x.Oneof = &Primitive_Boolean{Boolean: in}
+		matched = true
+	case string:
+		x.Oneof = &Primitive_String_{String_: in}
+		matched = true
+	case int64:
+		x.Oneof = &Primitive_Integer{Integer: in}
+		matched = true
+	case int32:
+		x.Oneof = &Primitive_Integer{Integer: int64(in)}
+		matched = true
+	case int:
+		x.Oneof = &Primitive_Integer{Integer: int64(in)}
+		matched = true
+	case float64:
+		x.Oneof = &Primitive_Number{Number: in}
+		matched = true
+	case float32:
+		x.Oneof = &Primitive_Number{Number: float64(in)}
+		matched = true
 	}
-	v2, ok := in.(float64)
-	if ok {
-		x.Oneof = &Primitive_Number{Number: v2}
-		return x, nil
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
-	v3, ok := in.(bool)
-	if ok {
-		x.Oneof = &Primitive_Boolean{Boolean: v3}
-		return x, nil
-	}
-	v4, ok := in.(string)
-	if ok {
-		x.Oneof = &Primitive_String_{String_: v4}
-		return x, nil
-	}
-	message := fmt.Sprintf("has unexpected value for primitive: %+v (%T)", in, in)
-	errors = append(errors, compiler.NewError(context, message))
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -5242,10 +5221,12 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 
 func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	if m.Schema != nil {
-		_, err := m.Schema.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
+	for _, item := range m.SchemaOrReference {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
@@ -5616,12 +5597,10 @@ func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 			}
 		}
 	}
-	for _, item := range m.RequestBody {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
+	if m.RequestBody != nil {
+		_, err := m.RequestBody.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
 		}
 	}
 	if m.Responses != nil {

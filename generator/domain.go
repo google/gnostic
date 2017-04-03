@@ -32,15 +32,17 @@ type Domain struct {
 	PatternNames       map[string]string       // a configured mapping from patterns to property names
 	ObjectTypeRequests map[string]*TypeRequest // anonymous types implied by type instantiation
 	MapTypeRequests    map[string]string       // "NamedObject" types that will be used to implement ordered maps
+	Version            string                  // OpenAPI Version ("v2" or "v3")
 }
 
-func NewDomain(schema *jsonschema.Schema) *Domain {
+func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 	cc := &Domain{}
 	cc.TypeModels = make(map[string]*TypeModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
 	cc.ObjectTypeRequests = make(map[string]*TypeRequest, 0)
 	cc.MapTypeRequests = make(map[string]string, 0)
 	cc.Schema = schema
+	cc.Version = version
 	return cc
 }
 

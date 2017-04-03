@@ -150,7 +150,7 @@ message ExternalDocs {
   repeated NamedAny specification_extension = 3;
 }
 
-// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST follow the location of `header` (for example, `style`).
+// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
 message Header {
   string name = 1;
   string in = 2;
@@ -191,8 +191,7 @@ message Info {
 }
 
 message ItemsItem {
-  Schema schema = 1;
-  bool boolean = 2;
+  repeated SchemaOrReference schema_or_reference = 1;
 }
 
 // License information for the exposed API.
@@ -380,7 +379,7 @@ message Operation {
   ExternalDocs external_docs = 4;
   string operation_id = 5;
   repeated ParameterOrReference parameters = 6;
-  repeated RequestBodyOrReference request_body = 7;
+  RequestBodyOrReference request_body = 7;
   Responses responses = 8;
   Callbacks callbacks = 9;
   bool deprecated = 10;

@@ -124,7 +124,7 @@ func GenerateOpenAPIModel(version string) error {
 	openapi_schema.ResolveAllOfs()
 
 	// build a simplified model of the types described by the schema
-	cc := NewDomain(openapi_schema)
+	cc := NewDomain(openapi_schema, version)
 	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 	cc.PatternNames = map[string]string{
