@@ -674,8 +674,14 @@ func main() {
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Description = stringptr("Any property starting with x- is valid.")
-		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		oneOf := make([]*jsonschema.Schema, 0)
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("object")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("array")})
+		objectSchema.OneOf = &oneOf
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("specificationExtension", objectSchema))
 	}
 

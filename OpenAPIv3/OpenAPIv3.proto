@@ -56,7 +56,7 @@ message AnyOrExpression {
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callback {
   repeated NamedPathItem expression = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedSpecificationExtension specification_extension = 2;
 }
 
 message CallbackOrReference {
@@ -69,7 +69,7 @@ message CallbackOrReference {
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callbacks {
   repeated NamedCallbackOrReference name = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedSpecificationExtension specification_extension = 2;
 }
 
 // Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.
@@ -83,7 +83,7 @@ message Components {
   SecuritySchemes security_schemes = 7;
   Links links = 8;
   Callbacks callbacks = 9;
-  repeated NamedAny specification_extension = 10;
+  repeated NamedSpecificationExtension specification_extension = 10;
 }
 
 // Contact information for the exposed API.
@@ -91,7 +91,7 @@ message Contact {
   string name = 1;
   string url = 2;
   string email = 3;
-  repeated NamedAny specification_extension = 4;
+  repeated NamedSpecificationExtension specification_extension = 4;
 }
 
 // Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.
@@ -108,7 +108,7 @@ message Document {
   repeated SecurityRequirement security = 6;
   repeated Tag tags = 7;
   ExternalDocs external_docs = 8;
-  repeated NamedAny specification_extension = 9;
+  repeated NamedSpecificationExtension specification_extension = 9;
 }
 
 // An object representing multipart region encoding for `requestBody` objects.
@@ -122,7 +122,7 @@ message EncodingProperty {
   Object headers = 2;
   string style = 3;
   bool explode = 4;
-  repeated NamedAny specification_extension = 5;
+  repeated NamedSpecificationExtension specification_extension = 5;
 }
 
 // Allows sharing examples for operation requests and responses. This object can either be a freeform object, array or primitive value.  To represent examples of media types that cannot naturally represented in the OpenAPI definition, a string value can be used to contain the example with escaping where necessary.
@@ -147,7 +147,7 @@ message Expression {
 message ExternalDocs {
   string description = 1;
   string url = 2;
-  repeated NamedAny specification_extension = 3;
+  repeated NamedSpecificationExtension specification_extension = 3;
 }
 
 // The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
@@ -187,7 +187,7 @@ message Info {
   Contact contact = 4;
   License license = 5;
   string version = 6;
-  repeated NamedAny specification_extension = 7;
+  repeated NamedSpecificationExtension specification_extension = 7;
 }
 
 message ItemsItem {
@@ -198,7 +198,7 @@ message ItemsItem {
 message License {
   string name = 1;
   string url = 2;
-  repeated NamedAny specification_extension = 3;
+  repeated NamedSpecificationExtension specification_extension = 3;
 }
 
 // The `Link Object` is responsible for defining a possible operation based on a single response.
@@ -208,7 +208,7 @@ message Link {
   LinkParameters parameters = 3;
   Headers headers = 4;
   string description = 5;
-  repeated NamedAny specification_extension = 6;
+  repeated NamedSpecificationExtension specification_extension = 6;
 }
 
 message LinkOrReference {
@@ -234,7 +234,7 @@ message MediaType {
   repeated ExampleOrReference examples = 2;
   ExampleOrReference example = 3;
   Encoding encoding = 4;
-  repeated NamedAny specification_extension = 5;
+  repeated NamedSpecificationExtension specification_extension = 5;
 }
 
 // Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
@@ -349,13 +349,21 @@ message NamedServerVariable {
   ServerVariable value = 2;
 }
 
+// Automatically-generated message used to represent maps of SpecificationExtension as ordered (name,value) pairs.
+message NamedSpecificationExtension {
+  // Map key
+  string name = 1;
+  // Mapped value
+  SpecificationExtension value = 2;
+}
+
 // Configuration details for a supported OAuth Flow
 message OauthFlow {
   string authorization_url = 1;
   string token_url = 2;
   string refresh_url = 3;
   Scopes scopes = 4;
-  repeated NamedAny specification_extension = 5;
+  repeated NamedSpecificationExtension specification_extension = 5;
 }
 
 // Allows configuration of the supported OAuth Flows.
@@ -364,7 +372,7 @@ message OauthFlows {
   OauthFlow password = 2;
   OauthFlow client_credentials = 3;
   OauthFlow authorization_code = 4;
-  repeated NamedAny specification_extension = 5;
+  repeated NamedSpecificationExtension specification_extension = 5;
 }
 
 message Object {
@@ -385,7 +393,7 @@ message Operation {
   bool deprecated = 10;
   repeated SecurityRequirement security = 11;
   Server servers = 12;
-  repeated NamedAny specification_extension = 13;
+  repeated NamedSpecificationExtension specification_extension = 13;
 }
 
 // Describes a single operation parameter.  A unique parameter is defined by a combination of a name and location.
@@ -403,7 +411,7 @@ message Parameter {
   repeated ExampleOrReference examples = 11;
   ExampleOrReference example = 12;
   Content content = 13;
-  repeated NamedAny specification_extension = 14;
+  repeated NamedSpecificationExtension specification_extension = 14;
 }
 
 message ParameterOrReference {
@@ -432,13 +440,13 @@ message PathItem {
   Operation trace = 11;
   Server servers = 12;
   repeated ParameterOrReference parameters = 13;
-  repeated NamedAny specification_extension = 14;
+  repeated NamedSpecificationExtension specification_extension = 14;
 }
 
 // Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.
 message Paths {
   repeated NamedPathItem path = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedSpecificationExtension specification_extension = 2;
 }
 
 message Primitive {
@@ -468,7 +476,7 @@ message RequestBody {
   string description = 1;
   Content content = 2;
   bool required = 3;
-  repeated NamedAny specification_extension = 4;
+  repeated NamedSpecificationExtension specification_extension = 4;
 }
 
 message RequestBodyOrReference {
@@ -484,7 +492,7 @@ message Response {
   Headers headers = 2;
   Content content = 3;
   Links links = 4;
-  repeated NamedAny specification_extension = 5;
+  repeated NamedSpecificationExtension specification_extension = 5;
 }
 
 message ResponseOrReference {
@@ -498,7 +506,7 @@ message ResponseOrReference {
 message Responses {
   ResponseOrReference default = 1;
   repeated NamedResponseOrReference response_code = 2;
-  repeated NamedAny specification_extension = 3;
+  repeated NamedSpecificationExtension specification_extension = 3;
 }
 
 // The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.
@@ -535,7 +543,7 @@ message Schema {
   Properties properties = 30;
   string description = 31;
   string format = 32;
-  repeated NamedAny specification_extension = 33;
+  repeated NamedSpecificationExtension specification_extension = 33;
 }
 
 message SchemaOrReference {
@@ -552,7 +560,7 @@ message Schemas {
 // Lists the available scopes for an OAuth2 security scheme.
 message Scopes {
   repeated NamedAny name = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedSpecificationExtension specification_extension = 2;
 }
 
 // Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.
@@ -570,7 +578,7 @@ message SecurityScheme {
   string bearer_format = 6;
   OauthFlows flow = 7;
   string open_id_connect_url = 8;
-  repeated NamedAny specification_extension = 9;
+  repeated NamedSpecificationExtension specification_extension = 9;
 }
 
 message SecuritySchemes {
@@ -582,7 +590,7 @@ message Server {
   string url = 1;
   string description = 2;
   ServerVariables variables = 3;
-  repeated NamedAny specification_extension = 4;
+  repeated NamedSpecificationExtension specification_extension = 4;
 }
 
 // An object representing a Server Variable for server URL template substitution.
@@ -590,17 +598,22 @@ message ServerVariable {
   repeated Primitive enum = 1;
   Primitive default = 2;
   string description = 3;
-  repeated NamedAny specification_extension = 4;
+  repeated NamedSpecificationExtension specification_extension = 4;
 }
 
 message ServerVariables {
   repeated NamedServerVariable name = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedSpecificationExtension specification_extension = 2;
 }
 
 // Any property starting with x- is valid.
 message SpecificationExtension {
-  repeated NamedAny additional_properties = 1;
+  oneof oneof {
+    int64 integer = 1;
+    double number = 2;
+    bool boolean = 3;
+    string string = 4;
+  }
 }
 
 message StringArray {
@@ -612,7 +625,7 @@ message Tag {
   string name = 1;
   string description = 2;
   ExternalDocs external_docs = 3;
-  repeated NamedAny specification_extension = 4;
+  repeated NamedSpecificationExtension specification_extension = 4;
 }
 
 // A metadata object that allows for more fine-tuned XML model definitions.  When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information. See examples for expected behavior.
@@ -622,6 +635,6 @@ message Xml {
   string prefix = 3;
   bool attribute = 4;
   bool wrapped = 5;
-  repeated NamedAny specification_extension = 6;
+  repeated NamedSpecificationExtension specification_extension = 6;
 }
 

@@ -1133,8 +1133,26 @@
     },
     "specificationExtension": {
       "description": "Any property starting with x- is valid.",
-      "additionalProperties": true,
-      "additionalItems": true
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        },
+        {
+          "type": "array"
+        }
+      ]
     },
     "primitive": {
       "oneOf": [
