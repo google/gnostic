@@ -328,11 +328,7 @@
           "uniqueItems": true
         },
         "requestBody": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/requestBodyOrReference"
-          },
-          "uniqueItems": true
+          "$ref": "#/definitions/requestBodyOrReference"
         },
         "responses": {
           "$ref": "#/definitions/responses"
@@ -456,8 +452,10 @@
     "content": {
       "type": "object",
       "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.",
-      "additionalProperties": {
-        "$ref": "#/definitions/mediaType"
+      "patternProperties": {
+        "{media-type}": {
+          "$ref": "#/definitions/mediaType"
+        }
       }
     },
     "mediaType": {
@@ -508,7 +506,7 @@
         "contentType": {
           "type": "string"
         },
-        "Headers": {
+        "headers": {
           "$ref": "#/definitions/object"
         },
         "style": {
@@ -645,7 +643,7 @@
     },
     "header": {
       "type": "object",
-      "description": "The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST follow the location of `header` (for example, `style`).",
+      "description": "The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).",
       "properties": {
         "name": {
           "type": "string"
@@ -815,30 +813,27 @@
         "enum": {
           "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
         },
-        "$ref": {
-          "type": "string"
-        },
         "type": {
           "type": "string"
         },
         "allOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           },
           "minItems": 1
         },
         "oneOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           },
           "minItems": 1
         },
         "anyOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           },
           "minItems": 1
         },
@@ -848,12 +843,12 @@
         "items": {
           "anyOf": [
             {
-              "$ref": "#/definitions/schema"
+              "$ref": "#/definitions/schemaOrReference"
             },
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/schema"
+                "$ref": "#/definitions/schemaOrReference"
               },
               "minItems": 1
             }
@@ -903,12 +898,7 @@
       "type": "object",
       "description": "Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
       "required": [
-        "type",
-        "name",
-        "in",
-        "scheme",
-        "flow",
-        "openIdConnectUrl"
+        "type"
       ],
       "patternProperties": {
         "^x-": {
@@ -968,11 +958,6 @@
     "oauthFlow": {
       "type": "object",
       "description": "Configuration details for a supported OAuth Flow",
-      "required": [
-        "authorizationUrl",
-        "tokenUrl",
-        "scopes"
-      ],
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -1138,7 +1123,6 @@
       "additionalItems": true
     },
     "any": {
-      "type": "object",
       "additionalProperties": true,
       "additionalItems": true
     },
@@ -1148,10 +1132,27 @@
       "additionalItems": true
     },
     "specificationExtension": {
-      "type": "object",
       "description": "Any property starting with x- is valid.",
-      "additionalProperties": true,
-      "additionalItems": true
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        },
+        {
+          "type": "array"
+        }
+      ]
     },
     "primitive": {
       "oneOf": [

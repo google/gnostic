@@ -32,15 +32,17 @@ type Domain struct {
 	PatternNames       map[string]string       // a configured mapping from patterns to property names
 	ObjectTypeRequests map[string]*TypeRequest // anonymous types implied by type instantiation
 	MapTypeRequests    map[string]string       // "NamedObject" types that will be used to implement ordered maps
+	Version            string                  // OpenAPI Version ("v2" or "v3")
 }
 
-func NewDomain(schema *jsonschema.Schema) *Domain {
+func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 	cc := &Domain{}
 	cc.TypeModels = make(map[string]*TypeModel, 0)
 	cc.PatternNames = make(map[string]string, 0)
 	cc.ObjectTypeRequests = make(map[string]*TypeRequest, 0)
 	cc.MapTypeRequests = make(map[string]string, 0)
 	cc.Schema = schema
+	cc.Version = version
 	return cc
 }
 
@@ -336,9 +338,23 @@ func (domain *Domain) buildOneOfAccessors(typeModel *TypeModel, schema *jsonsche
 				typeProperty := NewTypePropertyWithNameAndType(*propertyName, typeName)
 				typeModel.addProperty(typeProperty)
 			}
-		} else if oneOf.Type != nil && oneOf.Type.String != nil && *oneOf.Type.String == "boolean" {
-			typeProperty := NewTypePropertyWithNameAndType("boolean", "bool")
-			typeModel.addProperty(typeProperty)
+		} else if oneOf.Type != nil && oneOf.Type.String != nil {
+			switch *oneOf.Type.String {
+			case "boolean":
+				typeProperty := NewTypePropertyWithNameAndType("boolean", "bool")
+				typeModel.addProperty(typeProperty)
+			case "integer":
+				typeProperty := NewTypePropertyWithNameAndType("integer", "int")
+				typeModel.addProperty(typeProperty)
+			case "number":
+				typeProperty := NewTypePropertyWithNameAndType("number", "float")
+				typeModel.addProperty(typeProperty)
+			case "string":
+				typeProperty := NewTypePropertyWithNameAndType("string", "string")
+				typeModel.addProperty(typeProperty)
+			default:
+				log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
+			}
 		} else {
 			log.Printf("Unsupported oneOf:\n%+v", oneOf.String())
 		}

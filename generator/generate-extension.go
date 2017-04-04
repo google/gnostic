@@ -139,7 +139,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	openapiSchema.ResolveAllOfs()
 
 	// build a simplified model of the types described by the schema
-	cc := NewDomain(openapiSchema)
+	cc := NewDomain(openapiSchema, "v2") // TODO fix for OpenAPI v3
 
 	// create a type for each object defined in the schema
 	extensionToMessage := make(map[string]string)

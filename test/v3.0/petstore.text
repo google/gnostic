@@ -36,7 +36,7 @@ paths: <
             response: <
               description: "unexpected error"
               content: <
-                additional_properties: <
+                media_type: <
                   name: "application/json"
                   value: <
                     schema: <
@@ -70,7 +70,7 @@ paths: <
                   >
                 >
                 content: <
-                  additional_properties: <
+                  media_type: <
                     name: "application/json"
                     value: <
                       schema: <
@@ -95,7 +95,7 @@ paths: <
             response: <
               description: "unexpected error"
               content: <
-                additional_properties: <
+                media_type: <
                   name: "application/json"
                   value: <
                     schema: <
@@ -145,7 +145,7 @@ paths: <
             response: <
               description: "unexpected error"
               content: <
-                additional_properties: <
+                media_type: <
                   name: "application/json"
                   value: <
                     schema: <
@@ -164,7 +164,7 @@ paths: <
               response: <
                 description: "Expected response to a valid request"
                 content: <
-                  additional_properties: <
+                  media_type: <
                     name: "application/json"
                     value: <
                       schema: <
@@ -218,29 +218,9 @@ components: <
       value: <
         type: "array"
         items: <
-          schema: <
-            required: "id"
-            required: "name"
-            properties: <
-              additional_properties: <
-                name: "id"
-                value: <
-                  type: "integer"
-                  format: "int64"
-                >
-              >
-              additional_properties: <
-                name: "name"
-                value: <
-                  type: "string"
-                >
-              >
-              additional_properties: <
-                name: "tag"
-                value: <
-                  type: "string"
-                >
-              >
+          schema_or_reference: <
+            reference: <
+              _ref: "#/components/schemas/Pet"
             >
           >
         >

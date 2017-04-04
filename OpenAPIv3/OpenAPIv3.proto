@@ -96,7 +96,7 @@ message Contact {
 
 // Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.
 message Content {
-  repeated NamedMediaType additional_properties = 1;
+  repeated NamedMediaType media_type = 1;
 }
 
 message Document {
@@ -150,7 +150,7 @@ message ExternalDocs {
   repeated NamedSpecificationExtension specification_extension = 3;
 }
 
-// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST follow the location of `header` (for example, `style`).
+// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
 message Header {
   string name = 1;
   string in = 2;
@@ -191,7 +191,7 @@ message Info {
 }
 
 message ItemsItem {
-  repeated Schema schema = 1;
+  repeated SchemaOrReference schema_or_reference = 1;
 }
 
 // License information for the exposed API.
@@ -387,7 +387,7 @@ message Operation {
   ExternalDocs external_docs = 4;
   string operation_id = 5;
   repeated ParameterOrReference parameters = 6;
-  repeated RequestBodyOrReference request_body = 7;
+  RequestBodyOrReference request_body = 7;
   Responses responses = 8;
   Callbacks callbacks = 9;
   bool deprecated = 10;
@@ -451,7 +451,10 @@ message Paths {
 
 message Primitive {
   oneof oneof {
-    bool boolean = 1;
+    int64 integer = 1;
+    double number = 2;
+    bool boolean = 3;
+    string string = 4;
   }
 }
 
@@ -514,36 +517,33 @@ message Schema {
   bool write_only = 4;
   Xml xml = 5;
   ExternalDocs external_docs = 6;
-  Any example = 7;
-  Any examples = 8;
-  bool deprecated = 9;
-  string title = 10;
-  double multiple_of = 11;
-  double maximum = 12;
-  bool exclusive_maximum = 13;
-  double minimum = 14;
-  bool exclusive_minimum = 15;
-  int64 max_length = 16;
-  int64 min_length = 17;
-  string pattern = 18;
-  int64 max_items = 19;
-  int64 min_items = 20;
-  bool unique_items = 21;
-  int64 max_properties = 22;
-  int64 min_properties = 23;
-  repeated string required = 24;
-  repeated Any enum = 25;
-  string _ref = 26;
-  string type = 27;
-  repeated Schema all_of = 28;
-  repeated Schema one_of = 29;
-  repeated Schema any_of = 30;
-  Schema not = 31;
-  ItemsItem items = 32;
-  Properties properties = 33;
-  string description = 34;
-  string format = 35;
-  repeated NamedSpecificationExtension specification_extension = 36;
+  bool deprecated = 7;
+  string title = 8;
+  double multiple_of = 9;
+  double maximum = 10;
+  bool exclusive_maximum = 11;
+  double minimum = 12;
+  bool exclusive_minimum = 13;
+  int64 max_length = 14;
+  int64 min_length = 15;
+  string pattern = 16;
+  int64 max_items = 17;
+  int64 min_items = 18;
+  bool unique_items = 19;
+  int64 max_properties = 20;
+  int64 min_properties = 21;
+  repeated string required = 22;
+  repeated Any enum = 23;
+  string type = 24;
+  repeated SchemaOrReference all_of = 25;
+  repeated SchemaOrReference one_of = 26;
+  repeated SchemaOrReference any_of = 27;
+  Schema not = 28;
+  ItemsItem items = 29;
+  Properties properties = 30;
+  string description = 31;
+  string format = 32;
+  repeated NamedSpecificationExtension specification_extension = 33;
 }
 
 message SchemaOrReference {
@@ -608,7 +608,12 @@ message ServerVariables {
 
 // Any property starting with x- is valid.
 message SpecificationExtension {
-  repeated NamedAny additional_properties = 1;
+  oneof oneof {
+    int64 integer = 1;
+    double number = 2;
+    bool boolean = 3;
+    string string = 4;
+  }
 }
 
 message StringArray {

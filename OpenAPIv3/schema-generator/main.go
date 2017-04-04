@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"regexp"
 	"sort"
 	"strings"
@@ -134,14 +135,23 @@ func removeMarkdownLinks(input string) (output string) {
 func parseFixedFields(input string, schemaObject *SchemaObject) {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
+
+		line = strings.Replace(line, " \\| ", " OR ", -1)
+
 		parts := strings.Split(line, "|")
 		if len(parts) > 1 {
 			fieldName := strings.Trim(stripLink(parts[0]), " ")
 			if fieldName != "Field Name" && fieldName != "---" {
+
+				if len(parts) == 3 || len(parts) == 4 {
+					// this is what we expect
+				} else {
+					log.Printf("ERROR: %+v", parts)
+				}
+
 				typeName := parts[1]
 				typeName = strings.Trim(typeName, " ")
 				typeName = strings.Replace(typeName, "`", "", -1)
-				typeName = strings.Replace(typeName, " <span>&#124;</span> ", "|", -1)
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
@@ -163,7 +173,19 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 
 				requiredLabel := "**Required.** "
 				if strings.Contains(description, requiredLabel) {
-					schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
+					// only include required values if their "Validity" is "Any" or if no validity is specified
+					valid := true
+					if len(parts) == 4 {
+						validity := parts[2]
+						if strings.Contains(validity, "Any") {
+							valid = true
+						} else {
+							valid = false
+						}
+					}
+					if valid {
+						schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
+					}
 					description = strings.Replace(description, requiredLabel, "", -1)
 				}
 				schemaField := SchemaObjectField{
@@ -183,6 +205,9 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 func parsePatternedFields(input string, schemaObject *SchemaObject) {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
+
+		line = strings.Replace(line, " \\| ", " OR ", -1)
+
 		parts := strings.Split(line, "|")
 		if len(parts) > 1 {
 			fieldName := strings.Trim(stripLink(parts[0]), " ")
@@ -194,7 +219,6 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 				typeName := parts[1]
 				typeName = strings.Trim(typeName, " ")
 				typeName = strings.Replace(typeName, "`", "", -1)
-				typeName = strings.Replace(typeName, " <span>&#124;</span> ", "|", -1)
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
@@ -367,8 +391,8 @@ func definitionNameForType(typeName string) string {
 	case "ExternalDocumentation":
 		name = "externalDocs"
 	default:
-		// does the name contain a "|"
-		if parts := strings.Split(typeName, "|"); len(parts) > 1 {
+		// does the name contain an "OR"
+		if parts := strings.Split(typeName, "OR"); len(parts) > 1 {
 			name = lowerFirst(parts[0]) + "Or" + parts[1]
 			noteUnionType(name, parts[0], parts[1])
 		} else {
@@ -533,7 +557,7 @@ func arrayOfSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type:     jsonschema.NewStringOrStringArrayWithString("array"),
 		MinItems: int64ptr(1),
-		Items:    jsonschema.NewSchemaOrSchemaArrayWithSchema(&jsonschema.Schema{Ref: stringptr("#/definitions/schema")}),
+		Items:    jsonschema.NewSchemaOrSchemaArrayWithSchema(&jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")}),
 	}
 }
 
@@ -634,7 +658,6 @@ func main() {
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
-		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("any", objectSchema))
@@ -650,10 +673,15 @@ func main() {
 	// add schema objects for "specificationExtension"
 	if true {
 		objectSchema := &jsonschema.Schema{}
-		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.Description = stringptr("Any property starting with x- is valid.")
-		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
+		oneOf := make([]*jsonschema.Schema, 0)
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("object")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("array")})
+		objectSchema.OneOf = &oneOf
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("specificationExtension", objectSchema))
 	}
 
@@ -690,14 +718,13 @@ func main() {
 			"required",
 			"enum",
 		})
-	schemaObject.AddProperty("$ref", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("type", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("allOf", arrayOfSchema())
 	schemaObject.AddProperty("oneOf", arrayOfSchema())
 	schemaObject.AddProperty("anyOf", arrayOfSchema())
 	schemaObject.AddProperty("not", &jsonschema.Schema{Ref: stringptr("#/definitions/schema")})
 	anyOf := make([]*jsonschema.Schema, 0)
-	anyOf = append(anyOf, &jsonschema.Schema{Ref: stringptr("#/definitions/schema")})
+	anyOf = append(anyOf, &jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")})
 	anyOf = append(anyOf, arrayOfSchema())
 	schemaObject.AddProperty("items",
 		&jsonschema.Schema{AnyOf: &anyOf})
@@ -707,12 +734,13 @@ func main() {
 			&jsonschema.Schema{Ref: stringptr("#/definitions/schema")})})
 	schemaObject.AddProperty("description", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("format", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
-	fmt.Printf("SCHEMA\n%s\n", schemaObject.String())
 
 	// fix the content object
 	contentObject := schema.DefinitionWithName("content")
-	contentObject.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(
-		&jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")})
+	pairs := make([]*jsonschema.NamedSchema, 0)
+	contentObject.PatternProperties = &pairs
+	namedSchema := &jsonschema.NamedSchema{Name: "{media-type}", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
+	*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
 
 	// write the updated schema
 	output := schema.JSONString()
