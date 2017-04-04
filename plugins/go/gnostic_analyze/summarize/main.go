@@ -97,10 +97,6 @@ func main() {
 		if api.Operations["anonymous"] != 0 {
 			apis_with_anonymous_operations += 1
 			anonymous_anything = true
-			fmt.Printf("%s has anonymous operations %d/%d\n",
-				api.Name,
-				api.Operations["anonymous"],
-				api.Operations["total"])
 		}
 		if api.HasAnonymousObjects {
 			apis_with_anonymous_objects += 1
@@ -108,6 +104,8 @@ func main() {
 		}
 		if anonymous_anything {
 			apis_with_anonymous_anything += 1
+		} else {
+			fmt.Printf("%s has no anonymous operations or objects\n", api.Name)
 		}
 		for k, v := range api.Operations {
 			op_frequencies[k] += v
