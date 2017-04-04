@@ -14,23 +14,25 @@
 package statistics
 
 import (
-	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	openapi "github.com/googleapis/gnostic/OpenAPIv2"
 )
 
 // DocumentStatistics contains information collected about an API description.
 type DocumentStatistics struct {
-	Name                 string         `json:"name"`
-	Title                string         `json:"title"`
-	Operations           map[string]int `json:"operations"`
-	DefinitionCount      int            `json:"definitions"`
-	ParameterTypes       map[string]int `json:"parameterTypes"`
-	ResultTypes          map[string]int `json:"resultTypes"`
-	DefinitionFieldTypes map[string]int `json:"definitionFieldTypes"`
-	DefinitionArrayTypes map[string]int `json:"definitionArrayTypes"`
+	Name                   string         `json:"name"`
+	Title                  string         `json:"title"`
+	Operations             map[string]int `json:"operations"`
+	DefinitionCount        int            `json:"definitions"`
+	ParameterTypes         map[string]int `json:"parameterTypes"`
+	ResultTypes            map[string]int `json:"resultTypes"`
+	DefinitionFieldTypes   map[string]int `json:"definitionFieldTypes"`
+	DefinitionArrayTypes   map[string]int `json:"definitionArrayTypes"`
+	HasAnonymousOperations bool           `json:"hasAnonymousOperations"`
+	HasAnonymousObjects    bool           `json:"hasAnonymousObjects"`
 }
 
 func NewDocumentStatistics() *DocumentStatistics {
@@ -40,6 +42,8 @@ func NewDocumentStatistics() *DocumentStatistics {
 	s.ResultTypes = make(map[string]int, 0)
 	s.DefinitionFieldTypes = make(map[string]int, 0)
 	s.DefinitionArrayTypes = make(map[string]int, 0)
+	s.HasAnonymousOperations = false
+	s.HasAnonymousObjects = false
 	return s
 }
 
@@ -48,21 +52,30 @@ func (s *DocumentStatistics) addOperation(name string) {
 }
 
 func (s *DocumentStatistics) addParameterType(name string) {
+	if strings.Contains(name, "object") {
+		s.HasAnonymousObjects = true
+	}
 	s.ParameterTypes[name] = s.ParameterTypes[name] + 1
 }
 
 func (s *DocumentStatistics) addResultType(name string) {
+	if strings.Contains(name, "object") {
+		s.HasAnonymousObjects = true
+	}
 	s.ResultTypes[name] = s.ResultTypes[name] + 1
 }
 
 func (s *DocumentStatistics) addDefinitionFieldType(name string) {
-	if name == "array" {
-		panic(errors.New("hih?"))
+	if strings.Contains(name, "object") {
+		s.HasAnonymousObjects = true
 	}
 	s.DefinitionFieldTypes[name] = s.DefinitionFieldTypes[name] + 1
 }
 
 func (s *DocumentStatistics) addDefinitionArrayType(name string) {
+	if strings.Contains(name, "object") {
+		s.HasAnonymousObjects = true
+	}
 	s.DefinitionArrayTypes[name] = s.DefinitionArrayTypes[name] + 1
 }
 
@@ -70,6 +83,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 	s.addOperation("total")
 	if operation.OperationId == "" {
 		s.addOperation("anonymous")
+		s.HasAnonymousOperations = true
 	}
 	for _, parameter := range operation.Parameters {
 		p := parameter.GetParameter()

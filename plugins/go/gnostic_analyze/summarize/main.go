@@ -83,7 +83,9 @@ func main() {
 	filepath.Walk(".", walker)
 
 	// Compute some interesting properties.
-	apis_with_anonymous_ops := 0
+	apis_with_anonymous_operations := 0
+	apis_with_anonymous_objects := 0
+	apis_with_anonymous_anything := 0
 	op_frequencies := make(map[string]int, 0)
 	parameter_type_frequencies := make(map[string]int, 0)
 	result_type_frequencies := make(map[string]int, 0)
@@ -91,12 +93,21 @@ func main() {
 	definition_array_type_frequencies := make(map[string]int, 0)
 
 	for _, api := range stats {
+		anonymous_anything := false
 		if api.Operations["anonymous"] != 0 {
-			apis_with_anonymous_ops += 1
+			apis_with_anonymous_operations += 1
+			anonymous_anything = true
 			fmt.Printf("%s has anonymous operations %d/%d\n",
 				api.Name,
 				api.Operations["anonymous"],
 				api.Operations["total"])
+		}
+		if api.HasAnonymousObjects {
+			apis_with_anonymous_objects += 1
+			anonymous_anything = true
+		}
+		if anonymous_anything {
+			apis_with_anonymous_anything += 1
 		}
 		for k, v := range api.Operations {
 			op_frequencies[k] += v
@@ -118,7 +129,9 @@ func main() {
 	// Report the results.
 	fmt.Printf("\n")
 	fmt.Printf("Collected information on %d APIs.\n\n", len(stats))
-	fmt.Printf("APIs with anonymous operations: %d\n", apis_with_anonymous_ops)
+	fmt.Printf("APIs with anonymous operations: %d\n", apis_with_anonymous_operations)
+	fmt.Printf("APIs with anonymous objects: %d\n", apis_with_anonymous_objects)
+	fmt.Printf("APIs with anonymous anything: %d\n", apis_with_anonymous_anything)
 	fmt.Printf("\nOperation frequencies:\n")
 	printFrequencies(op_frequencies)
 	fmt.Printf("\nParameter type frequencies:\n")
