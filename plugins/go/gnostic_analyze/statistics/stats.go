@@ -198,6 +198,15 @@ func (s *DocumentStatistics) analyzeDefinition(definition *openapi.Schema) {
 		default:
 			log.Printf("type %s", typeName)
 		}
+	} else {
+		// treat unspecified types as "object"
+		if definition.Properties != nil {
+			for _, pair := range definition.Properties.AdditionalProperties {
+				propertySchema := pair.Value
+				propertyType := typeForSchema(propertySchema)
+				s.addDefinitionFieldType(propertyType)
+			}
+		}
 	}
 }
 
