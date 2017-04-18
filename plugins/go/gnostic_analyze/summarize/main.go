@@ -93,19 +93,26 @@ func main() {
 	definition_array_type_frequencies := make(map[string]int, 0)
 
 	for _, api := range stats {
-		anonymous_anything := false
 		if api.Operations["anonymous"] != 0 {
 			apis_with_anonymous_operations += 1
-			anonymous_anything = true
 		}
 		if api.HasAnonymousObjects {
 			apis_with_anonymous_objects += 1
-			anonymous_anything = true
 		}
-		if anonymous_anything {
+		if api.HasAnonymousOperations {
 			apis_with_anonymous_anything += 1
+			if api.HasAnonymousObjects {
+				fmt.Printf("%s has anonymous operations and objects\n", api.Name)
+			} else {
+				fmt.Printf("%s has anonymous operations\n", api.Name)
+			}
 		} else {
-			fmt.Printf("%s has no anonymous operations or objects\n", api.Name)
+			if api.HasAnonymousObjects {
+				apis_with_anonymous_anything += 1
+				fmt.Printf("%s has anonymous objects\n", api.Name)
+			} else {
+				fmt.Printf("%s has no anonymous operations or objects\n", api.Name)
+			}
 		}
 		for k, v := range api.Operations {
 			op_frequencies[k] += v

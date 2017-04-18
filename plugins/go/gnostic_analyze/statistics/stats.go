@@ -33,6 +33,8 @@ type DocumentStatistics struct {
 	DefinitionArrayTypes   map[string]int `json:"definitionArrayTypes"`
 	HasAnonymousOperations bool           `json:"hasAnonymousOperations"`
 	HasAnonymousObjects    bool           `json:"hasAnonymousObjects"`
+	AnonymousOperations    []string       `json:"anonymousOperations"`
+	AnonymousObjects       []string       `json:"anonymousObjects"`
 }
 
 func NewDocumentStatistics() *DocumentStatistics {
@@ -44,6 +46,8 @@ func NewDocumentStatistics() *DocumentStatistics {
 	s.DefinitionArrayTypes = make(map[string]int, 0)
 	s.HasAnonymousOperations = false
 	s.HasAnonymousObjects = false
+	s.AnonymousOperations = make([]string, 0)
+	s.AnonymousObjects = make([]string, 0)
 	return s
 }
 
@@ -51,39 +55,44 @@ func (s *DocumentStatistics) addOperation(name string) {
 	s.Operations[name] = s.Operations[name] + 1
 }
 
-func (s *DocumentStatistics) addParameterType(name string) {
+func (s *DocumentStatistics) addParameterType(path string, name string) {
 	if strings.Contains(name, "object") {
 		s.HasAnonymousObjects = true
+		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.ParameterTypes[name] = s.ParameterTypes[name] + 1
 }
 
-func (s *DocumentStatistics) addResultType(name string) {
+func (s *DocumentStatistics) addResultType(path string, name string) {
 	if strings.Contains(name, "object") {
 		s.HasAnonymousObjects = true
+		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.ResultTypes[name] = s.ResultTypes[name] + 1
 }
 
-func (s *DocumentStatistics) addDefinitionFieldType(name string) {
+func (s *DocumentStatistics) addDefinitionFieldType(path string, name string) {
 	if strings.Contains(name, "object") {
 		s.HasAnonymousObjects = true
+		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.DefinitionFieldTypes[name] = s.DefinitionFieldTypes[name] + 1
 }
 
-func (s *DocumentStatistics) addDefinitionArrayType(name string) {
+func (s *DocumentStatistics) addDefinitionArrayType(path string, name string) {
 	if strings.Contains(name, "object") {
 		s.HasAnonymousObjects = true
+		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.DefinitionArrayTypes[name] = s.DefinitionArrayTypes[name] + 1
 }
 
-func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
+func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Operation) {
 	s.addOperation("total")
 	if operation.OperationId == "" {
 		s.addOperation("anonymous")
 		s.HasAnonymousOperations = true
+		s.AnonymousOperations = append(s.AnonymousOperations, path)
 	}
 	for _, parameter := range operation.Parameters {
 		p := parameter.GetParameter()
@@ -91,7 +100,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 			b := p.GetBodyParameter()
 			if b != nil {
 				typeName := typeForSchema(b.Schema)
-				s.addParameterType(typeName)
+				s.addParameterType(path+"/"+b.Name, typeName)
 			}
 			n := p.GetNonBodyParameter()
 			if n != nil {
@@ -105,7 +114,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 							t += "-of-? " + fmt.Sprintf("(%+v)", hp)
 						}
 					}
-					s.addParameterType(t)
+					s.addParameterType(path+"/"+hp.Name, t)
 				}
 				fp := n.GetFormDataParameterSubSchema()
 				if fp != nil {
@@ -117,7 +126,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 							t += "-of-" + fmt.Sprintf("(%+v)", fp)
 						}
 					}
-					s.addParameterType(t)
+					s.addParameterType(path+"/"+fp.Name, t)
 				}
 				qp := n.GetQueryParameterSubSchema()
 				if qp != nil {
@@ -129,7 +138,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 							t += "-of-? " + fmt.Sprintf("(%+v)", qp)
 						}
 					}
-					s.addParameterType(t)
+					s.addParameterType(path+"/"+qp.Name, t)
 				}
 				pp := n.GetPathParameterSubSchema()
 				if pp != nil {
@@ -141,13 +150,13 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 							t += "-of-? " + fmt.Sprintf("(%+v)", pp)
 						}
 					}
-					s.addParameterType(t)
+					s.addParameterType(path+"/"+pp.Name, t)
 				}
 			}
 		}
 		r := parameter.GetJsonReference()
 		if r != nil {
-			s.addParameterType("reference")
+			s.addParameterType(path+"/", "reference")
 		}
 	}
 
@@ -158,11 +167,11 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 			responseSchema := response.Schema
 			responseSchemaSchema := responseSchema.GetSchema()
 			if responseSchemaSchema != nil {
-				s.addResultType(typeForSchema(responseSchemaSchema))
+				s.addResultType(path+"/", typeForSchema(responseSchemaSchema))
 			}
 			responseFileSchema := responseSchema.GetFileSchema()
 			if responseFileSchema != nil {
-				s.addResultType(typeForFileSchema(responseFileSchema))
+				s.addResultType(path+"/", typeForFileSchema(responseFileSchema))
 			}
 		}
 		ref := value.GetJsonReference()
@@ -172,7 +181,7 @@ func (s *DocumentStatistics) analyzeOperation(operation *openapi.Operation) {
 
 }
 
-func (s *DocumentStatistics) analyzeDefinition(definition *openapi.Schema) {
+func (s *DocumentStatistics) analyzeDefinition(path string, definition *openapi.Schema) {
 	s.DefinitionCount++
 	if definition.Type != nil {
 		typeName := definition.Type.Value[0]
@@ -182,11 +191,11 @@ func (s *DocumentStatistics) analyzeDefinition(definition *openapi.Schema) {
 				for _, pair := range definition.Properties.AdditionalProperties {
 					propertySchema := pair.Value
 					propertyType := typeForSchema(propertySchema)
-					s.addDefinitionFieldType(propertyType)
+					s.addDefinitionFieldType(path+"/"+pair.Name, propertyType)
 				}
 			}
 		case "array":
-			s.addDefinitionArrayType(typeForSchema(definition))
+			s.addDefinitionArrayType(path+"/", typeForSchema(definition))
 		case "string":
 			// seems ok
 		case "boolean":
@@ -204,7 +213,7 @@ func (s *DocumentStatistics) analyzeDefinition(definition *openapi.Schema) {
 			for _, pair := range definition.Properties.AdditionalProperties {
 				propertySchema := pair.Value
 				propertyType := typeForSchema(propertySchema)
-				s.addDefinitionFieldType(propertyType)
+				s.addDefinitionFieldType(path+"/"+pair.Name, propertyType)
 			}
 		}
 	}
@@ -216,25 +225,25 @@ func (s *DocumentStatistics) AnalyzeDocument(document *openapi.Document) {
 		path := pair.Value
 		if path.Get != nil {
 			s.addOperation("get")
-			s.analyzeOperation(path.Get)
+			s.analyzeOperation("paths"+pair.Name+"/get", path.Get)
 		}
 		if path.Post != nil {
 			s.addOperation("post")
-			s.analyzeOperation(path.Post)
+			s.analyzeOperation("paths"+pair.Name+"/post", path.Post)
 		}
 		if path.Put != nil {
 			s.addOperation("put")
-			s.analyzeOperation(path.Put)
+			s.analyzeOperation("paths"+pair.Name+"/put", path.Put)
 		}
 		if path.Delete != nil {
 			s.addOperation("delete")
-			s.analyzeOperation(path.Delete)
+			s.analyzeOperation("paths"+pair.Name+"/delete", path.Delete)
 		}
 	}
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			definition := pair.Value
-			s.analyzeDefinition(definition)
+			s.analyzeDefinition("definitions/"+pair.Name, definition)
 		}
 	}
 }
