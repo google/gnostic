@@ -167,11 +167,11 @@ func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Op
 			responseSchema := response.Schema
 			responseSchemaSchema := responseSchema.GetSchema()
 			if responseSchemaSchema != nil {
-				s.addResultType(path+"/", typeForSchema(responseSchemaSchema))
+				s.addResultType(path+"/responses/"+pair.Name, typeForSchema(responseSchemaSchema))
 			}
 			responseFileSchema := responseSchema.GetFileSchema()
 			if responseFileSchema != nil {
-				s.addResultType(path+"/", typeForFileSchema(responseFileSchema))
+				s.addResultType(path+"/responses/"+pair.Name, typeForFileSchema(responseFileSchema))
 			}
 		}
 		ref := value.GetJsonReference()
