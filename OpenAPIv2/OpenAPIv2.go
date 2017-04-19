@@ -576,6 +576,12 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 				message := fmt.Sprintf("has unexpected value for schemes: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [http https ws wss]
+			if ok && !compiler.StringArrayContainsValues([]string{"http", "https", "ws", "wss"}, x.Schemes) {
+				message := fmt.Sprintf("has unexpected value for schemes: %+v", v5)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// repeated string consumes = 6;
 		v6 := compiler.MapValueForKey(m, "consumes")
@@ -3224,6 +3230,12 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 				x.Schemes = compiler.ConvertInterfaceArrayToStringArray(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for schemes: %+v (%T)", v10, v10)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [http https ws wss]
+			if ok && !compiler.StringArrayContainsValues([]string{"http", "https", "ws", "wss"}, x.Schemes) {
+				message := fmt.Sprintf("has unexpected value for schemes: %+v", v10)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}

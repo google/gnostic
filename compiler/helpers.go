@@ -182,3 +182,12 @@ func StringArrayContainsValue(array []string, value string) bool {
 	}
 	return false
 }
+
+func StringArrayContainsValues(array []string, values []string) bool {
+	for _, value := range values {
+		if !StringArrayContainsValue(array, value) {
+			return false
+		}
+	}
+	return true
+}

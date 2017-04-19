@@ -191,12 +191,26 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 					}
 					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("array") {
-					// the property has an array type, so define it as a a repeated property of the specified type
+					// the property has an array type, so define it as a repeated property of the specified type
 					propertyTypeName := domain.arrayItemTypeForSchema(propertyName, propertySchema)
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, propertyTypeName)
 					typeProperty.Repeated = true
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
+					}
+					if typeProperty.Type == "string" {
+						itemSchema := propertySchema.Items.Schema
+						if itemSchema != nil {
+							if itemSchema.Enumeration != nil {
+								allowedValues := make([]string, 0)
+								for _, enumValue := range *itemSchema.Enumeration {
+									if enumValue.String != nil {
+										allowedValues = append(allowedValues, *enumValue.String)
+									}
+								}
+								typeProperty.StringEnumValues = allowedValues
+							}
+						}
 					}
 					typeModel.addProperty(typeProperty)
 				} else {
