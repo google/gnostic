@@ -265,6 +265,20 @@ func typeForSchema(schema *openapi.Schema) string {
 			} else {
 				return fmt.Sprintf("array-of-%+v", schema)
 			}
+		} else if value == "object" {
+			// this might be representable with a map
+			// or not
+			if (schema.Properties != nil) && (len(schema.Properties.AdditionalProperties) > 0) {
+				return value
+			}
+			if schema.AdditionalProperties.GetSchema().Type != nil {
+				return "map-of-" + schema.AdditionalProperties.GetSchema().Type.Value[0]
+			}
+			if schema.AdditionalProperties.GetSchema().XRef != "" {
+				return "map-of-reference"
+			} else {
+				return "map-of-" + fmt.Sprintf("%+v", schema)
+			}
 		} else {
 			return value
 		}
