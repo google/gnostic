@@ -15,7 +15,6 @@ package statistics
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	openapi "github.com/googleapis/gnostic/OpenAPIv2"
@@ -23,31 +22,34 @@ import (
 
 // DocumentStatistics contains information collected about an API description.
 type DocumentStatistics struct {
-	Name                   string         `json:"name"`
-	Title                  string         `json:"title"`
-	Operations             map[string]int `json:"operations"`
-	DefinitionCount        int            `json:"definitions"`
-	ParameterTypes         map[string]int `json:"parameterTypes"`
-	ResultTypes            map[string]int `json:"resultTypes"`
-	DefinitionFieldTypes   map[string]int `json:"definitionFieldTypes"`
-	DefinitionArrayTypes   map[string]int `json:"definitionArrayTypes"`
-	HasAnonymousOperations bool           `json:"hasAnonymousOperations"`
-	HasAnonymousObjects    bool           `json:"hasAnonymousObjects"`
-	AnonymousOperations    []string       `json:"anonymousOperations"`
-	AnonymousObjects       []string       `json:"anonymousObjects"`
+	Name                     string         `json:"name"`
+	Title                    string         `json:"title"`
+	Operations               map[string]int `json:"operations"`
+	DefinitionCount          int            `json:"definitions"`
+	ParameterTypes           map[string]int `json:"parameterTypes"`
+	ResultTypes              map[string]int `json:"resultTypes"`
+	DefinitionFieldTypes     map[string]int `json:"definitionFieldTypes"`
+	DefinitionArrayTypes     map[string]int `json:"definitionArrayTypes"`
+	DefinitionPrimitiveTypes map[string]int `json:"definitionPrimitiveTypes"`
+	HasAnonymousOperations   bool           `json:"hasAnonymousOperations"`
+	HasAnonymousObjects      bool           `json:"hasAnonymousObjects"`
+	AnonymousOperations      []string       `json:"anonymousOperations"`
+	AnonymousObjects         []string       `json:"anonymousObjects"`
 }
 
-func NewDocumentStatistics() *DocumentStatistics {
+func NewDocumentStatistics(source string, document *openapi.Document) *DocumentStatistics {
 	s := &DocumentStatistics{}
 	s.Operations = make(map[string]int, 0)
 	s.ParameterTypes = make(map[string]int, 0)
 	s.ResultTypes = make(map[string]int, 0)
 	s.DefinitionFieldTypes = make(map[string]int, 0)
 	s.DefinitionArrayTypes = make(map[string]int, 0)
+	s.DefinitionPrimitiveTypes = make(map[string]int, 0)
 	s.HasAnonymousOperations = false
 	s.HasAnonymousObjects = false
 	s.AnonymousOperations = make([]string, 0)
 	s.AnonymousObjects = make([]string, 0)
+	s.analyzeDocument(source, document)
 	return s
 }
 
@@ -87,7 +89,22 @@ func (s *DocumentStatistics) addDefinitionArrayType(path string, name string) {
 	s.DefinitionArrayTypes[name] = s.DefinitionArrayTypes[name] + 1
 }
 
-func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Operation) {
+func (s *DocumentStatistics) addDefinitionPrimitiveType(path string, name string) {
+	s.DefinitionPrimitiveTypes[name] = s.DefinitionPrimitiveTypes[name] + 1
+}
+
+func typeForPrimitivesItems(p *openapi.PrimitivesItems) string {
+	if p.Type != "" {
+		return p.Type
+	} else if p.Items != nil && p.Items.Type != "" {
+		return p.Items.Type
+	} else {
+		return "object" + fmt.Sprintf("{{%+v}}", p)
+	}
+}
+
+func (s *DocumentStatistics) analyzeOperation(method string, path string, operation *openapi.Operation) {
+	s.addOperation(method)
 	s.addOperation("total")
 	if operation.OperationId == "" {
 		s.addOperation("anonymous")
@@ -108,11 +125,7 @@ func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Op
 				if hp != nil {
 					t := hp.Type
 					if t == "array" {
-						if hp.Items.Type != "" {
-							t += "-of-" + hp.Items.Type
-						} else {
-							t += "-of-? " + fmt.Sprintf("(%+v)", hp)
-						}
+						t += "-of-" + typeForPrimitivesItems(hp.Items)
 					}
 					s.addParameterType(path+"/"+hp.Name, t)
 				}
@@ -120,11 +133,7 @@ func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Op
 				if fp != nil {
 					t := fp.Type
 					if t == "array" {
-						if fp.Items.Type != "" {
-							t += "-of-" + fp.Items.Type
-						} else {
-							t += "-of-" + fmt.Sprintf("(%+v)", fp)
-						}
+						t += "-of-" + typeForPrimitivesItems(fp.Items)
 					}
 					s.addParameterType(path+"/"+fp.Name, t)
 				}
@@ -132,10 +141,8 @@ func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Op
 				if qp != nil {
 					t := qp.Type
 					if t == "array" {
-						if qp.Items.Type != "" {
-							t += "-of-" + qp.Items.Type
-						} else {
-							t += "-of-? " + fmt.Sprintf("(%+v)", qp)
+						if t == "array" {
+							t += "-of-" + typeForPrimitivesItems(qp.Items)
 						}
 					}
 					s.addParameterType(path+"/"+qp.Name, t)
@@ -144,10 +151,8 @@ func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Op
 				if pp != nil {
 					t := pp.Type
 					if t == "array" {
-						if pp.Items.Type != "" {
-							t += "-of-" + pp.Items.Type
-						} else {
-							t += "-of-? " + fmt.Sprintf("(%+v)", pp)
+						if t == "array" {
+							t += "-of-" + typeForPrimitivesItems(pp.Items)
 						}
 					}
 					s.addParameterType(path+"/"+pp.Name, t)
@@ -181,34 +186,14 @@ func (s *DocumentStatistics) analyzeOperation(path string, operation *openapi.Op
 
 }
 
+// Analyze a definition in an OpenAPI description.
+// Collect information about the definition type and any subsidiary types,
+// such as the types of object fields or array elements.
 func (s *DocumentStatistics) analyzeDefinition(path string, definition *openapi.Schema) {
 	s.DefinitionCount++
-	if definition.Type != nil {
-		typeName := definition.Type.Value[0]
-		switch typeName {
-		case "object":
-			if definition.Properties != nil {
-				for _, pair := range definition.Properties.AdditionalProperties {
-					propertySchema := pair.Value
-					propertyType := typeForSchema(propertySchema)
-					s.addDefinitionFieldType(path+"/"+pair.Name, propertyType)
-				}
-			}
-		case "array":
-			s.addDefinitionArrayType(path+"/", typeForSchema(definition))
-		case "string":
-			// seems ok
-		case "boolean":
-			// seems ok
-		case "integer":
-			// seems ok
-		case "null":
-			// ...a null definition?
-		default:
-			log.Printf("type %s", typeName)
-		}
-	} else {
-		// treat unspecified types as "object"
+	typeName := typeNameForSchema(definition)
+	switch typeName {
+	case "object":
 		if definition.Properties != nil {
 			for _, pair := range definition.Properties.AdditionalProperties {
 				propertySchema := pair.Value
@@ -216,28 +201,33 @@ func (s *DocumentStatistics) analyzeDefinition(path string, definition *openapi.
 				s.addDefinitionFieldType(path+"/"+pair.Name, propertyType)
 			}
 		}
+	case "array":
+		s.addDefinitionArrayType(path+"/", typeForSchema(definition))
+	default: // string, boolean, integer, number, null...
+		s.addDefinitionPrimitiveType(path+"/", typeName)
 	}
 }
 
-func (s *DocumentStatistics) AnalyzeDocument(document *openapi.Document) {
+// Analyze an OpenAPI description.
+// Collect information about types used in the API.
+// This should be called exactly once per DocumentStatistics object.
+func (s *DocumentStatistics) analyzeDocument(source string, document *openapi.Document) {
+	s.Name = source
+
 	s.Title = document.Info.Title
 	for _, pair := range document.Paths.Path {
 		path := pair.Value
 		if path.Get != nil {
-			s.addOperation("get")
-			s.analyzeOperation("paths"+pair.Name+"/get", path.Get)
+			s.analyzeOperation("get", "paths"+pair.Name+"/get", path.Get)
 		}
 		if path.Post != nil {
-			s.addOperation("post")
-			s.analyzeOperation("paths"+pair.Name+"/post", path.Post)
+			s.analyzeOperation("post", "paths"+pair.Name+"/post", path.Post)
 		}
 		if path.Put != nil {
-			s.addOperation("put")
-			s.analyzeOperation("paths"+pair.Name+"/put", path.Put)
+			s.analyzeOperation("put", "paths"+pair.Name+"/put", path.Put)
 		}
 		if path.Delete != nil {
-			s.addOperation("delete")
-			s.analyzeOperation("paths"+pair.Name+"/delete", path.Delete)
+			s.analyzeOperation("delete", "paths"+pair.Name+"/delete", path.Delete)
 		}
 	}
 	if document.Definitions != nil {
@@ -250,46 +240,76 @@ func (s *DocumentStatistics) AnalyzeDocument(document *openapi.Document) {
 
 // helpers
 
-// Return a type name to use for a schema.
-func typeForSchema(schema *openapi.Schema) string {
-	if schema.Type != nil {
-		value := schema.Type.Value[0]
-		if value == "array" {
-			if schema.Items != nil {
-				items := schema.Items
-				itemSchema := items.Schema[0]
-				itemType := typeForSchema(itemSchema)
-				return "array-of-" + itemType
-			} else if schema.XRef != "" {
-				return "array-of-reference"
-			} else {
-				return fmt.Sprintf("array-of-%+v", schema)
+func typeNameForSchema(schema *openapi.Schema) string {
+	typeName := "object" // default type
+	if schema.Type != nil && len(schema.Type.Value) > 0 {
+		typeName = ""
+		for i, name := range schema.Type.Value {
+			if i > 0 {
+				typeName += "|"
 			}
-		} else if value == "object" {
-			// this might be representable with a map
-			// or not
-			if (schema.Properties != nil) && (len(schema.Properties.AdditionalProperties) > 0) {
-				return value
-			}
-			if schema.AdditionalProperties.GetSchema().Type != nil {
-				return "map-of-" + schema.AdditionalProperties.GetSchema().Type.Value[0]
-			}
-			if schema.AdditionalProperties.GetSchema().XRef != "" {
-				return "map-of-reference"
-			} else {
-				return "map-of-" + fmt.Sprintf("%+v", schema)
-			}
-		} else {
-			return value
+			typeName += name
 		}
 	}
+	return typeName
+}
+
+// Return a type name to use for a schema.
+func typeForSchema(schema *openapi.Schema) string {
 	if schema.XRef != "" {
 		return "reference"
 	}
 	if len(schema.Enum) > 0 {
 		return "enum"
 	}
-	return "object?"
+	typeName := typeNameForSchema(schema)
+	if typeName == "array" {
+		if schema.Items != nil {
+			// items contains an array of schemas
+			itemType := ""
+			for i, itemSchema := range schema.Items.Schema {
+				if i > 0 {
+					itemType += "|"
+				}
+				itemType += typeForSchema(itemSchema)
+			}
+			return "array-of-" + itemType
+		} else if schema.XRef != "" {
+			return "array-of-reference"
+		} else {
+			// we need to do more work to understand this type
+			return fmt.Sprintf("array-of-[%+v]", schema)
+		}
+	} else if typeName == "object" {
+		// this object might be representable with a map
+		// but not if it has properties
+		if (schema.Properties != nil) && (len(schema.Properties.AdditionalProperties) > 0) {
+			return typeName
+		}
+		if schema.AdditionalProperties != nil {
+			if schema.AdditionalProperties.GetSchema() != nil {
+				additionalPropertiesSchemaType := typeForSchema(schema.AdditionalProperties.GetSchema())
+				return "map-of-" + additionalPropertiesSchemaType
+			}
+			if schema.AdditionalProperties.GetBoolean() == false {
+				// no additional properties are allowed, so we're not sure what to do if we get here...
+				return typeName
+			}
+		}
+		if schema.Items != nil {
+			itemType := ""
+			for i, itemSchema := range schema.Items.Schema {
+				if i > 0 {
+					itemType += "|"
+				}
+				itemType += typeForSchema(itemSchema)
+			}
+			return "map-of-" + itemType
+		}
+		return "map-of-object"
+	} else {
+		return typeName
+	}
 }
 
 func typeForFileSchema(schema *openapi.FileSchema) string {

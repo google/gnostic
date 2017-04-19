@@ -151,6 +151,15 @@ func (domain *Domain) buildTypeProperties(typeModel *TypeModel, schema *jsonsche
 					if propertySchema.Description != nil {
 						typeProperty.Description = *propertySchema.Description
 					}
+					if propertySchema.Enumeration != nil {
+						allowedValues := make([]string, 0)
+						for _, enumValue := range *propertySchema.Enumeration {
+							if enumValue.String != nil {
+								allowedValues = append(allowedValues, *enumValue.String)
+							}
+						}
+						typeProperty.StringEnumValues = allowedValues
+					}
 					typeModel.addProperty(typeProperty)
 				} else if propertySchema.TypeIs("boolean") {
 					typeProperty := NewTypePropertyWithNameAndType(propertyName, "bool")

@@ -83,9 +83,7 @@ func main() {
 	sendAndExitIfError(err, response)
 
 	// Analyze the API document.
-	stats := statistics.NewDocumentStatistics()
-	stats.Name = wrapper.Name
-	stats.AnalyzeDocument(document)
+	stats := statistics.NewDocumentStatistics(wrapper.Name, document)
 
 	// Return the analysis results with an appropriate filename.
 	// Results are in files named "summary.json" in the same relative

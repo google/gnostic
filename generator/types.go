@@ -36,13 +36,14 @@ func NewTypeRequest(name string, propertyName string, schema *jsonschema.Schema)
 
 // models type properties, eg. fields
 type TypeProperty struct {
-	Name        string // name of property
-	Type        string // type for property (scalar or message type)
-	MapType     string // if this property is for a map, the name of the mapped type
-	Repeated    bool   // true if this property is repeated (an array)
-	Pattern     string // if the property is a pattern property, names must match this pattern.
-	Implicit    bool   // true if this property is implied by a pattern or "additional properties" property
-	Description string // if present, the "description" field in the schema
+	Name             string   // name of property
+	Type             string   // type for property (scalar or message type)
+	StringEnumValues []string // possible values if this is an enumerated string type
+	MapType          string   // if this property is for a map, the name of the mapped type
+	Repeated         bool     // true if this property is repeated (an array)
+	Pattern          string   // if the property is a pattern property, names must match this pattern.
+	Implicit         bool     // true if this property is implied by a pattern or "additional properties" property
+	Description      string   // if present, the "description" field in the schema
 }
 
 func (typeProperty *TypeProperty) description() string {

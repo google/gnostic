@@ -94,6 +94,12 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [apiKey]
+			if ok && !compiler.StringArrayContainsValue([]string{"apiKey"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string name = 2;
 		v2 := compiler.MapValueForKey(m, "name")
@@ -109,6 +115,12 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v3 != nil {
 			x.In, ok = v3.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [header query]
+			if ok && !compiler.StringArrayContainsValue([]string{"header", "query"}, x.In) {
 				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -183,6 +195,12 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		if v1 != nil {
 			x.Type, ok = v1.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [basic]
+			if ok && !compiler.StringArrayContainsValue([]string{"basic"}, x.Type) {
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -275,6 +293,12 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v3 != nil {
 			x.In, ok = v3.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [body]
+			if ok && !compiler.StringArrayContainsValue([]string{"body"}, x.In) {
 				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -505,6 +529,12 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v1 != nil {
 			x.Swagger, ok = v1.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for swagger: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [2.0]
+			if ok && !compiler.StringArrayContainsValue([]string{"2.0"}, x.Swagger) {
 				message := fmt.Sprintf("has unexpected value for swagger: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -881,6 +911,12 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [file]
+			if ok && !compiler.StringArrayContainsValue([]string{"file"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// bool read_only = 7;
 		v7 := compiler.MapValueForKey(m, "readOnly")
@@ -976,6 +1012,12 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [formData]
+			if ok && !compiler.StringArrayContainsValue([]string{"formData"}, x.In) {
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string description = 3;
 		v3 := compiler.MapValueForKey(m, "description")
@@ -1012,6 +1054,12 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [string number boolean integer array file]
+			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array", "file"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string format = 7;
 		v7 := compiler.MapValueForKey(m, "format")
@@ -1036,6 +1084,12 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v9 != nil {
 			x.CollectionFormat, ok = v9.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [csv ssv tsv pipes multi]
+			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes", "multi"}, x.CollectionFormat) {
 				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -1278,6 +1332,12 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [string number integer boolean array]
+			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "integer", "boolean", "array"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string format = 2;
 		v2 := compiler.MapValueForKey(m, "format")
@@ -1302,6 +1362,12 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v4 != nil {
 			x.CollectionFormat, ok = v4.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [csv ssv tsv pipes]
+			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
 				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -1556,6 +1622,12 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [header]
+			if ok && !compiler.StringArrayContainsValue([]string{"header"}, x.In) {
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string description = 3;
 		v3 := compiler.MapValueForKey(m, "description")
@@ -1583,6 +1655,12 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [string number boolean integer array]
+			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string format = 6;
 		v6 := compiler.MapValueForKey(m, "format")
@@ -1607,6 +1685,12 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v8 != nil {
 			x.CollectionFormat, ok = v8.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [csv ssv tsv pipes]
+			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
 				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -2560,12 +2644,24 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [oauth2]
+			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string flow = 2;
 		v2 := compiler.MapValueForKey(m, "flow")
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [accessCode]
+			if ok && !compiler.StringArrayContainsValue([]string{"accessCode"}, x.Flow) {
 				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -2670,12 +2766,24 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [oauth2]
+			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string flow = 2;
 		v2 := compiler.MapValueForKey(m, "flow")
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [application]
+			if ok && !compiler.StringArrayContainsValue([]string{"application"}, x.Flow) {
 				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -2771,12 +2879,24 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [oauth2]
+			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string flow = 2;
 		v2 := compiler.MapValueForKey(m, "flow")
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [implicit]
+			if ok && !compiler.StringArrayContainsValue([]string{"implicit"}, x.Flow) {
 				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -2872,12 +2992,24 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [oauth2]
+			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string flow = 2;
 		v2 := compiler.MapValueForKey(m, "flow")
 		if v2 != nil {
 			x.Flow, ok = v2.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [password]
+			if ok && !compiler.StringArrayContainsValue([]string{"password"}, x.Flow) {
 				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -3438,6 +3570,12 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [path]
+			if ok && !compiler.StringArrayContainsValue([]string{"path"}, x.In) {
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string description = 3;
 		v3 := compiler.MapValueForKey(m, "description")
@@ -3465,6 +3603,12 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [string number boolean integer array]
+			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string format = 6;
 		v6 := compiler.MapValueForKey(m, "format")
@@ -3489,6 +3633,12 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v8 != nil {
 			x.CollectionFormat, ok = v8.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [csv ssv tsv pipes]
+			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
 				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -3794,6 +3944,12 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [string number integer boolean array]
+			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "integer", "boolean", "array"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string format = 2;
 		v2 := compiler.MapValueForKey(m, "format")
@@ -3818,6 +3974,12 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v4 != nil {
 			x.CollectionFormat, ok = v4.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [csv ssv tsv pipes]
+			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
 				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
@@ -4092,6 +4254,12 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [query]
+			if ok && !compiler.StringArrayContainsValue([]string{"query"}, x.In) {
+				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string description = 3;
 		v3 := compiler.MapValueForKey(m, "description")
@@ -4128,6 +4296,12 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
+			// check for valid enum values
+			// [string number boolean integer array]
+			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array"}, x.Type) {
+				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				errors = append(errors, compiler.NewError(context, message))
+			}
 		}
 		// string format = 7;
 		v7 := compiler.MapValueForKey(m, "format")
@@ -4152,6 +4326,12 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v9 != nil {
 			x.CollectionFormat, ok = v9.(string)
 			if !ok {
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+			// check for valid enum values
+			// [csv ssv tsv pipes multi]
+			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes", "multi"}, x.CollectionFormat) {
 				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
 			}

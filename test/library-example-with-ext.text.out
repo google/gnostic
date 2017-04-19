@@ -34,7 +34,7 @@ paths: <
         parameters: <
           parameter: <
             non_body_parameter: <
-              path_parameter_sub_schema: <
+              query_parameter_sub_schema: <
                 required: true
                 in: "query"
                 description: "New description"
@@ -47,7 +47,7 @@ paths: <
         parameters: <
           parameter: <
             non_body_parameter: <
-              path_parameter_sub_schema: <
+              query_parameter_sub_schema: <
                 required: true
                 in: "query"
                 description: "test"
@@ -99,7 +99,7 @@ paths: <
       parameters: <
         parameter: <
           non_body_parameter: <
-            path_parameter_sub_schema: <
+            query_parameter_sub_schema: <
               required: true
               in: "query"
               description: "Description to override"
@@ -134,7 +134,7 @@ parameters: <
     name: "paramAtSwaggerScope"
     value: <
       non_body_parameter: <
-        path_parameter_sub_schema: <
+        query_parameter_sub_schema: <
           required: true
           in: "query"
           description: "test"

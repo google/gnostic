@@ -363,6 +363,25 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("  }")
+
+					if propertyModel.StringEnumValues != nil {
+						code.Print("// check for valid enum values")
+						code.Print("// %+v", propertyModel.StringEnumValues)
+
+						stringArrayLiteral := "[]string{"
+						for i, item := range propertyModel.StringEnumValues {
+							if i > 0 {
+								stringArrayLiteral += ","
+							}
+							stringArrayLiteral += "\"" + item + "\""
+						}
+						stringArrayLiteral += "}"
+
+						code.Print("if ok && !compiler.StringArrayContainsValue(%s, x.%s) {", stringArrayLiteral, fieldName)
+						code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+						code.Print("  errors = append(errors, compiler.NewError(context, message))")
+						code.Print("}")
+					}
 					code.Print("}")
 				}
 			} else if propertyType == "float" {

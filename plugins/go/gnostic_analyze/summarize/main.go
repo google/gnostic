@@ -91,6 +91,7 @@ func main() {
 	result_type_frequencies := make(map[string]int, 0)
 	definition_field_type_frequencies := make(map[string]int, 0)
 	definition_array_type_frequencies := make(map[string]int, 0)
+	definition_primitive_type_frequencies := make(map[string]int, 0)
 
 	for _, api := range stats {
 		if api.Operations["anonymous"] != 0 {
@@ -129,6 +130,9 @@ func main() {
 		for k, v := range api.DefinitionArrayTypes {
 			definition_array_type_frequencies[k] += v
 		}
+		for k, v := range api.DefinitionPrimitiveTypes {
+			definition_primitive_type_frequencies[k] += v
+		}
 	}
 
 	// Report the results.
@@ -147,4 +151,6 @@ func main() {
 	printFrequencies(definition_field_type_frequencies)
 	fmt.Printf("\nDefinition array type frequencies:\n")
 	printFrequencies(definition_array_type_frequencies)
+	fmt.Printf("\nDefinition primitive type frequencies:\n")
+	printFrequencies(definition_primitive_type_frequencies)
 }

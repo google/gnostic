@@ -29,7 +29,7 @@ paths: <
         parameters: <
           parameter: <
             non_body_parameter: <
-              path_parameter_sub_schema: <
+              query_parameter_sub_schema: <
                 in: "query"
                 description: "tags to filter by"
                 name: "tags"
@@ -45,7 +45,7 @@ paths: <
         parameters: <
           parameter: <
             non_body_parameter: <
-              path_parameter_sub_schema: <
+              query_parameter_sub_schema: <
                 in: "query"
                 description: "maximum number of results to return"
                 name: "limit"
