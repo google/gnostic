@@ -31,8 +31,6 @@ type DocumentStatistics struct {
 	DefinitionFieldTypes     map[string]int `json:"definitionFieldTypes"`
 	DefinitionArrayTypes     map[string]int `json:"definitionArrayTypes"`
 	DefinitionPrimitiveTypes map[string]int `json:"definitionPrimitiveTypes"`
-	HasAnonymousOperations   bool           `json:"hasAnonymousOperations"`
-	HasAnonymousObjects      bool           `json:"hasAnonymousObjects"`
 	AnonymousOperations      []string       `json:"anonymousOperations"`
 	AnonymousObjects         []string       `json:"anonymousObjects"`
 }
@@ -45,8 +43,6 @@ func NewDocumentStatistics(source string, document *openapi.Document) *DocumentS
 	s.DefinitionFieldTypes = make(map[string]int, 0)
 	s.DefinitionArrayTypes = make(map[string]int, 0)
 	s.DefinitionPrimitiveTypes = make(map[string]int, 0)
-	s.HasAnonymousOperations = false
-	s.HasAnonymousObjects = false
 	s.AnonymousOperations = make([]string, 0)
 	s.AnonymousObjects = make([]string, 0)
 	s.analyzeDocument(source, document)
@@ -59,7 +55,6 @@ func (s *DocumentStatistics) addOperation(name string) {
 
 func (s *DocumentStatistics) addParameterType(path string, name string) {
 	if strings.Contains(name, "object") {
-		s.HasAnonymousObjects = true
 		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.ParameterTypes[name] = s.ParameterTypes[name] + 1
@@ -67,7 +62,6 @@ func (s *DocumentStatistics) addParameterType(path string, name string) {
 
 func (s *DocumentStatistics) addResultType(path string, name string) {
 	if strings.Contains(name, "object") {
-		s.HasAnonymousObjects = true
 		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.ResultTypes[name] = s.ResultTypes[name] + 1
@@ -75,7 +69,6 @@ func (s *DocumentStatistics) addResultType(path string, name string) {
 
 func (s *DocumentStatistics) addDefinitionFieldType(path string, name string) {
 	if strings.Contains(name, "object") {
-		s.HasAnonymousObjects = true
 		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.DefinitionFieldTypes[name] = s.DefinitionFieldTypes[name] + 1
@@ -83,7 +76,6 @@ func (s *DocumentStatistics) addDefinitionFieldType(path string, name string) {
 
 func (s *DocumentStatistics) addDefinitionArrayType(path string, name string) {
 	if strings.Contains(name, "object") {
-		s.HasAnonymousObjects = true
 		s.AnonymousObjects = append(s.AnonymousObjects, path)
 	}
 	s.DefinitionArrayTypes[name] = s.DefinitionArrayTypes[name] + 1
@@ -99,7 +91,7 @@ func typeForPrimitivesItems(p *openapi.PrimitivesItems) string {
 	} else if p.Items != nil && p.Items.Type != "" {
 		return p.Items.Type
 	} else {
-		return "object" + fmt.Sprintf("{{%+v}}", p)
+		return "object"
 	}
 }
 
@@ -108,7 +100,6 @@ func (s *DocumentStatistics) analyzeOperation(method string, path string, operat
 	s.addOperation("total")
 	if operation.OperationId == "" {
 		s.addOperation("anonymous")
-		s.HasAnonymousOperations = true
 		s.AnonymousOperations = append(s.AnonymousOperations, path)
 	}
 	for _, parameter := range operation.Parameters {
@@ -260,7 +251,8 @@ func typeForSchema(schema *openapi.Schema) string {
 		return "reference"
 	}
 	if len(schema.Enum) > 0 {
-		return "enum"
+		enumType := typeNameForSchema(schema)
+		return "enum-of-" + enumType
 	}
 	typeName := typeNameForSchema(schema)
 	if typeName == "array" {

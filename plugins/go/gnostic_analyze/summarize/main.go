@@ -97,18 +97,18 @@ func main() {
 		if api.Operations["anonymous"] != 0 {
 			apis_with_anonymous_operations += 1
 		}
-		if api.HasAnonymousObjects {
+		if len(api.AnonymousObjects) > 0 {
 			apis_with_anonymous_objects += 1
 		}
-		if api.HasAnonymousOperations {
+		if len(api.AnonymousOperations) > 0 {
 			apis_with_anonymous_anything += 1
-			if api.HasAnonymousObjects {
+			if len(api.AnonymousObjects) > 0 {
 				fmt.Printf("%s has anonymous operations and objects\n", api.Name)
 			} else {
 				fmt.Printf("%s has anonymous operations\n", api.Name)
 			}
 		} else {
-			if api.HasAnonymousObjects {
+			if len(api.AnonymousObjects) > 0 {
 				apis_with_anonymous_anything += 1
 				fmt.Printf("%s has anonymous objects\n", api.Name)
 			} else {
