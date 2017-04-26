@@ -103,7 +103,7 @@ func ReadInfoForFile(filename string) (interface{}, error) {
 			return nil, err
 		}
 		var info yaml.MapSlice
-		yaml.Unmarshal(bytes, &info)
+		err = yaml.Unmarshal(bytes, &info)
 		if err != nil {
 			return nil, err
 		}
