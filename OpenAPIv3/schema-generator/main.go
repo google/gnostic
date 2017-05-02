@@ -13,6 +13,8 @@
 // limitations under the License.
 
 // schema-generator is a support tool that generates the OpenAPI v3 JSON schema.
+// Yes, it's gross, but the OpenAPI 3.0 spec, which defines REST APIs with a
+// rigorous JSON schema, is itself defined with a Markdown file. Ironic?
 package main
 
 import (
@@ -136,8 +138,10 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 
+		// replace escaped bars with "OR", assuming these are used to describe union types
 		line = strings.Replace(line, " \\| ", " OR ", -1)
 
+		// split the table on the remaining bars
 		parts := strings.Split(line, "|")
 		if len(parts) > 1 {
 			fieldName := strings.Trim(stripLink(parts[0]), " ")
@@ -291,11 +295,11 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	// divide the specification into sections
 	document := ReadSection(string(b), 1)
-	//document.Display("")
+	document.Display("")
 
 	// read object names and their details
-	specification := document.Children[4] // fragile!
-	schema := specification.Children[5]   // fragile!
+	specification := document.Children[4] // fragile! the section title is "Specification"
+	schema := specification.Children[6]   // fragile! the section title is "Schema"
 	anchor := regexp.MustCompile("^#### <a name=\"(.*)Object\"")
 	schemaObjects := make([]SchemaObject, 0)
 	for _, section := range schema.Children {
@@ -402,16 +406,29 @@ func definitionNameForType(typeName string) string {
 	return "#/definitions/" + name
 }
 
-func definitionNameForMapOfType(typeName string) string {
-	// pluralize the type name to get the name of an object representing a map of them
-	name := lowerFirst(typeName)
+func pluralize(name string) string {
 	if name[len(name)-1] == 'y' {
 		name = name[0:len(name)-1] + "ies"
 	} else {
 		name = name + "s"
 	}
-	noteMapType(name, typeName)
-	return "#/definitions/" + name
+	return name
+}
+
+func definitionNameForMapOfType(typeName string) string {
+	// pluralize the type name to get the name of an object representing a map of them
+	var elementTypeName string
+	var mapTypeName string
+	if parts := strings.Split(typeName, "OR"); len(parts) > 1 {
+		elementTypeName = lowerFirst(parts[0]) + "Or" + parts[1]
+		noteUnionType(elementTypeName, parts[0], parts[1])
+		mapTypeName = pluralize(lowerFirst(parts[0])) + "Or" + pluralize(parts[1])
+	} else {
+		elementTypeName = lowerFirst(typeName)
+		mapTypeName = pluralize(elementTypeName)
+	}
+	noteMapType(mapTypeName, elementTypeName)
+	return "#/definitions/" + mapTypeName
 }
 
 func updateSchemaFieldWithModelField(schemaField *jsonschema.Schema, modelField *SchemaObjectField) {
@@ -675,7 +692,7 @@ func main() {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Description = stringptr("Any property starting with x- is valid.")
 		oneOf := make([]*jsonschema.Schema, 0)
-		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("null")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
@@ -685,11 +702,24 @@ func main() {
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("specificationExtension", objectSchema))
 	}
 
-	// add schema objects for "primitive"
+	// add schema objects for "defaultType"
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		oneOf := make([]*jsonschema.Schema, 0)
-		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("null")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("array")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("object")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+		objectSchema.OneOf = &oneOf
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("defaultType", objectSchema))
+	}
+
+	// add schema objects for "primitive"
+	if false { // we don't seem to need these for 3.0 RC2
+		objectSchema := &jsonschema.Schema{}
+		oneOf := make([]*jsonschema.Schema, 0)
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
@@ -718,6 +748,7 @@ func main() {
 			"required",
 			"enum",
 		})
+	schemaObject.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false)
 	schemaObject.AddProperty("type", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("allOf", arrayOfSchema())
 	schemaObject.AddProperty("oneOf", arrayOfSchema())
@@ -731,7 +762,7 @@ func main() {
 	schemaObject.AddProperty("properties", &jsonschema.Schema{
 		Type: jsonschema.NewStringOrStringArrayWithString("object"),
 		AdditionalProperties: jsonschema.NewSchemaOrBooleanWithSchema(
-			&jsonschema.Schema{Ref: stringptr("#/definitions/schema")})})
+			&jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")})})
 	schemaObject.AddProperty("description", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("format", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 
