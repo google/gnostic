@@ -703,7 +703,7 @@ func main() {
 	}
 
 	// add schema objects for "defaultType"
-	if true {
+	if false { // we don't seem to need these for 3.0 RC2
 		objectSchema := &jsonschema.Schema{}
 		oneOf := make([]*jsonschema.Schema, 0)
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("null")})

@@ -194,20 +194,26 @@ components: <
           additional_properties: <
             name: "id"
             value: <
-              type: "integer"
-              format: "int64"
+              schema: <
+                type: "integer"
+                format: "int64"
+              >
             >
           >
           additional_properties: <
             name: "name"
             value: <
-              type: "string"
+              schema: <
+                type: "string"
+              >
             >
           >
           additional_properties: <
             name: "tag"
             value: <
-              type: "string"
+              schema: <
+                type: "string"
+              >
             >
           >
         >
@@ -235,14 +241,18 @@ components: <
           additional_properties: <
             name: "code"
             value: <
-              type: "integer"
-              format: "int32"
+              schema: <
+                type: "integer"
+                format: "int32"
+              >
             >
           >
           additional_properties: <
             name: "message"
             value: <
-              type: "string"
+              schema: <
+                type: "string"
+              >
             >
           >
         >

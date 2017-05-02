@@ -632,7 +632,7 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"contentType", "explode", "headers", "style"}
+		allowedKeys := []string{"allowReserved", "contentType", "explode", "headers", "style"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -675,7 +675,16 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
+		// bool allow_reserved = 5;
+		v5 := compiler.MapValueForKey(m, "allowReserved")
+		if v5 != nil {
+			x.AllowReserved, ok = v5.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for allowReserved: %+v (%T)", v5, v5)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated NamedSpecificationExtension specification_extension = 6;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -706,12 +715,58 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{}
+		allowedKeys := []string{"description", "externalValue", "summary"}
+		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string summary = 1;
+		v1 := compiler.MapValueForKey(m, "summary")
+		if v1 != nil {
+			x.Summary, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string description = 2;
+		v2 := compiler.MapValueForKey(m, "description")
+		if v2 != nil {
+			x.Description, ok = v2.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string external_value = 3;
+		v3 := compiler.MapValueForKey(m, "externalValue")
+		if v3 != nil {
+			x.ExternalValue, ok = v3.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for externalValue: %+v (%T)", v3, v3)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated NamedSpecificationExtension specification_extension = 4;
+		// MAP: SpecificationExtension ^x-
+		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				if compiler.PatternMatches("^x-", k) {
+					pair := &NamedSpecificationExtension{}
+					pair.Name = k
+					var err error
+					pair.Value, err = NewSpecificationExtension(v, compiler.NewContext(k, context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.SpecificationExtension = append(x.SpecificationExtension, pair)
+				}
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -770,6 +825,35 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*ExamplesOrReferences, error) {
+	errors := make([]error, 0)
+	x := &ExamplesOrReferences{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedExampleOrReference additional_properties = 1;
+		// MAP: ExampleOrReference
+		x.AdditionalProperties = make([]*NamedExampleOrReference, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedExampleOrReference{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewExampleOrReference(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -886,7 +970,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "example", "examples", "explode", "in", "name", "required", "schema", "style"}
+		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "examples", "explode", "in", "name", "required", "schema", "style"}
 		allowedPatterns := []string{}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -983,36 +1067,20 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 				errors = append(errors, err)
 			}
 		}
-		// repeated ExampleOrReference examples = 11;
+		// ExamplesOrReferences examples = 11;
 		v11 := compiler.MapValueForKey(m, "examples")
 		if v11 != nil {
-			// repeated ExampleOrReference
-			x.Examples = make([]*ExampleOrReference, 0)
-			a, ok := v11.([]interface{})
-			if ok {
-				for _, item := range a {
-					y, err := NewExampleOrReference(item, compiler.NewContext("examples", context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.Examples = append(x.Examples, y)
-				}
-			}
-		}
-		// ExampleOrReference example = 12;
-		v12 := compiler.MapValueForKey(m, "example")
-		if v12 != nil {
 			var err error
-			x.Example, err = NewExampleOrReference(v12, compiler.NewContext("example", context))
+			x.Examples, err = NewExamplesOrReferences(v11, compiler.NewContext("examples", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Content content = 13;
-		v13 := compiler.MapValueForKey(m, "content")
-		if v13 != nil {
+		// Content content = 12;
+		v12 := compiler.MapValueForKey(m, "content")
+		if v12 != nil {
 			var err error
-			x.Content, err = NewContent(v13, compiler.NewContext("content", context))
+			x.Content, err = NewContent(v12, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1284,19 +1352,19 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"description", "headers", "href", "operationId", "parameters"}
+		allowedKeys := []string{"description", "headers", "operationId", "operationRef", "parameters", "server"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		// string href = 1;
-		v1 := compiler.MapValueForKey(m, "href")
+		// string operation_ref = 1;
+		v1 := compiler.MapValueForKey(m, "operationRef")
 		if v1 != nil {
-			x.Href, ok = v1.(string)
+			x.OperationRef, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for href: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for operationRef: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1336,7 +1404,16 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 6;
+		// Server server = 6;
+		v6 := compiler.MapValueForKey(m, "server")
+		if v6 != nil {
+			var err error
+			x.Server, err = NewServer(v6, compiler.NewContext("server", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// repeated NamedSpecificationExtension specification_extension = 7;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -1482,7 +1559,7 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"encoding", "example", "examples", "schema"}
+		allowedKeys := []string{"encoding", "examples", "schema"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1498,41 +1575,25 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 				errors = append(errors, err)
 			}
 		}
-		// repeated ExampleOrReference examples = 2;
+		// ExamplesOrReferences examples = 2;
 		v2 := compiler.MapValueForKey(m, "examples")
 		if v2 != nil {
-			// repeated ExampleOrReference
-			x.Examples = make([]*ExampleOrReference, 0)
-			a, ok := v2.([]interface{})
-			if ok {
-				for _, item := range a {
-					y, err := NewExampleOrReference(item, compiler.NewContext("examples", context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.Examples = append(x.Examples, y)
-				}
+			var err error
+			x.Examples, err = NewExamplesOrReferences(v2, compiler.NewContext("examples", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
-		// ExampleOrReference example = 3;
-		v3 := compiler.MapValueForKey(m, "example")
+		// Encoding encoding = 3;
+		v3 := compiler.MapValueForKey(m, "encoding")
 		if v3 != nil {
 			var err error
-			x.Example, err = NewExampleOrReference(v3, compiler.NewContext("example", context))
+			x.Encoding, err = NewEncoding(v3, compiler.NewContext("encoding", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Encoding encoding = 4;
-		v4 := compiler.MapValueForKey(m, "encoding")
-		if v4 != nil {
-			var err error
-			x.Encoding, err = NewEncoding(v4, compiler.NewContext("encoding", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// repeated NamedSpecificationExtension specification_extension = 5;
+		// repeated NamedSpecificationExtension specification_extension = 4;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -1695,6 +1756,43 @@ func NewNamedEncodingProperty(in interface{}, context *compiler.Context) (*Named
 		if v2 != nil {
 			var err error
 			x.Value, err = NewEncodingProperty(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*NamedExampleOrReference, error) {
+	errors := make([]error, 0)
+	x := &NamedExampleOrReference{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// ExampleOrReference value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewExampleOrReference(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1991,6 +2089,43 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 		if v2 != nil {
 			var err error
 			x.Value, err = NewSchema(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*NamedSchemaOrReference, error) {
+	errors := make([]error, 0)
+	x := &NamedSchemaOrReference{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// SchemaOrReference value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewSchemaOrReference(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2435,13 +2570,20 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 				}
 			}
 		}
-		// Server servers = 12;
+		// repeated Server servers = 12;
 		v12 := compiler.MapValueForKey(m, "servers")
 		if v12 != nil {
-			var err error
-			x.Servers, err = NewServer(v12, compiler.NewContext("servers", context))
-			if err != nil {
-				errors = append(errors, err)
+			// repeated Server
+			x.Servers = make([]*Server, 0)
+			a, ok := v12.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewServer(item, compiler.NewContext("servers", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Servers = append(x.Servers, y)
+				}
 			}
 		}
 		// repeated NamedSpecificationExtension specification_extension = 13;
@@ -2481,7 +2623,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "example", "examples", "explode", "in", "name", "required", "schema", "style"}
+		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "examples", "explode", "in", "name", "required", "schema", "style"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -2578,41 +2720,25 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 				errors = append(errors, err)
 			}
 		}
-		// repeated ExampleOrReference examples = 11;
+		// ExamplesOrReferences examples = 11;
 		v11 := compiler.MapValueForKey(m, "examples")
 		if v11 != nil {
-			// repeated ExampleOrReference
-			x.Examples = make([]*ExampleOrReference, 0)
-			a, ok := v11.([]interface{})
-			if ok {
-				for _, item := range a {
-					y, err := NewExampleOrReference(item, compiler.NewContext("examples", context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.Examples = append(x.Examples, y)
-				}
+			var err error
+			x.Examples, err = NewExamplesOrReferences(v11, compiler.NewContext("examples", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
-		// ExampleOrReference example = 12;
-		v12 := compiler.MapValueForKey(m, "example")
+		// Content content = 12;
+		v12 := compiler.MapValueForKey(m, "content")
 		if v12 != nil {
 			var err error
-			x.Example, err = NewExampleOrReference(v12, compiler.NewContext("example", context))
+			x.Content, err = NewContent(v12, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Content content = 13;
-		v13 := compiler.MapValueForKey(m, "content")
-		if v13 != nil {
-			var err error
-			x.Content, err = NewContent(v13, compiler.NewContext("content", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// repeated NamedSpecificationExtension specification_extension = 14;
+		// repeated NamedSpecificationExtension specification_extension = 13;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -2817,13 +2943,20 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 				errors = append(errors, err)
 			}
 		}
-		// Server servers = 12;
+		// repeated Server servers = 12;
 		v12 := compiler.MapValueForKey(m, "servers")
 		if v12 != nil {
-			var err error
-			x.Servers, err = NewServer(v12, compiler.NewContext("servers", context))
-			if err != nil {
-				errors = append(errors, err)
+			// repeated Server
+			x.Servers = make([]*Server, 0)
+			a, ok := v12.([]interface{})
+			if ok {
+				for _, item := range a {
+					y, err := NewServer(item, compiler.NewContext("servers", context))
+					if err != nil {
+						errors = append(errors, err)
+					}
+					x.Servers = append(x.Servers, y)
+				}
 			}
 		}
 		// repeated ParameterOrReference parameters = 13;
@@ -2922,40 +3055,6 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewPrimitive(in interface{}, context *compiler.Context) (*Primitive, error) {
-	errors := make([]error, 0)
-	x := &Primitive{}
-	matched := false
-	switch in := in.(type) {
-	case bool:
-		x.Oneof = &Primitive_Boolean{Boolean: in}
-		matched = true
-	case string:
-		x.Oneof = &Primitive_String_{String_: in}
-		matched = true
-	case int64:
-		x.Oneof = &Primitive_Integer{Integer: in}
-		matched = true
-	case int32:
-		x.Oneof = &Primitive_Integer{Integer: int64(in)}
-		matched = true
-	case int:
-		x.Oneof = &Primitive_Integer{Integer: int64(in)}
-		matched = true
-	case float64:
-		x.Oneof = &Primitive_Number{Number: in}
-		matched = true
-	case float32:
-		x.Oneof = &Primitive_Number{Number: float64(in)}
-		matched = true
-	}
-	if matched {
-		// since the oneof matched one of its possibilities, discard any matching errors
-		errors = make([]error, 0)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
 	errors := make([]error, 0)
 	x := &Properties{}
@@ -2964,17 +3063,17 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		// repeated NamedSchema additional_properties = 1;
-		// MAP: Schema
-		x.AdditionalProperties = make([]*NamedSchema, 0)
+		// repeated NamedSchemaOrReference additional_properties = 1;
+		// MAP: SchemaOrReference
+		x.AdditionalProperties = make([]*NamedSchemaOrReference, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				pair := &NamedSchema{}
+				pair := &NamedSchemaOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSchemaOrReference(v, compiler.NewContext(k, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3056,6 +3155,12 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
+		requiredKeys := []string{"content"}
+		missingKeys := compiler.MissingKeysInMap(m, requiredKeys)
+		if len(missingKeys) > 0 {
+			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
 		allowedKeys := []string{"content", "description", "required"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
@@ -3948,7 +4053,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"bearerFormat", "description", "flow", "in", "name", "openIdConnectUrl", "scheme", "type"}
+		allowedKeys := []string{"bearerFormat", "description", "flows", "in", "name", "openIdConnectUrl", "scheme", "type"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -4009,11 +4114,11 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// OauthFlows flow = 7;
-		v7 := compiler.MapValueForKey(m, "flow")
+		// OauthFlows flows = 7;
+		v7 := compiler.MapValueForKey(m, "flows")
 		if v7 != nil {
 			var err error
-			x.Flow, err = NewOauthFlows(v7, compiler.NewContext("flow", context))
+			x.Flows, err = NewOauthFlows(v7, compiler.NewContext("flows", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4087,6 +4192,12 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
+		requiredKeys := []string{"url"}
+		missingKeys := compiler.MissingKeysInMap(m, requiredKeys)
+		if len(missingKeys) > 0 {
+			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
 		allowedKeys := []string{"description", "url", "variables"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
@@ -4165,29 +4276,24 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		// repeated Primitive enum = 1;
+		// repeated string enum = 1;
 		v1 := compiler.MapValueForKey(m, "enum")
 		if v1 != nil {
-			// repeated Primitive
-			x.Enum = make([]*Primitive, 0)
-			a, ok := v1.([]interface{})
+			v, ok := v1.([]interface{})
 			if ok {
-				for _, item := range a {
-					y, err := NewPrimitive(item, compiler.NewContext("enum", context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.Enum = append(x.Enum, y)
-				}
+				x.Enum = compiler.ConvertInterfaceArrayToStringArray(v)
+			} else {
+				message := fmt.Sprintf("has unexpected value for enum: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Primitive default = 2;
+		// string default = 2;
 		v2 := compiler.MapValueForKey(m, "default")
 		if v2 != nil {
-			var err error
-			x.Default, err = NewPrimitive(v2, compiler.NewContext("default", context))
-			if err != nil {
-				errors = append(errors, err)
+			x.Default, ok = v2.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for default: %+v (%T)", v2, v2)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 		// string description = 3;
@@ -4291,13 +4397,13 @@ func NewSpecificationExtension(in interface{}, context *compiler.Context) (*Spec
 		x.Oneof = &SpecificationExtension_String_{String_: in}
 		matched = true
 	case int64:
-		x.Oneof = &SpecificationExtension_Integer{Integer: in}
+		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
 		matched = true
 	case int32:
-		x.Oneof = &SpecificationExtension_Integer{Integer: int64(in)}
+		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
 		matched = true
 	case int:
-		x.Oneof = &SpecificationExtension_Integer{Integer: int64(in)}
+		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
 		matched = true
 	case float64:
 		x.Oneof = &SpecificationExtension_Number{Number: in}
@@ -4764,6 +4870,14 @@ func (m *EncodingProperty) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Example) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	for _, item := range m.SpecificationExtension {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -4792,6 +4906,19 @@ func (m *ExampleOrReference) ResolveReferences(root string) (interface{}, error)
 
 func (m *Examples) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *ExamplesOrReferences) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -4829,16 +4956,8 @@ func (m *Header) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	for _, item := range m.Examples {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	if m.Example != nil {
-		_, err := m.Example.ResolveReferences(root)
+	if m.Examples != nil {
+		_, err := m.Examples.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -4953,6 +5072,12 @@ func (m *Link) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
+	if m.Server != nil {
+		_, err := m.Server.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
@@ -5021,16 +5146,8 @@ func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	for _, item := range m.Examples {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	if m.Example != nil {
-		_, err := m.Example.ResolveReferences(root)
+	if m.Examples != nil {
+		_, err := m.Examples.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -5086,6 +5203,17 @@ func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, 
 }
 
 func (m *NamedEncodingProperty) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Value != nil {
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5174,6 +5302,17 @@ func (m *NamedResponseOrReference) ResolveReferences(root string) (interface{}, 
 }
 
 func (m *NamedSchema) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Value != nil {
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5328,10 +5467,12 @@ func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 			}
 		}
 	}
-	if m.Servers != nil {
-		_, err := m.Servers.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
+	for _, item := range m.Servers {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.SpecificationExtension {
@@ -5353,16 +5494,8 @@ func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	for _, item := range m.Examples {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	if m.Example != nil {
-		_, err := m.Example.ResolveReferences(root)
+	if m.Examples != nil {
+		_, err := m.Examples.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -5484,10 +5617,12 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	if m.Servers != nil {
-		_, err := m.Servers.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
+	for _, item := range m.Servers {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, item := range m.Parameters {
@@ -5527,11 +5662,6 @@ func (m *Paths) ResolveReferences(root string) (interface{}, error) {
 			}
 		}
 	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-func (m *Primitive) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -5843,8 +5973,8 @@ func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error
 
 func (m *SecurityScheme) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	if m.Flow != nil {
-		_, err := m.Flow.ResolveReferences(root)
+	if m.Flows != nil {
+		_, err := m.Flows.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -5894,20 +6024,6 @@ func (m *Server) ResolveReferences(root string) (interface{}, error) {
 
 func (m *ServerVariable) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	for _, item := range m.Enum {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	if m.Default != nil {
-		_, err := m.Default.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
