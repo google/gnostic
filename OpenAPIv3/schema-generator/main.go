@@ -703,7 +703,7 @@ func main() {
 	}
 
 	// add schema objects for "defaultType"
-	if false { // we don't seem to need these for 3.0 RC2
+	if true {
 		objectSchema := &jsonschema.Schema{}
 		oneOf := make([]*jsonschema.Schema, 0)
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("null")})
@@ -763,6 +763,15 @@ func main() {
 		Type: jsonschema.NewStringOrStringArrayWithString("object"),
 		AdditionalProperties: jsonschema.NewSchemaOrBooleanWithSchema(
 			&jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")})})
+
+	if true { // add additionalProperties schema object
+		oneOf := make([]*jsonschema.Schema, 0)
+		oneOf = append(oneOf, &jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		schemaObject.AddProperty("additionalProperties", &jsonschema.Schema{OneOf: &oneOf})
+	}
+
+	schemaObject.AddProperty("default", &jsonschema.Schema{Ref: stringptr("#/definitions/defaultType")})
 	schemaObject.AddProperty("description", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("format", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 

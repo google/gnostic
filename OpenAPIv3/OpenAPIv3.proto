@@ -41,6 +41,13 @@ option java_package = "org.openapi_v3";
 // the future. 'GPB' is reserved for the protocol buffer implementation itself.
 option objc_class_prefix = "OAS";
 
+message AdditionalPropertiesItem {
+  oneof oneof {
+    SchemaOrReference schema_or_reference = 1;
+    bool boolean = 2;
+  }
+}
+
 message Any {
   google.protobuf.Any value = 1;
   string yaml = 2;
@@ -97,6 +104,14 @@ message Contact {
 // Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.
 message Content {
   repeated NamedMediaType media_type = 1;
+}
+
+message DefaultType {
+  oneof oneof {
+    double number = 1;
+    bool boolean = 2;
+    string string = 3;
+  }
 }
 
 message Document {
@@ -554,9 +569,11 @@ message Schema {
   Schema not = 28;
   ItemsItem items = 29;
   Properties properties = 30;
-  string description = 31;
-  string format = 32;
-  repeated NamedSpecificationExtension specification_extension = 33;
+  AdditionalPropertiesItem additional_properties = 31;
+  DefaultType default = 32;
+  string description = 33;
+  string format = 34;
+  repeated NamedSpecificationExtension specification_extension = 35;
 }
 
 message SchemaOrReference {

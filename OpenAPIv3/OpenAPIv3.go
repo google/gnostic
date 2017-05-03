@@ -27,6 +27,36 @@ func Version() string {
 	return "openapi_v3"
 }
 
+func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*AdditionalPropertiesItem, error) {
+	errors := make([]error, 0)
+	x := &AdditionalPropertiesItem{}
+	matched := false
+	// SchemaOrReference schema_or_reference = 1;
+	{
+		m, ok := compiler.UnpackMap(in)
+		if ok {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewSchemaOrReference(m, compiler.NewContext("schemaOrReference", context))
+			if matching_error == nil {
+				x.Oneof = &AdditionalPropertiesItem_SchemaOrReference{SchemaOrReference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
+			}
+		}
+	}
+	// bool boolean = 2;
+	boolValue, ok := in.(bool)
+	if ok {
+		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: boolValue}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	errors := make([]error, 0)
 	x := &Any{}
@@ -445,6 +475,40 @@ func NewContent(in interface{}, context *compiler.Context) (*Content, error) {
 				}
 			}
 		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewDefaultType(in interface{}, context *compiler.Context) (*DefaultType, error) {
+	errors := make([]error, 0)
+	x := &DefaultType{}
+	matched := false
+	switch in := in.(type) {
+	case bool:
+		x.Oneof = &DefaultType_Boolean{Boolean: in}
+		matched = true
+	case string:
+		x.Oneof = &DefaultType_String_{String_: in}
+		matched = true
+	case int64:
+		x.Oneof = &DefaultType_Number{Number: float64(in)}
+		matched = true
+	case int32:
+		x.Oneof = &DefaultType_Number{Number: float64(in)}
+		matched = true
+	case int:
+		x.Oneof = &DefaultType_Number{Number: float64(in)}
+		matched = true
+	case float64:
+		x.Oneof = &DefaultType_Number{Number: in}
+		matched = true
+	case float32:
+		x.Oneof = &DefaultType_Number{Number: float64(in)}
+		matched = true
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3450,7 +3514,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"allOf", "anyOf", "deprecated", "description", "discriminator", "enum", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "not", "nullable", "oneOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "writeOnly", "xml"}
+		allowedKeys := []string{"additionalProperties", "allOf", "anyOf", "default", "deprecated", "description", "discriminator", "enum", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "not", "nullable", "oneOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "writeOnly", "xml"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -3811,25 +3875,43 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, err)
 			}
 		}
-		// string description = 31;
-		v31 := compiler.MapValueForKey(m, "description")
+		// AdditionalPropertiesItem additional_properties = 31;
+		v31 := compiler.MapValueForKey(m, "additionalProperties")
 		if v31 != nil {
-			x.Description, ok = v31.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v31, v31)
-				errors = append(errors, compiler.NewError(context, message))
+			var err error
+			x.AdditionalProperties, err = NewAdditionalPropertiesItem(v31, compiler.NewContext("additionalProperties", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
-		// string format = 32;
-		v32 := compiler.MapValueForKey(m, "format")
+		// DefaultType default = 32;
+		v32 := compiler.MapValueForKey(m, "default")
 		if v32 != nil {
-			x.Format, ok = v32.(string)
+			var err error
+			x.Default, err = NewDefaultType(v32, compiler.NewContext("default", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+		// string description = 33;
+		v33 := compiler.MapValueForKey(m, "description")
+		if v33 != nil {
+			x.Description, ok = v33.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v32, v32)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v33, v33)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedSpecificationExtension specification_extension = 33;
+		// string format = 34;
+		v34 := compiler.MapValueForKey(m, "format")
+		if v34 != nil {
+			x.Format, ok = v34.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v34, v34)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated NamedSpecificationExtension specification_extension = 35;
 		// MAP: SpecificationExtension ^x-
 		x.SpecificationExtension = make([]*NamedSpecificationExtension, 0)
 		for _, item := range m {
@@ -4589,6 +4671,20 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	{
+		p, ok := m.Oneof.(*AdditionalPropertiesItem_SchemaOrReference)
+		if ok {
+			_, err := p.SchemaOrReference.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Any) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
@@ -4772,6 +4868,11 @@ func (m *Content) ResolveReferences(root string) (interface{}, error) {
 			}
 		}
 	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *DefaultType) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -5886,6 +5987,18 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	}
 	if m.Properties != nil {
 		_, err := m.Properties.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if m.AdditionalProperties != nil {
+		_, err := m.AdditionalProperties.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if m.Default != nil {
+		_, err := m.Default.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
