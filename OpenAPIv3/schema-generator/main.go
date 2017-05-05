@@ -517,7 +517,10 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 			if schemaField == nil {
 				// create and add the schema field
 				schemaField = &jsonschema.Schema{}
-				namedSchema := &jsonschema.NamedSchema{Name: modelField.Name, Value: schemaField}
+				// Component names should match "^[a-zA-Z0-9\.\-_]+$"
+				// See https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#componentsObject
+				propertyName := strings.Replace(modelField.Name, "{name}", "^[a-zA-Z0-9\\\\.\\\\-_]+$", -1)
+				namedSchema := &jsonschema.NamedSchema{Name: propertyName, Value: schemaField}
 				newNamedSchemas = append(newNamedSchemas, namedSchema)
 			}
 			updateSchemaFieldWithModelField(schemaField, &modelField)
