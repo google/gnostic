@@ -198,31 +198,31 @@
       },
       "properties": {
         "schemas": {
-          "$ref": "#/definitions/schemas"
+          "$ref": "#/definitions/schemasOrReferences"
         },
         "responses": {
-          "$ref": "#/definitions/responses"
+          "$ref": "#/definitions/responsesOrReferences"
         },
         "parameters": {
-          "$ref": "#/definitions/parameters"
+          "$ref": "#/definitions/parametersOrReferences"
         },
         "examples": {
-          "$ref": "#/definitions/examples"
+          "$ref": "#/definitions/examplesOrReferences"
         },
         "requestBodies": {
-          "$ref": "#/definitions/requestBodies"
+          "$ref": "#/definitions/requestBodiesOrReferences"
         },
         "headers": {
-          "$ref": "#/definitions/headers"
+          "$ref": "#/definitions/headersOrReferences"
         },
         "securitySchemes": {
-          "$ref": "#/definitions/securitySchemes"
+          "$ref": "#/definitions/securitySchemesOrReferences"
         },
         "links": {
-          "$ref": "#/definitions/links"
+          "$ref": "#/definitions/linksOrReferences"
         },
         "callbacks": {
-          "$ref": "#/definitions/callbacks"
+          "$ref": "#/definitions/callbacksOrReferences"
         }
       }
     },
@@ -1131,34 +1131,68 @@
         }
       ]
     },
+    "securitySchemeOrReference": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/securityScheme"
+        },
+        {
+          "$ref": "#/definitions/reference"
+        }
+      ]
+    },
+    "callbacksOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/callbackOrReference"
+      }
+    },
     "examplesOrReferences": {
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/exampleOrReference"
       }
     },
-    "parameters": {
+    "headersOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/parameter"
+        "$ref": "#/definitions/headerOrReference"
       }
     },
-    "requestBodies": {
+    "linksOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/requestBody"
+        "$ref": "#/definitions/linkOrReference"
       }
     },
-    "schemas": {
+    "parametersOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/schema"
+        "$ref": "#/definitions/parameterOrReference"
       }
     },
-    "securitySchemes": {
+    "requestBodiesOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/securityScheme"
+        "$ref": "#/definitions/requestBodyOrReference"
+      }
+    },
+    "responsesOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/responseOrReference"
+      }
+    },
+    "schemasOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/schemaOrReference"
+      }
+    },
+    "securitySchemesOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/securitySchemeOrReference"
       }
     },
     "object": {

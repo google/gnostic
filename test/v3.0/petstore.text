@@ -188,31 +188,33 @@ components: <
     additional_properties: <
       name: "Pet"
       value: <
-        required: "id"
-        required: "name"
-        properties: <
-          additional_properties: <
-            name: "id"
-            value: <
-              schema: <
-                type: "integer"
-                format: "int64"
+        schema: <
+          required: "id"
+          required: "name"
+          properties: <
+            additional_properties: <
+              name: "id"
+              value: <
+                schema: <
+                  type: "integer"
+                  format: "int64"
+                >
               >
             >
-          >
-          additional_properties: <
-            name: "name"
-            value: <
-              schema: <
-                type: "string"
+            additional_properties: <
+              name: "name"
+              value: <
+                schema: <
+                  type: "string"
+                >
               >
             >
-          >
-          additional_properties: <
-            name: "tag"
-            value: <
-              schema: <
-                type: "string"
+            additional_properties: <
+              name: "tag"
+              value: <
+                schema: <
+                  type: "string"
+                >
               >
             >
           >
@@ -222,11 +224,13 @@ components: <
     additional_properties: <
       name: "Pets"
       value: <
-        type: "array"
-        items: <
-          schema_or_reference: <
-            reference: <
-              _ref: "#/components/schemas/Pet"
+        schema: <
+          type: "array"
+          items: <
+            schema_or_reference: <
+              reference: <
+                _ref: "#/components/schemas/Pet"
+              >
             >
           >
         >
@@ -235,23 +239,25 @@ components: <
     additional_properties: <
       name: "Error"
       value: <
-        required: "code"
-        required: "message"
-        properties: <
-          additional_properties: <
-            name: "code"
-            value: <
-              schema: <
-                type: "integer"
-                format: "int32"
+        schema: <
+          required: "code"
+          required: "message"
+          properties: <
+            additional_properties: <
+              name: "code"
+              value: <
+                schema: <
+                  type: "integer"
+                  format: "int32"
+                >
               >
             >
-          >
-          additional_properties: <
-            name: "message"
-            value: <
-              schema: <
-                type: "string"
+            additional_properties: <
+              name: "message"
+              value: <
+                schema: <
+                  type: "string"
+                >
               >
             >
           >

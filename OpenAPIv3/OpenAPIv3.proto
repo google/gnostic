@@ -79,17 +79,21 @@ message Callbacks {
   repeated NamedSpecificationExtension specification_extension = 2;
 }
 
+message CallbacksOrReferences {
+  repeated NamedCallbackOrReference additional_properties = 1;
+}
+
 // Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.
 message Components {
-  Schemas schemas = 1;
-  Responses responses = 2;
-  Parameters parameters = 3;
-  Examples examples = 4;
-  RequestBodies request_bodies = 5;
-  Headers headers = 6;
-  SecuritySchemes security_schemes = 7;
-  Links links = 8;
-  Callbacks callbacks = 9;
+  SchemasOrReferences schemas = 1;
+  ResponsesOrReferences responses = 2;
+  ParametersOrReferences parameters = 3;
+  ExamplesOrReferences examples = 4;
+  RequestBodiesOrReferences request_bodies = 5;
+  HeadersOrReferences headers = 6;
+  SecuritySchemesOrReferences security_schemes = 7;
+  LinksOrReferences links = 8;
+  CallbacksOrReferences callbacks = 9;
   repeated NamedSpecificationExtension specification_extension = 10;
 }
 
@@ -201,6 +205,10 @@ message Headers {
   repeated NamedHeaderOrReference name = 1;
 }
 
+message HeadersOrReferences {
+  repeated NamedHeaderOrReference additional_properties = 1;
+}
+
 // The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.
 message Info {
   string title = 1;
@@ -249,6 +257,10 @@ message LinkParameters {
 // The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.
 message Links {
   repeated NamedLinkOrReference name = 1;
+}
+
+message LinksOrReferences {
+  repeated NamedLinkOrReference additional_properties = 1;
 }
 
 // Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.
@@ -323,12 +335,12 @@ message NamedMediaType {
   MediaType value = 2;
 }
 
-// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
-message NamedParameter {
+// Automatically-generated message used to represent maps of ParameterOrReference as ordered (name,value) pairs.
+message NamedParameterOrReference {
   // Map key
   string name = 1;
   // Mapped value
-  Parameter value = 2;
+  ParameterOrReference value = 2;
 }
 
 // Automatically-generated message used to represent maps of PathItem as ordered (name,value) pairs.
@@ -339,12 +351,12 @@ message NamedPathItem {
   PathItem value = 2;
 }
 
-// Automatically-generated message used to represent maps of RequestBody as ordered (name,value) pairs.
-message NamedRequestBody {
+// Automatically-generated message used to represent maps of RequestBodyOrReference as ordered (name,value) pairs.
+message NamedRequestBodyOrReference {
   // Map key
   string name = 1;
   // Mapped value
-  RequestBody value = 2;
+  RequestBodyOrReference value = 2;
 }
 
 // Automatically-generated message used to represent maps of ResponseOrReference as ordered (name,value) pairs.
@@ -355,14 +367,6 @@ message NamedResponseOrReference {
   ResponseOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
-message NamedSchema {
-  // Map key
-  string name = 1;
-  // Mapped value
-  Schema value = 2;
-}
-
 // Automatically-generated message used to represent maps of SchemaOrReference as ordered (name,value) pairs.
 message NamedSchemaOrReference {
   // Map key
@@ -371,12 +375,12 @@ message NamedSchemaOrReference {
   SchemaOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of SecurityScheme as ordered (name,value) pairs.
-message NamedSecurityScheme {
+// Automatically-generated message used to represent maps of SecuritySchemeOrReference as ordered (name,value) pairs.
+message NamedSecuritySchemeOrReference {
   // Map key
   string name = 1;
   // Mapped value
-  SecurityScheme value = 2;
+  SecuritySchemeOrReference value = 2;
 }
 
 // Automatically-generated message used to represent maps of ServerVariable as ordered (name,value) pairs.
@@ -458,8 +462,8 @@ message ParameterOrReference {
   }
 }
 
-message Parameters {
-  repeated NamedParameter additional_properties = 1;
+message ParametersOrReferences {
+  repeated NamedParameterOrReference additional_properties = 1;
 }
 
 // Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.
@@ -495,8 +499,8 @@ message Reference {
   string _ref = 1;
 }
 
-message RequestBodies {
-  repeated NamedRequestBody additional_properties = 1;
+message RequestBodiesOrReferences {
+  repeated NamedRequestBodyOrReference additional_properties = 1;
 }
 
 // Describes a single request body.
@@ -535,6 +539,10 @@ message Responses {
   ResponseOrReference default = 1;
   repeated NamedResponseOrReference response_code = 2;
   repeated NamedSpecificationExtension specification_extension = 3;
+}
+
+message ResponsesOrReferences {
+  repeated NamedResponseOrReference additional_properties = 1;
 }
 
 // The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.
@@ -583,8 +591,8 @@ message SchemaOrReference {
   }
 }
 
-message Schemas {
-  repeated NamedSchema additional_properties = 1;
+message SchemasOrReferences {
+  repeated NamedSchemaOrReference additional_properties = 1;
 }
 
 // Lists the available scopes for an OAuth2 security scheme.
@@ -611,8 +619,15 @@ message SecurityScheme {
   repeated NamedSpecificationExtension specification_extension = 9;
 }
 
-message SecuritySchemes {
-  repeated NamedSecurityScheme additional_properties = 1;
+message SecuritySchemeOrReference {
+  oneof oneof {
+    SecurityScheme security_scheme = 1;
+    Reference reference = 2;
+  }
+}
+
+message SecuritySchemesOrReferences {
+  repeated NamedSecuritySchemeOrReference additional_properties = 1;
 }
 
 // An object representing a Server.

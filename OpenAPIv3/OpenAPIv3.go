@@ -257,6 +257,35 @@ func NewCallbacks(in interface{}, context *compiler.Context) (*Callbacks, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*CallbacksOrReferences, error) {
+	errors := make([]error, 0)
+	x := &CallbacksOrReferences{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedCallbackOrReference additional_properties = 1;
+		// MAP: CallbackOrReference
+		x.AdditionalProperties = make([]*NamedCallbackOrReference, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedCallbackOrReference{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewCallbackOrReference(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewComponents(in interface{}, context *compiler.Context) (*Components, error) {
 	errors := make([]error, 0)
 	x := &Components{}
@@ -272,83 +301,83 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		// Schemas schemas = 1;
+		// SchemasOrReferences schemas = 1;
 		v1 := compiler.MapValueForKey(m, "schemas")
 		if v1 != nil {
 			var err error
-			x.Schemas, err = NewSchemas(v1, compiler.NewContext("schemas", context))
+			x.Schemas, err = NewSchemasOrReferences(v1, compiler.NewContext("schemas", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Responses responses = 2;
+		// ResponsesOrReferences responses = 2;
 		v2 := compiler.MapValueForKey(m, "responses")
 		if v2 != nil {
 			var err error
-			x.Responses, err = NewResponses(v2, compiler.NewContext("responses", context))
+			x.Responses, err = NewResponsesOrReferences(v2, compiler.NewContext("responses", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Parameters parameters = 3;
+		// ParametersOrReferences parameters = 3;
 		v3 := compiler.MapValueForKey(m, "parameters")
 		if v3 != nil {
 			var err error
-			x.Parameters, err = NewParameters(v3, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewParametersOrReferences(v3, compiler.NewContext("parameters", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Examples examples = 4;
+		// ExamplesOrReferences examples = 4;
 		v4 := compiler.MapValueForKey(m, "examples")
 		if v4 != nil {
 			var err error
-			x.Examples, err = NewExamples(v4, compiler.NewContext("examples", context))
+			x.Examples, err = NewExamplesOrReferences(v4, compiler.NewContext("examples", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// RequestBodies request_bodies = 5;
+		// RequestBodiesOrReferences request_bodies = 5;
 		v5 := compiler.MapValueForKey(m, "requestBodies")
 		if v5 != nil {
 			var err error
-			x.RequestBodies, err = NewRequestBodies(v5, compiler.NewContext("requestBodies", context))
+			x.RequestBodies, err = NewRequestBodiesOrReferences(v5, compiler.NewContext("requestBodies", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Headers headers = 6;
+		// HeadersOrReferences headers = 6;
 		v6 := compiler.MapValueForKey(m, "headers")
 		if v6 != nil {
 			var err error
-			x.Headers, err = NewHeaders(v6, compiler.NewContext("headers", context))
+			x.Headers, err = NewHeadersOrReferences(v6, compiler.NewContext("headers", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// SecuritySchemes security_schemes = 7;
+		// SecuritySchemesOrReferences security_schemes = 7;
 		v7 := compiler.MapValueForKey(m, "securitySchemes")
 		if v7 != nil {
 			var err error
-			x.SecuritySchemes, err = NewSecuritySchemes(v7, compiler.NewContext("securitySchemes", context))
+			x.SecuritySchemes, err = NewSecuritySchemesOrReferences(v7, compiler.NewContext("securitySchemes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Links links = 8;
+		// LinksOrReferences links = 8;
 		v8 := compiler.MapValueForKey(m, "links")
 		if v8 != nil {
 			var err error
-			x.Links, err = NewLinks(v8, compiler.NewContext("links", context))
+			x.Links, err = NewLinksOrReferences(v8, compiler.NewContext("links", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Callbacks callbacks = 9;
+		// CallbacksOrReferences callbacks = 9;
 		v9 := compiler.MapValueForKey(m, "callbacks")
 		if v9 != nil {
 			var err error
-			x.Callbacks, err = NewCallbacks(v9, compiler.NewContext("callbacks", context))
+			x.Callbacks, err = NewCallbacksOrReferences(v9, compiler.NewContext("callbacks", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1230,6 +1259,35 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*HeadersOrReferences, error) {
+	errors := make([]error, 0)
+	x := &HeadersOrReferences{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedHeaderOrReference additional_properties = 1;
+		// MAP: HeaderOrReference
+		x.AdditionalProperties = make([]*NamedHeaderOrReference, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedHeaderOrReference{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewHeaderOrReference(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	errors := make([]error, 0)
 	x := &Info{}
@@ -1615,6 +1673,35 @@ func NewLinks(in interface{}, context *compiler.Context) (*Links, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrReferences, error) {
+	errors := make([]error, 0)
+	x := &LinksOrReferences{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedLinkOrReference additional_properties = 1;
+		// MAP: LinkOrReference
+		x.AdditionalProperties = make([]*NamedLinkOrReference, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedLinkOrReference{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewLinkOrReference(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error) {
 	errors := make([]error, 0)
 	x := &MediaType{}
@@ -1976,9 +2063,9 @@ func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaTy
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParameter, error) {
+func NewNamedParameterOrReference(in interface{}, context *compiler.Context) (*NamedParameterOrReference, error) {
 	errors := make([]error, 0)
-	x := &NamedParameter{}
+	x := &NamedParameterOrReference{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
@@ -2000,11 +2087,11 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Parameter value = 2;
+		// ParameterOrReference value = 2;
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewParameter(v2, compiler.NewContext("value", context))
+			x.Value, err = NewParameterOrReference(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2050,9 +2137,9 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewNamedRequestBody(in interface{}, context *compiler.Context) (*NamedRequestBody, error) {
+func NewNamedRequestBodyOrReference(in interface{}, context *compiler.Context) (*NamedRequestBodyOrReference, error) {
 	errors := make([]error, 0)
-	x := &NamedRequestBody{}
+	x := &NamedRequestBodyOrReference{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
@@ -2074,11 +2161,11 @@ func NewNamedRequestBody(in interface{}, context *compiler.Context) (*NamedReque
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// RequestBody value = 2;
+		// RequestBodyOrReference value = 2;
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewRequestBody(v2, compiler.NewContext("value", context))
+			x.Value, err = NewRequestBodyOrReference(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2124,43 +2211,6 @@ func NewNamedResponseOrReference(in interface{}, context *compiler.Context) (*Na
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, error) {
-	errors := make([]error, 0)
-	x := &NamedSchema{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// string name = 1;
-		v1 := compiler.MapValueForKey(m, "name")
-		if v1 != nil {
-			x.Name, ok = v1.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// Schema value = 2;
-		v2 := compiler.MapValueForKey(m, "value")
-		if v2 != nil {
-			var err error
-			x.Value, err = NewSchema(v2, compiler.NewContext("value", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*NamedSchemaOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedSchemaOrReference{}
@@ -2198,9 +2248,9 @@ func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*Name
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewNamedSecurityScheme(in interface{}, context *compiler.Context) (*NamedSecurityScheme, error) {
+func NewNamedSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*NamedSecuritySchemeOrReference, error) {
 	errors := make([]error, 0)
-	x := &NamedSecurityScheme{}
+	x := &NamedSecuritySchemeOrReference{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
@@ -2222,11 +2272,11 @@ func NewNamedSecurityScheme(in interface{}, context *compiler.Context) (*NamedSe
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// SecurityScheme value = 2;
+		// SecuritySchemeOrReference value = 2;
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewSecurityScheme(v2, compiler.NewContext("value", context))
+			x.Value, err = NewSecuritySchemeOrReference(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2864,25 +2914,25 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewParameters(in interface{}, context *compiler.Context) (*Parameters, error) {
+func NewParametersOrReferences(in interface{}, context *compiler.Context) (*ParametersOrReferences, error) {
 	errors := make([]error, 0)
-	x := &Parameters{}
+	x := &ParametersOrReferences{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		// repeated NamedParameter additional_properties = 1;
-		// MAP: Parameter
-		x.AdditionalProperties = make([]*NamedParameter, 0)
+		// repeated NamedParameterOrReference additional_properties = 1;
+		// MAP: ParameterOrReference
+		x.AdditionalProperties = make([]*NamedParameterOrReference, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				pair := &NamedParameter{}
+				pair := &NamedParameterOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
+				pair.Value, err = NewParameterOrReference(v, compiler.NewContext(k, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3182,25 +3232,25 @@ func NewReference(in interface{}, context *compiler.Context) (*Reference, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewRequestBodies(in interface{}, context *compiler.Context) (*RequestBodies, error) {
+func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*RequestBodiesOrReferences, error) {
 	errors := make([]error, 0)
-	x := &RequestBodies{}
+	x := &RequestBodiesOrReferences{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		// repeated NamedRequestBody additional_properties = 1;
-		// MAP: RequestBody
-		x.AdditionalProperties = make([]*NamedRequestBody, 0)
+		// repeated NamedRequestBodyOrReference additional_properties = 1;
+		// MAP: RequestBodyOrReference
+		x.AdditionalProperties = make([]*NamedRequestBodyOrReference, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				pair := &NamedRequestBody{}
+				pair := &NamedRequestBodyOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewRequestBody(v, compiler.NewContext(k, context))
+				pair.Value, err = NewRequestBodyOrReference(v, compiler.NewContext(k, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3500,6 +3550,35 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*ResponsesOrReferences, error) {
+	errors := make([]error, 0)
+	x := &ResponsesOrReferences{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedResponseOrReference additional_properties = 1;
+		// MAP: ResponseOrReference
+		x.AdditionalProperties = make([]*NamedResponseOrReference, 0)
+		for _, item := range m {
+			k, ok := item.Key.(string)
+			if ok {
+				v := item.Value
+				pair := &NamedResponseOrReference{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewResponseOrReference(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
 		}
 	}
@@ -3973,25 +4052,25 @@ func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrR
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewSchemas(in interface{}, context *compiler.Context) (*Schemas, error) {
+func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*SchemasOrReferences, error) {
 	errors := make([]error, 0)
-	x := &Schemas{}
+	x := &SchemasOrReferences{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		// repeated NamedSchema additional_properties = 1;
-		// MAP: Schema
-		x.AdditionalProperties = make([]*NamedSchema, 0)
+		// repeated NamedSchemaOrReference additional_properties = 1;
+		// MAP: SchemaOrReference
+		x.AdditionalProperties = make([]*NamedSchemaOrReference, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				pair := &NamedSchema{}
+				pair := &NamedSchemaOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSchemaOrReference(v, compiler.NewContext(k, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -4237,25 +4316,64 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewSecuritySchemes(in interface{}, context *compiler.Context) (*SecuritySchemes, error) {
+func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*SecuritySchemeOrReference, error) {
 	errors := make([]error, 0)
-	x := &SecuritySchemes{}
+	x := &SecuritySchemeOrReference{}
+	matched := false
+	// SecurityScheme security_scheme = 1;
+	{
+		m, ok := compiler.UnpackMap(in)
+		if ok {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewSecurityScheme(m, compiler.NewContext("securityScheme", context))
+			if matching_error == nil {
+				x.Oneof = &SecuritySchemeOrReference_SecurityScheme{SecurityScheme: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
+			}
+		}
+	}
+	// Reference reference = 2;
+	{
+		m, ok := compiler.UnpackMap(in)
+		if ok {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
+			if matching_error == nil {
+				x.Oneof = &SecuritySchemeOrReference_Reference{Reference: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
+			}
+		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (*SecuritySchemesOrReferences, error) {
+	errors := make([]error, 0)
+	x := &SecuritySchemesOrReferences{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		// repeated NamedSecurityScheme additional_properties = 1;
-		// MAP: SecurityScheme
-		x.AdditionalProperties = make([]*NamedSecurityScheme, 0)
+		// repeated NamedSecuritySchemeOrReference additional_properties = 1;
+		// MAP: SecuritySchemeOrReference
+		x.AdditionalProperties = make([]*NamedSecuritySchemeOrReference, 0)
 		for _, item := range m {
 			k, ok := item.Key.(string)
 			if ok {
 				v := item.Value
-				pair := &NamedSecurityScheme{}
+				pair := &NamedSecuritySchemeOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSecurityScheme(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSecuritySchemeOrReference(v, compiler.NewContext(k, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -4778,6 +4896,19 @@ func (m *Callbacks) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *CallbacksOrReferences) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Components) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schemas != nil {
@@ -5108,6 +5239,19 @@ func (m *Headers) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *HeadersOrReferences) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Info) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Contact != nil {
@@ -5239,6 +5383,19 @@ func (m *Links) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *LinksOrReferences) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
@@ -5358,7 +5515,7 @@ func (m *NamedMediaType) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *NamedParameter) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedParameterOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5380,7 +5537,7 @@ func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *NamedRequestBody) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedRequestBodyOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5402,17 +5559,6 @@ func (m *NamedResponseOrReference) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *NamedSchema) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	if m.Value != nil {
-		_, err := m.Value.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5424,7 +5570,7 @@ func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *NamedSecurityScheme) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedSecuritySchemeOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5641,7 +5787,7 @@ func (m *ParameterOrReference) ResolveReferences(root string) (interface{}, erro
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *Parameters) ResolveReferences(root string) (interface{}, error) {
+func (m *ParametersOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5791,7 +5937,7 @@ func (m *Reference) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *RequestBodies) ResolveReferences(root string) (interface{}, error) {
+func (m *RequestBodiesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5927,6 +6073,19 @@ func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *ResponsesOrReferences) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Xml != nil {
@@ -6037,7 +6196,7 @@ func (m *SchemaOrReference) ResolveReferences(root string) (interface{}, error) 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *Schemas) ResolveReferences(root string) (interface{}, error) {
+func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6103,7 +6262,30 @@ func (m *SecurityScheme) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *SecuritySchemes) ResolveReferences(root string) (interface{}, error) {
+func (m *SecuritySchemeOrReference) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	{
+		p, ok := m.Oneof.(*SecuritySchemeOrReference_SecurityScheme)
+		if ok {
+			_, err := p.SecurityScheme.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	{
+		p, ok := m.Oneof.(*SecuritySchemeOrReference_Reference)
+		if ok {
+			_, err := p.Reference.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *SecuritySchemesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
