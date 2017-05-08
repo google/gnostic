@@ -1197,17 +1197,14 @@
     },
     "object": {
       "type": "object",
-      "additionalProperties": true,
-      "additionalItems": true
+      "additionalProperties": true
     },
     "any": {
-      "additionalProperties": true,
-      "additionalItems": true
+      "additionalProperties": true
     },
     "expression": {
       "type": "object",
-      "additionalProperties": true,
-      "additionalItems": true
+      "additionalProperties": true
     },
     "specificationExtension": {
       "description": "Any property starting with x- is valid.",

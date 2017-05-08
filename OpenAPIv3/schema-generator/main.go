@@ -670,20 +670,17 @@ func main() {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("object", objectSchema))
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("any", objectSchema))
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("expression", objectSchema))
 	}
 
