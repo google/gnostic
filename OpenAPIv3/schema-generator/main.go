@@ -520,6 +520,9 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 				// Component names should match "^[a-zA-Z0-9\.\-_]+$"
 				// See https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#componentsObject
 				propertyName := strings.Replace(modelField.Name, "{name}", "^[a-zA-Z0-9\\\\.\\\\-_]+$", -1)
+				//  The field name MUST begin with a slash, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#paths-object
+				// JSON Schema for OpenAPI v2 uses "^/" as regex for paths, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/schemas/v2.0/schema.json#L173
+				propertyName = strings.Replace(propertyName, "/{path}", "^/", -1)
 				// Replace human-friendly (and regex-confusing) description with a blank pattern
 				propertyName = strings.Replace(propertyName, "{expression}", "^", -1)
 				propertyName = strings.Replace(propertyName, "{property}", "^", -1)
