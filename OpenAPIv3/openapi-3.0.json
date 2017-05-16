@@ -9,6 +9,7 @@
     "info",
     "paths"
   ],
+  "additionalProperties": false,
   "patternProperties": {
     "^x-": {
       "$ref": "#/definitions/specificationExtension"
@@ -60,6 +61,7 @@
         "title",
         "version"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -89,6 +91,7 @@
     "contact": {
       "type": "object",
       "description": "Contact information for the exposed API.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -112,6 +115,7 @@
       "required": [
         "name"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -132,6 +136,7 @@
       "required": [
         "url"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -152,6 +157,7 @@
     "serverVariables": {
       "type": "object",
       "description": "",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "$ref": "#/definitions/serverVariable"
@@ -167,6 +173,7 @@
       "required": [
         "default"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -191,6 +198,7 @@
     "components": {
       "type": "object",
       "description": "Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -229,6 +237,7 @@
     "paths": {
       "type": "object",
       "description": "Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.",
+      "additionalProperties": false,
       "patternProperties": {
         "/{path}": {
           "$ref": "#/definitions/pathItem"
@@ -241,6 +250,7 @@
     "pathItem": {
       "type": "object",
       "description": "Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -302,6 +312,7 @@
       "required": [
         "responses"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -368,6 +379,7 @@
       "required": [
         "url"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -389,6 +401,7 @@
         "name",
         "in"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -442,6 +455,7 @@
       "required": [
         "content"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -462,6 +476,7 @@
     "content": {
       "type": "object",
       "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.",
+      "additionalProperties": false,
       "patternProperties": {
         "{media-type}": {
           "$ref": "#/definitions/mediaType"
@@ -471,6 +486,7 @@
     "mediaType": {
       "type": "object",
       "description": "Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -494,6 +510,7 @@
     "encoding": {
       "type": "object",
       "description": "An object representing multipart region encoding for `requestBody` objects.",
+      "additionalProperties": false,
       "patternProperties": {
         "{property}": {
           "$ref": "#/definitions/encodingProperty"
@@ -503,6 +520,7 @@
     "encodingProperty": {
       "type": "object",
       "description": "A single encoding definition applied to a single schema property.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -529,6 +547,7 @@
     "responses": {
       "type": "object",
       "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.",
+      "additionalProperties": false,
       "patternProperties": {
         "^([0-9]{3})$": {
           "$ref": "#/definitions/responseOrReference"
@@ -549,6 +568,7 @@
       "required": [
         "description"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -572,6 +592,7 @@
     "callbacks": {
       "type": "object",
       "description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "$ref": "#/definitions/callbackOrReference"
@@ -584,6 +605,7 @@
     "callback": {
       "type": "object",
       "description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
+      "additionalProperties": false,
       "patternProperties": {
         "{expression}": {
           "$ref": "#/definitions/pathItem"
@@ -596,6 +618,7 @@
     "headers": {
       "type": "object",
       "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "$ref": "#/definitions/headerOrReference"
@@ -605,6 +628,7 @@
     "example": {
       "type": "object",
       "description": "",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -628,6 +652,7 @@
     "links": {
       "type": "object",
       "description": "The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "$ref": "#/definitions/linkOrReference"
@@ -637,6 +662,7 @@
     "link": {
       "type": "object",
       "description": "The `Link Object` is responsible for defining a possible operation based on a single response.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -666,6 +692,7 @@
     "linkParameters": {
       "type": "object",
       "description": "Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.  To specify parameters required by the operation, we can use a **Link Parameters Object**. This object contains parameter names along with static or dynamic values:",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "$ref": "#/definitions/anyOrExpression"
@@ -675,6 +702,7 @@
     "header": {
       "type": "object",
       "description": "The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).",
+      "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string"
@@ -723,6 +751,7 @@
       "required": [
         "name"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -742,7 +771,8 @@
     },
     "examples": {
       "type": "object",
-      "description": ""
+      "description": "",
+      "additionalProperties": false
     },
     "reference": {
       "type": "object",
@@ -750,6 +780,7 @@
       "required": [
         "$ref"
       ],
+      "additionalProperties": false,
       "properties": {
         "$ref": {
           "type": "string"
@@ -909,6 +940,7 @@
     "xml": {
       "type": "object",
       "description": "A metadata object that allows for more fine-tuned XML model definitions.  When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information. See examples for expected behavior.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -938,6 +970,7 @@
       "required": [
         "type"
       ],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -973,6 +1006,7 @@
     "oauthFlows": {
       "type": "object",
       "description": "Allows configuration of the supported OAuth Flows.",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -996,6 +1030,7 @@
     "oauthFlow": {
       "type": "object",
       "description": "Configuration details for a supported OAuth Flow",
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": {
           "$ref": "#/definitions/specificationExtension"
@@ -1019,6 +1054,7 @@
     "scopes": {
       "type": "object",
       "description": "Lists the available scopes for an OAuth2 security scheme.",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "type": "string"
@@ -1031,6 +1067,7 @@
     "securityRequirement": {
       "type": "object",
       "description": "Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.",
+      "additionalProperties": false,
       "patternProperties": {
         "{name}": {
           "type": "array",
