@@ -479,6 +479,8 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 		schema.Required = &arrayCopy
 	}
 
+	schema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false);
+
 	schema.Description = stringptr(modelObject.Description)
 
 	// handle fixed fields
