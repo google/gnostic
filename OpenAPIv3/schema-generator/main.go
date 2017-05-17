@@ -519,7 +519,16 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 			if schemaField == nil {
 				// create and add the schema field
 				schemaField = &jsonschema.Schema{}
-				namedSchema := &jsonschema.NamedSchema{Name: modelField.Name, Value: schemaField}
+				// Component names should match "^[a-zA-Z0-9\.\-_]+$"
+				// See https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#componentsObject
+				propertyName := strings.Replace(modelField.Name, "{name}", "^[a-zA-Z0-9\\\\.\\\\-_]+$", -1)
+				//  The field name MUST begin with a slash, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#paths-object
+				// JSON Schema for OpenAPI v2 uses "^/" as regex for paths, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/schemas/v2.0/schema.json#L173
+				propertyName = strings.Replace(propertyName, "/{path}", "^/", -1)
+				// Replace human-friendly (and regex-confusing) description with a blank pattern
+				propertyName = strings.Replace(propertyName, "{expression}", "^", -1)
+				propertyName = strings.Replace(propertyName, "{property}", "^", -1)
+				namedSchema := &jsonschema.NamedSchema{Name: propertyName, Value: schemaField}
 				newNamedSchemas = append(newNamedSchemas, namedSchema)
 			}
 			updateSchemaFieldWithModelField(schemaField, &modelField)
@@ -778,7 +787,7 @@ func main() {
 	contentObject := schema.DefinitionWithName("content")
 	pairs := make([]*jsonschema.NamedSchema, 0)
 	contentObject.PatternProperties = &pairs
-	namedSchema := &jsonschema.NamedSchema{Name: "{media-type}", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
+	namedSchema := &jsonschema.NamedSchema{Name: "^", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
 	*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
 
 	// write the updated schema

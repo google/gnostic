@@ -159,7 +159,7 @@
       "description": "",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "$ref": "#/definitions/serverVariable"
         },
         "^x-": {
@@ -239,7 +239,7 @@
       "description": "Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.",
       "additionalProperties": false,
       "patternProperties": {
-        "/{path}": {
+        "^/": {
           "$ref": "#/definitions/pathItem"
         },
         "^x-": {
@@ -478,7 +478,7 @@
       "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.",
       "additionalProperties": false,
       "patternProperties": {
-        "{media-type}": {
+        "^": {
           "$ref": "#/definitions/mediaType"
         }
       }
@@ -512,7 +512,7 @@
       "description": "An object representing multipart region encoding for `requestBody` objects.",
       "additionalProperties": false,
       "patternProperties": {
-        "{property}": {
+        "^": {
           "$ref": "#/definitions/encodingProperty"
         }
       }
@@ -594,7 +594,7 @@
       "description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "$ref": "#/definitions/callbackOrReference"
         },
         "^x-": {
@@ -607,7 +607,7 @@
       "description": "A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.",
       "additionalProperties": false,
       "patternProperties": {
-        "{expression}": {
+        "^": {
           "$ref": "#/definitions/pathItem"
         },
         "^x-": {
@@ -620,7 +620,7 @@
       "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "$ref": "#/definitions/headerOrReference"
         }
       }
@@ -654,7 +654,7 @@
       "description": "The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "$ref": "#/definitions/linkOrReference"
         }
       }
@@ -694,7 +694,7 @@
       "description": "Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.  To specify parameters required by the operation, we can use a **Link Parameters Object**. This object contains parameter names along with static or dynamic values:",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "$ref": "#/definitions/anyOrExpression"
         }
       }
@@ -1056,7 +1056,7 @@
       "description": "Lists the available scopes for an OAuth2 security scheme.",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "type": "string"
         },
         "^x-": {
@@ -1069,7 +1069,7 @@
       "description": "Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.",
       "additionalProperties": false,
       "patternProperties": {
-        "{name}": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
           "type": "array",
           "items": {
             "type": "string"
