@@ -25,7 +25,7 @@ import (
 )
 
 type documentHandler func(version string, extensionName string, document string)
-type extensionHandler func(name string, info yaml.MapSlice) (bool, proto.Message, error)
+type extensionHandler func(name string, info interface{}) (bool, proto.Message, error)
 
 func forInputYamlFromOpenapic(handler documentHandler) {
 	data, err := ioutil.ReadAll(os.Stdin)
@@ -43,7 +43,7 @@ func ProcessExtension(handleExtension extensionHandler) {
 	response := &ExtensionHandlerResponse{}
 	forInputYamlFromOpenapic(
 		func(version string, extensionName string, yamlInput string) {
-			var info yaml.MapSlice
+			var info interface{}
 			var newObject proto.Message
 			var err error
 			err = yaml.Unmarshal([]byte(yamlInput), &info)

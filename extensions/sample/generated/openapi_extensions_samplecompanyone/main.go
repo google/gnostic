@@ -21,10 +21,9 @@ import (
 	"github.com/googleapis/gnostic/compiler"
 	"github.com/googleapis/gnostic/extensions"
 	"github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_samplecompanyone/proto"
-	"gopkg.in/yaml.v2"
 )
 
-func handleExtension(extensionName string, info yaml.MapSlice) (bool, proto.Message, error) {
+func handleExtension(extensionName string, info interface{}) (bool, proto.Message, error) {
 	switch extensionName {
 	// All supported extensions
 

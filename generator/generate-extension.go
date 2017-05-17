@@ -52,7 +52,7 @@ var PROTO_OPTIONS_FOR_EXTENSION = []ProtoOption{
 }
 
 const additionalCompilerCodeWithMain = "" +
-	"func handleExtension(extensionName string, info yaml.MapSlice) (bool, proto.Message, error) {\n" +
+	"func handleExtension(extensionName string, info interface{}) (bool, proto.Message, error) {\n" +
 	"      switch extensionName {\n" +
 	"      // All supported extensions\n" +
 	"      %s\n" +
@@ -219,7 +219,6 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	// generate the main file.
 	outDirRelativeToGoPathSrc := strings.Replace(outDir, path.Join(os.Getenv("GOPATH"), "src")+"/", "", 1)
 	imports := []string{
-		"gopkg.in/yaml.v2",
 		"github.com/golang/protobuf/proto",
 		"github.com/googleapis/gnostic/extensions",
 		"github.com/googleapis/gnostic/compiler",
