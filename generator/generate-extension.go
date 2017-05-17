@@ -52,7 +52,7 @@ var PROTO_OPTIONS_FOR_EXTENSION = []ProtoOption{
 }
 
 const additionalCompilerCodeWithMain = "" +
-	"func handleExtension(extensionName string, info interface{}) (bool, proto.Message, error) {\n" +
+	"func handleExtension(extensionName string, yamlInput string) (bool, proto.Message, error) {\n" +
 	"      switch extensionName {\n" +
 	"      // All supported extensions\n" +
 	"      %s\n" +
@@ -67,6 +67,11 @@ const additionalCompilerCodeWithMain = "" +
 
 const caseString = "\n" +
 	"case \"%s\":\n" +
+        "var info yaml.MapSlice\n" +
+	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
+	"if err != nil {\n" +
+	"  return true, nil, err\n" +
+	"}\n" +
 	"newObject, err := %s.New%s(info, compiler.NewContext(\"$root\", nil))\n" +
 	"return true, newObject, err"
 
@@ -222,6 +227,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"github.com/golang/protobuf/proto",
 		"github.com/googleapis/gnostic/extensions",
 		"github.com/googleapis/gnostic/compiler",
+		"gopkg.in/yaml.v2",
 		outDirRelativeToGoPathSrc + "/" + "proto",
 	}
 	var extensionNameKeys []string
