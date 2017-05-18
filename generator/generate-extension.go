@@ -65,15 +65,25 @@ const additionalCompilerCodeWithMain = "" +
 	"	openapiextension_v1.ProcessExtension(handleExtension)\n" +
 	"}\n"
 
-const caseString = "\n" +
+const caseStringForObjectTypes = "\n" +
 	"case \"%s\":\n" +
-        "var info yaml.MapSlice\n" +
+	"var info yaml.MapSlice\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
 	"newObject, err := %s.New%s(info, compiler.NewContext(\"$root\", nil))\n" +
 	"return true, newObject, err"
+
+const caseStringForWrapperTypes = "\n" +
+	"case \"%s\":\n" +
+	"var info %s\n" +
+	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
+	"if err != nil {\n" +
+	"  return true, nil, err\n" +
+	"}\n" +
+	"newObject := &wrappers.%s{Value: info}\n" +
+	"return true, newObject, nil"
 
 func GenerateMainFile(packageName string, license string, codeBody string, imports []string) string {
 	code := &printer.Code{}
@@ -116,8 +126,25 @@ func toProtoPackageName(input string) string {
 	return out
 }
 
-func GenerateExtension(schemaFile string, outDir string) error {
+type primitiveTypeInfo struct {
+	goTypeName       string
+	wrapperProtoName string
+}
 
+var supportedPrimitiveTypeInfos = map[string]primitiveTypeInfo{
+	"string":  primitiveTypeInfo{goTypeName: "string", wrapperProtoName: "StringValue"},
+	"number":  primitiveTypeInfo{goTypeName: "float64", wrapperProtoName: "DoubleValue"},
+	"integer": primitiveTypeInfo{goTypeName: "int64", wrapperProtoName: "Int64Value"},
+	"boolean": primitiveTypeInfo{goTypeName: "bool", wrapperProtoName: "BoolValue"},
+}
+
+type generatedTypeInfo struct {
+	schemaName string
+	// if this is not nil, the schema should be treataed as a primitive type.
+	optionalPrimitiveTypeInfo *primitiveTypeInfo
+}
+
+func GenerateExtension(schemaFile string, outDir string) error {
 	outFileBaseName := getBaseFileNameWithoutExt(schemaFile)
 	extensionNameWithoutXDashPrefix := outFileBaseName[len("x-"):]
 	outDir = path.Join(outDir, "openapi_extensions_"+extensionNameWithoutXDashPrefix)
@@ -147,8 +174,13 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	cc := NewDomain(openapiSchema, "v2") // TODO fix for OpenAPI v3
 
 	// create a type for each object defined in the schema
-	extensionToMessage := make(map[string]string)
+	extensionNameToMessageName := make(map[string]generatedTypeInfo)
 	schemaErrors := make([]error, 0)
+	supportedPrimitives := make([]string, 0)
+	for key, _ := range supportedPrimitiveTypeInfos {
+		supportedPrimitives = append(supportedPrimitives, key)
+	}
+	sort.Strings(supportedPrimitives)
 	if cc.Schema.Definitions != nil {
 		for _, pair := range *(cc.Schema.Definitions) {
 			definitionName := pair.Name
@@ -157,15 +189,31 @@ func GenerateExtension(schemaFile string, outDir string) error {
 			if definitionSchema.Id == nil || len(*(definitionSchema.Id)) == 0 {
 				schemaErrors = append(schemaErrors,
 					errors.New(
-						fmt.Sprintf("Schema %s has no 'id' field, which must match the name of the OpenAPI extension that the schema represents.\n", definitionName)))
+						fmt.Sprintf("Schema %s has no 'id' field, which must match the "+
+							"name of the OpenAPI extension that the schema represents.\n",
+							definitionName)))
 			} else {
-				if _, ok := extensionToMessage[*(definitionSchema.Id)]; ok {
+				if _, ok := extensionNameToMessageName[*(definitionSchema.Id)]; ok {
 					schemaErrors = append(schemaErrors,
 						errors.New(
 							fmt.Sprintf("Schema %s and %s have the same 'id' field value.\n",
-								definitionName, extensionToMessage[*(definitionSchema.Id)])))
+								definitionName, extensionNameToMessageName[*(definitionSchema.Id)].schemaName)))
+				} else if (definitionSchema.Type == nil) || (*definitionSchema.Type.String == "object") {
+					extensionNameToMessageName[*(definitionSchema.Id)] = generatedTypeInfo{schemaName: definitionName}
+				} else {
+					// this is a primitive type
+					if val, ok := supportedPrimitiveTypeInfos[*definitionSchema.Type.String]; ok {
+						extensionNameToMessageName[*(definitionSchema.Id)] = generatedTypeInfo{schemaName: definitionName, optionalPrimitiveTypeInfo: &val}
+					} else {
+						schemaErrors = append(schemaErrors,
+							errors.New(
+								fmt.Sprintf("Schema %s has type '%s' which is "+
+									"not supported. Supported primitive types are "+
+									"%s.\n", definitionName,
+									*definitionSchema.Type.String,
+									supportedPrimitives)))
+					}
 				}
-				extensionToMessage[*(definitionSchema.Id)] = definitionName
 			}
 			typeName := cc.TypeNameForStub(definitionName)
 			typeModel := cc.BuildTypeForDefinition(typeName, definitionName, definitionSchema)
@@ -223,6 +271,25 @@ func GenerateExtension(schemaFile string, outDir string) error {
 
 	// generate the main file.
 	outDirRelativeToGoPathSrc := strings.Replace(outDir, path.Join(os.Getenv("GOPATH"), "src")+"/", "", 1)
+
+	var extensionNameKeys []string
+	for k := range extensionNameToMessageName {
+		extensionNameKeys = append(extensionNameKeys, k)
+	}
+	sort.Strings(extensionNameKeys)
+
+	wrapperTypeIncluded := false
+	var cases string
+	for _, extensionName := range extensionNameKeys {
+		if extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo == nil {
+			cases += fmt.Sprintf(caseStringForObjectTypes, extensionName, goPackageName, extensionNameToMessageName[extensionName].schemaName)
+		} else {
+			wrapperTypeIncluded = true
+			cases += fmt.Sprintf(caseStringForWrapperTypes, extensionName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
+		}
+
+	}
+	extMainCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
 	imports := []string{
 		"github.com/golang/protobuf/proto",
 		"github.com/googleapis/gnostic/extensions",
@@ -230,18 +297,9 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"gopkg.in/yaml.v2",
 		outDirRelativeToGoPathSrc + "/" + "proto",
 	}
-	var extensionNameKeys []string
-	for k := range extensionToMessage {
-		extensionNameKeys = append(extensionNameKeys, k)
+	if wrapperTypeIncluded {
+		imports = append(imports, "github.com/golang/protobuf/ptypes/wrappers")
 	}
-	sort.Strings(extensionNameKeys)
-
-	var cases string
-	for _, extensionName := range extensionNameKeys {
-		cases += fmt.Sprintf(caseString, extensionName, goPackageName, extensionToMessage[extensionName])
-	}
-	extMainCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
-
 	main := GenerateMainFile("main", LICENSE, extMainCode, imports)
 	mainFileName := path.Join(outDir, "main.go")
 	err = ioutil.WriteFile(mainFileName, []byte(main), 0644)

@@ -33,6 +33,23 @@
                             "type": "integer"
                         }
                     }
+                },
+                "SampleCompanyOnePrimitiveString": {
+                    "type": "string",
+                    "id": "x-samplecompanyone-mysimplestring"
+                },
+                "SampleCompanyOnePrimitiveNumber": {
+                    "type": "number",
+                    "id": "x-samplecompanyone-mysimplenumber"
+                },
+                "SampleCompanyOnePrimitiveBoolean": {
+                    "type": "boolean",
+                    "id": "x-samplecompanyone-mysimpleboolean"
+                },
+                "SampleCompanyOnePrimitiveInt64": {
+                    "type": "string",
+                    "id": "x-samplecompanyone-mysimpleint64"
                 }
+
             }
         }

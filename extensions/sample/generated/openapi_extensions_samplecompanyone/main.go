@@ -18,6 +18,7 @@ package main
 
 import (
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/googleapis/gnostic/compiler"
 	"github.com/googleapis/gnostic/extensions"
 	"github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_samplecompanyone/proto"
@@ -36,6 +37,38 @@ func handleExtension(extensionName string, yamlInput string) (bool, proto.Messag
 		}
 		newObject, err := samplecompanyone.NewSampleCompanyOneBook(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
+	case "x-samplecompanyone-mysimpleboolean":
+		var info bool
+		err := yaml.Unmarshal([]byte(yamlInput), &info)
+		if err != nil {
+			return true, nil, err
+		}
+		newObject := &wrappers.BoolValue{Value: info}
+		return true, newObject, nil
+	case "x-samplecompanyone-mysimpleint64":
+		var info string
+		err := yaml.Unmarshal([]byte(yamlInput), &info)
+		if err != nil {
+			return true, nil, err
+		}
+		newObject := &wrappers.StringValue{Value: info}
+		return true, newObject, nil
+	case "x-samplecompanyone-mysimplenumber":
+		var info float64
+		err := yaml.Unmarshal([]byte(yamlInput), &info)
+		if err != nil {
+			return true, nil, err
+		}
+		newObject := &wrappers.DoubleValue{Value: info}
+		return true, newObject, nil
+	case "x-samplecompanyone-mysimplestring":
+		var info string
+		err := yaml.Unmarshal([]byte(yamlInput), &info)
+		if err != nil {
+			return true, nil, err
+		}
+		newObject := &wrappers.StringValue{Value: info}
+		return true, newObject, nil
 	case "x-samplecompanyone-shelve":
 		var info yaml.MapSlice
 		err := yaml.Unmarshal([]byte(yamlInput), &info)
