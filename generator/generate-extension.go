@@ -136,6 +136,9 @@ var supportedPrimitiveTypeInfos = map[string]primitiveTypeInfo{
 	"number":  primitiveTypeInfo{goTypeName: "float64", wrapperProtoName: "DoubleValue"},
 	"integer": primitiveTypeInfo{goTypeName: "int64", wrapperProtoName: "Int64Value"},
 	"boolean": primitiveTypeInfo{goTypeName: "bool", wrapperProtoName: "BoolValue"},
+	// TODO: Investigate how to support arrays. For now users will not be allowed to
+	// create extension handlers for arrays and they will have to use the
+	// plane yaml string as is.
 }
 
 type generatedTypeInfo struct {
