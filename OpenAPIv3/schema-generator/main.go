@@ -217,7 +217,7 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 			fieldName := strings.Trim(stripLink(parts[0]), " ")
 			fieldName = removeMarkdownLinks(fieldName)
 			if fieldName == "HTTP Status Code" {
-				fieldName = "^([0-9]{3})$"
+				fieldName = "^([0-9X]{3})$"
 			}
 			if fieldName != "Field Pattern" && fieldName != "---" {
 				typeName := parts[1]
