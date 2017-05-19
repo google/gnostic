@@ -639,6 +639,9 @@ func main() {
 		newArray := make([]*jsonschema.NamedSchema, 0)
 		newArray = append(newArray, *(parameterObject.Properties)...)
 		headerObject.Properties = &newArray
+		ppArray := make([]*jsonschema.NamedSchema, 0)
+		ppArray = append(ppArray, *(parameterObject.PatternProperties)...)
+		headerObject.PatternProperties = &ppArray
 		// we need to remove a few properties...
 	}
 
