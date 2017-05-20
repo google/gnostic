@@ -18,10 +18,9 @@ package main
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/googleapis/gnostic/compiler"
 	"github.com/googleapis/gnostic/extensions"
-	"github.com/googleapis/gnostic/extensions/sample/generated/openapi_extensions_samplecompanyone/proto"
+	"github.com/googleapis/gnostic/extensions/sample/generated/gnostic-x-samplecompanytwo/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,53 +28,21 @@ func handleExtension(extensionName string, yamlInput string) (bool, proto.Messag
 	switch extensionName {
 	// All supported extensions
 
-	case "x-samplecompanyone-book":
+	case "x-samplecompanytwo-book":
 		var info yaml.MapSlice
 		err := yaml.Unmarshal([]byte(yamlInput), &info)
 		if err != nil {
 			return true, nil, err
 		}
-		newObject, err := samplecompanyone.NewSampleCompanyOneBook(info, compiler.NewContext("$root", nil))
+		newObject, err := samplecompanytwo.NewSampleCompanyTwoBook(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
-	case "x-samplecompanyone-mysimpleboolean":
-		var info bool
-		err := yaml.Unmarshal([]byte(yamlInput), &info)
-		if err != nil {
-			return true, nil, err
-		}
-		newObject := &wrappers.BoolValue{Value: info}
-		return true, newObject, nil
-	case "x-samplecompanyone-mysimpleint64":
-		var info string
-		err := yaml.Unmarshal([]byte(yamlInput), &info)
-		if err != nil {
-			return true, nil, err
-		}
-		newObject := &wrappers.StringValue{Value: info}
-		return true, newObject, nil
-	case "x-samplecompanyone-mysimplenumber":
-		var info float64
-		err := yaml.Unmarshal([]byte(yamlInput), &info)
-		if err != nil {
-			return true, nil, err
-		}
-		newObject := &wrappers.DoubleValue{Value: info}
-		return true, newObject, nil
-	case "x-samplecompanyone-mysimplestring":
-		var info string
-		err := yaml.Unmarshal([]byte(yamlInput), &info)
-		if err != nil {
-			return true, nil, err
-		}
-		newObject := &wrappers.StringValue{Value: info}
-		return true, newObject, nil
-	case "x-samplecompanyone-shelve":
+	case "x-samplecompanytwo-shelve":
 		var info yaml.MapSlice
 		err := yaml.Unmarshal([]byte(yamlInput), &info)
 		if err != nil {
 			return true, nil, err
 		}
-		newObject, err := samplecompanyone.NewSampleCompanyOneShelve(info, compiler.NewContext("$root", nil))
+		newObject, err := samplecompanytwo.NewSampleCompanyTwoShelve(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
 	default:
 		return false, nil, nil

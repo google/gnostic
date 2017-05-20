@@ -244,10 +244,10 @@ Options:
   --errors_out=PATH   Write compilation errors to the specified location.
   --PLUGIN_out=PATH   Run the plugin named gnostic_PLUGIN and write results
                       to the specified location.
+  --x-EXTENSION       Use the extension named gnostic-x-EXTENSION
+                      to process OpenAPI specification extensions.
   --resolve_refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
-  --x=NAME            Run the specified gnostic extension to process
-                      extensions found in OpenAPI descriptions.
 `
 	// default values for all options
 	sourceName := ""
@@ -263,8 +263,8 @@ Options:
 	plugin_regex := regexp.MustCompile("--(.+)_out=(.+)")
 
 	// arg processing matches patterns of the form "--x=GENERATOR_NAME"
-	extensionHandler_regex, err := regexp.Compile("--x=(.+)")
-	defaultPrefixForExtensions := "openapi_extensions_"
+	extensionHandler_regex, err := regexp.Compile("--x-(.+)")
+	defaultPrefixForExtensions := "gnostic-x-"
 
 	for i, arg := range os.Args {
 		if i == 0 {

@@ -150,7 +150,7 @@ type generatedTypeInfo struct {
 func GenerateExtension(schemaFile string, outDir string) error {
 	outFileBaseName := getBaseFileNameWithoutExt(schemaFile)
 	extensionNameWithoutXDashPrefix := outFileBaseName[len("x-"):]
-	outDir = path.Join(outDir, "openapi_extensions_"+extensionNameWithoutXDashPrefix)
+	outDir = path.Join(outDir, "gnostic-x-"+extensionNameWithoutXDashPrefix)
 	protoPackage := toProtoPackageName(extensionNameWithoutXDashPrefix)
 	protoPackageName := strings.ToLower(protoPackage)
 	goPackageName := protoPackageName

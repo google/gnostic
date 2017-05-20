@@ -9,4 +9,5 @@ build:
 	rm -f $(GOPATH)/bin/gnostic_go_client $(GOPATH)/bin/gnostic_go_server
 	ln -s $(GOPATH)/bin/gnostic_go_generator $(GOPATH)/bin/gnostic_go_client
 	ln -s $(GOPATH)/bin/gnostic_go_generator $(GOPATH)/bin/gnostic_go_server
+	cd extensions/sample; ./INSTALL.sh; cd
 
