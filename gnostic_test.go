@@ -215,8 +215,8 @@ func TestExtensionHandlerWithLibraryExample(t *testing.T) {
 
 	command := exec.Command(
 		"gnostic",
-		"--x-samplecompanyone",
-		"--x-samplecompanytwo",
+		"--x-sampleone",
+		"--x-sampletwo",
 		"--text_out="+output_file,
 		"--resolve_refs",
 		input_file)

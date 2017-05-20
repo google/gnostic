@@ -23,11 +23,9 @@ addons:
     - unzip
 
 install: 
-  - go get github.com/googleapis/gnostic
-  - go get github.com/googleapis/gnostic/plugins/go/gnostic_go_sample
-  - go get github.com/googleapis/gnostic/extensions/sample/generated/gnostic-x-samplecompanyone
-  - go get github.com/googleapis/gnostic/extensions/sample/generated/gnostic-x-samplecompanytwo
   - ./.travis-install.sh
+  - export PATH=.:$HOME/local/bin:$PATH
+  - make
 
 script:
   - go test . -v

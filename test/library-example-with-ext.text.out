@@ -147,27 +147,27 @@ parameters: <
   >
 >
 vendor_extension: <
-  name: "x-samplecompanyone-book"
+  name: "x-sampleone-book"
   value: <
     value: <
-      type_url: "type.googleapis.com/samplecompanyone.SampleCompanyOneBook"
+      type_url: "type.googleapis.com/sampleone.Book"
       value: "\010{\020\347\007"
     >
     yaml: "code: 123\nmessage: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-samplecompanyone-shelve"
+  name: "x-sampleone-shelf"
   value: <
     value: <
-      type_url: "type.googleapis.com/samplecompanyone.SampleCompanyOneShelve"
+      type_url: "type.googleapis.com/sampleone.Shelf"
       value: "\010{\020\347\007"
     >
     yaml: "foo1: 123\nbar: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-samplecompanyone-mysimplestring"
+  name: "x-sampleone-mysimplestring"
   value: <
     value: <
       type_url: "type.googleapis.com/google.protobuf.StringValue"
@@ -177,7 +177,7 @@ vendor_extension: <
   >
 >
 vendor_extension: <
-  name: "x-samplecompanyone-mysimpleint64"
+  name: "x-sampleone-mysimpleint64"
   value: <
     value: <
       type_url: "type.googleapis.com/google.protobuf.StringValue"
@@ -187,7 +187,7 @@ vendor_extension: <
   >
 >
 vendor_extension: <
-  name: "x-samplecompanyone-mysimplenumber"
+  name: "x-sampleone-mysimplenumber"
   value: <
     value: <
       type_url: "type.googleapis.com/google.protobuf.DoubleValue"
@@ -197,7 +197,7 @@ vendor_extension: <
   >
 >
 vendor_extension: <
-  name: "x-samplecompanyone-mysimpleboolean"
+  name: "x-sampleone-mysimpleboolean"
   value: <
     value: <
       type_url: "type.googleapis.com/google.protobuf.BoolValue"
@@ -207,20 +207,20 @@ vendor_extension: <
   >
 >
 vendor_extension: <
-  name: "x-samplecompanytwo-book"
+  name: "x-sampletwo-book"
   value: <
     value: <
-      type_url: "type.googleapis.com/samplecompanytwo.SampleCompanyTwoBook"
+      type_url: "type.googleapis.com/sampletwo.Book"
       value: "\010{\020\347\007"
     >
     yaml: "code: 123\nmessage: 999\n"
   >
 >
 vendor_extension: <
-  name: "x-samplecompanytwo-shelve"
+  name: "x-sampletwo-shelf"
   value: <
     value: <
-      type_url: "type.googleapis.com/samplecompanytwo.SampleCompanyTwoShelve"
+      type_url: "type.googleapis.com/sampletwo.Shelf"
       value: "\010{\020\347\007"
     >
     yaml: "foo1: 123\nbar: 999\n"
