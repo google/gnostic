@@ -246,7 +246,7 @@ Options:
                       to the specified location.
   --resolve_refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
-  --extension=NAME    Run the specified gnostic extension to process
+  --x=NAME            Run the specified gnostic extension to process
                       extensions found in OpenAPI descriptions.
 `
 	// default values for all options
@@ -262,8 +262,8 @@ Options:
 	// arg processing matches patterns of the form "--PLUGIN_out=PATH"
 	plugin_regex := regexp.MustCompile("--(.+)_out=(.+)")
 
-	// arg processing matches patterns of the form "--extension=GENERATOR_NAME"
-	extensionHandler_regex, err := regexp.Compile("--extension=(.+)")
+	// arg processing matches patterns of the form "--x=GENERATOR_NAME"
+	extensionHandler_regex, err := regexp.Compile("--x=(.+)")
 	defaultPrefixForExtensions := "openapi_extensions_"
 
 	for i, arg := range os.Args {
