@@ -9,6 +9,11 @@
     
     "x-samplecompanyone-book" : {"code": 123, "message": 999},
     "x-samplecompanyone-shelve" : {"foo1": 123, "bar": 999},
+
+    "x-samplecompanyone-mysimplestring" : "hello world",
+    "x-samplecompanyone-mysimpleint64" : 12345,
+    "x-samplecompanyone-mysimplenumber" : 111.222,
+    "x-samplecompanyone-mysimpleboolean" : true,
     
     "x-samplecompanytwo-book" : {"code": 123, "message": 999},
     "x-samplecompanytwo-shelve" : {"foo1": 123, "bar": 999},

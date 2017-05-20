@@ -167,6 +167,46 @@ vendor_extension: <
   >
 >
 vendor_extension: <
+  name: "x-samplecompanyone-mysimplestring"
+  value: <
+    value: <
+      type_url: "type.googleapis.com/google.protobuf.StringValue"
+      value: "\n\013hello world"
+    >
+    yaml: "hello world\n"
+  >
+>
+vendor_extension: <
+  name: "x-samplecompanyone-mysimpleint64"
+  value: <
+    value: <
+      type_url: "type.googleapis.com/google.protobuf.StringValue"
+      value: "\n\00512345"
+    >
+    yaml: "12345\n"
+  >
+>
+vendor_extension: <
+  name: "x-samplecompanyone-mysimplenumber"
+  value: <
+    value: <
+      type_url: "type.googleapis.com/google.protobuf.DoubleValue"
+      value: "\t\221\355|?5\316[@"
+    >
+    yaml: "111.222\n"
+  >
+>
+vendor_extension: <
+  name: "x-samplecompanyone-mysimpleboolean"
+  value: <
+    value: <
+      type_url: "type.googleapis.com/google.protobuf.BoolValue"
+      value: "\010\001"
+    >
+    yaml: "true\n"
+  >
+>
+vendor_extension: <
   name: "x-samplecompanytwo-book"
   value: <
     value: <

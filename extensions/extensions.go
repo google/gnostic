@@ -21,11 +21,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"gopkg.in/yaml.v2"
 )
 
 type documentHandler func(version string, extensionName string, document string)
-type extensionHandler func(name string, info yaml.MapSlice) (bool, proto.Message, error)
+type extensionHandler func(name string, yamlInput string) (bool, proto.Message, error)
 
 func forInputYamlFromOpenapic(handler documentHandler) {
 	data, err := ioutil.ReadAll(os.Stdin)
@@ -43,18 +42,10 @@ func ProcessExtension(handleExtension extensionHandler) {
 	response := &ExtensionHandlerResponse{}
 	forInputYamlFromOpenapic(
 		func(version string, extensionName string, yamlInput string) {
-			var info yaml.MapSlice
 			var newObject proto.Message
 			var err error
-			err = yaml.Unmarshal([]byte(yamlInput), &info)
-			if err != nil {
-				response.Error = append(response.Error, err.Error())
-				responseBytes, _ := proto.Marshal(response)
-				os.Stdout.Write(responseBytes)
-				os.Exit(0)
-			}
 
-			handled, newObject, err := handleExtension(extensionName, info)
+			handled, newObject, err := handleExtension(extensionName, yamlInput)
 			if !handled {
 				responseBytes, _ := proto.Marshal(response)
 				os.Stdout.Write(responseBytes)

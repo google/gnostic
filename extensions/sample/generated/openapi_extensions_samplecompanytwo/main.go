@@ -24,14 +24,24 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func handleExtension(extensionName string, info yaml.MapSlice) (bool, proto.Message, error) {
+func handleExtension(extensionName string, yamlInput string) (bool, proto.Message, error) {
 	switch extensionName {
 	// All supported extensions
 
 	case "x-samplecompanytwo-book":
+		var info yaml.MapSlice
+		err := yaml.Unmarshal([]byte(yamlInput), &info)
+		if err != nil {
+			return true, nil, err
+		}
 		newObject, err := samplecompanytwo.NewSampleCompanyTwoBook(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
 	case "x-samplecompanytwo-shelve":
+		var info yaml.MapSlice
+		err := yaml.Unmarshal([]byte(yamlInput), &info)
+		if err != nil {
+			return true, nil, err
+		}
 		newObject, err := samplecompanytwo.NewSampleCompanyTwoShelve(info, compiler.NewContext("$root", nil))
 		return true, newObject, err
 	default:
