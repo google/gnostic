@@ -17,7 +17,7 @@ import PackageDescription
 let package = Package(
   name: "SwiftOpenAPIPlugin",
   targets: [
-    Target(name: "gnostic_swift_generator",
+    Target(name: "gnostic-swift-generator",
            dependencies: [
             "TemplateEncoder",
             ]),

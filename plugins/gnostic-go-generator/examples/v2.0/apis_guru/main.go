@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-        "github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/v2.0/apis_guru/apis_guru"
+        "github.com/googleapis/gnostic/plugins/gnostic-go-generator/examples/v2.0/apis_guru/apis_guru"
 	"sort"
 )
 

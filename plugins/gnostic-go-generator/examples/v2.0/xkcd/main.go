@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/v2.0/xkcd/xkcd"
+	"github.com/googleapis/gnostic/plugins/gnostic-go-generator/examples/v2.0/xkcd/xkcd"
 )
 
 func main() {

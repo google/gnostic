@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate encode_templates
+//go:generate encode-templates
 
 // gnostic_go_generator is a sample Gnostic plugin that generates Go
 // code that supports an API.

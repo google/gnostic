@@ -34,7 +34,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/plugins/go/gnostic_analyze/statistics"
+	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
 
 	openapi "github.com/googleapis/gnostic/OpenAPIv2"
 	plugins "github.com/googleapis/gnostic/plugins"

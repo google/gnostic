@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/v2.0/bookstore/bookstore"
+	"github.com/googleapis/gnostic/plugins/gnostic-go-generator/examples/v2.0/bookstore/bookstore"
 )
 
 // init() is called when the package is loaded

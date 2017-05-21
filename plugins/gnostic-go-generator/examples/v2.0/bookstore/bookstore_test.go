@@ -21,7 +21,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/gnostic/plugins/go/gnostic_go_generator/examples/v2.0/bookstore/bookstore"
+	"github.com/googleapis/gnostic/plugins/gnostic-go-generator/examples/v2.0/bookstore/bookstore"
 )
 
 const service = "http://localhost:8080"

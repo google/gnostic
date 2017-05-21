@@ -15,7 +15,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "openapi_swift_sample",
+    name: "openapi-swift-sample",
     dependencies: [
         .Package(url: "https://github.com/apple/swift-protobuf.git", Version(0,9,24))
     ]
