@@ -259,8 +259,8 @@ Options:
 	resolveReferences := false
 	extensionHandlers := make([]compiler.ExtensionHandler, 0)
 
-	// arg processing matches patterns of the form "--PLUGIN-out=PATH"
-	plugin_regex := regexp.MustCompile("--(.+)-out=(.+)")
+	// arg processing matches patterns of the form "--PLUGIN-out=PATH" and "--PLUGIN_out=PATH"
+	plugin_regex := regexp.MustCompile("--(.+)[-_]out=(.+)")
 
 	// arg processing matches patterns of the form "--x=GENERATOR_NAME"
 	extensionHandler_regex, err := regexp.Compile("--x-(.+)")
