@@ -26,7 +26,7 @@ Go and Swift.
 **gnostic** compilation code and the OpenAPI Protocol Buffer
 representation are automatically generated from the 
 [OpenAPI JSON Schema](https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v2.0/schema.json).
-Source code for the generator is in the [generator](generator) directory.
+Source code for the generator is in the [generate-gnostic](generate-gnostic) directory.
 
 ## Disclaimer
 
@@ -51,10 +51,10 @@ that describes the OpenAPI specification and a Go-language file of code that
 will read a JSON or YAML OpenAPI representation into the generated protocol 
 buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
 
-        cd $GOPATH/src/github.com/googleapis/gnostic/generator
-        go build
+        cd $GOPATH/src/github.com/googleapis/gnostic/generate-gnostic
+        go install
         cd ..
-        ./generator/generator
+        generate-gnostic --v2
 
 3. [Optional] Generate protocol buffer support code. 
 A pre-generated version of this file is checked into the OpenAPIv2 directory.
@@ -71,13 +71,13 @@ You can get protoc [here](https://github.com/google/protobuf).
 5. Run **gnostic**. This will create a file in the current directory named "petstore.pb" that contains a binary
 Protocol Buffer description of a sample API.
 
-        gnostic --pb_out=. examples/petstore.json
+        gnostic --pb-out=. examples/petstore.json
 
 6. You can also compile files that you specify with a URL. Here's another way to compile the previous 
 example. This time we're creating "petstore.text", which contains a textual representation of the
 Protocol Buffer description. This is mainly for use in testing and debugging.
 
-        gnostic --text_out=petstore.text https://raw.githubusercontent.com/googleapis/gnostic/master/examples/petstore.json
+        gnostic --text-out=petstore.text https://raw.githubusercontent.com/googleapis/gnostic/master/examples/petstore.json
 
 7. For a sample application, see apps/report.
 
@@ -88,8 +88,8 @@ Protocol Buffer description. This is mainly for use in testing and debugging.
 that reports some basic information about an API. The "-" causes the plugin to 
 write its output to stdout.
 
-        go install github.com/googleapis/gnostic/plugins/go/gnostic_go_sample
-        gnostic examples/petstore.json --go_sample_out=-
+        go install github.com/googleapis/gnostic/plugins/gnostic-go-sample
+        gnostic examples/petstore.json --go-sample-out=-
 
 ## Copyright
 
