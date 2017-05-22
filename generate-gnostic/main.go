@@ -186,13 +186,16 @@ Usage: %s [OPTIONS]
 Options:
   --v2
     Generate Protocol Buffer representation and support code for OpenAPI v2.
-    Files are read from and written to appropriate locations in the gnostic project directory.
-  --v3  
+    Files are read from and written to appropriate locations in the gnostic
+    project directory.
+  --v3
     Generate Protocol Buffer representation and support code for OpenAPI v3
-    Files are read from and written to appropriate locations in the gnostic project directory.
-  --extension EXTENSION_SCHEMA [EXTENSIONOPTIONS] 
+    Files are read from and written to appropriate locations in the gnostic
+    project directory.
+  --extension EXTENSION_SCHEMA [EXTENSIONOPTIONS]
     Generate a gnostic extension that reads a set of OpenAPI extensions.
-    EXTENSION_SCHEMA is the json schema for the OpenAPI extensions to be supported.
+    EXTENSION_SCHEMA is the json schema for the OpenAPI extensions to be
+    supported.
     EXTENSION_OPTIONS
       --out_dir=PATH: Location for writing extension models and support code.
 `, path.Base(os.Args[0]))

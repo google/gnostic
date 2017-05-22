@@ -26,7 +26,7 @@ Go and Swift.
 **gnostic** compilation code and the OpenAPI Protocol Buffer
 representation are automatically generated from the 
 [OpenAPI JSON Schema](https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v2.0/schema.json).
-Source code for the generator is in the [generator](generator) directory.
+Source code for the generator is in the [generate-gnostic](generate-gnostic) directory.
 
 ## Disclaimer
 
@@ -51,10 +51,10 @@ that describes the OpenAPI specification and a Go-language file of code that
 will read a JSON or YAML OpenAPI representation into the generated protocol 
 buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
 
-        cd $GOPATH/src/github.com/googleapis/gnostic/generator
-        go build
+        cd $GOPATH/src/github.com/googleapis/gnostic/generate-gnostic
+        go install
         cd ..
-        ./generator/generator
+        generate-gnostic --v2
 
 3. [Optional] Generate protocol buffer support code. 
 A pre-generated version of this file is checked into the OpenAPIv2 directory.

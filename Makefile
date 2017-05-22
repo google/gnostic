@@ -2,7 +2,7 @@
 build:	
 	go get
 	go install
-	cd generator; go get; go install
+	cd generate-gnostic; go get; go install
 	cd apps/report; go get; go install
 	cd plugins/gnostic-go-sample; go get; go install
 	cd plugins/gnostic-go-generator/encode-templates; go get; go install
