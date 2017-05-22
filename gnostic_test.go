@@ -20,9 +20,9 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 	var cmd = exec.Command(
 		"gnostic",
 		input_file,
-		"--text_out=.",
-		"--errors_out=.",
-		"--resolve_refs")
+		"--text-out=.",
+		"--errors-out=.",
+		"--resolve-refs")
 	t.Log(cmd.Args)
 	err = cmd.Run()
 	if err != nil && !expect_errors {
@@ -122,7 +122,7 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 	var err error
 	output, err := exec.Command(
 		"gnostic",
-		"--"+plugin+"_out=-",
+		"--"+plugin+"-out=-",
 		input_file).Output()
 	if err != nil {
 		t.Logf("Compile failed: %+v", err)
@@ -141,7 +141,7 @@ func test_plugin(t *testing.T, plugin string, input_file string, output_file str
 
 func TestSamplePluginWithPetstore(t *testing.T) {
 	test_plugin(t,
-		"go_sample",
+		"go-sample",
 		"examples/v2.0/yaml/petstore.yaml",
 		"sample-petstore.out",
 		"test/v2.0/yaml/sample-petstore.out")
@@ -152,13 +152,13 @@ func TestErrorInvalidPluginInvocations(t *testing.T) {
 	output, err := exec.Command(
 		"gnostic",
 		"examples/v2.0/yaml/petstore.yaml",
-		"--errors_out=-",
-		"--plugin_out=foo=bar,:abc",
-		"--plugin_out=,foo=bar:abc",
-		"--plugin_out=foo=:abc",
-		"--plugin_out==bar:abc",
-		"--plugin_out=,,:abc",
-		"--plugin_out=foo=bar=baz:abc",
+		"--errors-out=-",
+		"--plugin-out=foo=bar,:abc",
+		"--plugin-out=,foo=bar:abc",
+		"--plugin-out=foo=:abc",
+		"--plugin-out==bar:abc",
+		"--plugin-out=,,:abc",
+		"--plugin-out=foo=bar=baz:abc",
 	).Output()
 	if err == nil {
 		t.Logf("Invalid invocations were accepted")
@@ -181,18 +181,18 @@ func TestValidPluginInvocations(t *testing.T) {
 	output, err := exec.Command(
 		"gnostic",
 		"examples/v2.0/yaml/petstore.yaml",
-		"--errors_out=-",
+		"--errors-out=-",
 		// verify an invocation with no parameters
-		"--go_sample_out=!", // "!" indicates that no output should be generated
+		"--go-sample-out=!", // "!" indicates that no output should be generated
 		// verify single pair of parameters
-		"--go_sample_out=a=b:!",
+		"--go-sample-out=a=b:!",
 		// verify multiple parameters
-		"--go_sample_out=a=b,c=123,xyz=alphabetagammadelta:!",
+		"--go-sample-out=a=b,c=123,xyz=alphabetagammadelta:!",
 		// verify that special characters / . - _ can be included in parameter keys and values
-		"--go_sample_out=a/b/c=x/y/z:!",
-		"--go_sample_out=a.b.c=x.y.z:!",
-		"--go_sample_out=a-b-c=x-y-z:!",
-		"--go_sample_out=a_b_c=x_y_z:!",
+		"--go-sample-out=a/b/c=x/y/z:!",
+		"--go-sample-out=a.b.c=x.y.z:!",
+		"--go-sample-out=a-b-c=x-y-z:!",
+		"--go-sample-out=a_b_c=x_y_z:!",
 	).Output()
 	if len(output) != 0 {
 		t.Logf("Valid invocations generated invalid errors\n%s", string(output))
@@ -215,10 +215,10 @@ func TestExtensionHandlerWithLibraryExample(t *testing.T) {
 
 	command := exec.Command(
 		"gnostic",
-		"--extension=samplecompanyone",
-		"--extension=samplecompanytwo",
-		"--text_out="+output_file,
-		"--resolve_refs",
+		"--x-sampleone",
+		"--x-sampletwo",
+		"--text-out="+output_file,
+		"--resolve-refs",
 		input_file)
 
 	_, err = command.Output()

@@ -83,7 +83,7 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 		request := &plugins.Request{}
 
 		// Infer the name of the executable by adding the prefix.
-		executableName := "gnostic_" + pluginCall.Name
+		executableName := "gnostic-" + pluginCall.Name
 
 		// validate invocation string with regular expression
 		invocation := pluginCall.Invocation
@@ -238,16 +238,16 @@ func main() {
 Usage: gnostic OPENAPI_SOURCE [OPTIONS]
   OPENAPI_SOURCE is the filename or URL of an OpenAPI description to read.
 Options:
-  --pb_out=PATH       Write a binary proto to the specified location.
-  --json_out=PATH     Write a json proto to the specified location.
-  --text_out=PATH     Write a text proto to the specified location.
-  --errors_out=PATH   Write compilation errors to the specified location.
-  --PLUGIN_out=PATH   Run the plugin named gnostic_PLUGIN and write results
+  --pb-out=PATH       Write a binary proto to the specified location.
+  --json-out=PATH     Write a json proto to the specified location.
+  --text-out=PATH     Write a text proto to the specified location.
+  --errors-out=PATH   Write compilation errors to the specified location.
+  --PLUGIN-out=PATH   Run the plugin named gnostic_PLUGIN and write results
                       to the specified location.
-  --resolve_refs      Explicitly resolve $ref references.
+  --x-EXTENSION       Use the extension named gnostic-x-EXTENSION
+                      to process OpenAPI specification extensions.
+  --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
-  --extension=NAME    Run the specified gnostic extension to process
-                      extensions found in OpenAPI descriptions.
 `
 	// default values for all options
 	sourceName := ""
@@ -259,12 +259,12 @@ Options:
 	resolveReferences := false
 	extensionHandlers := make([]compiler.ExtensionHandler, 0)
 
-	// arg processing matches patterns of the form "--PLUGIN_out=PATH"
-	plugin_regex := regexp.MustCompile("--(.+)_out=(.+)")
+	// arg processing matches patterns of the form "--PLUGIN-out=PATH" and "--PLUGIN_out=PATH"
+	plugin_regex := regexp.MustCompile("--(.+)[-_]out=(.+)")
 
-	// arg processing matches patterns of the form "--extension=GENERATOR_NAME"
-	extensionHandler_regex, err := regexp.Compile("--extension=(.+)")
-	defaultPrefixForExtensions := "openapi_extensions_"
+	// arg processing matches patterns of the form "--x=GENERATOR_NAME"
+	extensionHandler_regex, err := regexp.Compile("--x-(.+)")
+	defaultPrefixForExtensions := "gnostic-x-"
 
 	for i, arg := range os.Args {
 		if i == 0 {
@@ -289,7 +289,7 @@ Options:
 			}
 		} else if m = extensionHandler_regex.FindSubmatch([]byte(arg)); m != nil {
 			extensionHandlers = append(extensionHandlers, compiler.ExtensionHandler{Name: defaultPrefixForExtensions + string(m[1])})
-		} else if arg == "--resolve_refs" {
+		} else if arg == "--resolve-refs" {
 			resolveReferences = true
 		} else if arg[0] == '-' {
 			fmt.Fprintf(os.Stderr, "Unknown option: %s.\n%s\n", arg, usage)
