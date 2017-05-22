@@ -1,8 +1,8 @@
         {
             "definitions": {
-                "SampleCompanyTwoBook": {
+                "Book": {
                     "type": "object",
-                    "id": "x-samplecompanytwo-book",
+                    "id": "x-sampletwo-book",
                     "required": [
                         "code",
                         "message"
@@ -17,9 +17,9 @@
                         }
                     }
                 },
-                "SampleCompanyTwoShelve": {
+                "Shelf": {
                     "type": "object",
-                    "id": "x-samplecompanytwo-shelve",
+                    "id": "x-sampletwo-shelf",
                     "required": [
                         "foo1",
                         "bar"

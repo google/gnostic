@@ -1,8 +1,8 @@
         {
             "definitions": {
-                "SampleCompanyOneBook": {
+                "Book": {
                     "type": "object",
-                    "id": "x-samplecompanyone-book",
+                    "id": "x-sampleone-book",
                     "required": [
                         "code",
                         "message"
@@ -17,9 +17,9 @@
                         }
                     }
                 },
-                "SampleCompanyOneShelve": {
+                "Shelf": {
                     "type": "object",
-                    "id": "x-samplecompanyone-shelve",
+                    "id": "x-sampleone-shelf",
                     "required": [
                         "foo1",
                         "bar"
@@ -34,21 +34,21 @@
                         }
                     }
                 },
-                "SampleCompanyOnePrimitiveString": {
+                "PrimitiveString": {
                     "type": "string",
-                    "id": "x-samplecompanyone-mysimplestring"
+                    "id": "x-sampleone-mysimplestring"
                 },
-                "SampleCompanyOnePrimitiveNumber": {
+                "PrimitiveNumber": {
                     "type": "number",
-                    "id": "x-samplecompanyone-mysimplenumber"
+                    "id": "x-sampleone-mysimplenumber"
                 },
-                "SampleCompanyOnePrimitiveBoolean": {
+                "PrimitiveBoolean": {
                     "type": "boolean",
-                    "id": "x-samplecompanyone-mysimpleboolean"
+                    "id": "x-sampleone-mysimpleboolean"
                 },
-                "SampleCompanyOnePrimitiveInt64": {
+                "PrimitiveInt64": {
                     "type": "string",
-                    "id": "x-samplecompanyone-mysimpleint64"
+                    "id": "x-sampleone-mysimpleint64"
                 }
 
             }
