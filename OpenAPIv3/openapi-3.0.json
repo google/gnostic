@@ -549,7 +549,7 @@
       "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.",
       "additionalProperties": false,
       "patternProperties": {
-        "^([0-9]{3})$": {
+        "^([0-9X]{3})$": {
           "$ref": "#/definitions/responseOrReference"
         },
         "^x-": {
@@ -703,6 +703,11 @@
       "type": "object",
       "description": "The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).",
       "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
       "properties": {
         "name": {
           "type": "string"
@@ -1056,7 +1061,7 @@
       "description": "Lists the available scopes for an OAuth2 security scheme.",
       "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9\\.\\-_]+$": {
+        "^": {
           "type": "string"
         },
         "^x-": {
