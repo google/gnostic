@@ -1259,7 +1259,7 @@
     "strings": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/string"
+        "type": "string"
       }
     },
     "object": {

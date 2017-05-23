@@ -687,7 +687,11 @@ func main() {
 			objectSchema = &jsonschema.Schema{}
 			objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 			additionalPropertiesSchema := &jsonschema.Schema{}
-			additionalPropertiesSchema.Ref = stringptr("#/definitions/" + lowerFirst(mapType.ObjectType))
+			if mapType.ObjectType == "string" {
+				additionalPropertiesSchema.Type = jsonschema.NewStringOrStringArrayWithString("string")
+			} else {
+				additionalPropertiesSchema.Ref = stringptr("#/definitions/" + lowerFirst(mapType.ObjectType))
+			}
 			objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(additionalPropertiesSchema)
 			*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema(mapType.Name, objectSchema))
 		}
