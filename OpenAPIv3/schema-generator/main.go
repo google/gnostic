@@ -170,6 +170,13 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				if matches := mapPattern.FindSubmatch([]byte(typeName)); matches != nil {
 					typeName = string(matches[1])
 					isMap = true
+				} else {
+					// match map[string,<typename>]
+					mapPattern2 := regexp.MustCompile("^Map\\[string,(.+)\\]$")
+					if matches := mapPattern2.FindSubmatch([]byte(typeName)); matches != nil {
+						typeName = string(matches[1])
+						isMap = true
+					}
 				}
 				description := strings.Trim(parts[len(parts)-1], " ")
 				description = removeMarkdownLinks(description)
@@ -407,9 +414,12 @@ func definitionNameForType(typeName string) string {
 }
 
 func pluralize(name string) string {
-	if name[len(name)-1] == 'y' {
+	switch name[len(name)-1] {
+	case 'y':
 		name = name[0:len(name)-1] + "ies"
-	} else {
+	case 's':
+		name = name + "Map"
+	default:
 		name = name + "s"
 	}
 	return name
@@ -479,7 +489,7 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 		schema.Required = &arrayCopy
 	}
 
-	schema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false);
+	schema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false)
 
 	schema.Description = stringptr(modelObject.Description)
 

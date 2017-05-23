@@ -531,7 +531,7 @@
           "type": "string"
         },
         "headers": {
-          "$ref": "#/definitions/object"
+          "$ref": "#/definitions/headersMap"
         },
         "style": {
           "type": "string"
@@ -617,7 +617,7 @@
     },
     "headers": {
       "type": "object",
-      "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.",
+      "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.",
       "additionalProperties": false,
       "patternProperties": {
         "^[a-zA-Z0-9\\.\\-_]+$": {
@@ -806,7 +806,7 @@
           "type": "boolean"
         },
         "discriminator": {
-          "type": "string"
+          "$ref": "#/definitions/discriminator"
         },
         "readOnly": {
           "type": "boolean"
@@ -939,6 +939,19 @@
         },
         "format": {
           "type": "string"
+        }
+      }
+    },
+    "discriminator": {
+      "type": "object",
+      "description": "When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  Note, when using the discriminator, _inline_ schemas will not be considered when using the discriminator.",
+      "additionalProperties": false,
+      "properties": {
+        "propertyName": {
+          "type": "string"
+        },
+        "mapping": {
+          "$ref": "#/definitions/strings"
         }
       }
     },
@@ -1195,6 +1208,12 @@
         "$ref": "#/definitions/exampleOrReference"
       }
     },
+    "headersMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/headers"
+      }
+    },
     "headersOrReferences": {
       "type": "object",
       "additionalProperties": {
@@ -1235,6 +1254,12 @@
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/securitySchemeOrReference"
+      }
+    },
+    "strings": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/string"
       }
     },
     "object": {
