@@ -26,19 +26,21 @@ import (
 
 // models a collection of types that is defined by a schema
 type Domain struct {
-	TypeModels         map[string]*TypeModel   // models of the types in the domain
-	Prefix             string                  // type prefix to use
-	Schema             *jsonschema.Schema      // top-level schema
-	PatternNames       map[string]string       // a configured mapping from patterns to property names
-	ObjectTypeRequests map[string]*TypeRequest // anonymous types implied by type instantiation
-	MapTypeRequests    map[string]string       // "NamedObject" types that will be used to implement ordered maps
-	Version            string                  // OpenAPI Version ("v2" or "v3")
+	TypeModels            map[string]*TypeModel   // models of the types in the domain
+	Prefix                string                  // type prefix to use
+	Schema                *jsonschema.Schema      // top-level schema
+	TypeNameOverrides     map[string]string       // a configured mapping from patterns to type names
+	PropertyNameOverrides map[string]string       // a configured mapping from patterns to property names
+	ObjectTypeRequests    map[string]*TypeRequest // anonymous types implied by type instantiation
+	MapTypeRequests       map[string]string       // "NamedObject" types that will be used to implement ordered maps
+	Version               string                  // OpenAPI Version ("v2" or "v3")
 }
 
 func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 	cc := &Domain{}
 	cc.TypeModels = make(map[string]*TypeModel, 0)
-	cc.PatternNames = make(map[string]string, 0)
+	cc.TypeNameOverrides = make(map[string]string, 0)
+	cc.PropertyNameOverrides = make(map[string]string, 0)
 	cc.ObjectTypeRequests = make(map[string]*TypeRequest, 0)
 	cc.MapTypeRequests = make(map[string]string, 0)
 	cc.Schema = schema
@@ -253,18 +255,23 @@ func (domain *Domain) buildPatternPropertyAccessors(typeModel *TypeModel, schema
 			propertyPattern := pair.Name
 			propertySchema := pair.Value
 			typeModel.OpenPatterns = append(typeModel.OpenPatterns, propertyPattern)
-			typeName := "Any"
-			propertyName := domain.PatternNames[propertyPattern]
 			if propertySchema.Ref != nil {
-				typeName = domain.typeNameForReference(*propertySchema.Ref)
+				typeName := domain.typeNameForReference(*propertySchema.Ref)
+				if _, ok := domain.TypeNameOverrides[typeName]; ok {
+					typeName = domain.TypeNameOverrides[typeName]
+				}
+				propertyName := domain.typeNameForReference(*propertySchema.Ref)
+				if _, ok := domain.PropertyNameOverrides[propertyName]; ok {
+					propertyName = domain.PropertyNameOverrides[propertyName]
+				}
+				propertyTypeName := fmt.Sprintf("Named%s", typeName)
+				property := NewTypePropertyWithNameTypeAndPattern(propertyName, propertyTypeName, propertyPattern)
+				property.Implicit = true
+				property.MapType = typeName
+				property.Repeated = true
+				domain.MapTypeRequests[property.MapType] = property.MapType
+				typeModel.addProperty(property)
 			}
-			propertyTypeName := fmt.Sprintf("Named%s", typeName)
-			property := NewTypePropertyWithNameTypeAndPattern(propertyName, propertyTypeName, propertyPattern)
-			property.Implicit = true
-			property.MapType = typeName
-			property.Repeated = true
-			domain.MapTypeRequests[property.MapType] = property.MapType
-			typeModel.addProperty(property)
 		}
 	}
 }

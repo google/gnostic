@@ -20,6 +20,7 @@ It has these top-level messages:
 	Contact
 	Content
 	DefaultType
+	Discriminator
 	Document
 	Encoding
 	EncodingProperty
@@ -57,7 +58,7 @@ It has these top-level messages:
 	NamedSchemaOrReference
 	NamedSecuritySchemeOrReference
 	NamedServerVariable
-	NamedSpecificationExtension
+	NamedString
 	OauthFlow
 	OauthFlows
 	Object
@@ -89,6 +90,7 @@ It has these top-level messages:
 	ServerVariables
 	SpecificationExtension
 	StringArray
+	Strings
 	Tag
 	Xml
 */
@@ -377,8 +379,8 @@ func _AnyOrExpression_OneofSizer(msg proto.Message) (n int) {
 
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 type Callback struct {
-	Expression             []*NamedPathItem               `protobuf:"bytes,1,rep,name=expression" json:"expression,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Path                   []*NamedPathItem `protobuf:"bytes,1,rep,name=path" json:"path,omitempty"`
+	SpecificationExtension []*NamedAny      `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Callback) Reset()                    { *m = Callback{} }
@@ -386,14 +388,14 @@ func (m *Callback) String() string            { return proto.CompactTextString(m
 func (*Callback) ProtoMessage()               {}
 func (*Callback) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
-func (m *Callback) GetExpression() []*NamedPathItem {
+func (m *Callback) GetPath() []*NamedPathItem {
 	if m != nil {
-		return m.Expression
+		return m.Path
 	}
 	return nil
 }
 
-func (m *Callback) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Callback) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -523,8 +525,8 @@ func _CallbackOrReference_OneofSizer(msg proto.Message) (n int) {
 
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 type Callbacks struct {
-	Name                   []*NamedCallbackOrReference    `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	CallbackOrReference    []*NamedCallbackOrReference `protobuf:"bytes,1,rep,name=callback_or_reference,json=callbackOrReference" json:"callback_or_reference,omitempty"`
+	SpecificationExtension []*NamedAny                 `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Callbacks) Reset()                    { *m = Callbacks{} }
@@ -532,14 +534,14 @@ func (m *Callbacks) String() string            { return proto.CompactTextString(
 func (*Callbacks) ProtoMessage()               {}
 func (*Callbacks) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-func (m *Callbacks) GetName() []*NamedCallbackOrReference {
+func (m *Callbacks) GetCallbackOrReference() []*NamedCallbackOrReference {
 	if m != nil {
-		return m.Name
+		return m.CallbackOrReference
 	}
 	return nil
 }
 
-func (m *Callbacks) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Callbacks) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -564,16 +566,16 @@ func (m *CallbacksOrReferences) GetAdditionalProperties() []*NamedCallbackOrRefe
 
 // Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.
 type Components struct {
-	Schemas                *SchemasOrReferences           `protobuf:"bytes,1,opt,name=schemas" json:"schemas,omitempty"`
-	Responses              *ResponsesOrReferences         `protobuf:"bytes,2,opt,name=responses" json:"responses,omitempty"`
-	Parameters             *ParametersOrReferences        `protobuf:"bytes,3,opt,name=parameters" json:"parameters,omitempty"`
-	Examples               *ExamplesOrReferences          `protobuf:"bytes,4,opt,name=examples" json:"examples,omitempty"`
-	RequestBodies          *RequestBodiesOrReferences     `protobuf:"bytes,5,opt,name=request_bodies,json=requestBodies" json:"request_bodies,omitempty"`
-	Headers                *HeadersOrReferences           `protobuf:"bytes,6,opt,name=headers" json:"headers,omitempty"`
-	SecuritySchemes        *SecuritySchemesOrReferences   `protobuf:"bytes,7,opt,name=security_schemes,json=securitySchemes" json:"security_schemes,omitempty"`
-	Links                  *LinksOrReferences             `protobuf:"bytes,8,opt,name=links" json:"links,omitempty"`
-	Callbacks              *CallbacksOrReferences         `protobuf:"bytes,9,opt,name=callbacks" json:"callbacks,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,10,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Schemas                *SchemasOrReferences         `protobuf:"bytes,1,opt,name=schemas" json:"schemas,omitempty"`
+	Responses              *ResponsesOrReferences       `protobuf:"bytes,2,opt,name=responses" json:"responses,omitempty"`
+	Parameters             *ParametersOrReferences      `protobuf:"bytes,3,opt,name=parameters" json:"parameters,omitempty"`
+	Examples               *ExamplesOrReferences        `protobuf:"bytes,4,opt,name=examples" json:"examples,omitempty"`
+	RequestBodies          *RequestBodiesOrReferences   `protobuf:"bytes,5,opt,name=request_bodies,json=requestBodies" json:"request_bodies,omitempty"`
+	Headers                *HeadersOrReferences         `protobuf:"bytes,6,opt,name=headers" json:"headers,omitempty"`
+	SecuritySchemes        *SecuritySchemesOrReferences `protobuf:"bytes,7,opt,name=security_schemes,json=securitySchemes" json:"security_schemes,omitempty"`
+	Links                  *LinksOrReferences           `protobuf:"bytes,8,opt,name=links" json:"links,omitempty"`
+	Callbacks              *CallbacksOrReferences       `protobuf:"bytes,9,opt,name=callbacks" json:"callbacks,omitempty"`
+	SpecificationExtension []*NamedAny                  `protobuf:"bytes,10,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Components) Reset()                    { *m = Components{} }
@@ -644,7 +646,7 @@ func (m *Components) GetCallbacks() *CallbacksOrReferences {
 	return nil
 }
 
-func (m *Components) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Components) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -653,10 +655,10 @@ func (m *Components) GetSpecificationExtension() []*NamedSpecificationExtension 
 
 // Contact information for the exposed API.
 type Contact struct {
-	Name                   string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Url                    string                         `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
-	Email                  string                         `protobuf:"bytes,3,opt,name=email" json:"email,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Name                   string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Url                    string      `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
+	Email                  string      `protobuf:"bytes,3,opt,name=email" json:"email,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Contact) Reset()                    { *m = Contact{} }
@@ -685,7 +687,7 @@ func (m *Contact) GetEmail() string {
 	return ""
 }
 
-func (m *Contact) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Contact) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -851,22 +853,47 @@ func _DefaultType_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
+// When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  Note, when using the discriminator, _inline_ schemas will not be considered when using the discriminator.
+type Discriminator struct {
+	PropertyName string   `protobuf:"bytes,1,opt,name=property_name,json=propertyName" json:"property_name,omitempty"`
+	Mapping      *Strings `protobuf:"bytes,2,opt,name=mapping" json:"mapping,omitempty"`
+}
+
+func (m *Discriminator) Reset()                    { *m = Discriminator{} }
+func (m *Discriminator) String() string            { return proto.CompactTextString(m) }
+func (*Discriminator) ProtoMessage()               {}
+func (*Discriminator) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+
+func (m *Discriminator) GetPropertyName() string {
+	if m != nil {
+		return m.PropertyName
+	}
+	return ""
+}
+
+func (m *Discriminator) GetMapping() *Strings {
+	if m != nil {
+		return m.Mapping
+	}
+	return nil
+}
+
 type Document struct {
-	Openapi                string                         `protobuf:"bytes,1,opt,name=openapi" json:"openapi,omitempty"`
-	Info                   *Info                          `protobuf:"bytes,2,opt,name=info" json:"info,omitempty"`
-	Servers                []*Server                      `protobuf:"bytes,3,rep,name=servers" json:"servers,omitempty"`
-	Paths                  *Paths                         `protobuf:"bytes,4,opt,name=paths" json:"paths,omitempty"`
-	Components             *Components                    `protobuf:"bytes,5,opt,name=components" json:"components,omitempty"`
-	Security               []*SecurityRequirement         `protobuf:"bytes,6,rep,name=security" json:"security,omitempty"`
-	Tags                   []*Tag                         `protobuf:"bytes,7,rep,name=tags" json:"tags,omitempty"`
-	ExternalDocs           *ExternalDocs                  `protobuf:"bytes,8,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,9,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Openapi                string                 `protobuf:"bytes,1,opt,name=openapi" json:"openapi,omitempty"`
+	Info                   *Info                  `protobuf:"bytes,2,opt,name=info" json:"info,omitempty"`
+	Servers                []*Server              `protobuf:"bytes,3,rep,name=servers" json:"servers,omitempty"`
+	Paths                  *Paths                 `protobuf:"bytes,4,opt,name=paths" json:"paths,omitempty"`
+	Components             *Components            `protobuf:"bytes,5,opt,name=components" json:"components,omitempty"`
+	Security               []*SecurityRequirement `protobuf:"bytes,6,rep,name=security" json:"security,omitempty"`
+	Tags                   []*Tag                 `protobuf:"bytes,7,rep,name=tags" json:"tags,omitempty"`
+	ExternalDocs           *ExternalDocs          `protobuf:"bytes,8,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
+	SpecificationExtension []*NamedAny            `protobuf:"bytes,9,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Document) Reset()                    { *m = Document{} }
 func (m *Document) String() string            { return proto.CompactTextString(m) }
 func (*Document) ProtoMessage()               {}
-func (*Document) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*Document) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 func (m *Document) GetOpenapi() string {
 	if m != nil {
@@ -924,7 +951,7 @@ func (m *Document) GetExternalDocs() *ExternalDocs {
 	return nil
 }
 
-func (m *Document) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Document) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -933,35 +960,35 @@ func (m *Document) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // An object representing multipart region encoding for `requestBody` objects.
 type Encoding struct {
-	Property []*NamedEncodingProperty `protobuf:"bytes,1,rep,name=property" json:"property,omitempty"`
+	EncodingProperty []*NamedEncodingProperty `protobuf:"bytes,1,rep,name=encoding_property,json=encodingProperty" json:"encoding_property,omitempty"`
 }
 
 func (m *Encoding) Reset()                    { *m = Encoding{} }
 func (m *Encoding) String() string            { return proto.CompactTextString(m) }
 func (*Encoding) ProtoMessage()               {}
-func (*Encoding) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*Encoding) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
-func (m *Encoding) GetProperty() []*NamedEncodingProperty {
+func (m *Encoding) GetEncodingProperty() []*NamedEncodingProperty {
 	if m != nil {
-		return m.Property
+		return m.EncodingProperty
 	}
 	return nil
 }
 
 // A single encoding definition applied to a single schema property.
 type EncodingProperty struct {
-	ContentType            string                         `protobuf:"bytes,1,opt,name=content_type,json=contentType" json:"content_type,omitempty"`
-	Headers                *Object                        `protobuf:"bytes,2,opt,name=headers" json:"headers,omitempty"`
-	Style                  string                         `protobuf:"bytes,3,opt,name=style" json:"style,omitempty"`
-	Explode                bool                           `protobuf:"varint,4,opt,name=explode" json:"explode,omitempty"`
-	AllowReserved          bool                           `protobuf:"varint,5,opt,name=allow_reserved,json=allowReserved" json:"allow_reserved,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,6,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	ContentType            string      `protobuf:"bytes,1,opt,name=content_type,json=contentType" json:"content_type,omitempty"`
+	Headers                *Headers    `protobuf:"bytes,2,opt,name=headers" json:"headers,omitempty"`
+	Style                  string      `protobuf:"bytes,3,opt,name=style" json:"style,omitempty"`
+	Explode                bool        `protobuf:"varint,4,opt,name=explode" json:"explode,omitempty"`
+	AllowReserved          bool        `protobuf:"varint,5,opt,name=allow_reserved,json=allowReserved" json:"allow_reserved,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,6,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *EncodingProperty) Reset()                    { *m = EncodingProperty{} }
 func (m *EncodingProperty) String() string            { return proto.CompactTextString(m) }
 func (*EncodingProperty) ProtoMessage()               {}
-func (*EncodingProperty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*EncodingProperty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
 func (m *EncodingProperty) GetContentType() string {
 	if m != nil {
@@ -970,7 +997,7 @@ func (m *EncodingProperty) GetContentType() string {
 	return ""
 }
 
-func (m *EncodingProperty) GetHeaders() *Object {
+func (m *EncodingProperty) GetHeaders() *Headers {
 	if m != nil {
 		return m.Headers
 	}
@@ -998,7 +1025,7 @@ func (m *EncodingProperty) GetAllowReserved() bool {
 	return false
 }
 
-func (m *EncodingProperty) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *EncodingProperty) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1006,16 +1033,17 @@ func (m *EncodingProperty) GetSpecificationExtension() []*NamedSpecificationExte
 }
 
 type Example struct {
-	Summary                string                         `protobuf:"bytes,1,opt,name=summary" json:"summary,omitempty"`
-	Description            string                         `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
-	ExternalValue          string                         `protobuf:"bytes,3,opt,name=external_value,json=externalValue" json:"external_value,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Summary                string      `protobuf:"bytes,1,opt,name=summary" json:"summary,omitempty"`
+	Description            string      `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
+	Value                  *Any        `protobuf:"bytes,3,opt,name=value" json:"value,omitempty"`
+	ExternalValue          string      `protobuf:"bytes,4,opt,name=external_value,json=externalValue" json:"external_value,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Example) Reset()                    { *m = Example{} }
 func (m *Example) String() string            { return proto.CompactTextString(m) }
 func (*Example) ProtoMessage()               {}
-func (*Example) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+func (*Example) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
 func (m *Example) GetSummary() string {
 	if m != nil {
@@ -1031,6 +1059,13 @@ func (m *Example) GetDescription() string {
 	return ""
 }
 
+func (m *Example) GetValue() *Any {
+	if m != nil {
+		return m.Value
+	}
+	return nil
+}
+
 func (m *Example) GetExternalValue() string {
 	if m != nil {
 		return m.ExternalValue
@@ -1038,7 +1073,7 @@ func (m *Example) GetExternalValue() string {
 	return ""
 }
 
-func (m *Example) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Example) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1055,7 +1090,7 @@ type ExampleOrReference struct {
 func (m *ExampleOrReference) Reset()                    { *m = ExampleOrReference{} }
 func (m *ExampleOrReference) String() string            { return proto.CompactTextString(m) }
 func (*ExampleOrReference) ProtoMessage()               {}
-func (*ExampleOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+func (*ExampleOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
 type isExampleOrReference_Oneof interface {
 	isExampleOrReference_Oneof()
@@ -1172,7 +1207,7 @@ type Examples struct {
 func (m *Examples) Reset()                    { *m = Examples{} }
 func (m *Examples) String() string            { return proto.CompactTextString(m) }
 func (*Examples) ProtoMessage()               {}
-func (*Examples) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+func (*Examples) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 type ExamplesOrReferences struct {
 	AdditionalProperties []*NamedExampleOrReference `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
@@ -1181,7 +1216,7 @@ type ExamplesOrReferences struct {
 func (m *ExamplesOrReferences) Reset()                    { *m = ExamplesOrReferences{} }
 func (m *ExamplesOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*ExamplesOrReferences) ProtoMessage()               {}
-func (*ExamplesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+func (*ExamplesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
 func (m *ExamplesOrReferences) GetAdditionalProperties() []*NamedExampleOrReference {
 	if m != nil {
@@ -1197,7 +1232,7 @@ type Expression struct {
 func (m *Expression) Reset()                    { *m = Expression{} }
 func (m *Expression) String() string            { return proto.CompactTextString(m) }
 func (*Expression) ProtoMessage()               {}
-func (*Expression) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+func (*Expression) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
 func (m *Expression) GetAdditionalProperties() []*NamedAny {
 	if m != nil {
@@ -1208,15 +1243,15 @@ func (m *Expression) GetAdditionalProperties() []*NamedAny {
 
 // Allows referencing an external resource for extended documentation.
 type ExternalDocs struct {
-	Description            string                         `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
-	Url                    string                         `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,3,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Description            string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	Url                    string      `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,3,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *ExternalDocs) Reset()                    { *m = ExternalDocs{} }
 func (m *ExternalDocs) String() string            { return proto.CompactTextString(m) }
 func (*ExternalDocs) ProtoMessage()               {}
-func (*ExternalDocs) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+func (*ExternalDocs) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
 func (m *ExternalDocs) GetDescription() string {
 	if m != nil {
@@ -1232,7 +1267,7 @@ func (m *ExternalDocs) GetUrl() string {
 	return ""
 }
 
-func (m *ExternalDocs) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *ExternalDocs) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1241,24 +1276,26 @@ func (m *ExternalDocs) GetSpecificationExtension() []*NamedSpecificationExtensio
 
 // The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
 type Header struct {
-	Name            string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	In              string                `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
-	Description     string                `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	Required        bool                  `protobuf:"varint,4,opt,name=required" json:"required,omitempty"`
-	Deprecated      bool                  `protobuf:"varint,5,opt,name=deprecated" json:"deprecated,omitempty"`
-	AllowEmptyValue bool                  `protobuf:"varint,6,opt,name=allow_empty_value,json=allowEmptyValue" json:"allow_empty_value,omitempty"`
-	Style           string                `protobuf:"bytes,7,opt,name=style" json:"style,omitempty"`
-	Explode         bool                  `protobuf:"varint,8,opt,name=explode" json:"explode,omitempty"`
-	AllowReserved   bool                  `protobuf:"varint,9,opt,name=allow_reserved,json=allowReserved" json:"allow_reserved,omitempty"`
-	Schema          *SchemaOrReference    `protobuf:"bytes,10,opt,name=schema" json:"schema,omitempty"`
-	Examples        *ExamplesOrReferences `protobuf:"bytes,11,opt,name=examples" json:"examples,omitempty"`
-	Content         *Content              `protobuf:"bytes,12,opt,name=content" json:"content,omitempty"`
+	Name                   string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	In                     string                `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
+	Description            string                `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	Required               bool                  `protobuf:"varint,4,opt,name=required" json:"required,omitempty"`
+	Deprecated             bool                  `protobuf:"varint,5,opt,name=deprecated" json:"deprecated,omitempty"`
+	AllowEmptyValue        bool                  `protobuf:"varint,6,opt,name=allow_empty_value,json=allowEmptyValue" json:"allow_empty_value,omitempty"`
+	Style                  string                `protobuf:"bytes,7,opt,name=style" json:"style,omitempty"`
+	Explode                bool                  `protobuf:"varint,8,opt,name=explode" json:"explode,omitempty"`
+	AllowReserved          bool                  `protobuf:"varint,9,opt,name=allow_reserved,json=allowReserved" json:"allow_reserved,omitempty"`
+	Schema                 *SchemaOrReference    `protobuf:"bytes,10,opt,name=schema" json:"schema,omitempty"`
+	Example                *Any                  `protobuf:"bytes,11,opt,name=example" json:"example,omitempty"`
+	Examples               *ExamplesOrReferences `protobuf:"bytes,12,opt,name=examples" json:"examples,omitempty"`
+	Content                *Content              `protobuf:"bytes,13,opt,name=content" json:"content,omitempty"`
+	SpecificationExtension []*NamedAny           `protobuf:"bytes,14,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Header) Reset()                    { *m = Header{} }
 func (m *Header) String() string            { return proto.CompactTextString(m) }
 func (*Header) ProtoMessage()               {}
-func (*Header) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
+func (*Header) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
 func (m *Header) GetName() string {
 	if m != nil {
@@ -1330,6 +1367,13 @@ func (m *Header) GetSchema() *SchemaOrReference {
 	return nil
 }
 
+func (m *Header) GetExample() *Any {
+	if m != nil {
+		return m.Example
+	}
+	return nil
+}
+
 func (m *Header) GetExamples() *ExamplesOrReferences {
 	if m != nil {
 		return m.Examples
@@ -1344,6 +1388,13 @@ func (m *Header) GetContent() *Content {
 	return nil
 }
 
+func (m *Header) GetSpecificationExtension() []*NamedAny {
+	if m != nil {
+		return m.SpecificationExtension
+	}
+	return nil
+}
+
 type HeaderOrReference struct {
 	// Types that are valid to be assigned to Oneof:
 	//	*HeaderOrReference_Header
@@ -1354,7 +1405,7 @@ type HeaderOrReference struct {
 func (m *HeaderOrReference) Reset()                    { *m = HeaderOrReference{} }
 func (m *HeaderOrReference) String() string            { return proto.CompactTextString(m) }
 func (*HeaderOrReference) ProtoMessage()               {}
-func (*HeaderOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+func (*HeaderOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 type isHeaderOrReference_Oneof interface {
 	isHeaderOrReference_Oneof()
@@ -1465,19 +1516,19 @@ func _HeaderOrReference_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.
+// Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.
 type Headers struct {
-	Name []*NamedHeaderOrReference `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
+	HeaderOrReference []*NamedHeaderOrReference `protobuf:"bytes,1,rep,name=header_or_reference,json=headerOrReference" json:"header_or_reference,omitempty"`
 }
 
 func (m *Headers) Reset()                    { *m = Headers{} }
 func (m *Headers) String() string            { return proto.CompactTextString(m) }
 func (*Headers) ProtoMessage()               {}
-func (*Headers) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
+func (*Headers) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
-func (m *Headers) GetName() []*NamedHeaderOrReference {
+func (m *Headers) GetHeaderOrReference() []*NamedHeaderOrReference {
 	if m != nil {
-		return m.Name
+		return m.HeaderOrReference
 	}
 	return nil
 }
@@ -1489,7 +1540,7 @@ type HeadersOrReferences struct {
 func (m *HeadersOrReferences) Reset()                    { *m = HeadersOrReferences{} }
 func (m *HeadersOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*HeadersOrReferences) ProtoMessage()               {}
-func (*HeadersOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
+func (*HeadersOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
 
 func (m *HeadersOrReferences) GetAdditionalProperties() []*NamedHeaderOrReference {
 	if m != nil {
@@ -1500,19 +1551,19 @@ func (m *HeadersOrReferences) GetAdditionalProperties() []*NamedHeaderOrReferenc
 
 // The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.
 type Info struct {
-	Title                  string                         `protobuf:"bytes,1,opt,name=title" json:"title,omitempty"`
-	Description            string                         `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
-	TermsOfService         string                         `protobuf:"bytes,3,opt,name=terms_of_service,json=termsOfService" json:"terms_of_service,omitempty"`
-	Contact                *Contact                       `protobuf:"bytes,4,opt,name=contact" json:"contact,omitempty"`
-	License                *License                       `protobuf:"bytes,5,opt,name=license" json:"license,omitempty"`
-	Version                string                         `protobuf:"bytes,6,opt,name=version" json:"version,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,7,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Title                  string      `protobuf:"bytes,1,opt,name=title" json:"title,omitempty"`
+	Description            string      `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
+	TermsOfService         string      `protobuf:"bytes,3,opt,name=terms_of_service,json=termsOfService" json:"terms_of_service,omitempty"`
+	Contact                *Contact    `protobuf:"bytes,4,opt,name=contact" json:"contact,omitempty"`
+	License                *License    `protobuf:"bytes,5,opt,name=license" json:"license,omitempty"`
+	Version                string      `protobuf:"bytes,6,opt,name=version" json:"version,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,7,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Info) Reset()                    { *m = Info{} }
 func (m *Info) String() string            { return proto.CompactTextString(m) }
 func (*Info) ProtoMessage()               {}
-func (*Info) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
+func (*Info) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
 
 func (m *Info) GetTitle() string {
 	if m != nil {
@@ -1556,7 +1607,7 @@ func (m *Info) GetVersion() string {
 	return ""
 }
 
-func (m *Info) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Info) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1570,7 +1621,7 @@ type ItemsItem struct {
 func (m *ItemsItem) Reset()                    { *m = ItemsItem{} }
 func (m *ItemsItem) String() string            { return proto.CompactTextString(m) }
 func (*ItemsItem) ProtoMessage()               {}
-func (*ItemsItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
+func (*ItemsItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
 
 func (m *ItemsItem) GetSchemaOrReference() []*SchemaOrReference {
 	if m != nil {
@@ -1581,15 +1632,15 @@ func (m *ItemsItem) GetSchemaOrReference() []*SchemaOrReference {
 
 // License information for the exposed API.
 type License struct {
-	Name                   string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Url                    string                         `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,3,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Name                   string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Url                    string      `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,3,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *License) Reset()                    { *m = License{} }
 func (m *License) String() string            { return proto.CompactTextString(m) }
 func (*License) ProtoMessage()               {}
-func (*License) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
+func (*License) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
 
 func (m *License) GetName() string {
 	if m != nil {
@@ -1605,7 +1656,7 @@ func (m *License) GetUrl() string {
 	return ""
 }
 
-func (m *License) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *License) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1614,19 +1665,19 @@ func (m *License) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // The `Link Object` is responsible for defining a possible operation based on a single response.
 type Link struct {
-	OperationRef           string                         `protobuf:"bytes,1,opt,name=operation_ref,json=operationRef" json:"operation_ref,omitempty"`
-	OperationId            string                         `protobuf:"bytes,2,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
-	Parameters             *LinkParameters                `protobuf:"bytes,3,opt,name=parameters" json:"parameters,omitempty"`
-	Headers                *Headers                       `protobuf:"bytes,4,opt,name=headers" json:"headers,omitempty"`
-	Description            string                         `protobuf:"bytes,5,opt,name=description" json:"description,omitempty"`
-	Server                 *Server                        `protobuf:"bytes,6,opt,name=server" json:"server,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,7,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	OperationRef           string          `protobuf:"bytes,1,opt,name=operation_ref,json=operationRef" json:"operation_ref,omitempty"`
+	OperationId            string          `protobuf:"bytes,2,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
+	Parameters             *LinkParameters `protobuf:"bytes,3,opt,name=parameters" json:"parameters,omitempty"`
+	Headers                *Headers        `protobuf:"bytes,4,opt,name=headers" json:"headers,omitempty"`
+	Description            string          `protobuf:"bytes,5,opt,name=description" json:"description,omitempty"`
+	Server                 *Server         `protobuf:"bytes,6,opt,name=server" json:"server,omitempty"`
+	SpecificationExtension []*NamedAny     `protobuf:"bytes,7,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Link) Reset()                    { *m = Link{} }
 func (m *Link) String() string            { return proto.CompactTextString(m) }
 func (*Link) ProtoMessage()               {}
-func (*Link) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
+func (*Link) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
 
 func (m *Link) GetOperationRef() string {
 	if m != nil {
@@ -1670,7 +1721,7 @@ func (m *Link) GetServer() *Server {
 	return nil
 }
 
-func (m *Link) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Link) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1687,7 +1738,7 @@ type LinkOrReference struct {
 func (m *LinkOrReference) Reset()                    { *m = LinkOrReference{} }
 func (m *LinkOrReference) String() string            { return proto.CompactTextString(m) }
 func (*LinkOrReference) ProtoMessage()               {}
-func (*LinkOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
+func (*LinkOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
 
 type isLinkOrReference_Oneof interface {
 	isLinkOrReference_Oneof()
@@ -1800,34 +1851,34 @@ func _LinkOrReference_OneofSizer(msg proto.Message) (n int) {
 
 // Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.  To specify parameters required by the operation, we can use a **Link Parameters Object**. This object contains parameter names along with static or dynamic values:
 type LinkParameters struct {
-	Name []*NamedAnyOrExpression `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
+	AnyOrExpression []*NamedAnyOrExpression `protobuf:"bytes,1,rep,name=any_or_expression,json=anyOrExpression" json:"any_or_expression,omitempty"`
 }
 
 func (m *LinkParameters) Reset()                    { *m = LinkParameters{} }
 func (m *LinkParameters) String() string            { return proto.CompactTextString(m) }
 func (*LinkParameters) ProtoMessage()               {}
-func (*LinkParameters) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
+func (*LinkParameters) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
 
-func (m *LinkParameters) GetName() []*NamedAnyOrExpression {
+func (m *LinkParameters) GetAnyOrExpression() []*NamedAnyOrExpression {
 	if m != nil {
-		return m.Name
+		return m.AnyOrExpression
 	}
 	return nil
 }
 
 // The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.
 type Links struct {
-	Name []*NamedLinkOrReference `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
+	LinkOrReference []*NamedLinkOrReference `protobuf:"bytes,1,rep,name=link_or_reference,json=linkOrReference" json:"link_or_reference,omitempty"`
 }
 
 func (m *Links) Reset()                    { *m = Links{} }
 func (m *Links) String() string            { return proto.CompactTextString(m) }
 func (*Links) ProtoMessage()               {}
-func (*Links) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
+func (*Links) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{31} }
 
-func (m *Links) GetName() []*NamedLinkOrReference {
+func (m *Links) GetLinkOrReference() []*NamedLinkOrReference {
 	if m != nil {
-		return m.Name
+		return m.LinkOrReference
 	}
 	return nil
 }
@@ -1839,7 +1890,7 @@ type LinksOrReferences struct {
 func (m *LinksOrReferences) Reset()                    { *m = LinksOrReferences{} }
 func (m *LinksOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*LinksOrReferences) ProtoMessage()               {}
-func (*LinksOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{31} }
+func (*LinksOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{32} }
 
 func (m *LinksOrReferences) GetAdditionalProperties() []*NamedLinkOrReference {
 	if m != nil {
@@ -1850,20 +1901,28 @@ func (m *LinksOrReferences) GetAdditionalProperties() []*NamedLinkOrReference {
 
 // Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.
 type MediaType struct {
-	Schema                 *SchemaOrReference             `protobuf:"bytes,1,opt,name=schema" json:"schema,omitempty"`
-	Examples               *ExamplesOrReferences          `protobuf:"bytes,2,opt,name=examples" json:"examples,omitempty"`
-	Encoding               *Encoding                      `protobuf:"bytes,3,opt,name=encoding" json:"encoding,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Schema                 *SchemaOrReference    `protobuf:"bytes,1,opt,name=schema" json:"schema,omitempty"`
+	Example                *Any                  `protobuf:"bytes,2,opt,name=example" json:"example,omitempty"`
+	Examples               *ExamplesOrReferences `protobuf:"bytes,3,opt,name=examples" json:"examples,omitempty"`
+	Encoding               *Encoding             `protobuf:"bytes,4,opt,name=encoding" json:"encoding,omitempty"`
+	SpecificationExtension []*NamedAny           `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *MediaType) Reset()                    { *m = MediaType{} }
 func (m *MediaType) String() string            { return proto.CompactTextString(m) }
 func (*MediaType) ProtoMessage()               {}
-func (*MediaType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{32} }
+func (*MediaType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{33} }
 
 func (m *MediaType) GetSchema() *SchemaOrReference {
 	if m != nil {
 		return m.Schema
+	}
+	return nil
+}
+
+func (m *MediaType) GetExample() *Any {
+	if m != nil {
+		return m.Example
 	}
 	return nil
 }
@@ -1882,7 +1941,7 @@ func (m *MediaType) GetEncoding() *Encoding {
 	return nil
 }
 
-func (m *MediaType) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *MediaType) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -1900,7 +1959,7 @@ type NamedAny struct {
 func (m *NamedAny) Reset()                    { *m = NamedAny{} }
 func (m *NamedAny) String() string            { return proto.CompactTextString(m) }
 func (*NamedAny) ProtoMessage()               {}
-func (*NamedAny) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{33} }
+func (*NamedAny) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{34} }
 
 func (m *NamedAny) GetName() string {
 	if m != nil {
@@ -1927,7 +1986,7 @@ type NamedAnyOrExpression struct {
 func (m *NamedAnyOrExpression) Reset()                    { *m = NamedAnyOrExpression{} }
 func (m *NamedAnyOrExpression) String() string            { return proto.CompactTextString(m) }
 func (*NamedAnyOrExpression) ProtoMessage()               {}
-func (*NamedAnyOrExpression) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{34} }
+func (*NamedAnyOrExpression) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{35} }
 
 func (m *NamedAnyOrExpression) GetName() string {
 	if m != nil {
@@ -1954,7 +2013,7 @@ type NamedCallbackOrReference struct {
 func (m *NamedCallbackOrReference) Reset()                    { *m = NamedCallbackOrReference{} }
 func (m *NamedCallbackOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedCallbackOrReference) ProtoMessage()               {}
-func (*NamedCallbackOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{35} }
+func (*NamedCallbackOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{36} }
 
 func (m *NamedCallbackOrReference) GetName() string {
 	if m != nil {
@@ -1981,7 +2040,7 @@ type NamedEncodingProperty struct {
 func (m *NamedEncodingProperty) Reset()                    { *m = NamedEncodingProperty{} }
 func (m *NamedEncodingProperty) String() string            { return proto.CompactTextString(m) }
 func (*NamedEncodingProperty) ProtoMessage()               {}
-func (*NamedEncodingProperty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{36} }
+func (*NamedEncodingProperty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{37} }
 
 func (m *NamedEncodingProperty) GetName() string {
 	if m != nil {
@@ -2008,7 +2067,7 @@ type NamedExampleOrReference struct {
 func (m *NamedExampleOrReference) Reset()                    { *m = NamedExampleOrReference{} }
 func (m *NamedExampleOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedExampleOrReference) ProtoMessage()               {}
-func (*NamedExampleOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{37} }
+func (*NamedExampleOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{38} }
 
 func (m *NamedExampleOrReference) GetName() string {
 	if m != nil {
@@ -2035,7 +2094,7 @@ type NamedHeaderOrReference struct {
 func (m *NamedHeaderOrReference) Reset()                    { *m = NamedHeaderOrReference{} }
 func (m *NamedHeaderOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedHeaderOrReference) ProtoMessage()               {}
-func (*NamedHeaderOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{38} }
+func (*NamedHeaderOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{39} }
 
 func (m *NamedHeaderOrReference) GetName() string {
 	if m != nil {
@@ -2062,7 +2121,7 @@ type NamedLinkOrReference struct {
 func (m *NamedLinkOrReference) Reset()                    { *m = NamedLinkOrReference{} }
 func (m *NamedLinkOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedLinkOrReference) ProtoMessage()               {}
-func (*NamedLinkOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{39} }
+func (*NamedLinkOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{40} }
 
 func (m *NamedLinkOrReference) GetName() string {
 	if m != nil {
@@ -2089,7 +2148,7 @@ type NamedMediaType struct {
 func (m *NamedMediaType) Reset()                    { *m = NamedMediaType{} }
 func (m *NamedMediaType) String() string            { return proto.CompactTextString(m) }
 func (*NamedMediaType) ProtoMessage()               {}
-func (*NamedMediaType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{40} }
+func (*NamedMediaType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{41} }
 
 func (m *NamedMediaType) GetName() string {
 	if m != nil {
@@ -2116,7 +2175,7 @@ type NamedParameterOrReference struct {
 func (m *NamedParameterOrReference) Reset()                    { *m = NamedParameterOrReference{} }
 func (m *NamedParameterOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedParameterOrReference) ProtoMessage()               {}
-func (*NamedParameterOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{41} }
+func (*NamedParameterOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{42} }
 
 func (m *NamedParameterOrReference) GetName() string {
 	if m != nil {
@@ -2143,7 +2202,7 @@ type NamedPathItem struct {
 func (m *NamedPathItem) Reset()                    { *m = NamedPathItem{} }
 func (m *NamedPathItem) String() string            { return proto.CompactTextString(m) }
 func (*NamedPathItem) ProtoMessage()               {}
-func (*NamedPathItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{42} }
+func (*NamedPathItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{43} }
 
 func (m *NamedPathItem) GetName() string {
 	if m != nil {
@@ -2170,7 +2229,7 @@ type NamedRequestBodyOrReference struct {
 func (m *NamedRequestBodyOrReference) Reset()                    { *m = NamedRequestBodyOrReference{} }
 func (m *NamedRequestBodyOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedRequestBodyOrReference) ProtoMessage()               {}
-func (*NamedRequestBodyOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{43} }
+func (*NamedRequestBodyOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{44} }
 
 func (m *NamedRequestBodyOrReference) GetName() string {
 	if m != nil {
@@ -2197,7 +2256,7 @@ type NamedResponseOrReference struct {
 func (m *NamedResponseOrReference) Reset()                    { *m = NamedResponseOrReference{} }
 func (m *NamedResponseOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedResponseOrReference) ProtoMessage()               {}
-func (*NamedResponseOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{44} }
+func (*NamedResponseOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{45} }
 
 func (m *NamedResponseOrReference) GetName() string {
 	if m != nil {
@@ -2224,7 +2283,7 @@ type NamedSchemaOrReference struct {
 func (m *NamedSchemaOrReference) Reset()                    { *m = NamedSchemaOrReference{} }
 func (m *NamedSchemaOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedSchemaOrReference) ProtoMessage()               {}
-func (*NamedSchemaOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{45} }
+func (*NamedSchemaOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{46} }
 
 func (m *NamedSchemaOrReference) GetName() string {
 	if m != nil {
@@ -2251,7 +2310,7 @@ type NamedSecuritySchemeOrReference struct {
 func (m *NamedSecuritySchemeOrReference) Reset()                    { *m = NamedSecuritySchemeOrReference{} }
 func (m *NamedSecuritySchemeOrReference) String() string            { return proto.CompactTextString(m) }
 func (*NamedSecuritySchemeOrReference) ProtoMessage()               {}
-func (*NamedSecuritySchemeOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{46} }
+func (*NamedSecuritySchemeOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{47} }
 
 func (m *NamedSecuritySchemeOrReference) GetName() string {
 	if m != nil {
@@ -2278,7 +2337,7 @@ type NamedServerVariable struct {
 func (m *NamedServerVariable) Reset()                    { *m = NamedServerVariable{} }
 func (m *NamedServerVariable) String() string            { return proto.CompactTextString(m) }
 func (*NamedServerVariable) ProtoMessage()               {}
-func (*NamedServerVariable) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{47} }
+func (*NamedServerVariable) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{48} }
 
 func (m *NamedServerVariable) GetName() string {
 	if m != nil {
@@ -2294,46 +2353,46 @@ func (m *NamedServerVariable) GetValue() *ServerVariable {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of SpecificationExtension as ordered (name,value) pairs.
-type NamedSpecificationExtension struct {
+// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
+type NamedString struct {
 	// Map key
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	// Mapped value
-	Value *SpecificationExtension `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
-func (m *NamedSpecificationExtension) Reset()                    { *m = NamedSpecificationExtension{} }
-func (m *NamedSpecificationExtension) String() string            { return proto.CompactTextString(m) }
-func (*NamedSpecificationExtension) ProtoMessage()               {}
-func (*NamedSpecificationExtension) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{48} }
+func (m *NamedString) Reset()                    { *m = NamedString{} }
+func (m *NamedString) String() string            { return proto.CompactTextString(m) }
+func (*NamedString) ProtoMessage()               {}
+func (*NamedString) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{49} }
 
-func (m *NamedSpecificationExtension) GetName() string {
+func (m *NamedString) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *NamedSpecificationExtension) GetValue() *SpecificationExtension {
+func (m *NamedString) GetValue() string {
 	if m != nil {
 		return m.Value
 	}
-	return nil
+	return ""
 }
 
 // Configuration details for a supported OAuth Flow
 type OauthFlow struct {
-	AuthorizationUrl       string                         `protobuf:"bytes,1,opt,name=authorization_url,json=authorizationUrl" json:"authorization_url,omitempty"`
-	TokenUrl               string                         `protobuf:"bytes,2,opt,name=token_url,json=tokenUrl" json:"token_url,omitempty"`
-	RefreshUrl             string                         `protobuf:"bytes,3,opt,name=refresh_url,json=refreshUrl" json:"refresh_url,omitempty"`
-	Scopes                 *Scopes                        `protobuf:"bytes,4,opt,name=scopes" json:"scopes,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	AuthorizationUrl       string      `protobuf:"bytes,1,opt,name=authorization_url,json=authorizationUrl" json:"authorization_url,omitempty"`
+	TokenUrl               string      `protobuf:"bytes,2,opt,name=token_url,json=tokenUrl" json:"token_url,omitempty"`
+	RefreshUrl             string      `protobuf:"bytes,3,opt,name=refresh_url,json=refreshUrl" json:"refresh_url,omitempty"`
+	Scopes                 *Scopes     `protobuf:"bytes,4,opt,name=scopes" json:"scopes,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *OauthFlow) Reset()                    { *m = OauthFlow{} }
 func (m *OauthFlow) String() string            { return proto.CompactTextString(m) }
 func (*OauthFlow) ProtoMessage()               {}
-func (*OauthFlow) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{49} }
+func (*OauthFlow) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{50} }
 
 func (m *OauthFlow) GetAuthorizationUrl() string {
 	if m != nil {
@@ -2363,7 +2422,7 @@ func (m *OauthFlow) GetScopes() *Scopes {
 	return nil
 }
 
-func (m *OauthFlow) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *OauthFlow) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -2372,17 +2431,17 @@ func (m *OauthFlow) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // Allows configuration of the supported OAuth Flows.
 type OauthFlows struct {
-	Implicit               *OauthFlow                     `protobuf:"bytes,1,opt,name=implicit" json:"implicit,omitempty"`
-	Password               *OauthFlow                     `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
-	ClientCredentials      *OauthFlow                     `protobuf:"bytes,3,opt,name=client_credentials,json=clientCredentials" json:"client_credentials,omitempty"`
-	AuthorizationCode      *OauthFlow                     `protobuf:"bytes,4,opt,name=authorization_code,json=authorizationCode" json:"authorization_code,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Implicit               *OauthFlow  `protobuf:"bytes,1,opt,name=implicit" json:"implicit,omitempty"`
+	Password               *OauthFlow  `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
+	ClientCredentials      *OauthFlow  `protobuf:"bytes,3,opt,name=client_credentials,json=clientCredentials" json:"client_credentials,omitempty"`
+	AuthorizationCode      *OauthFlow  `protobuf:"bytes,4,opt,name=authorization_code,json=authorizationCode" json:"authorization_code,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *OauthFlows) Reset()                    { *m = OauthFlows{} }
 func (m *OauthFlows) String() string            { return proto.CompactTextString(m) }
 func (*OauthFlows) ProtoMessage()               {}
-func (*OauthFlows) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{50} }
+func (*OauthFlows) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{51} }
 
 func (m *OauthFlows) GetImplicit() *OauthFlow {
 	if m != nil {
@@ -2412,7 +2471,7 @@ func (m *OauthFlows) GetAuthorizationCode() *OauthFlow {
 	return nil
 }
 
-func (m *OauthFlows) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *OauthFlows) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -2426,7 +2485,7 @@ type Object struct {
 func (m *Object) Reset()                    { *m = Object{} }
 func (m *Object) String() string            { return proto.CompactTextString(m) }
 func (*Object) ProtoMessage()               {}
-func (*Object) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{51} }
+func (*Object) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{52} }
 
 func (m *Object) GetAdditionalProperties() []*NamedAny {
 	if m != nil {
@@ -2437,25 +2496,25 @@ func (m *Object) GetAdditionalProperties() []*NamedAny {
 
 // Describes a single API operation on a path.
 type Operation struct {
-	Tags                   []string                       `protobuf:"bytes,1,rep,name=tags" json:"tags,omitempty"`
-	Summary                string                         `protobuf:"bytes,2,opt,name=summary" json:"summary,omitempty"`
-	Description            string                         `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	ExternalDocs           *ExternalDocs                  `protobuf:"bytes,4,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
-	OperationId            string                         `protobuf:"bytes,5,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
-	Parameters             []*ParameterOrReference        `protobuf:"bytes,6,rep,name=parameters" json:"parameters,omitempty"`
-	RequestBody            *RequestBodyOrReference        `protobuf:"bytes,7,opt,name=request_body,json=requestBody" json:"request_body,omitempty"`
-	Responses              *Responses                     `protobuf:"bytes,8,opt,name=responses" json:"responses,omitempty"`
-	Callbacks              *Callbacks                     `protobuf:"bytes,9,opt,name=callbacks" json:"callbacks,omitempty"`
-	Deprecated             bool                           `protobuf:"varint,10,opt,name=deprecated" json:"deprecated,omitempty"`
-	Security               []*SecurityRequirement         `protobuf:"bytes,11,rep,name=security" json:"security,omitempty"`
-	Servers                []*Server                      `protobuf:"bytes,12,rep,name=servers" json:"servers,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,13,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Tags                   []string                `protobuf:"bytes,1,rep,name=tags" json:"tags,omitempty"`
+	Summary                string                  `protobuf:"bytes,2,opt,name=summary" json:"summary,omitempty"`
+	Description            string                  `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	ExternalDocs           *ExternalDocs           `protobuf:"bytes,4,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
+	OperationId            string                  `protobuf:"bytes,5,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
+	Parameters             []*ParameterOrReference `protobuf:"bytes,6,rep,name=parameters" json:"parameters,omitempty"`
+	RequestBody            *RequestBodyOrReference `protobuf:"bytes,7,opt,name=request_body,json=requestBody" json:"request_body,omitempty"`
+	Responses              *Responses              `protobuf:"bytes,8,opt,name=responses" json:"responses,omitempty"`
+	Callbacks              *Callbacks              `protobuf:"bytes,9,opt,name=callbacks" json:"callbacks,omitempty"`
+	Deprecated             bool                    `protobuf:"varint,10,opt,name=deprecated" json:"deprecated,omitempty"`
+	Security               []*SecurityRequirement  `protobuf:"bytes,11,rep,name=security" json:"security,omitempty"`
+	Servers                []*Server               `protobuf:"bytes,12,rep,name=servers" json:"servers,omitempty"`
+	SpecificationExtension []*NamedAny             `protobuf:"bytes,13,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Operation) Reset()                    { *m = Operation{} }
 func (m *Operation) String() string            { return proto.CompactTextString(m) }
 func (*Operation) ProtoMessage()               {}
-func (*Operation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{52} }
+func (*Operation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{53} }
 
 func (m *Operation) GetTags() []string {
 	if m != nil {
@@ -2541,7 +2600,7 @@ func (m *Operation) GetServers() []*Server {
 	return nil
 }
 
-func (m *Operation) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Operation) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -2550,25 +2609,26 @@ func (m *Operation) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // Describes a single operation parameter.  A unique parameter is defined by a combination of a name and location.
 type Parameter struct {
-	Name                   string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	In                     string                         `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
-	Description            string                         `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	Required               bool                           `protobuf:"varint,4,opt,name=required" json:"required,omitempty"`
-	Deprecated             bool                           `protobuf:"varint,5,opt,name=deprecated" json:"deprecated,omitempty"`
-	AllowEmptyValue        bool                           `protobuf:"varint,6,opt,name=allow_empty_value,json=allowEmptyValue" json:"allow_empty_value,omitempty"`
-	Style                  string                         `protobuf:"bytes,7,opt,name=style" json:"style,omitempty"`
-	Explode                bool                           `protobuf:"varint,8,opt,name=explode" json:"explode,omitempty"`
-	AllowReserved          bool                           `protobuf:"varint,9,opt,name=allow_reserved,json=allowReserved" json:"allow_reserved,omitempty"`
-	Schema                 *SchemaOrReference             `protobuf:"bytes,10,opt,name=schema" json:"schema,omitempty"`
-	Examples               *ExamplesOrReferences          `protobuf:"bytes,11,opt,name=examples" json:"examples,omitempty"`
-	Content                *Content                       `protobuf:"bytes,12,opt,name=content" json:"content,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,13,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Name                   string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	In                     string                `protobuf:"bytes,2,opt,name=in" json:"in,omitempty"`
+	Description            string                `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	Required               bool                  `protobuf:"varint,4,opt,name=required" json:"required,omitempty"`
+	Deprecated             bool                  `protobuf:"varint,5,opt,name=deprecated" json:"deprecated,omitempty"`
+	AllowEmptyValue        bool                  `protobuf:"varint,6,opt,name=allow_empty_value,json=allowEmptyValue" json:"allow_empty_value,omitempty"`
+	Style                  string                `protobuf:"bytes,7,opt,name=style" json:"style,omitempty"`
+	Explode                bool                  `protobuf:"varint,8,opt,name=explode" json:"explode,omitempty"`
+	AllowReserved          bool                  `protobuf:"varint,9,opt,name=allow_reserved,json=allowReserved" json:"allow_reserved,omitempty"`
+	Schema                 *SchemaOrReference    `protobuf:"bytes,10,opt,name=schema" json:"schema,omitempty"`
+	Example                *Any                  `protobuf:"bytes,11,opt,name=example" json:"example,omitempty"`
+	Examples               *ExamplesOrReferences `protobuf:"bytes,12,opt,name=examples" json:"examples,omitempty"`
+	Content                *Content              `protobuf:"bytes,13,opt,name=content" json:"content,omitempty"`
+	SpecificationExtension []*NamedAny           `protobuf:"bytes,14,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Parameter) Reset()                    { *m = Parameter{} }
 func (m *Parameter) String() string            { return proto.CompactTextString(m) }
 func (*Parameter) ProtoMessage()               {}
-func (*Parameter) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{53} }
+func (*Parameter) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{54} }
 
 func (m *Parameter) GetName() string {
 	if m != nil {
@@ -2640,6 +2700,13 @@ func (m *Parameter) GetSchema() *SchemaOrReference {
 	return nil
 }
 
+func (m *Parameter) GetExample() *Any {
+	if m != nil {
+		return m.Example
+	}
+	return nil
+}
+
 func (m *Parameter) GetExamples() *ExamplesOrReferences {
 	if m != nil {
 		return m.Examples
@@ -2654,7 +2721,7 @@ func (m *Parameter) GetContent() *Content {
 	return nil
 }
 
-func (m *Parameter) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Parameter) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -2671,7 +2738,7 @@ type ParameterOrReference struct {
 func (m *ParameterOrReference) Reset()                    { *m = ParameterOrReference{} }
 func (m *ParameterOrReference) String() string            { return proto.CompactTextString(m) }
 func (*ParameterOrReference) ProtoMessage()               {}
-func (*ParameterOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{54} }
+func (*ParameterOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{55} }
 
 type isParameterOrReference_Oneof interface {
 	isParameterOrReference_Oneof()
@@ -2789,7 +2856,7 @@ type ParametersOrReferences struct {
 func (m *ParametersOrReferences) Reset()                    { *m = ParametersOrReferences{} }
 func (m *ParametersOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*ParametersOrReferences) ProtoMessage()               {}
-func (*ParametersOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{55} }
+func (*ParametersOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{56} }
 
 func (m *ParametersOrReferences) GetAdditionalProperties() []*NamedParameterOrReference {
 	if m != nil {
@@ -2800,26 +2867,26 @@ func (m *ParametersOrReferences) GetAdditionalProperties() []*NamedParameterOrRe
 
 // Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.
 type PathItem struct {
-	XRef                   string                         `protobuf:"bytes,1,opt,name=_ref,json=Ref" json:"_ref,omitempty"`
-	Summary                string                         `protobuf:"bytes,2,opt,name=summary" json:"summary,omitempty"`
-	Description            string                         `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	Get                    *Operation                     `protobuf:"bytes,4,opt,name=get" json:"get,omitempty"`
-	Put                    *Operation                     `protobuf:"bytes,5,opt,name=put" json:"put,omitempty"`
-	Post                   *Operation                     `protobuf:"bytes,6,opt,name=post" json:"post,omitempty"`
-	Delete                 *Operation                     `protobuf:"bytes,7,opt,name=delete" json:"delete,omitempty"`
-	Options                *Operation                     `protobuf:"bytes,8,opt,name=options" json:"options,omitempty"`
-	Head                   *Operation                     `protobuf:"bytes,9,opt,name=head" json:"head,omitempty"`
-	Patch                  *Operation                     `protobuf:"bytes,10,opt,name=patch" json:"patch,omitempty"`
-	Trace                  *Operation                     `protobuf:"bytes,11,opt,name=trace" json:"trace,omitempty"`
-	Servers                []*Server                      `protobuf:"bytes,12,rep,name=servers" json:"servers,omitempty"`
-	Parameters             []*ParameterOrReference        `protobuf:"bytes,13,rep,name=parameters" json:"parameters,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,14,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	XRef                   string                  `protobuf:"bytes,1,opt,name=_ref,json=Ref" json:"_ref,omitempty"`
+	Summary                string                  `protobuf:"bytes,2,opt,name=summary" json:"summary,omitempty"`
+	Description            string                  `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	Get                    *Operation              `protobuf:"bytes,4,opt,name=get" json:"get,omitempty"`
+	Put                    *Operation              `protobuf:"bytes,5,opt,name=put" json:"put,omitempty"`
+	Post                   *Operation              `protobuf:"bytes,6,opt,name=post" json:"post,omitempty"`
+	Delete                 *Operation              `protobuf:"bytes,7,opt,name=delete" json:"delete,omitempty"`
+	Options                *Operation              `protobuf:"bytes,8,opt,name=options" json:"options,omitempty"`
+	Head                   *Operation              `protobuf:"bytes,9,opt,name=head" json:"head,omitempty"`
+	Patch                  *Operation              `protobuf:"bytes,10,opt,name=patch" json:"patch,omitempty"`
+	Trace                  *Operation              `protobuf:"bytes,11,opt,name=trace" json:"trace,omitempty"`
+	Servers                []*Server               `protobuf:"bytes,12,rep,name=servers" json:"servers,omitempty"`
+	Parameters             []*ParameterOrReference `protobuf:"bytes,13,rep,name=parameters" json:"parameters,omitempty"`
+	SpecificationExtension []*NamedAny             `protobuf:"bytes,14,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *PathItem) Reset()                    { *m = PathItem{} }
 func (m *PathItem) String() string            { return proto.CompactTextString(m) }
 func (*PathItem) ProtoMessage()               {}
-func (*PathItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{56} }
+func (*PathItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{57} }
 
 func (m *PathItem) GetXRef() string {
 	if m != nil {
@@ -2912,7 +2979,7 @@ func (m *PathItem) GetParameters() []*ParameterOrReference {
 	return nil
 }
 
-func (m *PathItem) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *PathItem) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -2921,14 +2988,14 @@ func (m *PathItem) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.
 type Paths struct {
-	Path                   []*NamedPathItem               `protobuf:"bytes,1,rep,name=path" json:"path,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Path                   []*NamedPathItem `protobuf:"bytes,1,rep,name=path" json:"path,omitempty"`
+	SpecificationExtension []*NamedAny      `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Paths) Reset()                    { *m = Paths{} }
 func (m *Paths) String() string            { return proto.CompactTextString(m) }
 func (*Paths) ProtoMessage()               {}
-func (*Paths) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{57} }
+func (*Paths) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{58} }
 
 func (m *Paths) GetPath() []*NamedPathItem {
 	if m != nil {
@@ -2937,7 +3004,7 @@ func (m *Paths) GetPath() []*NamedPathItem {
 	return nil
 }
 
-func (m *Paths) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Paths) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -2951,7 +3018,7 @@ type Properties struct {
 func (m *Properties) Reset()                    { *m = Properties{} }
 func (m *Properties) String() string            { return proto.CompactTextString(m) }
 func (*Properties) ProtoMessage()               {}
-func (*Properties) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{58} }
+func (*Properties) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{59} }
 
 func (m *Properties) GetAdditionalProperties() []*NamedSchemaOrReference {
 	if m != nil {
@@ -2968,7 +3035,7 @@ type Reference struct {
 func (m *Reference) Reset()                    { *m = Reference{} }
 func (m *Reference) String() string            { return proto.CompactTextString(m) }
 func (*Reference) ProtoMessage()               {}
-func (*Reference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{59} }
+func (*Reference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{60} }
 
 func (m *Reference) GetXRef() string {
 	if m != nil {
@@ -2984,7 +3051,7 @@ type RequestBodiesOrReferences struct {
 func (m *RequestBodiesOrReferences) Reset()                    { *m = RequestBodiesOrReferences{} }
 func (m *RequestBodiesOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*RequestBodiesOrReferences) ProtoMessage()               {}
-func (*RequestBodiesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{60} }
+func (*RequestBodiesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{61} }
 
 func (m *RequestBodiesOrReferences) GetAdditionalProperties() []*NamedRequestBodyOrReference {
 	if m != nil {
@@ -2995,16 +3062,16 @@ func (m *RequestBodiesOrReferences) GetAdditionalProperties() []*NamedRequestBod
 
 // Describes a single request body.
 type RequestBody struct {
-	Description            string                         `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
-	Content                *Content                       `protobuf:"bytes,2,opt,name=content" json:"content,omitempty"`
-	Required               bool                           `protobuf:"varint,3,opt,name=required" json:"required,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Description            string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	Content                *Content    `protobuf:"bytes,2,opt,name=content" json:"content,omitempty"`
+	Required               bool        `protobuf:"varint,3,opt,name=required" json:"required,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *RequestBody) Reset()                    { *m = RequestBody{} }
 func (m *RequestBody) String() string            { return proto.CompactTextString(m) }
 func (*RequestBody) ProtoMessage()               {}
-func (*RequestBody) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{61} }
+func (*RequestBody) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{62} }
 
 func (m *RequestBody) GetDescription() string {
 	if m != nil {
@@ -3027,7 +3094,7 @@ func (m *RequestBody) GetRequired() bool {
 	return false
 }
 
-func (m *RequestBody) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *RequestBody) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -3044,7 +3111,7 @@ type RequestBodyOrReference struct {
 func (m *RequestBodyOrReference) Reset()                    { *m = RequestBodyOrReference{} }
 func (m *RequestBodyOrReference) String() string            { return proto.CompactTextString(m) }
 func (*RequestBodyOrReference) ProtoMessage()               {}
-func (*RequestBodyOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{62} }
+func (*RequestBodyOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{63} }
 
 type isRequestBodyOrReference_Oneof interface {
 	isRequestBodyOrReference_Oneof()
@@ -3157,17 +3224,17 @@ func _RequestBodyOrReference_OneofSizer(msg proto.Message) (n int) {
 
 // Describes a single response from an API Operation, including design-time, static  `links` to operations based on the response.
 type Response struct {
-	Description            string                         `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
-	Headers                *Headers                       `protobuf:"bytes,2,opt,name=headers" json:"headers,omitempty"`
-	Content                *Content                       `protobuf:"bytes,3,opt,name=content" json:"content,omitempty"`
-	Links                  *Links                         `protobuf:"bytes,4,opt,name=links" json:"links,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Description            string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	Headers                *Headers    `protobuf:"bytes,2,opt,name=headers" json:"headers,omitempty"`
+	Content                *Content    `protobuf:"bytes,3,opt,name=content" json:"content,omitempty"`
+	Links                  *Links      `protobuf:"bytes,4,opt,name=links" json:"links,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,5,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Response) Reset()                    { *m = Response{} }
 func (m *Response) String() string            { return proto.CompactTextString(m) }
 func (*Response) ProtoMessage()               {}
-func (*Response) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{63} }
+func (*Response) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{64} }
 
 func (m *Response) GetDescription() string {
 	if m != nil {
@@ -3197,7 +3264,7 @@ func (m *Response) GetLinks() *Links {
 	return nil
 }
 
-func (m *Response) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Response) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -3214,7 +3281,7 @@ type ResponseOrReference struct {
 func (m *ResponseOrReference) Reset()                    { *m = ResponseOrReference{} }
 func (m *ResponseOrReference) String() string            { return proto.CompactTextString(m) }
 func (*ResponseOrReference) ProtoMessage()               {}
-func (*ResponseOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{64} }
+func (*ResponseOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{65} }
 
 type isResponseOrReference_Oneof interface {
 	isResponseOrReference_Oneof()
@@ -3327,15 +3394,15 @@ func _ResponseOrReference_OneofSizer(msg proto.Message) (n int) {
 
 // A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.
 type Responses struct {
-	Default                *ResponseOrReference           `protobuf:"bytes,1,opt,name=default" json:"default,omitempty"`
-	ResponseCode           []*NamedResponseOrReference    `protobuf:"bytes,2,rep,name=response_code,json=responseCode" json:"response_code,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,3,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Default                *ResponseOrReference        `protobuf:"bytes,1,opt,name=default" json:"default,omitempty"`
+	ResponseOrReference    []*NamedResponseOrReference `protobuf:"bytes,2,rep,name=response_or_reference,json=responseOrReference" json:"response_or_reference,omitempty"`
+	SpecificationExtension []*NamedAny                 `protobuf:"bytes,3,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Responses) Reset()                    { *m = Responses{} }
 func (m *Responses) String() string            { return proto.CompactTextString(m) }
 func (*Responses) ProtoMessage()               {}
-func (*Responses) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{65} }
+func (*Responses) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{66} }
 
 func (m *Responses) GetDefault() *ResponseOrReference {
 	if m != nil {
@@ -3344,14 +3411,14 @@ func (m *Responses) GetDefault() *ResponseOrReference {
 	return nil
 }
 
-func (m *Responses) GetResponseCode() []*NamedResponseOrReference {
+func (m *Responses) GetResponseOrReference() []*NamedResponseOrReference {
 	if m != nil {
-		return m.ResponseCode
+		return m.ResponseOrReference
 	}
 	return nil
 }
 
-func (m *Responses) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Responses) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -3365,7 +3432,7 @@ type ResponsesOrReferences struct {
 func (m *ResponsesOrReferences) Reset()                    { *m = ResponsesOrReferences{} }
 func (m *ResponsesOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*ResponsesOrReferences) ProtoMessage()               {}
-func (*ResponsesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{66} }
+func (*ResponsesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{67} }
 
 func (m *ResponsesOrReferences) GetAdditionalProperties() []*NamedResponseOrReference {
 	if m != nil {
@@ -3376,47 +3443,48 @@ func (m *ResponsesOrReferences) GetAdditionalProperties() []*NamedResponseOrRefe
 
 // The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.
 type Schema struct {
-	Nullable               bool                           `protobuf:"varint,1,opt,name=nullable" json:"nullable,omitempty"`
-	Discriminator          string                         `protobuf:"bytes,2,opt,name=discriminator" json:"discriminator,omitempty"`
-	ReadOnly               bool                           `protobuf:"varint,3,opt,name=read_only,json=readOnly" json:"read_only,omitempty"`
-	WriteOnly              bool                           `protobuf:"varint,4,opt,name=write_only,json=writeOnly" json:"write_only,omitempty"`
-	Xml                    *Xml                           `protobuf:"bytes,5,opt,name=xml" json:"xml,omitempty"`
-	ExternalDocs           *ExternalDocs                  `protobuf:"bytes,6,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
-	Deprecated             bool                           `protobuf:"varint,7,opt,name=deprecated" json:"deprecated,omitempty"`
-	Title                  string                         `protobuf:"bytes,8,opt,name=title" json:"title,omitempty"`
-	MultipleOf             float64                        `protobuf:"fixed64,9,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
-	Maximum                float64                        `protobuf:"fixed64,10,opt,name=maximum" json:"maximum,omitempty"`
-	ExclusiveMaximum       bool                           `protobuf:"varint,11,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum                float64                        `protobuf:"fixed64,12,opt,name=minimum" json:"minimum,omitempty"`
-	ExclusiveMinimum       bool                           `protobuf:"varint,13,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
-	MaxLength              int64                          `protobuf:"varint,14,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
-	MinLength              int64                          `protobuf:"varint,15,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
-	Pattern                string                         `protobuf:"bytes,16,opt,name=pattern" json:"pattern,omitempty"`
-	MaxItems               int64                          `protobuf:"varint,17,opt,name=max_items,json=maxItems" json:"max_items,omitempty"`
-	MinItems               int64                          `protobuf:"varint,18,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
-	UniqueItems            bool                           `protobuf:"varint,19,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
-	MaxProperties          int64                          `protobuf:"varint,20,opt,name=max_properties,json=maxProperties" json:"max_properties,omitempty"`
-	MinProperties          int64                          `protobuf:"varint,21,opt,name=min_properties,json=minProperties" json:"min_properties,omitempty"`
-	Required               []string                       `protobuf:"bytes,22,rep,name=required" json:"required,omitempty"`
-	Enum                   []*Any                         `protobuf:"bytes,23,rep,name=enum" json:"enum,omitempty"`
-	Type                   string                         `protobuf:"bytes,24,opt,name=type" json:"type,omitempty"`
-	AllOf                  []*SchemaOrReference           `protobuf:"bytes,25,rep,name=all_of,json=allOf" json:"all_of,omitempty"`
-	OneOf                  []*SchemaOrReference           `protobuf:"bytes,26,rep,name=one_of,json=oneOf" json:"one_of,omitempty"`
-	AnyOf                  []*SchemaOrReference           `protobuf:"bytes,27,rep,name=any_of,json=anyOf" json:"any_of,omitempty"`
-	Not                    *Schema                        `protobuf:"bytes,28,opt,name=not" json:"not,omitempty"`
-	Items                  *ItemsItem                     `protobuf:"bytes,29,opt,name=items" json:"items,omitempty"`
-	Properties             *Properties                    `protobuf:"bytes,30,opt,name=properties" json:"properties,omitempty"`
-	AdditionalProperties   *AdditionalPropertiesItem      `protobuf:"bytes,31,opt,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
-	Default                *DefaultType                   `protobuf:"bytes,32,opt,name=default" json:"default,omitempty"`
-	Description            string                         `protobuf:"bytes,33,opt,name=description" json:"description,omitempty"`
-	Format                 string                         `protobuf:"bytes,34,opt,name=format" json:"format,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,35,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Nullable               bool                      `protobuf:"varint,1,opt,name=nullable" json:"nullable,omitempty"`
+	Discriminator          *Discriminator            `protobuf:"bytes,2,opt,name=discriminator" json:"discriminator,omitempty"`
+	ReadOnly               bool                      `protobuf:"varint,3,opt,name=read_only,json=readOnly" json:"read_only,omitempty"`
+	WriteOnly              bool                      `protobuf:"varint,4,opt,name=write_only,json=writeOnly" json:"write_only,omitempty"`
+	Xml                    *Xml                      `protobuf:"bytes,5,opt,name=xml" json:"xml,omitempty"`
+	ExternalDocs           *ExternalDocs             `protobuf:"bytes,6,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
+	Example                *Any                      `protobuf:"bytes,7,opt,name=example" json:"example,omitempty"`
+	Deprecated             bool                      `protobuf:"varint,8,opt,name=deprecated" json:"deprecated,omitempty"`
+	Title                  string                    `protobuf:"bytes,9,opt,name=title" json:"title,omitempty"`
+	MultipleOf             float64                   `protobuf:"fixed64,10,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	Maximum                float64                   `protobuf:"fixed64,11,opt,name=maximum" json:"maximum,omitempty"`
+	ExclusiveMaximum       bool                      `protobuf:"varint,12,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
+	Minimum                float64                   `protobuf:"fixed64,13,opt,name=minimum" json:"minimum,omitempty"`
+	ExclusiveMinimum       bool                      `protobuf:"varint,14,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
+	MaxLength              int64                     `protobuf:"varint,15,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
+	MinLength              int64                     `protobuf:"varint,16,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
+	Pattern                string                    `protobuf:"bytes,17,opt,name=pattern" json:"pattern,omitempty"`
+	MaxItems               int64                     `protobuf:"varint,18,opt,name=max_items,json=maxItems" json:"max_items,omitempty"`
+	MinItems               int64                     `protobuf:"varint,19,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
+	UniqueItems            bool                      `protobuf:"varint,20,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
+	MaxProperties          int64                     `protobuf:"varint,21,opt,name=max_properties,json=maxProperties" json:"max_properties,omitempty"`
+	MinProperties          int64                     `protobuf:"varint,22,opt,name=min_properties,json=minProperties" json:"min_properties,omitempty"`
+	Required               []string                  `protobuf:"bytes,23,rep,name=required" json:"required,omitempty"`
+	Enum                   []*Any                    `protobuf:"bytes,24,rep,name=enum" json:"enum,omitempty"`
+	Type                   string                    `protobuf:"bytes,25,opt,name=type" json:"type,omitempty"`
+	AllOf                  []*SchemaOrReference      `protobuf:"bytes,26,rep,name=all_of,json=allOf" json:"all_of,omitempty"`
+	OneOf                  []*SchemaOrReference      `protobuf:"bytes,27,rep,name=one_of,json=oneOf" json:"one_of,omitempty"`
+	AnyOf                  []*SchemaOrReference      `protobuf:"bytes,28,rep,name=any_of,json=anyOf" json:"any_of,omitempty"`
+	Not                    *Schema                   `protobuf:"bytes,29,opt,name=not" json:"not,omitempty"`
+	Items                  *ItemsItem                `protobuf:"bytes,30,opt,name=items" json:"items,omitempty"`
+	Properties             *Properties               `protobuf:"bytes,31,opt,name=properties" json:"properties,omitempty"`
+	AdditionalProperties   *AdditionalPropertiesItem `protobuf:"bytes,32,opt,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
+	Default                *DefaultType              `protobuf:"bytes,33,opt,name=default" json:"default,omitempty"`
+	Description            string                    `protobuf:"bytes,34,opt,name=description" json:"description,omitempty"`
+	Format                 string                    `protobuf:"bytes,35,opt,name=format" json:"format,omitempty"`
+	SpecificationExtension []*NamedAny               `protobuf:"bytes,36,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Schema) Reset()                    { *m = Schema{} }
 func (m *Schema) String() string            { return proto.CompactTextString(m) }
 func (*Schema) ProtoMessage()               {}
-func (*Schema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{67} }
+func (*Schema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{68} }
 
 func (m *Schema) GetNullable() bool {
 	if m != nil {
@@ -3425,11 +3493,11 @@ func (m *Schema) GetNullable() bool {
 	return false
 }
 
-func (m *Schema) GetDiscriminator() string {
+func (m *Schema) GetDiscriminator() *Discriminator {
 	if m != nil {
 		return m.Discriminator
 	}
-	return ""
+	return nil
 }
 
 func (m *Schema) GetReadOnly() bool {
@@ -3456,6 +3524,13 @@ func (m *Schema) GetXml() *Xml {
 func (m *Schema) GetExternalDocs() *ExternalDocs {
 	if m != nil {
 		return m.ExternalDocs
+	}
+	return nil
+}
+
+func (m *Schema) GetExample() *Any {
+	if m != nil {
+		return m.Example
 	}
 	return nil
 }
@@ -3656,7 +3731,7 @@ func (m *Schema) GetFormat() string {
 	return ""
 }
 
-func (m *Schema) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Schema) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -3673,7 +3748,7 @@ type SchemaOrReference struct {
 func (m *SchemaOrReference) Reset()                    { *m = SchemaOrReference{} }
 func (m *SchemaOrReference) String() string            { return proto.CompactTextString(m) }
 func (*SchemaOrReference) ProtoMessage()               {}
-func (*SchemaOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{68} }
+func (*SchemaOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{69} }
 
 type isSchemaOrReference_Oneof interface {
 	isSchemaOrReference_Oneof()
@@ -3791,7 +3866,7 @@ type SchemasOrReferences struct {
 func (m *SchemasOrReferences) Reset()                    { *m = SchemasOrReferences{} }
 func (m *SchemasOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*SchemasOrReferences) ProtoMessage()               {}
-func (*SchemasOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{69} }
+func (*SchemasOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{70} }
 
 func (m *SchemasOrReferences) GetAdditionalProperties() []*NamedSchemaOrReference {
 	if m != nil {
@@ -3802,23 +3877,15 @@ func (m *SchemasOrReferences) GetAdditionalProperties() []*NamedSchemaOrReferenc
 
 // Lists the available scopes for an OAuth2 security scheme.
 type Scopes struct {
-	Name                   []*NamedAny                    `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,1,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Scopes) Reset()                    { *m = Scopes{} }
 func (m *Scopes) String() string            { return proto.CompactTextString(m) }
 func (*Scopes) ProtoMessage()               {}
-func (*Scopes) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{70} }
+func (*Scopes) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{71} }
 
-func (m *Scopes) GetName() []*NamedAny {
-	if m != nil {
-		return m.Name
-	}
-	return nil
-}
-
-func (m *Scopes) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Scopes) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -3827,38 +3894,30 @@ func (m *Scopes) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.
 type SecurityRequirement struct {
-	Name []*NamedAny `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
 }
 
 func (m *SecurityRequirement) Reset()                    { *m = SecurityRequirement{} }
 func (m *SecurityRequirement) String() string            { return proto.CompactTextString(m) }
 func (*SecurityRequirement) ProtoMessage()               {}
-func (*SecurityRequirement) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{71} }
-
-func (m *SecurityRequirement) GetName() []*NamedAny {
-	if m != nil {
-		return m.Name
-	}
-	return nil
-}
+func (*SecurityRequirement) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{72} }
 
 // Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).
 type SecurityScheme struct {
-	Type                   string                         `protobuf:"bytes,1,opt,name=type" json:"type,omitempty"`
-	Description            string                         `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
-	Name                   string                         `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
-	In                     string                         `protobuf:"bytes,4,opt,name=in" json:"in,omitempty"`
-	Scheme                 string                         `protobuf:"bytes,5,opt,name=scheme" json:"scheme,omitempty"`
-	BearerFormat           string                         `protobuf:"bytes,6,opt,name=bearer_format,json=bearerFormat" json:"bearer_format,omitempty"`
-	Flows                  *OauthFlows                    `protobuf:"bytes,7,opt,name=flows" json:"flows,omitempty"`
-	OpenIdConnectUrl       string                         `protobuf:"bytes,8,opt,name=open_id_connect_url,json=openIdConnectUrl" json:"open_id_connect_url,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,9,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Type                   string      `protobuf:"bytes,1,opt,name=type" json:"type,omitempty"`
+	Description            string      `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
+	Name                   string      `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+	In                     string      `protobuf:"bytes,4,opt,name=in" json:"in,omitempty"`
+	Scheme                 string      `protobuf:"bytes,5,opt,name=scheme" json:"scheme,omitempty"`
+	BearerFormat           string      `protobuf:"bytes,6,opt,name=bearer_format,json=bearerFormat" json:"bearer_format,omitempty"`
+	Flows                  *OauthFlows `protobuf:"bytes,7,opt,name=flows" json:"flows,omitempty"`
+	OpenIdConnectUrl       string      `protobuf:"bytes,8,opt,name=open_id_connect_url,json=openIdConnectUrl" json:"open_id_connect_url,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,9,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *SecurityScheme) Reset()                    { *m = SecurityScheme{} }
 func (m *SecurityScheme) String() string            { return proto.CompactTextString(m) }
 func (*SecurityScheme) ProtoMessage()               {}
-func (*SecurityScheme) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{72} }
+func (*SecurityScheme) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{73} }
 
 func (m *SecurityScheme) GetType() string {
 	if m != nil {
@@ -3916,7 +3975,7 @@ func (m *SecurityScheme) GetOpenIdConnectUrl() string {
 	return ""
 }
 
-func (m *SecurityScheme) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *SecurityScheme) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -3933,7 +3992,7 @@ type SecuritySchemeOrReference struct {
 func (m *SecuritySchemeOrReference) Reset()                    { *m = SecuritySchemeOrReference{} }
 func (m *SecuritySchemeOrReference) String() string            { return proto.CompactTextString(m) }
 func (*SecuritySchemeOrReference) ProtoMessage()               {}
-func (*SecuritySchemeOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{73} }
+func (*SecuritySchemeOrReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{74} }
 
 type isSecuritySchemeOrReference_Oneof interface {
 	isSecuritySchemeOrReference_Oneof()
@@ -4051,7 +4110,7 @@ type SecuritySchemesOrReferences struct {
 func (m *SecuritySchemesOrReferences) Reset()                    { *m = SecuritySchemesOrReferences{} }
 func (m *SecuritySchemesOrReferences) String() string            { return proto.CompactTextString(m) }
 func (*SecuritySchemesOrReferences) ProtoMessage()               {}
-func (*SecuritySchemesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{74} }
+func (*SecuritySchemesOrReferences) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{75} }
 
 func (m *SecuritySchemesOrReferences) GetAdditionalProperties() []*NamedSecuritySchemeOrReference {
 	if m != nil {
@@ -4062,16 +4121,16 @@ func (m *SecuritySchemesOrReferences) GetAdditionalProperties() []*NamedSecurity
 
 // An object representing a Server.
 type Server struct {
-	Url                    string                         `protobuf:"bytes,1,opt,name=url" json:"url,omitempty"`
-	Description            string                         `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
-	Variables              *ServerVariables               `protobuf:"bytes,3,opt,name=variables" json:"variables,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Url                    string           `protobuf:"bytes,1,opt,name=url" json:"url,omitempty"`
+	Description            string           `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
+	Variables              *ServerVariables `protobuf:"bytes,3,opt,name=variables" json:"variables,omitempty"`
+	SpecificationExtension []*NamedAny      `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Server) Reset()                    { *m = Server{} }
 func (m *Server) String() string            { return proto.CompactTextString(m) }
 func (*Server) ProtoMessage()               {}
-func (*Server) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{75} }
+func (*Server) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{76} }
 
 func (m *Server) GetUrl() string {
 	if m != nil {
@@ -4094,7 +4153,7 @@ func (m *Server) GetVariables() *ServerVariables {
 	return nil
 }
 
-func (m *Server) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Server) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -4103,16 +4162,16 @@ func (m *Server) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // An object representing a Server Variable for server URL template substitution.
 type ServerVariable struct {
-	Enum                   []string                       `protobuf:"bytes,1,rep,name=enum" json:"enum,omitempty"`
-	Default                string                         `protobuf:"bytes,2,opt,name=default" json:"default,omitempty"`
-	Description            string                         `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Enum                   []string    `protobuf:"bytes,1,rep,name=enum" json:"enum,omitempty"`
+	Default                string      `protobuf:"bytes,2,opt,name=default" json:"default,omitempty"`
+	Description            string      `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *ServerVariable) Reset()                    { *m = ServerVariable{} }
 func (m *ServerVariable) String() string            { return proto.CompactTextString(m) }
 func (*ServerVariable) ProtoMessage()               {}
-func (*ServerVariable) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{76} }
+func (*ServerVariable) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{77} }
 
 func (m *ServerVariable) GetEnum() []string {
 	if m != nil {
@@ -4135,7 +4194,7 @@ func (m *ServerVariable) GetDescription() string {
 	return ""
 }
 
-func (m *ServerVariable) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *ServerVariable) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -4143,23 +4202,23 @@ func (m *ServerVariable) GetSpecificationExtension() []*NamedSpecificationExtens
 }
 
 type ServerVariables struct {
-	Name                   []*NamedServerVariable         `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	ServerVariable         []*NamedServerVariable `protobuf:"bytes,1,rep,name=server_variable,json=serverVariable" json:"server_variable,omitempty"`
+	SpecificationExtension []*NamedAny            `protobuf:"bytes,2,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *ServerVariables) Reset()                    { *m = ServerVariables{} }
 func (m *ServerVariables) String() string            { return proto.CompactTextString(m) }
 func (*ServerVariables) ProtoMessage()               {}
-func (*ServerVariables) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{77} }
+func (*ServerVariables) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{78} }
 
-func (m *ServerVariables) GetName() []*NamedServerVariable {
+func (m *ServerVariables) GetServerVariable() []*NamedServerVariable {
 	if m != nil {
-		return m.Name
+		return m.ServerVariable
 	}
 	return nil
 }
 
-func (m *ServerVariables) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *ServerVariables) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -4178,7 +4237,7 @@ type SpecificationExtension struct {
 func (m *SpecificationExtension) Reset()                    { *m = SpecificationExtension{} }
 func (m *SpecificationExtension) String() string            { return proto.CompactTextString(m) }
 func (*SpecificationExtension) ProtoMessage()               {}
-func (*SpecificationExtension) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{78} }
+func (*SpecificationExtension) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{79} }
 
 type isSpecificationExtension_Oneof interface {
 	isSpecificationExtension_Oneof()
@@ -4316,7 +4375,7 @@ type StringArray struct {
 func (m *StringArray) Reset()                    { *m = StringArray{} }
 func (m *StringArray) String() string            { return proto.CompactTextString(m) }
 func (*StringArray) ProtoMessage()               {}
-func (*StringArray) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{79} }
+func (*StringArray) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{80} }
 
 func (m *StringArray) GetValue() []string {
 	if m != nil {
@@ -4325,18 +4384,34 @@ func (m *StringArray) GetValue() []string {
 	return nil
 }
 
+type Strings struct {
+	AdditionalProperties []*NamedString `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
+}
+
+func (m *Strings) Reset()                    { *m = Strings{} }
+func (m *Strings) String() string            { return proto.CompactTextString(m) }
+func (*Strings) ProtoMessage()               {}
+func (*Strings) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{81} }
+
+func (m *Strings) GetAdditionalProperties() []*NamedString {
+	if m != nil {
+		return m.AdditionalProperties
+	}
+	return nil
+}
+
 // Allows adding meta data to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag used there.
 type Tag struct {
-	Name                   string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Description            string                         `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
-	ExternalDocs           *ExternalDocs                  `protobuf:"bytes,3,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Name                   string        `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Description            string        `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
+	ExternalDocs           *ExternalDocs `protobuf:"bytes,3,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
+	SpecificationExtension []*NamedAny   `protobuf:"bytes,4,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Tag) Reset()                    { *m = Tag{} }
 func (m *Tag) String() string            { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()               {}
-func (*Tag) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{80} }
+func (*Tag) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{82} }
 
 func (m *Tag) GetName() string {
 	if m != nil {
@@ -4359,7 +4434,7 @@ func (m *Tag) GetExternalDocs() *ExternalDocs {
 	return nil
 }
 
-func (m *Tag) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Tag) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -4368,18 +4443,18 @@ func (m *Tag) GetSpecificationExtension() []*NamedSpecificationExtension {
 
 // A metadata object that allows for more fine-tuned XML model definitions.  When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information. See examples for expected behavior.
 type Xml struct {
-	Name                   string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Namespace              string                         `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
-	Prefix                 string                         `protobuf:"bytes,3,opt,name=prefix" json:"prefix,omitempty"`
-	Attribute              bool                           `protobuf:"varint,4,opt,name=attribute" json:"attribute,omitempty"`
-	Wrapped                bool                           `protobuf:"varint,5,opt,name=wrapped" json:"wrapped,omitempty"`
-	SpecificationExtension []*NamedSpecificationExtension `protobuf:"bytes,6,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
+	Name                   string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Namespace              string      `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
+	Prefix                 string      `protobuf:"bytes,3,opt,name=prefix" json:"prefix,omitempty"`
+	Attribute              bool        `protobuf:"varint,4,opt,name=attribute" json:"attribute,omitempty"`
+	Wrapped                bool        `protobuf:"varint,5,opt,name=wrapped" json:"wrapped,omitempty"`
+	SpecificationExtension []*NamedAny `protobuf:"bytes,6,rep,name=specification_extension,json=specificationExtension" json:"specification_extension,omitempty"`
 }
 
 func (m *Xml) Reset()                    { *m = Xml{} }
 func (m *Xml) String() string            { return proto.CompactTextString(m) }
 func (*Xml) ProtoMessage()               {}
-func (*Xml) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{81} }
+func (*Xml) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{83} }
 
 func (m *Xml) GetName() string {
 	if m != nil {
@@ -4416,7 +4491,7 @@ func (m *Xml) GetWrapped() bool {
 	return false
 }
 
-func (m *Xml) GetSpecificationExtension() []*NamedSpecificationExtension {
+func (m *Xml) GetSpecificationExtension() []*NamedAny {
 	if m != nil {
 		return m.SpecificationExtension
 	}
@@ -4435,6 +4510,7 @@ func init() {
 	proto.RegisterType((*Contact)(nil), "openapi.v3.Contact")
 	proto.RegisterType((*Content)(nil), "openapi.v3.Content")
 	proto.RegisterType((*DefaultType)(nil), "openapi.v3.DefaultType")
+	proto.RegisterType((*Discriminator)(nil), "openapi.v3.Discriminator")
 	proto.RegisterType((*Document)(nil), "openapi.v3.Document")
 	proto.RegisterType((*Encoding)(nil), "openapi.v3.Encoding")
 	proto.RegisterType((*EncodingProperty)(nil), "openapi.v3.EncodingProperty")
@@ -4472,7 +4548,7 @@ func init() {
 	proto.RegisterType((*NamedSchemaOrReference)(nil), "openapi.v3.NamedSchemaOrReference")
 	proto.RegisterType((*NamedSecuritySchemeOrReference)(nil), "openapi.v3.NamedSecuritySchemeOrReference")
 	proto.RegisterType((*NamedServerVariable)(nil), "openapi.v3.NamedServerVariable")
-	proto.RegisterType((*NamedSpecificationExtension)(nil), "openapi.v3.NamedSpecificationExtension")
+	proto.RegisterType((*NamedString)(nil), "openapi.v3.NamedString")
 	proto.RegisterType((*OauthFlow)(nil), "openapi.v3.OauthFlow")
 	proto.RegisterType((*OauthFlows)(nil), "openapi.v3.OauthFlows")
 	proto.RegisterType((*Object)(nil), "openapi.v3.Object")
@@ -4504,6 +4580,7 @@ func init() {
 	proto.RegisterType((*ServerVariables)(nil), "openapi.v3.ServerVariables")
 	proto.RegisterType((*SpecificationExtension)(nil), "openapi.v3.SpecificationExtension")
 	proto.RegisterType((*StringArray)(nil), "openapi.v3.StringArray")
+	proto.RegisterType((*Strings)(nil), "openapi.v3.Strings")
 	proto.RegisterType((*Tag)(nil), "openapi.v3.Tag")
 	proto.RegisterType((*Xml)(nil), "openapi.v3.Xml")
 }
@@ -4511,228 +4588,233 @@ func init() {
 func init() { proto.RegisterFile("OpenAPIv3/OpenAPIv3.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 3557 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xec, 0x3b, 0x4b, 0x6f, 0x1c, 0xc7,
-	0x99, 0xec, 0x79, 0xcf, 0x37, 0x7c, 0x16, 0x29, 0x6a, 0x44, 0x59, 0x12, 0x35, 0x94, 0x2c, 0xad,
-	0xac, 0x87, 0x2d, 0x5a, 0x82, 0xb5, 0xb6, 0xe1, 0xa5, 0x24, 0x1a, 0x24, 0x60, 0x2f, 0xb5, 0x4d,
-	0xbf, 0xd6, 0xbb, 0x8b, 0xd9, 0x62, 0x4f, 0x0d, 0xd9, 0x56, 0xbf, 0xd4, 0xdd, 0x23, 0x71, 0x72,
-	0x08, 0x60, 0x20, 0x39, 0xf8, 0x60, 0x20, 0x01, 0x1c, 0x23, 0x87, 0xe4, 0x62, 0x04, 0x70, 0xae,
-	0xf9, 0x05, 0x01, 0xfc, 0x03, 0x72, 0x0f, 0xe0, 0x43, 0x4e, 0x01, 0x7c, 0xce, 0x35, 0x87, 0xa0,
-	0x5e, 0xdd, 0x5d, 0xd3, 0x35, 0x43, 0xd2, 0x1c, 0x12, 0x08, 0x90, 0xd3, 0x4c, 0xd5, 0xf7, 0xd5,
-	0x57, 0xaf, 0xef, 0xfd, 0x55, 0xc3, 0xb9, 0xad, 0x80, 0x78, 0x6b, 0x4f, 0x36, 0x9f, 0xaf, 0xde,
-	0x49, 0xfe, 0xdd, 0x0e, 0x42, 0x3f, 0xf6, 0x11, 0xf8, 0x01, 0xf1, 0x70, 0x60, 0xdf, 0x7e, 0xbe,
-	0xba, 0x74, 0x6e, 0xd7, 0xf7, 0x77, 0x1d, 0x72, 0x87, 0x41, 0x76, 0x7a, 0xdd, 0x3b, 0xd8, 0xeb,
-	0x73, 0xb4, 0xd6, 0x2f, 0x0c, 0x68, 0xae, 0x75, 0x3a, 0x76, 0x6c, 0xfb, 0x1e, 0x76, 0x9e, 0x84,
-	0x7e, 0x40, 0xc2, 0xd8, 0x26, 0xd1, 0x66, 0x4c, 0x5c, 0xb4, 0x05, 0xf3, 0x91, 0xb5, 0x47, 0x5c,
-	0xdc, 0xf6, 0xc3, 0x76, 0x48, 0xba, 0x24, 0x24, 0x9e, 0x45, 0x9a, 0xc6, 0xb2, 0x71, 0xbd, 0x71,
-	0xf7, 0xc2, 0xed, 0x74, 0x86, 0xdb, 0xdb, 0x0c, 0x6d, 0x2b, 0x34, 0x25, 0xd2, 0xc6, 0x84, 0x39,
-	0x17, 0x0d, 0x76, 0xa2, 0x25, 0xa8, 0xee, 0xf8, 0xbe, 0x43, 0xb0, 0xd7, 0x2c, 0x2c, 0x1b, 0xd7,
-	0x6b, 0x1b, 0x13, 0xa6, 0xec, 0x78, 0x58, 0x85, 0xb2, 0xef, 0x11, 0xbf, 0xdb, 0x5a, 0x87, 0xe2,
-	0x9a, 0xd7, 0x47, 0x37, 0xa0, 0xfc, 0x1c, 0x3b, 0x3d, 0x39, 0xdd, 0xc2, 0x6d, 0xbe, 0x89, 0xdb,
-	0x72, 0x13, 0xb7, 0xd7, 0xbc, 0xbe, 0xc9, 0x51, 0x10, 0x82, 0x52, 0x1f, 0xbb, 0x0e, 0x23, 0x5a,
-	0x37, 0xd9, 0xff, 0x56, 0x1f, 0x66, 0xd6, 0xbc, 0xfe, 0x56, 0xb8, 0xbe, 0x1f, 0x84, 0x24, 0x8a,
-	0x6c, 0xdf, 0x43, 0x2b, 0x50, 0xc4, 0x5e, 0x5f, 0x10, 0x9c, 0xc9, 0xae, 0x7f, 0xcd, 0xeb, 0x6f,
-	0x4c, 0x98, 0x14, 0x8a, 0xde, 0x00, 0x20, 0xc9, 0x10, 0x46, 0xb1, 0x71, 0x77, 0x31, 0x8b, 0x9b,
-	0x12, 0xdc, 0x98, 0x30, 0x33, 0xb8, 0xe9, 0x0e, 0xbe, 0x35, 0xa0, 0xf6, 0x08, 0x3b, 0xce, 0x0e,
-	0xb6, 0x9e, 0xa2, 0x07, 0x0a, 0x3d, 0x63, 0xb9, 0x78, 0xbd, 0x71, 0xf7, 0x5c, 0x96, 0xde, 0x7f,
-	0x62, 0x97, 0x74, 0x9e, 0xe0, 0x78, 0x8f, 0x9e, 0x79, 0x96, 0x20, 0xfa, 0x7f, 0x38, 0x1b, 0x05,
-	0xc4, 0xb2, 0xbb, 0xb6, 0x85, 0xe9, 0x05, 0xb5, 0xc9, 0x7e, 0x4c, 0x3c, 0xb1, 0x2e, 0x4a, 0xe7,
-	0x5a, 0x8e, 0xce, 0x76, 0x16, 0x7f, 0x5d, 0xa2, 0x9b, 0x8b, 0x91, 0xb6, 0xbf, 0xf5, 0x85, 0x01,
-	0xf3, 0x72, 0xa5, 0xd9, 0x8b, 0xba, 0x0b, 0x35, 0x4b, 0x74, 0x27, 0xe7, 0x9f, 0x99, 0x4a, 0x0e,
-	0xd9, 0x98, 0x30, 0x13, 0x3c, 0x74, 0x0f, 0xea, 0x29, 0x8f, 0xf0, 0x73, 0x3b, 0x93, 0x1d, 0x94,
-	0xe5, 0x8d, 0x14, 0x53, 0x39, 0xb5, 0xba, 0x24, 0x1c, 0xa1, 0x37, 0xa0, 0xe4, 0x61, 0x97, 0x88,
-	0x03, 0xbb, 0x92, 0xdb, 0xa8, 0x66, 0xd5, 0x26, 0x1b, 0x71, 0x0a, 0xa7, 0x16, 0xc2, 0x99, 0x64,
-	0xa1, 0x99, 0xf9, 0x23, 0xf4, 0xdf, 0x70, 0x06, 0x27, 0xc2, 0xd4, 0x0e, 0x12, 0x69, 0x3a, 0xd2,
-	0x2e, 0x16, 0xb0, 0x46, 0x1e, 0x5b, 0x7f, 0x2c, 0x03, 0x3c, 0xf2, 0xdd, 0xc0, 0xf7, 0x88, 0x17,
-	0x47, 0xe8, 0x01, 0x54, 0xb9, 0x78, 0x45, 0xe2, 0x7e, 0x2e, 0xe5, 0xc5, 0x51, 0x59, 0x9b, 0x29,
-	0xf1, 0xd1, 0x3b, 0xf4, 0x9e, 0xa2, 0xc0, 0xf7, 0x22, 0x12, 0x89, 0x7b, 0xba, 0xac, 0xde, 0x93,
-	0x00, 0x2a, 0xc3, 0xd3, 0x31, 0xe8, 0x21, 0x40, 0x80, 0x43, 0xec, 0x92, 0x98, 0x84, 0x51, 0xb3,
-	0xc8, 0x28, 0xb4, 0xb2, 0x14, 0x9e, 0x24, 0x50, 0x85, 0x44, 0x66, 0x14, 0x7a, 0x0b, 0x6a, 0x64,
-	0x1f, 0xbb, 0x81, 0x43, 0xa2, 0x66, 0x89, 0x51, 0x58, 0x56, 0x65, 0x8c, 0xc3, 0x94, 0xf1, 0xc9,
-	0x08, 0xf4, 0x1e, 0x4c, 0x87, 0xe4, 0x59, 0x8f, 0x44, 0x71, 0x7b, 0xc7, 0xef, 0xd0, 0x03, 0x2e,
-	0x33, 0x1a, 0x57, 0xd5, 0x7d, 0x30, 0x8c, 0x87, 0x0c, 0x41, 0x21, 0x34, 0x15, 0x66, 0x41, 0xf4,
-	0x2c, 0xf7, 0x08, 0xee, 0xd0, 0xcd, 0x54, 0xf2, 0x67, 0xb9, 0xc1, 0x41, 0xea, 0x59, 0x0a, 0x7c,
-	0x64, 0xc2, 0x6c, 0x44, 0xac, 0x5e, 0x68, 0xc7, 0xfd, 0x36, 0x3b, 0x5f, 0x12, 0x35, 0xab, 0x8c,
-	0x86, 0xc2, 0x64, 0xdb, 0x02, 0x67, 0x9b, 0xa3, 0x28, 0xb4, 0x66, 0x22, 0x15, 0x88, 0x56, 0xa1,
-	0xec, 0xd8, 0xde, 0xd3, 0xa8, 0x59, 0xcb, 0xeb, 0xd9, 0xf7, 0x28, 0x40, 0x19, 0xce, 0x71, 0xe9,
-	0xa5, 0x4a, 0x41, 0x8c, 0x9a, 0xf5, 0xfc, 0xa5, 0x6a, 0xf9, 0xd5, 0x4c, 0xc7, 0x8c, 0x92, 0x1a,
-	0x18, 0x8f, 0xd4, 0x7c, 0x6b, 0x40, 0xf5, 0x91, 0xef, 0xc5, 0xd8, 0x8a, 0xa9, 0xc2, 0x16, 0xd2,
-	0xcd, 0x14, 0x36, 0x93, 0xdb, 0x59, 0x28, 0xf6, 0x42, 0xa9, 0xc3, 0xe9, 0x5f, 0xb4, 0x00, 0x65,
-	0xe2, 0x62, 0xdb, 0x61, 0x3c, 0x56, 0x37, 0x79, 0x63, 0xd4, 0x4a, 0x4b, 0xe3, 0x59, 0xe9, 0x63,
-	0xbe, 0x50, 0xe2, 0xc5, 0x54, 0x7b, 0xbb, 0xa4, 0x63, 0xe3, 0x76, 0xdc, 0x0f, 0xa4, 0x32, 0x5a,
-	0xca, 0xd1, 0x7f, 0x9f, 0xa2, 0x7c, 0xd0, 0x0f, 0x88, 0x59, 0x77, 0xe5, 0xdf, 0x56, 0x17, 0x1a,
-	0x8f, 0x49, 0x17, 0xf7, 0x9c, 0x98, 0x36, 0x51, 0x13, 0x2a, 0x5e, 0xcf, 0xdd, 0x21, 0x21, 0xdb,
-	0xb4, 0xb1, 0x31, 0x61, 0x8a, 0xf6, 0x28, 0xab, 0x48, 0x47, 0x45, 0x71, 0x68, 0x7b, 0xbb, 0xfc,
-	0x0c, 0xe8, 0x28, 0xde, 0x4e, 0xf5, 0xe6, 0xf7, 0x45, 0xa8, 0x3d, 0xf6, 0xad, 0x9e, 0x4b, 0xd7,
-	0xdb, 0x84, 0xaa, 0x58, 0x9c, 0x38, 0x5b, 0xd9, 0x44, 0x57, 0xa0, 0x64, 0x7b, 0x5d, 0x5f, 0x48,
-	0xfc, 0x6c, 0x76, 0x0f, 0x9b, 0x5e, 0xd7, 0x37, 0x19, 0x14, 0xdd, 0x84, 0x6a, 0x44, 0xc2, 0xe7,
-	0x5c, 0xb0, 0xe9, 0x66, 0x91, 0xca, 0xc7, 0x14, 0x64, 0x4a, 0x14, 0x74, 0x0d, 0xca, 0x01, 0x8e,
-	0xf7, 0xa4, 0x08, 0xcf, 0xa9, 0x4a, 0x20, 0xde, 0x8b, 0x4c, 0x0e, 0x47, 0xf7, 0x01, 0xac, 0x44,
-	0x79, 0x09, 0x61, 0x55, 0x8c, 0x6a, 0xaa, 0xda, 0xcc, 0x0c, 0x26, 0x7a, 0x13, 0x6a, 0x52, 0x3c,
-	0x9a, 0x15, 0xb6, 0x9e, 0x4b, 0x3a, 0xb9, 0xa2, 0xa2, 0x6e, 0x87, 0x84, 0x9e, 0x80, 0x99, 0x0c,
-	0x40, 0x2b, 0x50, 0x8a, 0xf1, 0x2e, 0x15, 0xc8, 0xe2, 0xa0, 0xbd, 0xff, 0x00, 0xef, 0x9a, 0x0c,
-	0x88, 0xde, 0x86, 0x29, 0xca, 0x3f, 0x21, 0x55, 0xd8, 0x1d, 0xdf, 0x92, 0x52, 0xd7, 0x54, 0xb5,
-	0x11, 0x47, 0x78, 0xec, 0x5b, 0x91, 0x39, 0x49, 0x32, 0xad, 0x51, 0xcc, 0x58, 0x1f, 0x0f, 0x33,
-	0x6e, 0x42, 0x6d, 0xdd, 0xb3, 0xfc, 0x8e, 0xed, 0xed, 0xa2, 0xb7, 0xa1, 0x26, 0x8c, 0x4a, 0x5f,
-	0xf0, 0xe2, 0xe5, 0x1c, 0x79, 0x89, 0x2c, 0x6c, 0x47, 0xdf, 0x4c, 0x86, 0xb4, 0x7e, 0x53, 0x80,
-	0xd9, 0x41, 0x30, 0xba, 0x0c, 0x93, 0x16, 0x67, 0x76, 0xc9, 0xe3, 0x94, 0x6d, 0x1a, 0xa2, 0x8f,
-	0xb1, 0xee, 0xcd, 0x54, 0x41, 0x72, 0xee, 0x51, 0x98, 0x62, 0x6b, 0xe7, 0x33, 0x62, 0xc5, 0xa9,
-	0x4e, 0x5c, 0x80, 0x72, 0x14, 0xf7, 0x1d, 0x22, 0xa5, 0x96, 0x35, 0x28, 0x63, 0x92, 0xfd, 0xc0,
-	0xf1, 0x3b, 0x84, 0x31, 0x4b, 0xcd, 0x94, 0x4d, 0x74, 0x15, 0xa6, 0xb1, 0xe3, 0xf8, 0x2f, 0xda,
-	0x21, 0x61, 0x7c, 0xd5, 0x61, 0xfc, 0x51, 0x33, 0xa7, 0x58, 0xaf, 0x29, 0x3a, 0x47, 0x9d, 0x74,
-	0x65, 0x3c, 0x27, 0xfd, 0x27, 0x03, 0xaa, 0xc2, 0xf0, 0xd0, 0xe5, 0x46, 0x3d, 0xd7, 0xc5, 0x61,
-	0x5f, 0xca, 0x91, 0x68, 0xa2, 0x65, 0x68, 0x74, 0x48, 0x64, 0x85, 0x76, 0x10, 0x4b, 0x07, 0xb1,
-	0x6e, 0x66, 0xbb, 0xe8, 0x86, 0x12, 0x96, 0xe2, 0x2e, 0x2c, 0x3f, 0x89, 0x84, 0xd1, 0x3e, 0x62,
-	0x4e, 0xeb, 0xc9, 0xeb, 0xb1, 0x9f, 0x1b, 0x80, 0xc4, 0x86, 0xb2, 0xce, 0xdd, 0x1d, 0x7a, 0x15,
-	0xac, 0x57, 0xf8, 0x0e, 0xf3, 0x1a, 0xd3, 0x4b, 0x95, 0x90, 0xc0, 0x3a, 0xb6, 0x67, 0x07, 0x50,
-	0x93, 0x06, 0xbd, 0x15, 0xc0, 0x82, 0xce, 0xb8, 0xa3, 0x4f, 0x46, 0xbb, 0x4e, 0x2b, 0x79, 0x3e,
-	0xcf, 0x6d, 0x6c, 0x88, 0xe7, 0xf4, 0x31, 0x40, 0x26, 0x06, 0xd8, 0x1c, 0x3d, 0xcf, 0x42, 0x6e,
-	0x1e, 0x1a, 0x66, 0xe8, 0x09, 0xff, 0xce, 0x80, 0xc9, 0xac, 0x6a, 0x18, 0x64, 0x0d, 0x23, 0xcf,
-	0x1a, 0x79, 0x1b, 0x37, 0x82, 0x0b, 0x8a, 0xe3, 0xe1, 0x82, 0x3f, 0x14, 0xa1, 0xc2, 0x9d, 0x18,
-	0xad, 0xd9, 0x9d, 0x86, 0x82, 0x2d, 0xd9, 0xb8, 0x60, 0x7b, 0x83, 0x9b, 0x28, 0xe6, 0x37, 0xb1,
-	0x04, 0xb5, 0x90, 0x2b, 0xdc, 0x8e, 0x90, 0xe5, 0xa4, 0x8d, 0x2e, 0x02, 0x74, 0x48, 0x10, 0x12,
-	0x0b, 0xc7, 0x89, 0x20, 0x67, 0x7a, 0xd0, 0x0d, 0x98, 0xe3, 0xc2, 0x4e, 0xdc, 0x20, 0xee, 0x0b,
-	0xf1, 0xa8, 0x30, 0xb4, 0x19, 0x06, 0x58, 0xa7, 0xfd, 0x5c, 0x40, 0x12, 0x45, 0x52, 0x1d, 0xa2,
-	0x48, 0x6a, 0x07, 0x29, 0x92, 0xba, 0x4e, 0x91, 0xdc, 0x83, 0x0a, 0x77, 0x85, 0x9b, 0x70, 0x88,
-	0x40, 0xd6, 0x14, 0xc8, 0x8a, 0xc7, 0xda, 0x38, 0xb2, 0xc7, 0x7a, 0x0b, 0xaa, 0x42, 0xa3, 0x36,
-	0x27, 0xf3, 0x32, 0x27, 0xbc, 0x0d, 0x53, 0xe2, 0xb4, 0x3e, 0x37, 0x60, 0x8e, 0xdf, 0x59, 0x56,
-	0x70, 0x6f, 0x42, 0x85, 0x2b, 0x59, 0x21, 0xb7, 0x28, 0xef, 0xa7, 0x52, 0x07, 0x81, 0xe3, 0x1c,
-	0x5b, 0x6a, 0xd7, 0xa0, 0x2a, 0x7c, 0x5f, 0x74, 0x5f, 0x09, 0xc6, 0x5a, 0x39, 0x8e, 0xcc, 0x2d,
-	0x95, 0xf3, 0x56, 0xcb, 0x83, 0x79, 0x8d, 0xfb, 0x8c, 0x3e, 0x1e, 0x2d, 0x83, 0x87, 0xa1, 0xaf,
-	0x97, 0xc8, 0xef, 0x0a, 0x50, 0xa2, 0xce, 0x0c, 0x65, 0x9d, 0xd8, 0x8e, 0x1d, 0xc9, 0xe9, 0xbc,
-	0x71, 0x08, 0xd5, 0x7d, 0x1d, 0x66, 0x63, 0x12, 0xba, 0x51, 0xdb, 0xef, 0xb6, 0x29, 0xbb, 0xd8,
-	0x96, 0x54, 0xde, 0xd3, 0xac, 0x7f, 0xab, 0xbb, 0xcd, 0x7b, 0xe5, 0x85, 0x62, 0x2b, 0x16, 0xce,
-	0x4f, 0xee, 0x42, 0xb1, 0x25, 0x2e, 0x94, 0x3a, 0xbc, 0xb7, 0xa0, 0xea, 0xd8, 0x16, 0xf1, 0x22,
-	0x22, 0xbc, 0x9f, 0x79, 0xd5, 0xad, 0x67, 0x20, 0x53, 0xe2, 0x50, 0x26, 0xa7, 0x0e, 0x16, 0x37,
-	0x6e, 0xcc, 0xfc, 0x88, 0xe6, 0x28, 0x7d, 0x51, 0x1d, 0x8f, 0xbe, 0xf8, 0x14, 0xea, 0x9b, 0x31,
-	0x71, 0x79, 0x0a, 0xe8, 0xfd, 0x61, 0x29, 0xa0, 0xe2, 0xc1, 0x92, 0x93, 0x4f, 0x00, 0xb5, 0x7e,
-	0x69, 0x40, 0x55, 0x6c, 0xf6, 0x90, 0x31, 0xc0, 0xc9, 0xeb, 0xc7, 0x1f, 0x0a, 0x50, 0xa2, 0x71,
-	0x15, 0x5a, 0x81, 0x29, 0xca, 0x49, 0x7c, 0x9a, 0x90, 0x74, 0xc5, 0xca, 0x26, 0x93, 0x4e, 0x93,
-	0x74, 0xa9, 0xbb, 0x94, 0x22, 0xd9, 0x1d, 0xc9, 0x44, 0x49, 0xdf, 0x66, 0x07, 0xfd, 0xbb, 0x26,
-	0x3e, 0x5e, 0x1a, 0x8c, 0xe2, 0xd2, 0x18, 0x59, 0x89, 0x8b, 0x6f, 0xa5, 0xae, 0x96, 0x86, 0xad,
-	0x84, 0x30, 0xa5, 0xbe, 0xd6, 0x00, 0x47, 0x97, 0xf3, 0x1c, 0x7d, 0x03, 0x2a, 0xdc, 0x5b, 0x17,
-	0xb1, 0xad, 0xce, 0x9f, 0x17, 0x18, 0xa7, 0xc0, 0x5b, 0x7d, 0x98, 0xa1, 0x9b, 0xcf, 0x2a, 0xb5,
-	0x97, 0xa1, 0x44, 0x43, 0x58, 0xa1, 0xd2, 0x66, 0x07, 0xcf, 0x69, 0x63, 0xc2, 0x64, 0xf0, 0x63,
-	0xab, 0xb3, 0x77, 0x61, 0x5a, 0x3d, 0x77, 0xf4, 0xba, 0xa2, 0xd5, 0x96, 0x75, 0x96, 0x3f, 0x9b,
-	0x3e, 0x14, 0x3a, 0xed, 0x6d, 0x28, 0xb3, 0x28, 0xfc, 0xc0, 0xe1, 0x03, 0x1b, 0x15, 0xc3, 0x3f,
-	0x83, 0xb9, 0x5c, 0x10, 0x8f, 0x3e, 0x1c, 0xad, 0x10, 0x0f, 0xa6, 0xad, 0x57, 0x87, 0x5f, 0x15,
-	0xa0, 0x9e, 0x84, 0xa6, 0x19, 0xbb, 0x67, 0xfc, 0x58, 0xbb, 0x57, 0x38, 0xb2, 0xdd, 0x7b, 0x15,
-	0x6a, 0x44, 0x44, 0x1c, 0x42, 0x12, 0x14, 0x0f, 0x4b, 0x46, 0x23, 0x66, 0x82, 0x75, 0x0a, 0x6e,
-	0xf1, 0x3a, 0xd4, 0xe4, 0xfd, 0x6a, 0x95, 0xd0, 0x55, 0x99, 0x79, 0x2e, 0x68, 0x13, 0xc5, 0x22,
-	0xe9, 0xdc, 0xfa, 0x3f, 0x58, 0xd0, 0xb1, 0x89, 0x96, 0xe4, 0x6b, 0x2a, 0xc9, 0xf3, 0x03, 0x24,
-	0x15, 0x36, 0x13, 0xe4, 0x09, 0x34, 0x87, 0xa5, 0x08, 0xb5, 0x53, 0xdc, 0x53, 0xa7, 0xb8, 0xa4,
-	0xcb, 0xfe, 0x64, 0xef, 0x57, 0x4c, 0xd3, 0x86, 0x33, 0xda, 0xb0, 0x51, 0x3b, 0xc7, 0x5d, 0x75,
-	0x8e, 0x97, 0x74, 0x57, 0x99, 0xc4, 0x9d, 0x62, 0x02, 0x0b, 0xce, 0x0e, 0xf1, 0xd7, 0xb5, 0x53,
-	0xbc, 0xae, 0x4e, 0x71, 0x51, 0xc3, 0x6b, 0x9a, 0x5d, 0x60, 0x58, 0xd4, 0x3b, 0x0a, 0xda, 0x39,
-	0x56, 0xd5, 0x39, 0x2e, 0xe4, 0x55, 0xac, 0x66, 0x0a, 0x79, 0xdd, 0x83, 0xfa, 0xeb, 0xa8, 0xd7,
-	0x3d, 0x28, 0xba, 0x82, 0xfc, 0x7f, 0xc1, 0xb4, 0x9a, 0x4a, 0xd2, 0x12, 0x7e, 0x45, 0x25, 0xac,
-	0x28, 0xc0, 0x34, 0x09, 0x25, 0x48, 0xee, 0xc2, 0x39, 0x51, 0x5b, 0x10, 0x2a, 0xef, 0xa0, 0x65,
-	0xdf, 0x57, 0xa9, 0x2f, 0x6b, 0x73, 0xba, 0x9a, 0xb5, 0x6f, 0xc1, 0x94, 0x52, 0xc4, 0xd0, 0x12,
-	0xbf, 0xa1, 0x12, 0x5f, 0x18, 0xcc, 0x15, 0xb1, 0xea, 0x87, 0x20, 0xf8, 0x14, 0xce, 0x33, 0x82,
-	0x69, 0x0a, 0xb7, 0x7f, 0xd0, 0xda, 0xdf, 0x50, 0xc9, 0xb7, 0xf4, 0x99, 0xe0, 0xbe, 0x66, 0xf5,
-	0x52, 0xd0, 0x64, 0xde, 0xfb, 0x38, 0x82, 0xa6, 0xa1, 0x31, 0xc8, 0xa2, 0x39, 0x4d, 0x7b, 0x64,
-	0x16, 0xcd, 0xeb, 0x6a, 0x31, 0xc5, 0x33, 0xb8, 0xc8, 0xa7, 0x50, 0x32, 0xca, 0x07, 0x4d, 0xf5,
-	0xa6, 0x3a, 0xd5, 0xd5, 0xe1, 0x89, 0x6b, 0xcd, 0x94, 0xff, 0x03, 0xf3, 0x62, 0x4a, 0xea, 0x41,
-	0x7c, 0x84, 0x43, 0x1b, 0xef, 0x38, 0xfa, 0x79, 0x5e, 0x55, 0xe7, 0x59, 0xca, 0x3b, 0x22, 0x72,
-	0xf8, 0x20, 0x1b, 0xe8, 0xf5, 0xfb, 0x91, 0xd9, 0x60, 0x88, 0x99, 0x10, 0x93, 0xfd, 0xac, 0x00,
-	0xf5, 0x2d, 0xdc, 0x8b, 0xf7, 0xde, 0x75, 0xfc, 0x17, 0xe8, 0x15, 0x98, 0xa3, 0xff, 0xfd, 0xd0,
-	0xfe, 0x09, 0xb7, 0x42, 0xd4, 0x2d, 0xe5, 0x13, 0xcd, 0x2a, 0x80, 0x0f, 0x43, 0x07, 0x9d, 0x87,
-	0x7a, 0xec, 0x3f, 0x25, 0x1c, 0x89, 0x3b, 0x84, 0x35, 0xd6, 0x41, 0x81, 0x97, 0xa0, 0x11, 0x92,
-	0x6e, 0x48, 0xa2, 0x3d, 0x06, 0xe6, 0xd1, 0x04, 0x88, 0x2e, 0x8a, 0x40, 0x3d, 0x34, 0xcb, 0x0f,
-	0x92, 0x42, 0x88, 0xea, 0xa1, 0x31, 0x88, 0x29, 0x30, 0x46, 0x19, 0xc7, 0xf2, 0x78, 0x8c, 0xe3,
-	0x5f, 0x0a, 0x00, 0xc9, 0x31, 0x44, 0xe8, 0x35, 0xa8, 0xd9, 0x6e, 0xe0, 0xd8, 0x96, 0x1d, 0x0b,
-	0xb7, 0x41, 0xd1, 0x39, 0x09, 0xa6, 0x99, 0xa0, 0xd1, 0x21, 0x01, 0x8e, 0xa2, 0x17, 0x7e, 0xd8,
-	0xd1, 0xa9, 0xa9, 0xcc, 0x10, 0x89, 0x86, 0x1e, 0x03, 0xb2, 0x1c, 0x9b, 0x78, 0x71, 0xdb, 0x0a,
-	0x49, 0x87, 0x78, 0xb1, 0x8d, 0x1d, 0xe9, 0x39, 0x0f, 0x19, 0x3c, 0xc7, 0x07, 0x3c, 0x4a, 0xf1,
-	0x29, 0x15, 0xf5, 0xce, 0x2c, 0x99, 0x6d, 0x1c, 0x4e, 0x45, 0x19, 0xf0, 0xc8, 0xef, 0x90, 0x53,
-	0x38, 0xe2, 0x6d, 0xa8, 0xf0, 0x9c, 0xe9, 0x38, 0x93, 0x51, 0xbf, 0x2d, 0x43, 0x7d, 0x4b, 0x06,
-	0x21, 0x54, 0x34, 0x58, 0xea, 0x9b, 0xd2, 0xa9, 0x8b, 0x4c, 0x77, 0x26, 0xa5, 0x59, 0x18, 0x99,
-	0xd2, 0xd4, 0xa4, 0x7c, 0x72, 0x59, 0xf2, 0xd2, 0x91, 0xb2, 0xe4, 0x83, 0x41, 0x53, 0x39, 0x1f,
-	0x34, 0xfd, 0x87, 0x12, 0x34, 0x55, 0xf2, 0x7e, 0xaf, 0xd6, 0x00, 0x65, 0x43, 0xa7, 0x75, 0x98,
-	0xcc, 0x14, 0x05, 0xfb, 0xa2, 0x0e, 0x77, 0x18, 0x43, 0xd0, 0x48, 0xeb, 0x81, 0x7d, 0xb4, 0x9a,
-	0x2d, 0x8f, 0xd6, 0x74, 0x71, 0x86, 0x00, 0x66, 0x4b, 0xa2, 0xab, 0xf9, 0xf2, 0xdb, 0x19, 0x6d,
-	0xf9, 0x2d, 0x5b, 0x72, 0x53, 0x73, 0x65, 0x90, 0xcb, 0x95, 0x65, 0x8b, 0x1f, 0x8d, 0xa3, 0x16,
-	0x3f, 0x32, 0x85, 0x9c, 0xc9, 0x83, 0x0b, 0x39, 0x23, 0x98, 0x7e, 0x6a, 0x3c, 0x4c, 0xff, 0x75,
-	0x09, 0xea, 0xc9, 0x15, 0xfe, 0x2b, 0x11, 0xf9, 0x4f, 0x92, 0x88, 0x3c, 0x05, 0xc6, 0xf8, 0xd2,
-	0x80, 0x05, 0xad, 0x87, 0x7a, 0x0f, 0xea, 0x89, 0x74, 0xeb, 0x6c, 0x4f, 0x32, 0x88, 0x06, 0xfc,
-	0x09, 0xe6, 0xb1, 0xf3, 0x04, 0x31, 0x2c, 0xea, 0xdf, 0x2f, 0xa0, 0x4f, 0x47, 0x6b, 0xeb, 0xab,
-	0x9a, 0x47, 0x3d, 0x1a, 0x95, 0xa5, 0x57, 0xdf, 0x5f, 0x96, 0xa1, 0x96, 0xb8, 0xcf, 0x73, 0x50,
-	0xca, 0xe4, 0x9f, 0x8a, 0x26, 0xe9, 0x1e, 0x4b, 0x79, 0x5f, 0x83, 0xe2, 0x2e, 0x89, 0xb5, 0x86,
-	0x30, 0xc9, 0x6c, 0x51, 0x0c, 0x8a, 0x18, 0xf4, 0x62, 0x91, 0xa0, 0x1c, 0x86, 0x18, 0xf4, 0x62,
-	0xf4, 0x6f, 0x50, 0x0a, 0xfc, 0x28, 0x16, 0x29, 0xa5, 0x21, 0x98, 0x0c, 0x05, 0xdd, 0x82, 0x4a,
-	0x87, 0x38, 0x24, 0x26, 0x42, 0x1f, 0x0f, 0x41, 0x16, 0x48, 0xe8, 0x0e, 0x54, 0x7d, 0xb6, 0x6a,
-	0xad, 0xee, 0x4d, 0xf1, 0x25, 0x16, 0x5d, 0xca, 0x1e, 0xc1, 0x1d, 0x9d, 0xd2, 0xcd, 0x2c, 0x85,
-	0xa2, 0xd0, 0xe0, 0x29, 0xc0, 0xb1, 0xb5, 0x27, 0xc4, 0x6d, 0x08, 0x2e, 0xc7, 0xa1, 0xc8, 0x71,
-	0x88, 0x2d, 0x22, 0x44, 0x6c, 0x18, 0x32, 0xc3, 0x39, 0xa2, 0xb2, 0x55, 0x4d, 0xdd, 0xd4, 0x8f,
-	0x30, 0x75, 0x23, 0xa4, 0x72, 0x7a, 0x3c, 0x52, 0xf9, 0x6b, 0x03, 0xca, 0xac, 0x82, 0x8f, 0x6e,
-	0x41, 0x29, 0xc0, 0xf1, 0xde, 0xc1, 0x2f, 0xd7, 0x18, 0xda, 0x29, 0xbc, 0xbe, 0x22, 0x00, 0xa9,
-	0xe0, 0x1c, 0xbd, 0x96, 0x90, 0x57, 0xac, 0x7a, 0x89, 0xbc, 0x08, 0xf5, 0x54, 0x17, 0xe5, 0x25,
-	0xb2, 0xd5, 0x87, 0x73, 0x43, 0x5f, 0x18, 0xa1, 0xff, 0x1d, 0xbd, 0xaa, 0xfc, 0x19, 0x0c, 0xf1,
-	0x4c, 0xf4, 0x4b, 0xfb, 0xde, 0x80, 0x46, 0x66, 0xc0, 0x21, 0xea, 0x8e, 0x19, 0xad, 0x5f, 0x38,
-	0x84, 0xd6, 0xcf, 0x1a, 0xd6, 0xe2, 0x80, 0x61, 0x3d, 0xf9, 0xfc, 0xdc, 0xd7, 0x06, 0x2c, 0x0e,
-	0x89, 0xfc, 0xdf, 0x1a, 0xf0, 0xf1, 0xb8, 0x59, 0x38, 0x3b, 0xc4, 0xc7, 0xdb, 0x98, 0x50, 0x5d,
-	0xbb, 0xe3, 0x9a, 0x86, 0x5f, 0x15, 0xa0, 0x26, 0xdd, 0xbf, 0xc3, 0x1d, 0xba, 0xfa, 0x6c, 0x62,
-	0x74, 0x2e, 0x3f, 0x73, 0x47, 0xc5, 0x43, 0xdc, 0xd1, 0x35, 0xf9, 0x4c, 0x4c, 0xf3, 0xf6, 0x86,
-	0x65, 0x98, 0xe5, 0xd3, 0xb0, 0x93, 0x0f, 0x68, 0xbe, 0x30, 0x60, 0x5e, 0x97, 0x3d, 0xb9, 0x4b,
-	0xd9, 0x88, 0x77, 0xeb, 0x5e, 0x91, 0xca, 0x21, 0x1b, 0x13, 0x66, 0x82, 0x77, 0xec, 0x3b, 0xfa,
-	0x9b, 0x41, 0xe5, 0x56, 0xfa, 0xe5, 0x0f, 0xa0, 0xda, 0xe1, 0x6f, 0xb0, 0x74, 0xcf, 0x24, 0x75,
-	0xd9, 0x1a, 0x89, 0x8f, 0x36, 0x61, 0x4a, 0x2e, 0x8a, 0x07, 0x92, 0x85, 0x21, 0x6f, 0x38, 0x75,
-	0x54, 0x26, 0xe5, 0xd0, 0x83, 0x42, 0xca, 0xe2, 0xd8, 0x5e, 0xa4, 0x6a, 0x9f, 0x6d, 0x1e, 0xfd,
-	0x45, 0xaa, 0x6e, 0x37, 0x7a, 0x2d, 0xf4, 0x77, 0x80, 0x0a, 0x57, 0xa6, 0x54, 0x5f, 0x78, 0x3d,
-	0xc7, 0xc1, 0x3b, 0xa2, 0xe2, 0x5a, 0x33, 0x93, 0x36, 0xba, 0x02, 0x53, 0x1d, 0x9b, 0x0a, 0x85,
-	0x6b, 0x7b, 0x38, 0xf6, 0x43, 0xe1, 0xbf, 0xa8, 0x9d, 0xe8, 0x3c, 0xbd, 0x76, 0xdc, 0x69, 0xfb,
-	0x9e, 0xd3, 0x4f, 0x55, 0x0e, 0xee, 0x6c, 0x79, 0x4e, 0x1f, 0x5d, 0x00, 0x78, 0x11, 0xda, 0x31,
-	0xe1, 0x50, 0xee, 0xe9, 0xd7, 0x59, 0x0f, 0x03, 0x5f, 0x86, 0xe2, 0xbe, 0xeb, 0x08, 0xb7, 0x45,
-	0xc9, 0xd6, 0x7f, 0xe2, 0x3a, 0x26, 0x85, 0xe5, 0xe3, 0xd7, 0xca, 0x91, 0xe2, 0x57, 0x35, 0x98,
-	0xa8, 0xe6, 0x82, 0x89, 0xa4, 0xdc, 0x5c, 0xcb, 0x96, 0x9b, 0x2f, 0x41, 0xc3, 0xed, 0x39, 0xb1,
-	0x1d, 0x38, 0xa4, 0xed, 0x77, 0x99, 0x87, 0x62, 0x98, 0x20, 0xbb, 0xb6, 0x98, 0x53, 0xe7, 0xe2,
-	0x7d, 0xdb, 0xed, 0xb9, 0xcc, 0x25, 0x31, 0x4c, 0xd9, 0x44, 0xaf, 0xc0, 0x1c, 0xd9, 0xb7, 0x9c,
-	0x5e, 0x64, 0x3f, 0x27, 0x6d, 0x89, 0xd3, 0x60, 0xf3, 0xce, 0x26, 0x80, 0xf7, 0x05, 0x32, 0x25,
-	0x63, 0x7b, 0x0c, 0x65, 0x52, 0x90, 0xe1, 0xcd, 0x01, 0x32, 0x02, 0x67, 0x6a, 0x90, 0x8c, 0x40,
-	0xbe, 0x00, 0xe0, 0xe2, 0xfd, 0xb6, 0x43, 0xbc, 0xdd, 0x78, 0xaf, 0x39, 0xbd, 0x6c, 0x5c, 0x2f,
-	0x9a, 0x75, 0x17, 0xef, 0xbf, 0xc7, 0x3a, 0x18, 0xd8, 0xf6, 0x24, 0x78, 0x46, 0x80, 0x6d, 0x4f,
-	0x80, 0x9b, 0x50, 0x0d, 0x70, 0x4c, 0xcf, 0xac, 0x39, 0xcb, 0x1d, 0x54, 0xd1, 0xa4, 0x57, 0x4b,
-	0xe9, 0xda, 0x31, 0x71, 0xa3, 0xe6, 0x1c, 0x1b, 0x57, 0x73, 0xf1, 0x3e, 0xab, 0x31, 0x33, 0xa0,
-	0xed, 0x09, 0x20, 0x12, 0x40, 0xdb, 0xe3, 0xc0, 0xcb, 0x30, 0xd9, 0xf3, 0xec, 0x67, 0x3d, 0x22,
-	0xe0, 0xf3, 0x6c, 0xe5, 0x0d, 0xde, 0xc7, 0x51, 0xae, 0xc2, 0x34, 0x25, 0x9e, 0x61, 0xec, 0x05,
-	0x46, 0x64, 0xca, 0xc5, 0xfb, 0x19, 0x2f, 0x81, 0xa2, 0xd9, 0x5e, 0x16, 0xed, 0x8c, 0x40, 0xb3,
-	0xbd, 0x0c, 0x5a, 0xd6, 0xee, 0x2d, 0xb2, 0xd4, 0x49, 0x6a, 0xf7, 0x56, 0xa0, 0x44, 0xbc, 0x9e,
-	0xdb, 0x3c, 0x9b, 0x7f, 0x4d, 0xb8, 0xe6, 0xf5, 0x4d, 0x06, 0x64, 0x79, 0x97, 0x7e, 0x40, 0x9a,
-	0x4d, 0x1e, 0xd7, 0xd2, 0xff, 0xe8, 0x75, 0xa8, 0x60, 0xc7, 0xa1, 0x1c, 0x70, 0xee, 0x30, 0x55,
-	0xf3, 0x32, 0x76, 0x9c, 0xad, 0x2e, 0x1d, 0xe5, 0x7b, 0x8c, 0x6f, 0x96, 0x0e, 0x35, 0xca, 0xf7,
-	0x08, 0x1f, 0x85, 0xbd, 0x3e, 0x1d, 0x75, 0xfe, 0x70, 0x73, 0x79, 0xfd, 0xad, 0x2e, 0xba, 0x02,
-	0x45, 0xcf, 0x8f, 0x9b, 0x2f, 0xe9, 0xd2, 0x8f, 0x74, 0x88, 0x49, 0xc1, 0xd4, 0x23, 0xe6, 0xd7,
-	0x70, 0x21, 0xaf, 0x95, 0x93, 0x07, 0x03, 0x26, 0xc7, 0x41, 0xf7, 0x01, 0x32, 0x87, 0x7d, 0x31,
-	0xff, 0xe0, 0x33, 0x3d, 0x75, 0x33, 0x83, 0x39, 0x5c, 0x5f, 0x5d, 0x62, 0x24, 0x14, 0x7d, 0x35,
-	0xec, 0xbb, 0x15, 0xbd, 0xbe, 0x42, 0xaf, 0xa5, 0xb6, 0x60, 0x39, 0xef, 0x36, 0x64, 0x9e, 0xea,
-	0xa6, 0x36, 0x60, 0xc0, 0xc6, 0x5f, 0xce, 0xdb, 0xf8, 0x45, 0xa8, 0x74, 0xfd, 0xd0, 0xc5, 0x71,
-	0xb3, 0xc5, 0x80, 0xa2, 0x35, 0x4a, 0xe5, 0xaf, 0x8c, 0x47, 0xe5, 0x7f, 0x6e, 0xc0, 0x5c, 0xbe,
-	0x96, 0x70, 0x73, 0xa0, 0xc8, 0xab, 0xb9, 0x4d, 0xf6, 0x86, 0x98, 0xeb, 0xed, 0xe3, 0x1a, 0x5b,
-	0x0f, 0xe6, 0x35, 0x9f, 0x1a, 0x9c, 0x9c, 0x4f, 0xfe, 0x95, 0x41, 0x4d, 0x0e, 0xcb, 0x84, 0x5f,
-	0x57, 0xaa, 0xef, 0xfa, 0x4c, 0xe9, 0x69, 0x7d, 0x0f, 0xf2, 0x0e, 0xcc, 0x6b, 0x92, 0x71, 0x87,
-	0x5f, 0x62, 0xeb, 0xaf, 0x05, 0x98, 0x56, 0x4b, 0x2d, 0x89, 0x26, 0x31, 0x32, 0x9a, 0xe4, 0xe0,
-	0xf7, 0x4b, 0x32, 0xaf, 0x56, 0xcc, 0xe5, 0xd5, 0x4a, 0x49, 0x5e, 0x6d, 0x51, 0xb0, 0x08, 0x11,
-	0x69, 0x58, 0xd1, 0x42, 0x2b, 0x30, 0xb5, 0x43, 0x70, 0x48, 0xc2, 0xb6, 0xe0, 0x68, 0xfe, 0xf2,
-	0x68, 0x92, 0x77, 0xbe, 0xcb, 0xf9, 0xfa, 0x26, 0x94, 0xbb, 0x8e, 0xff, 0x42, 0x7e, 0xe5, 0xb0,
-	0xa8, 0x4d, 0xab, 0x47, 0x26, 0x47, 0x42, 0xb7, 0x60, 0x9e, 0xc2, 0xdb, 0x76, 0xa7, 0x6d, 0xf9,
-	0x9e, 0x47, 0xac, 0x98, 0xd5, 0x40, 0xb8, 0x95, 0x9c, 0xa5, 0xa0, 0xcd, 0xce, 0x23, 0x0e, 0xf8,
-	0x70, 0xf4, 0x5b, 0x9f, 0x31, 0x3d, 0xa6, 0xfe, 0xc6, 0x80, 0x73, 0xc3, 0xab, 0x63, 0xeb, 0x30,
-	0x33, 0xf0, 0x35, 0x87, 0x90, 0xa2, 0xa5, 0xe1, 0x35, 0xb1, 0x8d, 0x09, 0x73, 0x5a, 0xfd, 0x82,
-	0xe3, 0xd8, 0x52, 0xf5, 0x53, 0x38, 0x3f, 0xe2, 0x83, 0x11, 0xd4, 0x1e, 0x2d, 0x5d, 0x37, 0xf2,
-	0x67, 0x34, 0xb4, 0x88, 0xa7, 0x97, 0xb2, 0x3f, 0x53, 0x29, 0xe3, 0x2f, 0x82, 0xc4, 0x7b, 0x2c,
-	0x23, 0x7d, 0x8f, 0x75, 0x30, 0x0f, 0x3e, 0x80, 0xfa, 0x73, 0x51, 0xc8, 0x93, 0x35, 0x9c, 0xf3,
-	0xc3, 0x6b, 0x7d, 0x91, 0x99, 0x62, 0x9f, 0x42, 0x6c, 0xf9, 0x9d, 0x41, 0x25, 0x6d, 0xb0, 0x56,
-	0xc9, 0x0c, 0xbb, 0xa8, 0x95, 0x30, 0x3b, 0xde, 0x4c, 0x6d, 0x85, 0x48, 0xb7, 0x0d, 0x31, 0x09,
-	0x9a, 0x74, 0xdb, 0xc9, 0x6f, 0xe2, 0xf7, 0x06, 0xcc, 0x0c, 0x9c, 0x22, 0x5a, 0x55, 0x94, 0xcd,
-	0x25, 0x0d, 0x13, 0x28, 0x15, 0xd6, 0xd3, 0x52, 0x8d, 0xcf, 0x60, 0x71, 0x48, 0xf5, 0xf6, 0xc4,
-	0xbe, 0x87, 0x59, 0x81, 0xc6, 0x36, 0xeb, 0x5a, 0x0b, 0x43, 0xdc, 0xa7, 0xbe, 0xb9, 0xfc, 0x8e,
-	0x94, 0xde, 0xaf, 0xa8, 0xf6, 0x7e, 0x6f, 0x40, 0xf1, 0x03, 0xbc, 0xab, 0x2d, 0x44, 0x1c, 0xcc,
-	0xe2, 0xb9, 0x70, 0xa2, 0x38, 0xae, 0x8f, 0x46, 0xc6, 0xc4, 0x21, 0x3f, 0x18, 0x50, 0xfc, 0xc4,
-	0x75, 0xb4, 0xdb, 0x7b, 0x09, 0xea, 0xf4, 0x37, 0x0a, 0xb0, 0x50, 0x4f, 0x75, 0x33, 0xed, 0xa0,
-	0xd6, 0x21, 0x08, 0x49, 0xd7, 0xde, 0x17, 0xac, 0x2d, 0x5a, 0x74, 0x14, 0x8e, 0xe3, 0xd0, 0xde,
-	0xe9, 0xc5, 0xf2, 0x0b, 0x8e, 0xb4, 0x83, 0xca, 0xcb, 0x8b, 0x10, 0x07, 0x41, 0x52, 0x6a, 0x91,
-	0xcd, 0x93, 0xff, 0x6c, 0xe3, 0xe1, 0xcb, 0x30, 0xed, 0x87, 0xbb, 0x92, 0x4a, 0xfb, 0xf9, 0xea,
-	0xc3, 0x49, 0xf1, 0x31, 0xf4, 0x93, 0xd0, 0x8f, 0xfd, 0x27, 0xc6, 0x37, 0x85, 0xe2, 0xd6, 0xda,
-	0xf6, 0x4e, 0x85, 0x7d, 0x39, 0xbc, 0xfa, 0x8f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x26, 0xf2, 0x7d,
-	0x79, 0x35, 0x3d, 0x00, 0x00,
+	// 3644 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xec, 0x3b, 0x49, 0x6f, 0x1c, 0xc7,
+	0xd5, 0xec, 0xd9, 0xe7, 0x0d, 0xd7, 0xe2, 0xa2, 0x11, 0x65, 0x49, 0xd4, 0x50, 0xb2, 0x64, 0x59,
+	0x8b, 0x2d, 0x5a, 0xfe, 0xac, 0xcf, 0xfe, 0xe0, 0x8f, 0x92, 0x68, 0x50, 0x80, 0x64, 0x2a, 0x2d,
+	0xcb, 0x52, 0x9c, 0x38, 0x83, 0x62, 0x4f, 0x0d, 0xd9, 0x56, 0x6f, 0xea, 0xee, 0x91, 0x38, 0x39,
+	0x18, 0x48, 0x00, 0x03, 0xb1, 0x81, 0x00, 0x09, 0x10, 0xe4, 0x07, 0xf8, 0x98, 0x04, 0xf1, 0x25,
+	0xbf, 0x21, 0x80, 0x0f, 0x39, 0x05, 0xf0, 0x0f, 0xc8, 0x1f, 0x08, 0x72, 0xcd, 0x29, 0xa8, 0xad,
+	0xbb, 0x6b, 0xba, 0x66, 0xb8, 0x8d, 0x91, 0x8b, 0x4f, 0x33, 0x55, 0xef, 0xd5, 0xab, 0xed, 0xed,
+	0xaf, 0x1a, 0x4e, 0x6e, 0x05, 0xc4, 0x5b, 0x7f, 0x78, 0xef, 0xc5, 0xda, 0xf5, 0xe4, 0xdf, 0xb5,
+	0x20, 0xf4, 0x63, 0x1f, 0x81, 0x1f, 0x10, 0x0f, 0x07, 0xf6, 0xb5, 0x17, 0x6b, 0xcb, 0x27, 0x77,
+	0x7c, 0x7f, 0xc7, 0x21, 0xd7, 0x19, 0x64, 0xbb, 0xd7, 0xbd, 0x8e, 0xbd, 0x3e, 0x47, 0x6b, 0xfd,
+	0xc6, 0x80, 0xe6, 0x7a, 0xa7, 0x63, 0xc7, 0xb6, 0xef, 0x61, 0xe7, 0x61, 0xe8, 0x07, 0x24, 0x8c,
+	0x6d, 0x12, 0xdd, 0x8b, 0x89, 0x8b, 0xb6, 0x60, 0x3e, 0xb2, 0x76, 0x89, 0x8b, 0xdb, 0x7e, 0xd8,
+	0x0e, 0x49, 0x97, 0x84, 0xc4, 0xb3, 0x48, 0xd3, 0x58, 0x31, 0x2e, 0x35, 0x6e, 0x9c, 0xbe, 0x96,
+	0xce, 0x70, 0xed, 0x11, 0x43, 0xdb, 0x0a, 0x4d, 0x89, 0xb4, 0x39, 0x61, 0xce, 0x45, 0x83, 0x9d,
+	0x68, 0x19, 0xaa, 0xdb, 0xbe, 0xef, 0x10, 0xec, 0x35, 0x0b, 0x2b, 0xc6, 0xa5, 0xda, 0xe6, 0x84,
+	0x29, 0x3b, 0x6e, 0x57, 0xa1, 0xec, 0x7b, 0xc4, 0xef, 0xb6, 0x36, 0xa0, 0xb8, 0xee, 0xf5, 0xd1,
+	0x65, 0x28, 0xbf, 0xc0, 0x4e, 0x4f, 0x4e, 0xb7, 0x70, 0x8d, 0x6f, 0xe2, 0x9a, 0xdc, 0xc4, 0xb5,
+	0x75, 0xaf, 0x6f, 0x72, 0x14, 0x84, 0xa0, 0xd4, 0xc7, 0xae, 0xc3, 0x88, 0xd6, 0x4d, 0xf6, 0xbf,
+	0xd5, 0x87, 0x99, 0x75, 0xaf, 0xbf, 0x15, 0x6e, 0xec, 0x05, 0x21, 0x89, 0x22, 0xdb, 0xf7, 0xd0,
+	0x2a, 0x14, 0xb1, 0xd7, 0x17, 0x04, 0x67, 0xb2, 0xeb, 0x5f, 0xf7, 0xfa, 0x9b, 0x13, 0x26, 0x85,
+	0xa2, 0x77, 0x00, 0x48, 0x32, 0x84, 0x51, 0x6c, 0xdc, 0x58, 0xca, 0xe2, 0xa6, 0x04, 0x37, 0x27,
+	0xcc, 0x0c, 0x6e, 0xba, 0x83, 0x5f, 0x19, 0x50, 0xbb, 0x83, 0x1d, 0x67, 0x1b, 0x5b, 0xcf, 0xd0,
+	0x55, 0x28, 0x05, 0x38, 0xde, 0x6d, 0x1a, 0x2b, 0xc5, 0x4b, 0x8d, 0x1b, 0x27, 0xb3, 0x94, 0x3e,
+	0xc4, 0x2e, 0xe9, 0x3c, 0xc4, 0xf1, 0x2e, 0x3d, 0x6d, 0x93, 0xa1, 0xa1, 0x07, 0x70, 0x22, 0x0a,
+	0x88, 0x65, 0x77, 0x6d, 0x0b, 0xd3, 0x4b, 0x69, 0x93, 0xbd, 0x98, 0x78, 0x62, 0x2d, 0x45, 0x76,
+	0x10, 0x83, 0x14, 0xe8, 0x41, 0x2c, 0x29, 0x83, 0x36, 0xe4, 0x98, 0xd6, 0x97, 0x06, 0xcc, 0xcb,
+	0xa5, 0x64, 0x6f, 0xe2, 0x06, 0xd4, 0x2c, 0xd1, 0x9d, 0x1c, 0x70, 0x86, 0xae, 0x1c, 0xb2, 0x39,
+	0x61, 0x26, 0x78, 0xe8, 0x26, 0xd4, 0x53, 0x26, 0xe0, 0x07, 0xb3, 0x98, 0x1d, 0x94, 0xbd, 0xfc,
+	0x14, 0x33, 0x3d, 0x96, 0xbf, 0x18, 0x50, 0x97, 0x84, 0x23, 0xf4, 0x14, 0x16, 0x25, 0xe5, 0x41,
+	0xf6, 0xa2, 0xdb, 0x3c, 0x9f, 0xdb, 0xa6, 0x66, 0x1b, 0xe6, 0xbc, 0xa5, 0xd9, 0xdb, 0x98, 0x8f,
+	0x30, 0x84, 0xc5, 0x64, 0xd5, 0x99, 0x69, 0x22, 0xf4, 0x63, 0x58, 0xc4, 0x89, 0xe8, 0xb4, 0x83,
+	0x44, 0x76, 0x0e, 0xb5, 0x83, 0x05, 0xac, 0x91, 0xbe, 0xd6, 0x9f, 0xca, 0x00, 0x77, 0x7c, 0x37,
+	0xf0, 0x3d, 0xe2, 0xc5, 0x11, 0xba, 0x05, 0x55, 0x2e, 0x4c, 0x91, 0xb8, 0xac, 0xb3, 0x79, 0xe1,
+	0x53, 0xd6, 0x66, 0x4a, 0x7c, 0xf4, 0x3e, 0xbd, 0xb4, 0x28, 0xf0, 0xbd, 0x88, 0x44, 0xe2, 0xd2,
+	0xce, 0xa9, 0x97, 0x26, 0x80, 0xca, 0xf0, 0x74, 0x0c, 0xba, 0x0d, 0x10, 0xe0, 0x10, 0xbb, 0x24,
+	0x26, 0x61, 0xd4, 0x2c, 0x32, 0x0a, 0xad, 0x2c, 0x85, 0x87, 0x09, 0x54, 0x21, 0x91, 0x19, 0x85,
+	0xde, 0x83, 0x1a, 0xd9, 0xc3, 0x6e, 0xe0, 0x90, 0xa8, 0x59, 0x62, 0x14, 0x56, 0x54, 0x89, 0xe2,
+	0x30, 0x65, 0x7c, 0x32, 0x02, 0xdd, 0x87, 0xe9, 0x90, 0x3c, 0xef, 0x91, 0x28, 0x6e, 0x6f, 0xfb,
+	0x1d, 0x7a, 0xc0, 0x65, 0x46, 0xe3, 0x82, 0xba, 0x0f, 0x86, 0x71, 0x9b, 0x21, 0x28, 0x84, 0xa6,
+	0xc2, 0x2c, 0x88, 0x9e, 0xe5, 0x2e, 0xc1, 0x1d, 0xba, 0x99, 0x4a, 0xfe, 0x2c, 0x37, 0x39, 0x48,
+	0x3d, 0x4b, 0x81, 0x8f, 0x4c, 0x98, 0x8d, 0x88, 0xd5, 0x0b, 0xed, 0xb8, 0xdf, 0x66, 0xe7, 0x4b,
+	0xa2, 0x66, 0x95, 0xd1, 0xb8, 0xa8, 0xdc, 0x87, 0xc0, 0x79, 0xc4, 0x51, 0x14, 0x5a, 0x33, 0x91,
+	0x0a, 0x44, 0x6b, 0x50, 0x76, 0x6c, 0xef, 0x59, 0xd4, 0xac, 0xe5, 0xb5, 0xea, 0x7d, 0x0a, 0x50,
+	0x86, 0x73, 0x5c, 0x7a, 0xa9, 0x92, 0xf1, 0xa3, 0x66, 0x3d, 0x7f, 0xa9, 0x5a, 0x7e, 0x35, 0xd3,
+	0x31, 0xa3, 0x44, 0x04, 0x8e, 0x20, 0x22, 0xbf, 0x33, 0xa0, 0x7a, 0xc7, 0xf7, 0x62, 0x6c, 0xc5,
+	0x54, 0x17, 0x7b, 0xd8, 0xe5, 0x6a, 0xbb, 0x6e, 0xb2, 0xff, 0x68, 0x16, 0x8a, 0xbd, 0x50, 0xaa,
+	0x67, 0xfa, 0x17, 0x2d, 0x40, 0x99, 0xb8, 0xd8, 0x76, 0x18, 0x43, 0xd5, 0x4d, 0xde, 0x18, 0xb5,
+	0xac, 0xd2, 0x11, 0x96, 0x75, 0x97, 0xaf, 0x8a, 0x78, 0x31, 0xba, 0x05, 0xe0, 0x92, 0x8e, 0x8d,
+	0xdb, 0x71, 0x3f, 0x90, 0x2a, 0x66, 0x39, 0x47, 0xec, 0x01, 0x45, 0xf9, 0xa8, 0x1f, 0x10, 0xb3,
+	0xee, 0xca, 0xbf, 0xad, 0x2e, 0x34, 0xee, 0x92, 0x2e, 0xee, 0x39, 0x31, 0x6d, 0xa2, 0x26, 0x54,
+	0xbc, 0x9e, 0xbb, 0x4d, 0x42, 0xb6, 0x43, 0x63, 0x73, 0xc2, 0x14, 0xed, 0x51, 0xd6, 0x8d, 0x8e,
+	0x8a, 0xe2, 0xd0, 0xf6, 0x76, 0xf8, 0x86, 0xe9, 0x28, 0xde, 0x4e, 0xd5, 0xa3, 0x05, 0x53, 0x77,
+	0xed, 0xc8, 0x0a, 0x6d, 0xd7, 0xf6, 0x70, 0xec, 0x87, 0x68, 0x15, 0xa6, 0x84, 0x52, 0xe9, 0xb7,
+	0x33, 0x47, 0x3a, 0x29, 0x3b, 0xe9, 0x92, 0xd1, 0x55, 0xa8, 0xba, 0x38, 0x08, 0x28, 0x65, 0x2e,
+	0xdd, 0xf3, 0x0a, 0x2b, 0xb2, 0x39, 0x22, 0x53, 0xe2, 0xb4, 0xbe, 0x2d, 0x42, 0xed, 0xae, 0x6f,
+	0xf5, 0x5c, 0x7a, 0x28, 0x4d, 0xa8, 0x0a, 0x5c, 0x41, 0x5a, 0x36, 0xd1, 0x79, 0x28, 0xd9, 0x5e,
+	0xd7, 0x17, 0x24, 0x67, 0xb3, 0x24, 0xef, 0x79, 0x5d, 0xdf, 0x64, 0x50, 0x74, 0x05, 0xaa, 0x11,
+	0x09, 0x5f, 0x70, 0xbd, 0x40, 0x4f, 0x14, 0xa9, 0x62, 0x40, 0x41, 0xa6, 0x44, 0x41, 0x17, 0xa1,
+	0x4c, 0x2d, 0x9c, 0xd4, 0x00, 0x73, 0xaa, 0x0e, 0x89, 0x77, 0x23, 0x93, 0xc3, 0xd1, 0xdb, 0x00,
+	0x56, 0xa2, 0xfb, 0x84, 0xac, 0x2b, 0x16, 0x38, 0xd5, 0x8c, 0x66, 0x06, 0x13, 0xbd, 0x0b, 0x35,
+	0x29, 0x5d, 0xcd, 0x0a, 0x5b, 0xcf, 0x59, 0x9d, 0x58, 0x52, 0x4d, 0x61, 0x87, 0x84, 0x9e, 0x80,
+	0x99, 0x0c, 0x40, 0xab, 0x50, 0x8a, 0xf1, 0x0e, 0x95, 0xe7, 0xe2, 0xa0, 0x73, 0xf0, 0x11, 0xde,
+	0x31, 0x19, 0x10, 0xfd, 0x1f, 0x4c, 0x51, 0x8e, 0x0c, 0xa9, 0xbe, 0xef, 0xf8, 0x96, 0x14, 0xda,
+	0xa6, 0xaa, 0xcc, 0x38, 0xc2, 0x5d, 0xdf, 0x8a, 0xcc, 0x49, 0x92, 0x69, 0x8d, 0x62, 0xef, 0xfa,
+	0x11, 0xd8, 0xfb, 0x13, 0xa8, 0x6d, 0x78, 0x96, 0xdf, 0xb1, 0xbd, 0x1d, 0xf4, 0x21, 0xcc, 0x11,
+	0xf1, 0x5f, 0x5a, 0xa2, 0xbe, 0x60, 0xf3, 0x73, 0x39, 0xa2, 0x72, 0x94, 0x30, 0x38, 0x7d, 0x73,
+	0x96, 0x0c, 0xf4, 0xb4, 0xbe, 0x2a, 0xc0, 0xec, 0x20, 0x1a, 0x3a, 0x07, 0x93, 0x16, 0x97, 0x27,
+	0x29, 0x46, 0x94, 0x69, 0x1a, 0xa2, 0x8f, 0x49, 0xc7, 0xd5, 0x54, 0xbb, 0x6a, 0xd8, 0x51, 0x68,
+	0xd7, 0x54, 0xa3, 0x2e, 0x40, 0x39, 0x8a, 0xfb, 0x0e, 0x91, 0x6a, 0x80, 0x35, 0x28, 0x5f, 0x92,
+	0xbd, 0xc0, 0xf1, 0x3b, 0x84, 0xf1, 0x4a, 0xcd, 0x94, 0x4d, 0x74, 0x01, 0xa6, 0xb1, 0xe3, 0xf8,
+	0x2f, 0xdb, 0x21, 0x61, 0x6c, 0xd5, 0x61, 0xec, 0x51, 0x33, 0xa7, 0x58, 0xaf, 0x29, 0x3a, 0x47,
+	0x1d, 0x74, 0xe5, 0x08, 0x07, 0xfd, 0x0f, 0x03, 0xaa, 0xc2, 0x46, 0xd1, 0xb5, 0x45, 0x3d, 0xd7,
+	0xc5, 0x61, 0x5f, 0xca, 0x8c, 0x68, 0xa2, 0x15, 0x68, 0x74, 0x08, 0x95, 0xdf, 0x20, 0x96, 0x9e,
+	0x63, 0xdd, 0xcc, 0x76, 0xa1, 0x0b, 0xd2, 0xa5, 0x2d, 0x6a, 0x3d, 0x50, 0xe9, 0xcd, 0x5e, 0x80,
+	0xe9, 0x84, 0xcb, 0x38, 0x7e, 0x89, 0xd1, 0x4a, 0x78, 0xef, 0x63, 0x86, 0x36, 0x62, 0x93, 0xe5,
+	0x23, 0x6c, 0xf2, 0x0b, 0x03, 0x90, 0xd8, 0x64, 0xd6, 0x99, 0xba, 0x4e, 0xef, 0x82, 0xf5, 0x0a,
+	0xd7, 0x63, 0x5e, 0x63, 0xb9, 0xa9, 0xa6, 0x13, 0x58, 0xc7, 0xf6, 0x12, 0x01, 0x6a, 0xd2, 0x1f,
+	0x68, 0x05, 0xb0, 0xa0, 0xf3, 0x0d, 0xa8, 0xef, 0x38, 0xca, 0xf3, 0x5a, 0xcd, 0x73, 0x7c, 0x6e,
+	0x63, 0x43, 0x1c, 0xaf, 0x27, 0x00, 0x99, 0x80, 0xe1, 0xde, 0xe8, 0x79, 0xf4, 0x07, 0xac, 0x27,
+	0xfc, 0x5b, 0x03, 0x26, 0xb3, 0xaa, 0x61, 0x90, 0x5d, 0x8c, 0x3c, 0xbb, 0xe4, 0xad, 0xe6, 0x88,
+	0x2b, 0x2f, 0x1e, 0xe1, 0xca, 0xff, 0x58, 0x82, 0x0a, 0x17, 0x49, 0xad, 0xd5, 0x9e, 0x86, 0x82,
+	0x2d, 0xf9, 0xb8, 0x60, 0x7b, 0x83, 0x2b, 0x2e, 0xe6, 0x57, 0xbc, 0x0c, 0xb5, 0x90, 0x6b, 0xd7,
+	0x8e, 0x90, 0xdc, 0xa4, 0x8d, 0xce, 0x00, 0x74, 0x48, 0x10, 0x12, 0x0b, 0xc7, 0x89, 0xd8, 0x66,
+	0x7a, 0xd0, 0x65, 0x98, 0xe3, 0xa2, 0x4d, 0xdc, 0x20, 0xee, 0x0b, 0xc6, 0xaf, 0x30, 0xb4, 0x19,
+	0x06, 0xd8, 0xa0, 0xfd, 0x9c, 0xf5, 0x13, 0xb5, 0x51, 0x1d, 0xa2, 0x36, 0x6a, 0xfb, 0xa9, 0x8d,
+	0xba, 0x4e, 0x6d, 0xdc, 0x84, 0x0a, 0x77, 0x9b, 0x9b, 0x70, 0x80, 0x10, 0xd7, 0x14, 0xc8, 0xe8,
+	0xb5, 0x54, 0x44, 0x1a, 0x7a, 0xc1, 0x4e, 0x84, 0x23, 0xeb, 0x08, 0x4f, 0x1e, 0xda, 0x11, 0xbe,
+	0x0a, 0x55, 0xa1, 0x6b, 0x9b, 0x53, 0x79, 0x59, 0x14, 0xae, 0x8e, 0x29, 0x71, 0x46, 0x71, 0xcb,
+	0xf4, 0x11, 0xb8, 0xe5, 0x17, 0x06, 0xcc, 0x71, 0x6e, 0xc9, 0xea, 0x87, 0x2b, 0x50, 0xe1, 0xca,
+	0x5c, 0xa8, 0x07, 0x94, 0xd7, 0xf7, 0xd4, 0xd9, 0xe1, 0x38, 0xc7, 0x56, 0x0e, 0x9f, 0x42, 0x75,
+	0x33, 0x71, 0xc6, 0xe7, 0x39, 0x51, 0x5d, 0xf4, 0xd8, 0xca, 0xed, 0x2c, 0xb7, 0x72, 0x73, 0x6e,
+	0x77, 0xb0, 0xab, 0xe5, 0xc1, 0xbc, 0x26, 0x00, 0x40, 0x4f, 0x46, 0xab, 0x81, 0x83, 0x4c, 0xa6,
+	0x57, 0x0a, 0xdf, 0x14, 0xa0, 0x44, 0xfd, 0x29, 0xca, 0xd0, 0xb1, 0x1d, 0x3b, 0x52, 0xfe, 0x78,
+	0xe3, 0x00, 0x16, 0xe5, 0x12, 0xcc, 0xc6, 0x24, 0x74, 0xa3, 0xb6, 0xdf, 0x6d, 0x53, 0x26, 0xb6,
+	0x2d, 0x69, 0x4a, 0xa7, 0x59, 0xff, 0x56, 0xf7, 0x11, 0xef, 0x95, 0xbc, 0x83, 0xad, 0x58, 0xf8,
+	0x5f, 0x39, 0xde, 0xc1, 0x96, 0xe0, 0x1d, 0xea, 0xc5, 0x5f, 0x85, 0xaa, 0x63, 0x5b, 0xc4, 0x8b,
+	0x88, 0x70, 0xc0, 0xe6, 0xd5, 0xc0, 0x84, 0x81, 0x4c, 0x89, 0x43, 0x45, 0x8f, 0xfa, 0x78, 0xdc,
+	0xc0, 0x32, 0xab, 0x28, 0x9a, 0xa3, 0x98, 0xb0, 0x7a, 0x24, 0x9f, 0xa7, 0x7e, 0x2f, 0x26, 0x2e,
+	0xcf, 0x4f, 0x3d, 0x18, 0x96, 0x9f, 0x2a, 0xee, 0x2f, 0xbc, 0xf9, 0xec, 0x54, 0xeb, 0x73, 0xa8,
+	0x8a, 0x8d, 0x1d, 0x30, 0x88, 0x19, 0xb3, 0x3a, 0xfe, 0xae, 0x00, 0x25, 0x1a, 0xf2, 0x51, 0xc7,
+	0x9f, 0xb2, 0x08, 0xa7, 0x19, 0x92, 0xae, 0x74, 0xfc, 0x93, 0x4e, 0x93, 0x74, 0xa9, 0x33, 0x96,
+	0x22, 0xd9, 0x1d, 0xc9, 0x1d, 0x49, 0xdf, 0xbd, 0x0e, 0xfa, 0x5f, 0x4d, 0xe8, 0xbe, 0x3c, 0x18,
+	0x60, 0xa6, 0xe1, 0xbb, 0x12, 0xb2, 0x67, 0x1c, 0xb9, 0xd2, 0x01, 0x1c, 0xb9, 0x01, 0x56, 0x2d,
+	0xe7, 0x59, 0xf5, 0x32, 0x54, 0x78, 0x24, 0x20, 0xc2, 0x6e, 0x5d, 0xac, 0x20, 0x30, 0xc6, 0xcd,
+	0x34, 0x7d, 0x98, 0xa1, 0x3b, 0xcd, 0xaa, 0xad, 0x57, 0xa1, 0x44, 0x43, 0x69, 0xa1, 0xb4, 0x66,
+	0x07, 0x0f, 0x65, 0x73, 0xc2, 0x64, 0xf0, 0x63, 0x2b, 0xac, 0x9f, 0xc1, 0xb4, 0x7a, 0xc8, 0xe8,
+	0x3e, 0xcc, 0x61, 0xaf, 0x4f, 0x39, 0x36, 0x93, 0x66, 0xe4, 0x2c, 0xbb, 0xa2, 0xdb, 0x55, 0x36,
+	0x83, 0x69, 0xce, 0x60, 0xb5, 0xa3, 0xf5, 0x18, 0xca, 0x2c, 0x4b, 0x40, 0xc9, 0xd2, 0x05, 0xeb,
+	0x24, 0x21, 0x4f, 0x76, 0xe0, 0x34, 0xcc, 0x19, 0x47, 0xed, 0x68, 0x7d, 0x06, 0x73, 0xb9, 0xe4,
+	0x03, 0x7a, 0x3c, 0x5a, 0x0d, 0xee, 0x3f, 0xcd, 0x90, 0x5c, 0x57, 0x01, 0xea, 0x49, 0xe0, 0x9d,
+	0xb1, 0xc1, 0xc6, 0x11, 0x6d, 0x70, 0xe1, 0x10, 0x36, 0xb8, 0x78, 0x68, 0x1b, 0xfc, 0x06, 0xd4,
+	0x64, 0xb0, 0x24, 0x04, 0x43, 0xe1, 0x45, 0x19, 0x33, 0x99, 0x09, 0xd6, 0xb8, 0xfd, 0xf4, 0x0d,
+	0xa8, 0x49, 0x1c, 0xad, 0x9a, 0x4a, 0x82, 0x8c, 0xc2, 0xa8, 0x20, 0xa3, 0xf5, 0x29, 0x2c, 0xe8,
+	0x38, 0x4c, 0x4b, 0xf2, 0x4d, 0x95, 0xe4, 0xa9, 0x01, 0x92, 0x0a, 0x87, 0x0a, 0xf2, 0x04, 0x9a,
+	0xc3, 0x52, 0x9e, 0xda, 0x29, 0x6e, 0xaa, 0x53, 0x9c, 0xd5, 0x65, 0xb3, 0xb2, 0xf7, 0x2e, 0xa6,
+	0x69, 0xc3, 0xa2, 0x36, 0xa2, 0xd5, 0xce, 0x71, 0x43, 0x9d, 0xe3, 0x15, 0xdd, 0xbd, 0x25, 0x21,
+	0xb1, 0x98, 0xc0, 0x82, 0x13, 0x43, 0x02, 0x08, 0xed, 0x14, 0x6f, 0xa9, 0x53, 0x9c, 0xd1, 0x30,
+	0x96, 0x66, 0x17, 0x18, 0x96, 0xf4, 0x6e, 0x83, 0x76, 0x8e, 0x35, 0x75, 0x8e, 0xd3, 0x79, 0xbd,
+	0xac, 0x99, 0x42, 0x5e, 0xf7, 0xa0, 0x1e, 0x3c, 0xec, 0x75, 0x0f, 0x8a, 0xb4, 0x20, 0xff, 0x23,
+	0x98, 0x56, 0x13, 0x68, 0x5a, 0xc2, 0xaf, 0xab, 0x84, 0x15, 0x45, 0x9a, 0xa6, 0xde, 0x04, 0xc9,
+	0x1d, 0x38, 0x29, 0xea, 0x23, 0x42, 0x75, 0xee, 0xb7, 0xec, 0xb7, 0x55, 0xea, 0x2b, 0xda, 0x1c,
+	0xb5, 0x66, 0xed, 0x5b, 0x30, 0xa5, 0x14, 0x62, 0xb4, 0xc4, 0x2f, 0xab, 0xc4, 0x17, 0x06, 0x93,
+	0x57, 0xac, 0x82, 0x23, 0x08, 0x3e, 0x83, 0x53, 0x8c, 0x60, 0x9a, 0x92, 0xee, 0xef, 0xb7, 0xf6,
+	0x77, 0x54, 0xf2, 0x2d, 0x7d, 0x66, 0xbb, 0xaf, 0x59, 0xbd, 0x14, 0x34, 0x99, 0xc7, 0x3f, 0x8e,
+	0xa0, 0x69, 0x68, 0x0c, 0xb2, 0x68, 0x4e, 0x03, 0x1f, 0x9a, 0x45, 0xf3, 0x3a, 0x5c, 0x4c, 0xf1,
+	0x1c, 0xce, 0xf0, 0x29, 0x94, 0x0c, 0xf9, 0x7e, 0x53, 0xbd, 0xab, 0x4e, 0x75, 0x61, 0x78, 0x22,
+	0x5e, 0x33, 0xe5, 0x4f, 0x60, 0x5e, 0x4c, 0x49, 0xdd, 0x8e, 0x8f, 0x71, 0x68, 0xe3, 0x6d, 0x47,
+	0x3f, 0xcf, 0x1b, 0xea, 0x3c, 0xcb, 0x79, 0xef, 0x45, 0x0e, 0x97, 0xc4, 0xff, 0x07, 0x1a, 0x9c,
+	0x38, 0xcb, 0xc1, 0x6a, 0x89, 0x2e, 0x64, 0x89, 0xd6, 0xe5, 0xc0, 0x7f, 0x19, 0x50, 0xdf, 0xc2,
+	0xbd, 0x78, 0xf7, 0x03, 0xc7, 0x7f, 0x89, 0x5e, 0x87, 0x39, 0xfa, 0xdf, 0x0f, 0xed, 0x9f, 0x73,
+	0xf3, 0x41, 0x9d, 0x50, 0x4e, 0x64, 0x56, 0x01, 0x3c, 0x0e, 0x1d, 0x74, 0x0a, 0xea, 0xb1, 0xff,
+	0x8c, 0x70, 0x24, 0x4e, 0xb4, 0xc6, 0x3a, 0x28, 0xf0, 0x2c, 0x34, 0x42, 0xd2, 0x0d, 0x49, 0xb4,
+	0xcb, 0xc0, 0x3c, 0x4e, 0x00, 0xd1, 0x45, 0x11, 0xa8, 0x8b, 0x66, 0xf9, 0x41, 0x52, 0xa4, 0x51,
+	0x5d, 0x34, 0x06, 0x31, 0x05, 0xc6, 0xb8, 0xad, 0xda, 0xdf, 0x0a, 0x00, 0xc9, 0x9e, 0x23, 0xf4,
+	0x26, 0xd4, 0x6c, 0x37, 0x70, 0x6c, 0xcb, 0x8e, 0x85, 0x1f, 0xa0, 0x28, 0x8b, 0x04, 0xd3, 0x4c,
+	0xd0, 0xe8, 0x90, 0x00, 0x47, 0xd1, 0x4b, 0x3f, 0xec, 0xe8, 0xf4, 0x4b, 0x66, 0x88, 0x44, 0x43,
+	0x77, 0x01, 0x59, 0x8e, 0x4d, 0xbc, 0xb8, 0x6d, 0x85, 0xa4, 0x43, 0xbc, 0xd8, 0xc6, 0x8e, 0xf4,
+	0x09, 0x86, 0x0c, 0x9e, 0xe3, 0x03, 0xee, 0xa4, 0xf8, 0x94, 0x8a, 0x7a, 0x41, 0x96, 0x4c, 0x5c,
+	0x0e, 0xa7, 0xa2, 0x0c, 0xb8, 0xe3, 0x77, 0xc6, 0x9e, 0xcd, 0x7b, 0x04, 0x95, 0xad, 0xed, 0xcf,
+	0x88, 0x15, 0x8f, 0x33, 0x87, 0xf5, 0x55, 0x19, 0xea, 0x5b, 0x32, 0xbe, 0xa0, 0x0c, 0xcd, 0x32,
+	0xe6, 0x94, 0x4e, 0x5d, 0x24, 0xc8, 0x33, 0xd9, 0xd1, 0xc2, 0xc8, 0xec, 0xa8, 0x26, 0x79, 0x94,
+	0x4b, 0xae, 0x97, 0x0e, 0x95, 0x5c, 0x1f, 0x8c, 0x87, 0xca, 0xf9, 0x78, 0xe8, 0xff, 0x95, 0x78,
+	0xa8, 0x92, 0xf7, 0x5a, 0xb5, 0x66, 0x22, 0x1b, 0x15, 0x6d, 0xc0, 0x64, 0xa6, 0x14, 0xd9, 0x17,
+	0xd5, 0xbf, 0x83, 0xa8, 0xeb, 0x46, 0x5a, 0x85, 0xec, 0xa3, 0xb5, 0x6c, 0x51, 0xb6, 0xa6, 0x8b,
+	0x2a, 0x04, 0x30, 0x5b, 0x88, 0x5d, 0xcb, 0x17, 0xfd, 0x16, 0xb5, 0x45, 0xbf, 0x6c, 0xa1, 0x4f,
+	0xcd, 0xba, 0x41, 0x2e, 0xeb, 0x96, 0xad, 0x99, 0x34, 0x0e, 0x5b, 0x33, 0xc9, 0xd4, 0x7f, 0x26,
+	0xf7, 0xaf, 0xff, 0x8c, 0xe0, 0xf0, 0xa9, 0x23, 0x70, 0xf8, 0x9f, 0x4b, 0x50, 0x4f, 0xee, 0xeb,
+	0x87, 0xfc, 0xe5, 0x0f, 0xf9, 0xcb, 0xfd, 0x18, 0xe6, 0xd7, 0x06, 0x2c, 0x68, 0x9d, 0xc9, 0x9b,
+	0x50, 0x4f, 0x44, 0x5c, 0x67, 0x6d, 0x92, 0x41, 0x34, 0xc6, 0x4f, 0x30, 0x8f, 0x9d, 0x1a, 0x88,
+	0x61, 0x49, 0xff, 0x74, 0x02, 0x7d, 0x32, 0x5a, 0x65, 0x5f, 0xd0, 0xbc, 0x21, 0xd2, 0xe8, 0x2d,
+	0xbd, 0x0e, 0xff, 0x77, 0x09, 0x6a, 0x89, 0xa7, 0x3b, 0x07, 0xa5, 0x4c, 0x7e, 0xa9, 0x68, 0x92,
+	0xee, 0xb1, 0x34, 0xf8, 0x45, 0x28, 0xee, 0x90, 0x58, 0x6b, 0xfa, 0x92, 0xcc, 0x15, 0xc5, 0xa0,
+	0x88, 0x41, 0x2f, 0x16, 0x99, 0xc5, 0x61, 0x88, 0x41, 0x2f, 0x46, 0xaf, 0x41, 0x29, 0xf0, 0xa3,
+	0x58, 0xa4, 0x8c, 0x86, 0x60, 0x32, 0x14, 0x74, 0x15, 0x2a, 0x1d, 0xe2, 0x90, 0x98, 0x08, 0xa5,
+	0x3c, 0x04, 0x59, 0x20, 0xa1, 0xeb, 0x50, 0xf5, 0xd9, 0xaa, 0xb5, 0x0a, 0x38, 0xc5, 0x97, 0x58,
+	0x74, 0x29, 0xbb, 0x04, 0x77, 0x74, 0x9a, 0x37, 0xb3, 0x14, 0x8a, 0x42, 0xe3, 0x9c, 0x00, 0xc7,
+	0xd6, 0xae, 0x10, 0xc3, 0x21, 0xb8, 0x1c, 0x87, 0x22, 0xc7, 0x21, 0xb6, 0xa4, 0xec, 0x0d, 0x43,
+	0x66, 0x38, 0x87, 0xd4, 0xb8, 0xaa, 0xbd, 0x9b, 0x3a, 0x82, 0xbd, 0x1b, 0xb3, 0x08, 0x7e, 0x61,
+	0x40, 0x99, 0x95, 0xfa, 0xff, 0xcb, 0xaf, 0xe2, 0x08, 0x40, 0x2a, 0x12, 0x87, 0x4f, 0xef, 0xe7,
+	0x55, 0xa9, 0x5e, 0xd6, 0xce, 0x40, 0x3d, 0xd5, 0x32, 0x79, 0x59, 0x6b, 0xf5, 0xe1, 0xe4, 0xd0,
+	0x67, 0x4b, 0xe8, 0xa7, 0xa3, 0x57, 0x75, 0x31, 0xb7, 0xaa, 0x21, 0x8e, 0x87, 0x7e, 0x69, 0xdf,
+	0x1a, 0xd0, 0xc8, 0x0c, 0x38, 0x40, 0x35, 0x32, 0xa3, 0xbc, 0x0b, 0x07, 0x50, 0xde, 0x59, 0x53,
+	0x5a, 0x1c, 0x30, 0xa5, 0x63, 0x7e, 0xe6, 0xf3, 0x7b, 0x03, 0x96, 0x86, 0xc4, 0xda, 0xef, 0x0d,
+	0xf8, 0x6b, 0x5c, 0xbb, 0x9f, 0x18, 0xe2, 0xaf, 0x6d, 0x4e, 0xa8, 0x6e, 0xda, 0x71, 0x35, 0xfc,
+	0x2f, 0x0b, 0x50, 0x93, 0xae, 0xdc, 0xc1, 0x4e, 0xf8, 0x30, 0x6f, 0x27, 0x32, 0x17, 0x52, 0x3c,
+	0xc0, 0x85, 0x5c, 0x94, 0x0f, 0xcd, 0x34, 0xcf, 0x6f, 0x58, 0xae, 0x57, 0x3e, 0x2e, 0x1b, 0x73,
+	0x24, 0xf2, 0xa5, 0x01, 0xf3, 0xba, 0xe4, 0xc4, 0x0d, 0xca, 0x20, 0xbc, 0x5b, 0xf7, 0x02, 0x55,
+	0x0e, 0xd9, 0x9c, 0x30, 0x13, 0xbc, 0x63, 0x5f, 0xc8, 0x3f, 0x0d, 0x2a, 0x91, 0xd2, 0xa1, 0xbe,
+	0x05, 0xd5, 0x0e, 0x7f, 0xd8, 0xa5, 0x7b, 0x55, 0xa9, 0x4b, 0x86, 0x48, 0x7c, 0xf4, 0x14, 0x16,
+	0xe5, 0xa2, 0xd4, 0x8c, 0x7b, 0x61, 0xc8, 0xd3, 0x4f, 0x1d, 0xb5, 0xf9, 0x50, 0x73, 0x2c, 0x63,
+	0xae, 0x29, 0x85, 0xb0, 0xa8, 0x7d, 0xe1, 0x79, 0xf8, 0xc7, 0xab, 0xba, 0x1d, 0x0c, 0xa9, 0x6a,
+	0x36, 0xa0, 0xc2, 0x55, 0x24, 0xd5, 0x02, 0x5e, 0xcf, 0x71, 0xf0, 0xb6, 0x28, 0x6d, 0xd6, 0xcc,
+	0xa4, 0x8d, 0xde, 0x87, 0xa9, 0x4e, 0xf6, 0xbd, 0x9b, 0xb8, 0x50, 0xc5, 0x16, 0x28, 0x0f, 0xe2,
+	0x4c, 0x15, 0x1f, 0x9d, 0xa2, 0xdc, 0x80, 0x3b, 0x6d, 0xdf, 0x73, 0xfa, 0xa9, 0x8e, 0xc1, 0x9d,
+	0x2d, 0xcf, 0xe9, 0xa3, 0xd3, 0x00, 0x2f, 0x43, 0x3b, 0x26, 0x1c, 0xca, 0x9d, 0xf9, 0x3a, 0xeb,
+	0x61, 0xe0, 0x73, 0x50, 0xdc, 0x73, 0x1d, 0xe1, 0x81, 0x28, 0xfe, 0xee, 0x53, 0xd7, 0x31, 0x29,
+	0x2c, 0x1f, 0x8f, 0x56, 0x0e, 0x15, 0x8f, 0x66, 0xbc, 0xea, 0xea, 0x3e, 0x5e, 0xb5, 0x1a, 0x5a,
+	0xd4, 0x72, 0xa1, 0x45, 0x52, 0x1d, 0xae, 0x67, 0xab, 0xc3, 0x67, 0xa1, 0xe1, 0xf6, 0x9c, 0xd8,
+	0x0e, 0x1c, 0xd2, 0xf6, 0xbb, 0xcc, 0xd7, 0x30, 0x4c, 0x90, 0x5d, 0x5b, 0xcc, 0x95, 0x73, 0xf1,
+	0x9e, 0xed, 0xf6, 0x5c, 0xe6, 0x5b, 0x18, 0xa6, 0x6c, 0xa2, 0xd7, 0x61, 0x8e, 0xec, 0x59, 0x4e,
+	0x2f, 0xb2, 0x5f, 0x90, 0xb6, 0xc4, 0x99, 0x64, 0xf3, 0xce, 0x26, 0x80, 0x07, 0x02, 0x99, 0x92,
+	0xb1, 0x3d, 0x86, 0x32, 0x25, 0xc8, 0xf0, 0xe6, 0x00, 0x19, 0x81, 0x33, 0x3d, 0x48, 0x46, 0x20,
+	0x9f, 0x06, 0x70, 0xf1, 0x5e, 0xdb, 0x21, 0xde, 0x4e, 0xbc, 0xdb, 0x9c, 0x59, 0x31, 0x2e, 0x15,
+	0xcd, 0xba, 0x8b, 0xf7, 0xee, 0xb3, 0x0e, 0x06, 0xb6, 0x3d, 0x09, 0x9e, 0x15, 0x60, 0xdb, 0x13,
+	0xe0, 0x26, 0x54, 0x03, 0x1c, 0xd3, 0xe3, 0x6d, 0xce, 0x71, 0xb7, 0x54, 0x34, 0x29, 0x17, 0x50,
+	0xba, 0x76, 0x4c, 0xdc, 0xa8, 0x89, 0xd8, 0xb8, 0x9a, 0x8b, 0xf7, 0x58, 0x95, 0x98, 0x01, 0x6d,
+	0x4f, 0x00, 0xe7, 0x05, 0xd0, 0xf6, 0x38, 0xf0, 0x1c, 0x4c, 0xf6, 0x3c, 0xfb, 0x79, 0x8f, 0x08,
+	0xf8, 0x02, 0x5b, 0x79, 0x83, 0xf7, 0x71, 0x94, 0x0b, 0x30, 0x4d, 0x89, 0x67, 0xc4, 0x63, 0x91,
+	0x11, 0x99, 0x72, 0xf1, 0x5e, 0xc6, 0x83, 0xa0, 0x68, 0xb6, 0x97, 0x45, 0x5b, 0x12, 0x68, 0xb6,
+	0x97, 0x41, 0xcb, 0xda, 0xc4, 0x13, 0x2c, 0x6b, 0x92, 0xda, 0xc4, 0x55, 0x28, 0x11, 0xaf, 0xe7,
+	0x36, 0x9b, 0xf9, 0xf7, 0x87, 0x94, 0x57, 0x18, 0x90, 0xa5, 0x5c, 0xfa, 0x01, 0x69, 0x9e, 0xe4,
+	0x51, 0x2e, 0xfd, 0x8f, 0xde, 0x82, 0x0a, 0x76, 0x1c, 0xca, 0x01, 0xcb, 0x07, 0xa9, 0x7b, 0x97,
+	0xb1, 0xe3, 0x6c, 0x75, 0xe9, 0x28, 0xdf, 0x63, 0x7c, 0x73, 0xea, 0x40, 0xa3, 0x7c, 0x8f, 0xf0,
+	0x51, 0xac, 0x76, 0xd9, 0x6d, 0xbe, 0x72, 0xb0, 0xb9, 0xbc, 0xfe, 0x56, 0x17, 0x9d, 0x87, 0xa2,
+	0xe7, 0xc7, 0xcd, 0xd3, 0xba, 0x9c, 0x22, 0x1d, 0x62, 0x52, 0x30, 0xf5, 0x83, 0xf9, 0x35, 0x9c,
+	0xc9, 0xeb, 0xf5, 0xa4, 0xe4, 0x6f, 0x72, 0x1c, 0xf4, 0x36, 0x40, 0xe6, 0xb0, 0xcf, 0xe6, 0x9f,
+	0x88, 0xa6, 0xa7, 0x6e, 0x66, 0x30, 0x87, 0x6b, 0xbd, 0x15, 0x46, 0x42, 0xd1, 0x7a, 0xc3, 0x3e,
+	0x8b, 0xd1, 0x6b, 0x3d, 0xf4, 0x66, 0x6a, 0x4d, 0xce, 0xe5, 0xbd, 0x8c, 0xcc, 0x0b, 0xe2, 0xd4,
+	0x8a, 0x0c, 0xb8, 0x04, 0xad, 0xbc, 0x4b, 0xb0, 0x04, 0x95, 0xae, 0x1f, 0xba, 0x38, 0x6e, 0xae,
+	0x32, 0xa0, 0x68, 0x8d, 0xb2, 0x12, 0xe7, 0x8f, 0xf8, 0xb4, 0x27, 0x9f, 0xd9, 0xbf, 0x32, 0x50,
+	0x8a, 0xd5, 0x5c, 0x1d, 0x7b, 0xc7, 0xcc, 0x55, 0xfd, 0x71, 0x6d, 0xb3, 0x07, 0xf3, 0x9a, 0x0f,
+	0x19, 0xbe, 0x3f, 0xe7, 0xfc, 0x09, 0x35, 0x52, 0xfb, 0xa5, 0xb2, 0x8d, 0x23, 0x1c, 0xe6, 0x22,
+	0xcc, 0x6b, 0xd2, 0x66, 0xad, 0xbf, 0x17, 0x60, 0x5a, 0x2d, 0x48, 0x24, 0xe2, 0x6c, 0x64, 0xc4,
+	0x79, 0xff, 0x37, 0x3f, 0x32, 0xd5, 0x55, 0xcc, 0xa5, 0xba, 0x4a, 0x49, 0xaa, 0x6b, 0x49, 0x5c,
+	0x1d, 0x11, 0x69, 0x50, 0xd1, 0x42, 0xab, 0x30, 0xb5, 0x4d, 0x70, 0x48, 0xc2, 0xb6, 0x60, 0x2b,
+	0xfe, 0x5a, 0x67, 0x92, 0x77, 0x7e, 0xc0, 0x99, 0xeb, 0x0a, 0x94, 0xbb, 0x8e, 0xff, 0x52, 0x7e,
+	0xdb, 0xb0, 0xa4, 0xcd, 0x61, 0x47, 0x26, 0x47, 0x42, 0x57, 0x61, 0x9e, 0xc2, 0xdb, 0x76, 0xa7,
+	0x6d, 0xf9, 0x9e, 0x47, 0xac, 0x98, 0x55, 0x17, 0x6a, 0xbc, 0x42, 0x41, 0x41, 0xf7, 0x3a, 0x77,
+	0x38, 0xe0, 0xf1, 0xe8, 0x37, 0x33, 0x47, 0x79, 0x03, 0xfd, 0xb5, 0x01, 0x27, 0x87, 0x17, 0x8c,
+	0x36, 0x60, 0x66, 0xe0, 0x83, 0x0d, 0xc1, 0xca, 0xcb, 0xc3, 0xcb, 0x44, 0x9b, 0x13, 0xe6, 0xb4,
+	0xfa, 0x91, 0xc6, 0xb1, 0x59, 0xfb, 0x73, 0x38, 0x35, 0xe2, 0x9b, 0x10, 0xd4, 0x1e, 0xcd, 0xe2,
+	0x97, 0xf3, 0x2c, 0x3e, 0xb4, 0xae, 0xa5, 0x67, 0xf5, 0xbf, 0x1a, 0x50, 0xe1, 0xb9, 0x01, 0xf9,
+	0x88, 0xc9, 0x48, 0x1f, 0x31, 0xed, 0xcf, 0x70, 0xb7, 0xa0, 0xfe, 0x42, 0xd4, 0xb6, 0x64, 0x75,
+	0xe4, 0xd4, 0xf0, 0xf2, 0x57, 0x64, 0xa6, 0xd8, 0xe3, 0x8e, 0xf4, 0xbe, 0x31, 0xa8, 0x0c, 0x0d,
+	0xd6, 0xea, 0x98, 0xdd, 0x14, 0x55, 0x08, 0x66, 0x26, 0x9b, 0xa9, 0x2a, 0x16, 0x39, 0xac, 0x21,
+	0x1a, 0x57, 0x93, 0xc3, 0x1a, 0xf3, 0x8a, 0xff, 0x60, 0xc0, 0xcc, 0xc0, 0xf9, 0xa0, 0x4d, 0xca,
+	0x95, 0xb4, 0xab, 0x2d, 0x0f, 0x4a, 0xdc, 0xf4, 0x59, 0xcd, 0x4d, 0x2b, 0x95, 0xc5, 0xe9, 0x48,
+	0xdd, 0xfc, 0x98, 0xd3, 0x22, 0xcf, 0x61, 0xe9, 0x91, 0x16, 0xf2, 0xfd, 0x7d, 0xf4, 0xb2, 0x0a,
+	0x0d, 0x5e, 0x1f, 0x5d, 0x0f, 0x43, 0xdc, 0x4f, 0x0b, 0xa2, 0xfc, 0x3a, 0x45, 0x41, 0xf4, 0x09,
+	0x54, 0xc5, 0x87, 0x2c, 0xe8, 0xfe, 0x68, 0x59, 0x39, 0x91, 0x3f, 0x41, 0x36, 0x70, 0x78, 0x16,
+	0xa4, 0xf8, 0x11, 0xd6, 0xd7, 0x66, 0xf7, 0x97, 0x8b, 0x5c, 0x80, 0x50, 0x1c, 0xd7, 0xd7, 0x20,
+	0x47, 0xe1, 0xb4, 0xef, 0x0c, 0x28, 0x3e, 0x75, 0x1d, 0xed, 0x5e, 0x5e, 0x81, 0x3a, 0xfd, 0x8d,
+	0x02, 0x6c, 0xc9, 0x5a, 0x73, 0xda, 0x41, 0x8d, 0x45, 0x10, 0x92, 0xae, 0xbd, 0x27, 0xe4, 0x41,
+	0xb4, 0xe8, 0x28, 0x1c, 0xc7, 0xa1, 0xbd, 0xdd, 0x8b, 0xe5, 0x87, 0x18, 0x69, 0x07, 0x15, 0xb2,
+	0x97, 0x21, 0x0e, 0x82, 0xa4, 0x18, 0x22, 0x9b, 0x63, 0xfe, 0xfa, 0xe2, 0xf6, 0xab, 0x30, 0xed,
+	0x87, 0x3b, 0x72, 0x48, 0xfb, 0xc5, 0xda, 0xed, 0x49, 0xf1, 0xb1, 0xf3, 0xc3, 0xd0, 0x8f, 0xfd,
+	0x87, 0xc6, 0xd7, 0x85, 0xe2, 0xd6, 0xfa, 0xa3, 0xed, 0x0a, 0xfb, 0x32, 0x78, 0xed, 0x3f, 0x01,
+	0x00, 0x00, 0xff, 0xff, 0xdb, 0xaf, 0xcd, 0xca, 0x15, 0x3d, 0x00, 0x00,
 }

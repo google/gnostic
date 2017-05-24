@@ -62,8 +62,8 @@ message AnyOrExpression {
 
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callback {
-  repeated NamedPathItem expression = 1;
-  repeated NamedSpecificationExtension specification_extension = 2;
+  repeated NamedPathItem path = 1;
+  repeated NamedAny specification_extension = 2;
 }
 
 message CallbackOrReference {
@@ -75,8 +75,8 @@ message CallbackOrReference {
 
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callbacks {
-  repeated NamedCallbackOrReference name = 1;
-  repeated NamedSpecificationExtension specification_extension = 2;
+  repeated NamedCallbackOrReference callback_or_reference = 1;
+  repeated NamedAny specification_extension = 2;
 }
 
 message CallbacksOrReferences {
@@ -94,7 +94,7 @@ message Components {
   SecuritySchemesOrReferences security_schemes = 7;
   LinksOrReferences links = 8;
   CallbacksOrReferences callbacks = 9;
-  repeated NamedSpecificationExtension specification_extension = 10;
+  repeated NamedAny specification_extension = 10;
 }
 
 // Contact information for the exposed API.
@@ -102,7 +102,7 @@ message Contact {
   string name = 1;
   string url = 2;
   string email = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  repeated NamedAny specification_extension = 4;
 }
 
 // Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.
@@ -118,6 +118,12 @@ message DefaultType {
   }
 }
 
+// When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  Note, when using the discriminator, _inline_ schemas will not be considered when using the discriminator.
+message Discriminator {
+  string property_name = 1;
+  Strings mapping = 2;
+}
+
 message Document {
   string openapi = 1;
   Info info = 2;
@@ -127,29 +133,30 @@ message Document {
   repeated SecurityRequirement security = 6;
   repeated Tag tags = 7;
   ExternalDocs external_docs = 8;
-  repeated NamedSpecificationExtension specification_extension = 9;
+  repeated NamedAny specification_extension = 9;
 }
 
 // An object representing multipart region encoding for `requestBody` objects.
 message Encoding {
-  repeated NamedEncodingProperty property = 1;
+  repeated NamedEncodingProperty encoding_property = 1;
 }
 
 // A single encoding definition applied to a single schema property.
 message EncodingProperty {
   string content_type = 1;
-  Object headers = 2;
+  Headers headers = 2;
   string style = 3;
   bool explode = 4;
   bool allow_reserved = 5;
-  repeated NamedSpecificationExtension specification_extension = 6;
+  repeated NamedAny specification_extension = 6;
 }
 
 message Example {
   string summary = 1;
   string description = 2;
-  string external_value = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  Any value = 3;
+  string external_value = 4;
+  repeated NamedAny specification_extension = 5;
 }
 
 message ExampleOrReference {
@@ -174,7 +181,7 @@ message Expression {
 message ExternalDocs {
   string description = 1;
   string url = 2;
-  repeated NamedSpecificationExtension specification_extension = 3;
+  repeated NamedAny specification_extension = 3;
 }
 
 // The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
@@ -189,8 +196,10 @@ message Header {
   bool explode = 8;
   bool allow_reserved = 9;
   SchemaOrReference schema = 10;
-  ExamplesOrReferences examples = 11;
-  Content content = 12;
+  Any example = 11;
+  ExamplesOrReferences examples = 12;
+  Content content = 13;
+  repeated NamedAny specification_extension = 14;
 }
 
 message HeaderOrReference {
@@ -200,9 +209,9 @@ message HeaderOrReference {
   }
 }
 
-// Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.
+// Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.
 message Headers {
-  repeated NamedHeaderOrReference name = 1;
+  repeated NamedHeaderOrReference header_or_reference = 1;
 }
 
 message HeadersOrReferences {
@@ -217,7 +226,7 @@ message Info {
   Contact contact = 4;
   License license = 5;
   string version = 6;
-  repeated NamedSpecificationExtension specification_extension = 7;
+  repeated NamedAny specification_extension = 7;
 }
 
 message ItemsItem {
@@ -228,7 +237,7 @@ message ItemsItem {
 message License {
   string name = 1;
   string url = 2;
-  repeated NamedSpecificationExtension specification_extension = 3;
+  repeated NamedAny specification_extension = 3;
 }
 
 // The `Link Object` is responsible for defining a possible operation based on a single response.
@@ -239,7 +248,7 @@ message Link {
   Headers headers = 4;
   string description = 5;
   Server server = 6;
-  repeated NamedSpecificationExtension specification_extension = 7;
+  repeated NamedAny specification_extension = 7;
 }
 
 message LinkOrReference {
@@ -251,12 +260,12 @@ message LinkOrReference {
 
 // Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.  To specify parameters required by the operation, we can use a **Link Parameters Object**. This object contains parameter names along with static or dynamic values:
 message LinkParameters {
-  repeated NamedAnyOrExpression name = 1;
+  repeated NamedAnyOrExpression any_or_expression = 1;
 }
 
 // The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.
 message Links {
-  repeated NamedLinkOrReference name = 1;
+  repeated NamedLinkOrReference link_or_reference = 1;
 }
 
 message LinksOrReferences {
@@ -266,9 +275,10 @@ message LinksOrReferences {
 // Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.
 message MediaType {
   SchemaOrReference schema = 1;
-  ExamplesOrReferences examples = 2;
-  Encoding encoding = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  Any example = 2;
+  ExamplesOrReferences examples = 3;
+  Encoding encoding = 4;
+  repeated NamedAny specification_extension = 5;
 }
 
 // Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
@@ -391,12 +401,12 @@ message NamedServerVariable {
   ServerVariable value = 2;
 }
 
-// Automatically-generated message used to represent maps of SpecificationExtension as ordered (name,value) pairs.
-message NamedSpecificationExtension {
+// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
+message NamedString {
   // Map key
   string name = 1;
   // Mapped value
-  SpecificationExtension value = 2;
+  string value = 2;
 }
 
 // Configuration details for a supported OAuth Flow
@@ -405,7 +415,7 @@ message OauthFlow {
   string token_url = 2;
   string refresh_url = 3;
   Scopes scopes = 4;
-  repeated NamedSpecificationExtension specification_extension = 5;
+  repeated NamedAny specification_extension = 5;
 }
 
 // Allows configuration of the supported OAuth Flows.
@@ -414,7 +424,7 @@ message OauthFlows {
   OauthFlow password = 2;
   OauthFlow client_credentials = 3;
   OauthFlow authorization_code = 4;
-  repeated NamedSpecificationExtension specification_extension = 5;
+  repeated NamedAny specification_extension = 5;
 }
 
 message Object {
@@ -435,7 +445,7 @@ message Operation {
   bool deprecated = 10;
   repeated SecurityRequirement security = 11;
   repeated Server servers = 12;
-  repeated NamedSpecificationExtension specification_extension = 13;
+  repeated NamedAny specification_extension = 13;
 }
 
 // Describes a single operation parameter.  A unique parameter is defined by a combination of a name and location.
@@ -450,9 +460,10 @@ message Parameter {
   bool explode = 8;
   bool allow_reserved = 9;
   SchemaOrReference schema = 10;
-  ExamplesOrReferences examples = 11;
-  Content content = 12;
-  repeated NamedSpecificationExtension specification_extension = 13;
+  Any example = 11;
+  ExamplesOrReferences examples = 12;
+  Content content = 13;
+  repeated NamedAny specification_extension = 14;
 }
 
 message ParameterOrReference {
@@ -481,13 +492,13 @@ message PathItem {
   Operation trace = 11;
   repeated Server servers = 12;
   repeated ParameterOrReference parameters = 13;
-  repeated NamedSpecificationExtension specification_extension = 14;
+  repeated NamedAny specification_extension = 14;
 }
 
 // Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.
 message Paths {
   repeated NamedPathItem path = 1;
-  repeated NamedSpecificationExtension specification_extension = 2;
+  repeated NamedAny specification_extension = 2;
 }
 
 message Properties {
@@ -508,7 +519,7 @@ message RequestBody {
   string description = 1;
   Content content = 2;
   bool required = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  repeated NamedAny specification_extension = 4;
 }
 
 message RequestBodyOrReference {
@@ -524,7 +535,7 @@ message Response {
   Headers headers = 2;
   Content content = 3;
   Links links = 4;
-  repeated NamedSpecificationExtension specification_extension = 5;
+  repeated NamedAny specification_extension = 5;
 }
 
 message ResponseOrReference {
@@ -537,8 +548,8 @@ message ResponseOrReference {
 // A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.
 message Responses {
   ResponseOrReference default = 1;
-  repeated NamedResponseOrReference response_code = 2;
-  repeated NamedSpecificationExtension specification_extension = 3;
+  repeated NamedResponseOrReference response_or_reference = 2;
+  repeated NamedAny specification_extension = 3;
 }
 
 message ResponsesOrReferences {
@@ -548,40 +559,41 @@ message ResponsesOrReferences {
 // The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.
 message Schema {
   bool nullable = 1;
-  string discriminator = 2;
+  Discriminator discriminator = 2;
   bool read_only = 3;
   bool write_only = 4;
   Xml xml = 5;
   ExternalDocs external_docs = 6;
-  bool deprecated = 7;
-  string title = 8;
-  double multiple_of = 9;
-  double maximum = 10;
-  bool exclusive_maximum = 11;
-  double minimum = 12;
-  bool exclusive_minimum = 13;
-  int64 max_length = 14;
-  int64 min_length = 15;
-  string pattern = 16;
-  int64 max_items = 17;
-  int64 min_items = 18;
-  bool unique_items = 19;
-  int64 max_properties = 20;
-  int64 min_properties = 21;
-  repeated string required = 22;
-  repeated Any enum = 23;
-  string type = 24;
-  repeated SchemaOrReference all_of = 25;
-  repeated SchemaOrReference one_of = 26;
-  repeated SchemaOrReference any_of = 27;
-  Schema not = 28;
-  ItemsItem items = 29;
-  Properties properties = 30;
-  AdditionalPropertiesItem additional_properties = 31;
-  DefaultType default = 32;
-  string description = 33;
-  string format = 34;
-  repeated NamedSpecificationExtension specification_extension = 35;
+  Any example = 7;
+  bool deprecated = 8;
+  string title = 9;
+  double multiple_of = 10;
+  double maximum = 11;
+  bool exclusive_maximum = 12;
+  double minimum = 13;
+  bool exclusive_minimum = 14;
+  int64 max_length = 15;
+  int64 min_length = 16;
+  string pattern = 17;
+  int64 max_items = 18;
+  int64 min_items = 19;
+  bool unique_items = 20;
+  int64 max_properties = 21;
+  int64 min_properties = 22;
+  repeated string required = 23;
+  repeated Any enum = 24;
+  string type = 25;
+  repeated SchemaOrReference all_of = 26;
+  repeated SchemaOrReference one_of = 27;
+  repeated SchemaOrReference any_of = 28;
+  Schema not = 29;
+  ItemsItem items = 30;
+  Properties properties = 31;
+  AdditionalPropertiesItem additional_properties = 32;
+  DefaultType default = 33;
+  string description = 34;
+  string format = 35;
+  repeated NamedAny specification_extension = 36;
 }
 
 message SchemaOrReference {
@@ -597,13 +609,11 @@ message SchemasOrReferences {
 
 // Lists the available scopes for an OAuth2 security scheme.
 message Scopes {
-  repeated NamedAny name = 1;
-  repeated NamedSpecificationExtension specification_extension = 2;
+  repeated NamedAny specification_extension = 1;
 }
 
 // Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.
 message SecurityRequirement {
-  repeated NamedAny name = 1;
 }
 
 // Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).
@@ -616,7 +626,7 @@ message SecurityScheme {
   string bearer_format = 6;
   OauthFlows flows = 7;
   string open_id_connect_url = 8;
-  repeated NamedSpecificationExtension specification_extension = 9;
+  repeated NamedAny specification_extension = 9;
 }
 
 message SecuritySchemeOrReference {
@@ -635,7 +645,7 @@ message Server {
   string url = 1;
   string description = 2;
   ServerVariables variables = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  repeated NamedAny specification_extension = 4;
 }
 
 // An object representing a Server Variable for server URL template substitution.
@@ -643,12 +653,12 @@ message ServerVariable {
   repeated string enum = 1;
   string default = 2;
   string description = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  repeated NamedAny specification_extension = 4;
 }
 
 message ServerVariables {
-  repeated NamedServerVariable name = 1;
-  repeated NamedSpecificationExtension specification_extension = 2;
+  repeated NamedServerVariable server_variable = 1;
+  repeated NamedAny specification_extension = 2;
 }
 
 // Any property starting with x- is valid.
@@ -664,12 +674,16 @@ message StringArray {
   repeated string value = 1;
 }
 
+message Strings {
+  repeated NamedString additional_properties = 1;
+}
+
 // Allows adding meta data to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag used there.
 message Tag {
   string name = 1;
   string description = 2;
   ExternalDocs external_docs = 3;
-  repeated NamedSpecificationExtension specification_extension = 4;
+  repeated NamedAny specification_extension = 4;
 }
 
 // A metadata object that allows for more fine-tuned XML model definitions.  When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information. See examples for expected behavior.
@@ -679,6 +693,6 @@ message Xml {
   string prefix = 3;
   bool attribute = 4;
   bool wrapped = 5;
-  repeated NamedSpecificationExtension specification_extension = 6;
+  repeated NamedAny specification_extension = 6;
 }
 

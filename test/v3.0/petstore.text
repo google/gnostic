@@ -49,13 +49,13 @@ paths: <
               >
             >
           >
-          response_code: <
+          response_or_reference: <
             name: "200"
             value: <
               response: <
                 description: "An paged array of pets"
                 headers: <
-                  name: <
+                  header_or_reference: <
                     name: "x-next"
                     value: <
                       header: <
@@ -108,7 +108,7 @@ paths: <
               >
             >
           >
-          response_code: <
+          response_or_reference: <
             name: "201"
             value: <
               response: <
@@ -158,7 +158,7 @@ paths: <
               >
             >
           >
-          response_code: <
+          response_or_reference: <
             name: "200"
             value: <
               response: <

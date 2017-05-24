@@ -56,6 +56,10 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 	return code.String()
 }
 
+func escape_slashes(pattern string) string {
+	return strings.Replace(pattern, "\\", "\\\\", -1)
+}
+
 func (domain *Domain) generateConstructorForType(code *printer.Code, typeName string) {
 	code.Print("func New%s(in interface{}, context *compiler.Context) (*%s, error) {", typeName, typeName)
 	code.Print("errors := make([]error, 0)")
@@ -282,7 +286,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						allowedPatternString += ","
 					}
 					allowedPatternString += "\""
-					allowedPatternString += pattern
+					allowedPatternString += escape_slashes(pattern)
 					allowedPatternString += "\""
 				}
 			}
@@ -498,7 +502,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("if ok {")
 					code.Print("v := item.Value")
 					if propertyModel.Pattern != "" {
-						code.Print("if compiler.PatternMatches(\"%s\", k) {", propertyModel.Pattern)
+						code.Print("if compiler.PatternMatches(\"%s\", k) {",
+							escape_slashes(propertyModel.Pattern))
 					}
 
 					code.Print("pair := &Named" + strings.Title(mapTypeName) + "{}")

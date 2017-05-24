@@ -531,7 +531,7 @@
           "type": "string"
         },
         "headers": {
-          "$ref": "#/definitions/headersMap"
+          "$ref": "#/definitions/headers"
         },
         "style": {
           "type": "string"
@@ -1206,12 +1206,6 @@
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/exampleOrReference"
-      }
-    },
-    "headersMap": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/headers"
       }
     },
     "headersOrReferences": {
