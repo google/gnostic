@@ -66,6 +66,9 @@ func main() {
 	// Read the plugin input.
 	data, err := ioutil.ReadAll(os.Stdin)
 	sendAndExitIfError(err, response)
+	if len(data) == 0 {
+		sendAndExitIfError(errors.New("No input data.\n"), response)
+	}
 
 	// Deserialize the input.
 	request := &plugins.Request{}

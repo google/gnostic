@@ -62,6 +62,9 @@ func main() {
 	// Read the request.
 	data, err := ioutil.ReadAll(os.Stdin)
 	sendAndExitIfError(err, response)
+	if len(data) == 0 {
+		sendAndExitIfError(errors.New("No input data.\n"), response)
+	}
 
 	// Unmarshal the request.
 	request := &plugins.Request{}
