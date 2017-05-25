@@ -28,13 +28,20 @@ type extensionHandler func(name string, yamlInput string) (bool, proto.Message, 
 
 func forInputYamlFromOpenapic(handler documentHandler) {
 	data, err := ioutil.ReadAll(os.Stdin)
-
 	if err != nil {
 		fmt.Println("File error:", err.Error())
 		os.Exit(1)
 	}
+	if len(data) == 0 {
+		fmt.Println("No input data.")
+		os.Exit(1)
+	}
 	request := &ExtensionHandlerRequest{}
 	err = proto.Unmarshal(data, request)
+	if err != nil {
+		fmt.Println("Input error:", err.Error())
+		os.Exit(1)
+	}
 	handler(request.Wrapper.Version, request.Wrapper.ExtensionName, request.Wrapper.Yaml)
 }
 
