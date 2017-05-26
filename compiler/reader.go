@@ -66,20 +66,8 @@ func FetchFile(fileurl string) ([]byte, error) {
 	}
 }
 
-// read a file and unmarshal it as a yaml.MapSlice
-func ReadInfoForFile(filename string) (interface{}, error) {
-	initializeInfoCache()
-	info, ok := info_cache[filename]
-	if ok {
-		if VERBOSE_READER {
-			log.Printf("Cache hit info for file %s", filename)
-		}
-		return info, nil
-	}
-	if VERBOSE_READER {
-		log.Printf("Reading info for file %s", filename)
-	}
-
+// read the bytes of a file
+func ReadBytesForFile(filename string) ([]byte, error) {
 	// is the filename a url?
 	fileurl, _ := url.Parse(filename)
 	if fileurl.Scheme != "" {
@@ -88,22 +76,32 @@ func ReadInfoForFile(filename string) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		var info yaml.MapSlice
-		err = yaml.Unmarshal(bytes, &info)
-		if err != nil {
-			return nil, err
-		}
-		info_cache[filename] = info
-		return info, nil
+		return bytes, nil
 	} else {
 		// no, it's a local filename
 		bytes, err := ioutil.ReadFile(filename)
 		if err != nil {
-			log.Printf("File error: %v\n", err)
 			return nil, err
 		}
+		return bytes, nil
+	}
+}
+
+// unmarshal a file as a yaml.MapSlice
+func ReadInfoFromBytes(filename string, bytes []byte) (interface{}, error) {
+	initializeInfoCache()
+	info, ok := info_cache[filename]
+	if ok {
+		if VERBOSE_READER {
+			log.Printf("Cache hit info for file %s", filename)
+		}
+		return info, nil
+	} else {
 		var info yaml.MapSlice
-		err = yaml.Unmarshal(bytes, &info)
+		if VERBOSE_READER {
+			log.Printf("Reading info for file %s", filename)
+		}
+		err := yaml.Unmarshal(bytes, &info)
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +134,11 @@ func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
 	} else {
 		filename = basefile
 	}
-	info, err := ReadInfoForFile(filename)
+	bytes, err := ReadBytesForFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	info, err := ReadInfoFromBytes(filename, bytes)
 	if err != nil {
 		log.Printf("File error: %v\n", err)
 	} else {

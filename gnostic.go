@@ -364,9 +364,8 @@ func (g *Gnostic) errorBytes(err error) []byte {
 }
 
 // Read an OpenAPI description from YAML or JSON.
-func (g *Gnostic) readOpenAPIText() (message proto.Message, err error) {
-	// Read the OpenAPI source.
-	info, err := compiler.ReadInfoForFile(g.sourceName)
+func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err error) {
+	info, err := compiler.ReadInfoFromBytes(g.sourceName, bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -390,6 +389,23 @@ func (g *Gnostic) readOpenAPIText() (message proto.Message, err error) {
 		message = document
 	}
 	return message, err
+}
+
+// Read an OpenAPI binary file.
+func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err error) {
+	// try to read an OpenAPI v3 document
+	document_v3 := &openapi_v3.Document{}
+	err = proto.Unmarshal(data, document_v3)
+	if err == nil {
+		return document_v3, nil
+	}
+	// if that failed, try to read an OpenAPI v2 document
+	document_v2 := &openapi_v2.Document{}
+	err = proto.Unmarshal(data, document_v2)
+	if err == nil {
+		return document_v2, nil
+	}
+	return nil, err
 }
 
 // Perform all actions specified in the command-line options.
@@ -447,8 +463,31 @@ func (g *Gnostic) main() {
 	var err error
 	g.readOptions()
 	g.validateOptions()
-	message, err := g.readOpenAPIText()
+
+	// Read the OpenAPI source.
+	bytes, err := compiler.ReadBytesForFile(g.sourceName)
 	if err != nil {
+		writeFile(g.errorPath, g.errorBytes(err), g.sourceName, "errors")
+		os.Exit(-1)
+	}
+	extension := strings.ToLower(filepath.Ext(g.sourceName))
+	var message proto.Message
+	if extension == ".json" || extension == ".yaml" {
+		// Try to read the source as JSON/YAML.
+		message, err = g.readOpenAPIText(bytes)
+		if err != nil {
+			writeFile(g.errorPath, g.errorBytes(err), g.sourceName, "errors")
+			os.Exit(-1)
+		}
+	} else if extension == ".pb" {
+		// Try to read the source as a binary protocol buffer.
+		message, err = g.readOpenAPIBinary(bytes)
+		if err != nil {
+			writeFile(g.errorPath, g.errorBytes(err), g.sourceName, "errors")
+			os.Exit(-1)
+		}
+	} else {
+		err = errors.New("Unknown file extension. 'json', 'yaml', and 'pb' are accepted.")
 		writeFile(g.errorPath, g.errorBytes(err), g.sourceName, "errors")
 		os.Exit(-1)
 	}
