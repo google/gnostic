@@ -53,9 +53,9 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateResolveReferencesMethodsForType(code, typeName)
 	}
 
-	// generate ToInfo() methods for each type
+	// generate ToMapSlice() methods for each type
 	for _, typeName := range typeNames {
-		domain.generateToInfoMethodsForType(code, typeName)
+		domain.generateToMapSliceMethodsForType(code, typeName)
 	}
 
 	return code.String()
@@ -642,15 +642,40 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 	code.Print("}\n")
 }
 
-// ToInfo() methods
-func (domain *Domain) generateToInfoMethodsForType(code *printer.Code, typeName string) {
-	code.Print("func (m *%s) ToInfo() yaml.MapSlice {", typeName)
+// ToMapSlice() methods
+func (domain *Domain) generateToMapSliceMethodsForType(code *printer.Code, typeName string) {
+	code.Print("func (m *%s) ToMapSlice() yaml.MapSlice {", typeName)
 	code.Print("info := yaml.MapSlice{}")
 	typeModel := domain.TypeModels[typeName]
 	if typeModel.OneOfWrapper {
 	} else {
 		for _, propertyModel := range typeModel.Properties {
-			code.Print("// %+v", propertyModel)
+			switch propertyModel.Type {
+			case "string":
+				if !propertyModel.Repeated {
+					propertyName := propertyModel.Name
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+				} else {
+					code.Print("// %+v", propertyModel)
+				}
+			case "bool":
+				code.Print("// %+v", propertyModel)
+			case "float":
+				code.Print("// %+v", propertyModel)
+			case "int":
+				code.Print("// %+v", propertyModel)
+			default:
+				propertyName := propertyModel.Name
+				if propertyName == "value" {
+					code.Print("// %+v", propertyModel)
+				} else if !propertyModel.Repeated {
+					code.Print("if m.%s != nil {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s.ToMapSlice()})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("// %+v", propertyModel)
+				}
+			}
 		}
 	}
 	code.Print("return info")

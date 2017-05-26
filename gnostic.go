@@ -49,6 +49,7 @@ import (
 	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"
 	plugins "github.com/googleapis/gnostic/plugins"
+	"gopkg.in/yaml.v2"
 )
 
 const ( // OpenAPI Version
@@ -254,6 +255,7 @@ type Gnostic struct {
 	binaryProtoPath   string
 	jsonProtoPath     string
 	textProtoPath     string
+	yamlOutputPath    string
 	errorPath         string
 	resolveReferences bool
 	pluginCalls       []*PluginCall
@@ -272,6 +274,7 @@ Options:
   --pb-out=PATH       Write a binary proto to the specified location.
   --json-out=PATH     Write a json proto to the specified location.
   --text-out=PATH     Write a text proto to the specified location.
+  --yaml-out=PATH     Write a yaml API description to the specified location.
   --errors-out=PATH   Write compilation errors to the specified location.
   --PLUGIN-out=PATH   Run the plugin named gnostic_PLUGIN and write results
                       to the specified location.
@@ -285,6 +288,7 @@ Options:
 	g.binaryProtoPath = ""
 	g.jsonProtoPath = ""
 	g.textProtoPath = ""
+	g.yamlOutputPath = ""
 	g.errorPath = ""
 	g.resolveReferences = false
 
@@ -317,6 +321,8 @@ func (g *Gnostic) readOptions() {
 				g.jsonProtoPath = invocation
 			case "text":
 				g.textProtoPath = invocation
+			case "yaml":
+				g.yamlOutputPath = invocation
 			case "errors":
 				g.errorPath = invocation
 			default:
@@ -343,6 +349,7 @@ func (g *Gnostic) validateOptions() {
 	if g.binaryProtoPath == "" &&
 		g.jsonProtoPath == "" &&
 		g.textProtoPath == "" &&
+		g.yamlOutputPath == "" &&
 		g.errorPath == "" &&
 		len(g.pluginCalls) == 0 {
 		fmt.Fprintf(os.Stderr, "Missing output directives.\n%s\n", g.usage)
@@ -447,6 +454,26 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 	if g.textProtoPath != "" {
 		bytes := []byte(proto.MarshalTextString(message))
 		writeFile(g.textProtoPath, bytes, g.sourceName, "text")
+	}
+	// Optionally write model in yaml format.
+	if g.yamlOutputPath != "" {
+		var bytes []byte
+		if g.openAPIVersion == OpenAPIv2 {
+			document := message.(*openapi_v2.Document)
+			info := document.ToMapSlice()
+			bytes, err = yaml.Marshal(info)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating yaml output %s\n", err.Error())
+			}
+		} else if g.openAPIVersion == OpenAPIv3 {
+			//document := message.(*openapi_v3.Document)
+			bytes = []byte("OpenAPI 3.0 yaml output coming soon")
+		}
+		if len(bytes) > 0 {
+			writeFile(g.yamlOutputPath, bytes, g.sourceName, "yaml")
+		} else {
+			fmt.Fprintf(os.Stderr, "No yaml output available.\n")
+		}
 	}
 	// Call all specified plugins.
 	for _, pluginCall := range g.pluginCalls {
