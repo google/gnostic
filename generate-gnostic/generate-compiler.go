@@ -53,6 +53,11 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateResolveReferencesMethodsForType(code, typeName)
 	}
 
+	// generate ToInfo() methods for each type
+	for _, typeName := range typeNames {
+		domain.generateToInfoMethodsForType(code, typeName)
+	}
+
 	return code.String()
 }
 
@@ -634,5 +639,20 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 		}
 	}
 	code.Print("  return nil, compiler.NewErrorGroupOrNil(errors)")
+	code.Print("}\n")
+}
+
+// ToInfo() methods
+func (domain *Domain) generateToInfoMethodsForType(code *printer.Code, typeName string) {
+	code.Print("func (m *%s) ToInfo() yaml.MapSlice {", typeName)
+	code.Print("info := yaml.MapSlice{}")
+	typeModel := domain.TypeModels[typeName]
+	if typeModel.OneOfWrapper {
+	} else {
+		for _, propertyModel := range typeModel.Properties {
+			code.Print("// %+v", propertyModel)
+		}
+	}
+	code.Print("return info")
 	code.Print("}\n")
 }
