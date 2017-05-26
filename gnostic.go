@@ -233,8 +233,27 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 	}
 }
 
-func main() {
-	usage := `
+type Gnostic struct {
+	usage             string
+	sourceName        string
+	binaryProtoPath   string
+	jsonProtoPath     string
+	textProtoPath     string
+	errorPath         string
+	pluginCalls       []*PluginCall
+	resolveReferences bool
+	extensionHandlers []compiler.ExtensionHandler
+	errorPrefix       string
+	openapi_version   int
+}
+
+func newGnostic() *Gnostic {
+	g := &Gnostic{}
+	return g
+}
+
+func (g *Gnostic) main() {
+	g.usage = `
 Usage: gnostic OPENAPI_SOURCE [OPTIONS]
   OPENAPI_SOURCE is the filename or URL of an OpenAPI description to read.
 Options:
@@ -250,14 +269,14 @@ Options:
                       This could have problems with recursive definitions.
 `
 	// default values for all options
-	sourceName := ""
-	binaryProtoPath := ""
-	jsonProtoPath := ""
-	textProtoPath := ""
-	errorPath := ""
-	pluginCalls := make([]*PluginCall, 0)
-	resolveReferences := false
-	extensionHandlers := make([]compiler.ExtensionHandler, 0)
+	g.sourceName = ""
+	g.binaryProtoPath = ""
+	g.jsonProtoPath = ""
+	g.textProtoPath = ""
+	g.errorPath = ""
+	g.pluginCalls = make([]*PluginCall, 0)
+	g.resolveReferences = false
+	g.extensionHandlers = make([]compiler.ExtensionHandler, 0)
 
 	// arg processing matches patterns of the form "--PLUGIN-out=PATH" and "--PLUGIN_out=PATH"
 	plugin_regex := regexp.MustCompile("--(.+)[-_]out=(.+)")
@@ -276,91 +295,92 @@ Options:
 			invocation := string(m[2])
 			switch pluginName {
 			case "pb":
-				binaryProtoPath = invocation
+				g.binaryProtoPath = invocation
 			case "json":
-				jsonProtoPath = invocation
+				g.jsonProtoPath = invocation
 			case "text":
-				textProtoPath = invocation
+				g.textProtoPath = invocation
 			case "errors":
-				errorPath = invocation
+				g.errorPath = invocation
 			default:
 				pluginCall := &PluginCall{Name: pluginName, Invocation: invocation}
-				pluginCalls = append(pluginCalls, pluginCall)
+				g.pluginCalls = append(g.pluginCalls, pluginCall)
 			}
 		} else if m = extensionHandler_regex.FindSubmatch([]byte(arg)); m != nil {
-			extensionHandlers = append(extensionHandlers, compiler.ExtensionHandler{Name: defaultPrefixForExtensions + string(m[1])})
+			g.extensionHandlers = append(g.extensionHandlers,
+				compiler.ExtensionHandler{Name: defaultPrefixForExtensions + string(m[1])})
 		} else if arg == "--resolve-refs" {
-			resolveReferences = true
+			g.resolveReferences = true
 		} else if arg[0] == '-' {
-			fmt.Fprintf(os.Stderr, "Unknown option: %s.\n%s\n", arg, usage)
+			fmt.Fprintf(os.Stderr, "Unknown option: %s.\n%s\n", arg, g.usage)
 			os.Exit(-1)
 		} else {
-			sourceName = arg
+			g.sourceName = arg
 		}
 	}
 
-	if binaryProtoPath == "" &&
-		jsonProtoPath == "" &&
-		textProtoPath == "" &&
-		errorPath == "" &&
-		len(pluginCalls) == 0 {
-		fmt.Fprintf(os.Stderr, "Missing output directives.\n%s\n", usage)
+	if g.binaryProtoPath == "" &&
+		g.jsonProtoPath == "" &&
+		g.textProtoPath == "" &&
+		g.errorPath == "" &&
+		len(g.pluginCalls) == 0 {
+		fmt.Fprintf(os.Stderr, "Missing output directives.\n%s\n", g.usage)
 		os.Exit(-1)
 	}
 
-	if sourceName == "" {
-		fmt.Fprintf(os.Stderr, "No input specified.\n%s\n", usage)
+	if g.sourceName == "" {
+		fmt.Fprintf(os.Stderr, "No input specified.\n%s\n", g.usage)
 		os.Exit(-1)
 	}
 
-	errorPrefix := "Errors reading " + sourceName + "\n"
+	g.errorPrefix = "Errors reading " + g.sourceName + "\n"
 
 	// If we get here and the error output is unspecified, write errors to stderr.
-	if errorPath == "" {
-		errorPath = "="
+	if g.errorPath == "" {
+		g.errorPath = "="
 	}
 
 	// Read the OpenAPI source.
-	info, err := compiler.ReadInfoForFile(sourceName)
+	info, err := compiler.ReadInfoForFile(g.sourceName)
 	if err != nil {
-		writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+		writeFile(g.errorPath, []byte(g.errorPrefix+err.Error()), g.sourceName, "errors")
 		os.Exit(-1)
 	}
 
 	// Determine the OpenAPI version.
-	openapi_version := openapi_version(info)
-	if openapi_version == OpenAPIvUnknown {
+	g.openapi_version = openapi_version(info)
+	if g.openapi_version == OpenAPIvUnknown {
 		fmt.Fprintf(os.Stderr, "Unknown OpenAPI Version\n")
 		os.Exit(-1)
 	}
 
 	var message proto.Message
-	if openapi_version == OpenAPIv2 {
-		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
+	if g.openapi_version == OpenAPIv2 {
+		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
-			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+			writeFile(g.errorPath, []byte(g.errorPrefix+err.Error()), g.sourceName, "errors")
 			os.Exit(-1)
 		}
 		// optionally resolve internal references
-		if resolveReferences {
-			_, err = document.ResolveReferences(sourceName)
+		if g.resolveReferences {
+			_, err = document.ResolveReferences(g.sourceName)
 			if err != nil {
-				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+				writeFile(g.errorPath, []byte(g.errorPrefix+err.Error()), g.sourceName, "errors")
 				os.Exit(-1)
 			}
 		}
 		message = document
-	} else if openapi_version == OpenAPIv3 {
-		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
+	} else if g.openapi_version == OpenAPIv3 {
+		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
-			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+			writeFile(g.errorPath, []byte(g.errorPrefix+err.Error()), g.sourceName, "errors")
 			os.Exit(-1)
 		}
 		// optionally resolve internal references
-		if resolveReferences {
-			_, err = document.ResolveReferences(sourceName)
+		if g.resolveReferences {
+			_, err = document.ResolveReferences(g.sourceName)
 			if err != nil {
-				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+				writeFile(g.errorPath, []byte(g.errorPrefix+err.Error()), g.sourceName, "errors")
 				os.Exit(-1)
 			}
 		}
@@ -368,26 +388,31 @@ Options:
 	}
 
 	// perform all specified actions
-	if binaryProtoPath != "" {
+	if g.binaryProtoPath != "" {
 		// write proto in binary format
 		protoBytes, _ := proto.Marshal(message)
-		writeFile(binaryProtoPath, protoBytes, sourceName, "pb")
+		writeFile(g.binaryProtoPath, protoBytes, g.sourceName, "pb")
 	}
-	if jsonProtoPath != "" {
+	if g.jsonProtoPath != "" {
 		// write proto in json format
 		jsonBytes, _ := json.Marshal(message)
-		writeFile(jsonProtoPath, jsonBytes, sourceName, "json")
+		writeFile(g.jsonProtoPath, jsonBytes, g.sourceName, "json")
 	}
-	if textProtoPath != "" {
+	if g.textProtoPath != "" {
 		// write proto in text format
 		bytes := []byte(proto.MarshalTextString(message))
-		writeFile(textProtoPath, bytes, sourceName, "text")
+		writeFile(g.textProtoPath, bytes, g.sourceName, "text")
 	}
-	for _, pluginCall := range pluginCalls {
-		err = pluginCall.perform(message, openapi_version, sourceName)
+	for _, pluginCall := range g.pluginCalls {
+		err = pluginCall.perform(message, g.openapi_version, g.sourceName)
 		if err != nil {
-			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+			writeFile(g.errorPath, []byte(g.errorPrefix+err.Error()), g.sourceName, "errors")
 			defer os.Exit(-1)
 		}
 	}
+}
+
+func main() {
+	g := newGnostic()
+	g.main()
 }
