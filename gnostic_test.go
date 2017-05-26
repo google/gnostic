@@ -115,6 +115,12 @@ func TestErrorUnresolvedRefs(t *testing.T) {
 		"test/errors/petstore-unresolvedrefs.errors")
 }
 
+func TestErrorMissingVersion(t *testing.T) {
+	test_errors(t,
+		"examples/errors/petstore-missingversion.yaml",
+		"test/errors/petstore-missingversion.errors")
+}
+
 func test_plugin(t *testing.T, plugin string, input_file string, output_file string, reference_file string) {
 	// remove any preexisting output files
 	os.Remove(output_file)
