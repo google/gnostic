@@ -645,39 +645,116 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 // ToMapSlice() methods
 func (domain *Domain) generateToMapSliceMethodsForType(code *printer.Code, typeName string) {
 	code.Print("func (m *%s) ToMapSlice() yaml.MapSlice {", typeName)
-	code.Print("info := yaml.MapSlice{}")
 	typeModel := domain.TypeModels[typeName]
 	if typeModel.OneOfWrapper {
+		code.Print("// ONE OF WRAPPER")
+		code.Print("// %+v", typeModel)
+		for i, item := range typeModel.Properties {
+			code.Print("// %+v", *item)
+			if item.Type != "bool" {
+				code.Print("v%d := m.Get%s()", i, item.Type)
+				code.Print("if v%d != nil {", i)
+				code.Print(" return v%d.ToMapSlice()", i)
+				code.Print("}")
+			} else {
+				code.Print("// unhandled boolean")
+			}
+		}
+		code.Print("return nil")
 	} else {
+		code.Print("info := yaml.MapSlice{}")
 		for _, propertyModel := range typeModel.Properties {
 			switch propertyModel.Type {
 			case "string":
+				propertyName := propertyModel.Name
 				if !propertyModel.Repeated {
-					propertyName := propertyModel.Name
+					code.Print("if m.%s != \"\" {", propertyModel.FieldName())
 					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
 				} else {
-					code.Print("// %+v", propertyModel)
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
 				}
 			case "bool":
-				code.Print("// %+v", propertyModel)
-			case "float":
-				code.Print("// %+v", propertyModel)
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != false {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
 			case "int":
-				code.Print("// %+v", propertyModel)
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
+			case "float":
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != 0.0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
 			default:
 				propertyName := propertyModel.Name
 				if propertyName == "value" {
 					code.Print("// %+v", propertyModel)
 				} else if !propertyModel.Repeated {
 					code.Print("if m.%s != nil {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s.ToMapSlice()})", propertyName, propertyModel.FieldName())
+					if propertyModel.Type == "TypeItem" {
+						code.Print("if len(m.Type.Value) == 1 {")
+						code.Print("info = append(info, yaml.MapItem{\"type\", m.Type.Value[0]})")
+						code.Print("} else {")
+						code.Print("info = append(info, yaml.MapItem{\"type\", m.Type.Value})")
+						code.Print("}")
+					} else if propertyModel.Type == "ItemsItem" {
+						code.Print("items := make([]yaml.MapSlice, 0)")
+						code.Print("for _, item := range m.Items.Schema {")
+						code.Print("	items = append(items, item.ToMapSlice())")
+						code.Print("}")
+						code.Print("info = append(info, yaml.MapItem{\"items\", items[0]})")
+					} else {
+						code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s.ToMapSlice()})",
+							propertyName, propertyModel.FieldName())
+					}
 					code.Print("}")
+					code.Print("// %+v", propertyModel)
+				} else if propertyModel.MapType == "string" {
+					code.Print("// %+v", propertyModel)
+				} else if propertyModel.MapType != "" {
+					code.Print("if m.%s != nil {", propertyModel.FieldName())
+					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})")
+					code.Print("}")
+					code.Print("}")
+					code.Print("// %+v", propertyModel)
 				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("items := make([]yaml.MapSlice, 0)")
+					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
+					code.Print("items = append(items, item.ToMapSlice())")
+					code.Print("}")
+					code.Print("info = append(info, yaml.MapItem{\"%s\", items})", propertyName)
+					code.Print("}")
 					code.Print("// %+v", propertyModel)
 				}
 			}
 		}
+		code.Print("return info")
 	}
-	code.Print("return info")
 	code.Print("}\n")
 }

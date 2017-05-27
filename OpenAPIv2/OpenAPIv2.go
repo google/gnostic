@@ -6944,43 +6944,93 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 }
 
 func (m *AdditionalPropertiesItem) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:AdditionalPropertiesItem Properties:[0xc4201ce300 0xc4201ce380] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSchema()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// unhandled boolean
+	return nil
 }
 
 func (m *Any) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
 	// &{Name:value Type:google.protobuf.Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"yaml", m.Yaml})
+	if m.Yaml != "" {
+		// m.Yaml is text ... deserialize it and return the object
+		_ = yaml.Unmarshal([]byte(m.Yaml), &info)
+		fmt.Printf("-----\n%+v\n", m.Yaml)
+		fmt.Printf("%+v\n", info)
+		return info
+	}
 	return info
 }
 
 func (m *ApiKeySecurity) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"in", m.In})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *BasicAuthenticationSecurity) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *BodyParameter) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"in", m.In})
-	// &{Name:required Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Determines whether or not this parameter is required or optional.}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
 	if m.Schema != nil {
 		info = append(info, yaml.MapItem{"schema", m.Schema.ToMapSlice()})
+	}
+	// &{Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
@@ -6988,55 +7038,114 @@ func (m *BodyParameter) ToMapSlice() yaml.MapSlice {
 
 func (m *Contact) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"url", m.Url})
-	info = append(info, yaml.MapItem{"email", m.Email})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.Email != "" {
+		info = append(info, yaml.MapItem{"email", m.Email})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Default) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:false Description:}
 	return info
 }
 
 func (m *Definitions) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedSchema StringEnumValues:[] MapType:Schema Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *Document) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"swagger", m.Swagger})
+	if m.Swagger != "" {
+		info = append(info, yaml.MapItem{"swagger", m.Swagger})
+	}
 	if m.Info != nil {
 		info = append(info, yaml.MapItem{"info", m.Info.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"host", m.Host})
-	info = append(info, yaml.MapItem{"basePath", m.BasePath})
-	// &{Name:schemes Type:string StringEnumValues:[http https ws wss] MapType: Repeated:true Pattern: Implicit:false Description:The transfer protocol of the API.}
-	// &{Name:consumes Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:A list of MIME types accepted by the API.}
-	// &{Name:produces Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:A list of MIME types the API can produce.}
+	// &{Name:info Type:Info StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Host != "" {
+		info = append(info, yaml.MapItem{"host", m.Host})
+	}
+	if m.BasePath != "" {
+		info = append(info, yaml.MapItem{"basePath", m.BasePath})
+	}
+	if len(m.Schemes) != 0 {
+		info = append(info, yaml.MapItem{"schemes", m.Schemes})
+	}
+	if len(m.Consumes) != 0 {
+		info = append(info, yaml.MapItem{"consumes", m.Consumes})
+	}
+	if len(m.Produces) != 0 {
+		info = append(info, yaml.MapItem{"produces", m.Produces})
+	}
 	if m.Paths != nil {
 		info = append(info, yaml.MapItem{"paths", m.Paths.ToMapSlice()})
 	}
+	// &{Name:paths Type:Paths StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Definitions != nil {
 		info = append(info, yaml.MapItem{"definitions", m.Definitions.ToMapSlice()})
 	}
+	// &{Name:definitions Type:Definitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Parameters != nil {
 		info = append(info, yaml.MapItem{"parameters", m.Parameters.ToMapSlice()})
 	}
+	// &{Name:parameters Type:ParameterDefinitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Responses != nil {
 		info = append(info, yaml.MapItem{"responses", m.Responses.ToMapSlice()})
+	}
+	// &{Name:responses Type:ResponseDefinitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Security) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Security {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"security", items})
 	}
 	// &{Name:security Type:SecurityRequirement StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
 	if m.SecurityDefinitions != nil {
 		info = append(info, yaml.MapItem{"securityDefinitions", m.SecurityDefinitions.ToMapSlice()})
 	}
+	// &{Name:securityDefinitions Type:SecurityDefinitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Tags) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Tags {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"tags", items})
+	}
 	// &{Name:tags Type:Tag StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
 	if m.ExternalDocs != nil {
 		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToMapSlice()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
@@ -7044,34 +7153,68 @@ func (m *Document) ToMapSlice() yaml.MapSlice {
 
 func (m *Examples) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *ExternalDocs) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"url", m.Url})
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *FileSchema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"format", m.Format})
-	info = append(info, yaml.MapItem{"title", m.Title})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:required Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	// &{Name:readOnly Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Required) != 0 {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.ReadOnly != false {
+		info = append(info, yaml.MapItem{"readOnly", m.ReadOnly})
+	}
 	if m.ExternalDocs != nil {
 		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToMapSlice()})
 	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Example != nil {
 		info = append(info, yaml.MapItem{"example", m.Example.ToMapSlice()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
@@ -7079,112 +7222,278 @@ func (m *FileSchema) ToMapSlice() yaml.MapSlice {
 
 func (m *FormDataParameterSubSchema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:required Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Determines whether or not this parameter is required or optional.}
-	info = append(info, yaml.MapItem{"in", m.In})
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"name", m.Name})
-	// &{Name:allowEmptyValue Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:allows sending a parameter by name only or with an empty value.}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"format", m.Format})
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.AllowEmptyValue != false {
+		info = append(info, yaml.MapItem{"allowEmptyValue", m.AllowEmptyValue})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
 	if m.Items != nil {
 		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Header) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"format", m.Format})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
 	if m.Items != nil {
 		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *HeaderParameterSubSchema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:required Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Determines whether or not this parameter is required or optional.}
-	info = append(info, yaml.MapItem{"in", m.In})
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"format", m.Format})
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
 	if m.Items != nil {
 		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Headers) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedHeader StringEnumValues:[] MapType:Header Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *Info) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"title", m.Title})
-	info = append(info, yaml.MapItem{"version", m.Version})
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"termsOfService", m.TermsOfService})
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Version != "" {
+		info = append(info, yaml.MapItem{"version", m.Version})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.TermsOfService != "" {
+		info = append(info, yaml.MapItem{"termsOfService", m.TermsOfService})
+	}
 	if m.Contact != nil {
 		info = append(info, yaml.MapItem{"contact", m.Contact.ToMapSlice()})
 	}
+	// &{Name:contact Type:Contact StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.License != nil {
 		info = append(info, yaml.MapItem{"license", m.License.ToMapSlice()})
+	}
+	// &{Name:license Type:License StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
@@ -7192,149 +7501,270 @@ func (m *Info) ToMapSlice() yaml.MapSlice {
 
 func (m *ItemsItem) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if len(m.Schema) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Schema {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"schema", items})
+	}
 	// &{Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
 	return info
 }
 
 func (m *JsonReference) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"$ref", m.XRef})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
 	return info
 }
 
 func (m *License) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"url", m.Url})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *NamedAny) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedHeader) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:Header StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedParameter) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedPathItem) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:PathItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedResponse) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedResponseValue) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:ResponseValue StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedSchema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedSecurityDefinitionsItem) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:SecurityDefinitionsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NamedString) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"value", m.Value})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Value != "" {
+		info = append(info, yaml.MapItem{"value", m.Value})
+	}
 	return info
 }
 
 func (m *NamedStringArray) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
 	// &{Name:value Type:StringArray StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 func (m *NonBodyParameter) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:NonBodyParameter Properties:[0xc4201c8800 0xc4201c8880 0xc4201c8900 0xc4201c8980] Required:[in name type] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:headerParameterSubSchema Type:HeaderParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetHeaderParameterSubSchema()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:formDataParameterSubSchema Type:FormDataParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetFormDataParameterSubSchema()
+	if v1 != nil {
+		return v1.ToMapSlice()
+	}
+	// {Name:queryParameterSubSchema Type:QueryParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v2 := m.GetQueryParameterSubSchema()
+	if v2 != nil {
+		return v2.ToMapSlice()
+	}
+	// {Name:pathParameterSubSchema Type:PathParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v3 := m.GetPathParameterSubSchema()
+	if v3 != nil {
+		return v3.ToMapSlice()
+	}
+	return nil
 }
 
 func (m *Oauth2AccessCodeSecurity) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"flow", m.Flow})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
 	if m.Scopes != nil {
 		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
-	info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.AuthorizationUrl != "" {
+		info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
+	}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Oauth2ApplicationSecurity) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"flow", m.Flow})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
 	if m.Scopes != nil {
 		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Oauth2ImplicitSecurity) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"flow", m.Flow})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
 	if m.Scopes != nil {
 		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.AuthorizationUrl != "" {
+		info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Oauth2PasswordSecurity) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"flow", m.Flow})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
 	if m.Scopes != nil {
 		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
@@ -7347,185 +7777,439 @@ func (m *Oauth2Scopes) ToMapSlice() yaml.MapSlice {
 
 func (m *Operation) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:tags Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"summary", m.Summary})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if len(m.Tags) != 0 {
+		info = append(info, yaml.MapItem{"tags", m.Tags})
+	}
+	if m.Summary != "" {
+		info = append(info, yaml.MapItem{"summary", m.Summary})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
 	if m.ExternalDocs != nil {
 		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"operationId", m.OperationId})
-	// &{Name:produces Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:A list of MIME types the API can produce.}
-	// &{Name:consumes Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:A list of MIME types the API can consume.}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.OperationId != "" {
+		info = append(info, yaml.MapItem{"operationId", m.OperationId})
+	}
+	if len(m.Produces) != 0 {
+		info = append(info, yaml.MapItem{"produces", m.Produces})
+	}
+	if len(m.Consumes) != 0 {
+		info = append(info, yaml.MapItem{"consumes", m.Consumes})
+	}
+	if len(m.Parameters) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Parameters {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"parameters", items})
+	}
 	// &{Name:parameters Type:ParametersItem StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:The parameters needed to send a valid API call.}
 	if m.Responses != nil {
 		info = append(info, yaml.MapItem{"responses", m.Responses.ToMapSlice()})
 	}
-	// &{Name:schemes Type:string StringEnumValues:[http https ws wss] MapType: Repeated:true Pattern: Implicit:false Description:The transfer protocol of the API.}
-	// &{Name:deprecated Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:responses Type:Responses StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Schemes) != 0 {
+		info = append(info, yaml.MapItem{"schemes", m.Schemes})
+	}
+	if m.Deprecated != false {
+		info = append(info, yaml.MapItem{"deprecated", m.Deprecated})
+	}
+	if len(m.Security) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Security {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"security", items})
+	}
 	// &{Name:security Type:SecurityRequirement StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Parameter) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:Parameter Properties:[0xc4201c8a00 0xc4201c8a80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:bodyParameter Type:BodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetBodyParameter()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:nonBodyParameter Type:NonBodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetNonBodyParameter()
+	if v1 != nil {
+		return v1.ToMapSlice()
+	}
+	return nil
 }
 
 func (m *ParameterDefinitions) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedParameter StringEnumValues:[] MapType:Parameter Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *ParametersItem) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:ParametersItem Properties:[0xc4201ce880 0xc4201ce900] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetParameter()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:jsonReference Type:JsonReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetJsonReference()
+	if v1 != nil {
+		return v1.ToMapSlice()
+	}
+	return nil
 }
 
 func (m *PathItem) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"$ref", m.XRef})
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
 	if m.Get != nil {
 		info = append(info, yaml.MapItem{"get", m.Get.ToMapSlice()})
 	}
+	// &{Name:get Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Put != nil {
 		info = append(info, yaml.MapItem{"put", m.Put.ToMapSlice()})
 	}
+	// &{Name:put Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Post != nil {
 		info = append(info, yaml.MapItem{"post", m.Post.ToMapSlice()})
 	}
+	// &{Name:post Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Delete != nil {
 		info = append(info, yaml.MapItem{"delete", m.Delete.ToMapSlice()})
 	}
+	// &{Name:delete Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Options != nil {
 		info = append(info, yaml.MapItem{"options", m.Options.ToMapSlice()})
 	}
+	// &{Name:options Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Head != nil {
 		info = append(info, yaml.MapItem{"head", m.Head.ToMapSlice()})
 	}
+	// &{Name:head Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Patch != nil {
 		info = append(info, yaml.MapItem{"patch", m.Patch.ToMapSlice()})
 	}
+	// &{Name:patch Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Parameters) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Parameters {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"parameters", items})
+	}
 	// &{Name:parameters Type:ParametersItem StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:The parameters needed to send a valid API call.}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *PathParameterSubSchema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:required Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Determines whether or not this parameter is required or optional.}
-	info = append(info, yaml.MapItem{"in", m.In})
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"format", m.Format})
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
 	if m.Items != nil {
 		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Paths) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	if m.Path != nil {
+		for _, item := range m.Path {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
 	return info
 }
 
 func (m *PrimitivesItems) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"format", m.Format})
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
 	if m.Items != nil {
 		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Properties) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedSchema StringEnumValues:[] MapType:Schema Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *QueryParameterSubSchema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:required Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Determines whether or not this parameter is required or optional.}
-	info = append(info, yaml.MapItem{"in", m.In})
-	info = append(info, yaml.MapItem{"description", m.Description})
-	info = append(info, yaml.MapItem{"name", m.Name})
-	// &{Name:allowEmptyValue Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:allows sending a parameter by name only or with an empty value.}
-	info = append(info, yaml.MapItem{"type", m.Type})
-	info = append(info, yaml.MapItem{"format", m.Format})
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.AllowEmptyValue != false {
+		info = append(info, yaml.MapItem{"allowEmptyValue", m.AllowEmptyValue})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
 	if m.Items != nil {
 		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Response) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
 	if m.Schema != nil {
 		info = append(info, yaml.MapItem{"schema", m.Schema.ToMapSlice()})
 	}
+	// &{Name:schema Type:SchemaItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Headers != nil {
 		info = append(info, yaml.MapItem{"headers", m.Headers.ToMapSlice()})
 	}
+	// &{Name:headers Type:Headers StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Examples != nil {
 		info = append(info, yaml.MapItem{"examples", m.Examples.ToMapSlice()})
+	}
+	// &{Name:examples Type:Examples StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
@@ -7533,108 +8217,273 @@ func (m *Response) ToMapSlice() yaml.MapSlice {
 
 func (m *ResponseDefinitions) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedResponse StringEnumValues:[] MapType:Response Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *ResponseValue) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:ResponseValue Properties:[0xc4201c4400 0xc4201c4480] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetResponse()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:jsonReference Type:JsonReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetJsonReference()
+	if v1 != nil {
+		return v1.ToMapSlice()
+	}
+	return nil
 }
 
 func (m *Responses) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.ResponseCode != nil {
+		for _, item := range m.ResponseCode {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:responseCode Type:NamedResponseValue StringEnumValues:[] MapType:ResponseValue Repeated:true Pattern:^([0-9]{3})$|^(default)$ Implicit:true Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Schema) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"$ref", m.XRef})
-	info = append(info, yaml.MapItem{"format", m.Format})
-	info = append(info, yaml.MapItem{"title", m.Title})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
 	if m.Default != nil {
 		info = append(info, yaml.MapItem{"default", m.Default.ToMapSlice()})
 	}
-	// &{Name:multipleOf Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maximum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMaximum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minimum Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:exclusiveMinimum Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minLength Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	info = append(info, yaml.MapItem{"pattern", m.Pattern})
-	// &{Name:maxItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minItems Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:uniqueItems Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:maxProperties Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:minProperties Type:int StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:required Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if m.MaxProperties != 0 {
+		info = append(info, yaml.MapItem{"maxProperties", m.MaxProperties})
+	}
+	if m.MinProperties != 0 {
+		info = append(info, yaml.MapItem{"minProperties", m.MinProperties})
+	}
+	if len(m.Required) != 0 {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
 	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
 	if m.AdditionalProperties != nil {
 		info = append(info, yaml.MapItem{"additionalProperties", m.AdditionalProperties.ToMapSlice()})
 	}
+	// &{Name:additionalProperties Type:AdditionalPropertiesItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Type != nil {
-		info = append(info, yaml.MapItem{"type", m.Type.ToMapSlice()})
+		if len(m.Type.Value) == 1 {
+			info = append(info, yaml.MapItem{"type", m.Type.Value[0]})
+		} else {
+			info = append(info, yaml.MapItem{"type", m.Type.Value})
+		}
 	}
+	// &{Name:type Type:TypeItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
-		info = append(info, yaml.MapItem{"items", m.Items.ToMapSlice()})
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.Items.Schema {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"items", items[0]})
+	}
+	// &{Name:items Type:ItemsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.AllOf) != 0 {
+		items := make([]yaml.MapSlice, 0)
+		for _, item := range m.AllOf {
+			items = append(items, item.ToMapSlice())
+		}
+		info = append(info, yaml.MapItem{"allOf", items})
 	}
 	// &{Name:allOf Type:Schema StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
 	if m.Properties != nil {
 		info = append(info, yaml.MapItem{"properties", m.Properties.ToMapSlice()})
 	}
-	info = append(info, yaml.MapItem{"discriminator", m.Discriminator})
-	// &{Name:readOnly Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:properties Type:Properties StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Discriminator != "" {
+		info = append(info, yaml.MapItem{"discriminator", m.Discriminator})
+	}
+	if m.ReadOnly != false {
+		info = append(info, yaml.MapItem{"readOnly", m.ReadOnly})
+	}
 	if m.Xml != nil {
 		info = append(info, yaml.MapItem{"xml", m.Xml.ToMapSlice()})
 	}
+	// &{Name:xml Type:Xml StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.ExternalDocs != nil {
 		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToMapSlice()})
 	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Example != nil {
 		info = append(info, yaml.MapItem{"example", m.Example.ToMapSlice()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *SchemaItem) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:SchemaItem Properties:[0xc4201ce980 0xc4201cea00] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSchema()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:fileSchema Type:FileSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetFileSchema()
+	if v1 != nil {
+		return v1.ToMapSlice()
+	}
+	return nil
 }
 
 func (m *SecurityDefinitions) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedSecurityDefinitionsItem StringEnumValues:[] MapType:SecurityDefinitionsItem Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *SecurityDefinitionsItem) ToMapSlice() yaml.MapSlice {
-	info := yaml.MapSlice{}
-	return info
+	// ONE OF WRAPPER
+	// &{Name:SecurityDefinitionsItem Properties:[0xc4201ce580 0xc4201ce600 0xc4201ce680 0xc4201ce700 0xc4201ce780 0xc4201ce800] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// {Name:basicAuthenticationSecurity Type:BasicAuthenticationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetBasicAuthenticationSecurity()
+	if v0 != nil {
+		return v0.ToMapSlice()
+	}
+	// {Name:apiKeySecurity Type:ApiKeySecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetApiKeySecurity()
+	if v1 != nil {
+		return v1.ToMapSlice()
+	}
+	// {Name:oauth2ImplicitSecurity Type:Oauth2ImplicitSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v2 := m.GetOauth2ImplicitSecurity()
+	if v2 != nil {
+		return v2.ToMapSlice()
+	}
+	// {Name:oauth2PasswordSecurity Type:Oauth2PasswordSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v3 := m.GetOauth2PasswordSecurity()
+	if v3 != nil {
+		return v3.ToMapSlice()
+	}
+	// {Name:oauth2ApplicationSecurity Type:Oauth2ApplicationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v4 := m.GetOauth2ApplicationSecurity()
+	if v4 != nil {
+		return v4.ToMapSlice()
+	}
+	// {Name:oauth2AccessCodeSecurity Type:Oauth2AccessCodeSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v5 := m.GetOauth2AccessCodeSecurity()
+	if v5 != nil {
+		return v5.ToMapSlice()
+	}
+	return nil
 }
 
 func (m *SecurityRequirement) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedStringArray StringEnumValues:[] MapType:StringArray Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *StringArray) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:value Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.Value) != 0 {
+		info = append(info, yaml.MapItem{"value", m.Value})
+	}
 	return info
 }
 
 func (m *Tag) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"description", m.Description})
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
 	if m.ExternalDocs != nil {
 		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToMapSlice()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
 	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
@@ -7642,23 +8491,45 @@ func (m *Tag) ToMapSlice() yaml.MapSlice {
 
 func (m *TypeItem) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	// &{Name:value Type:string StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.Value) != 0 {
+		info = append(info, yaml.MapItem{"value", m.Value})
+	}
 	return info
 }
 
 func (m *VendorExtension) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
 func (m *Xml) ToMapSlice() yaml.MapSlice {
 	info := yaml.MapSlice{}
-	info = append(info, yaml.MapItem{"name", m.Name})
-	info = append(info, yaml.MapItem{"namespace", m.Namespace})
-	info = append(info, yaml.MapItem{"prefix", m.Prefix})
-	// &{Name:attribute Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// &{Name:wrapped Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Namespace != "" {
+		info = append(info, yaml.MapItem{"namespace", m.Namespace})
+	}
+	if m.Prefix != "" {
+		info = append(info, yaml.MapItem{"prefix", m.Prefix})
+	}
+	if m.Attribute != false {
+		info = append(info, yaml.MapItem{"attribute", m.Attribute})
+	}
+	if m.Wrapped != false {
+		info = append(info, yaml.MapItem{"wrapped", m.Wrapped})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})
+		}
+	}
 	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
