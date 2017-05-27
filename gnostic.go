@@ -403,13 +403,15 @@ func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err err
 	// try to read an OpenAPI v3 document
 	document_v3 := &openapi_v3.Document{}
 	err = proto.Unmarshal(data, document_v3)
-	if err == nil {
+	if err == nil && document_v3.Openapi == "3.0" {
+		g.openAPIVersion = OpenAPIv3
 		return document_v3, nil
 	}
 	// if that failed, try to read an OpenAPI v2 document
 	document_v2 := &openapi_v2.Document{}
 	err = proto.Unmarshal(data, document_v2)
-	if err == nil {
+	if err == nil && document_v2.Swagger == "2.0" {
+		g.openAPIVersion = OpenAPIv2
 		return document_v2, nil
 	}
 	return nil, err
