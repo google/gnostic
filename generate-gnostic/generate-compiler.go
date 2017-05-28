@@ -53,9 +53,9 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateResolveReferencesMethodsForType(code, typeName)
 	}
 
-	// generate ToMapSlice() methods for each type
+	// generate ToRawInfo() methods for each type
 	for _, typeName := range typeNames {
-		domain.generateToMapSliceMethodsForType(code, typeName)
+		domain.generateToRawInfoMethodForType(code, typeName)
 	}
 
 	return code.String()
@@ -642,11 +642,25 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 	code.Print("}\n")
 }
 
-// ToMapSlice() methods
-func (domain *Domain) generateToMapSliceMethodsForType(code *printer.Code, typeName string) {
-	code.Print("func (m *%s) ToMapSlice() yaml.MapSlice {", typeName)
+// ToRawInfo() methods
+func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeName string) {
+	code.Print("func (m *%s) ToRawInfo() interface{} {", typeName)
 	typeModel := domain.TypeModels[typeName]
-	if typeModel.OneOfWrapper {
+	if typeName == "Any" {
+		code.Print("var err error")
+		code.Print("var info1 []yaml.MapSlice")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info1)")
+		code.Print("if err == nil {return info1}")
+		code.Print("var info2 yaml.MapSlice")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info2)")
+		code.Print("if err == nil {return info2}")
+		code.Print("var info3 interface{}")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info3)")
+		code.Print("if err == nil {return info3}")
+		code.Print("return nil")
+	} else if typeName == "StringArray" {
+		code.Print("return m.Value")
+	} else if typeModel.OneOfWrapper {
 		code.Print("// ONE OF WRAPPER")
 		code.Print("// %+v", typeModel)
 		for i, item := range typeModel.Properties {
@@ -654,7 +668,7 @@ func (domain *Domain) generateToMapSliceMethodsForType(code *printer.Code, typeN
 			if item.Type != "bool" {
 				code.Print("v%d := m.Get%s()", i, item.Type)
 				code.Print("if v%d != nil {", i)
-				code.Print(" return v%d.ToMapSlice()", i)
+				code.Print(" return v%d.ToRawInfo()", i)
 				code.Print("}")
 			} else {
 				code.Print("// unhandled boolean")
@@ -722,13 +736,13 @@ func (domain *Domain) generateToMapSliceMethodsForType(code *printer.Code, typeN
 						code.Print("info = append(info, yaml.MapItem{\"type\", m.Type.Value})")
 						code.Print("}")
 					} else if propertyModel.Type == "ItemsItem" {
-						code.Print("items := make([]yaml.MapSlice, 0)")
+						code.Print("items := make([]interface{}, 0)")
 						code.Print("for _, item := range m.Items.Schema {")
-						code.Print("	items = append(items, item.ToMapSlice())")
+						code.Print("	items = append(items, item.ToRawInfo())")
 						code.Print("}")
 						code.Print("info = append(info, yaml.MapItem{\"items\", items[0]})")
 					} else {
-						code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s.ToMapSlice()})",
+						code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s.ToRawInfo()})",
 							propertyName, propertyModel.FieldName())
 					}
 					code.Print("}")
@@ -738,15 +752,15 @@ func (domain *Domain) generateToMapSliceMethodsForType(code *printer.Code, typeN
 				} else if propertyModel.MapType != "" {
 					code.Print("if m.%s != nil {", propertyModel.FieldName())
 					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{item.Name, item.Value.ToMapSlice()})")
+					code.Print("info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})")
 					code.Print("}")
 					code.Print("}")
 					code.Print("// %+v", propertyModel)
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("items := make([]yaml.MapSlice, 0)")
+					code.Print("items := make([]interface{}, 0)")
 					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
-					code.Print("items = append(items, item.ToMapSlice())")
+					code.Print("items = append(items, item.ToRawInfo())")
 					code.Print("}")
 					code.Print("info = append(info, yaml.MapItem{\"%s\", items})", propertyName)
 					code.Print("}")

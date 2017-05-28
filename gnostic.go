@@ -462,8 +462,7 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 		var bytes []byte
 		if g.openAPIVersion == OpenAPIv2 {
 			document := message.(*openapi_v2.Document)
-			info := document.ToMapSlice()
-			bytes, err = yaml.Marshal(info)
+			bytes, err = yaml.Marshal(document.ToRawInfo())
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating yaml output %s\n", err.Error())
 			}
