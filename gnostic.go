@@ -462,10 +462,10 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating json output %s\n", err.Error())
 			}
+			writeFile(g.jsonOutputPath, bytes, g.sourceName, "json")
+		} else {
+			fmt.Fprintf(os.Stderr, "No json output available.\n")
 		}
-		writeFile(g.jsonOutputPath, bytes, g.sourceName, "json")
-	} else {
-		fmt.Fprintf(os.Stderr, "No json output available.\n")
 	}
 }
 

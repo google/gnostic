@@ -23,7 +23,7 @@ func test_compiler(t *testing.T, input_file string, reference_file string, expec
 		"--text-out=.",
 		"--errors-out=.",
 		"--resolve-refs")
-	t.Log(cmd.Args)
+	//t.Log(cmd.Args)
 	err = cmd.Run()
 	if err != nil && !expect_errors {
 		t.Logf("Compile failed: %+v", err)
@@ -347,6 +347,86 @@ func TestYAMLOutput(t *testing.T) {
 		os.Remove(text_file2)
 		os.Remove(yaml_file2)
 	}
+}
+
+func TestBuilder(t *testing.T) {
+	var err error
+
+	pb_file := "petstore.pb"
+	yaml_file := "petstore.yaml"
+	json_file := "petstore.json"
+	text_file := "petstore.text"
+	text_reference := "test/v2.0/petstore.text"
+
+	os.Remove(pb_file)
+	os.Remove(text_file)
+	os.Remove(yaml_file)
+	os.Remove(json_file)
+
+	// Generate petstore.pb.
+	command := exec.Command(
+		"petstore-builder")
+	_, err = command.Output()
+	if err != nil {
+		t.Logf("Command %v failed: %+v", command, err)
+		t.FailNow()
+	}
+
+	// Convert petstore.pb to yaml and json.
+	command = exec.Command(
+		"gnostic",
+		pb_file,
+		"--json-out="+json_file,
+		"--yaml-out="+yaml_file)
+	_, err = command.Output()
+	if err != nil {
+		t.Logf("Command %v failed: %+v", command, err)
+		t.FailNow()
+	}
+
+	// Read petstore.yaml, resolve references, and export text.
+	command = exec.Command(
+		"gnostic",
+		yaml_file,
+		"--resolve-refs",
+		"--text-out="+text_file)
+	_, err = command.Output()
+	if err != nil {
+		t.Logf("Command %v failed: %+v", command, err)
+		t.FailNow()
+	}
+
+	// Verify that the generated text matches our reference.
+	err = exec.Command("diff", text_file, text_reference).Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	}
+
+	// Read petstore.json, resolve references, and export text.
+	command = exec.Command(
+		"gnostic",
+		json_file,
+		"--resolve-refs",
+		"--text-out="+text_file)
+	_, err = command.Output()
+	if err != nil {
+		t.Logf("Command %v failed: %+v", command, err)
+		t.FailNow()
+	}
+
+	// Verify that the generated text matches our reference.
+	err = exec.Command("diff", text_file, text_reference).Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	}
+
+	// if the test succeeded, clean up
+	os.Remove(pb_file)
+	os.Remove(text_file)
+	os.Remove(yaml_file)
+	os.Remove(json_file)
 }
 
 // OpenAPI 3.0 tests
