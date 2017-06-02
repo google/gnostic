@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/googleapis/gnostic/jsonschema"
 )
@@ -69,6 +70,15 @@ func NewTypePropertyWithNameAndType(name string, typeName string) *TypeProperty 
 
 func NewTypePropertyWithNameTypeAndPattern(name string, typeName string, pattern string) *TypeProperty {
 	return &TypeProperty{Name: name, Type: typeName, Pattern: pattern}
+}
+
+func (typeProperty *TypeProperty) FieldName() string {
+	propertyName := typeProperty.Name
+	if propertyName == "$ref" {
+		return "XRef"
+	} else {
+		return strings.Title(propertyName)
+	}
 }
 
 // models types
