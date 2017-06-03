@@ -438,8 +438,11 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 			rawInfo = nil
 		}
 	} else if g.openAPIVersion == OpenAPIv3 {
-		//document := message.(*openapi_v3.Document)
-		rawInfo = nil
+		document := message.(*openapi_v3.Document)
+		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
+		if !ok {
+			rawInfo = nil
+		}
 	}
 	// Optionally write description in yaml format.
 	if g.yamlOutputPath != "" {
