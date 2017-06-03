@@ -352,7 +352,7 @@ func TestYAMLOutput(t *testing.T) {
 func TestBuilder(t *testing.T) {
 	var err error
 
-	pb_file := "petstore.pb"
+	pb_file := "petstore-v2.pb"
 	yaml_file := "petstore.yaml"
 	json_file := "petstore.json"
 	text_file := "petstore.text"
@@ -365,7 +365,8 @@ func TestBuilder(t *testing.T) {
 
 	// Generate petstore.pb.
 	command := exec.Command(
-		"petstore-builder")
+		"petstore-builder",
+		"--v2")
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Command %v failed: %+v", command, err)
