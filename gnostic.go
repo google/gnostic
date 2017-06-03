@@ -33,7 +33,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -48,7 +47,9 @@ import (
 	"github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"
+	"github.com/googleapis/gnostic/jsonwriter"
 	plugins "github.com/googleapis/gnostic/plugins"
+	"gopkg.in/yaml.v2"
 )
 
 const ( // OpenAPI Version
@@ -57,7 +58,8 @@ const ( // OpenAPI Version
 	OpenAPIv3       = 3
 )
 
-func openapi_version(info interface{}) int {
+// Determine the version of an OpenAPI description read from JSON or YAML.
+func getOpenAPIVersionFromInfo(info interface{}) int {
 	m, ok := compiler.UnpackMap(info)
 	if !ok {
 		return OpenAPIvUnknown
@@ -73,19 +75,25 @@ func openapi_version(info interface{}) int {
 	return OpenAPIvUnknown
 }
 
+const (
+	pluginPrefix    = "gnostic-"
+	extensionPrefix = "gnostic-x-"
+)
+
 type PluginCall struct {
 	Name       string
 	Invocation string
 }
 
-func (pluginCall *PluginCall) perform(document proto.Message, openapi_version int, sourceName string) error {
+// Invokes a plugin.
+func (pluginCall *PluginCall) perform(document proto.Message, openAPIVersion int, sourceName string) error {
 	if pluginCall.Name != "" {
 		request := &plugins.Request{}
 
 		// Infer the name of the executable by adding the prefix.
-		executableName := "gnostic-" + pluginCall.Name
+		executableName := pluginPrefix + pluginCall.Name
 
-		// validate invocation string with regular expression
+		// Validate invocation string with regular expression.
 		invocation := pluginCall.Invocation
 
 		//
@@ -130,7 +138,7 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 
 		wrapper := &plugins.Wrapper{}
 		wrapper.Name = sourceName
-		switch openapi_version {
+		switch openAPIVersion {
 		case OpenAPIv2:
 			wrapper.Version = "v2"
 		case OpenAPIv3:
@@ -160,10 +168,10 @@ func (pluginCall *PluginCall) perform(document proto.Message, openapi_version in
 			return errors.New(fmt.Sprintf("Plugin error: %+v", response.Errors))
 		}
 
-		// write files to the specified directory
+		// Write files to the specified directory.
 		var writer io.Writer
 		if outputLocation == "!" {
-			// write nothing
+			// Write nothing.
 		} else if outputLocation == "-" {
 			writer = os.Stdout
 			for _, file := range response.Files {
@@ -205,6 +213,13 @@ func isDirectory(path string) bool {
 	return fileInfo.IsDir()
 }
 
+// Write bytes to a named file.
+// Certain names have special meaning:
+//   ! writes nothing
+//   - writes to stdout
+//   = writes to stderr
+// If a directory name is given, the file is written there with
+// a name derived from the source and extension arguments.
 func writeFile(name string, bytes []byte, source string, extension string) {
 	var writer io.Writer
 	if name == "!" {
@@ -215,9 +230,9 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = os.Stderr
 	} else if isDirectory(name) {
 		base := filepath.Base(source)
-		// remove the original source extension
+		// Remove the original source extension.
 		base = base[0 : len(base)-len(filepath.Ext(base))]
-		// build the path that puts the result in the passed-in directory
+		// Build the path that puts the result in the passed-in directory.
 		filename := name + "/" + base + "." + extension
 		file, _ := os.Create(filename)
 		defer file.Close()
@@ -233,14 +248,33 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 	}
 }
 
-func main() {
-	usage := `
+// The Gnostic structure holds global state information for gnostic.
+type Gnostic struct {
+	usage             string
+	sourceName        string
+	binaryOutputPath  string
+	textOutputPath    string
+	yamlOutputPath    string
+	jsonOutputPath    string
+	errorOutputPath   string
+	resolveReferences bool
+	pluginCalls       []*PluginCall
+	extensionHandlers []compiler.ExtensionHandler
+	openAPIVersion    int
+}
+
+// Initialize a structure to store global application state.
+func newGnostic() *Gnostic {
+	g := &Gnostic{}
+	// Option fields initialize to their default values.
+	g.usage = `
 Usage: gnostic OPENAPI_SOURCE [OPTIONS]
   OPENAPI_SOURCE is the filename or URL of an OpenAPI description to read.
 Options:
   --pb-out=PATH       Write a binary proto to the specified location.
-  --json-out=PATH     Write a json proto to the specified location.
   --text-out=PATH     Write a text proto to the specified location.
+  --json-out=PATH     Write a json API description to the specified location.
+  --yaml-out=PATH     Write a yaml API description to the specified location.
   --errors-out=PATH   Write compilation errors to the specified location.
   --PLUGIN-out=PATH   Run the plugin named gnostic_PLUGIN and write results
                       to the specified location.
@@ -249,22 +283,19 @@ Options:
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
 `
-	// default values for all options
-	sourceName := ""
-	binaryProtoPath := ""
-	jsonProtoPath := ""
-	textProtoPath := ""
-	errorPath := ""
-	pluginCalls := make([]*PluginCall, 0)
-	resolveReferences := false
-	extensionHandlers := make([]compiler.ExtensionHandler, 0)
+	// Initialize internal structures.
+	g.pluginCalls = make([]*PluginCall, 0)
+	g.extensionHandlers = make([]compiler.ExtensionHandler, 0)
+	return g
+}
 
-	// arg processing matches patterns of the form "--PLUGIN-out=PATH" and "--PLUGIN_out=PATH"
+// Parse command-line options.
+func (g *Gnostic) readOptions() {
+	// plugin processing matches patterns of the form "--PLUGIN-out=PATH" and "--PLUGIN_out=PATH"
 	plugin_regex := regexp.MustCompile("--(.+)[-_]out=(.+)")
 
-	// arg processing matches patterns of the form "--x=GENERATOR_NAME"
-	extensionHandler_regex, err := regexp.Compile("--x-(.+)")
-	defaultPrefixForExtensions := "gnostic-x-"
+	// extension processing matches patterns of the form "--x-EXTENSION"
+	extension_regex := regexp.MustCompile("--x-(.+)")
 
 	for i, arg := range os.Args {
 		if i == 0 {
@@ -276,118 +307,246 @@ Options:
 			invocation := string(m[2])
 			switch pluginName {
 			case "pb":
-				binaryProtoPath = invocation
-			case "json":
-				jsonProtoPath = invocation
+				g.binaryOutputPath = invocation
 			case "text":
-				textProtoPath = invocation
+				g.textOutputPath = invocation
+			case "json":
+				g.jsonOutputPath = invocation
+			case "yaml":
+				g.yamlOutputPath = invocation
 			case "errors":
-				errorPath = invocation
+				g.errorOutputPath = invocation
 			default:
 				pluginCall := &PluginCall{Name: pluginName, Invocation: invocation}
-				pluginCalls = append(pluginCalls, pluginCall)
+				g.pluginCalls = append(g.pluginCalls, pluginCall)
 			}
-		} else if m = extensionHandler_regex.FindSubmatch([]byte(arg)); m != nil {
-			extensionHandlers = append(extensionHandlers, compiler.ExtensionHandler{Name: defaultPrefixForExtensions + string(m[1])})
+		} else if m = extension_regex.FindSubmatch([]byte(arg)); m != nil {
+			extensionName := string(m[1])
+			extensionHandler := compiler.ExtensionHandler{Name: extensionPrefix + extensionName}
+			g.extensionHandlers = append(g.extensionHandlers, extensionHandler)
 		} else if arg == "--resolve-refs" {
-			resolveReferences = true
+			g.resolveReferences = true
 		} else if arg[0] == '-' {
-			fmt.Fprintf(os.Stderr, "Unknown option: %s.\n%s\n", arg, usage)
+			fmt.Fprintf(os.Stderr, "Unknown option: %s.\n%s\n", arg, g.usage)
 			os.Exit(-1)
 		} else {
-			sourceName = arg
+			g.sourceName = arg
 		}
 	}
+}
 
-	if binaryProtoPath == "" &&
-		jsonProtoPath == "" &&
-		textProtoPath == "" &&
-		errorPath == "" &&
-		len(pluginCalls) == 0 {
-		fmt.Fprintf(os.Stderr, "Missing output directives.\n%s\n", usage)
+// Validate command-line options.
+func (g *Gnostic) validateOptions() {
+	if g.binaryOutputPath == "" &&
+		g.textOutputPath == "" &&
+		g.yamlOutputPath == "" &&
+		g.jsonOutputPath == "" &&
+		g.errorOutputPath == "" &&
+		len(g.pluginCalls) == 0 {
+		fmt.Fprintf(os.Stderr, "Missing output directives.\n%s\n", g.usage)
 		os.Exit(-1)
 	}
-
-	if sourceName == "" {
-		fmt.Fprintf(os.Stderr, "No input specified.\n%s\n", usage)
+	if g.sourceName == "" {
+		fmt.Fprintf(os.Stderr, "No input specified.\n%s\n", g.usage)
 		os.Exit(-1)
 	}
-
-	errorPrefix := "Errors reading " + sourceName + "\n"
-
 	// If we get here and the error output is unspecified, write errors to stderr.
-	if errorPath == "" {
-		errorPath = "="
+	if g.errorOutputPath == "" {
+		g.errorOutputPath = "="
 	}
+}
 
-	// Read the OpenAPI source.
-	info, err := compiler.ReadInfoForFile(sourceName)
+// Generate an error message to be written to stderr or a file.
+func (g *Gnostic) errorBytes(err error) []byte {
+	return []byte("Errors reading " + g.sourceName + "\n" + err.Error())
+}
+
+// Read an OpenAPI description from YAML or JSON.
+func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err error) {
+	info, err := compiler.ReadInfoFromBytes(g.sourceName, bytes)
 	if err != nil {
-		writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
-		os.Exit(-1)
+		return nil, err
 	}
-
 	// Determine the OpenAPI version.
-	openapi_version := openapi_version(info)
-	if openapi_version == OpenAPIvUnknown {
-		fmt.Fprintf(os.Stderr, "Unknown OpenAPI Version\n")
+	g.openAPIVersion = getOpenAPIVersionFromInfo(info)
+	if g.openAPIVersion == OpenAPIvUnknown {
+		return nil, errors.New("Unable to identify OpenAPI version.")
+	}
+	// Compile to the proto model.
+	if g.openAPIVersion == OpenAPIv2 {
+		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		if err != nil {
+			return nil, err
+		}
+		message = document
+	} else if g.openAPIVersion == OpenAPIv3 {
+		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		if err != nil {
+			return nil, err
+		}
+		message = document
+	}
+	return message, err
+}
+
+// Read an OpenAPI binary file.
+func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err error) {
+	// try to read an OpenAPI v3 document
+	document_v3 := &openapi_v3.Document{}
+	err = proto.Unmarshal(data, document_v3)
+	if err == nil && document_v3.Openapi == "3.0" {
+		g.openAPIVersion = OpenAPIv3
+		return document_v3, nil
+	}
+	// if that failed, try to read an OpenAPI v2 document
+	document_v2 := &openapi_v2.Document{}
+	err = proto.Unmarshal(data, document_v2)
+	if err == nil && document_v2.Swagger == "2.0" {
+		g.openAPIVersion = OpenAPIv2
+		return document_v2, nil
+	}
+	return nil, err
+}
+
+// Write a binary pb representation.
+func (g *Gnostic) writeBinaryOutput(message proto.Message) {
+	protoBytes, err := proto.Marshal(message)
+	if err != nil {
+		writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
+		defer os.Exit(-1)
+	} else {
+		writeFile(g.binaryOutputPath, protoBytes, g.sourceName, "pb")
+	}
+}
+
+// Write a text pb representation.
+func (g *Gnostic) writeTextOutput(message proto.Message) {
+	bytes := []byte(proto.MarshalTextString(message))
+	writeFile(g.textOutputPath, bytes, g.sourceName, "text")
+}
+
+// Write JSON/YAML OpenAPI representations.
+func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
+	// Convert the OpenAPI document into an exportable MapSlice.
+	var rawInfo yaml.MapSlice
+	var ok bool
+	var err error
+	if g.openAPIVersion == OpenAPIv2 {
+		document := message.(*openapi_v2.Document)
+		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
+		if !ok {
+			rawInfo = nil
+		}
+	} else if g.openAPIVersion == OpenAPIv3 {
+		//document := message.(*openapi_v3.Document)
+		rawInfo = nil
+	}
+	// Optionally write description in yaml format.
+	if g.yamlOutputPath != "" {
+		var bytes []byte
+		if rawInfo != nil {
+			bytes, err = yaml.Marshal(rawInfo)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating yaml output %s\n", err.Error())
+			}
+			writeFile(g.yamlOutputPath, bytes, g.sourceName, "yaml")
+		} else {
+			fmt.Fprintf(os.Stderr, "No yaml output available.\n")
+		}
+	}
+	// Optionally write description in json format.
+	if g.jsonOutputPath != "" {
+		var bytes []byte
+		if rawInfo != nil {
+			bytes, _ = jsonwriter.Marshal(rawInfo)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating json output %s\n", err.Error())
+			}
+			writeFile(g.jsonOutputPath, bytes, g.sourceName, "json")
+		} else {
+			fmt.Fprintf(os.Stderr, "No json output available.\n")
+		}
+	}
+}
+
+// Perform all actions specified in the command-line options.
+func (g *Gnostic) performActions(message proto.Message) (err error) {
+	// Optionally resolve internal references.
+	if g.resolveReferences {
+		if g.openAPIVersion == OpenAPIv2 {
+			document := message.(*openapi_v2.Document)
+			_, err = document.ResolveReferences(g.sourceName)
+		} else if g.openAPIVersion == OpenAPIv3 {
+			document := message.(*openapi_v3.Document)
+			_, err = document.ResolveReferences(g.sourceName)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	// Optionally write proto in binary format.
+	if g.binaryOutputPath != "" {
+		g.writeBinaryOutput(message)
+	}
+	// Optionally write proto in text format.
+	if g.textOutputPath != "" {
+		g.writeTextOutput(message)
+	}
+	// Optionaly write document in yaml and/or json formats.
+	if g.yamlOutputPath != "" || g.jsonOutputPath != "" {
+		g.writeJSONYAMLOutput(message)
+	}
+	// Call all specified plugins.
+	for _, pluginCall := range g.pluginCalls {
+		err := pluginCall.perform(message, g.openAPIVersion, g.sourceName)
+		if err != nil {
+			writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
+			defer os.Exit(-1) // run all plugins, even when some have errors
+		}
+	}
+	return nil
+}
+
+func (g *Gnostic) main() {
+	var err error
+	g.readOptions()
+	g.validateOptions()
+	// Read the OpenAPI source.
+	bytes, err := compiler.ReadBytesForFile(g.sourceName)
+	if err != nil {
+		writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 		os.Exit(-1)
 	}
-
+	extension := strings.ToLower(filepath.Ext(g.sourceName))
 	var message proto.Message
-	if openapi_version == OpenAPIv2 {
-		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
+	if extension == ".json" || extension == ".yaml" {
+		// Try to read the source as JSON/YAML.
+		message, err = g.readOpenAPIText(bytes)
 		if err != nil {
-			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+			writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 			os.Exit(-1)
 		}
-		// optionally resolve internal references
-		if resolveReferences {
-			_, err = document.ResolveReferences(sourceName)
-			if err != nil {
-				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
-				os.Exit(-1)
-			}
-		}
-		message = document
-	} else if openapi_version == OpenAPIv3 {
-		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &extensionHandlers))
+	} else if extension == ".pb" {
+		// Try to read the source as a binary protocol buffer.
+		message, err = g.readOpenAPIBinary(bytes)
 		if err != nil {
-			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
+			writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 			os.Exit(-1)
 		}
-		// optionally resolve internal references
-		if resolveReferences {
-			_, err = document.ResolveReferences(sourceName)
-			if err != nil {
-				writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
-				os.Exit(-1)
-			}
-		}
-		message = document
+	} else {
+		err = errors.New("Unknown file extension. 'json', 'yaml', and 'pb' are accepted.")
+		writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
+		os.Exit(-1)
 	}
+	// Perform actions specified by command options.
+	err = g.performActions(message)
+	if err != nil {
+		writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
+		os.Exit(-1)
+	}
+}
 
-	// perform all specified actions
-	if binaryProtoPath != "" {
-		// write proto in binary format
-		protoBytes, _ := proto.Marshal(message)
-		writeFile(binaryProtoPath, protoBytes, sourceName, "pb")
-	}
-	if jsonProtoPath != "" {
-		// write proto in json format
-		jsonBytes, _ := json.Marshal(message)
-		writeFile(jsonProtoPath, jsonBytes, sourceName, "json")
-	}
-	if textProtoPath != "" {
-		// write proto in text format
-		bytes := []byte(proto.MarshalTextString(message))
-		writeFile(textProtoPath, bytes, sourceName, "text")
-	}
-	for _, pluginCall := range pluginCalls {
-		err = pluginCall.perform(message, openapi_version, sourceName)
-		if err != nil {
-			writeFile(errorPath, []byte(errorPrefix+err.Error()), sourceName, "errors")
-			defer os.Exit(-1)
-		}
-	}
+func main() {
+	g := newGnostic()
+	g.main()
 }
