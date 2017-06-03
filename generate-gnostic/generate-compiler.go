@@ -700,13 +700,23 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 		code.Print("// %+v", typeModel)
 		for i, item := range typeModel.Properties {
 			code.Print("// %+v", *item)
-			if item.Type != "bool" {
+			if item.Type == "float" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_Number); ok {", i, typeName)
+				code.Print("return v%d.Number", i)
+				code.Print("}")
+			} else if item.Type == "bool" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_Boolean); ok {", i, typeName)
+				code.Print("return v%d.Boolean", i)
+				code.Print("}")
+			} else if item.Type == "string" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_String_); ok {", i, typeName)
+				code.Print("return v%d.String_", i)
+				code.Print("}")
+			} else {
 				code.Print("v%d := m.Get%s()", i, item.Type)
 				code.Print("if v%d != nil {", i)
 				code.Print(" return v%d.ToRawInfo()", i)
 				code.Print("}")
-			} else {
-				code.Print("// unhandled boolean")
 			}
 		}
 		code.Print("return nil")
@@ -772,7 +782,11 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 						code.Print("}")
 					} else if propertyModel.Type == "ItemsItem" {
 						code.Print("items := make([]interface{}, 0)")
-						code.Print("for _, item := range m.Items.Schema {")
+						if domain.Version == "v2" {
+							code.Print("for _, item := range m.Items.Schema {")
+						} else {
+							code.Print("for _, item := range m.Items.SchemaOrReference {")
+						}
 						code.Print("	items = append(items, item.ToRawInfo())")
 						code.Print("}")
 						code.Print("info = append(info, yaml.MapItem{\"items\", items[0]})")

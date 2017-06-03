@@ -53,13 +53,6 @@ message Any {
   string yaml = 2;
 }
 
-message AnyOrExpression {
-  oneof oneof {
-    Any any = 1;
-    Expression expression = 2;
-  }
-}
-
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callback {
   repeated NamedPathItem path = 1;
@@ -71,12 +64,6 @@ message CallbackOrReference {
     Callback callback = 1;
     Reference reference = 2;
   }
-}
-
-// A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
-message Callbacks {
-  repeated NamedCallbackOrReference callback_or_reference = 1;
-  repeated NamedAny specification_extension = 2;
 }
 
 message CallbacksOrReferences {
@@ -105,11 +92,6 @@ message Contact {
   repeated NamedAny specification_extension = 4;
 }
 
-// Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.
-message Content {
-  repeated NamedMediaType media_type = 1;
-}
-
 message DefaultType {
   oneof oneof {
     double number = 1;
@@ -136,19 +118,18 @@ message Document {
   repeated NamedAny specification_extension = 9;
 }
 
-// An object representing multipart region encoding for `requestBody` objects.
-message Encoding {
-  repeated NamedEncodingProperty encoding_property = 1;
-}
-
 // A single encoding definition applied to a single schema property.
-message EncodingProperty {
+message Encoding {
   string content_type = 1;
   Headers headers = 2;
   string style = 3;
   bool explode = 4;
   bool allow_reserved = 5;
   repeated NamedAny specification_extension = 6;
+}
+
+message Encodings {
+  repeated NamedEncoding additional_properties = 1;
 }
 
 message Example {
@@ -177,6 +158,10 @@ message Expression {
   repeated NamedAny additional_properties = 1;
 }
 
+message Expressions {
+  repeated NamedExpression additional_properties = 1;
+}
+
 // Allows referencing an external resource for extended documentation.
 message ExternalDocs {
   string description = 1;
@@ -184,7 +169,7 @@ message ExternalDocs {
   repeated NamedAny specification_extension = 3;
 }
 
-// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
+// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the corresponding `headers` map. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
 message Header {
   string name = 1;
   string in = 2;
@@ -198,7 +183,7 @@ message Header {
   SchemaOrReference schema = 10;
   Any example = 11;
   ExamplesOrReferences examples = 12;
-  Content content = 13;
+  MediaTypes content = 13;
   repeated NamedAny specification_extension = 14;
 }
 
@@ -209,9 +194,8 @@ message HeaderOrReference {
   }
 }
 
-// Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.
 message Headers {
-  repeated NamedHeaderOrReference header_or_reference = 1;
+  repeated NamedHeader additional_properties = 1;
 }
 
 message HeadersOrReferences {
@@ -240,12 +224,12 @@ message License {
   repeated NamedAny specification_extension = 3;
 }
 
-// The `Link Object` is responsible for defining a possible operation based on a single response.
+// The `Link object` represents a possible design-time link for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself. For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.
 message Link {
   string operation_ref = 1;
   string operation_id = 2;
-  LinkParameters parameters = 3;
-  Headers headers = 4;
+  Expressions parameters = 3;
+  HeadersOrReferences headers = 4;
   string description = 5;
   Server server = 6;
   repeated NamedAny specification_extension = 7;
@@ -258,27 +242,21 @@ message LinkOrReference {
   }
 }
 
-// Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.  To specify parameters required by the operation, we can use a **Link Parameters Object**. This object contains parameter names along with static or dynamic values:
-message LinkParameters {
-  repeated NamedAnyOrExpression any_or_expression = 1;
-}
-
-// The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.
-message Links {
-  repeated NamedLinkOrReference link_or_reference = 1;
-}
-
 message LinksOrReferences {
   repeated NamedLinkOrReference additional_properties = 1;
 }
 
-// Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.
+// Each Media Type Object provides schema and examples for a the media type identified by its key.
 message MediaType {
   SchemaOrReference schema = 1;
   Any example = 2;
   ExamplesOrReferences examples = 3;
-  Encoding encoding = 4;
+  Encodings encoding = 4;
   repeated NamedAny specification_extension = 5;
+}
+
+message MediaTypes {
+  repeated NamedMediaType additional_properties = 1;
 }
 
 // Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
@@ -289,14 +267,6 @@ message NamedAny {
   Any value = 2;
 }
 
-// Automatically-generated message used to represent maps of AnyOrExpression as ordered (name,value) pairs.
-message NamedAnyOrExpression {
-  // Map key
-  string name = 1;
-  // Mapped value
-  AnyOrExpression value = 2;
-}
-
 // Automatically-generated message used to represent maps of CallbackOrReference as ordered (name,value) pairs.
 message NamedCallbackOrReference {
   // Map key
@@ -305,12 +275,12 @@ message NamedCallbackOrReference {
   CallbackOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of EncodingProperty as ordered (name,value) pairs.
-message NamedEncodingProperty {
+// Automatically-generated message used to represent maps of Encoding as ordered (name,value) pairs.
+message NamedEncoding {
   // Map key
   string name = 1;
   // Mapped value
-  EncodingProperty value = 2;
+  Encoding value = 2;
 }
 
 // Automatically-generated message used to represent maps of ExampleOrReference as ordered (name,value) pairs.
@@ -319,6 +289,22 @@ message NamedExampleOrReference {
   string name = 1;
   // Mapped value
   ExampleOrReference value = 2;
+}
+
+// Automatically-generated message used to represent maps of Expression as ordered (name,value) pairs.
+message NamedExpression {
+  // Map key
+  string name = 1;
+  // Mapped value
+  Expression value = 2;
+}
+
+// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
+message NamedHeader {
+  // Map key
+  string name = 1;
+  // Mapped value
+  Header value = 2;
 }
 
 // Automatically-generated message used to represent maps of HeaderOrReference as ordered (name,value) pairs.
@@ -414,7 +400,7 @@ message OauthFlow {
   string authorization_url = 1;
   string token_url = 2;
   string refresh_url = 3;
-  Scopes scopes = 4;
+  Strings scopes = 4;
   repeated NamedAny specification_extension = 5;
 }
 
@@ -441,7 +427,7 @@ message Operation {
   repeated ParameterOrReference parameters = 6;
   RequestBodyOrReference request_body = 7;
   Responses responses = 8;
-  Callbacks callbacks = 9;
+  CallbacksOrReferences callbacks = 9;
   bool deprecated = 10;
   repeated SecurityRequirement security = 11;
   repeated Server servers = 12;
@@ -462,7 +448,7 @@ message Parameter {
   SchemaOrReference schema = 10;
   Any example = 11;
   ExamplesOrReferences examples = 12;
-  Content content = 13;
+  MediaTypes content = 13;
   repeated NamedAny specification_extension = 14;
 }
 
@@ -517,7 +503,7 @@ message RequestBodiesOrReferences {
 // Describes a single request body.
 message RequestBody {
   string description = 1;
-  Content content = 2;
+  MediaTypes content = 2;
   bool required = 3;
   repeated NamedAny specification_extension = 4;
 }
@@ -532,9 +518,9 @@ message RequestBodyOrReference {
 // Describes a single response from an API Operation, including design-time, static  `links` to operations based on the response.
 message Response {
   string description = 1;
-  Headers headers = 2;
-  Content content = 3;
-  Links links = 4;
+  HeadersOrReferences headers = 2;
+  MediaTypes content = 3;
+  LinksOrReferences links = 4;
   repeated NamedAny specification_extension = 5;
 }
 
@@ -607,11 +593,6 @@ message SchemasOrReferences {
   repeated NamedSchemaOrReference additional_properties = 1;
 }
 
-// Lists the available scopes for an OAuth2 security scheme.
-message Scopes {
-  repeated NamedAny specification_extension = 1;
-}
-
 // Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.
 message SecurityRequirement {
 }
@@ -657,8 +638,7 @@ message ServerVariable {
 }
 
 message ServerVariables {
-  repeated NamedServerVariable server_variable = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedServerVariable additional_properties = 1;
 }
 
 // Any property starting with x- is valid.

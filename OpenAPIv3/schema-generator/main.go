@@ -806,10 +806,12 @@ func main() {
 
 	// fix the content object
 	contentObject := schema.DefinitionWithName("content")
-	pairs := make([]*jsonschema.NamedSchema, 0)
-	contentObject.PatternProperties = &pairs
-	namedSchema := &jsonschema.NamedSchema{Name: "^", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
-	*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
+	if contentObject != nil {
+		pairs := make([]*jsonschema.NamedSchema, 0)
+		contentObject.PatternProperties = &pairs
+		namedSchema := &jsonschema.NamedSchema{Name: "^", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
+		*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
+	}
 
 	// write the updated schema
 	output := schema.JSONString()

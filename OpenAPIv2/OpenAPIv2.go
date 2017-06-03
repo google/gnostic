@@ -6945,14 +6945,16 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 
 func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:AdditionalPropertiesItem Properties:[0xc4201ce300 0xc4201ce380] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:AdditionalPropertiesItem Properties:[0xc4201c2900 0xc4201c2980] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
 		return v0.ToRawInfo()
 	}
 	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// unhandled boolean
+	if v1, ok := m.GetOneof().(*AdditionalPropertiesItem_Boolean); ok {
+		return v1.Boolean
+	}
 	return nil
 }
 
@@ -6995,7 +6997,7 @@ func (m *ApiKeySecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7012,7 +7014,7 @@ func (m *BasicAuthenticationSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7039,7 +7041,7 @@ func (m *BodyParameter) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7059,7 +7061,7 @@ func (m *Contact) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7154,7 +7156,7 @@ func (m *Document) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7182,7 +7184,7 @@ func (m *ExternalDocs) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7223,7 +7225,7 @@ func (m *FileSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7307,7 +7309,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7379,7 +7381,7 @@ func (m *Header) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7460,7 +7462,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7502,7 +7504,7 @@ func (m *Info) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7543,7 +7545,7 @@ func (m *License) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7641,7 +7643,7 @@ func (m *NamedStringArray) ToRawInfo() interface{} {
 
 func (m *NonBodyParameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:NonBodyParameter Properties:[0xc4201c8800 0xc4201c8880 0xc4201c8900 0xc4201c8980] Required:[in name type] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:NonBodyParameter Properties:[0xc4201be800 0xc4201be880 0xc4201be900 0xc4201be980] Required:[in name type] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:headerParameterSubSchema Type:HeaderParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetHeaderParameterSubSchema()
 	if v0 != nil {
@@ -7691,7 +7693,7 @@ func (m *Oauth2AccessCodeSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7718,7 +7720,7 @@ func (m *Oauth2ApplicationSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7745,7 +7747,7 @@ func (m *Oauth2ImplicitSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7772,7 +7774,7 @@ func (m *Oauth2PasswordSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7837,13 +7839,13 @@ func (m *Operation) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Parameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:Parameter Properties:[0xc4201c8a00 0xc4201c8a80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:Parameter Properties:[0xc4201bea00 0xc4201bea80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:bodyParameter Type:BodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetBodyParameter()
 	if v0 != nil {
@@ -7870,7 +7872,7 @@ func (m *ParameterDefinitions) ToRawInfo() interface{} {
 
 func (m *ParametersItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ParametersItem Properties:[0xc4201ce880 0xc4201ce900] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:ParametersItem Properties:[0xc4201c2700 0xc4201c2780] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetParameter()
 	if v0 != nil {
@@ -7930,7 +7932,7 @@ func (m *PathItem) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8011,7 +8013,7 @@ func (m *PathParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8022,13 +8024,13 @@ func (m *Paths) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	if m.Path != nil {
 		for _, item := range m.Path {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
+	// &{Name:Path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
 	return info
 }
 
@@ -8097,7 +8099,7 @@ func (m *PrimitivesItems) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8192,7 +8194,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8218,7 +8220,7 @@ func (m *Response) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8235,7 +8237,7 @@ func (m *ResponseDefinitions) ToRawInfo() interface{} {
 
 func (m *ResponseValue) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ResponseValue Properties:[0xc4201c4400 0xc4201c4480] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:ResponseValue Properties:[0xc4201b6400 0xc4201b6480] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetResponse()
 	if v0 != nil {
@@ -8256,13 +8258,13 @@ func (m *Responses) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:responseCode Type:NamedResponseValue StringEnumValues:[] MapType:ResponseValue Repeated:true Pattern:^([0-9]{3})$|^(default)$ Implicit:true Description:}
+	// &{Name:ResponseCode Type:NamedResponseValue StringEnumValues:[] MapType:ResponseValue Repeated:true Pattern:^([0-9]{3})$|^(default)$ Implicit:true Description:}
 	if m.VendorExtension != nil {
 		for _, item := range m.VendorExtension {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8389,13 +8391,13 @@ func (m *Schema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *SchemaItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SchemaItem Properties:[0xc4201ce980 0xc4201cea00] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:SchemaItem Properties:[0xc4201c2800 0xc4201c2880] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
@@ -8422,7 +8424,7 @@ func (m *SecurityDefinitions) ToRawInfo() interface{} {
 
 func (m *SecurityDefinitionsItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SecurityDefinitionsItem Properties:[0xc4201ce580 0xc4201ce600 0xc4201ce680 0xc4201ce700 0xc4201ce780 0xc4201ce800] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// &{Name:SecurityDefinitionsItem Properties:[0xc4201c2400 0xc4201c2480 0xc4201c2500 0xc4201c2580 0xc4201c2600 0xc4201c2680] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
 	// {Name:basicAuthenticationSecurity Type:BasicAuthenticationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetBasicAuthenticationSecurity()
 	if v0 != nil {
@@ -8488,7 +8490,7 @@ func (m *Tag) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8533,6 +8535,6 @@ func (m *Xml) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }

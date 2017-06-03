@@ -36,7 +36,7 @@ paths: <
             response: <
               description: "unexpected error"
               content: <
-                media_type: <
+                additional_properties: <
                   name: "application/json"
                   value: <
                     schema: <
@@ -55,7 +55,7 @@ paths: <
               response: <
                 description: "An paged array of pets"
                 headers: <
-                  header_or_reference: <
+                  additional_properties: <
                     name: "x-next"
                     value: <
                       header: <
@@ -70,7 +70,7 @@ paths: <
                   >
                 >
                 content: <
-                  media_type: <
+                  additional_properties: <
                     name: "application/json"
                     value: <
                       schema: <
@@ -95,7 +95,7 @@ paths: <
             response: <
               description: "unexpected error"
               content: <
-                media_type: <
+                additional_properties: <
                   name: "application/json"
                   value: <
                     schema: <
@@ -145,7 +145,7 @@ paths: <
             response: <
               description: "unexpected error"
               content: <
-                media_type: <
+                additional_properties: <
                   name: "application/json"
                   value: <
                     schema: <
@@ -164,7 +164,7 @@ paths: <
               response: <
                 description: "Expected response to a valid request"
                 content: <
-                  media_type: <
+                  additional_properties: <
                     name: "application/json"
                     value: <
                       schema: <
