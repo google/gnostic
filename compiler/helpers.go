@@ -19,6 +19,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -190,4 +191,16 @@ func StringArrayContainsValues(array []string, values []string) bool {
 		}
 	}
 	return true
+}
+
+func StringValue(item interface{}) (value string, ok bool) {
+	value, ok = item.(string)
+	if ok {
+		return value, ok
+	}
+	intValue, ok := item.(int)
+	if ok {
+		return strconv.Itoa(intValue), true
+	}
+	return "", false
 }

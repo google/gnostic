@@ -503,7 +503,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("x.%s = make([]*Named%s, 0)", fieldName, mapTypeName)
 					}
 					code.Print("for _, item := range m {")
-					code.Print("k, ok := item.Key.(string)")
+					code.Print("k, ok := compiler.StringValue(item.Key)")
 					code.Print("if ok {")
 					code.Print("v := item.Value")
 					if propertyModel.Pattern != "" {

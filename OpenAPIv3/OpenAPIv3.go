@@ -84,7 +84,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 		// MAP: PathItem ^
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^", k) {
@@ -103,7 +103,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -185,7 +185,7 @@ func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*Callb
 		// MAP: CallbackOrReference
 		x.AdditionalProperties = make([]*NamedCallbackOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedCallbackOrReference{}
@@ -302,7 +302,7 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -379,7 +379,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -599,7 +599,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -694,7 +694,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -737,7 +737,7 @@ func NewEncodings(in interface{}, context *compiler.Context) (*Encodings, error)
 		// MAP: Encoding
 		x.AdditionalProperties = make([]*NamedEncoding, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedEncoding{}
@@ -809,7 +809,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -910,7 +910,7 @@ func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*Exampl
 		// MAP: ExampleOrReference
 		x.AdditionalProperties = make([]*NamedExampleOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedExampleOrReference{}
@@ -939,7 +939,7 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -980,7 +980,7 @@ func NewExpressions(in interface{}, context *compiler.Context) (*Expressions, er
 		// MAP: Expression
 		x.AdditionalProperties = make([]*NamedExpression, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedExpression{}
@@ -1040,7 +1040,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1207,7 +1207,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1289,7 +1289,7 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 		// MAP: Header
 		x.AdditionalProperties = make([]*NamedHeader, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedHeader{}
@@ -1318,7 +1318,7 @@ func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*Headers
 		// MAP: HeaderOrReference
 		x.AdditionalProperties = make([]*NamedHeaderOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedHeaderOrReference{}
@@ -1414,7 +1414,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1506,7 +1506,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1610,7 +1610,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1692,7 +1692,7 @@ func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrRe
 		// MAP: LinkOrReference
 		x.AdditionalProperties = make([]*NamedLinkOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedLinkOrReference{}
@@ -1764,7 +1764,7 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1807,7 +1807,7 @@ func NewMediaTypes(in interface{}, context *compiler.Context) (*MediaTypes, erro
 		// MAP: MediaType
 		x.AdditionalProperties = make([]*NamedMediaType, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedMediaType{}
@@ -2508,7 +2508,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2594,7 +2594,7 @@ func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, erro
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2637,7 +2637,7 @@ func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -2822,7 +2822,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2995,7 +2995,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3077,7 +3077,7 @@ func NewParametersOrReferences(in interface{}, context *compiler.Context) (*Para
 		// MAP: ParameterOrReference
 		x.AdditionalProperties = make([]*NamedParameterOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedParameterOrReference{}
@@ -3244,7 +3244,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3294,7 +3294,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: PathItem ^/
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^/", k) {
@@ -3313,7 +3313,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3356,7 +3356,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		// MAP: SchemaOrReference
 		x.AdditionalProperties = make([]*NamedSchemaOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchemaOrReference{}
@@ -3419,7 +3419,7 @@ func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*R
 		// MAP: RequestBodyOrReference
 		x.AdditionalProperties = make([]*NamedRequestBodyOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedRequestBodyOrReference{}
@@ -3488,7 +3488,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3619,7 +3619,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3717,7 +3717,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: ResponseOrReference ^([0-9X]{3})$
 		x.ResponseOrReference = make([]*NamedResponseOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^([0-9X]{3})$", k) {
@@ -3736,7 +3736,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3779,7 +3779,7 @@ func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*Respo
 		// MAP: ResponseOrReference
 		x.AdditionalProperties = make([]*NamedResponseOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedResponseOrReference{}
@@ -4214,7 +4214,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4296,7 +4296,7 @@ func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*Schemas
 		// MAP: SchemaOrReference
 		x.AdditionalProperties = make([]*NamedSchemaOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchemaOrReference{}
@@ -4429,7 +4429,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4511,7 +4511,7 @@ func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (
 		// MAP: SecuritySchemeOrReference
 		x.AdditionalProperties = make([]*NamedSecuritySchemeOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSecuritySchemeOrReference{}
@@ -4580,7 +4580,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4665,7 +4665,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4708,7 +4708,7 @@ func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVaria
 		// MAP: ServerVariable
 		x.AdditionalProperties = make([]*NamedServerVariable, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedServerVariable{}
@@ -4787,7 +4787,7 @@ func NewStrings(in interface{}, context *compiler.Context) (*Strings, error) {
 		// MAP: string
 		x.AdditionalProperties = make([]*NamedString, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedString{}
@@ -4852,7 +4852,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4947,7 +4947,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
