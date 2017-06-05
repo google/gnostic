@@ -534,6 +534,8 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 				nameRegex := "^[a-zA-Z0-9\\\\.\\\\-_]+$"
 				if modelObject.Name == "Scopes Object" {
 					nameRegex = "^"
+				} else if modelObject.Name == "Headers Object" {
+					nameRegex = "^[a-zA-Z0-9!#\\-\\$%&'\\*\\+\\\\\\.\\^_`\\|~]+"
 				}
 				propertyName := strings.Replace(modelField.Name, "{name}", nameRegex, -1)
 				//  The field name MUST begin with a slash, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#paths-object
