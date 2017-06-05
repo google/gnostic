@@ -620,7 +620,7 @@
       "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.",
       "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9\\.\\-_]+$": {
+        "^[a-zA-Z0-9!#\-\$%&'\*\+\\\.\^_`\|~]+": {
           "$ref": "#/definitions/headerOrReference"
         }
       }
