@@ -1,9 +1,10 @@
 // Copyright 2016 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-
-// Package disco represents Google API discovery documents.
-package disco
+//
+// Taken with minor modifications from
+//  https://github.com/google/google-api-go-client/blob/master/google-api-go-generator/internal/disco/disco.go
+package discovery
 
 import (
 	"encoding/json"
