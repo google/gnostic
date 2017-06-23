@@ -58,7 +58,7 @@ func main() {
 	}
 	//fmt.Printf("DISCOVERY: %+v\n", discoveryDocument)
 	// Generate the OpenAPI equivalent
-	openAPIDocument := discovery.BuildOpenAPI2DocumentForDocument(discoveryDocument)
+	openAPIDocument, err := discoveryDocument.OpenAPIv2()
 	bytes, err = proto.Marshal(openAPIDocument)
 	if err != nil {
 		panic(err)

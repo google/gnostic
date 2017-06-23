@@ -204,7 +204,8 @@ func addOpenAPI2PathsForResource(d *pb.Document, resource *Resource) {
 	}
 }
 
-func BuildOpenAPI2DocumentForDocument(api *Document) *pb.Document {
+// Return an OpenAPI v2 representation of this Discovery document
+func (api *Document) OpenAPIv2() (*pb.Document, error) {
 	d := &pb.Document{}
 	d.Swagger = "2.0"
 	d.Info = &pb.Info{
@@ -229,5 +230,5 @@ func BuildOpenAPI2DocumentForDocument(api *Document) *pb.Document {
 	for _, resource := range api.Resources {
 		addOpenAPI2PathsForResource(d, resource)
 	}
-	return d
+	return d, nil
 }
