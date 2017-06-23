@@ -80,7 +80,7 @@ func buildOpenAPI2ParameterForParameter(p *Parameter) *pb.Parameter {
 							Name:        p.Name,
 							In:          "query",
 							Description: p.Description,
-							Required:    false,
+							Required:    p.Required,
 							Type:        typeName,
 							Format:      format,
 						},
@@ -97,7 +97,7 @@ func buildOpenAPI2ParameterForParameter(p *Parameter) *pb.Parameter {
 							Name:        p.Name,
 							In:          "path",
 							Description: p.Description,
-							Required:    false,
+							Required:    p.Required,
 							Type:        typeName,
 							Format:      format,
 						},
@@ -112,24 +112,37 @@ func buildOpenAPI2ParameterForParameter(p *Parameter) *pb.Parameter {
 
 func buildOpenAPI2ResponseForSchema(schema *Schema) *pb.Response {
 	//log.Printf("- RESPONSE %+v\n", schema)
-	ref := schema.Ref
-	if ref == "" {
-		log.Printf("ERROR: UNHANDLED RESPONSE SCHEMA %+v", schema)
-	}
-	return &pb.Response{
-		Description: "Successful operation",
-		Schema: &pb.SchemaItem{
-			Oneof: &pb.SchemaItem_Schema{
-				Schema: &pb.Schema{
-					XRef: "#/definitions/" + ref,
+	if schema == nil {
+		return &pb.Response{
+			Description: "Successful operation",
+		}
+	} else {
+		ref := schema.Ref
+		if ref == "" {
+			log.Printf("WARNING: Unhandled response schema %+v", schema)
+		}
+		return &pb.Response{
+			Description: "Successful operation",
+			Schema: &pb.SchemaItem{
+				Oneof: &pb.SchemaItem_Schema{
+					Schema: &pb.Schema{
+						XRef: "#/definitions/" + ref,
+					},
 				},
 			},
-		},
+		}
 	}
 }
 
+func (method *Method) path() string {
+	if method.FlatPath != "" {
+		return method.FlatPath
+	}
+	return method.Path
+}
+
 func buildOpenAPI2OperationForMethod(method *Method) *pb.Operation {
-	//log.Printf("METHOD %s %s %s %s\n", method.Name, method.FlatPath, method.HTTPMethod, method.ID)
+	//log.Printf("METHOD %s %s %s %s\n", method.Name, method.path(), method.HTTPMethod, method.ID)
 	//log.Printf("MAP %+v\n", method.JSONMap)
 	parameters := make([]*pb.ParametersItem, 0)
 	for _, p := range method.Parameters {
@@ -152,7 +165,7 @@ func buildOpenAPI2OperationForMethod(method *Method) *pb.Operation {
 		},
 	}
 	return &pb.Operation{
-		Summary:     method.Description,
+		Description: method.Description,
 		OperationId: method.ID,
 		Parameters:  parameters,
 		Responses:   responses,
@@ -179,7 +192,7 @@ func getOpenAPI2PathItemForPath(d *pb.Document, path string) *pb.PathItem {
 
 func addOpenAPI2PathsForMethod(d *pb.Document, method *Method) {
 	operation := buildOpenAPI2OperationForMethod(method)
-	pathItem := getOpenAPI2PathItemForPath(d, "/"+method.FlatPath)
+	pathItem := getOpenAPI2PathItemForPath(d, method.path())
 	switch method.HTTPMethod {
 	case "GET":
 		pathItem.Get = operation
@@ -189,8 +202,10 @@ func addOpenAPI2PathsForMethod(d *pb.Document, method *Method) {
 		pathItem.Put = operation
 	case "DELETE":
 		pathItem.Delete = operation
+	case "PATCH":
+		pathItem.Patch = operation
 	default:
-		log.Printf("ERROR: UNKNOWN HTTP METHOD %s", method.HTTPMethod)
+		log.Printf("WARNING: Unknown HTTP method %s", method.HTTPMethod)
 	}
 }
 
@@ -215,7 +230,10 @@ func (api *Document) OpenAPIv2() (*pb.Document, error) {
 	}
 	url, _ := url.Parse(api.RootURL)
 	d.Host = url.Host
-	d.BasePath = url.Path
+	d.BasePath = api.BasePath
+	if d.BasePath == "" {
+		d.BasePath = "/"
+	}
 	d.Schemes = []string{url.Scheme}
 	d.Consumes = []string{"application/json"}
 	d.Produces = []string{"application/json"}

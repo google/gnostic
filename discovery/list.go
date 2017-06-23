@@ -17,6 +17,8 @@ import (
 	"encoding/json"
 )
 
+const APIsListServiceURL = "https://www.googleapis.com/discovery/v1/apis"
+
 // A List represents the results of a call to the apis/list API.
 // https://developers.google.com/discovery/v1/reference/apis/list
 type List struct {
