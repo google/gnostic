@@ -697,7 +697,7 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 		code.Print("return m.Value")
 	} else if typeModel.OneOfWrapper {
 		code.Print("// ONE OF WRAPPER")
-		code.Print("// %+v", typeModel)
+		code.Print("// %s", typeModel.Name)
 		for i, item := range typeModel.Properties {
 			code.Print("// %+v", *item)
 			if item.Type == "float" {

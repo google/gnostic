@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -128,7 +129,7 @@ func (s *Section) NiceTitle() string {
 
 // replace markdown links with their link text (removing the URL part)
 func removeMarkdownLinks(input string) (output string) {
-	markdownLink := regexp.MustCompile("\\[([^\\]]*)\\]\\(([^\\)]*)\\)") // matches [link title](link url)
+	markdownLink := regexp.MustCompile("\\[([^\\]\\[]*)\\]\\(([^\\)]*)\\)") // matches [link title](link url)
 	output = string(markdownLink.ReplaceAll([]byte(input), []byte("$1")))
 	return
 }
@@ -154,12 +155,12 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				}
 
 				typeName := parts[1]
+				typeName = strings.Replace(typeName, "{expression}", "Expression", -1)
 				typeName = strings.Trim(typeName, " ")
 				typeName = strings.Replace(typeName, "`", "", -1)
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
-				typeName = strings.Replace(typeName, "{expression}", "Expression", -1)
 				isArray := false
 				if typeName[0] == '[' && typeName[len(typeName)-1] == ']' {
 					typeName = typeName[1 : len(typeName)-1]
@@ -182,8 +183,10 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				description = removeMarkdownLinks(description)
 				description = strings.Replace(description, "\n", " ", -1)
 
-				requiredLabel := "**Required.** "
-				if strings.Contains(description, requiredLabel) {
+				requiredLabel1 := "**Required.** "
+				requiredLabel2 := "**REQUIRED**."
+				if strings.Contains(description, requiredLabel1) ||
+					strings.Contains(description, requiredLabel2) {
 					// only include required values if their "Validity" is "Any" or if no validity is specified
 					valid := true
 					if len(parts) == 4 {
@@ -197,7 +200,8 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 					if valid {
 						schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
 					}
-					description = strings.Replace(description, requiredLabel, "", -1)
+					description = strings.Replace(description, requiredLabel1, "", -1)
+					description = strings.Replace(description, requiredLabel2, "", -1)
 				}
 				schemaField := SchemaObjectField{
 					Name:        fieldName,
@@ -306,7 +310,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	// read object names and their details
 	specification := document.Children[4] // fragile! the section title is "Specification"
-	schema := specification.Children[6]   // fragile! the section title is "Schema"
+	schema := specification.Children[7]   // fragile! the section title is "Schema"
 	anchor := regexp.MustCompile("^#### <a name=\"(.*)Object\"")
 	schemaObjects := make([]SchemaObject, 0)
 	for _, section := range schema.Children {
@@ -414,6 +418,9 @@ func definitionNameForType(typeName string) string {
 }
 
 func pluralize(name string) string {
+	if name == "any" {
+		return "anys"
+	}
 	switch name[len(name)-1] {
 	case 'y':
 		name = name[0:len(name)-1] + "ies"
@@ -618,7 +625,12 @@ func main() {
 	}
 
 	// build the top-level schema using the "OAS" model
-	schema := buildSchemaWithModel(model.objectWithId("oas"))
+	oasModel := model.objectWithId("oas")
+	if oasModel == nil {
+		log.Printf("Unable to find OAS model. Has the source document structure changed?")
+		os.Exit(-1)
+	}
+	schema := buildSchemaWithModel(oasModel)
 
 	// manually set a few fields
 	schema.Title = stringptr("A JSON Schema for OpenAPI 3.0.")

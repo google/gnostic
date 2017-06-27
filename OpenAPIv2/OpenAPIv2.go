@@ -6945,7 +6945,7 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 
 func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:AdditionalPropertiesItem Properties:[0xc4201c2880 0xc4201c2900] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// AdditionalPropertiesItem
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
@@ -7643,7 +7643,7 @@ func (m *NamedStringArray) ToRawInfo() interface{} {
 
 func (m *NonBodyParameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:NonBodyParameter Properties:[0xc4201be800 0xc4201be880 0xc4201be900 0xc4201be980] Required:[in name type] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// NonBodyParameter
 	// {Name:headerParameterSubSchema Type:HeaderParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetHeaderParameterSubSchema()
 	if v0 != nil {
@@ -7845,7 +7845,7 @@ func (m *Operation) ToRawInfo() interface{} {
 
 func (m *Parameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:Parameter Properties:[0xc4201bea00 0xc4201bea80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// Parameter
 	// {Name:bodyParameter Type:BodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetBodyParameter()
 	if v0 != nil {
@@ -7872,7 +7872,7 @@ func (m *ParameterDefinitions) ToRawInfo() interface{} {
 
 func (m *ParametersItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ParametersItem Properties:[0xc4201c2680 0xc4201c2700] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ParametersItem
 	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetParameter()
 	if v0 != nil {
@@ -8237,7 +8237,7 @@ func (m *ResponseDefinitions) ToRawInfo() interface{} {
 
 func (m *ResponseValue) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ResponseValue Properties:[0xc4201b6400 0xc4201b6480] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ResponseValue
 	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetResponse()
 	if v0 != nil {
@@ -8397,7 +8397,7 @@ func (m *Schema) ToRawInfo() interface{} {
 
 func (m *SchemaItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SchemaItem Properties:[0xc4201c2780 0xc4201c2800] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// SchemaItem
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
@@ -8424,7 +8424,7 @@ func (m *SecurityDefinitions) ToRawInfo() interface{} {
 
 func (m *SecurityDefinitionsItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SecurityDefinitionsItem Properties:[0xc4201c2380 0xc4201c2400 0xc4201c2480 0xc4201c2500 0xc4201c2580 0xc4201c2600] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// SecurityDefinitionsItem
 	// {Name:basicAuthenticationSecurity Type:BasicAuthenticationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetBasicAuthenticationSecurity()
 	if v0 != nil {

@@ -65,6 +65,74 @@ func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpression, error) {
+	errors := make([]error, 0)
+	x := &AnyOrExpression{}
+	matched := false
+	// Any any = 1;
+	{
+		m, ok := compiler.UnpackMap(in)
+		if ok {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewAny(m, compiler.NewContext("any", context))
+			if matching_error == nil {
+				x.Oneof = &AnyOrExpression_Any{Any: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
+			}
+		}
+	}
+	// Expression expression = 2;
+	{
+		m, ok := compiler.UnpackMap(in)
+		if ok {
+			// errors might be ok here, they mean we just don't have the right subtype
+			t, matching_error := NewExpression(m, compiler.NewContext("expression", context))
+			if matching_error == nil {
+				x.Oneof = &AnyOrExpression_Expression{Expression: t}
+				matched = true
+			} else {
+				errors = append(errors, matching_error)
+			}
+		}
+	}
+	if matched {
+		// since the oneof matched one of its possibilities, discard any matching errors
+		errors = make([]error, 0)
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewAnysOrExpressions(in interface{}, context *compiler.Context) (*AnysOrExpressions, error) {
+	errors := make([]error, 0)
+	x := &AnysOrExpressions{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedAnyOrExpression additional_properties = 1;
+		// MAP: AnyOrExpression
+		x.AdditionalProperties = make([]*NamedAnyOrExpression, 0)
+		for _, item := range m {
+			k, ok := compiler.StringValue(item.Key)
+			if ok {
+				v := item.Value
+				pair := &NamedAnyOrExpression{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAnyOrExpression(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 	errors := make([]error, 0)
 	x := &Callback{}
@@ -452,6 +520,12 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
+		requiredKeys := []string{"propertyName"}
+		missingKeys := compiler.MissingKeysInMap(m, requiredKeys)
+		if len(missingKeys) > 0 {
+			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
 		allowedKeys := []string{"mapping", "propertyName"}
 		allowedPatterns := []string{}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
@@ -960,35 +1034,6 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 					if err != nil {
 						errors = append(errors, err)
 					}
-				}
-				x.AdditionalProperties = append(x.AdditionalProperties, pair)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewExpressions(in interface{}, context *compiler.Context) (*Expressions, error) {
-	errors := make([]error, 0)
-	x := &Expressions{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		// repeated NamedExpression additional_properties = 1;
-		// MAP: Expression
-		x.AdditionalProperties = make([]*NamedExpression, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
-			if ok {
-				v := item.Value
-				pair := &NamedExpression{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewExpression(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
@@ -1545,7 +1590,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"description", "headers", "operationId", "operationRef", "parameters", "server"}
+		allowedKeys := []string{"description", "operationId", "operationRef", "parameters", "requestBody", "server"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1570,20 +1615,20 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Expressions parameters = 3;
+		// AnysOrExpressions parameters = 3;
 		v3 := compiler.MapValueForKey(m, "parameters")
 		if v3 != nil {
 			var err error
-			x.Parameters, err = NewExpressions(v3, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewAnysOrExpressions(v3, compiler.NewContext("parameters", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// HeadersOrReferences headers = 4;
-		v4 := compiler.MapValueForKey(m, "headers")
+		// AnyOrExpression request_body = 4;
+		v4 := compiler.MapValueForKey(m, "requestBody")
 		if v4 != nil {
 			var err error
-			x.Headers, err = NewHeadersOrReferences(v4, compiler.NewContext("headers", context))
+			x.RequestBody, err = NewAnyOrExpression(v4, compiler.NewContext("requestBody", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1861,6 +1906,43 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewNamedAnyOrExpression(in interface{}, context *compiler.Context) (*NamedAnyOrExpression, error) {
+	errors := make([]error, 0)
+	x := &NamedAnyOrExpression{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// AnyOrExpression value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewAnyOrExpression(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*NamedCallbackOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedCallbackOrReference{}
@@ -1964,43 +2046,6 @@ func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*Nam
 		if v2 != nil {
 			var err error
 			x.Value, err = NewExampleOrReference(v2, compiler.NewContext("value", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewNamedExpression(in interface{}, context *compiler.Context) (*NamedExpression, error) {
-	errors := make([]error, 0)
-	x := &NamedExpression{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// string name = 1;
-		v1 := compiler.MapValueForKey(m, "name")
-		if v1 != nil {
-			x.Name, ok = v1.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// Expression value = 2;
-		v2 := compiler.MapValueForKey(m, "value")
-		if v2 != nil {
-			var err error
-			x.Value, err = NewExpression(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4997,6 +5042,42 @@ func (m *Any) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	{
+		p, ok := m.Oneof.(*AnyOrExpression_Any)
+		if ok {
+			_, err := p.Any.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	{
+		p, ok := m.Oneof.(*AnyOrExpression_Expression)
+		if ok {
+			_, err := p.Expression.ResolveReferences(root)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *AnysOrExpressions) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Callback) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Path {
@@ -5316,19 +5397,6 @@ func (m *Expression) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *Expressions) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.AdditionalProperties {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -5487,8 +5555,8 @@ func (m *Link) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	if m.Headers != nil {
-		_, err := m.Headers.ResolveReferences(root)
+	if m.RequestBody != nil {
+		_, err := m.RequestBody.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -5607,6 +5675,17 @@ func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *NamedAnyOrExpression) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Value != nil {
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5630,17 +5709,6 @@ func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
 }
 
 func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	if m.Value != nil {
-		_, err := m.Value.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-func (m *NamedExpression) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -6563,7 +6631,7 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 
 func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:AdditionalPropertiesItem Properties:[0xc4201a1280 0xc4201a1300] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// AdditionalPropertiesItem
 	// {Name:schemaOrReference Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchemaOrReference()
 	if v0 != nil {
@@ -6596,6 +6664,33 @@ func (m *Any) ToRawInfo() interface{} {
 	return nil
 }
 
+func (m *AnyOrExpression) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// AnyOrExpression
+	// {Name:any Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetAny()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:expression Type:Expression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetExpression()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *AnysOrExpressions) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAnyOrExpression StringEnumValues:[] MapType:AnyOrExpression Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
 func (m *Callback) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Path != nil {
@@ -6615,7 +6710,7 @@ func (m *Callback) ToRawInfo() interface{} {
 
 func (m *CallbackOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:CallbackOrReference Properties:[0xc42019fc00 0xc42019fc80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// CallbackOrReference
 	// {Name:callback Type:Callback StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetCallback()
 	if v0 != nil {
@@ -6709,7 +6804,7 @@ func (m *Contact) ToRawInfo() interface{} {
 
 func (m *DefaultType) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:DefaultType Properties:[0xc4201a1000 0xc4201a1080 0xc4201a1100] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// DefaultType
 	// {Name:number Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if v0, ok := m.GetOneof().(*DefaultType_Number); ok {
 		return v0.Number
@@ -6852,7 +6947,7 @@ func (m *Example) ToRawInfo() interface{} {
 
 func (m *ExampleOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ExampleOrReference Properties:[0xc42019fd00 0xc42019fd80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ExampleOrReference
 	// {Name:example Type:Example StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetExample()
 	if v0 != nil {
@@ -6890,17 +6985,6 @@ func (m *Expression) ToRawInfo() interface{} {
 		}
 	}
 	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
-	return info
-}
-
-func (m *Expressions) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if m.AdditionalProperties != nil {
-		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
-		}
-	}
-	// &{Name:additionalProperties Type:NamedExpression StringEnumValues:[] MapType:Expression Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
@@ -6977,7 +7061,7 @@ func (m *Header) ToRawInfo() interface{} {
 
 func (m *HeaderOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:HeaderOrReference Properties:[0xc42019fe00 0xc42019fe80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// HeaderOrReference
 	// {Name:header Type:Header StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetHeader()
 	if v0 != nil {
@@ -7085,11 +7169,11 @@ func (m *Link) ToRawInfo() interface{} {
 	if m.Parameters != nil {
 		info = append(info, yaml.MapItem{"parameters", m.Parameters.ToRawInfo()})
 	}
-	// &{Name:parameters Type:Expressions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	if m.Headers != nil {
-		info = append(info, yaml.MapItem{"headers", m.Headers.ToRawInfo()})
+	// &{Name:parameters Type:AnysOrExpressions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.RequestBody != nil {
+		info = append(info, yaml.MapItem{"requestBody", m.RequestBody.ToRawInfo()})
 	}
-	// &{Name:headers Type:HeadersOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:requestBody Type:AnyOrExpression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Description != "" {
 		info = append(info, yaml.MapItem{"description", m.Description})
 	}
@@ -7108,7 +7192,7 @@ func (m *Link) ToRawInfo() interface{} {
 
 func (m *LinkOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:LinkOrReference Properties:[0xc42019ff00 0xc42019ff80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// LinkOrReference
 	// {Name:link Type:Link StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetLink()
 	if v0 != nil {
@@ -7180,6 +7264,15 @@ func (m *NamedAny) ToRawInfo() interface{} {
 	return info
 }
 
+func (m *NamedAnyOrExpression) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:AnyOrExpression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
 func (m *NamedCallbackOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7204,15 +7297,6 @@ func (m *NamedExampleOrReference) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{"name", m.Name})
 	}
 	// &{Name:value Type:ExampleOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
-	return info
-}
-
-func (m *NamedExpression) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if m.Name != "" {
-		info = append(info, yaml.MapItem{"name", m.Name})
-	}
-	// &{Name:value Type:Expression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
@@ -7510,7 +7594,7 @@ func (m *Parameter) ToRawInfo() interface{} {
 
 func (m *ParameterOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ParameterOrReference Properties:[0xc4201a0000 0xc4201a0080] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ParameterOrReference
 	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetParameter()
 	if v0 != nil {
@@ -7673,7 +7757,7 @@ func (m *RequestBody) ToRawInfo() interface{} {
 
 func (m *RequestBodyOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:RequestBodyOrReference Properties:[0xc4201a0100 0xc4201a0180] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// RequestBodyOrReference
 	// {Name:requestBody Type:RequestBody StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetRequestBody()
 	if v0 != nil {
@@ -7715,7 +7799,7 @@ func (m *Response) ToRawInfo() interface{} {
 
 func (m *ResponseOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ResponseOrReference Properties:[0xc4201a0200 0xc4201a0280] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ResponseOrReference
 	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetResponse()
 	if v0 != nil {
@@ -7912,7 +7996,7 @@ func (m *Schema) ToRawInfo() interface{} {
 
 func (m *SchemaOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SchemaOrReference Properties:[0xc4201a0300 0xc4201a0380] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// SchemaOrReference
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
@@ -7980,7 +8064,7 @@ func (m *SecurityScheme) ToRawInfo() interface{} {
 
 func (m *SecuritySchemeOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SecuritySchemeOrReference Properties:[0xc4201a0400 0xc4201a0480] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// SecuritySchemeOrReference
 	// {Name:securityScheme Type:SecurityScheme StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSecurityScheme()
 	if v0 != nil {
@@ -8059,7 +8143,7 @@ func (m *ServerVariables) ToRawInfo() interface{} {
 
 func (m *SpecificationExtension) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SpecificationExtension Properties:[0xc4201a0e80 0xc4201a0f00 0xc4201a0f80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:Any property starting with x- is valid.}
+	// SpecificationExtension
 	// {Name:number Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if v0, ok := m.GetOneof().(*SpecificationExtension_Number); ok {
 		return v0.Number
