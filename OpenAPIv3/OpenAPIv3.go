@@ -1124,131 +1124,113 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "example", "examples", "explode", "in", "name", "required", "schema", "style"}
+		allowedKeys := []string{"allowEmptyValue", "allowReserved", "content", "deprecated", "description", "example", "examples", "explode", "required", "schema", "style"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		// string name = 1;
-		v1 := compiler.MapValueForKey(m, "name")
+		// string description = 1;
+		v1 := compiler.MapValueForKey(m, "description")
 		if v1 != nil {
-			x.Name, ok = v1.(string)
+			x.Description, ok = v1.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string in = 2;
-		v2 := compiler.MapValueForKey(m, "in")
+		// bool required = 2;
+		v2 := compiler.MapValueForKey(m, "required")
 		if v2 != nil {
-			x.In, ok = v2.(string)
+			x.Required, ok = v2.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string description = 3;
-		v3 := compiler.MapValueForKey(m, "description")
+		// bool deprecated = 3;
+		v3 := compiler.MapValueForKey(m, "deprecated")
 		if v3 != nil {
-			x.Description, ok = v3.(string)
+			x.Deprecated, ok = v3.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool required = 4;
-		v4 := compiler.MapValueForKey(m, "required")
+		// bool allow_empty_value = 4;
+		v4 := compiler.MapValueForKey(m, "allowEmptyValue")
 		if v4 != nil {
-			x.Required, ok = v4.(bool)
+			x.AllowEmptyValue, ok = v4.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool deprecated = 5;
-		v5 := compiler.MapValueForKey(m, "deprecated")
+		// string style = 5;
+		v5 := compiler.MapValueForKey(m, "style")
 		if v5 != nil {
-			x.Deprecated, ok = v5.(bool)
+			x.Style, ok = v5.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for style: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool allow_empty_value = 6;
-		v6 := compiler.MapValueForKey(m, "allowEmptyValue")
+		// bool explode = 6;
+		v6 := compiler.MapValueForKey(m, "explode")
 		if v6 != nil {
-			x.AllowEmptyValue, ok = v6.(bool)
+			x.Explode, ok = v6.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for explode: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string style = 7;
-		v7 := compiler.MapValueForKey(m, "style")
+		// bool allow_reserved = 7;
+		v7 := compiler.MapValueForKey(m, "allowReserved")
 		if v7 != nil {
-			x.Style, ok = v7.(string)
+			x.AllowReserved, ok = v7.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for style: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for allowReserved: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool explode = 8;
-		v8 := compiler.MapValueForKey(m, "explode")
+		// SchemaOrReference schema = 8;
+		v8 := compiler.MapValueForKey(m, "schema")
 		if v8 != nil {
-			x.Explode, ok = v8.(bool)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for explode: %+v (%T)", v8, v8)
-				errors = append(errors, compiler.NewError(context, message))
+			var err error
+			x.Schema, err = NewSchemaOrReference(v8, compiler.NewContext("schema", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
-		// bool allow_reserved = 9;
-		v9 := compiler.MapValueForKey(m, "allowReserved")
+		// Any example = 9;
+		v9 := compiler.MapValueForKey(m, "example")
 		if v9 != nil {
-			x.AllowReserved, ok = v9.(bool)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowReserved: %+v (%T)", v9, v9)
-				errors = append(errors, compiler.NewError(context, message))
+			var err error
+			x.Example, err = NewAny(v9, compiler.NewContext("example", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
-		// SchemaOrReference schema = 10;
-		v10 := compiler.MapValueForKey(m, "schema")
+		// ExamplesOrReferences examples = 10;
+		v10 := compiler.MapValueForKey(m, "examples")
 		if v10 != nil {
 			var err error
-			x.Schema, err = NewSchemaOrReference(v10, compiler.NewContext("schema", context))
+			x.Examples, err = NewExamplesOrReferences(v10, compiler.NewContext("examples", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Any example = 11;
-		v11 := compiler.MapValueForKey(m, "example")
+		// MediaTypes content = 11;
+		v11 := compiler.MapValueForKey(m, "content")
 		if v11 != nil {
 			var err error
-			x.Example, err = NewAny(v11, compiler.NewContext("example", context))
+			x.Content, err = NewMediaTypes(v11, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// ExamplesOrReferences examples = 12;
-		v12 := compiler.MapValueForKey(m, "examples")
-		if v12 != nil {
-			var err error
-			x.Examples, err = NewExamplesOrReferences(v12, compiler.NewContext("examples", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// MediaTypes content = 13;
-		v13 := compiler.MapValueForKey(m, "content")
-		if v13 != nil {
-			var err error
-			x.Content, err = NewMediaTypes(v13, compiler.NewContext("content", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-		// repeated NamedAny specification_extension = 14;
+		// repeated NamedAny specification_extension = 12;
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
@@ -7007,12 +6989,6 @@ func (m *ExternalDocs) ToRawInfo() interface{} {
 
 func (m *Header) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
-	if m.Name != "" {
-		info = append(info, yaml.MapItem{"name", m.Name})
-	}
-	if m.In != "" {
-		info = append(info, yaml.MapItem{"in", m.In})
-	}
 	if m.Description != "" {
 		info = append(info, yaml.MapItem{"description", m.Description})
 	}

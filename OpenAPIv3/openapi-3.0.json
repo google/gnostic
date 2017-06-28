@@ -633,12 +633,6 @@
         }
       },
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "in": {
-          "type": "string"
-        },
         "description": {
           "type": "string"
         },
