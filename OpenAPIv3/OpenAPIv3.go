@@ -104,6 +104,35 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+func NewAnysOrExpressions(in interface{}, context *compiler.Context) (*AnysOrExpressions, error) {
+	errors := make([]error, 0)
+	x := &AnysOrExpressions{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedAnyOrExpression additional_properties = 1;
+		// MAP: AnyOrExpression
+		x.AdditionalProperties = make([]*NamedAnyOrExpression, 0)
+		for _, item := range m {
+			k, ok := compiler.StringValue(item.Key)
+			if ok {
+				v := item.Value
+				pair := &NamedAnyOrExpression{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewAnyOrExpression(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
 func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 	errors := make([]error, 0)
 	x := &Callback{}
@@ -123,7 +152,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 		// MAP: PathItem ^
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^", k) {
@@ -142,7 +171,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -212,75 +241,6 @@ func NewCallbackOrReference(in interface{}, context *compiler.Context) (*Callbac
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewCallbacks(in interface{}, context *compiler.Context) (*Callbacks, error) {
-	errors := make([]error, 0)
-	x := &Callbacks{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^[a-zA-Z0-9\\.\\-_]+$", "^x-"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedCallbackOrReference callback_or_reference = 1;
-		// MAP: CallbackOrReference ^[a-zA-Z0-9\.\-_]+$
-		x.CallbackOrReference = make([]*NamedCallbackOrReference, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^[a-zA-Z0-9\\.\\-_]+$", k) {
-					pair := &NamedCallbackOrReference{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewCallbackOrReference(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.CallbackOrReference = append(x.CallbackOrReference, pair)
-				}
-			}
-		}
-		// repeated NamedAny specification_extension = 2;
-		// MAP: Any ^x-
-		x.SpecificationExtension = make([]*NamedAny, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedAny{}
-					pair.Name = k
-					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
-					if handled {
-						if err != nil {
-							errors = append(errors, err)
-						} else {
-							bytes, _ := yaml.Marshal(v)
-							result.Yaml = string(bytes)
-							result.Value = resultFromExt
-							pair.Value = result
-						}
-					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-						if err != nil {
-							errors = append(errors, err)
-						}
-					}
-					x.SpecificationExtension = append(x.SpecificationExtension, pair)
-				}
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*CallbacksOrReferences, error) {
 	errors := make([]error, 0)
 	x := &CallbacksOrReferences{}
@@ -293,7 +253,7 @@ func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*Callb
 		// MAP: CallbackOrReference
 		x.AdditionalProperties = make([]*NamedCallbackOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedCallbackOrReference{}
@@ -410,7 +370,7 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -487,7 +447,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -511,44 +471,6 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 						}
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
-				}
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewContent(in interface{}, context *compiler.Context) (*Content, error) {
-	errors := make([]error, 0)
-	x := &Content{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedMediaType media_type = 1;
-		// MAP: MediaType ^
-		x.MediaType = make([]*NamedMediaType, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^", k) {
-					pair := &NamedMediaType{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewMediaType(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.MediaType = append(x.MediaType, pair)
 				}
 			}
 		}
@@ -598,6 +520,12 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
+		requiredKeys := []string{"propertyName"}
+		missingKeys := compiler.MissingKeysInMap(m, requiredKeys)
+		if len(missingKeys) > 0 {
+			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
 		allowedKeys := []string{"mapping", "propertyName"}
 		allowedPatterns := []string{}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
@@ -745,7 +673,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -779,44 +707,6 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 	errors := make([]error, 0)
 	x := &Encoding{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedEncodingProperty encoding_property = 1;
-		// MAP: EncodingProperty ^
-		x.EncodingProperty = make([]*NamedEncodingProperty, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^", k) {
-					pair := &NamedEncodingProperty{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewEncodingProperty(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.EncodingProperty = append(x.EncodingProperty, pair)
-				}
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingProperty, error) {
-	errors := make([]error, 0)
-	x := &EncodingProperty{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
@@ -878,7 +768,7 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -903,6 +793,35 @@ func NewEncodingProperty(in interface{}, context *compiler.Context) (*EncodingPr
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewEncodings(in interface{}, context *compiler.Context) (*Encodings, error) {
+	errors := make([]error, 0)
+	x := &Encodings{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedEncoding additional_properties = 1;
+		// MAP: Encoding
+		x.AdditionalProperties = make([]*NamedEncoding, 0)
+		for _, item := range m {
+			k, ok := compiler.StringValue(item.Key)
+			if ok {
+				v := item.Value
+				pair := &NamedEncoding{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewEncoding(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
 		}
 	}
@@ -964,7 +883,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1065,7 +984,7 @@ func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*Exampl
 		// MAP: ExampleOrReference
 		x.AdditionalProperties = make([]*NamedExampleOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedExampleOrReference{}
@@ -1094,7 +1013,7 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -1166,7 +1085,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1320,11 +1239,11 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 				errors = append(errors, err)
 			}
 		}
-		// Content content = 13;
+		// MediaTypes content = 13;
 		v13 := compiler.MapValueForKey(m, "content")
 		if v13 != nil {
 			var err error
-			x.Content, err = NewContent(v13, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v13, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1333,7 +1252,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1411,30 +1330,21 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^[a-zA-Z0-9\\.\\-_]+$"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedHeaderOrReference header_or_reference = 1;
-		// MAP: HeaderOrReference ^[a-zA-Z0-9\.\-_]+$
-		x.HeaderOrReference = make([]*NamedHeaderOrReference, 0)
+		// repeated NamedHeader additional_properties = 1;
+		// MAP: Header
+		x.AdditionalProperties = make([]*NamedHeader, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^[a-zA-Z0-9\\.\\-_]+$", k) {
-					pair := &NamedHeaderOrReference{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewHeaderOrReference(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.HeaderOrReference = append(x.HeaderOrReference, pair)
+				pair := &NamedHeader{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
 				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
 		}
 	}
@@ -1453,7 +1363,7 @@ func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*Headers
 		// MAP: HeaderOrReference
 		x.AdditionalProperties = make([]*NamedHeaderOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedHeaderOrReference{}
@@ -1549,7 +1459,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1641,7 +1551,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1680,7 +1590,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"description", "headers", "operationId", "operationRef", "parameters", "server"}
+		allowedKeys := []string{"description", "operationId", "operationRef", "parameters", "requestBody", "server"}
 		allowedPatterns := []string{"^x-"}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1705,20 +1615,20 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// LinkParameters parameters = 3;
+		// AnysOrExpressions parameters = 3;
 		v3 := compiler.MapValueForKey(m, "parameters")
 		if v3 != nil {
 			var err error
-			x.Parameters, err = NewLinkParameters(v3, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewAnysOrExpressions(v3, compiler.NewContext("parameters", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Headers headers = 4;
-		v4 := compiler.MapValueForKey(m, "headers")
+		// AnyOrExpression request_body = 4;
+		v4 := compiler.MapValueForKey(m, "requestBody")
 		if v4 != nil {
 			var err error
-			x.Headers, err = NewHeaders(v4, compiler.NewContext("headers", context))
+			x.RequestBody, err = NewAnyOrExpression(v4, compiler.NewContext("requestBody", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1745,7 +1655,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1815,82 +1725,6 @@ func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrRefer
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewLinkParameters(in interface{}, context *compiler.Context) (*LinkParameters, error) {
-	errors := make([]error, 0)
-	x := &LinkParameters{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^[a-zA-Z0-9\\.\\-_]+$"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedAnyOrExpression any_or_expression = 1;
-		// MAP: AnyOrExpression ^[a-zA-Z0-9\.\-_]+$
-		x.AnyOrExpression = make([]*NamedAnyOrExpression, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^[a-zA-Z0-9\\.\\-_]+$", k) {
-					pair := &NamedAnyOrExpression{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewAnyOrExpression(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.AnyOrExpression = append(x.AnyOrExpression, pair)
-				}
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewLinks(in interface{}, context *compiler.Context) (*Links, error) {
-	errors := make([]error, 0)
-	x := &Links{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^[a-zA-Z0-9\\.\\-_]+$"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedLinkOrReference link_or_reference = 1;
-		// MAP: LinkOrReference ^[a-zA-Z0-9\.\-_]+$
-		x.LinkOrReference = make([]*NamedLinkOrReference, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^[a-zA-Z0-9\\.\\-_]+$", k) {
-					pair := &NamedLinkOrReference{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewLinkOrReference(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.LinkOrReference = append(x.LinkOrReference, pair)
-				}
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrReferences, error) {
 	errors := make([]error, 0)
 	x := &LinksOrReferences{}
@@ -1903,7 +1737,7 @@ func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrRe
 		// MAP: LinkOrReference
 		x.AdditionalProperties = make([]*NamedLinkOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedLinkOrReference{}
@@ -1962,11 +1796,11 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 				errors = append(errors, err)
 			}
 		}
-		// Encoding encoding = 4;
+		// Encodings encoding = 4;
 		v4 := compiler.MapValueForKey(m, "encoding")
 		if v4 != nil {
 			var err error
-			x.Encoding, err = NewEncoding(v4, compiler.NewContext("encoding", context))
+			x.Encoding, err = NewEncodings(v4, compiler.NewContext("encoding", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1975,7 +1809,7 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2000,6 +1834,35 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 					}
 					x.SpecificationExtension = append(x.SpecificationExtension, pair)
 				}
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewMediaTypes(in interface{}, context *compiler.Context) (*MediaTypes, error) {
+	errors := make([]error, 0)
+	x := &MediaTypes{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		// repeated NamedMediaType additional_properties = 1;
+		// MAP: MediaType
+		x.AdditionalProperties = make([]*NamedMediaType, 0)
+		for _, item := range m {
+			k, ok := compiler.StringValue(item.Key)
+			if ok {
+				v := item.Value
+				pair := &NamedMediaType{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewMediaType(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
 		}
 	}
@@ -2117,9 +1980,9 @@ func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*Na
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-func NewNamedEncodingProperty(in interface{}, context *compiler.Context) (*NamedEncodingProperty, error) {
+func NewNamedEncoding(in interface{}, context *compiler.Context) (*NamedEncoding, error) {
 	errors := make([]error, 0)
-	x := &NamedEncodingProperty{}
+	x := &NamedEncoding{}
 	m, ok := compiler.UnpackMap(in)
 	if !ok {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
@@ -2141,11 +2004,11 @@ func NewNamedEncodingProperty(in interface{}, context *compiler.Context) (*Named
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// EncodingProperty value = 2;
+		// Encoding value = 2;
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewEncodingProperty(v2, compiler.NewContext("value", context))
+			x.Value, err = NewEncoding(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2183,6 +2046,43 @@ func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*Nam
 		if v2 != nil {
 			var err error
 			x.Value, err = NewExampleOrReference(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, error) {
+	errors := make([]error, 0)
+	x := &NamedHeader{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		allowedPatterns := []string{}
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// Header value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewHeader(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2640,11 +2540,11 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Scopes scopes = 4;
+		// Strings scopes = 4;
 		v4 := compiler.MapValueForKey(m, "scopes")
 		if v4 != nil {
 			var err error
-			x.Scopes, err = NewScopes(v4, compiler.NewContext("scopes", context))
+			x.Scopes, err = NewStrings(v4, compiler.NewContext("scopes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2653,7 +2553,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2739,7 +2639,7 @@ func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, erro
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2782,7 +2682,7 @@ func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -2913,11 +2813,11 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 				errors = append(errors, err)
 			}
 		}
-		// Callbacks callbacks = 9;
+		// CallbacksOrReferences callbacks = 9;
 		v9 := compiler.MapValueForKey(m, "callbacks")
 		if v9 != nil {
 			var err error
-			x.Callbacks, err = NewCallbacks(v9, compiler.NewContext("callbacks", context))
+			x.Callbacks, err = NewCallbacksOrReferences(v9, compiler.NewContext("callbacks", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2967,7 +2867,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3127,11 +3027,11 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 				errors = append(errors, err)
 			}
 		}
-		// Content content = 13;
+		// MediaTypes content = 13;
 		v13 := compiler.MapValueForKey(m, "content")
 		if v13 != nil {
 			var err error
-			x.Content, err = NewContent(v13, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v13, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3140,7 +3040,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3222,7 +3122,7 @@ func NewParametersOrReferences(in interface{}, context *compiler.Context) (*Para
 		// MAP: ParameterOrReference
 		x.AdditionalProperties = make([]*NamedParameterOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedParameterOrReference{}
@@ -3389,7 +3289,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3439,7 +3339,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: PathItem ^/
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^/", k) {
@@ -3458,7 +3358,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3501,7 +3401,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		// MAP: SchemaOrReference
 		x.AdditionalProperties = make([]*NamedSchemaOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchemaOrReference{}
@@ -3564,7 +3464,7 @@ func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*R
 		// MAP: RequestBodyOrReference
 		x.AdditionalProperties = make([]*NamedRequestBodyOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedRequestBodyOrReference{}
@@ -3611,11 +3511,11 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Content content = 2;
+		// MediaTypes content = 2;
 		v2 := compiler.MapValueForKey(m, "content")
 		if v2 != nil {
 			var err error
-			x.Content, err = NewContent(v2, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v2, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3633,7 +3533,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3733,29 +3633,29 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Headers headers = 2;
+		// HeadersOrReferences headers = 2;
 		v2 := compiler.MapValueForKey(m, "headers")
 		if v2 != nil {
 			var err error
-			x.Headers, err = NewHeaders(v2, compiler.NewContext("headers", context))
+			x.Headers, err = NewHeadersOrReferences(v2, compiler.NewContext("headers", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Content content = 3;
+		// MediaTypes content = 3;
 		v3 := compiler.MapValueForKey(m, "content")
 		if v3 != nil {
 			var err error
-			x.Content, err = NewContent(v3, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v3, compiler.NewContext("content", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// Links links = 4;
+		// LinksOrReferences links = 4;
 		v4 := compiler.MapValueForKey(m, "links")
 		if v4 != nil {
 			var err error
-			x.Links, err = NewLinks(v4, compiler.NewContext("links", context))
+			x.Links, err = NewLinksOrReferences(v4, compiler.NewContext("links", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3764,7 +3664,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3862,7 +3762,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: ResponseOrReference ^([0-9X]{3})$
 		x.ResponseOrReference = make([]*NamedResponseOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^([0-9X]{3})$", k) {
@@ -3881,7 +3781,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3924,7 +3824,7 @@ func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*Respo
 		// MAP: ResponseOrReference
 		x.AdditionalProperties = make([]*NamedResponseOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedResponseOrReference{}
@@ -4359,7 +4259,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4441,7 +4341,7 @@ func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*Schemas
 		// MAP: SchemaOrReference
 		x.AdditionalProperties = make([]*NamedSchemaOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchemaOrReference{}
@@ -4452,56 +4352,6 @@ func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*Schemas
 					errors = append(errors, err)
 				}
 				x.AdditionalProperties = append(x.AdditionalProperties, pair)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-func NewScopes(in interface{}, context *compiler.Context) (*Scopes, error) {
-	errors := make([]error, 0)
-	x := &Scopes{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^", "^x-"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedAny specification_extension = 1;
-		// MAP: Any ^x-
-		x.SpecificationExtension = make([]*NamedAny, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedAny{}
-					pair.Name = k
-					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
-					if handled {
-						if err != nil {
-							errors = append(errors, err)
-						} else {
-							bytes, _ := yaml.Marshal(v)
-							result.Yaml = string(bytes)
-							result.Value = resultFromExt
-							pair.Value = result
-						}
-					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-						if err != nil {
-							errors = append(errors, err)
-						}
-					}
-					x.SpecificationExtension = append(x.SpecificationExtension, pair)
-				}
 			}
 		}
 	}
@@ -4624,7 +4474,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4706,7 +4556,7 @@ func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (
 		// MAP: SecuritySchemeOrReference
 		x.AdditionalProperties = make([]*NamedSecuritySchemeOrReference, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSecuritySchemeOrReference{}
@@ -4775,7 +4625,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4860,7 +4710,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4899,61 +4749,21 @@ func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVaria
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []string{"^[a-zA-Z0-9\\.\\-_]+$", "^x-"}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// repeated NamedServerVariable server_variable = 1;
-		// MAP: ServerVariable ^[a-zA-Z0-9\.\-_]+$
-		x.ServerVariable = make([]*NamedServerVariable, 0)
+		// repeated NamedServerVariable additional_properties = 1;
+		// MAP: ServerVariable
+		x.AdditionalProperties = make([]*NamedServerVariable, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^[a-zA-Z0-9\\.\\-_]+$", k) {
-					pair := &NamedServerVariable{}
-					pair.Name = k
-					var err error
-					pair.Value, err = NewServerVariable(v, compiler.NewContext(k, context))
-					if err != nil {
-						errors = append(errors, err)
-					}
-					x.ServerVariable = append(x.ServerVariable, pair)
+				pair := &NamedServerVariable{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewServerVariable(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
 				}
-			}
-		}
-		// repeated NamedAny specification_extension = 2;
-		// MAP: Any ^x-
-		x.SpecificationExtension = make([]*NamedAny, 0)
-		for _, item := range m {
-			k, ok := item.Key.(string)
-			if ok {
-				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
-					pair := &NamedAny{}
-					pair.Name = k
-					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
-					if handled {
-						if err != nil {
-							errors = append(errors, err)
-						} else {
-							bytes, _ := yaml.Marshal(v)
-							result.Yaml = string(bytes)
-							result.Value = resultFromExt
-							pair.Value = result
-						}
-					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
-						if err != nil {
-							errors = append(errors, err)
-						}
-					}
-					x.SpecificationExtension = append(x.SpecificationExtension, pair)
-				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
 			}
 		}
 	}
@@ -5022,7 +4832,7 @@ func NewStrings(in interface{}, context *compiler.Context) (*Strings, error) {
 		// MAP: string
 		x.AdditionalProperties = make([]*NamedString, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedString{}
@@ -5087,7 +4897,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5182,7 +4992,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5255,6 +5065,19 @@ func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *AnysOrExpressions) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *Callback) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Path {
@@ -5293,27 +5116,6 @@ func (m *CallbackOrReference) ResolveReferences(root string) (interface{}, error
 			_, err := p.Reference.ResolveReferences(root)
 			if err != nil {
 				return nil, err
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-func (m *Callbacks) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.CallbackOrReference {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	for _, item := range m.SpecificationExtension {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
 			}
 		}
 	}
@@ -5413,19 +5215,6 @@ func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *Content) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.MediaType {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 func (m *DefaultType) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
@@ -5505,7 +5294,13 @@ func (m *Document) ResolveReferences(root string) (interface{}, error) {
 
 func (m *Encoding) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	for _, item := range m.EncodingProperty {
+	if m.Headers != nil {
+		_, err := m.Headers.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	for _, item := range m.SpecificationExtension {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -5516,15 +5311,9 @@ func (m *Encoding) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *EncodingProperty) ResolveReferences(root string) (interface{}, error) {
+func (m *Encodings) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	if m.Headers != nil {
-		_, err := m.Headers.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	for _, item := range m.SpecificationExtension {
+	for _, item := range m.AdditionalProperties {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -5683,7 +5472,7 @@ func (m *HeaderOrReference) ResolveReferences(root string) (interface{}, error) 
 
 func (m *Headers) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	for _, item := range m.HeaderOrReference {
+	for _, item := range m.AdditionalProperties {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -5766,8 +5555,8 @@ func (m *Link) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
-	if m.Headers != nil {
-		_, err := m.Headers.ResolveReferences(root)
+	if m.RequestBody != nil {
+		_, err := m.RequestBody.ResolveReferences(root)
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -5806,32 +5595,6 @@ func (m *LinkOrReference) ResolveReferences(root string) (interface{}, error) {
 			_, err := p.Reference.ResolveReferences(root)
 			if err != nil {
 				return nil, err
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-func (m *LinkParameters) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.AnyOrExpression {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-func (m *Links) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.LinkOrReference {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
 			}
 		}
 	}
@@ -5888,6 +5651,19 @@ func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+func (m *MediaTypes) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5921,7 +5697,7 @@ func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *NamedEncodingProperty) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5933,6 +5709,17 @@ func (m *NamedEncodingProperty) ResolveReferences(root string) (interface{}, err
 }
 
 func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Value != nil {
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -6682,19 +6469,6 @@ func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-func (m *Scopes) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.SpecificationExtension {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
@@ -6789,15 +6563,7 @@ func (m *ServerVariable) ResolveReferences(root string) (interface{}, error) {
 
 func (m *ServerVariables) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
-	for _, item := range m.ServerVariable {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	for _, item := range m.SpecificationExtension {
+	for _, item := range m.AdditionalProperties {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -6861,4 +6627,1591 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 		}
 	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// AdditionalPropertiesItem
+	// {Name:schemaOrReference Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSchemaOrReference()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v1, ok := m.GetOneof().(*AdditionalPropertiesItem_Boolean); ok {
+		return v1.Boolean
+	}
+	return nil
+}
+
+func (m *Any) ToRawInfo() interface{} {
+	var err error
+	var info1 []yaml.MapSlice
+	err = yaml.Unmarshal([]byte(m.Yaml), &info1)
+	if err == nil {
+		return info1
+	}
+	var info2 yaml.MapSlice
+	err = yaml.Unmarshal([]byte(m.Yaml), &info2)
+	if err == nil {
+		return info2
+	}
+	var info3 interface{}
+	err = yaml.Unmarshal([]byte(m.Yaml), &info3)
+	if err == nil {
+		return info3
+	}
+	return nil
+}
+
+func (m *AnyOrExpression) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// AnyOrExpression
+	// {Name:any Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetAny()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:expression Type:Expression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetExpression()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *AnysOrExpressions) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAnyOrExpression StringEnumValues:[] MapType:AnyOrExpression Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Callback) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Path != nil {
+		for _, item := range m.Path {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:Path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^ Implicit:true Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *CallbackOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// CallbackOrReference
+	// {Name:callback Type:Callback StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetCallback()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *CallbacksOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedCallbackOrReference StringEnumValues:[] MapType:CallbackOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Components) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Schemas != nil {
+		info = append(info, yaml.MapItem{"schemas", m.Schemas.ToRawInfo()})
+	}
+	// &{Name:schemas Type:SchemasOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Responses != nil {
+		info = append(info, yaml.MapItem{"responses", m.Responses.ToRawInfo()})
+	}
+	// &{Name:responses Type:ResponsesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Parameters != nil {
+		info = append(info, yaml.MapItem{"parameters", m.Parameters.ToRawInfo()})
+	}
+	// &{Name:parameters Type:ParametersOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Examples != nil {
+		info = append(info, yaml.MapItem{"examples", m.Examples.ToRawInfo()})
+	}
+	// &{Name:examples Type:ExamplesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.RequestBodies != nil {
+		info = append(info, yaml.MapItem{"requestBodies", m.RequestBodies.ToRawInfo()})
+	}
+	// &{Name:requestBodies Type:RequestBodiesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Headers != nil {
+		info = append(info, yaml.MapItem{"headers", m.Headers.ToRawInfo()})
+	}
+	// &{Name:headers Type:HeadersOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SecuritySchemes != nil {
+		info = append(info, yaml.MapItem{"securitySchemes", m.SecuritySchemes.ToRawInfo()})
+	}
+	// &{Name:securitySchemes Type:SecuritySchemesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Links != nil {
+		info = append(info, yaml.MapItem{"links", m.Links.ToRawInfo()})
+	}
+	// &{Name:links Type:LinksOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Callbacks != nil {
+		info = append(info, yaml.MapItem{"callbacks", m.Callbacks.ToRawInfo()})
+	}
+	// &{Name:callbacks Type:CallbacksOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Contact) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.Email != "" {
+		info = append(info, yaml.MapItem{"email", m.Email})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *DefaultType) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// DefaultType
+	// {Name:number Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v0, ok := m.GetOneof().(*DefaultType_Number); ok {
+		return v0.Number
+	}
+	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v1, ok := m.GetOneof().(*DefaultType_Boolean); ok {
+		return v1.Boolean
+	}
+	// {Name:string Type:string StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v2, ok := m.GetOneof().(*DefaultType_String_); ok {
+		return v2.String_
+	}
+	return nil
+}
+
+func (m *Discriminator) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.PropertyName != "" {
+		info = append(info, yaml.MapItem{"propertyName", m.PropertyName})
+	}
+	if m.Mapping != nil {
+		info = append(info, yaml.MapItem{"mapping", m.Mapping.ToRawInfo()})
+	}
+	// &{Name:mapping Type:Strings StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	return info
+}
+
+func (m *Document) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Openapi != "" {
+		info = append(info, yaml.MapItem{"openapi", m.Openapi})
+	}
+	if m.Info != nil {
+		info = append(info, yaml.MapItem{"info", m.Info.ToRawInfo()})
+	}
+	// &{Name:info Type:Info StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Servers) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Servers {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"servers", items})
+	}
+	// &{Name:servers Type:Server StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.Paths != nil {
+		info = append(info, yaml.MapItem{"paths", m.Paths.ToRawInfo()})
+	}
+	// &{Name:paths Type:Paths StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Components != nil {
+		info = append(info, yaml.MapItem{"components", m.Components.ToRawInfo()})
+	}
+	// &{Name:components Type:Components StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Security) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Security {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"security", items})
+	}
+	// &{Name:security Type:SecurityRequirement StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.Tags) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Tags {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"tags", items})
+	}
+	// &{Name:tags Type:Tag StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Encoding) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.ContentType != "" {
+		info = append(info, yaml.MapItem{"contentType", m.ContentType})
+	}
+	if m.Headers != nil {
+		info = append(info, yaml.MapItem{"headers", m.Headers.ToRawInfo()})
+	}
+	// &{Name:headers Type:Headers StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Style != "" {
+		info = append(info, yaml.MapItem{"style", m.Style})
+	}
+	if m.Explode != false {
+		info = append(info, yaml.MapItem{"explode", m.Explode})
+	}
+	if m.AllowReserved != false {
+		info = append(info, yaml.MapItem{"allowReserved", m.AllowReserved})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Encodings) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedEncoding StringEnumValues:[] MapType:Encoding Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Example) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Summary != "" {
+		info = append(info, yaml.MapItem{"summary", m.Summary})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	// &{Name:value Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ExternalValue != "" {
+		info = append(info, yaml.MapItem{"externalValue", m.ExternalValue})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ExampleOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// ExampleOrReference
+	// {Name:example Type:Example StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetExample()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *Examples) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	return info
+}
+
+func (m *ExamplesOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedExampleOrReference StringEnumValues:[] MapType:ExampleOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Expression) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *ExternalDocs) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Header) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.Deprecated != false {
+		info = append(info, yaml.MapItem{"deprecated", m.Deprecated})
+	}
+	if m.AllowEmptyValue != false {
+		info = append(info, yaml.MapItem{"allowEmptyValue", m.AllowEmptyValue})
+	}
+	if m.Style != "" {
+		info = append(info, yaml.MapItem{"style", m.Style})
+	}
+	if m.Explode != false {
+		info = append(info, yaml.MapItem{"explode", m.Explode})
+	}
+	if m.AllowReserved != false {
+		info = append(info, yaml.MapItem{"allowReserved", m.AllowReserved})
+	}
+	if m.Schema != nil {
+		info = append(info, yaml.MapItem{"schema", m.Schema.ToRawInfo()})
+	}
+	// &{Name:schema Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Example != nil {
+		info = append(info, yaml.MapItem{"example", m.Example.ToRawInfo()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Examples != nil {
+		info = append(info, yaml.MapItem{"examples", m.Examples.ToRawInfo()})
+	}
+	// &{Name:examples Type:ExamplesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Content != nil {
+		info = append(info, yaml.MapItem{"content", m.Content.ToRawInfo()})
+	}
+	// &{Name:content Type:MediaTypes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *HeaderOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// HeaderOrReference
+	// {Name:header Type:Header StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetHeader()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *Headers) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedHeader StringEnumValues:[] MapType:Header Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *HeadersOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedHeaderOrReference StringEnumValues:[] MapType:HeaderOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Info) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.TermsOfService != "" {
+		info = append(info, yaml.MapItem{"termsOfService", m.TermsOfService})
+	}
+	if m.Contact != nil {
+		info = append(info, yaml.MapItem{"contact", m.Contact.ToRawInfo()})
+	}
+	// &{Name:contact Type:Contact StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.License != nil {
+		info = append(info, yaml.MapItem{"license", m.License.ToRawInfo()})
+	}
+	// &{Name:license Type:License StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Version != "" {
+		info = append(info, yaml.MapItem{"version", m.Version})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ItemsItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.SchemaOrReference) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.SchemaOrReference {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"schemaOrReference", items})
+	}
+	// &{Name:schemaOrReference Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	return info
+}
+
+func (m *License) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Link) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.OperationRef != "" {
+		info = append(info, yaml.MapItem{"operationRef", m.OperationRef})
+	}
+	if m.OperationId != "" {
+		info = append(info, yaml.MapItem{"operationId", m.OperationId})
+	}
+	if m.Parameters != nil {
+		info = append(info, yaml.MapItem{"parameters", m.Parameters.ToRawInfo()})
+	}
+	// &{Name:parameters Type:AnysOrExpressions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.RequestBody != nil {
+		info = append(info, yaml.MapItem{"requestBody", m.RequestBody.ToRawInfo()})
+	}
+	// &{Name:requestBody Type:AnyOrExpression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Server != nil {
+		info = append(info, yaml.MapItem{"server", m.Server.ToRawInfo()})
+	}
+	// &{Name:server Type:Server StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *LinkOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// LinkOrReference
+	// {Name:link Type:Link StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetLink()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *LinksOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedLinkOrReference StringEnumValues:[] MapType:LinkOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *MediaType) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Schema != nil {
+		info = append(info, yaml.MapItem{"schema", m.Schema.ToRawInfo()})
+	}
+	// &{Name:schema Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Example != nil {
+		info = append(info, yaml.MapItem{"example", m.Example.ToRawInfo()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Examples != nil {
+		info = append(info, yaml.MapItem{"examples", m.Examples.ToRawInfo()})
+	}
+	// &{Name:examples Type:ExamplesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Encoding != nil {
+		info = append(info, yaml.MapItem{"encoding", m.Encoding.ToRawInfo()})
+	}
+	// &{Name:encoding Type:Encodings StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *MediaTypes) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedMediaType StringEnumValues:[] MapType:MediaType Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *NamedAny) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedAnyOrExpression) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:AnyOrExpression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedCallbackOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:CallbackOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedEncoding) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Encoding StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedExampleOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:ExampleOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedHeader) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Header StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedHeaderOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:HeaderOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedLinkOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:LinkOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedMediaType) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:MediaType StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedParameterOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:ParameterOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedPathItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:PathItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedRequestBodyOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:RequestBodyOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedResponseOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:ResponseOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedSchemaOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedSecuritySchemeOrReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:SecuritySchemeOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedServerVariable) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:ServerVariable StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedString) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Value != "" {
+		info = append(info, yaml.MapItem{"value", m.Value})
+	}
+	return info
+}
+
+func (m *OauthFlow) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AuthorizationUrl != "" {
+		info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
+	}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.RefreshUrl != "" {
+		info = append(info, yaml.MapItem{"refreshUrl", m.RefreshUrl})
+	}
+	if m.Scopes != nil {
+		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToRawInfo()})
+	}
+	// &{Name:scopes Type:Strings StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *OauthFlows) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Implicit != nil {
+		info = append(info, yaml.MapItem{"implicit", m.Implicit.ToRawInfo()})
+	}
+	// &{Name:implicit Type:OauthFlow StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Password != nil {
+		info = append(info, yaml.MapItem{"password", m.Password.ToRawInfo()})
+	}
+	// &{Name:password Type:OauthFlow StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ClientCredentials != nil {
+		info = append(info, yaml.MapItem{"clientCredentials", m.ClientCredentials.ToRawInfo()})
+	}
+	// &{Name:clientCredentials Type:OauthFlow StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.AuthorizationCode != nil {
+		info = append(info, yaml.MapItem{"authorizationCode", m.AuthorizationCode.ToRawInfo()})
+	}
+	// &{Name:authorizationCode Type:OauthFlow StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Object) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Operation) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.Tags) != 0 {
+		info = append(info, yaml.MapItem{"tags", m.Tags})
+	}
+	if m.Summary != "" {
+		info = append(info, yaml.MapItem{"summary", m.Summary})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.OperationId != "" {
+		info = append(info, yaml.MapItem{"operationId", m.OperationId})
+	}
+	if len(m.Parameters) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Parameters {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"parameters", items})
+	}
+	// &{Name:parameters Type:ParameterOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.RequestBody != nil {
+		info = append(info, yaml.MapItem{"requestBody", m.RequestBody.ToRawInfo()})
+	}
+	// &{Name:requestBody Type:RequestBodyOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Responses != nil {
+		info = append(info, yaml.MapItem{"responses", m.Responses.ToRawInfo()})
+	}
+	// &{Name:responses Type:Responses StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Callbacks != nil {
+		info = append(info, yaml.MapItem{"callbacks", m.Callbacks.ToRawInfo()})
+	}
+	// &{Name:callbacks Type:CallbacksOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Deprecated != false {
+		info = append(info, yaml.MapItem{"deprecated", m.Deprecated})
+	}
+	if len(m.Security) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Security {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"security", items})
+	}
+	// &{Name:security Type:SecurityRequirement StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.Servers) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Servers {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"servers", items})
+	}
+	// &{Name:servers Type:Server StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Parameter) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.Deprecated != false {
+		info = append(info, yaml.MapItem{"deprecated", m.Deprecated})
+	}
+	if m.AllowEmptyValue != false {
+		info = append(info, yaml.MapItem{"allowEmptyValue", m.AllowEmptyValue})
+	}
+	if m.Style != "" {
+		info = append(info, yaml.MapItem{"style", m.Style})
+	}
+	if m.Explode != false {
+		info = append(info, yaml.MapItem{"explode", m.Explode})
+	}
+	if m.AllowReserved != false {
+		info = append(info, yaml.MapItem{"allowReserved", m.AllowReserved})
+	}
+	if m.Schema != nil {
+		info = append(info, yaml.MapItem{"schema", m.Schema.ToRawInfo()})
+	}
+	// &{Name:schema Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Example != nil {
+		info = append(info, yaml.MapItem{"example", m.Example.ToRawInfo()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Examples != nil {
+		info = append(info, yaml.MapItem{"examples", m.Examples.ToRawInfo()})
+	}
+	// &{Name:examples Type:ExamplesOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Content != nil {
+		info = append(info, yaml.MapItem{"content", m.Content.ToRawInfo()})
+	}
+	// &{Name:content Type:MediaTypes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ParameterOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// ParameterOrReference
+	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetParameter()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *ParametersOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedParameterOrReference StringEnumValues:[] MapType:ParameterOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *PathItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	if m.Summary != "" {
+		info = append(info, yaml.MapItem{"summary", m.Summary})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Get != nil {
+		info = append(info, yaml.MapItem{"get", m.Get.ToRawInfo()})
+	}
+	// &{Name:get Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Put != nil {
+		info = append(info, yaml.MapItem{"put", m.Put.ToRawInfo()})
+	}
+	// &{Name:put Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Post != nil {
+		info = append(info, yaml.MapItem{"post", m.Post.ToRawInfo()})
+	}
+	// &{Name:post Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Delete != nil {
+		info = append(info, yaml.MapItem{"delete", m.Delete.ToRawInfo()})
+	}
+	// &{Name:delete Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Options != nil {
+		info = append(info, yaml.MapItem{"options", m.Options.ToRawInfo()})
+	}
+	// &{Name:options Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Head != nil {
+		info = append(info, yaml.MapItem{"head", m.Head.ToRawInfo()})
+	}
+	// &{Name:head Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Patch != nil {
+		info = append(info, yaml.MapItem{"patch", m.Patch.ToRawInfo()})
+	}
+	// &{Name:patch Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Trace != nil {
+		info = append(info, yaml.MapItem{"trace", m.Trace.ToRawInfo()})
+	}
+	// &{Name:trace Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Servers) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Servers {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"servers", items})
+	}
+	// &{Name:servers Type:Server StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.Parameters) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Parameters {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"parameters", items})
+	}
+	// &{Name:parameters Type:ParameterOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Paths) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Path != nil {
+		for _, item := range m.Path {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:Path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Properties) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedSchemaOrReference StringEnumValues:[] MapType:SchemaOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Reference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	return info
+}
+
+func (m *RequestBodiesOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedRequestBodyOrReference StringEnumValues:[] MapType:RequestBodyOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *RequestBody) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Content != nil {
+		info = append(info, yaml.MapItem{"content", m.Content.ToRawInfo()})
+	}
+	// &{Name:content Type:MediaTypes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *RequestBodyOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// RequestBodyOrReference
+	// {Name:requestBody Type:RequestBody StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetRequestBody()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *Response) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Headers != nil {
+		info = append(info, yaml.MapItem{"headers", m.Headers.ToRawInfo()})
+	}
+	// &{Name:headers Type:HeadersOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Content != nil {
+		info = append(info, yaml.MapItem{"content", m.Content.ToRawInfo()})
+	}
+	// &{Name:content Type:MediaTypes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Links != nil {
+		info = append(info, yaml.MapItem{"links", m.Links.ToRawInfo()})
+	}
+	// &{Name:links Type:LinksOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ResponseOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// ResponseOrReference
+	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetResponse()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *Responses) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:ResponseOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ResponseOrReference != nil {
+		for _, item := range m.ResponseOrReference {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:ResponseOrReference Type:NamedResponseOrReference StringEnumValues:[] MapType:ResponseOrReference Repeated:true Pattern:^([0-9X]{3})$ Implicit:true Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ResponsesOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedResponseOrReference StringEnumValues:[] MapType:ResponseOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Schema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Nullable != false {
+		info = append(info, yaml.MapItem{"nullable", m.Nullable})
+	}
+	if m.Discriminator != nil {
+		info = append(info, yaml.MapItem{"discriminator", m.Discriminator.ToRawInfo()})
+	}
+	// &{Name:discriminator Type:Discriminator StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ReadOnly != false {
+		info = append(info, yaml.MapItem{"readOnly", m.ReadOnly})
+	}
+	if m.WriteOnly != false {
+		info = append(info, yaml.MapItem{"writeOnly", m.WriteOnly})
+	}
+	if m.Xml != nil {
+		info = append(info, yaml.MapItem{"xml", m.Xml.ToRawInfo()})
+	}
+	// &{Name:xml Type:Xml StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Example != nil {
+		info = append(info, yaml.MapItem{"example", m.Example.ToRawInfo()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Deprecated != false {
+		info = append(info, yaml.MapItem{"deprecated", m.Deprecated})
+	}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if m.MaxProperties != 0 {
+		info = append(info, yaml.MapItem{"maxProperties", m.MaxProperties})
+	}
+	if m.MinProperties != 0 {
+		info = append(info, yaml.MapItem{"minProperties", m.MinProperties})
+	}
+	if len(m.Required) != 0 {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if len(m.AllOf) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.AllOf {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"allOf", items})
+	}
+	// &{Name:allOf Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.OneOf) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.OneOf {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"oneOf", items})
+	}
+	// &{Name:oneOf Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if len(m.AnyOf) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.AnyOf {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"anyOf", items})
+	}
+	// &{Name:anyOf Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.Not != nil {
+		info = append(info, yaml.MapItem{"not", m.Not.ToRawInfo()})
+	}
+	// &{Name:not Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Items != nil {
+		items := make([]interface{}, 0)
+		for _, item := range m.Items.SchemaOrReference {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"items", items[0]})
+	}
+	// &{Name:items Type:ItemsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Properties != nil {
+		info = append(info, yaml.MapItem{"properties", m.Properties.ToRawInfo()})
+	}
+	// &{Name:properties Type:Properties StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.AdditionalProperties != nil {
+		info = append(info, yaml.MapItem{"additionalProperties", m.AdditionalProperties.ToRawInfo()})
+	}
+	// &{Name:additionalProperties Type:AdditionalPropertiesItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:DefaultType StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *SchemaOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// SchemaOrReference
+	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSchema()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *SchemasOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedSchemaOrReference StringEnumValues:[] MapType:SchemaOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *SecurityRequirement) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	return info
+}
+
+func (m *SecurityScheme) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Scheme != "" {
+		info = append(info, yaml.MapItem{"scheme", m.Scheme})
+	}
+	if m.BearerFormat != "" {
+		info = append(info, yaml.MapItem{"bearerFormat", m.BearerFormat})
+	}
+	if m.Flows != nil {
+		info = append(info, yaml.MapItem{"flows", m.Flows.ToRawInfo()})
+	}
+	// &{Name:flows Type:OauthFlows StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.OpenIdConnectUrl != "" {
+		info = append(info, yaml.MapItem{"openIdConnectUrl", m.OpenIdConnectUrl})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *SecuritySchemeOrReference) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// SecuritySchemeOrReference
+	// {Name:securityScheme Type:SecurityScheme StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSecurityScheme()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:reference Type:Reference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *SecuritySchemesOrReferences) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedSecuritySchemeOrReference StringEnumValues:[] MapType:SecuritySchemeOrReference Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Server) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Variables != nil {
+		info = append(info, yaml.MapItem{"variables", m.Variables.ToRawInfo()})
+	}
+	// &{Name:variables Type:ServerVariables StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ServerVariable) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.Enum) != 0 {
+		info = append(info, yaml.MapItem{"enum", m.Enum})
+	}
+	if m.Default != "" {
+		info = append(info, yaml.MapItem{"default", m.Default})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ServerVariables) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedServerVariable StringEnumValues:[] MapType:ServerVariable Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *SpecificationExtension) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// SpecificationExtension
+	// {Name:number Type:float StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v0, ok := m.GetOneof().(*SpecificationExtension_Number); ok {
+		return v0.Number
+	}
+	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v1, ok := m.GetOneof().(*SpecificationExtension_Boolean); ok {
+		return v1.Boolean
+	}
+	// {Name:string Type:string StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v2, ok := m.GetOneof().(*SpecificationExtension_String_); ok {
+		return v2.String_
+	}
+	return nil
+}
+
+func (m *StringArray) ToRawInfo() interface{} {
+	return m.Value
+}
+
+func (m *Strings) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	// &{Name:additionalProperties Type:NamedString StringEnumValues:[] MapType:string Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Tag) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Xml) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Namespace != "" {
+		info = append(info, yaml.MapItem{"namespace", m.Namespace})
+	}
+	if m.Prefix != "" {
+		info = append(info, yaml.MapItem{"prefix", m.Prefix})
+	}
+	if m.Attribute != false {
+		info = append(info, yaml.MapItem{"attribute", m.Attribute})
+	}
+	if m.Wrapped != false {
+		info = append(info, yaml.MapItem{"wrapped", m.Wrapped})
+	}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
 }

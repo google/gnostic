@@ -138,7 +138,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -218,7 +218,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -325,7 +325,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -402,7 +402,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -445,7 +445,7 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -486,7 +486,7 @@ func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, er
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchema{}
@@ -695,7 +695,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -738,7 +738,7 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -810,7 +810,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -955,7 +955,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1278,7 +1278,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1565,7 +1565,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1879,7 +1879,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1922,7 +1922,7 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 		// MAP: Header
 		x.AdditionalProperties = make([]*NamedHeader, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedHeader{}
@@ -2018,7 +2018,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2153,7 +2153,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2712,7 +2712,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2825,7 +2825,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2938,7 +2938,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3051,7 +3051,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3094,7 +3094,7 @@ func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, 
 		// MAP: string
 		x.AdditionalProperties = make([]*NamedString, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedString{}
@@ -3268,7 +3268,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3350,7 +3350,7 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 		// MAP: Parameter
 		x.AdditionalProperties = make([]*NamedParameter, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedParameter{}
@@ -3513,7 +3513,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3833,7 +3833,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3883,7 +3883,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3914,7 +3914,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: PathItem ^/
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^/", k) {
@@ -4174,7 +4174,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4217,7 +4217,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchema{}
@@ -4526,7 +4526,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4618,7 +4618,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4661,7 +4661,7 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 		// MAP: Response
 		x.AdditionalProperties = make([]*NamedResponse, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedResponse{}
@@ -4736,7 +4736,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: ResponseValue ^([0-9]{3})$|^(default)$
 		x.ResponseCode = make([]*NamedResponseValue, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
@@ -4755,7 +4755,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5145,7 +5145,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5227,7 +5227,7 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 		// MAP: SecurityDefinitionsItem
 		x.AdditionalProperties = make([]*NamedSecurityDefinitionsItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSecurityDefinitionsItem{}
@@ -5351,7 +5351,7 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 		// MAP: StringArray
 		x.AdditionalProperties = make([]*NamedStringArray, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedStringArray{}
@@ -5436,7 +5436,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5504,7 +5504,7 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -5597,7 +5597,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -6941,4 +6941,1600 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 		}
 	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// AdditionalPropertiesItem
+	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSchema()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if v1, ok := m.GetOneof().(*AdditionalPropertiesItem_Boolean); ok {
+		return v1.Boolean
+	}
+	return nil
+}
+
+func (m *Any) ToRawInfo() interface{} {
+	var err error
+	var info1 []yaml.MapSlice
+	err = yaml.Unmarshal([]byte(m.Yaml), &info1)
+	if err == nil {
+		return info1
+	}
+	var info2 yaml.MapSlice
+	err = yaml.Unmarshal([]byte(m.Yaml), &info2)
+	if err == nil {
+		return info2
+	}
+	var info3 interface{}
+	err = yaml.Unmarshal([]byte(m.Yaml), &info3)
+	if err == nil {
+		return info3
+	}
+	return nil
+}
+
+func (m *ApiKeySecurity) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *BasicAuthenticationSecurity) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *BodyParameter) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.Schema != nil {
+		info = append(info, yaml.MapItem{"schema", m.Schema.ToRawInfo()})
+	}
+	// &{Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Contact) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.Email != "" {
+		info = append(info, yaml.MapItem{"email", m.Email})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Default) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:false Description:}
+	return info
+}
+
+func (m *Definitions) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedSchema StringEnumValues:[] MapType:Schema Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Document) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Swagger != "" {
+		info = append(info, yaml.MapItem{"swagger", m.Swagger})
+	}
+	if m.Info != nil {
+		info = append(info, yaml.MapItem{"info", m.Info.ToRawInfo()})
+	}
+	// &{Name:info Type:Info StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Host != "" {
+		info = append(info, yaml.MapItem{"host", m.Host})
+	}
+	if m.BasePath != "" {
+		info = append(info, yaml.MapItem{"basePath", m.BasePath})
+	}
+	if len(m.Schemes) != 0 {
+		info = append(info, yaml.MapItem{"schemes", m.Schemes})
+	}
+	if len(m.Consumes) != 0 {
+		info = append(info, yaml.MapItem{"consumes", m.Consumes})
+	}
+	if len(m.Produces) != 0 {
+		info = append(info, yaml.MapItem{"produces", m.Produces})
+	}
+	if m.Paths != nil {
+		info = append(info, yaml.MapItem{"paths", m.Paths.ToRawInfo()})
+	}
+	// &{Name:paths Type:Paths StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Definitions != nil {
+		info = append(info, yaml.MapItem{"definitions", m.Definitions.ToRawInfo()})
+	}
+	// &{Name:definitions Type:Definitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Parameters != nil {
+		info = append(info, yaml.MapItem{"parameters", m.Parameters.ToRawInfo()})
+	}
+	// &{Name:parameters Type:ParameterDefinitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Responses != nil {
+		info = append(info, yaml.MapItem{"responses", m.Responses.ToRawInfo()})
+	}
+	// &{Name:responses Type:ResponseDefinitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Security) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Security {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"security", items})
+	}
+	// &{Name:security Type:SecurityRequirement StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.SecurityDefinitions != nil {
+		info = append(info, yaml.MapItem{"securityDefinitions", m.SecurityDefinitions.ToRawInfo()})
+	}
+	// &{Name:securityDefinitions Type:SecurityDefinitions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Tags) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Tags {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"tags", items})
+	}
+	// &{Name:tags Type:Tag StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Examples) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *ExternalDocs) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *FileSchema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Required) != 0 {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.ReadOnly != false {
+		info = append(info, yaml.MapItem{"readOnly", m.ReadOnly})
+	}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Example != nil {
+		info = append(info, yaml.MapItem{"example", m.Example.ToRawInfo()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *FormDataParameterSubSchema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.AllowEmptyValue != false {
+		info = append(info, yaml.MapItem{"allowEmptyValue", m.AllowEmptyValue})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Items != nil {
+		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
+	}
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Header) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Items != nil {
+		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
+	}
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *HeaderParameterSubSchema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Items != nil {
+		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
+	}
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Headers) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedHeader StringEnumValues:[] MapType:Header Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Info) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Version != "" {
+		info = append(info, yaml.MapItem{"version", m.Version})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.TermsOfService != "" {
+		info = append(info, yaml.MapItem{"termsOfService", m.TermsOfService})
+	}
+	if m.Contact != nil {
+		info = append(info, yaml.MapItem{"contact", m.Contact.ToRawInfo()})
+	}
+	// &{Name:contact Type:Contact StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.License != nil {
+		info = append(info, yaml.MapItem{"license", m.License.ToRawInfo()})
+	}
+	// &{Name:license Type:License StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ItemsItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.Schema) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Schema {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"schema", items})
+	}
+	// &{Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	return info
+}
+
+func (m *JsonReference) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	return info
+}
+
+func (m *License) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Url != "" {
+		info = append(info, yaml.MapItem{"url", m.Url})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *NamedAny) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedHeader) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Header StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedParameter) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedPathItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:PathItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedResponse) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedResponseValue) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:ResponseValue StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedSchema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedSecurityDefinitionsItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:SecurityDefinitionsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NamedString) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Value != "" {
+		info = append(info, yaml.MapItem{"value", m.Value})
+	}
+	return info
+}
+
+func (m *NamedStringArray) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	// &{Name:value Type:StringArray StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+func (m *NonBodyParameter) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// NonBodyParameter
+	// {Name:headerParameterSubSchema Type:HeaderParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetHeaderParameterSubSchema()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:formDataParameterSubSchema Type:FormDataParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetFormDataParameterSubSchema()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	// {Name:queryParameterSubSchema Type:QueryParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v2 := m.GetQueryParameterSubSchema()
+	if v2 != nil {
+		return v2.ToRawInfo()
+	}
+	// {Name:pathParameterSubSchema Type:PathParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v3 := m.GetPathParameterSubSchema()
+	if v3 != nil {
+		return v3.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *Oauth2AccessCodeSecurity) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
+	if m.Scopes != nil {
+		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToRawInfo()})
+	}
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.AuthorizationUrl != "" {
+		info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
+	}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Oauth2ApplicationSecurity) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
+	if m.Scopes != nil {
+		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToRawInfo()})
+	}
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Oauth2ImplicitSecurity) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
+	if m.Scopes != nil {
+		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToRawInfo()})
+	}
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.AuthorizationUrl != "" {
+		info = append(info, yaml.MapItem{"authorizationUrl", m.AuthorizationUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Oauth2PasswordSecurity) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Flow != "" {
+		info = append(info, yaml.MapItem{"flow", m.Flow})
+	}
+	if m.Scopes != nil {
+		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToRawInfo()})
+	}
+	// &{Name:scopes Type:Oauth2Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.TokenUrl != "" {
+		info = append(info, yaml.MapItem{"tokenUrl", m.TokenUrl})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Oauth2Scopes) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	// &{Name:additionalProperties Type:NamedString StringEnumValues:[] MapType:string Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Operation) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.Tags) != 0 {
+		info = append(info, yaml.MapItem{"tags", m.Tags})
+	}
+	if m.Summary != "" {
+		info = append(info, yaml.MapItem{"summary", m.Summary})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.OperationId != "" {
+		info = append(info, yaml.MapItem{"operationId", m.OperationId})
+	}
+	if len(m.Produces) != 0 {
+		info = append(info, yaml.MapItem{"produces", m.Produces})
+	}
+	if len(m.Consumes) != 0 {
+		info = append(info, yaml.MapItem{"consumes", m.Consumes})
+	}
+	if len(m.Parameters) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Parameters {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"parameters", items})
+	}
+	// &{Name:parameters Type:ParametersItem StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:The parameters needed to send a valid API call.}
+	if m.Responses != nil {
+		info = append(info, yaml.MapItem{"responses", m.Responses.ToRawInfo()})
+	}
+	// &{Name:responses Type:Responses StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Schemes) != 0 {
+		info = append(info, yaml.MapItem{"schemes", m.Schemes})
+	}
+	if m.Deprecated != false {
+		info = append(info, yaml.MapItem{"deprecated", m.Deprecated})
+	}
+	if len(m.Security) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Security {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"security", items})
+	}
+	// &{Name:security Type:SecurityRequirement StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Parameter) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// Parameter
+	// {Name:bodyParameter Type:BodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetBodyParameter()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:nonBodyParameter Type:NonBodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetNonBodyParameter()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *ParameterDefinitions) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedParameter StringEnumValues:[] MapType:Parameter Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *ParametersItem) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// ParametersItem
+	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetParameter()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:jsonReference Type:JsonReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetJsonReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *PathItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	if m.Get != nil {
+		info = append(info, yaml.MapItem{"get", m.Get.ToRawInfo()})
+	}
+	// &{Name:get Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Put != nil {
+		info = append(info, yaml.MapItem{"put", m.Put.ToRawInfo()})
+	}
+	// &{Name:put Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Post != nil {
+		info = append(info, yaml.MapItem{"post", m.Post.ToRawInfo()})
+	}
+	// &{Name:post Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Delete != nil {
+		info = append(info, yaml.MapItem{"delete", m.Delete.ToRawInfo()})
+	}
+	// &{Name:delete Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Options != nil {
+		info = append(info, yaml.MapItem{"options", m.Options.ToRawInfo()})
+	}
+	// &{Name:options Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Head != nil {
+		info = append(info, yaml.MapItem{"head", m.Head.ToRawInfo()})
+	}
+	// &{Name:head Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Patch != nil {
+		info = append(info, yaml.MapItem{"patch", m.Patch.ToRawInfo()})
+	}
+	// &{Name:patch Type:Operation StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.Parameters) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Parameters {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"parameters", items})
+	}
+	// &{Name:parameters Type:ParametersItem StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:The parameters needed to send a valid API call.}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *PathParameterSubSchema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Items != nil {
+		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
+	}
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Paths) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	if m.Path != nil {
+		for _, item := range m.Path {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:Path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
+	return info
+}
+
+func (m *PrimitivesItems) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Items != nil {
+		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
+	}
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Properties) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedSchema StringEnumValues:[] MapType:Schema Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *QueryParameterSubSchema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Required != false {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if m.In != "" {
+		info = append(info, yaml.MapItem{"in", m.In})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.AllowEmptyValue != false {
+		info = append(info, yaml.MapItem{"allowEmptyValue", m.AllowEmptyValue})
+	}
+	if m.Type != "" {
+		info = append(info, yaml.MapItem{"type", m.Type})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Items != nil {
+		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
+	}
+	// &{Name:items Type:PrimitivesItems StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.CollectionFormat != "" {
+		info = append(info, yaml.MapItem{"collectionFormat", m.CollectionFormat})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Response) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Schema != nil {
+		info = append(info, yaml.MapItem{"schema", m.Schema.ToRawInfo()})
+	}
+	// &{Name:schema Type:SchemaItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Headers != nil {
+		info = append(info, yaml.MapItem{"headers", m.Headers.ToRawInfo()})
+	}
+	// &{Name:headers Type:Headers StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Examples != nil {
+		info = append(info, yaml.MapItem{"examples", m.Examples.ToRawInfo()})
+	}
+	// &{Name:examples Type:Examples StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *ResponseDefinitions) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedResponse StringEnumValues:[] MapType:Response Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *ResponseValue) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// ResponseValue
+	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetResponse()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:jsonReference Type:JsonReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetJsonReference()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *Responses) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.ResponseCode != nil {
+		for _, item := range m.ResponseCode {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:ResponseCode Type:NamedResponseValue StringEnumValues:[] MapType:ResponseValue Repeated:true Pattern:^([0-9]{3})$|^(default)$ Implicit:true Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *Schema) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
+	if m.Format != "" {
+		info = append(info, yaml.MapItem{"format", m.Format})
+	}
+	if m.Title != "" {
+		info = append(info, yaml.MapItem{"title", m.Title})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.Default != nil {
+		info = append(info, yaml.MapItem{"default", m.Default.ToRawInfo()})
+	}
+	// &{Name:default Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.MultipleOf != 0.0 {
+		info = append(info, yaml.MapItem{"multipleOf", m.MultipleOf})
+	}
+	if m.Maximum != 0.0 {
+		info = append(info, yaml.MapItem{"maximum", m.Maximum})
+	}
+	if m.ExclusiveMaximum != false {
+		info = append(info, yaml.MapItem{"exclusiveMaximum", m.ExclusiveMaximum})
+	}
+	if m.Minimum != 0.0 {
+		info = append(info, yaml.MapItem{"minimum", m.Minimum})
+	}
+	if m.ExclusiveMinimum != false {
+		info = append(info, yaml.MapItem{"exclusiveMinimum", m.ExclusiveMinimum})
+	}
+	if m.MaxLength != 0 {
+		info = append(info, yaml.MapItem{"maxLength", m.MaxLength})
+	}
+	if m.MinLength != 0 {
+		info = append(info, yaml.MapItem{"minLength", m.MinLength})
+	}
+	if m.Pattern != "" {
+		info = append(info, yaml.MapItem{"pattern", m.Pattern})
+	}
+	if m.MaxItems != 0 {
+		info = append(info, yaml.MapItem{"maxItems", m.MaxItems})
+	}
+	if m.MinItems != 0 {
+		info = append(info, yaml.MapItem{"minItems", m.MinItems})
+	}
+	if m.UniqueItems != false {
+		info = append(info, yaml.MapItem{"uniqueItems", m.UniqueItems})
+	}
+	if m.MaxProperties != 0 {
+		info = append(info, yaml.MapItem{"maxProperties", m.MaxProperties})
+	}
+	if m.MinProperties != 0 {
+		info = append(info, yaml.MapItem{"minProperties", m.MinProperties})
+	}
+	if len(m.Required) != 0 {
+		info = append(info, yaml.MapItem{"required", m.Required})
+	}
+	if len(m.Enum) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.Enum {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"enum", items})
+	}
+	// &{Name:enum Type:Any StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.AdditionalProperties != nil {
+		info = append(info, yaml.MapItem{"additionalProperties", m.AdditionalProperties.ToRawInfo()})
+	}
+	// &{Name:additionalProperties Type:AdditionalPropertiesItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Type != nil {
+		if len(m.Type.Value) == 1 {
+			info = append(info, yaml.MapItem{"type", m.Type.Value[0]})
+		} else {
+			info = append(info, yaml.MapItem{"type", m.Type.Value})
+		}
+	}
+	// &{Name:type Type:TypeItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Items != nil {
+		items := make([]interface{}, 0)
+		for _, item := range m.Items.Schema {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"items", items[0]})
+	}
+	// &{Name:items Type:ItemsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if len(m.AllOf) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.AllOf {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{"allOf", items})
+	}
+	// &{Name:allOf Type:Schema StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
+	if m.Properties != nil {
+		info = append(info, yaml.MapItem{"properties", m.Properties.ToRawInfo()})
+	}
+	// &{Name:properties Type:Properties StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Discriminator != "" {
+		info = append(info, yaml.MapItem{"discriminator", m.Discriminator})
+	}
+	if m.ReadOnly != false {
+		info = append(info, yaml.MapItem{"readOnly", m.ReadOnly})
+	}
+	if m.Xml != nil {
+		info = append(info, yaml.MapItem{"xml", m.Xml.ToRawInfo()})
+	}
+	// &{Name:xml Type:Xml StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Example != nil {
+		info = append(info, yaml.MapItem{"example", m.Example.ToRawInfo()})
+	}
+	// &{Name:example Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *SchemaItem) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// SchemaItem
+	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetSchema()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:fileSchema Type:FileSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetFileSchema()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *SecurityDefinitions) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedSecurityDefinitionsItem StringEnumValues:[] MapType:SecurityDefinitionsItem Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *SecurityDefinitionsItem) ToRawInfo() interface{} {
+	// ONE OF WRAPPER
+	// SecurityDefinitionsItem
+	// {Name:basicAuthenticationSecurity Type:BasicAuthenticationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v0 := m.GetBasicAuthenticationSecurity()
+	if v0 != nil {
+		return v0.ToRawInfo()
+	}
+	// {Name:apiKeySecurity Type:ApiKeySecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v1 := m.GetApiKeySecurity()
+	if v1 != nil {
+		return v1.ToRawInfo()
+	}
+	// {Name:oauth2ImplicitSecurity Type:Oauth2ImplicitSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v2 := m.GetOauth2ImplicitSecurity()
+	if v2 != nil {
+		return v2.ToRawInfo()
+	}
+	// {Name:oauth2PasswordSecurity Type:Oauth2PasswordSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v3 := m.GetOauth2PasswordSecurity()
+	if v3 != nil {
+		return v3.ToRawInfo()
+	}
+	// {Name:oauth2ApplicationSecurity Type:Oauth2ApplicationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v4 := m.GetOauth2ApplicationSecurity()
+	if v4 != nil {
+		return v4.ToRawInfo()
+	}
+	// {Name:oauth2AccessCodeSecurity Type:Oauth2AccessCodeSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	v5 := m.GetOauth2AccessCodeSecurity()
+	if v5 != nil {
+		return v5.ToRawInfo()
+	}
+	return nil
+}
+
+func (m *SecurityRequirement) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedStringArray StringEnumValues:[] MapType:StringArray Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *StringArray) ToRawInfo() interface{} {
+	return m.Value
+}
+
+func (m *Tag) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Description != "" {
+		info = append(info, yaml.MapItem{"description", m.Description})
+	}
+	if m.ExternalDocs != nil {
+		info = append(info, yaml.MapItem{"externalDocs", m.ExternalDocs.ToRawInfo()})
+	}
+	// &{Name:externalDocs Type:ExternalDocs StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+func (m *TypeItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.Value) != 0 {
+		info = append(info, yaml.MapItem{"value", m.Value})
+	}
+	return info
+}
+
+func (m *VendorExtension) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern: Implicit:true Description:}
+	return info
+}
+
+func (m *Xml) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{"name", m.Name})
+	}
+	if m.Namespace != "" {
+		info = append(info, yaml.MapItem{"namespace", m.Namespace})
+	}
+	if m.Prefix != "" {
+		info = append(info, yaml.MapItem{"prefix", m.Prefix})
+	}
+	if m.Attribute != false {
+		info = append(info, yaml.MapItem{"attribute", m.Attribute})
+	}
+	if m.Wrapped != false {
+		info = append(info, yaml.MapItem{"wrapped", m.Wrapped})
+	}
+	if m.VendorExtension != nil {
+		for _, item := range m.VendorExtension {
+			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
 }

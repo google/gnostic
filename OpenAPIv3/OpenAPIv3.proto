@@ -60,6 +60,10 @@ message AnyOrExpression {
   }
 }
 
+message AnysOrExpressions {
+  repeated NamedAnyOrExpression additional_properties = 1;
+}
+
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callback {
   repeated NamedPathItem path = 1;
@@ -71,12 +75,6 @@ message CallbackOrReference {
     Callback callback = 1;
     Reference reference = 2;
   }
-}
-
-// A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
-message Callbacks {
-  repeated NamedCallbackOrReference callback_or_reference = 1;
-  repeated NamedAny specification_extension = 2;
 }
 
 message CallbacksOrReferences {
@@ -105,11 +103,6 @@ message Contact {
   repeated NamedAny specification_extension = 4;
 }
 
-// Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.
-message Content {
-  repeated NamedMediaType media_type = 1;
-}
-
 message DefaultType {
   oneof oneof {
     double number = 1;
@@ -118,7 +111,7 @@ message DefaultType {
   }
 }
 
-// When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  Note, when using the discriminator, _inline_ schemas will not be considered when using the discriminator.
+// When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  When using the discriminator, _inline_ schemas will not be considered.
 message Discriminator {
   string property_name = 1;
   Strings mapping = 2;
@@ -136,19 +129,18 @@ message Document {
   repeated NamedAny specification_extension = 9;
 }
 
-// An object representing multipart region encoding for `requestBody` objects.
-message Encoding {
-  repeated NamedEncodingProperty encoding_property = 1;
-}
-
 // A single encoding definition applied to a single schema property.
-message EncodingProperty {
+message Encoding {
   string content_type = 1;
   Headers headers = 2;
   string style = 3;
   bool explode = 4;
   bool allow_reserved = 5;
   repeated NamedAny specification_extension = 6;
+}
+
+message Encodings {
+  repeated NamedEncoding additional_properties = 1;
 }
 
 message Example {
@@ -184,7 +176,7 @@ message ExternalDocs {
   repeated NamedAny specification_extension = 3;
 }
 
-// The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
+// The Header Object follows the structure of the Parameter Object with the following changes:  1. `name` MUST NOT be specified, it is given in the corresponding `headers` map. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
 message Header {
   string name = 1;
   string in = 2;
@@ -198,7 +190,7 @@ message Header {
   SchemaOrReference schema = 10;
   Any example = 11;
   ExamplesOrReferences examples = 12;
-  Content content = 13;
+  MediaTypes content = 13;
   repeated NamedAny specification_extension = 14;
 }
 
@@ -209,9 +201,8 @@ message HeaderOrReference {
   }
 }
 
-// Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.
 message Headers {
-  repeated NamedHeaderOrReference header_or_reference = 1;
+  repeated NamedHeader additional_properties = 1;
 }
 
 message HeadersOrReferences {
@@ -240,12 +231,12 @@ message License {
   repeated NamedAny specification_extension = 3;
 }
 
-// The `Link Object` is responsible for defining a possible operation based on a single response.
+// The `Link object` represents a possible design-time link for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  Unlike _dynamic_ links (i.e. links provided **in** the response payload), the OAS linking mechanism does not require link information in the runtime response.  For computing links, and providing instructions to execute them, a runtime expression is used for accessing values in an operation and using them as parameters while invoking the linked operation.
 message Link {
   string operation_ref = 1;
   string operation_id = 2;
-  LinkParameters parameters = 3;
-  Headers headers = 4;
+  AnysOrExpressions parameters = 3;
+  AnyOrExpression request_body = 4;
   string description = 5;
   Server server = 6;
   repeated NamedAny specification_extension = 7;
@@ -258,27 +249,21 @@ message LinkOrReference {
   }
 }
 
-// Using the `operationId` to reference an operation in the definition has many benefits, including the ability to define media type options, security requirements, response and error payloads. Many operations require parameters to be passed, and these MAY be dynamic depending on the response itself.  To specify parameters required by the operation, we can use a **Link Parameters Object**. This object contains parameter names along with static or dynamic values:
-message LinkParameters {
-  repeated NamedAnyOrExpression any_or_expression = 1;
-}
-
-// The links object represents a set of possible design-time links for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  As opposed to _dynamic_ links (links provided **in** the response payload), the OAS linking mechanism does not require that link information be provided in a specific response format at runtime.  For computing links, and providing instructions to execute them, variable substitution is used for accessing values in a response and using them as values while invoking the linked operation.
-message Links {
-  repeated NamedLinkOrReference link_or_reference = 1;
-}
-
 message LinksOrReferences {
   repeated NamedLinkOrReference additional_properties = 1;
 }
 
-// Each Media Type Object provides schema and examples for a the media type identified by its key.  Media Type Objects can be used in a Content Object.
+// Each Media Type Object provides schema and examples for the media type identified by its key.
 message MediaType {
   SchemaOrReference schema = 1;
   Any example = 2;
   ExamplesOrReferences examples = 3;
-  Encoding encoding = 4;
+  Encodings encoding = 4;
   repeated NamedAny specification_extension = 5;
+}
+
+message MediaTypes {
+  repeated NamedMediaType additional_properties = 1;
 }
 
 // Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
@@ -305,12 +290,12 @@ message NamedCallbackOrReference {
   CallbackOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of EncodingProperty as ordered (name,value) pairs.
-message NamedEncodingProperty {
+// Automatically-generated message used to represent maps of Encoding as ordered (name,value) pairs.
+message NamedEncoding {
   // Map key
   string name = 1;
   // Mapped value
-  EncodingProperty value = 2;
+  Encoding value = 2;
 }
 
 // Automatically-generated message used to represent maps of ExampleOrReference as ordered (name,value) pairs.
@@ -319,6 +304,14 @@ message NamedExampleOrReference {
   string name = 1;
   // Mapped value
   ExampleOrReference value = 2;
+}
+
+// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
+message NamedHeader {
+  // Map key
+  string name = 1;
+  // Mapped value
+  Header value = 2;
 }
 
 // Automatically-generated message used to represent maps of HeaderOrReference as ordered (name,value) pairs.
@@ -414,7 +407,7 @@ message OauthFlow {
   string authorization_url = 1;
   string token_url = 2;
   string refresh_url = 3;
-  Scopes scopes = 4;
+  Strings scopes = 4;
   repeated NamedAny specification_extension = 5;
 }
 
@@ -441,7 +434,7 @@ message Operation {
   repeated ParameterOrReference parameters = 6;
   RequestBodyOrReference request_body = 7;
   Responses responses = 8;
-  Callbacks callbacks = 9;
+  CallbacksOrReferences callbacks = 9;
   bool deprecated = 10;
   repeated SecurityRequirement security = 11;
   repeated Server servers = 12;
@@ -462,7 +455,7 @@ message Parameter {
   SchemaOrReference schema = 10;
   Any example = 11;
   ExamplesOrReferences examples = 12;
-  Content content = 13;
+  MediaTypes content = 13;
   repeated NamedAny specification_extension = 14;
 }
 
@@ -505,7 +498,7 @@ message Properties {
   repeated NamedSchemaOrReference additional_properties = 1;
 }
 
-// A simple object to allow referencing other components in the specification, internally and externally.  The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.   For this specification, reference resolution is done as defined by the JSON Reference specification and not by the JSON Schema specification.
+// A simple object to allow referencing other components in the specification, internally and externally.  The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.   For this specification, reference resolution is accomplished as defined by the JSON Reference specification and not by the JSON Schema specification.
 message Reference {
   string _ref = 1;
 }
@@ -517,7 +510,7 @@ message RequestBodiesOrReferences {
 // Describes a single request body.
 message RequestBody {
   string description = 1;
-  Content content = 2;
+  MediaTypes content = 2;
   bool required = 3;
   repeated NamedAny specification_extension = 4;
 }
@@ -532,9 +525,9 @@ message RequestBodyOrReference {
 // Describes a single response from an API Operation, including design-time, static  `links` to operations based on the response.
 message Response {
   string description = 1;
-  Headers headers = 2;
-  Content content = 3;
-  Links links = 4;
+  HeadersOrReferences headers = 2;
+  MediaTypes content = 3;
+  LinksOrReferences links = 4;
   repeated NamedAny specification_extension = 5;
 }
 
@@ -545,7 +538,7 @@ message ResponseOrReference {
   }
 }
 
-// A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.
+// A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  The documentation is not necessarily expected to cover all possible HTTP response codes because they may not be known in advance. However, documentation is expected to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.
 message Responses {
   ResponseOrReference default = 1;
   repeated NamedResponseOrReference response_or_reference = 2;
@@ -556,7 +549,7 @@ message ResponsesOrReferences {
   repeated NamedResponseOrReference additional_properties = 1;
 }
 
-// The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.
+// The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  For more information about the properties, see JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema.
 message Schema {
   bool nullable = 1;
   Discriminator discriminator = 2;
@@ -607,16 +600,11 @@ message SchemasOrReferences {
   repeated NamedSchemaOrReference additional_properties = 1;
 }
 
-// Lists the available scopes for an OAuth2 security scheme.
-message Scopes {
-  repeated NamedAny specification_extension = 1;
-}
-
-// Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where there multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize.
+// Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the Open API object or Operation Object, only one of Security Requirement Objects in the list needs to be satisfied to authorize the request.
 message SecurityRequirement {
 }
 
-// Allows the definition of a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).
+// Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).
 message SecurityScheme {
   string type = 1;
   string description = 2;
@@ -657,8 +645,7 @@ message ServerVariable {
 }
 
 message ServerVariables {
-  repeated NamedServerVariable server_variable = 1;
-  repeated NamedAny specification_extension = 2;
+  repeated NamedServerVariable additional_properties = 1;
 }
 
 // Any property starting with x- is valid.
@@ -678,7 +665,7 @@ message Strings {
   repeated NamedString additional_properties = 1;
 }
 
-// Allows adding meta data to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag used there.
+// Adds metadata to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
 message Tag {
   string name = 1;
   string description = 2;

@@ -86,7 +86,9 @@ func (s *DocumentStatistics) addDefinitionPrimitiveType(path string, name string
 }
 
 func typeForPrimitivesItems(p *openapi.PrimitivesItems) string {
-	if p.Type != "" {
+	if p == nil {
+		return "object"
+        } else if p.Type != "" {
 		return p.Type
 	} else if p.Items != nil && p.Items.Type != "" {
 		return p.Items.Type
@@ -132,9 +134,7 @@ func (s *DocumentStatistics) analyzeOperation(method string, path string, operat
 				if qp != nil {
 					t := qp.Type
 					if t == "array" {
-						if t == "array" {
-							t += "-of-" + typeForPrimitivesItems(qp.Items)
-						}
+						t += "-of-" + typeForPrimitivesItems(qp.Items)
 					}
 					s.addParameterType(path+"/"+qp.Name, t)
 				}

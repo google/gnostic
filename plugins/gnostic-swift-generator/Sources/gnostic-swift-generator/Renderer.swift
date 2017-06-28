@@ -159,9 +159,9 @@ class ServiceRenderer {
         let f = ServiceTypeField()
         f.typeName = "\(parametersItem)"
 
-        switch parametersItem.oneof {
+        switch parametersItem.oneof! {
         case .parameter(let parameter):
-          switch parameter.oneof {
+          switch parameter.oneof! {
           case .bodyParameter(let bodyParameter):
             f.name = bodyParameter.name
             if bodyParameter.hasSchema {
@@ -169,7 +169,7 @@ class ServiceRenderer {
               f.position = "body"
             }
           case .nonBodyParameter(let nonBodyParameter):
-            switch (nonBodyParameter.oneof) {
+            switch (nonBodyParameter.oneof!) {
             case .headerParameterSubSchema(let headerParameter):
               f.name = headerParameter.name
               f.position = "header"
@@ -184,15 +184,9 @@ class ServiceRenderer {
               f.jsonName = pathParameter.name
               f.position = "path"
               f.setTypeForName(pathParameter.type, pathParameter.format)
-            default:
-              Log("?")
             }
-          default:
-            Log("?")
           }
         case .jsonReference: // (let reference):
-          Log("?")
-        default:
           Log("?")
         }
         t.fields.append(f)
@@ -215,21 +209,25 @@ class ServiceRenderer {
         let f = ServiceTypeField()
         f.name = propertyNameForResponseCode(responseCode.name)
         f.jsonName = ""
-        switch responseCode.value.oneof {
-        case .response(let response):
-          let schema = response.schema
-          switch schema.oneof {
-          case .schema(let schema):
-            f.setTypeForSchema(schema, optional:true)
-            t.fields.append(f)
-            if f.name == "ok" {
-              m.resultTypeName = f.typeName.replacingOccurrences(of:"?", with:"")
+        if let responseCodeValueOneOf = responseCode.value.oneof {
+          switch responseCodeValueOneOf {
+          case .response(let response):
+            let schema = response.schema
+            if let schemaOneOf = schema.oneof {
+              switch schemaOneOf {
+              case .schema(let schema):
+                f.setTypeForSchema(schema, optional:true)
+                t.fields.append(f)
+                if f.name == "ok" {
+                  m.resultTypeName = f.typeName.replacingOccurrences(of:"?", with:"")
+                }
+              default:
+                break
+              }
             }
           default:
             break
           }
-        default:
-          break
         }
       }
       if t.fields.count > 0 {
@@ -244,7 +242,7 @@ class ServiceRenderer {
                              method : String,
                              path : String) {
     let m = ServiceMethod()
-    m.name = operation.operationId
+    m.name = operation.operationID
     m.path = path
     m.method = method
     m.description = operation.description_p

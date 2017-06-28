@@ -53,6 +53,11 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateResolveReferencesMethodsForType(code, typeName)
 	}
 
+	// generate ToRawInfo() methods for each type
+	for _, typeName := range typeNames {
+		domain.generateToRawInfoMethodForType(code, typeName)
+	}
+
 	return code.String()
 }
 
@@ -498,7 +503,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("x.%s = make([]*Named%s, 0)", fieldName, mapTypeName)
 					}
 					code.Print("for _, item := range m {")
-					code.Print("k, ok := item.Key.(string)")
+					code.Print("k, ok := compiler.StringValue(item.Key)")
 					code.Print("if ok {")
 					code.Print("v := item.Value")
 					if propertyModel.Pattern != "" {
@@ -669,5 +674,150 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 		}
 	}
 	code.Print("  return nil, compiler.NewErrorGroupOrNil(errors)")
+	code.Print("}\n")
+}
+
+// ToRawInfo() methods
+func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeName string) {
+	code.Print("func (m *%s) ToRawInfo() interface{} {", typeName)
+	typeModel := domain.TypeModels[typeName]
+	if typeName == "Any" {
+		code.Print("var err error")
+		code.Print("var info1 []yaml.MapSlice")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info1)")
+		code.Print("if err == nil {return info1}")
+		code.Print("var info2 yaml.MapSlice")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info2)")
+		code.Print("if err == nil {return info2}")
+		code.Print("var info3 interface{}")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info3)")
+		code.Print("if err == nil {return info3}")
+		code.Print("return nil")
+	} else if typeName == "StringArray" {
+		code.Print("return m.Value")
+	} else if typeModel.OneOfWrapper {
+		code.Print("// ONE OF WRAPPER")
+		code.Print("// %s", typeModel.Name)
+		for i, item := range typeModel.Properties {
+			code.Print("// %+v", *item)
+			if item.Type == "float" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_Number); ok {", i, typeName)
+				code.Print("return v%d.Number", i)
+				code.Print("}")
+			} else if item.Type == "bool" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_Boolean); ok {", i, typeName)
+				code.Print("return v%d.Boolean", i)
+				code.Print("}")
+			} else if item.Type == "string" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_String_); ok {", i, typeName)
+				code.Print("return v%d.String_", i)
+				code.Print("}")
+			} else {
+				code.Print("v%d := m.Get%s()", i, item.Type)
+				code.Print("if v%d != nil {", i)
+				code.Print(" return v%d.ToRawInfo()", i)
+				code.Print("}")
+			}
+		}
+		code.Print("return nil")
+	} else {
+		code.Print("info := yaml.MapSlice{}")
+		for _, propertyModel := range typeModel.Properties {
+			switch propertyModel.Type {
+			case "string":
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != \"\" {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
+			case "bool":
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != false {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
+			case "int":
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
+			case "float":
+				propertyName := propertyModel.Name
+				if !propertyModel.Repeated {
+					code.Print("if m.%s != 0.0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("}")
+				}
+			default:
+				propertyName := propertyModel.Name
+				if propertyName == "value" {
+					code.Print("// %+v", propertyModel)
+				} else if !propertyModel.Repeated {
+					code.Print("if m.%s != nil {", propertyModel.FieldName())
+					if propertyModel.Type == "TypeItem" {
+						code.Print("if len(m.Type.Value) == 1 {")
+						code.Print("info = append(info, yaml.MapItem{\"type\", m.Type.Value[0]})")
+						code.Print("} else {")
+						code.Print("info = append(info, yaml.MapItem{\"type\", m.Type.Value})")
+						code.Print("}")
+					} else if propertyModel.Type == "ItemsItem" {
+						code.Print("items := make([]interface{}, 0)")
+						if domain.Version == "v2" {
+							code.Print("for _, item := range m.Items.Schema {")
+						} else {
+							code.Print("for _, item := range m.Items.SchemaOrReference {")
+						}
+						code.Print("	items = append(items, item.ToRawInfo())")
+						code.Print("}")
+						code.Print("info = append(info, yaml.MapItem{\"items\", items[0]})")
+					} else {
+						code.Print("info = append(info, yaml.MapItem{\"%s\", m.%s.ToRawInfo()})",
+							propertyName, propertyModel.FieldName())
+					}
+					code.Print("}")
+					code.Print("// %+v", propertyModel)
+				} else if propertyModel.MapType == "string" {
+					code.Print("// %+v", propertyModel)
+				} else if propertyModel.MapType != "" {
+					code.Print("if m.%s != nil {", propertyModel.FieldName())
+					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
+					code.Print("info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})")
+					code.Print("}")
+					code.Print("}")
+					code.Print("// %+v", propertyModel)
+				} else {
+					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
+					code.Print("items := make([]interface{}, 0)")
+					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
+					code.Print("items = append(items, item.ToRawInfo())")
+					code.Print("}")
+					code.Print("info = append(info, yaml.MapItem{\"%s\", items})", propertyName)
+					code.Print("}")
+					code.Print("// %+v", propertyModel)
+				}
+			}
+		}
+		code.Print("return info")
+	}
 	code.Print("}\n")
 }
