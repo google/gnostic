@@ -54,9 +54,9 @@ func printDocument(document:Openapi_V2_Document,
 func main() throws {
   var response = Openapi_Plugin_V1_Response()
   let rawRequest = try Stdin.readall()
-  let request = try Openapi_Plugin_V1_Request(protobuf: rawRequest)
+  let request = try Openapi_Plugin_V1_Request(serializedData: rawRequest)
   let wrapper = request.wrapper 
-  let document = try Openapi_V2_Document(protobuf:wrapper.value)
+  let document = try Openapi_V2_Document(serializedData:wrapper.value)
   let report = printDocument(document:document, name:wrapper.name, version:wrapper.version)
   if let reportData = report.data(using:.utf8) {
     var file = Openapi_Plugin_V1_File()
@@ -64,7 +64,7 @@ func main() throws {
     file.data = reportData
     response.files.append(file)
   }
-  let serializedResponse = try response.serializeProtobuf()
+  let serializedResponse = try response.serializedData()
   Stdout.write(bytes: serializedResponse)
 }
 

@@ -88,19 +88,16 @@ func GenerateOpenAPIModel(version string) error {
 	var input string
 	var filename string
 	var proto_packagename string
-	var extension_name string
 
 	switch version {
 	case "v2":
 		input = "openapi-2.0.json"
 		filename = "OpenAPIv2"
 		proto_packagename = "openapi.v2"
-		extension_name = "vendorExtension"
 	case "v3":
 		input = "openapi-3.0.json"
 		filename = "OpenAPIv3"
 		proto_packagename = "openapi.v3"
-		extension_name = "specificationExtension"
 	default:
 		return errors.New(fmt.Sprintf("Unknown OpenAPI version %s", version))
 	}
@@ -127,19 +124,28 @@ func GenerateOpenAPIModel(version string) error {
 	cc := NewDomain(openapi_schema, version)
 	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
-	cc.PatternNames = map[string]string{
-		"^x-": extension_name,
-		// v2
-		"^/": "path",
-		"^([0-9]{3})$|^(default)$": "responseCode",
-		// v3
-		"^([0-9]{3})$": "responseCode",
-		"{property}":   "property",
-		"{name}":       "name",
-		"{expression}": "expression",
-		"/{path}":      "path",
-		"{media-type}": "mediaType",
+
+	switch version {
+	case "v2":
+		cc.TypeNameOverrides = map[string]string{
+			"VendorExtension": "Any",
+		}
+		cc.PropertyNameOverrides = map[string]string{
+			"PathItem":      "Path",
+			"ResponseValue": "ResponseCode",
+		}
+	case "v3":
+		cc.TypeNameOverrides = map[string]string{
+			"SpecificationExtension": "Any",
+		}
+		cc.PropertyNameOverrides = map[string]string{
+			"PathItem":      "Path",
+			"ResponseValue": "ResponseCode",
+		}
+	default:
+		return errors.New(fmt.Sprintf("Unknown OpenAPI version %s", version))
 	}
+
 	err = cc.Build()
 	if err != nil {
 		return err
@@ -150,12 +156,13 @@ func GenerateOpenAPIModel(version string) error {
 	}
 
 	// ensure that the target directory exists
-	err = os.MkdirAll(filename, 0755)
+	err = os.MkdirAll(project_root+filename, 0755)
 	if err != nil {
 		return err
 	}
 
 	// generate the protocol buffer description
+	log.Printf("Generating protocol buffer description")
 	proto := cc.GenerateProto(proto_packagename, LICENSE,
 		proto_options(go_packagename), []string{"google/protobuf/any.proto"})
 	proto_filename := project_root + filename + "/" + filename + ".proto"
@@ -165,6 +172,7 @@ func GenerateOpenAPIModel(version string) error {
 	}
 
 	// generate the compiler
+	log.Printf("Generating compiler support code")
 	compiler := cc.GenerateCompiler(go_packagename, LICENSE, []string{
 		"fmt",
 		"gopkg.in/yaml.v2",
@@ -177,6 +185,7 @@ func GenerateOpenAPIModel(version string) error {
 		return err
 	}
 	// format the compiler
+	log.Printf("Formatting compiler support code")
 	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
 }
 

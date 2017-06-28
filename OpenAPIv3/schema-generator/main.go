@@ -13,6 +13,8 @@
 // limitations under the License.
 
 // schema-generator is a support tool that generates the OpenAPI v3 JSON schema.
+// Yes, it's gross, but the OpenAPI 3.0 spec, which defines REST APIs with a
+// rigorous JSON schema, is itself defined with a Markdown file. Ironic?
 package main
 
 import (
@@ -20,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -126,7 +129,7 @@ func (s *Section) NiceTitle() string {
 
 // replace markdown links with their link text (removing the URL part)
 func removeMarkdownLinks(input string) (output string) {
-	markdownLink := regexp.MustCompile("\\[([^\\]]*)\\]\\(([^\\)]*)\\)") // matches [link title](link url)
+	markdownLink := regexp.MustCompile("\\[([^\\]\\[]*)\\]\\(([^\\)]*)\\)") // matches [link title](link url)
 	output = string(markdownLink.ReplaceAll([]byte(input), []byte("$1")))
 	return
 }
@@ -136,8 +139,10 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 
+		// replace escaped bars with "OR", assuming these are used to describe union types
 		line = strings.Replace(line, " \\| ", " OR ", -1)
 
+		// split the table on the remaining bars
 		parts := strings.Split(line, "|")
 		if len(parts) > 1 {
 			fieldName := strings.Trim(stripLink(parts[0]), " ")
@@ -150,12 +155,12 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				}
 
 				typeName := parts[1]
+				typeName = strings.Replace(typeName, "{expression}", "Expression", -1)
 				typeName = strings.Trim(typeName, " ")
 				typeName = strings.Replace(typeName, "`", "", -1)
 				typeName = removeMarkdownLinks(typeName)
 				typeName = strings.Replace(typeName, " ", "", -1)
 				typeName = strings.Replace(typeName, "Object", "", -1)
-				typeName = strings.Replace(typeName, "{expression}", "Expression", -1)
 				isArray := false
 				if typeName[0] == '[' && typeName[len(typeName)-1] == ']' {
 					typeName = typeName[1 : len(typeName)-1]
@@ -166,13 +171,22 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 				if matches := mapPattern.FindSubmatch([]byte(typeName)); matches != nil {
 					typeName = string(matches[1])
 					isMap = true
+				} else {
+					// match map[string,<typename>]
+					mapPattern2 := regexp.MustCompile("^Map\\[string,(.+)\\]$")
+					if matches := mapPattern2.FindSubmatch([]byte(typeName)); matches != nil {
+						typeName = string(matches[1])
+						isMap = true
+					}
 				}
 				description := strings.Trim(parts[len(parts)-1], " ")
 				description = removeMarkdownLinks(description)
 				description = strings.Replace(description, "\n", " ", -1)
 
-				requiredLabel := "**Required.** "
-				if strings.Contains(description, requiredLabel) {
+				requiredLabel1 := "**Required.** "
+				requiredLabel2 := "**REQUIRED**."
+				if strings.Contains(description, requiredLabel1) ||
+					strings.Contains(description, requiredLabel2) {
 					// only include required values if their "Validity" is "Any" or if no validity is specified
 					valid := true
 					if len(parts) == 4 {
@@ -186,7 +200,8 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 					if valid {
 						schemaObject.RequiredFields = append(schemaObject.RequiredFields, fieldName)
 					}
-					description = strings.Replace(description, requiredLabel, "", -1)
+					description = strings.Replace(description, requiredLabel1, "", -1)
+					description = strings.Replace(description, requiredLabel2, "", -1)
 				}
 				schemaField := SchemaObjectField{
 					Name:        fieldName,
@@ -213,7 +228,7 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 			fieldName := strings.Trim(stripLink(parts[0]), " ")
 			fieldName = removeMarkdownLinks(fieldName)
 			if fieldName == "HTTP Status Code" {
-				fieldName = "^([0-9]{3})$"
+				fieldName = "^([0-9X]{3})$"
 			}
 			if fieldName != "Field Pattern" && fieldName != "---" {
 				typeName := parts[1]
@@ -291,11 +306,11 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	// divide the specification into sections
 	document := ReadSection(string(b), 1)
-	//document.Display("")
+	document.Display("")
 
 	// read object names and their details
-	specification := document.Children[4] // fragile!
-	schema := specification.Children[5]   // fragile!
+	specification := document.Children[4] // fragile! the section title is "Specification"
+	schema := specification.Children[7]   // fragile! the section title is "Schema"
 	anchor := regexp.MustCompile("^#### <a name=\"(.*)Object\"")
 	schemaObjects := make([]SchemaObject, 0)
 	for _, section := range schema.Children {
@@ -402,16 +417,35 @@ func definitionNameForType(typeName string) string {
 	return "#/definitions/" + name
 }
 
-func definitionNameForMapOfType(typeName string) string {
-	// pluralize the type name to get the name of an object representing a map of them
-	name := lowerFirst(typeName)
-	if name[len(name)-1] == 'y' {
+func pluralize(name string) string {
+	if name == "any" {
+		return "anys"
+	}
+	switch name[len(name)-1] {
+	case 'y':
 		name = name[0:len(name)-1] + "ies"
-	} else {
+	case 's':
+		name = name + "Map"
+	default:
 		name = name + "s"
 	}
-	noteMapType(name, typeName)
-	return "#/definitions/" + name
+	return name
+}
+
+func definitionNameForMapOfType(typeName string) string {
+	// pluralize the type name to get the name of an object representing a map of them
+	var elementTypeName string
+	var mapTypeName string
+	if parts := strings.Split(typeName, "OR"); len(parts) > 1 {
+		elementTypeName = lowerFirst(parts[0]) + "Or" + parts[1]
+		noteUnionType(elementTypeName, parts[0], parts[1])
+		mapTypeName = pluralize(lowerFirst(parts[0])) + "Or" + pluralize(parts[1])
+	} else {
+		elementTypeName = lowerFirst(typeName)
+		mapTypeName = pluralize(elementTypeName)
+	}
+	noteMapType(mapTypeName, elementTypeName)
+	return "#/definitions/" + mapTypeName
 }
 
 func updateSchemaFieldWithModelField(schemaField *jsonschema.Schema, modelField *SchemaObjectField) {
@@ -462,7 +496,7 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 		schema.Required = &arrayCopy
 	}
 
-	schema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false);
+	schema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false)
 
 	schema.Description = stringptr(modelObject.Description)
 
@@ -502,7 +536,22 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 			if schemaField == nil {
 				// create and add the schema field
 				schemaField = &jsonschema.Schema{}
-				namedSchema := &jsonschema.NamedSchema{Name: modelField.Name, Value: schemaField}
+				// Component names should match "^[a-zA-Z0-9\.\-_]+$"
+				// See https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#componentsObject
+				nameRegex := "^[a-zA-Z0-9\\\\.\\\\-_]+$"
+				if modelObject.Name == "Scopes Object" {
+					nameRegex = "^"
+				} else if modelObject.Name == "Headers Object" {
+					nameRegex = "^[a-zA-Z0-9!#\\-\\$%&'\\*\\+\\\\\\.\\^_`\\|~]+"
+				}
+				propertyName := strings.Replace(modelField.Name, "{name}", nameRegex, -1)
+				//  The field name MUST begin with a slash, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#paths-object
+				// JSON Schema for OpenAPI v2 uses "^/" as regex for paths, see https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/schemas/v2.0/schema.json#L173
+				propertyName = strings.Replace(propertyName, "/{path}", "^/", -1)
+				// Replace human-friendly (and regex-confusing) description with a blank pattern
+				propertyName = strings.Replace(propertyName, "{expression}", "^", -1)
+				propertyName = strings.Replace(propertyName, "{property}", "^", -1)
+				namedSchema := &jsonschema.NamedSchema{Name: propertyName, Value: schemaField}
 				newNamedSchemas = append(newNamedSchemas, namedSchema)
 			}
 			updateSchemaFieldWithModelField(schemaField, &modelField)
@@ -578,7 +627,12 @@ func main() {
 	}
 
 	// build the top-level schema using the "OAS" model
-	schema := buildSchemaWithModel(model.objectWithId("oas"))
+	oasModel := model.objectWithId("oas")
+	if oasModel == nil {
+		log.Printf("Unable to find OAS model. Has the source document structure changed?")
+		os.Exit(-1)
+	}
+	schema := buildSchemaWithModel(oasModel)
 
 	// manually set a few fields
 	schema.Title = stringptr("A JSON Schema for OpenAPI 3.0.")
@@ -605,11 +659,18 @@ func main() {
 	headerObject := schema.DefinitionWithName("header")
 	parameterObject := schema.DefinitionWithName("parameter")
 	if parameterObject != nil {
-		// "So a shorthand for copying array arr would be tmp := append([]int{}, arr...)"
 		newArray := make([]*jsonschema.NamedSchema, 0)
-		newArray = append(newArray, *(parameterObject.Properties)...)
+		for _, property := range *(parameterObject.Properties) {
+			// we need to remove a few properties...
+			if property.Name != "name" && property.Name != "in" {
+				newArray = append(newArray, property)
+			}
+		}
 		headerObject.Properties = &newArray
-		// we need to remove a few properties...
+		// "So a shorthand for copying array arr would be tmp := append([]int{}, arr...)"
+		ppArray := make([]*jsonschema.NamedSchema, 0)
+		ppArray = append(ppArray, *(parameterObject.PatternProperties)...)
+		headerObject.PatternProperties = &ppArray
 	}
 
 	// generate implied union types
@@ -644,7 +705,11 @@ func main() {
 			objectSchema = &jsonschema.Schema{}
 			objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 			additionalPropertiesSchema := &jsonschema.Schema{}
-			additionalPropertiesSchema.Ref = stringptr("#/definitions/" + lowerFirst(mapType.ObjectType))
+			if mapType.ObjectType == "string" {
+				additionalPropertiesSchema.Type = jsonschema.NewStringOrStringArrayWithString("string")
+			} else {
+				additionalPropertiesSchema.Ref = stringptr("#/definitions/" + lowerFirst(mapType.ObjectType))
+			}
 			objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithSchema(additionalPropertiesSchema)
 			*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema(mapType.Name, objectSchema))
 		}
@@ -655,20 +720,17 @@ func main() {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("object", objectSchema))
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("any", objectSchema))
 	}
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Type = jsonschema.NewStringOrStringArrayWithString("object")
 		objectSchema.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(true)
-		objectSchema.AdditionalItems = jsonschema.NewSchemaOrBooleanWithBoolean(true)
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("expression", objectSchema))
 	}
 
@@ -677,7 +739,7 @@ func main() {
 		objectSchema := &jsonschema.Schema{}
 		objectSchema.Description = stringptr("Any property starting with x- is valid.")
 		oneOf := make([]*jsonschema.Schema, 0)
-		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("null")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
@@ -687,11 +749,24 @@ func main() {
 		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("specificationExtension", objectSchema))
 	}
 
-	// add schema objects for "primitive"
+	// add schema objects for "defaultType"
 	if true {
 		objectSchema := &jsonschema.Schema{}
 		oneOf := make([]*jsonschema.Schema, 0)
-		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("integer")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("null")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("array")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("object")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
+		objectSchema.OneOf = &oneOf
+		*schema.Definitions = append(*schema.Definitions, jsonschema.NewNamedSchema("defaultType", objectSchema))
+	}
+
+	// add schema objects for "primitive"
+	if false { // we don't seem to need these for 3.0 RC2
+		objectSchema := &jsonschema.Schema{}
+		oneOf := make([]*jsonschema.Schema, 0)
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("number")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
 		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
@@ -720,6 +795,7 @@ func main() {
 			"required",
 			"enum",
 		})
+	schemaObject.AdditionalProperties = jsonschema.NewSchemaOrBooleanWithBoolean(false)
 	schemaObject.AddProperty("type", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("allOf", arrayOfSchema())
 	schemaObject.AddProperty("oneOf", arrayOfSchema())
@@ -733,16 +809,27 @@ func main() {
 	schemaObject.AddProperty("properties", &jsonschema.Schema{
 		Type: jsonschema.NewStringOrStringArrayWithString("object"),
 		AdditionalProperties: jsonschema.NewSchemaOrBooleanWithSchema(
-			&jsonschema.Schema{Ref: stringptr("#/definitions/schema")})})
+			&jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")})})
+
+	if true { // add additionalProperties schema object
+		oneOf := make([]*jsonschema.Schema, 0)
+		oneOf = append(oneOf, &jsonschema.Schema{Ref: stringptr("#/definitions/schemaOrReference")})
+		oneOf = append(oneOf, &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("boolean")})
+		schemaObject.AddProperty("additionalProperties", &jsonschema.Schema{OneOf: &oneOf})
+	}
+
+	schemaObject.AddProperty("default", &jsonschema.Schema{Ref: stringptr("#/definitions/defaultType")})
 	schemaObject.AddProperty("description", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 	schemaObject.AddProperty("format", &jsonschema.Schema{Type: jsonschema.NewStringOrStringArrayWithString("string")})
 
 	// fix the content object
 	contentObject := schema.DefinitionWithName("content")
-	pairs := make([]*jsonschema.NamedSchema, 0)
-	contentObject.PatternProperties = &pairs
-	namedSchema := &jsonschema.NamedSchema{Name: "{media-type}", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
-	*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
+	if contentObject != nil {
+		pairs := make([]*jsonschema.NamedSchema, 0)
+		contentObject.PatternProperties = &pairs
+		namedSchema := &jsonschema.NamedSchema{Name: "^", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
+		*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
+	}
 
 	// write the updated schema
 	output := schema.JSONString()

@@ -349,14 +349,14 @@ func TestYAMLOutput(t *testing.T) {
 	}
 }
 
-func TestBuilder(t *testing.T) {
+func test_builder(version string, t *testing.T) {
 	var err error
 
-	pb_file := "petstore.pb"
+	pb_file := "petstore-" + version + ".pb"
 	yaml_file := "petstore.yaml"
 	json_file := "petstore.json"
 	text_file := "petstore.text"
-	text_reference := "test/v2.0/petstore.text"
+	text_reference := "test/" + version + ".0/petstore.text"
 
 	os.Remove(pb_file)
 	os.Remove(text_file)
@@ -365,7 +365,8 @@ func TestBuilder(t *testing.T) {
 
 	// Generate petstore.pb.
 	command := exec.Command(
-		"petstore-builder")
+		"petstore-builder",
+		"--"+version)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Command %v failed: %+v", command, err)
@@ -427,6 +428,14 @@ func TestBuilder(t *testing.T) {
 	os.Remove(text_file)
 	os.Remove(yaml_file)
 	os.Remove(json_file)
+}
+
+func TestBuilderV2(t *testing.T) {
+	test_builder("v2", t)
+}
+
+func TestBuilderV3(t *testing.T) {
+	test_builder("v3", t)
 }
 
 // OpenAPI 3.0 tests

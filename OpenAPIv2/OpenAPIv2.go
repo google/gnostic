@@ -138,7 +138,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -218,7 +218,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -325,7 +325,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -402,7 +402,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -445,7 +445,7 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -486,7 +486,7 @@ func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, er
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchema{}
@@ -695,7 +695,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -738,7 +738,7 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -810,7 +810,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -955,7 +955,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1278,7 +1278,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1565,7 +1565,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1879,7 +1879,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -1922,7 +1922,7 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 		// MAP: Header
 		x.AdditionalProperties = make([]*NamedHeader, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedHeader{}
@@ -2018,7 +2018,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2153,7 +2153,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2712,7 +2712,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2825,7 +2825,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -2938,7 +2938,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3051,7 +3051,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3094,7 +3094,7 @@ func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, 
 		// MAP: string
 		x.AdditionalProperties = make([]*NamedString, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedString{}
@@ -3268,7 +3268,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3350,7 +3350,7 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 		// MAP: Parameter
 		x.AdditionalProperties = make([]*NamedParameter, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedParameter{}
@@ -3513,7 +3513,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3833,7 +3833,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3883,7 +3883,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -3914,7 +3914,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		// MAP: PathItem ^/
 		x.Path = make([]*NamedPathItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^/", k) {
@@ -4174,7 +4174,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4217,7 +4217,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSchema{}
@@ -4526,7 +4526,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4618,7 +4618,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -4661,7 +4661,7 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 		// MAP: Response
 		x.AdditionalProperties = make([]*NamedResponse, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedResponse{}
@@ -4736,7 +4736,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: ResponseValue ^([0-9]{3})$|^(default)$
 		x.ResponseCode = make([]*NamedResponseValue, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
@@ -4755,7 +4755,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5145,7 +5145,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5227,7 +5227,7 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 		// MAP: SecurityDefinitionsItem
 		x.AdditionalProperties = make([]*NamedSecurityDefinitionsItem, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedSecurityDefinitionsItem{}
@@ -5351,7 +5351,7 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 		// MAP: StringArray
 		x.AdditionalProperties = make([]*NamedStringArray, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedStringArray{}
@@ -5436,7 +5436,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -5504,7 +5504,7 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 		// MAP: Any
 		x.AdditionalProperties = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				pair := &NamedAny{}
@@ -5597,7 +5597,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		// MAP: Any ^x-
 		x.VendorExtension = make([]*NamedAny, 0)
 		for _, item := range m {
-			k, ok := item.Key.(string)
+			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
 				if compiler.PatternMatches("^x-", k) {
@@ -6945,14 +6945,16 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 
 func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:AdditionalPropertiesItem Properties:[0xc4201ce300 0xc4201ce380] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// AdditionalPropertiesItem
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
 		return v0.ToRawInfo()
 	}
 	// {Name:boolean Type:bool StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
-	// unhandled boolean
+	if v1, ok := m.GetOneof().(*AdditionalPropertiesItem_Boolean); ok {
+		return v1.Boolean
+	}
 	return nil
 }
 
@@ -6995,7 +6997,7 @@ func (m *ApiKeySecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7012,7 +7014,7 @@ func (m *BasicAuthenticationSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7039,7 +7041,7 @@ func (m *BodyParameter) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7059,7 +7061,7 @@ func (m *Contact) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7154,7 +7156,7 @@ func (m *Document) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7182,7 +7184,7 @@ func (m *ExternalDocs) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7223,7 +7225,7 @@ func (m *FileSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7307,7 +7309,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7379,7 +7381,7 @@ func (m *Header) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7460,7 +7462,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7502,7 +7504,7 @@ func (m *Info) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7543,7 +7545,7 @@ func (m *License) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7641,7 +7643,7 @@ func (m *NamedStringArray) ToRawInfo() interface{} {
 
 func (m *NonBodyParameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:NonBodyParameter Properties:[0xc4201c8800 0xc4201c8880 0xc4201c8900 0xc4201c8980] Required:[in name type] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// NonBodyParameter
 	// {Name:headerParameterSubSchema Type:HeaderParameterSubSchema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetHeaderParameterSubSchema()
 	if v0 != nil {
@@ -7691,7 +7693,7 @@ func (m *Oauth2AccessCodeSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7718,7 +7720,7 @@ func (m *Oauth2ApplicationSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7745,7 +7747,7 @@ func (m *Oauth2ImplicitSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7772,7 +7774,7 @@ func (m *Oauth2PasswordSecurity) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7837,13 +7839,13 @@ func (m *Operation) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *Parameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:Parameter Properties:[0xc4201c8a00 0xc4201c8a80] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// Parameter
 	// {Name:bodyParameter Type:BodyParameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetBodyParameter()
 	if v0 != nil {
@@ -7870,7 +7872,7 @@ func (m *ParameterDefinitions) ToRawInfo() interface{} {
 
 func (m *ParametersItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ParametersItem Properties:[0xc4201ce880 0xc4201ce900] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ParametersItem
 	// {Name:parameter Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetParameter()
 	if v0 != nil {
@@ -7930,7 +7932,7 @@ func (m *PathItem) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8011,7 +8013,7 @@ func (m *PathParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8022,13 +8024,13 @@ func (m *Paths) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	if m.Path != nil {
 		for _, item := range m.Path {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
+	// &{Name:Path Type:NamedPathItem StringEnumValues:[] MapType:PathItem Repeated:true Pattern:^/ Implicit:true Description:}
 	return info
 }
 
@@ -8097,7 +8099,7 @@ func (m *PrimitivesItems) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8192,7 +8194,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8218,7 +8220,7 @@ func (m *Response) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8235,7 +8237,7 @@ func (m *ResponseDefinitions) ToRawInfo() interface{} {
 
 func (m *ResponseValue) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:ResponseValue Properties:[0xc4201c4400 0xc4201c4480] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// ResponseValue
 	// {Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetResponse()
 	if v0 != nil {
@@ -8256,13 +8258,13 @@ func (m *Responses) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:responseCode Type:NamedResponseValue StringEnumValues:[] MapType:ResponseValue Repeated:true Pattern:^([0-9]{3})$|^(default)$ Implicit:true Description:}
+	// &{Name:ResponseCode Type:NamedResponseValue StringEnumValues:[] MapType:ResponseValue Repeated:true Pattern:^([0-9]{3})$|^(default)$ Implicit:true Description:}
 	if m.VendorExtension != nil {
 		for _, item := range m.VendorExtension {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8389,13 +8391,13 @@ func (m *Schema) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
 func (m *SchemaItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SchemaItem Properties:[0xc4201ce980 0xc4201cea00] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// SchemaItem
 	// {Name:schema Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetSchema()
 	if v0 != nil {
@@ -8422,7 +8424,7 @@ func (m *SecurityDefinitions) ToRawInfo() interface{} {
 
 func (m *SecurityDefinitionsItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
-	// &{Name:SecurityDefinitionsItem Properties:[0xc4201ce580 0xc4201ce600 0xc4201ce680 0xc4201ce700 0xc4201ce780 0xc4201ce800] Required:[] OneOfWrapper:true Open:true OpenPatterns:[] IsStringArray:false IsItemArray:false IsBlob:false IsPair:false PairValueType: Description:}
+	// SecurityDefinitionsItem
 	// {Name:basicAuthenticationSecurity Type:BasicAuthenticationSecurity StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	v0 := m.GetBasicAuthenticationSecurity()
 	if v0 != nil {
@@ -8488,7 +8490,7 @@ func (m *Tag) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -8533,6 +8535,6 @@ func (m *Xml) ToRawInfo() interface{} {
 			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
 		}
 	}
-	// &{Name:vendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }

@@ -61,6 +61,10 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 	return code.String()
 }
 
+func escape_slashes(pattern string) string {
+	return strings.Replace(pattern, "\\", "\\\\", -1)
+}
+
 func (domain *Domain) generateConstructorForType(code *printer.Code, typeName string) {
 	code.Print("func New%s(in interface{}, context *compiler.Context) (*%s, error) {", typeName, typeName)
 	code.Print("errors := make([]error, 0)")
@@ -176,19 +180,49 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("		x.Oneof = &SpecificationExtension_String_{String_: in}")
 		code.Print("		matched = true")
 		code.Print("	case int64:")
-		code.Print("		x.Oneof = &SpecificationExtension_Integer{Integer: in}")
+		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
 		code.Print("		matched = true")
 		code.Print("	case int32:")
-		code.Print("		x.Oneof = &SpecificationExtension_Integer{Integer: int64(in)}")
+		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
 		code.Print("		matched = true")
 		code.Print("	case int:")
-		code.Print("		x.Oneof = &SpecificationExtension_Integer{Integer: int64(in)}")
+		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
 		code.Print("		matched = true")
 		code.Print("	case float64:")
 		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: in}")
 		code.Print("		matched = true")
 		code.Print("	case float32:")
 		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
+		code.Print("		matched = true")
+		code.Print("	}")
+		code.Print("	if matched {")
+		code.Print("		// since the oneof matched one of its possibilities, discard any matching errors")
+		code.Print("		errors = make([]error, 0)")
+		code.Print("	}")
+	} else if typeModel.Name == "DefaultType" {
+		code.Print("	x := &DefaultType{}")
+		code.Print("	matched := false")
+		code.Print("	switch in := in.(type) {")
+		code.Print("	case bool:")
+		code.Print("		x.Oneof = &DefaultType_Boolean{Boolean: in}")
+		code.Print("		matched = true")
+		code.Print("	case string:")
+		code.Print("		x.Oneof = &DefaultType_String_{String_: in}")
+		code.Print("		matched = true")
+		code.Print("	case int64:")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
+		code.Print("		matched = true")
+		code.Print("	case int32:")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
+		code.Print("		matched = true")
+		code.Print("	case int:")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
+		code.Print("		matched = true")
+		code.Print("	case float64:")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: in}")
+		code.Print("		matched = true")
+		code.Print("	case float32:")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
 		code.Print("		matched = true")
 		code.Print("	}")
 		code.Print("	if matched {")
@@ -257,7 +291,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						allowedPatternString += ","
 					}
 					allowedPatternString += "\""
-					allowedPatternString += pattern
+					allowedPatternString += escape_slashes(pattern)
 					allowedPatternString += "\""
 				}
 			}
@@ -469,11 +503,12 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("x.%s = make([]*Named%s, 0)", fieldName, mapTypeName)
 					}
 					code.Print("for _, item := range m {")
-					code.Print("k, ok := item.Key.(string)")
+					code.Print("k, ok := compiler.StringValue(item.Key)")
 					code.Print("if ok {")
 					code.Print("v := item.Value")
 					if propertyModel.Pattern != "" {
-						code.Print("if compiler.PatternMatches(\"%s\", k) {", propertyModel.Pattern)
+						code.Print("if compiler.PatternMatches(\"%s\", k) {",
+							escape_slashes(propertyModel.Pattern))
 					}
 
 					code.Print("pair := &Named" + strings.Title(mapTypeName) + "{}")
@@ -662,16 +697,26 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 		code.Print("return m.Value")
 	} else if typeModel.OneOfWrapper {
 		code.Print("// ONE OF WRAPPER")
-		code.Print("// %+v", typeModel)
+		code.Print("// %s", typeModel.Name)
 		for i, item := range typeModel.Properties {
 			code.Print("// %+v", *item)
-			if item.Type != "bool" {
+			if item.Type == "float" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_Number); ok {", i, typeName)
+				code.Print("return v%d.Number", i)
+				code.Print("}")
+			} else if item.Type == "bool" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_Boolean); ok {", i, typeName)
+				code.Print("return v%d.Boolean", i)
+				code.Print("}")
+			} else if item.Type == "string" {
+				code.Print("if v%d, ok := m.GetOneof().(*%s_String_); ok {", i, typeName)
+				code.Print("return v%d.String_", i)
+				code.Print("}")
+			} else {
 				code.Print("v%d := m.Get%s()", i, item.Type)
 				code.Print("if v%d != nil {", i)
 				code.Print(" return v%d.ToRawInfo()", i)
 				code.Print("}")
-			} else {
-				code.Print("// unhandled boolean")
 			}
 		}
 		code.Print("return nil")
@@ -737,7 +782,11 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 						code.Print("}")
 					} else if propertyModel.Type == "ItemsItem" {
 						code.Print("items := make([]interface{}, 0)")
-						code.Print("for _, item := range m.Items.Schema {")
+						if domain.Version == "v2" {
+							code.Print("for _, item := range m.Items.Schema {")
+						} else {
+							code.Print("for _, item := range m.Items.SchemaOrReference {")
+						}
 						code.Print("	items = append(items, item.ToRawInfo())")
 						code.Print("}")
 						code.Print("info = append(info, yaml.MapItem{\"items\", items[0]})")
