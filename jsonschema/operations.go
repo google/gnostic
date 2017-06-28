@@ -294,6 +294,8 @@ func (schema *Schema) ResolveRefs() {
 						// don't substitute for references inside oneOf declarations
 					} else if resolvedRef.OneOf != nil {
 						// don't substitute for references that contain oneOf declarations
+					} else if resolvedRef.AdditionalProperties != nil {
+						// don't substitute for references that look like objects
 					} else {
 						schema.Ref = nil
 						schema.CopyProperties(resolvedRef)
