@@ -22,9 +22,9 @@ func main() throws {
   
   // read the OpenAPI document
   let rawRequest = try Stdin.readall()
-  let request = try Openapi_Plugin_V1_Request(protobuf: rawRequest)
+  let request = try Openapi_Plugin_V1_Request(serializedData:rawRequest)
   let wrapper = request.wrapper
-  let document = try Openapi_V2_Document(protobuf:wrapper.value)
+  let document = try Openapi_V2_Document(serializedData:wrapper.value)
 
   // build the service renderer
   let renderer = ServiceRenderer(document:document)
@@ -44,7 +44,7 @@ func main() throws {
   try renderer.generate(filenames:filenames, response:&response)
 
   // return the results
-  let serializedResponse = try response.serializeProtobuf()
+  let serializedResponse = try response.serializedData()
   Stdout.write(bytes: serializedResponse)
 }
 
