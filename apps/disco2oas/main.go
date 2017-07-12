@@ -80,7 +80,7 @@ func main() {
 			} else if *v3 {
 				fetchAndConvertAPI(api, *verbose, "v3")
 			} else {
-				fetchAndConvertAPI(api, *verbose, "v3") // default
+				fetchAndConvertAPI(api, *verbose, "v2") // default
 			}
 		}
 	}

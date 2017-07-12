@@ -136,9 +136,9 @@ func buildOpenAPI2ResponseForSchema(schema *Schema) *pb.Response {
 
 func (method *Method) path() string {
 	if method.FlatPath != "" {
-		return method.FlatPath
+		return "/" + method.FlatPath
 	}
-	return method.Path
+	return "/" + method.Path
 }
 
 func buildOpenAPI2OperationForMethod(method *Method) *pb.Operation {
@@ -219,6 +219,14 @@ func addOpenAPI2PathsForResource(d *pb.Document, resource *Resource) {
 	}
 }
 
+func removeTrailingSlash(path string) string {
+	if path[len(path)-1] == '/' {
+		return path[0 : len(path)-1]
+	} else {
+		return path
+	}
+}
+
 // Return an OpenAPI v2 representation of this Discovery document
 func (api *Document) OpenAPIv2() (*pb.Document, error) {
 	d := &pb.Document{}
@@ -230,10 +238,7 @@ func (api *Document) OpenAPIv2() (*pb.Document, error) {
 	}
 	url, _ := url.Parse(api.RootURL)
 	d.Host = url.Host
-	d.BasePath = api.BasePath
-	if d.BasePath == "" {
-		d.BasePath = "/"
-	}
+	d.BasePath = removeTrailingSlash(api.BasePath)
 	d.Schemes = []string{url.Scheme}
 	d.Consumes = []string{"application/json"}
 	d.Produces = []string{"application/json"}
