@@ -3,7 +3,7 @@
   "id": "http://openapis.org/v3/schema.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "description": "This is the root document object of the OpenAPI definition file.",
+  "description": "This is the root document object of the OpenAPI definition.",
   "required": [
     "openapi",
     "info",
@@ -905,7 +905,7 @@
     },
     "securityScheme": {
       "type": "object",
-      "description": "Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).",
+      "description": "Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter), OAuth2's common flows (implicit, password, application and access code) as defined in RFC6749, and OpenID Connect Discovery.",
       "required": [
         "type"
       ],
