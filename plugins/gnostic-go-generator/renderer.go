@@ -31,7 +31,7 @@ import (
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
-// A service type typically corresponds to a definition, parameter,
+// ServiceType typically corresponds to a definition, parameter,
 // or response in the API and is represented by a type in generated code.
 type ServiceType struct {
 	Name   string
@@ -48,7 +48,7 @@ func (s *ServiceType) hasFieldNamed(name string) bool {
 	return false
 }
 
-// A service type field is a field in a definition and can be
+// ServiceTypeField is a field in a definition and can be
 // associated with a position in a request structure.
 type ServiceTypeField struct {
 	Name          string // the name as specified
@@ -60,7 +60,7 @@ type ServiceTypeField struct {
 	Position      string // "body", "header", "formdata", "query", or "path"
 }
 
-// A service method is an operation of an API and typically
+// ServiceMethod is an operation of an API and typically
 // has associated client and server code.
 type ServiceMethod struct {
 	Name               string       // Operation name, possibly generated from method and path
@@ -77,7 +77,7 @@ type ServiceMethod struct {
 	ResponsesType      *ServiceType // responses (output)
 }
 
-// A renderer reads an OpenAPI document and generates code.
+// ServiceRenderer reads an OpenAPI document and generates code.
 type ServiceRenderer struct {
 	Templates map[string]*template.Template
 
@@ -87,7 +87,7 @@ type ServiceRenderer struct {
 	Methods []*ServiceMethod
 }
 
-// Create a renderer.
+// NewServiceRenderer creates a renderer.
 func NewServiceRenderer(document *openapi.Document, packageName string) (renderer *ServiceRenderer, err error) {
 	renderer = &ServiceRenderer{}
 	// Load templates.
@@ -119,9 +119,8 @@ func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err err
 		t, err := template.New(filename).Funcs(helpers).Parse(string(templateData))
 		if err != nil {
 			return err
-		} else {
-			renderer.Templates[filename] = t
 		}
+		renderer.Templates[filename] = t
 	}
 	return err
 }
@@ -187,7 +186,7 @@ func upperFirst(s string) string {
 	return string(unicode.ToUpper(r)) + strings.ToLower(s[n:])
 }
 
-func generate_operation_name(method, path string) string {
+func generateOperationName(method, path string) string {
 
 	filteredPath := strings.Replace(path, "/", "_", -1)
 	filteredPath = strings.Replace(filteredPath, ".", "_", -1)
@@ -203,7 +202,7 @@ func (renderer *ServiceRenderer) loadOperation(op *openapi.Operation, method str
 	m.Path = path
 	m.Method = method
 	if m.Name == "" {
-		m.Name = generate_operation_name(method, path)
+		m.Name = generateOperationName(method, path)
 	}
 	m.Description = op.Description
 	m.HandlerName = "Handle" + m.Name
@@ -289,9 +288,8 @@ func (renderer *ServiceRenderer) loadServiceTypeFromParameters(name string, para
 	if len(t.Fields) > 0 {
 		renderer.Types = append(renderer.Types, t)
 		return t, err
-	} else {
-		return nil, err
 	}
+	return nil, err
 }
 
 func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, name string, responses *openapi.Responses) (t *ServiceType, err error) {
@@ -317,9 +315,8 @@ func (renderer *ServiceRenderer) loadServiceTypeFromResponses(m *ServiceMethod, 
 	if len(t.Fields) > 0 {
 		renderer.Types = append(renderer.Types, t)
 		return t, err
-	} else {
-		return nil, err
 	}
+	return nil, err
 }
 
 func filteredTypeName(typeName string) (name string) {
@@ -397,12 +394,11 @@ func typeForRef(ref string) (typeName string) {
 func propertyNameForResponseCode(code string) string {
 	if code == "200" {
 		return "OK"
-	} else {
-		return strings.Title(code)
 	}
+	return strings.Title(code)
 }
 
-// Run the renderer to generate the named files.
+// Generate runs the renderer to generate the named files.
 func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
 	for _, filename := range files {
 		file := &plugins.File{}

@@ -38,6 +38,7 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 	code.Print(")\n")
 
 	// generate a simple Version() function
+	code.Print("// Version returns the package name (and OpenAPI version).")
 	code.Print("func Version() string {")
 	code.Print("  return \"%s\"", packageName)
 	code.Print("}\n")
@@ -67,6 +68,7 @@ func escapeSlashes(pattern string) string {
 }
 
 func (domain *Domain) generateConstructorForType(code *printer.Code, typeName string) {
+	code.Print("// New%s creates an object of type %s if possible, returning an error if not.", typeName, typeName)
 	code.Print("func New%s(in interface{}, context *compiler.Context) (*%s, error) {", typeName, typeName)
 	code.Print("errors := make([]error, 0)")
 
@@ -360,12 +362,12 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 							code.Print("  if ok {")
 						}
 						code.Print("    // errors might be ok here, they mean we just don't have the right subtype")
-						code.Print("    t, matching_error := New%s(m, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
-						code.Print("    if matching_error == nil {")
+						code.Print("    t, matchingError := New%s(m, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
+						code.Print("    if matchingError == nil {")
 						code.Print("      x.Oneof = &%s_%s{%s: t}", parentTypeName, typeModel.Name, typeModel.Name)
 						code.Print("      matched = true")
 						code.Print("    } else {")
-						code.Print("      errors = append(errors, matching_error)")
+						code.Print("      errors = append(errors, matchingError)")
 						code.Print("    }")
 						if !unpackAtTop {
 							code.Print("  }")
@@ -572,6 +574,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 
 // ResolveReferences() methods
 func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code, typeName string) {
+	code.Print("// ResolveReferences resolves references found inside %s objects.", typeName)
 	code.Print("func (m *%s) ResolveReferences(root string) (interface{}, error) {", typeName)
 	code.Print("errors := make([]error, 0)")
 
@@ -680,6 +683,7 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 
 // ToRawInfo() methods
 func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeName string) {
+	code.Print("// ToRawInfo returns a description of %s suitable for JSON or YAML export.", typeName)
 	code.Print("func (m *%s) ToRawInfo() interface{} {", typeName)
 	typeModel := domain.TypeModels[typeName]
 	if typeName == "Any" {

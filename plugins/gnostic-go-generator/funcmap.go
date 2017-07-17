@@ -56,12 +56,12 @@ func hasFormParameters(m *ServiceMethod) bool {
 	return false
 }
 
-func goType(openapi_type string) string {
-	switch openapi_type {
+func goType(openapiType string) string {
+	switch openapiType {
 	case "number":
 		return "int"
 	default:
-		return openapi_type
+		return openapiType
 	}
 }
 

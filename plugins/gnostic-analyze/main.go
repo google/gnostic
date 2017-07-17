@@ -26,7 +26,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -63,7 +62,7 @@ func main() {
 	data, err := ioutil.ReadAll(os.Stdin)
 	sendAndExitIfError(err, response)
 	if len(data) == 0 {
-		sendAndExitIfError(errors.New("No input data.\n"), response)
+		sendAndExitIfError(fmt.Errorf("no input data"), response)
 	}
 
 	// Unmarshal the request.
@@ -74,9 +73,8 @@ func main() {
 	// Verify that the passed-in description is supported.
 	wrapper := request.Wrapper
 	if wrapper.Version != "v2" {
-		err = errors.New(
-			fmt.Sprintf("%s requires an OpenAPI v2 description.",
-				os.Args[0]))
+		err = fmt.Errorf("%s requires an OpenAPI v2 description.",
+			os.Args[0])
 		sendAndExitIfError(err, response)
 	}
 

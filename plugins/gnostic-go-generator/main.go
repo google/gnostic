@@ -19,7 +19,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -67,7 +66,7 @@ func main() {
 	data, err := ioutil.ReadAll(os.Stdin)
 	sendAndExitIfError(err, response)
 	if len(data) == 0 {
-		sendAndExitIfError(errors.New("No input data.\n"), response)
+		sendAndExitIfError(fmt.Errorf("no input data"), response)
 	}
 
 	// Deserialize the input.
@@ -91,7 +90,7 @@ func main() {
 
 	// Read the document sent by the plugin and use it to generate client/server code.
 	if request.Wrapper.Version != "v2" {
-		err = errors.New(fmt.Sprintf("Unsupported OpenAPI version %s", request.Wrapper.Version))
+		err = fmt.Errorf("Unsupported OpenAPI version %s", request.Wrapper.Version)
 		sendAndExitIfError(err, response)
 	}
 	document := &openapi.Document{}

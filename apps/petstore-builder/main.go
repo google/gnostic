@@ -35,29 +35,29 @@ Options:
 }
 
 func main() {
-	openapi_v2 := false
-	openapi_v3 := false
+	openAPIv2 := false
+	openAPIv3 := false
 
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue // skip the tool name
 		}
 		if arg == "--v2" {
-			openapi_v2 = true
+			openAPIv2 = true
 		} else if arg == "--v3" {
-			openapi_v3 = true
+			openAPIv3 = true
 		} else {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 			os.Exit(-1)
 		}
 	}
 
-	if !openapi_v2 && !openapi_v3 {
-		openapi_v2 = true
+	if !openAPIv2 && !openAPIv3 {
+		openAPIv2 = true
 	}
 
-	if openapi_v2 {
-		document := buildDocument_v2()
+	if openAPIv2 {
+		document := buildDocumentV2()
 		bytes, err := proto.Marshal(document)
 		if err != nil {
 			panic(err)
@@ -68,8 +68,8 @@ func main() {
 		}
 	}
 
-	if openapi_v3 {
-		document := buildDocument_v3()
+	if openAPIv3 {
+		document := buildDocumentV3()
 		bytes, err := proto.Marshal(document)
 		if err != nil {
 			panic(err)
