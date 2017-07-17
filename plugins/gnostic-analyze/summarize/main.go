@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/googleapis/gnostic/plugins/go/gnostic_analyze/statistics"
+	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
 )
 
 // Results are collected in this global slice.
@@ -55,27 +55,27 @@ func printFrequencies(m map[string]int) {
 	}
 }
 
-func rankByCount(frequencies map[string]int) PairList {
-	pl := make(PairList, len(frequencies))
+func rankByCount(frequencies map[string]int) pairList {
+	pl := make(pairList, len(frequencies))
 	i := 0
 	for k, v := range frequencies {
-		pl[i] = Pair{k, v}
+		pl[i] = pair{k, v}
 		i++
 	}
 	sort.Sort(sort.Reverse(pl))
 	return pl
 }
 
-type Pair struct {
+type pair struct {
 	Key   string
 	Value int
 }
 
-type PairList []Pair
+type pairList []pair
 
-func (p PairList) Len() int           { return len(p) }
-func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
-func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p pairList) Len() int           { return len(p) }
+func (p pairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p pairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 func main() {
 	// Collect all statistics in the current directory and its subdirectories.
@@ -83,25 +83,25 @@ func main() {
 	filepath.Walk(".", walker)
 
 	// Compute some interesting properties.
-	apis_with_anonymous_operations := 0
-	apis_with_anonymous_objects := 0
-	apis_with_anonymous_anything := 0
-	op_frequencies := make(map[string]int, 0)
-	parameter_type_frequencies := make(map[string]int, 0)
-	result_type_frequencies := make(map[string]int, 0)
-	definition_field_type_frequencies := make(map[string]int, 0)
-	definition_array_type_frequencies := make(map[string]int, 0)
-	definition_primitive_type_frequencies := make(map[string]int, 0)
+	apisWithAnonymousOperations := 0
+	apisWithAnonymousObjects := 0
+	apisWithAnonymousAnything := 0
+	opFrequencies := make(map[string]int, 0)
+	parameterTypeFrequencies := make(map[string]int, 0)
+	resultTypeFrequencies := make(map[string]int, 0)
+	definitionFieldTypeFrequencies := make(map[string]int, 0)
+	definitionArrayTypeFrequencies := make(map[string]int, 0)
+	definitionPrimitiveTypeFrequencies := make(map[string]int, 0)
 
 	for _, api := range stats {
 		if api.Operations["anonymous"] != 0 {
-			apis_with_anonymous_operations += 1
+			apisWithAnonymousOperations++
 		}
 		if len(api.AnonymousObjects) > 0 {
-			apis_with_anonymous_objects += 1
+			apisWithAnonymousObjects++
 		}
 		if len(api.AnonymousOperations) > 0 {
-			apis_with_anonymous_anything += 1
+			apisWithAnonymousAnything++
 			if len(api.AnonymousObjects) > 0 {
 				fmt.Printf("%s has anonymous operations and objects\n", api.Name)
 			} else {
@@ -109,48 +109,48 @@ func main() {
 			}
 		} else {
 			if len(api.AnonymousObjects) > 0 {
-				apis_with_anonymous_anything += 1
+				apisWithAnonymousAnything++
 				fmt.Printf("%s has anonymous objects\n", api.Name)
 			} else {
 				fmt.Printf("%s has no anonymous operations or objects\n", api.Name)
 			}
 		}
 		for k, v := range api.Operations {
-			op_frequencies[k] += v
+			opFrequencies[k] += v
 		}
 		for k, v := range api.ParameterTypes {
-			parameter_type_frequencies[k] += v
+			parameterTypeFrequencies[k] += v
 		}
 		for k, v := range api.ResultTypes {
-			result_type_frequencies[k] += v
+			resultTypeFrequencies[k] += v
 		}
 		for k, v := range api.DefinitionFieldTypes {
-			definition_field_type_frequencies[k] += v
+			definitionFieldTypeFrequencies[k] += v
 		}
 		for k, v := range api.DefinitionArrayTypes {
-			definition_array_type_frequencies[k] += v
+			definitionArrayTypeFrequencies[k] += v
 		}
 		for k, v := range api.DefinitionPrimitiveTypes {
-			definition_primitive_type_frequencies[k] += v
+			definitionPrimitiveTypeFrequencies[k] += v
 		}
 	}
 
 	// Report the results.
 	fmt.Printf("\n")
 	fmt.Printf("Collected information on %d APIs.\n\n", len(stats))
-	fmt.Printf("APIs with anonymous operations: %d\n", apis_with_anonymous_operations)
-	fmt.Printf("APIs with anonymous objects: %d\n", apis_with_anonymous_objects)
-	fmt.Printf("APIs with anonymous anything: %d\n", apis_with_anonymous_anything)
+	fmt.Printf("APIs with anonymous operations: %d\n", apisWithAnonymousOperations)
+	fmt.Printf("APIs with anonymous objects: %d\n", apisWithAnonymousObjects)
+	fmt.Printf("APIs with anonymous anything: %d\n", apisWithAnonymousAnything)
 	fmt.Printf("\nOperation frequencies:\n")
-	printFrequencies(op_frequencies)
+	printFrequencies(opFrequencies)
 	fmt.Printf("\nParameter type frequencies:\n")
-	printFrequencies(parameter_type_frequencies)
+	printFrequencies(parameterTypeFrequencies)
 	fmt.Printf("\nResult type frequencies:\n")
-	printFrequencies(result_type_frequencies)
+	printFrequencies(resultTypeFrequencies)
 	fmt.Printf("\nDefinition object field type frequencies:\n")
-	printFrequencies(definition_field_type_frequencies)
+	printFrequencies(definitionFieldTypeFrequencies)
 	fmt.Printf("\nDefinition array type frequencies:\n")
-	printFrequencies(definition_array_type_frequencies)
+	printFrequencies(definitionArrayTypeFrequencies)
 	fmt.Printf("\nDefinition primitive type frequencies:\n")
-	printFrequencies(definition_primitive_type_frequencies)
+	printFrequencies(definitionPrimitiveTypeFrequencies)
 }

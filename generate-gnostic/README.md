@@ -1,4 +1,4 @@
-# gnostic-generator
+# generate-gnostic
 
 ## The gnostic compiler generator
 
@@ -9,5 +9,5 @@ It is currently used to build models of OpenAPI specifications
 and extensions which are described as "vendor extensions" in 
 OpenAPI 2.0 and "specification extensions" in OpenAPI 3.0.
 
-For usage information, run the `gnostic-generator` binary with no
+For usage information, run the `generate-gnostic` binary with no
 options.

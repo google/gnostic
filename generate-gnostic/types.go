@@ -23,7 +23,7 @@ import (
 
 /// Type Modeling
 
-// models types that we encounter during model-building that have no named schema
+// TypeRequest models types that we encounter during model-building that have no named schema.
 type TypeRequest struct {
 	Name         string             // name of type to be created
 	PropertyName string             // name of a property that refers to this type
@@ -31,11 +31,12 @@ type TypeRequest struct {
 	OneOfWrapper bool               // true if the type wraps "oneOfs"
 }
 
+// NewTypeRequest creates a TypeRequest.
 func NewTypeRequest(name string, propertyName string, schema *jsonschema.Schema) *TypeRequest {
 	return &TypeRequest{Name: name, PropertyName: propertyName, Schema: schema}
 }
 
-// models type properties, eg. fields
+// TypeProperty models type properties, eg. fields.
 type TypeProperty struct {
 	Name             string   // name of property
 	Type             string   // type for property (scalar or message type)
@@ -60,28 +61,31 @@ func (typeProperty *TypeProperty) description() string {
 	return result
 }
 
+// NewTypeProperty creates a TypeProperty
 func NewTypeProperty() *TypeProperty {
 	return &TypeProperty{}
 }
 
+// NewTypePropertyWithNameAndType creates a TypeProperty
 func NewTypePropertyWithNameAndType(name string, typeName string) *TypeProperty {
 	return &TypeProperty{Name: name, Type: typeName}
 }
 
+// NewTypePropertyWithNameTypeAndPattern creates a TypeProperty
 func NewTypePropertyWithNameTypeAndPattern(name string, typeName string, pattern string) *TypeProperty {
 	return &TypeProperty{Name: name, Type: typeName, Pattern: pattern}
 }
 
+// FieldName returns the message field name to use for a property.
 func (typeProperty *TypeProperty) FieldName() string {
 	propertyName := typeProperty.Name
 	if propertyName == "$ref" {
 		return "XRef"
-	} else {
-		return strings.Title(propertyName)
 	}
+	return strings.Title(propertyName)
 }
 
-// models types
+// TypeModel models types.
 type TypeModel struct {
 	Name          string          // type name
 	Properties    []*TypeProperty // slice of properties
@@ -120,6 +124,7 @@ func (typeModel *TypeModel) description() string {
 	return result
 }
 
+// NewTypeModel creates a TypeModel.
 func NewTypeModel() *TypeModel {
 	typeModel := &TypeModel{}
 	typeModel.Properties = make([]*TypeProperty, 0)

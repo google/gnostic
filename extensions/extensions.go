@@ -45,6 +45,7 @@ func forInputYamlFromOpenapic(handler documentHandler) {
 	handler(request.Wrapper.Version, request.Wrapper.ExtensionName, request.Wrapper.Yaml)
 }
 
+// ProcessExtension calles the handler for a specified extension.
 func ProcessExtension(handleExtension extensionHandler) {
 	response := &ExtensionHandlerResponse{}
 	forInputYamlFromOpenapic(

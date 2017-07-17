@@ -3847,7 +3847,7 @@ func (m *SecurityRequirement) String() string            { return proto.CompactT
 func (*SecurityRequirement) ProtoMessage()               {}
 func (*SecurityRequirement) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{70} }
 
-// Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter) and OAuth2's common flows (implicit, password, application and access code).
+// Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter), OAuth2's common flows (implicit, password, application and access code) as defined in RFC6749, and OpenID Connect Discovery.
 type SecurityScheme struct {
 	Type                   string      `protobuf:"bytes,1,opt,name=type" json:"type,omitempty"`
 	Description            string      `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`

@@ -41,7 +41,7 @@ func lowerFirst(s string) string {
 	return string(unicode.ToLower(r)) + s[n:]
 }
 
-// model a section of the OpenAPI specification text document
+// Section models a section of the OpenAPI specification text document.
 type Section struct {
 	Level    int
 	Text     string
@@ -49,7 +49,7 @@ type Section struct {
 	Children []*Section
 }
 
-// read a section of the OpenAPI Specification, recursively dividing it into subsections
+// ReadSection reads a section of the OpenAPI Specification, recursively dividing it into subsections
 func ReadSection(text string, level int) (section *Section) {
 	titlePattern := regexp.MustCompile("^" + strings.Repeat("#", level) + " .*$")
 	subtitlePattern := regexp.MustCompile("^" + strings.Repeat("#", level+1) + " .*$")
@@ -82,7 +82,7 @@ func ReadSection(text string, level int) (section *Section) {
 	return
 }
 
-// recursively display a section of the specification
+// Display recursively displays a section of the specification.
 func (s *Section) Display(section string) {
 	if len(s.Children) == 0 {
 		//fmt.Printf("%s\n", s.Text)
@@ -114,7 +114,7 @@ func stripLink(input string) (output string) {
 	}
 }
 
-// return a nice-to-display title for a section by removing the opening "###" and any links
+// NiceTitle returns a nice-to-display title for a section by removing the opening "###" and any links.
 func (s *Section) NiceTitle() string {
 	titlePattern := regexp.MustCompile("^#+ (.*)$")
 	titleWithLinkPattern := regexp.MustCompile("^#+ <a .*</a>(.*)$")
@@ -266,6 +266,7 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 	}
 }
 
+// SchemaObjectField describes a field of a schema.
 type SchemaObjectField struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
@@ -274,9 +275,10 @@ type SchemaObjectField struct {
 	Description string `json:"description"`
 }
 
+// SchemaObject describes a schema.
 type SchemaObject struct {
 	Name            string              `json:"name"`
-	Id              string              `json:"id"`
+	ID              string              `json:"id"`
 	Description     string              `json:"description"`
 	Extendable      bool                `json:"extendable"`
 	RequiredFields  []string            `json:"required"`
@@ -284,19 +286,21 @@ type SchemaObject struct {
 	PatternedFields []SchemaObjectField `json:"patterned"`
 }
 
+// SchemaModel is a collection of schemas.
 type SchemaModel struct {
 	Objects []SchemaObject
 }
 
-func (m *SchemaModel) objectWithId(id string) *SchemaObject {
+func (m *SchemaModel) objectWithID(id string) *SchemaObject {
 	for _, object := range m.Objects {
-		if object.Id == id {
+		if object.ID == id {
 			return &object
 		}
 	}
 	return nil
 }
 
+// NewSchemaModel returns a new SchemaModel.
 func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	b, err := ioutil.ReadFile("3.0.md")
@@ -320,7 +324,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 			schemaObject := SchemaObject{
 				Name:           section.NiceTitle(),
-				Id:             id,
+				ID:             id,
 				RequiredFields: nil,
 			}
 
@@ -358,6 +362,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 	return &SchemaModel{Objects: schemaObjects}, nil
 }
 
+// UnionType represents a union of two types.
 type UnionType struct {
 	Name        string
 	ObjectType1 string
@@ -377,6 +382,7 @@ func noteUnionType(typeName, objectType1, objectType2 string) {
 	}
 }
 
+// MapType represents a map of a specified type (with string keys).
 type MapType struct {
 	Name       string
 	ObjectType string
@@ -523,7 +529,7 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 
 	} else {
 		if schema.Properties != nil {
-			fmt.Printf("SCHEMA SHOULD NOT HAVE PROPERTIES %s\n", modelObject.Id)
+			fmt.Printf("SCHEMA SHOULD NOT HAVE PROPERTIES %s\n", modelObject.ID)
 		}
 	}
 
@@ -567,7 +573,7 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 
 	} else {
 		if schema.PatternProperties != nil && !modelObject.Extendable {
-			fmt.Printf("SCHEMA SHOULD NOT HAVE PATTERN PROPERTIES %s\n", modelObject.Id)
+			fmt.Printf("SCHEMA SHOULD NOT HAVE PATTERN PROPERTIES %s\n", modelObject.ID)
 		}
 	}
 
@@ -588,7 +594,7 @@ func buildSchemaWithModel(modelObject *SchemaObject) (schema *jsonschema.Schema)
 	} else {
 		schemaField := schema.PatternPropertyWithName("^x-")
 		if schemaField != nil {
-			fmt.Printf("INVALID EXTENSION SUPPORT %s:%s\n", modelObject.Id, "^x-")
+			fmt.Printf("INVALID EXTENSION SUPPORT %s:%s\n", modelObject.ID, "^x-")
 		}
 	}
 
@@ -627,7 +633,7 @@ func main() {
 	}
 
 	// build the top-level schema using the "OAS" model
-	oasModel := model.objectWithId("oas")
+	oasModel := model.objectWithID("oas")
 	if oasModel == nil {
 		log.Printf("Unable to find OAS model. Has the source document structure changed?")
 		os.Exit(-1)
@@ -636,7 +642,7 @@ func main() {
 
 	// manually set a few fields
 	schema.Title = stringptr("A JSON Schema for OpenAPI 3.0.")
-	schema.Id = stringptr("http://openapis.org/v3/schema.json#")
+	schema.ID = stringptr("http://openapis.org/v3/schema.json#")
 	schema.Schema = stringptr("http://json-schema.org/draft-04/schema#")
 
 	// loop over all models and create the corresponding schema objects
@@ -644,11 +650,11 @@ func main() {
 	schema.Definitions = &definitions
 
 	for _, modelObject := range model.Objects {
-		if modelObject.Id == "oas" {
+		if modelObject.ID == "oas" {
 			continue
 		}
 		definitionSchema := buildSchemaWithModel(&modelObject)
-		name := modelObject.Id
+		name := modelObject.ID
 		if name == "externalDocumentation" {
 			name = "externalDocs"
 		}

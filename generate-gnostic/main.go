@@ -19,7 +19,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -32,7 +31,8 @@ import (
 	"github.com/googleapis/gnostic/jsonschema"
 )
 
-const LICENSE = "" +
+// License is the software license applied to generated code.
+const License = "" +
 	"// Copyright 2017 Google Inc. All Rights Reserved.\n" +
 	"//\n" +
 	"// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
@@ -47,7 +47,7 @@ const LICENSE = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
 
-func proto_options(packageName string) []ProtoOption {
+func protoOptions(packageName string) []ProtoOption {
 	return []ProtoOption{
 		ProtoOption{
 			Name:  "java_multiple_files",
@@ -84,44 +84,44 @@ func proto_options(packageName string) []ProtoOption {
 	}
 }
 
-func GenerateOpenAPIModel(version string) error {
+func generateOpenAPIModel(version string) error {
 	var input string
 	var filename string
-	var proto_packagename string
+	var protoPackageName string
 
 	switch version {
 	case "v2":
 		input = "openapi-2.0.json"
 		filename = "OpenAPIv2"
-		proto_packagename = "openapi.v2"
+		protoPackageName = "openapi.v2"
 	case "v3":
 		input = "openapi-3.0.json"
 		filename = "OpenAPIv3"
-		proto_packagename = "openapi.v3"
+		protoPackageName = "openapi.v3"
 	default:
-		return errors.New(fmt.Sprintf("Unknown OpenAPI version %s", version))
+		return fmt.Errorf("Unknown OpenAPI version %s", version)
 	}
 
-	go_packagename := strings.Replace(proto_packagename, ".", "_", -1)
+	goPackageName := strings.Replace(protoPackageName, ".", "_", -1)
 
-	project_root := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/"
+	projectRoot := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/"
 
-	base_schema, err := jsonschema.NewSchemaFromFile(project_root + "jsonschema/schema.json")
+	baseSchema, err := jsonschema.NewSchemaFromFile(projectRoot + "jsonschema/schema.json")
 	if err != nil {
 		return err
 	}
-	base_schema.ResolveRefs()
-	base_schema.ResolveAllOfs()
+	baseSchema.ResolveRefs()
+	baseSchema.ResolveAllOfs()
 
-	openapi_schema, err := jsonschema.NewSchemaFromFile(project_root + filename + "/" + input)
+	openapiSchema, err := jsonschema.NewSchemaFromFile(projectRoot + filename + "/" + input)
 	if err != nil {
 		return err
 	}
-	openapi_schema.ResolveRefs()
-	openapi_schema.ResolveAllOfs()
+	openapiSchema.ResolveRefs()
+	openapiSchema.ResolveAllOfs()
 
 	// build a simplified model of the types described by the schema
-	cc := NewDomain(openapi_schema, version)
+	cc := NewDomain(openapiSchema, version)
 	// generators will map these patterns to the associated property names
 	// these pattern names are a bit of a hack until we find a more automated way to obtain them
 
@@ -143,7 +143,7 @@ func GenerateOpenAPIModel(version string) error {
 			"ResponseValue": "ResponseCode",
 		}
 	default:
-		return errors.New(fmt.Sprintf("Unknown OpenAPI version %s", version))
+		return fmt.Errorf("Unknown OpenAPI version %s", version)
 	}
 
 	err = cc.Build()
@@ -156,37 +156,37 @@ func GenerateOpenAPIModel(version string) error {
 	}
 
 	// ensure that the target directory exists
-	err = os.MkdirAll(project_root+filename, 0755)
+	err = os.MkdirAll(projectRoot+filename, 0755)
 	if err != nil {
 		return err
 	}
 
 	// generate the protocol buffer description
 	log.Printf("Generating protocol buffer description")
-	proto := cc.GenerateProto(proto_packagename, LICENSE,
-		proto_options(go_packagename), []string{"google/protobuf/any.proto"})
-	proto_filename := project_root + filename + "/" + filename + ".proto"
-	err = ioutil.WriteFile(proto_filename, []byte(proto), 0644)
+	proto := cc.generateProto(protoPackageName, License,
+		protoOptions(goPackageName), []string{"google/protobuf/any.proto"})
+	protoFileName := projectRoot + filename + "/" + filename + ".proto"
+	err = ioutil.WriteFile(protoFileName, []byte(proto), 0644)
 	if err != nil {
 		return err
 	}
 
 	// generate the compiler
 	log.Printf("Generating compiler support code")
-	compiler := cc.GenerateCompiler(go_packagename, LICENSE, []string{
+	compiler := cc.GenerateCompiler(goPackageName, License, []string{
 		"fmt",
 		"gopkg.in/yaml.v2",
 		"strings",
 		"github.com/googleapis/gnostic/compiler",
 	})
-	go_filename := project_root + filename + "/" + filename + ".go"
-	err = ioutil.WriteFile(go_filename, []byte(compiler), 0644)
+	goFileName := projectRoot + filename + "/" + filename + ".go"
+	err = ioutil.WriteFile(goFileName, []byte(compiler), 0644)
 	if err != nil {
 		return err
 	}
 	// format the compiler
 	log.Printf("Formatting compiler support code")
-	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", go_filename).Run()
+	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", goFileName).Run()
 }
 
 func usage() string {
@@ -211,19 +211,19 @@ Options:
 }
 
 func main() {
-	var openapi_version = ""
-	var generate_extensions = false
+	var openapiVersion = ""
+	var generateExtensions = false
 
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue // skip the tool name
 		}
 		if arg == "--v2" {
-			openapi_version = "v2"
+			openapiVersion = "v2"
 		} else if arg == "--v3" {
-			openapi_version = "v3"
+			openapiVersion = "v3"
 		} else if arg == "--extension" {
-			generate_extensions = true
+			generateExtensions = true
 			break
 		} else {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
@@ -231,13 +231,13 @@ func main() {
 		}
 	}
 
-	if openapi_version != "" {
-		err := GenerateOpenAPIModel(openapi_version)
+	if openapiVersion != "" {
+		err := generateOpenAPIModel(openapiVersion)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
-	} else if generate_extensions {
-		err := ProcessExtensionGenCommandline(usage())
+	} else if generateExtensions {
+		err := processExtensionGenCommandline(usage())
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}

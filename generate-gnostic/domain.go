@@ -24,7 +24,7 @@ import (
 	"github.com/googleapis/gnostic/jsonschema"
 )
 
-// models a collection of types that is defined by a schema
+// Domain models a collection of types that is defined by a schema.
 type Domain struct {
 	TypeModels            map[string]*TypeModel   // models of the types in the domain
 	Prefix                string                  // type prefix to use
@@ -36,6 +36,7 @@ type Domain struct {
 	Version               string                  // OpenAPI Version ("v2" or "v3")
 }
 
+// NewDomain creates a domain representation.
 func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 	cc := &Domain{}
 	cc.TypeModels = make(map[string]*TypeModel, 0)
@@ -48,37 +49,34 @@ func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 	return cc
 }
 
-// Returns a capitalized name to use for a generated type
+// TypeNameForStub returns a capitalized name to use for a generated type.
 func (domain *Domain) TypeNameForStub(stub string) string {
 	return domain.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
 }
 
-// Returns a capitalized name to use for a generated type based on a JSON reference
+// typeNameForReference returns a capitalized name to use for a generated type based on a JSON reference
 func (domain *Domain) typeNameForReference(reference string) string {
 	parts := strings.Split(reference, "/")
 	first := parts[0]
 	last := parts[len(parts)-1]
 	if first == "#" {
 		return domain.TypeNameForStub(last)
-	} else {
-		return "Schema"
 	}
+	return "Schema"
 }
 
-// Returns a property name to use for a JSON reference
+// propertyNameForReference returns a property name to use for a JSON reference
 func (domain *Domain) propertyNameForReference(reference string) *string {
 	parts := strings.Split(reference, "/")
 	first := parts[0]
 	last := parts[len(parts)-1]
 	if first == "#" {
 		return &last
-	} else {
-		return nil
 	}
 	return nil
 }
 
-// Determines the item type for arrays defined by a schema
+// arrayItemTypeForSchema determines the item type for arrays defined by a schema
 func (domain *Domain) arrayItemTypeForSchema(propertyName string, schema *jsonschema.Schema) string {
 	// default
 	itemTypeName := "Any"
@@ -397,15 +395,10 @@ func schemaIsContainedInArray(s1 *jsonschema.Schema, s2 *jsonschema.Schema) bool
 		if s2.Items.Schema != nil {
 			if s1.IsEqual(s2.Items.Schema) {
 				return true
-			} else {
-				return false
 			}
-		} else {
-			return false
 		}
-	} else {
-		return false
 	}
+	return false
 }
 
 func (domain *Domain) addAnonymousAccessorForSchema(
@@ -480,15 +473,15 @@ func (domain *Domain) buildDefaultAccessors(typeModel *TypeModel, schema *jsonsc
 	typeModel.addProperty(property)
 }
 
+// BuildTypeForDefinition creates a type representation for a schema definition.
 func (domain *Domain) BuildTypeForDefinition(
 	typeName string,
 	propertyName string,
 	schema *jsonschema.Schema) *TypeModel {
 	if (schema.Type == nil) || (*schema.Type.String == "object") {
 		return domain.buildTypeForDefinitionObject(typeName, propertyName, schema)
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func (domain *Domain) buildTypeForDefinitionObject(
@@ -513,6 +506,7 @@ func (domain *Domain) buildTypeForDefinitionObject(
 	return typeModel
 }
 
+// Build builds a domain model.
 func (domain *Domain) Build() (err error) {
 	if (domain.Schema == nil) || (domain.Schema.Definitions == nil) {
 		return errors.New("missing definitions section")
@@ -551,7 +545,7 @@ func (domain *Domain) Build() (err error) {
 
 	// iterate over map item types to be instantiated and generate a type for each
 	mapTypeNames := make([]string, 0)
-	for mapTypeName, _ := range domain.MapTypeRequests {
+	for mapTypeName := range domain.MapTypeRequests {
 		mapTypeNames = append(mapTypeNames, mapTypeName)
 	}
 	sort.Strings(mapTypeNames)
@@ -610,13 +604,14 @@ func (domain *Domain) Build() (err error) {
 
 func (domain *Domain) sortedTypeNames() []string {
 	typeNames := make([]string, 0)
-	for typeName, _ := range domain.TypeModels {
+	for typeName := range domain.TypeModels {
 		typeNames = append(typeNames, typeName)
 	}
 	sort.Strings(typeNames)
 	return typeNames
 }
 
+// Description returns a string representation of a domain.
 func (domain *Domain) Description() string {
 	typeNames := domain.sortedTypeNames()
 	result := ""

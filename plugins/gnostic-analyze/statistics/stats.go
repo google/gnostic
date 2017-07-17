@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package statistics
 
 import (
@@ -35,6 +36,7 @@ type DocumentStatistics struct {
 	AnonymousObjects         []string       `json:"anonymousObjects"`
 }
 
+// NewDocumentStatistics builds a new DocumentStatistics object.
 func NewDocumentStatistics(source string, document *openapi.Document) *DocumentStatistics {
 	s := &DocumentStatistics{}
 	s.Operations = make(map[string]int, 0)
@@ -86,13 +88,14 @@ func (s *DocumentStatistics) addDefinitionPrimitiveType(path string, name string
 }
 
 func typeForPrimitivesItems(p *openapi.PrimitivesItems) string {
-	if p == nil {
+	switch {
+	case p == nil:
 		return "object"
-        } else if p.Type != "" {
+	case p.Type != "":
 		return p.Type
-	} else if p.Items != nil && p.Items.Type != "" {
+	case p.Items != nil && p.Items.Type != "":
 		return p.Items.Type
-	} else {
+	default:
 		return "object"
 	}
 }
