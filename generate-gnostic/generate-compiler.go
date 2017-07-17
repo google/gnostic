@@ -22,6 +22,7 @@ import (
 	"github.com/googleapis/gnostic/printer"
 )
 
+// GenerateCompiler generates the compiler code for a domain.
 func (domain *Domain) GenerateCompiler(packageName string, license string, imports []string) string {
 	code := &printer.Code{}
 	code.Print(license)
@@ -61,7 +62,7 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 	return code.String()
 }
 
-func escape_slashes(pattern string) string {
+func escapeSlashes(pattern string) string {
 	return strings.Replace(pattern, "\\", "\\\\", -1)
 }
 
@@ -291,7 +292,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						allowedPatternString += ","
 					}
 					allowedPatternString += "\""
-					allowedPatternString += escape_slashes(pattern)
+					allowedPatternString += escapeSlashes(pattern)
 					allowedPatternString += "\""
 				}
 			}
@@ -308,7 +309,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		var fieldNumber = 0
 		for _, propertyModel := range typeModel.Properties {
 			propertyName := propertyModel.Name
-			fieldNumber += 1
+			fieldNumber++
 			propertyType := propertyModel.Type
 			if propertyType == "int" {
 				propertyType = "int64"
@@ -508,7 +509,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("v := item.Value")
 					if propertyModel.Pattern != "" {
 						code.Print("if compiler.PatternMatches(\"%s\", k) {",
-							escape_slashes(propertyModel.Pattern))
+							escapeSlashes(propertyModel.Pattern))
 					}
 
 					code.Print("pair := &Named" + strings.Title(mapTypeName) + "{}")

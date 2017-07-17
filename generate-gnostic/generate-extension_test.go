@@ -17,15 +17,15 @@ func TestErrorExtensionGeneratorUnsupportedPrimitive(t *testing.T) {
 		"--out_dir=/tmp",
 	).Output()
 
-	output_file := "x-unsupportedprimitives.errors"
-	_ = ioutil.WriteFile(output_file, output, 0644)
-	err = exec.Command("diff", output_file, "test/errors/x-unsupportedprimitives.errors").Run()
+	outputFile := "x-unsupportedprimitives.errors"
+	_ = ioutil.WriteFile(outputFile, output, 0644)
+	err = exec.Command("diff", outputFile, "test/errors/x-unsupportedprimitives.errors").Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(output_file)
+		os.Remove(outputFile)
 	}
 }
 
@@ -39,14 +39,14 @@ func TestErrorExtensionGeneratorNameCollision(t *testing.T) {
 		"--out_dir=/tmp",
 	).Output()
 
-	output_file := "x-extension-name-collision.errors"
-	_ = ioutil.WriteFile(output_file, output, 0644)
-	err = exec.Command("diff", output_file, "test/errors/x-extension-name-collision.errors").Run()
+	outputFile := "x-extension-name-collision.errors"
+	_ = ioutil.WriteFile(outputFile, output, 0644)
+	err = exec.Command("diff", outputFile, "test/errors/x-extension-name-collision.errors").Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(output_file)
+		os.Remove(outputFile)
 	}
 }
