@@ -23,7 +23,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const INDENT = "  "
+const indentation = "  "
 
 // basic escaping, will need to be improved or replaced
 func escape(s string) string {
@@ -32,26 +32,26 @@ func escape(s string) string {
 	return s
 }
 
-type Writer struct {
+type writer struct {
 	b bytes.Buffer
 }
 
-func (w *Writer) bytes() []byte {
+func (w *writer) bytes() []byte {
 	return w.b.Bytes()
 }
 
-func (w *Writer) writeString(s string) {
+func (w *writer) writeString(s string) {
 	w.b.Write([]byte(s))
 }
 
-func (w *Writer) writeMap(info interface{}, indent string) {
+func (w *writer) writeMap(info interface{}, indent string) {
 	w.writeString("{\n")
-	inner_indent := indent + INDENT
+	innerIndent := indent + indentation
 	switch pairs := info.(type) {
 	case yaml.MapSlice:
 		for i, pair := range pairs {
 			// first print the key
-			w.writeString(fmt.Sprintf("%s\"%+v\": ", inner_indent, pair.Key))
+			w.writeString(fmt.Sprintf("%s\"%+v\": ", innerIndent, pair.Key))
 			// then the value
 			switch value := pair.Value.(type) {
 			case string:
@@ -65,19 +65,19 @@ func (w *Writer) writeMap(info interface{}, indent string) {
 					w.writeString("false")
 				}
 			case []interface{}:
-				w.writeArray(value, inner_indent)
+				w.writeArray(value, innerIndent)
 			case yaml.MapSlice:
-				w.writeMap(value, inner_indent)
+				w.writeMap(value, innerIndent)
 			case int:
 				w.writeString(fmt.Sprintf("%d", value))
 			case int64:
 				w.writeString(fmt.Sprintf("%d", value))
 			case []string:
-				w.writeStringArray(value, inner_indent)
+				w.writeStringArray(value, innerIndent)
 			case float64:
 				w.writeString(fmt.Sprintf("%f", value))
 			case []yaml.MapSlice:
-				w.writeMapSliceArray(value, inner_indent)
+				w.writeMapSliceArray(value, innerIndent)
 			default:
 				w.writeString(fmt.Sprintf("???MapItem(%+v, %T)", value, value))
 			}
@@ -93,11 +93,11 @@ func (w *Writer) writeMap(info interface{}, indent string) {
 	w.writeString("}")
 }
 
-func (w *Writer) writeArray(array []interface{}, indent string) {
+func (w *writer) writeArray(array []interface{}, indent string) {
 	w.writeString("[\n")
-	inner_indent := indent + INDENT
+	innerIndent := indent + indentation
 	for i, item := range array {
-		w.writeString(inner_indent)
+		w.writeString(innerIndent)
 		switch item := item.(type) {
 		case string:
 			w.writeString("\"")
@@ -110,7 +110,7 @@ func (w *Writer) writeArray(array []interface{}, indent string) {
 				w.writeString("false")
 			}
 		case yaml.MapSlice:
-			w.writeMap(item, inner_indent)
+			w.writeMap(item, innerIndent)
 		default:
 			w.writeString(fmt.Sprintf("???ArrayItem(%+v)", item))
 		}
@@ -123,11 +123,11 @@ func (w *Writer) writeArray(array []interface{}, indent string) {
 	w.writeString("]")
 }
 
-func (w *Writer) writeStringArray(array []string, indent string) {
+func (w *writer) writeStringArray(array []string, indent string) {
 	w.writeString("[\n")
-	inner_indent := indent + INDENT
+	innerIndent := indent + indentation
 	for i, item := range array {
-		w.writeString(inner_indent)
+		w.writeString(innerIndent)
 		w.writeString("\"")
 		w.writeString(escape(item))
 		w.writeString("\"")
@@ -140,12 +140,12 @@ func (w *Writer) writeStringArray(array []string, indent string) {
 	w.writeString("]")
 }
 
-func (w *Writer) writeMapSliceArray(array []yaml.MapSlice, indent string) {
+func (w *writer) writeMapSliceArray(array []yaml.MapSlice, indent string) {
 	w.writeString("[\n")
-	inner_indent := indent + INDENT
+	innerIndent := indent + indentation
 	for i, item := range array {
-		w.writeString(inner_indent)
-		w.writeMap(item, inner_indent)
+		w.writeString(innerIndent)
+		w.writeMap(item, innerIndent)
 		if i < len(array)-1 {
 			w.writeString(",")
 		}
@@ -155,8 +155,9 @@ func (w *Writer) writeMapSliceArray(array []yaml.MapSlice, indent string) {
 	w.writeString("]")
 }
 
+// Marshal writes a yaml.MapSlice as JSON
 func Marshal(in interface{}) (out []byte, err error) {
-	var w Writer
+	var w writer
 	m, ok := in.(yaml.MapSlice)
 	if !ok {
 		return nil, errors.New("invalid type passed to Marshal")

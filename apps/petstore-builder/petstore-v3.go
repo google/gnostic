@@ -18,7 +18,7 @@ import (
 	v3 "github.com/googleapis/gnostic/OpenAPIv3"
 )
 
-func buildDocument_v3() *v3.Document {
+func buildDocumentV3() *v3.Document {
 	d := &v3.Document{}
 	d.Openapi = "3.0"
 	d.Info = &v3.Info{

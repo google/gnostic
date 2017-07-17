@@ -9,144 +9,144 @@ import (
 	"testing"
 )
 
-func test_compiler(t *testing.T, input_file string, reference_file string, expect_errors bool) {
-	text_file := strings.Replace(filepath.Base(input_file), filepath.Ext(input_file), ".text", 1)
-	errors_file := strings.Replace(filepath.Base(input_file), filepath.Ext(input_file), ".errors", 1)
+func testCompiler(t *testing.T, inputFile string, referenceFile string, expectErrors bool) {
+	textFile := strings.Replace(filepath.Base(inputFile), filepath.Ext(inputFile), ".text", 1)
+	errorsFile := strings.Replace(filepath.Base(inputFile), filepath.Ext(inputFile), ".errors", 1)
 	// remove any preexisting output files
-	os.Remove(text_file)
-	os.Remove(errors_file)
+	os.Remove(textFile)
+	os.Remove(errorsFile)
 	// run the compiler
 	var err error
 	var cmd = exec.Command(
 		"gnostic",
-		input_file,
+		inputFile,
 		"--text-out=.",
 		"--errors-out=.",
 		"--resolve-refs")
 	//t.Log(cmd.Args)
 	err = cmd.Run()
-	if err != nil && !expect_errors {
+	if err != nil && !expectErrors {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
 	}
 	// verify the output against a reference
-	var output_file string
-	if expect_errors {
-		output_file = errors_file
+	var outputFile string
+	if expectErrors {
+		outputFile = errorsFile
 	} else {
-		output_file = text_file
+		outputFile = textFile
 	}
-	err = exec.Command("diff", output_file, reference_file).Run()
+	err = exec.Command("diff", outputFile, referenceFile).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(text_file)
-		os.Remove(errors_file)
+		os.Remove(textFile)
+		os.Remove(errorsFile)
 	}
 }
 
-func test_normal(t *testing.T, input_file string, reference_file string) {
-	test_compiler(t, input_file, reference_file, false)
+func testNormal(t *testing.T, inputFile string, referenceFile string) {
+	testCompiler(t, inputFile, referenceFile, false)
 }
 
-func test_errors(t *testing.T, input_file string, reference_file string) {
-	test_compiler(t, input_file, reference_file, true)
+func testErrors(t *testing.T, inputFile string, referenceFile string) {
+	testCompiler(t, inputFile, referenceFile, true)
 }
 
 func TestPetstoreJSON(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"examples/v2.0/json/petstore.json",
 		"test/v2.0/petstore.text")
 }
 
 func TestPetstoreYAML(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"examples/v2.0/yaml/petstore.yaml",
 		"test/v2.0/petstore.text")
 }
 
 func TestSeparateYAML(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestSeparateJSON(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"examples/v2.0/json/petstore-separate/spec/swagger.json",
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text") // yaml and json results should be identical
 }
 
 func TestRemotePetstoreJSON(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore.json",
 		"test/v2.0/petstore.text")
 }
 
 func TestRemotePetstoreYAML(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore.yaml",
 		"test/v2.0/petstore.text")
 }
 
 func TestRemoteSeparateYAML(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestRemoteSeparateJSON(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore-separate/spec/swagger.json",
 		"test/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestErrorBadProperties(t *testing.T) {
-	test_errors(t,
+	testErrors(t,
 		"examples/errors/petstore-badproperties.yaml",
 		"test/errors/petstore-badproperties.errors")
 }
 
 func TestErrorUnresolvedRefs(t *testing.T) {
-	test_errors(t,
+	testErrors(t,
 		"examples/errors/petstore-unresolvedrefs.yaml",
 		"test/errors/petstore-unresolvedrefs.errors")
 }
 
 func TestErrorMissingVersion(t *testing.T) {
-	test_errors(t,
+	testErrors(t,
 		"examples/errors/petstore-missingversion.yaml",
 		"test/errors/petstore-missingversion.errors")
 }
 
-func test_plugin(t *testing.T, plugin string, input_file string, output_file string, reference_file string) {
+func testPlugin(t *testing.T, plugin string, inputFile string, outputFile string, referenceFile string) {
 	// remove any preexisting output files
-	os.Remove(output_file)
+	os.Remove(outputFile)
 	// run the compiler
 	var err error
 	output, err := exec.Command(
 		"gnostic",
 		"--"+plugin+"-out=-",
-		input_file).Output()
+		inputFile).Output()
 	if err != nil {
 		t.Logf("Compile failed: %+v", err)
 		t.FailNow()
 	}
-	_ = ioutil.WriteFile(output_file, output, 0644)
-	err = exec.Command("diff", output_file, reference_file).Run()
+	_ = ioutil.WriteFile(outputFile, output, 0644)
+	err = exec.Command("diff", outputFile, referenceFile).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(output_file)
+		os.Remove(outputFile)
 	}
 }
 
 func TestSamplePluginWithPetstore(t *testing.T) {
-	test_plugin(t,
+	testPlugin(t,
 		"go-sample",
 		"examples/v2.0/yaml/petstore.yaml",
 		"sample-petstore.out",
@@ -170,15 +170,15 @@ func TestErrorInvalidPluginInvocations(t *testing.T) {
 		t.Logf("Invalid invocations were accepted")
 		t.FailNow()
 	}
-	output_file := "invalid-plugin-invocation.errors"
-	_ = ioutil.WriteFile(output_file, output, 0644)
-	err = exec.Command("diff", output_file, "test/errors/invalid-plugin-invocation.errors").Run()
+	outputFile := "invalid-plugin-invocation.errors"
+	_ = ioutil.WriteFile(outputFile, output, 0644)
+	err = exec.Command("diff", outputFile, "test/errors/invalid-plugin-invocation.errors").Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(output_file)
+		os.Remove(outputFile)
 	}
 }
 
@@ -211,11 +211,11 @@ func TestValidPluginInvocations(t *testing.T) {
 }
 
 func TestExtensionHandlerWithLibraryExample(t *testing.T) {
-	output_file := "library-example-with-ext.text.out"
-	input_file := "test/library-example-with-ext.json"
-	reference_file := "test/library-example-with-ext.text.out"
+	outputFile := "library-example-with-ext.text.out"
+	inputFile := "test/library-example-with-ext.json"
+	referenceFile := "test/library-example-with-ext.text.out"
 
-	os.Remove(output_file)
+	os.Remove(outputFile)
 	// run the compiler
 	var err error
 
@@ -223,47 +223,47 @@ func TestExtensionHandlerWithLibraryExample(t *testing.T) {
 		"gnostic",
 		"--x-sampleone",
 		"--x-sampletwo",
-		"--text-out="+output_file,
+		"--text-out="+outputFile,
 		"--resolve-refs",
-		input_file)
+		inputFile)
 
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Compile failed for command %v: %+v", command, err)
 		t.FailNow()
 	}
-	//_ = ioutil.WriteFile(output_file, output, 0644)
-	err = exec.Command("diff", output_file, reference_file).Run()
+	//_ = ioutil.WriteFile(outputFile, output, 0644)
+	err = exec.Command("diff", outputFile, referenceFile).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(output_file)
+		os.Remove(outputFile)
 	}
 }
 
 func TestJSONOutput(t *testing.T) {
-	input_file := "test/library-example-with-ext.json"
+	inputFile := "test/library-example-with-ext.json"
 
-	text_file := "sample.text"
-	json_file := "sample.json"
-	text_file2 := "sample2.text"
-	json_file2 := "sample2.json"
+	textFile := "sample.text"
+	jsonFile := "sample.json"
+	textFile2 := "sample2.text"
+	jsonFile2 := "sample2.json"
 
-	os.Remove(text_file)
-	os.Remove(json_file)
-	os.Remove(text_file2)
-	os.Remove(json_file2)
+	os.Remove(textFile)
+	os.Remove(jsonFile)
+	os.Remove(textFile2)
+	os.Remove(jsonFile2)
 
 	var err error
 
 	// Run the compiler once.
 	command := exec.Command(
 		"gnostic",
-		"--text-out="+text_file,
-		"--json-out="+json_file,
-		input_file)
+		"--text-out="+textFile,
+		"--json-out="+jsonFile,
+		inputFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Compile failed for command %v: %+v", command, err)
@@ -273,9 +273,9 @@ func TestJSONOutput(t *testing.T) {
 	// Run the compiler again, this time on the generated output.
 	command = exec.Command(
 		"gnostic",
-		"--text-out="+text_file2,
-		"--json-out="+json_file2,
-		json_file)
+		"--text-out="+textFile2,
+		"--json-out="+jsonFile2,
+		jsonFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Compile failed for command %v: %+v", command, err)
@@ -283,40 +283,40 @@ func TestJSONOutput(t *testing.T) {
 	}
 
 	// Verify that both models have the same internal representation.
-	err = exec.Command("diff", text_file, text_file2).Run()
+	err = exec.Command("diff", textFile, textFile2).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(text_file)
-		os.Remove(json_file)
-		os.Remove(text_file2)
-		os.Remove(json_file2)
+		os.Remove(textFile)
+		os.Remove(jsonFile)
+		os.Remove(textFile2)
+		os.Remove(jsonFile2)
 	}
 }
 
 func TestYAMLOutput(t *testing.T) {
-	input_file := "test/library-example-with-ext.json"
+	inputFile := "test/library-example-with-ext.json"
 
-	text_file := "sample.text"
-	yaml_file := "sample.yaml"
-	text_file2 := "sample2.text"
-	yaml_file2 := "sample2.yaml"
+	textFile := "sample.text"
+	yamlFile := "sample.yaml"
+	textFile2 := "sample2.text"
+	yamlFile2 := "sample2.yaml"
 
-	os.Remove(text_file)
-	os.Remove(yaml_file)
-	os.Remove(text_file2)
-	os.Remove(yaml_file2)
+	os.Remove(textFile)
+	os.Remove(yamlFile)
+	os.Remove(textFile2)
+	os.Remove(yamlFile2)
 
 	var err error
 
 	// Run the compiler once.
 	command := exec.Command(
 		"gnostic",
-		"--text-out="+text_file,
-		"--yaml-out="+yaml_file,
-		input_file)
+		"--text-out="+textFile,
+		"--yaml-out="+yamlFile,
+		inputFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Compile failed for command %v: %+v", command, err)
@@ -326,9 +326,9 @@ func TestYAMLOutput(t *testing.T) {
 	// Run the compiler again, this time on the generated output.
 	command = exec.Command(
 		"gnostic",
-		"--text-out="+text_file2,
-		"--yaml-out="+yaml_file2,
-		yaml_file)
+		"--text-out="+textFile2,
+		"--yaml-out="+yamlFile2,
+		yamlFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Compile failed for command %v: %+v", command, err)
@@ -336,32 +336,32 @@ func TestYAMLOutput(t *testing.T) {
 	}
 
 	// Verify that both models have the same internal representation.
-	err = exec.Command("diff", text_file, text_file2).Run()
+	err = exec.Command("diff", textFile, textFile2).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
-		os.Remove(text_file)
-		os.Remove(yaml_file)
-		os.Remove(text_file2)
-		os.Remove(yaml_file2)
+		os.Remove(textFile)
+		os.Remove(yamlFile)
+		os.Remove(textFile2)
+		os.Remove(yamlFile2)
 	}
 }
 
-func test_builder(version string, t *testing.T) {
+func testBuilder(version string, t *testing.T) {
 	var err error
 
-	pb_file := "petstore-" + version + ".pb"
-	yaml_file := "petstore.yaml"
-	json_file := "petstore.json"
-	text_file := "petstore.text"
-	text_reference := "test/" + version + ".0/petstore.text"
+	pbFile := "petstore-" + version + ".pb"
+	yamlFile := "petstore.yaml"
+	jsonFile := "petstore.json"
+	textFile := "petstore.text"
+	textReference := "test/" + version + ".0/petstore.text"
 
-	os.Remove(pb_file)
-	os.Remove(text_file)
-	os.Remove(yaml_file)
-	os.Remove(json_file)
+	os.Remove(pbFile)
+	os.Remove(textFile)
+	os.Remove(yamlFile)
+	os.Remove(jsonFile)
 
 	// Generate petstore.pb.
 	command := exec.Command(
@@ -376,9 +376,9 @@ func test_builder(version string, t *testing.T) {
 	// Convert petstore.pb to yaml and json.
 	command = exec.Command(
 		"gnostic",
-		pb_file,
-		"--json-out="+json_file,
-		"--yaml-out="+yaml_file)
+		pbFile,
+		"--json-out="+jsonFile,
+		"--yaml-out="+yamlFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Command %v failed: %+v", command, err)
@@ -388,9 +388,9 @@ func test_builder(version string, t *testing.T) {
 	// Read petstore.yaml, resolve references, and export text.
 	command = exec.Command(
 		"gnostic",
-		yaml_file,
+		yamlFile,
 		"--resolve-refs",
-		"--text-out="+text_file)
+		"--text-out="+textFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Command %v failed: %+v", command, err)
@@ -398,7 +398,7 @@ func test_builder(version string, t *testing.T) {
 	}
 
 	// Verify that the generated text matches our reference.
-	err = exec.Command("diff", text_file, text_reference).Run()
+	err = exec.Command("diff", textFile, textReference).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
@@ -407,9 +407,9 @@ func test_builder(version string, t *testing.T) {
 	// Read petstore.json, resolve references, and export text.
 	command = exec.Command(
 		"gnostic",
-		json_file,
+		jsonFile,
 		"--resolve-refs",
-		"--text-out="+text_file)
+		"--text-out="+textFile)
 	_, err = command.Output()
 	if err != nil {
 		t.Logf("Command %v failed: %+v", command, err)
@@ -417,37 +417,37 @@ func test_builder(version string, t *testing.T) {
 	}
 
 	// Verify that the generated text matches our reference.
-	err = exec.Command("diff", text_file, text_reference).Run()
+	err = exec.Command("diff", textFile, textReference).Run()
 	if err != nil {
 		t.Logf("Diff failed: %+v", err)
 		t.FailNow()
 	}
 
 	// if the test succeeded, clean up
-	os.Remove(pb_file)
-	os.Remove(text_file)
-	os.Remove(yaml_file)
-	os.Remove(json_file)
+	os.Remove(pbFile)
+	os.Remove(textFile)
+	os.Remove(yamlFile)
+	os.Remove(jsonFile)
 }
 
 func TestBuilderV2(t *testing.T) {
-	test_builder("v2", t)
+	testBuilder("v2", t)
 }
 
 func TestBuilderV3(t *testing.T) {
-	test_builder("v3", t)
+	testBuilder("v3", t)
 }
 
 // OpenAPI 3.0 tests
 
 func TestPetstoreYAML_30(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"examples/v3.0/yaml/petstore.yaml",
 		"test/v3.0/petstore.text")
 }
 
 func TestPetstoreJSON_30(t *testing.T) {
-	test_normal(t,
+	testNormal(t,
 		"examples/v3.0/json/petstore.json",
 		"test/v3.0/petstore.text")
 }

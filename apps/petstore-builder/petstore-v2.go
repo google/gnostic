@@ -18,7 +18,7 @@ import (
 	v2 "github.com/googleapis/gnostic/OpenAPIv2"
 )
 
-func buildDocument_v2() *v2.Document {
+func buildDocumentV2() *v2.Document {
 	d := &v2.Document{}
 	d.Swagger = "2.0"
 	d.Info = &v2.Info{

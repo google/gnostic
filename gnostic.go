@@ -53,26 +53,26 @@ import (
 )
 
 const ( // OpenAPI Version
-	OpenAPIvUnknown = 0
-	OpenAPIv2       = 2
-	OpenAPIv3       = 3
+	openAPIvUnknown = 0
+	openAPIv2       = 2
+	openAPIv3       = 3
 )
 
 // Determine the version of an OpenAPI description read from JSON or YAML.
 func getOpenAPIVersionFromInfo(info interface{}) int {
 	m, ok := compiler.UnpackMap(info)
 	if !ok {
-		return OpenAPIvUnknown
+		return openAPIvUnknown
 	}
 	swagger, ok := compiler.MapValueForKey(m, "swagger").(string)
 	if ok && strings.HasPrefix(swagger, "2.0") {
-		return OpenAPIv2
+		return openAPIv2
 	}
 	openapi, ok := compiler.MapValueForKey(m, "openapi").(string)
 	if ok && strings.HasPrefix(openapi, "3.0") {
-		return OpenAPIv3
+		return openAPIv3
 	}
-	return OpenAPIvUnknown
+	return openAPIvUnknown
 }
 
 const (
@@ -80,21 +80,21 @@ const (
 	extensionPrefix = "gnostic-x-"
 )
 
-type PluginCall struct {
+type pluginCall struct {
 	Name       string
 	Invocation string
 }
 
 // Invokes a plugin.
-func (pluginCall *PluginCall) perform(document proto.Message, openAPIVersion int, sourceName string) error {
-	if pluginCall.Name != "" {
+func (p *pluginCall) perform(document proto.Message, openAPIVersion int, sourceName string) error {
+	if p.Name != "" {
 		request := &plugins.Request{}
 
 		// Infer the name of the executable by adding the prefix.
-		executableName := pluginPrefix + pluginCall.Name
+		executableName := pluginPrefix + p.Name
 
 		// Validate invocation string with regular expression.
-		invocation := pluginCall.Invocation
+		invocation := p.Invocation
 
 		//
 		// Plugin invocations must consist of
@@ -104,12 +104,12 @@ func (pluginCall *PluginCall) perform(document proto.Message, openAPIVersion int
 		// dashes, underscores, periods, or forward slashes.
 		// A path can contain any characters other than the separators ',', ':', and '='.
 		//
-		invocation_regex := regexp.MustCompile(`^([\w-_\/\.]+=[\w-_\/\.]+(,[\w-_\/\.]+=[\w-_\/\.]+)*:)?[^,:=]+$`)
-		if !invocation_regex.Match([]byte(pluginCall.Invocation)) {
-			return errors.New(fmt.Sprintf("Invalid invocation of %s: %s", executableName, invocation))
+		invocationRegex := regexp.MustCompile(`^([\w-_\/\.]+=[\w-_\/\.]+(,[\w-_\/\.]+=[\w-_\/\.]+)*:)?[^,:=]+$`)
+		if !invocationRegex.Match([]byte(p.Invocation)) {
+			return fmt.Errorf("Invalid invocation of %s: %s", executableName, invocation)
 		}
 
-		invocationParts := strings.Split(pluginCall.Invocation, ":")
+		invocationParts := strings.Split(p.Invocation, ":")
 		var outputLocation string
 		switch len(invocationParts) {
 		case 1:
@@ -139,9 +139,9 @@ func (pluginCall *PluginCall) perform(document proto.Message, openAPIVersion int
 		wrapper := &plugins.Wrapper{}
 		wrapper.Name = sourceName
 		switch openAPIVersion {
-		case OpenAPIv2:
+		case openAPIv2:
 			wrapper.Version = "v2"
-		case OpenAPIv3:
+		case openAPIv3:
 			wrapper.Version = "v3"
 		default:
 			wrapper.Version = "unknown"
@@ -165,22 +165,23 @@ func (pluginCall *PluginCall) perform(document proto.Message, openAPIVersion int
 		}
 
 		if response.Errors != nil {
-			return errors.New(fmt.Sprintf("Plugin error: %+v", response.Errors))
+			return fmt.Errorf("Plugin error: %+v", response.Errors)
 		}
 
 		// Write files to the specified directory.
 		var writer io.Writer
-		if outputLocation == "!" {
+		switch {
+		case outputLocation == "!":
 			// Write nothing.
-		} else if outputLocation == "-" {
+		case outputLocation == "-":
 			writer = os.Stdout
 			for _, file := range response.Files {
 				writer.Write([]byte("\n\n" + file.Name + " -------------------- \n"))
 				writer.Write(file.Data)
 			}
-		} else if isFile(outputLocation) {
-			return errors.New(fmt.Sprintf("Error, unable to overwrite %s\n", outputLocation))
-		} else {
+		case isFile(outputLocation):
+			return fmt.Errorf("unable to overwrite %s", outputLocation)
+		default: // write files into a directory named by outputLocation
 			if !isDirectory(outputLocation) {
 				os.Mkdir(outputLocation, 0755)
 			}
@@ -258,7 +259,7 @@ type Gnostic struct {
 	jsonOutputPath    string
 	errorOutputPath   string
 	resolveReferences bool
-	pluginCalls       []*PluginCall
+	pluginCalls       []*pluginCall
 	extensionHandlers []compiler.ExtensionHandler
 	openAPIVersion    int
 }
@@ -284,7 +285,7 @@ Options:
                       This could have problems with recursive definitions.
 `
 	// Initialize internal structures.
-	g.pluginCalls = make([]*PluginCall, 0)
+	g.pluginCalls = make([]*pluginCall, 0)
 	g.extensionHandlers = make([]compiler.ExtensionHandler, 0)
 	return g
 }
@@ -292,17 +293,17 @@ Options:
 // Parse command-line options.
 func (g *Gnostic) readOptions() {
 	// plugin processing matches patterns of the form "--PLUGIN-out=PATH" and "--PLUGIN_out=PATH"
-	plugin_regex := regexp.MustCompile("--(.+)[-_]out=(.+)")
+	pluginRegex := regexp.MustCompile("--(.+)[-_]out=(.+)")
 
 	// extension processing matches patterns of the form "--x-EXTENSION"
-	extension_regex := regexp.MustCompile("--x-(.+)")
+	extensionRegex := regexp.MustCompile("--x-(.+)")
 
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue // skip the tool name
 		}
 		var m [][]byte
-		if m = plugin_regex.FindSubmatch([]byte(arg)); m != nil {
+		if m = pluginRegex.FindSubmatch([]byte(arg)); m != nil {
 			pluginName := string(m[1])
 			invocation := string(m[2])
 			switch pluginName {
@@ -317,10 +318,10 @@ func (g *Gnostic) readOptions() {
 			case "errors":
 				g.errorOutputPath = invocation
 			default:
-				pluginCall := &PluginCall{Name: pluginName, Invocation: invocation}
-				g.pluginCalls = append(g.pluginCalls, pluginCall)
+				p := &pluginCall{Name: pluginName, Invocation: invocation}
+				g.pluginCalls = append(g.pluginCalls, p)
 			}
-		} else if m = extension_regex.FindSubmatch([]byte(arg)); m != nil {
+		} else if m = extensionRegex.FindSubmatch([]byte(arg)); m != nil {
 			extensionName := string(m[1])
 			extensionHandler := compiler.ExtensionHandler{Name: extensionPrefix + extensionName}
 			g.extensionHandlers = append(g.extensionHandlers, extensionHandler)
@@ -369,17 +370,17 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	}
 	// Determine the OpenAPI version.
 	g.openAPIVersion = getOpenAPIVersionFromInfo(info)
-	if g.openAPIVersion == OpenAPIvUnknown {
-		return nil, errors.New("Unable to identify OpenAPI version.")
+	if g.openAPIVersion == openAPIvUnknown {
+		return nil, errors.New("unable to identify OpenAPI version")
 	}
 	// Compile to the proto model.
-	if g.openAPIVersion == OpenAPIv2 {
+	if g.openAPIVersion == openAPIv2 {
 		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
-	} else if g.openAPIVersion == OpenAPIv3 {
+	} else if g.openAPIVersion == openAPIv3 {
 		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
@@ -392,18 +393,18 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 // Read an OpenAPI binary file.
 func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err error) {
 	// try to read an OpenAPI v3 document
-	document_v3 := &openapi_v3.Document{}
-	err = proto.Unmarshal(data, document_v3)
-	if err == nil && strings.HasPrefix(document_v3.Openapi, "3.0") {
-		g.openAPIVersion = OpenAPIv3
-		return document_v3, nil
+	documentV3 := &openapi_v3.Document{}
+	err = proto.Unmarshal(data, documentV3)
+	if err == nil && strings.HasPrefix(documentV3.Openapi, "3.0") {
+		g.openAPIVersion = openAPIv3
+		return documentV3, nil
 	}
 	// if that failed, try to read an OpenAPI v2 document
-	document_v2 := &openapi_v2.Document{}
-	err = proto.Unmarshal(data, document_v2)
-	if err == nil && strings.HasPrefix(document_v2.Swagger, "2.0") {
-		g.openAPIVersion = OpenAPIv2
-		return document_v2, nil
+	documentV2 := &openapi_v2.Document{}
+	err = proto.Unmarshal(data, documentV2)
+	if err == nil && strings.HasPrefix(documentV2.Swagger, "2.0") {
+		g.openAPIVersion = openAPIv2
+		return documentV2, nil
 	}
 	return nil, err
 }
@@ -431,13 +432,13 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	var rawInfo yaml.MapSlice
 	var ok bool
 	var err error
-	if g.openAPIVersion == OpenAPIv2 {
+	if g.openAPIVersion == openAPIv2 {
 		document := message.(*openapi_v2.Document)
 		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
 		if !ok {
 			rawInfo = nil
 		}
-	} else if g.openAPIVersion == OpenAPIv3 {
+	} else if g.openAPIVersion == openAPIv3 {
 		document := message.(*openapi_v3.Document)
 		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
 		if !ok {
@@ -476,10 +477,10 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 func (g *Gnostic) performActions(message proto.Message) (err error) {
 	// Optionally resolve internal references.
 	if g.resolveReferences {
-		if g.openAPIVersion == OpenAPIv2 {
+		if g.openAPIVersion == openAPIv2 {
 			document := message.(*openapi_v2.Document)
 			_, err = document.ResolveReferences(g.sourceName)
-		} else if g.openAPIVersion == OpenAPIv3 {
+		} else if g.openAPIVersion == openAPIv3 {
 			document := message.(*openapi_v3.Document)
 			_, err = document.ResolveReferences(g.sourceName)
 		}
@@ -500,8 +501,8 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 		g.writeJSONYAMLOutput(message)
 	}
 	// Call all specified plugins.
-	for _, pluginCall := range g.pluginCalls {
-		err := pluginCall.perform(message, g.openAPIVersion, g.sourceName)
+	for _, p := range g.pluginCalls {
+		err := p.perform(message, g.openAPIVersion, g.sourceName)
 		if err != nil {
 			writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 			defer os.Exit(-1) // run all plugins, even when some have errors
@@ -537,7 +538,7 @@ func (g *Gnostic) main() {
 			os.Exit(-1)
 		}
 	} else {
-		err = errors.New("Unknown file extension. 'json', 'yaml', and 'pb' are accepted.")
+		err = errors.New("unknown file extension. 'json', 'yaml', and 'pb' are accepted")
 		writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 		os.Exit(-1)
 	}

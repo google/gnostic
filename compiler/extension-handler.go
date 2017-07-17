@@ -29,10 +29,12 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// ExtensionHandler describes a binary that is called by the compiler to handle specification extensions.
 type ExtensionHandler struct {
 	Name string
 }
 
+// HandleExtension calls a binary extension handler.
 func HandleExtension(context *Context, in interface{}, extensionName string) (bool, *any.Any, error) {
 	handled := false
 	var errFromPlugin error

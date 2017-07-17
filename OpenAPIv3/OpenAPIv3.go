@@ -23,10 +23,12 @@ import (
 	"strings"
 )
 
+// Version returns the package name (and OpenAPI version).
 func Version() string {
 	return "openapi_v3"
 }
 
+// NewAdditionalPropertiesItem creates an object of type AdditionalPropertiesItem if possible, returning an error if not.
 func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*AdditionalPropertiesItem, error) {
 	errors := make([]error, 0)
 	x := &AdditionalPropertiesItem{}
@@ -36,12 +38,12 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewSchemaOrReference(m, compiler.NewContext("schemaOrReference", context))
-			if matching_error == nil {
+			t, matchingError := NewSchemaOrReference(m, compiler.NewContext("schemaOrReference", context))
+			if matchingError == nil {
 				x.Oneof = &AdditionalPropertiesItem_SchemaOrReference{SchemaOrReference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -57,6 +59,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewAny creates an object of type Any if possible, returning an error if not.
 func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	errors := make([]error, 0)
 	x := &Any{}
@@ -65,6 +68,7 @@ func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewAnyOrExpression creates an object of type AnyOrExpression if possible, returning an error if not.
 func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpression, error) {
 	errors := make([]error, 0)
 	x := &AnyOrExpression{}
@@ -74,12 +78,12 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewAny(m, compiler.NewContext("any", context))
-			if matching_error == nil {
+			t, matchingError := NewAny(m, compiler.NewContext("any", context))
+			if matchingError == nil {
 				x.Oneof = &AnyOrExpression_Any{Any: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -88,12 +92,12 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewExpression(m, compiler.NewContext("expression", context))
-			if matching_error == nil {
+			t, matchingError := NewExpression(m, compiler.NewContext("expression", context))
+			if matchingError == nil {
 				x.Oneof = &AnyOrExpression_Expression{Expression: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -104,6 +108,7 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewAnysOrExpressions creates an object of type AnysOrExpressions if possible, returning an error if not.
 func NewAnysOrExpressions(in interface{}, context *compiler.Context) (*AnysOrExpressions, error) {
 	errors := make([]error, 0)
 	x := &AnysOrExpressions{}
@@ -133,6 +138,7 @@ func NewAnysOrExpressions(in interface{}, context *compiler.Context) (*AnysOrExp
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewCallback creates an object of type Callback if possible, returning an error if not.
 func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 	errors := make([]error, 0)
 	x := &Callback{}
@@ -202,6 +208,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewCallbackOrReference creates an object of type CallbackOrReference if possible, returning an error if not.
 func NewCallbackOrReference(in interface{}, context *compiler.Context) (*CallbackOrReference, error) {
 	errors := make([]error, 0)
 	x := &CallbackOrReference{}
@@ -211,12 +218,12 @@ func NewCallbackOrReference(in interface{}, context *compiler.Context) (*Callbac
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewCallback(m, compiler.NewContext("callback", context))
-			if matching_error == nil {
+			t, matchingError := NewCallback(m, compiler.NewContext("callback", context))
+			if matchingError == nil {
 				x.Oneof = &CallbackOrReference_Callback{Callback: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -225,12 +232,12 @@ func NewCallbackOrReference(in interface{}, context *compiler.Context) (*Callbac
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &CallbackOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -241,6 +248,7 @@ func NewCallbackOrReference(in interface{}, context *compiler.Context) (*Callbac
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewCallbacksOrReferences creates an object of type CallbacksOrReferences if possible, returning an error if not.
 func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*CallbacksOrReferences, error) {
 	errors := make([]error, 0)
 	x := &CallbacksOrReferences{}
@@ -270,6 +278,7 @@ func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*Callb
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewComponents creates an object of type Components if possible, returning an error if not.
 func NewComponents(in interface{}, context *compiler.Context) (*Components, error) {
 	errors := make([]error, 0)
 	x := &Components{}
@@ -401,6 +410,7 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewContact creates an object of type Contact if possible, returning an error if not.
 func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 	errors := make([]error, 0)
 	x := &Contact{}
@@ -478,6 +488,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewDefaultType creates an object of type DefaultType if possible, returning an error if not.
 func NewDefaultType(in interface{}, context *compiler.Context) (*DefaultType, error) {
 	errors := make([]error, 0)
 	x := &DefaultType{}
@@ -512,6 +523,7 @@ func NewDefaultType(in interface{}, context *compiler.Context) (*DefaultType, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewDiscriminator creates an object of type Discriminator if possible, returning an error if not.
 func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator, error) {
 	errors := make([]error, 0)
 	x := &Discriminator{}
@@ -555,6 +567,7 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewDocument creates an object of type Document if possible, returning an error if not.
 func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	errors := make([]error, 0)
 	x := &Document{}
@@ -704,6 +717,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewEncoding creates an object of type Encoding if possible, returning an error if not.
 func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 	errors := make([]error, 0)
 	x := &Encoding{}
@@ -799,6 +813,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewEncodings creates an object of type Encodings if possible, returning an error if not.
 func NewEncodings(in interface{}, context *compiler.Context) (*Encodings, error) {
 	errors := make([]error, 0)
 	x := &Encodings{}
@@ -828,6 +843,7 @@ func NewEncodings(in interface{}, context *compiler.Context) (*Encodings, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExample creates an object of type Example if possible, returning an error if not.
 func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 	errors := make([]error, 0)
 	x := &Example{}
@@ -914,6 +930,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExampleOrReference creates an object of type ExampleOrReference if possible, returning an error if not.
 func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleOrReference, error) {
 	errors := make([]error, 0)
 	x := &ExampleOrReference{}
@@ -923,12 +940,12 @@ func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleO
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewExample(m, compiler.NewContext("example", context))
-			if matching_error == nil {
+			t, matchingError := NewExample(m, compiler.NewContext("example", context))
+			if matchingError == nil {
 				x.Oneof = &ExampleOrReference_Example{Example: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -937,12 +954,12 @@ func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleO
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &ExampleOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -953,6 +970,7 @@ func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleO
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExamples creates an object of type Examples if possible, returning an error if not.
 func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 	errors := make([]error, 0)
 	x := &Examples{}
@@ -972,6 +990,7 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExamplesOrReferences creates an object of type ExamplesOrReferences if possible, returning an error if not.
 func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*ExamplesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &ExamplesOrReferences{}
@@ -1001,6 +1020,7 @@ func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*Exampl
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExpression creates an object of type Expression if possible, returning an error if not.
 func NewExpression(in interface{}, context *compiler.Context) (*Expression, error) {
 	errors := make([]error, 0)
 	x := &Expression{}
@@ -1042,6 +1062,7 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExternalDocs creates an object of type ExternalDocs if possible, returning an error if not.
 func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, error) {
 	errors := make([]error, 0)
 	x := &ExternalDocs{}
@@ -1116,6 +1137,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeader creates an object of type Header if possible, returning an error if not.
 func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	errors := make([]error, 0)
 	x := &Header{}
@@ -1265,6 +1287,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeaderOrReference creates an object of type HeaderOrReference if possible, returning an error if not.
 func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrReference, error) {
 	errors := make([]error, 0)
 	x := &HeaderOrReference{}
@@ -1274,12 +1297,12 @@ func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrR
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewHeader(m, compiler.NewContext("header", context))
-			if matching_error == nil {
+			t, matchingError := NewHeader(m, compiler.NewContext("header", context))
+			if matchingError == nil {
 				x.Oneof = &HeaderOrReference_Header{Header: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -1288,12 +1311,12 @@ func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrR
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &HeaderOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -1304,6 +1327,7 @@ func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrR
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeaders creates an object of type Headers if possible, returning an error if not.
 func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	errors := make([]error, 0)
 	x := &Headers{}
@@ -1333,6 +1357,7 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeadersOrReferences creates an object of type HeadersOrReferences if possible, returning an error if not.
 func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*HeadersOrReferences, error) {
 	errors := make([]error, 0)
 	x := &HeadersOrReferences{}
@@ -1362,6 +1387,7 @@ func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*Headers
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewInfo creates an object of type Info if possible, returning an error if not.
 func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	errors := make([]error, 0)
 	x := &Info{}
@@ -1472,6 +1498,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewItemsItem creates an object of type ItemsItem if possible, returning an error if not.
 func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
 	errors := make([]error, 0)
 	x := &ItemsItem{}
@@ -1490,6 +1517,7 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewLicense creates an object of type License if possible, returning an error if not.
 func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	errors := make([]error, 0)
 	x := &License{}
@@ -1564,6 +1592,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewLink creates an object of type Link if possible, returning an error if not.
 func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 	errors := make([]error, 0)
 	x := &Link{}
@@ -1668,6 +1697,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewLinkOrReference creates an object of type LinkOrReference if possible, returning an error if not.
 func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrReference, error) {
 	errors := make([]error, 0)
 	x := &LinkOrReference{}
@@ -1677,12 +1707,12 @@ func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrRefer
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewLink(m, compiler.NewContext("link", context))
-			if matching_error == nil {
+			t, matchingError := NewLink(m, compiler.NewContext("link", context))
+			if matchingError == nil {
 				x.Oneof = &LinkOrReference_Link{Link: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -1691,12 +1721,12 @@ func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrRefer
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &LinkOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -1707,6 +1737,7 @@ func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrRefer
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewLinksOrReferences creates an object of type LinksOrReferences if possible, returning an error if not.
 func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrReferences, error) {
 	errors := make([]error, 0)
 	x := &LinksOrReferences{}
@@ -1736,6 +1767,7 @@ func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrRe
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewMediaType creates an object of type MediaType if possible, returning an error if not.
 func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error) {
 	errors := make([]error, 0)
 	x := &MediaType{}
@@ -1822,6 +1854,7 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewMediaTypes creates an object of type MediaTypes if possible, returning an error if not.
 func NewMediaTypes(in interface{}, context *compiler.Context) (*MediaTypes, error) {
 	errors := make([]error, 0)
 	x := &MediaTypes{}
@@ -1851,6 +1884,7 @@ func NewMediaTypes(in interface{}, context *compiler.Context) (*MediaTypes, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedAny creates an object of type NamedAny if possible, returning an error if not.
 func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	errors := make([]error, 0)
 	x := &NamedAny{}
@@ -1888,6 +1922,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedAnyOrExpression creates an object of type NamedAnyOrExpression if possible, returning an error if not.
 func NewNamedAnyOrExpression(in interface{}, context *compiler.Context) (*NamedAnyOrExpression, error) {
 	errors := make([]error, 0)
 	x := &NamedAnyOrExpression{}
@@ -1925,6 +1960,7 @@ func NewNamedAnyOrExpression(in interface{}, context *compiler.Context) (*NamedA
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedCallbackOrReference creates an object of type NamedCallbackOrReference if possible, returning an error if not.
 func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*NamedCallbackOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedCallbackOrReference{}
@@ -1962,6 +1998,7 @@ func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*Na
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedEncoding creates an object of type NamedEncoding if possible, returning an error if not.
 func NewNamedEncoding(in interface{}, context *compiler.Context) (*NamedEncoding, error) {
 	errors := make([]error, 0)
 	x := &NamedEncoding{}
@@ -1999,6 +2036,7 @@ func NewNamedEncoding(in interface{}, context *compiler.Context) (*NamedEncoding
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedExampleOrReference creates an object of type NamedExampleOrReference if possible, returning an error if not.
 func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*NamedExampleOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedExampleOrReference{}
@@ -2036,6 +2074,7 @@ func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*Nam
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedHeader creates an object of type NamedHeader if possible, returning an error if not.
 func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, error) {
 	errors := make([]error, 0)
 	x := &NamedHeader{}
@@ -2073,6 +2112,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedHeaderOrReference creates an object of type NamedHeaderOrReference if possible, returning an error if not.
 func NewNamedHeaderOrReference(in interface{}, context *compiler.Context) (*NamedHeaderOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedHeaderOrReference{}
@@ -2110,6 +2150,7 @@ func NewNamedHeaderOrReference(in interface{}, context *compiler.Context) (*Name
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedLinkOrReference creates an object of type NamedLinkOrReference if possible, returning an error if not.
 func NewNamedLinkOrReference(in interface{}, context *compiler.Context) (*NamedLinkOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedLinkOrReference{}
@@ -2147,6 +2188,7 @@ func NewNamedLinkOrReference(in interface{}, context *compiler.Context) (*NamedL
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedMediaType creates an object of type NamedMediaType if possible, returning an error if not.
 func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaType, error) {
 	errors := make([]error, 0)
 	x := &NamedMediaType{}
@@ -2184,6 +2226,7 @@ func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaTy
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedParameterOrReference creates an object of type NamedParameterOrReference if possible, returning an error if not.
 func NewNamedParameterOrReference(in interface{}, context *compiler.Context) (*NamedParameterOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedParameterOrReference{}
@@ -2221,6 +2264,7 @@ func NewNamedParameterOrReference(in interface{}, context *compiler.Context) (*N
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedPathItem creates an object of type NamedPathItem if possible, returning an error if not.
 func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem, error) {
 	errors := make([]error, 0)
 	x := &NamedPathItem{}
@@ -2258,6 +2302,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedRequestBodyOrReference creates an object of type NamedRequestBodyOrReference if possible, returning an error if not.
 func NewNamedRequestBodyOrReference(in interface{}, context *compiler.Context) (*NamedRequestBodyOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedRequestBodyOrReference{}
@@ -2295,6 +2340,7 @@ func NewNamedRequestBodyOrReference(in interface{}, context *compiler.Context) (
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedResponseOrReference creates an object of type NamedResponseOrReference if possible, returning an error if not.
 func NewNamedResponseOrReference(in interface{}, context *compiler.Context) (*NamedResponseOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedResponseOrReference{}
@@ -2332,6 +2378,7 @@ func NewNamedResponseOrReference(in interface{}, context *compiler.Context) (*Na
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedSchemaOrReference creates an object of type NamedSchemaOrReference if possible, returning an error if not.
 func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*NamedSchemaOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedSchemaOrReference{}
@@ -2369,6 +2416,7 @@ func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*Name
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedSecuritySchemeOrReference creates an object of type NamedSecuritySchemeOrReference if possible, returning an error if not.
 func NewNamedSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*NamedSecuritySchemeOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedSecuritySchemeOrReference{}
@@ -2406,6 +2454,7 @@ func NewNamedSecuritySchemeOrReference(in interface{}, context *compiler.Context
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedServerVariable creates an object of type NamedServerVariable if possible, returning an error if not.
 func NewNamedServerVariable(in interface{}, context *compiler.Context) (*NamedServerVariable, error) {
 	errors := make([]error, 0)
 	x := &NamedServerVariable{}
@@ -2443,6 +2492,7 @@ func NewNamedServerVariable(in interface{}, context *compiler.Context) (*NamedSe
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedString creates an object of type NamedString if possible, returning an error if not.
 func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, error) {
 	errors := make([]error, 0)
 	x := &NamedString{}
@@ -2480,6 +2530,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauthFlow creates an object of type OauthFlow if possible, returning an error if not.
 func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error) {
 	errors := make([]error, 0)
 	x := &OauthFlow{}
@@ -2566,6 +2617,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauthFlows creates an object of type OauthFlows if possible, returning an error if not.
 func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, error) {
 	errors := make([]error, 0)
 	x := &OauthFlows{}
@@ -2652,6 +2704,7 @@ func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewObject creates an object of type Object if possible, returning an error if not.
 func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 	errors := make([]error, 0)
 	x := &Object{}
@@ -2693,6 +2746,7 @@ func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOperation creates an object of type Operation if possible, returning an error if not.
 func NewOperation(in interface{}, context *compiler.Context) (*Operation, error) {
 	errors := make([]error, 0)
 	x := &Operation{}
@@ -2880,6 +2934,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewParameter creates an object of type Parameter if possible, returning an error if not.
 func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error) {
 	errors := make([]error, 0)
 	x := &Parameter{}
@@ -3053,6 +3108,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewParameterOrReference creates an object of type ParameterOrReference if possible, returning an error if not.
 func NewParameterOrReference(in interface{}, context *compiler.Context) (*ParameterOrReference, error) {
 	errors := make([]error, 0)
 	x := &ParameterOrReference{}
@@ -3062,12 +3118,12 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewParameter(m, compiler.NewContext("parameter", context))
-			if matching_error == nil {
+			t, matchingError := NewParameter(m, compiler.NewContext("parameter", context))
+			if matchingError == nil {
 				x.Oneof = &ParameterOrReference_Parameter{Parameter: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3076,12 +3132,12 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &ParameterOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3092,6 +3148,7 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewParametersOrReferences creates an object of type ParametersOrReferences if possible, returning an error if not.
 func NewParametersOrReferences(in interface{}, context *compiler.Context) (*ParametersOrReferences, error) {
 	errors := make([]error, 0)
 	x := &ParametersOrReferences{}
@@ -3121,6 +3178,7 @@ func NewParametersOrReferences(in interface{}, context *compiler.Context) (*Para
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewPathItem creates an object of type PathItem if possible, returning an error if not.
 func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	errors := make([]error, 0)
 	x := &PathItem{}
@@ -3302,6 +3360,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewPaths creates an object of type Paths if possible, returning an error if not.
 func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	errors := make([]error, 0)
 	x := &Paths{}
@@ -3371,6 +3430,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewProperties creates an object of type Properties if possible, returning an error if not.
 func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
 	errors := make([]error, 0)
 	x := &Properties{}
@@ -3400,6 +3460,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewReference creates an object of type Reference if possible, returning an error if not.
 func NewReference(in interface{}, context *compiler.Context) (*Reference, error) {
 	errors := make([]error, 0)
 	x := &Reference{}
@@ -3434,6 +3495,7 @@ func NewReference(in interface{}, context *compiler.Context) (*Reference, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewRequestBodiesOrReferences creates an object of type RequestBodiesOrReferences if possible, returning an error if not.
 func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*RequestBodiesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &RequestBodiesOrReferences{}
@@ -3463,6 +3525,7 @@ func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*R
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewRequestBody creates an object of type RequestBody if possible, returning an error if not.
 func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, error) {
 	errors := make([]error, 0)
 	x := &RequestBody{}
@@ -3546,6 +3609,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewRequestBodyOrReference creates an object of type RequestBodyOrReference if possible, returning an error if not.
 func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*RequestBodyOrReference, error) {
 	errors := make([]error, 0)
 	x := &RequestBodyOrReference{}
@@ -3555,12 +3619,12 @@ func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*Requ
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewRequestBody(m, compiler.NewContext("requestBody", context))
-			if matching_error == nil {
+			t, matchingError := NewRequestBody(m, compiler.NewContext("requestBody", context))
+			if matchingError == nil {
 				x.Oneof = &RequestBodyOrReference_RequestBody{RequestBody: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3569,12 +3633,12 @@ func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*Requ
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &RequestBodyOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3585,6 +3649,7 @@ func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*Requ
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponse creates an object of type Response if possible, returning an error if not.
 func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 	errors := make([]error, 0)
 	x := &Response{}
@@ -3677,6 +3742,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponseOrReference creates an object of type ResponseOrReference if possible, returning an error if not.
 func NewResponseOrReference(in interface{}, context *compiler.Context) (*ResponseOrReference, error) {
 	errors := make([]error, 0)
 	x := &ResponseOrReference{}
@@ -3686,12 +3752,12 @@ func NewResponseOrReference(in interface{}, context *compiler.Context) (*Respons
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewResponse(m, compiler.NewContext("response", context))
-			if matching_error == nil {
+			t, matchingError := NewResponse(m, compiler.NewContext("response", context))
+			if matchingError == nil {
 				x.Oneof = &ResponseOrReference_Response{Response: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3700,12 +3766,12 @@ func NewResponseOrReference(in interface{}, context *compiler.Context) (*Respons
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &ResponseOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3716,6 +3782,7 @@ func NewResponseOrReference(in interface{}, context *compiler.Context) (*Respons
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponses creates an object of type Responses if possible, returning an error if not.
 func NewResponses(in interface{}, context *compiler.Context) (*Responses, error) {
 	errors := make([]error, 0)
 	x := &Responses{}
@@ -3794,6 +3861,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponsesOrReferences creates an object of type ResponsesOrReferences if possible, returning an error if not.
 func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*ResponsesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &ResponsesOrReferences{}
@@ -3823,6 +3891,7 @@ func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*Respo
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSchema creates an object of type Schema if possible, returning an error if not.
 func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	errors := make([]error, 0)
 	x := &Schema{}
@@ -4272,6 +4341,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSchemaOrReference creates an object of type SchemaOrReference if possible, returning an error if not.
 func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrReference, error) {
 	errors := make([]error, 0)
 	x := &SchemaOrReference{}
@@ -4281,12 +4351,12 @@ func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrR
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewSchema(m, compiler.NewContext("schema", context))
-			if matching_error == nil {
+			t, matchingError := NewSchema(m, compiler.NewContext("schema", context))
+			if matchingError == nil {
 				x.Oneof = &SchemaOrReference_Schema{Schema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -4295,12 +4365,12 @@ func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrR
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &SchemaOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -4311,6 +4381,7 @@ func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrR
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSchemasOrReferences creates an object of type SchemasOrReferences if possible, returning an error if not.
 func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*SchemasOrReferences, error) {
 	errors := make([]error, 0)
 	x := &SchemasOrReferences{}
@@ -4340,6 +4411,7 @@ func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*Schemas
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecurityRequirement creates an object of type SecurityRequirement if possible, returning an error if not.
 func NewSecurityRequirement(in interface{}, context *compiler.Context) (*SecurityRequirement, error) {
 	errors := make([]error, 0)
 	x := &SecurityRequirement{}
@@ -4359,6 +4431,7 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecurityScheme creates an object of type SecurityScheme if possible, returning an error if not.
 func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecurityScheme, error) {
 	errors := make([]error, 0)
 	x := &SecurityScheme{}
@@ -4487,6 +4560,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecuritySchemeOrReference creates an object of type SecuritySchemeOrReference if possible, returning an error if not.
 func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*SecuritySchemeOrReference, error) {
 	errors := make([]error, 0)
 	x := &SecuritySchemeOrReference{}
@@ -4496,12 +4570,12 @@ func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*S
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewSecurityScheme(m, compiler.NewContext("securityScheme", context))
-			if matching_error == nil {
+			t, matchingError := NewSecurityScheme(m, compiler.NewContext("securityScheme", context))
+			if matchingError == nil {
 				x.Oneof = &SecuritySchemeOrReference_SecurityScheme{SecurityScheme: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -4510,12 +4584,12 @@ func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*S
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewReference(m, compiler.NewContext("reference", context))
-			if matching_error == nil {
+			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			if matchingError == nil {
 				x.Oneof = &SecuritySchemeOrReference_Reference{Reference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -4526,6 +4600,7 @@ func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*S
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecuritySchemesOrReferences creates an object of type SecuritySchemesOrReferences if possible, returning an error if not.
 func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (*SecuritySchemesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &SecuritySchemesOrReferences{}
@@ -4555,6 +4630,7 @@ func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewServer creates an object of type Server if possible, returning an error if not.
 func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 	errors := make([]error, 0)
 	x := &Server{}
@@ -4638,6 +4714,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewServerVariable creates an object of type ServerVariable if possible, returning an error if not.
 func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariable, error) {
 	errors := make([]error, 0)
 	x := &ServerVariable{}
@@ -4723,6 +4800,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewServerVariables creates an object of type ServerVariables if possible, returning an error if not.
 func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVariables, error) {
 	errors := make([]error, 0)
 	x := &ServerVariables{}
@@ -4752,6 +4830,7 @@ func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVaria
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSpecificationExtension creates an object of type SpecificationExtension if possible, returning an error if not.
 func NewSpecificationExtension(in interface{}, context *compiler.Context) (*SpecificationExtension, error) {
 	errors := make([]error, 0)
 	x := &SpecificationExtension{}
@@ -4786,6 +4865,7 @@ func NewSpecificationExtension(in interface{}, context *compiler.Context) (*Spec
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewStringArray creates an object of type StringArray if possible, returning an error if not.
 func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, error) {
 	errors := make([]error, 0)
 	x := &StringArray{}
@@ -4802,6 +4882,7 @@ func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewStrings creates an object of type Strings if possible, returning an error if not.
 func NewStrings(in interface{}, context *compiler.Context) (*Strings, error) {
 	errors := make([]error, 0)
 	x := &Strings{}
@@ -4827,6 +4908,7 @@ func NewStrings(in interface{}, context *compiler.Context) (*Strings, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewTag creates an object of type Tag if possible, returning an error if not.
 func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 	errors := make([]error, 0)
 	x := &Tag{}
@@ -4910,6 +4992,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewXml creates an object of type Xml if possible, returning an error if not.
 func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 	errors := make([]error, 0)
 	x := &Xml{}
@@ -5005,6 +5088,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside AdditionalPropertiesItem objects.
 func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5019,11 +5103,13 @@ func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Any objects.
 func (m *Any) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside AnyOrExpression objects.
 func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5047,6 +5133,7 @@ func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside AnysOrExpressions objects.
 func (m *AnysOrExpressions) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5060,6 +5147,7 @@ func (m *AnysOrExpressions) ResolveReferences(root string) (interface{}, error) 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Callback objects.
 func (m *Callback) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Path {
@@ -5081,6 +5169,7 @@ func (m *Callback) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside CallbackOrReference objects.
 func (m *CallbackOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5104,6 +5193,7 @@ func (m *CallbackOrReference) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside CallbacksOrReferences objects.
 func (m *CallbacksOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5117,6 +5207,7 @@ func (m *CallbacksOrReferences) ResolveReferences(root string) (interface{}, err
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Components objects.
 func (m *Components) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schemas != nil {
@@ -5184,6 +5275,7 @@ func (m *Components) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Contact objects.
 func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -5197,11 +5289,13 @@ func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside DefaultType objects.
 func (m *DefaultType) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Discriminator objects.
 func (m *Discriminator) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Mapping != nil {
@@ -5213,6 +5307,7 @@ func (m *Discriminator) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Document objects.
 func (m *Document) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Info != nil {
@@ -5274,6 +5369,7 @@ func (m *Document) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Encoding objects.
 func (m *Encoding) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Headers != nil {
@@ -5293,6 +5389,7 @@ func (m *Encoding) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Encodings objects.
 func (m *Encodings) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5306,6 +5403,7 @@ func (m *Encodings) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Example objects.
 func (m *Example) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5325,6 +5423,7 @@ func (m *Example) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ExampleOrReference objects.
 func (m *ExampleOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5348,11 +5447,13 @@ func (m *ExampleOrReference) ResolveReferences(root string) (interface{}, error)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Examples objects.
 func (m *Examples) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ExamplesOrReferences objects.
 func (m *ExamplesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5366,6 +5467,7 @@ func (m *ExamplesOrReferences) ResolveReferences(root string) (interface{}, erro
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Expression objects.
 func (m *Expression) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5379,6 +5481,7 @@ func (m *Expression) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ExternalDocs objects.
 func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -5392,6 +5495,7 @@ func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Header objects.
 func (m *Header) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
@@ -5429,6 +5533,7 @@ func (m *Header) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside HeaderOrReference objects.
 func (m *HeaderOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5452,6 +5557,7 @@ func (m *HeaderOrReference) ResolveReferences(root string) (interface{}, error) 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Headers objects.
 func (m *Headers) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5465,6 +5571,7 @@ func (m *Headers) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside HeadersOrReferences objects.
 func (m *HeadersOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5478,6 +5585,7 @@ func (m *HeadersOrReferences) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Info objects.
 func (m *Info) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Contact != nil {
@@ -5503,6 +5611,7 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ItemsItem objects.
 func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SchemaOrReference {
@@ -5516,6 +5625,7 @@ func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside License objects.
 func (m *License) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -5529,6 +5639,7 @@ func (m *License) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Link objects.
 func (m *Link) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Parameters != nil {
@@ -5560,6 +5671,7 @@ func (m *Link) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside LinkOrReference objects.
 func (m *LinkOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5583,6 +5695,7 @@ func (m *LinkOrReference) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside LinksOrReferences objects.
 func (m *LinksOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5596,6 +5709,7 @@ func (m *LinksOrReferences) ResolveReferences(root string) (interface{}, error) 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside MediaType objects.
 func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
@@ -5633,6 +5747,7 @@ func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside MediaTypes objects.
 func (m *MediaTypes) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5646,6 +5761,7 @@ func (m *MediaTypes) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedAny objects.
 func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5657,6 +5773,7 @@ func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedAnyOrExpression objects.
 func (m *NamedAnyOrExpression) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5668,6 +5785,7 @@ func (m *NamedAnyOrExpression) ResolveReferences(root string) (interface{}, erro
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedCallbackOrReference objects.
 func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5679,6 +5797,7 @@ func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedEncoding objects.
 func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5690,6 +5809,7 @@ func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedExampleOrReference objects.
 func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5701,6 +5821,7 @@ func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, e
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedHeader objects.
 func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5712,6 +5833,7 @@ func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedHeaderOrReference objects.
 func (m *NamedHeaderOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5723,6 +5845,7 @@ func (m *NamedHeaderOrReference) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedLinkOrReference objects.
 func (m *NamedLinkOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5734,6 +5857,7 @@ func (m *NamedLinkOrReference) ResolveReferences(root string) (interface{}, erro
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedMediaType objects.
 func (m *NamedMediaType) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5745,6 +5869,7 @@ func (m *NamedMediaType) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedParameterOrReference objects.
 func (m *NamedParameterOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5756,6 +5881,7 @@ func (m *NamedParameterOrReference) ResolveReferences(root string) (interface{},
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedPathItem objects.
 func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5767,6 +5893,7 @@ func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedRequestBodyOrReference objects.
 func (m *NamedRequestBodyOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5778,6 +5905,7 @@ func (m *NamedRequestBodyOrReference) ResolveReferences(root string) (interface{
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedResponseOrReference objects.
 func (m *NamedResponseOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5789,6 +5917,7 @@ func (m *NamedResponseOrReference) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedSchemaOrReference objects.
 func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5800,6 +5929,7 @@ func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedSecuritySchemeOrReference objects.
 func (m *NamedSecuritySchemeOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5811,6 +5941,7 @@ func (m *NamedSecuritySchemeOrReference) ResolveReferences(root string) (interfa
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedServerVariable objects.
 func (m *NamedServerVariable) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -5822,11 +5953,13 @@ func (m *NamedServerVariable) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedString objects.
 func (m *NamedString) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside OauthFlow objects.
 func (m *OauthFlow) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
@@ -5846,6 +5979,7 @@ func (m *OauthFlow) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside OauthFlows objects.
 func (m *OauthFlows) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Implicit != nil {
@@ -5883,6 +6017,7 @@ func (m *OauthFlows) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Object objects.
 func (m *Object) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5896,6 +6031,7 @@ func (m *Object) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Operation objects.
 func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
@@ -5957,6 +6093,7 @@ func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Parameter objects.
 func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
@@ -5994,6 +6131,7 @@ func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ParameterOrReference objects.
 func (m *ParameterOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6017,6 +6155,7 @@ func (m *ParameterOrReference) ResolveReferences(root string) (interface{}, erro
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ParametersOrReferences objects.
 func (m *ParametersOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6030,6 +6169,7 @@ func (m *ParametersOrReferences) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside PathItem objects.
 func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
@@ -6121,6 +6261,7 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Paths objects.
 func (m *Paths) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Path {
@@ -6142,6 +6283,7 @@ func (m *Paths) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Properties objects.
 func (m *Properties) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6155,6 +6297,7 @@ func (m *Properties) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Reference objects.
 func (m *Reference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
@@ -6167,6 +6310,7 @@ func (m *Reference) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside RequestBodiesOrReferences objects.
 func (m *RequestBodiesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6180,6 +6324,7 @@ func (m *RequestBodiesOrReferences) ResolveReferences(root string) (interface{},
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside RequestBody objects.
 func (m *RequestBody) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Content != nil {
@@ -6199,6 +6344,7 @@ func (m *RequestBody) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside RequestBodyOrReference objects.
 func (m *RequestBodyOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6222,6 +6368,7 @@ func (m *RequestBodyOrReference) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Response objects.
 func (m *Response) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Headers != nil {
@@ -6253,6 +6400,7 @@ func (m *Response) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ResponseOrReference objects.
 func (m *ResponseOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6276,6 +6424,7 @@ func (m *ResponseOrReference) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Responses objects.
 func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Default != nil {
@@ -6303,6 +6452,7 @@ func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ResponsesOrReferences objects.
 func (m *ResponsesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6316,6 +6466,7 @@ func (m *ResponsesOrReferences) ResolveReferences(root string) (interface{}, err
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Schema objects.
 func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Discriminator != nil {
@@ -6415,6 +6566,7 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SchemaOrReference objects.
 func (m *SchemaOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6438,6 +6590,7 @@ func (m *SchemaOrReference) ResolveReferences(root string) (interface{}, error) 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SchemasOrReferences objects.
 func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6451,11 +6604,13 @@ func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecurityRequirement objects.
 func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecurityScheme objects.
 func (m *SecurityScheme) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Flows != nil {
@@ -6475,6 +6630,7 @@ func (m *SecurityScheme) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecuritySchemeOrReference objects.
 func (m *SecuritySchemeOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6498,6 +6654,7 @@ func (m *SecuritySchemeOrReference) ResolveReferences(root string) (interface{},
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecuritySchemesOrReferences objects.
 func (m *SecuritySchemesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6511,6 +6668,7 @@ func (m *SecuritySchemesOrReferences) ResolveReferences(root string) (interface{
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Server objects.
 func (m *Server) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Variables != nil {
@@ -6530,6 +6688,7 @@ func (m *Server) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ServerVariable objects.
 func (m *ServerVariable) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -6543,6 +6702,7 @@ func (m *ServerVariable) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ServerVariables objects.
 func (m *ServerVariables) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6556,16 +6716,19 @@ func (m *ServerVariables) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SpecificationExtension objects.
 func (m *SpecificationExtension) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside StringArray objects.
 func (m *StringArray) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Strings objects.
 func (m *Strings) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6579,6 +6742,7 @@ func (m *Strings) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Tag objects.
 func (m *Tag) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
@@ -6598,6 +6762,7 @@ func (m *Tag) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Xml objects.
 func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
@@ -6611,6 +6776,7 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ToRawInfo returns a description of AdditionalPropertiesItem suitable for JSON or YAML export.
 func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// AdditionalPropertiesItem
@@ -6626,6 +6792,7 @@ func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Any suitable for JSON or YAML export.
 func (m *Any) ToRawInfo() interface{} {
 	var err error
 	var info1 []yaml.MapSlice
@@ -6646,6 +6813,7 @@ func (m *Any) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of AnyOrExpression suitable for JSON or YAML export.
 func (m *AnyOrExpression) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// AnyOrExpression
@@ -6662,6 +6830,7 @@ func (m *AnyOrExpression) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of AnysOrExpressions suitable for JSON or YAML export.
 func (m *AnysOrExpressions) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -6673,6 +6842,7 @@ func (m *AnysOrExpressions) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Callback suitable for JSON or YAML export.
 func (m *Callback) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Path != nil {
@@ -6690,6 +6860,7 @@ func (m *Callback) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of CallbackOrReference suitable for JSON or YAML export.
 func (m *CallbackOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// CallbackOrReference
@@ -6706,6 +6877,7 @@ func (m *CallbackOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of CallbacksOrReferences suitable for JSON or YAML export.
 func (m *CallbacksOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -6717,6 +6889,7 @@ func (m *CallbacksOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Components suitable for JSON or YAML export.
 func (m *Components) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Schemas != nil {
@@ -6764,6 +6937,7 @@ func (m *Components) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Contact suitable for JSON or YAML export.
 func (m *Contact) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -6784,6 +6958,7 @@ func (m *Contact) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of DefaultType suitable for JSON or YAML export.
 func (m *DefaultType) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// DefaultType
@@ -6802,6 +6977,7 @@ func (m *DefaultType) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Discriminator suitable for JSON or YAML export.
 func (m *Discriminator) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.PropertyName != "" {
@@ -6814,6 +6990,7 @@ func (m *Discriminator) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Document suitable for JSON or YAML export.
 func (m *Document) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Openapi != "" {
@@ -6868,6 +7045,7 @@ func (m *Document) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Encoding suitable for JSON or YAML export.
 func (m *Encoding) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.ContentType != "" {
@@ -6895,6 +7073,7 @@ func (m *Encoding) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Encodings suitable for JSON or YAML export.
 func (m *Encodings) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -6906,6 +7085,7 @@ func (m *Encodings) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Example suitable for JSON or YAML export.
 func (m *Example) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Summary != "" {
@@ -6927,6 +7107,7 @@ func (m *Example) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ExampleOrReference suitable for JSON or YAML export.
 func (m *ExampleOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// ExampleOrReference
@@ -6943,11 +7124,13 @@ func (m *ExampleOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Examples suitable for JSON or YAML export.
 func (m *Examples) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	return info
 }
 
+// ToRawInfo returns a description of ExamplesOrReferences suitable for JSON or YAML export.
 func (m *ExamplesOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -6959,6 +7142,7 @@ func (m *ExamplesOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Expression suitable for JSON or YAML export.
 func (m *Expression) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -6970,6 +7154,7 @@ func (m *Expression) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ExternalDocs suitable for JSON or YAML export.
 func (m *ExternalDocs) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -6987,6 +7172,7 @@ func (m *ExternalDocs) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Header suitable for JSON or YAML export.
 func (m *Header) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -7035,6 +7221,7 @@ func (m *Header) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of HeaderOrReference suitable for JSON or YAML export.
 func (m *HeaderOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// HeaderOrReference
@@ -7051,6 +7238,7 @@ func (m *HeaderOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Headers suitable for JSON or YAML export.
 func (m *Headers) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7062,6 +7250,7 @@ func (m *Headers) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of HeadersOrReferences suitable for JSON or YAML export.
 func (m *HeadersOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7073,6 +7262,7 @@ func (m *HeadersOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Info suitable for JSON or YAML export.
 func (m *Info) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Title != "" {
@@ -7104,6 +7294,7 @@ func (m *Info) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ItemsItem suitable for JSON or YAML export.
 func (m *ItemsItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if len(m.SchemaOrReference) != 0 {
@@ -7117,6 +7308,7 @@ func (m *ItemsItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of License suitable for JSON or YAML export.
 func (m *License) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7134,6 +7326,7 @@ func (m *License) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Link suitable for JSON or YAML export.
 func (m *Link) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.OperationRef != "" {
@@ -7166,6 +7359,7 @@ func (m *Link) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of LinkOrReference suitable for JSON or YAML export.
 func (m *LinkOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// LinkOrReference
@@ -7182,6 +7376,7 @@ func (m *LinkOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of LinksOrReferences suitable for JSON or YAML export.
 func (m *LinksOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7193,6 +7388,7 @@ func (m *LinksOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of MediaType suitable for JSON or YAML export.
 func (m *MediaType) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Schema != nil {
@@ -7220,6 +7416,7 @@ func (m *MediaType) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of MediaTypes suitable for JSON or YAML export.
 func (m *MediaTypes) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7231,6 +7428,7 @@ func (m *MediaTypes) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedAny suitable for JSON or YAML export.
 func (m *NamedAny) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7240,6 +7438,7 @@ func (m *NamedAny) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedAnyOrExpression suitable for JSON or YAML export.
 func (m *NamedAnyOrExpression) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7249,6 +7448,7 @@ func (m *NamedAnyOrExpression) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedCallbackOrReference suitable for JSON or YAML export.
 func (m *NamedCallbackOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7258,6 +7458,7 @@ func (m *NamedCallbackOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedEncoding suitable for JSON or YAML export.
 func (m *NamedEncoding) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7267,6 +7468,7 @@ func (m *NamedEncoding) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedExampleOrReference suitable for JSON or YAML export.
 func (m *NamedExampleOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7276,6 +7478,7 @@ func (m *NamedExampleOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedHeader suitable for JSON or YAML export.
 func (m *NamedHeader) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7285,6 +7488,7 @@ func (m *NamedHeader) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedHeaderOrReference suitable for JSON or YAML export.
 func (m *NamedHeaderOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7294,6 +7498,7 @@ func (m *NamedHeaderOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedLinkOrReference suitable for JSON or YAML export.
 func (m *NamedLinkOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7303,6 +7508,7 @@ func (m *NamedLinkOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedMediaType suitable for JSON or YAML export.
 func (m *NamedMediaType) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7312,6 +7518,7 @@ func (m *NamedMediaType) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedParameterOrReference suitable for JSON or YAML export.
 func (m *NamedParameterOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7321,6 +7528,7 @@ func (m *NamedParameterOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedPathItem suitable for JSON or YAML export.
 func (m *NamedPathItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7330,6 +7538,7 @@ func (m *NamedPathItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedRequestBodyOrReference suitable for JSON or YAML export.
 func (m *NamedRequestBodyOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7339,6 +7548,7 @@ func (m *NamedRequestBodyOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedResponseOrReference suitable for JSON or YAML export.
 func (m *NamedResponseOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7348,6 +7558,7 @@ func (m *NamedResponseOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedSchemaOrReference suitable for JSON or YAML export.
 func (m *NamedSchemaOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7357,6 +7568,7 @@ func (m *NamedSchemaOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedSecuritySchemeOrReference suitable for JSON or YAML export.
 func (m *NamedSecuritySchemeOrReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7366,6 +7578,7 @@ func (m *NamedSecuritySchemeOrReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedServerVariable suitable for JSON or YAML export.
 func (m *NamedServerVariable) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7375,6 +7588,7 @@ func (m *NamedServerVariable) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedString suitable for JSON or YAML export.
 func (m *NamedString) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7386,6 +7600,7 @@ func (m *NamedString) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of OauthFlow suitable for JSON or YAML export.
 func (m *OauthFlow) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AuthorizationUrl != "" {
@@ -7410,6 +7625,7 @@ func (m *OauthFlow) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of OauthFlows suitable for JSON or YAML export.
 func (m *OauthFlows) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Implicit != nil {
@@ -7437,6 +7653,7 @@ func (m *OauthFlows) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Object suitable for JSON or YAML export.
 func (m *Object) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7448,6 +7665,7 @@ func (m *Object) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Operation suitable for JSON or YAML export.
 func (m *Operation) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if len(m.Tags) != 0 {
@@ -7514,6 +7732,7 @@ func (m *Operation) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Parameter suitable for JSON or YAML export.
 func (m *Parameter) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7568,6 +7787,7 @@ func (m *Parameter) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ParameterOrReference suitable for JSON or YAML export.
 func (m *ParameterOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// ParameterOrReference
@@ -7584,6 +7804,7 @@ func (m *ParameterOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of ParametersOrReferences suitable for JSON or YAML export.
 func (m *ParametersOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7595,6 +7816,7 @@ func (m *ParametersOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of PathItem suitable for JSON or YAML export.
 func (m *PathItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.XRef != "" {
@@ -7663,6 +7885,7 @@ func (m *PathItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Paths suitable for JSON or YAML export.
 func (m *Paths) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Path != nil {
@@ -7680,6 +7903,7 @@ func (m *Paths) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Properties suitable for JSON or YAML export.
 func (m *Properties) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7691,6 +7915,7 @@ func (m *Properties) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Reference suitable for JSON or YAML export.
 func (m *Reference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.XRef != "" {
@@ -7699,6 +7924,7 @@ func (m *Reference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of RequestBodiesOrReferences suitable for JSON or YAML export.
 func (m *RequestBodiesOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7710,6 +7936,7 @@ func (m *RequestBodiesOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of RequestBody suitable for JSON or YAML export.
 func (m *RequestBody) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -7731,6 +7958,7 @@ func (m *RequestBody) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of RequestBodyOrReference suitable for JSON or YAML export.
 func (m *RequestBodyOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// RequestBodyOrReference
@@ -7747,6 +7975,7 @@ func (m *RequestBodyOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Response suitable for JSON or YAML export.
 func (m *Response) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -7773,6 +8002,7 @@ func (m *Response) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ResponseOrReference suitable for JSON or YAML export.
 func (m *ResponseOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// ResponseOrReference
@@ -7789,6 +8019,7 @@ func (m *ResponseOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Responses suitable for JSON or YAML export.
 func (m *Responses) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Default != nil {
@@ -7810,6 +8041,7 @@ func (m *Responses) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ResponsesOrReferences suitable for JSON or YAML export.
 func (m *ResponsesOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7821,6 +8053,7 @@ func (m *ResponsesOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Schema suitable for JSON or YAML export.
 func (m *Schema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Nullable != false {
@@ -7970,6 +8203,7 @@ func (m *Schema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of SchemaOrReference suitable for JSON or YAML export.
 func (m *SchemaOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// SchemaOrReference
@@ -7986,6 +8220,7 @@ func (m *SchemaOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of SchemasOrReferences suitable for JSON or YAML export.
 func (m *SchemasOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7997,11 +8232,13 @@ func (m *SchemasOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of SecurityRequirement suitable for JSON or YAML export.
 func (m *SecurityRequirement) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	return info
 }
 
+// ToRawInfo returns a description of SecurityScheme suitable for JSON or YAML export.
 func (m *SecurityScheme) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -8038,6 +8275,7 @@ func (m *SecurityScheme) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of SecuritySchemeOrReference suitable for JSON or YAML export.
 func (m *SecuritySchemeOrReference) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// SecuritySchemeOrReference
@@ -8054,6 +8292,7 @@ func (m *SecuritySchemeOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of SecuritySchemesOrReferences suitable for JSON or YAML export.
 func (m *SecuritySchemesOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8065,6 +8304,7 @@ func (m *SecuritySchemesOrReferences) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Server suitable for JSON or YAML export.
 func (m *Server) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Url != "" {
@@ -8086,6 +8326,7 @@ func (m *Server) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ServerVariable suitable for JSON or YAML export.
 func (m *ServerVariable) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if len(m.Enum) != 0 {
@@ -8106,6 +8347,7 @@ func (m *ServerVariable) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ServerVariables suitable for JSON or YAML export.
 func (m *ServerVariables) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8117,6 +8359,7 @@ func (m *ServerVariables) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of SpecificationExtension suitable for JSON or YAML export.
 func (m *SpecificationExtension) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// SpecificationExtension
@@ -8135,16 +8378,19 @@ func (m *SpecificationExtension) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of StringArray suitable for JSON or YAML export.
 func (m *StringArray) ToRawInfo() interface{} {
 	return m.Value
 }
 
+// ToRawInfo returns a description of Strings suitable for JSON or YAML export.
 func (m *Strings) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	// &{Name:additionalProperties Type:NamedString StringEnumValues:[] MapType:string Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
+// ToRawInfo returns a description of Tag suitable for JSON or YAML export.
 func (m *Tag) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -8166,6 +8412,7 @@ func (m *Tag) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Xml suitable for JSON or YAML export.
 func (m *Xml) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
