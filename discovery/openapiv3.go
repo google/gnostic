@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package discovery
 
 import (
@@ -231,7 +232,7 @@ func addOpenAPI3PathsForResource(d *pb.Document, resource *Resource) {
 	*/
 }
 
-// Return an OpenAPI v3 representation of this Discovery document
+// OpenAPIv3 returns an OpenAPI v3 representation of this Discovery document
 func (api *Document) OpenAPIv3() (*pb.Document, error) {
 	d := &pb.Document{}
 	d.Openapi = "3.0"

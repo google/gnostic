@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package discovery
 
 import (
@@ -116,21 +117,20 @@ func buildOpenAPI2ResponseForSchema(schema *Schema) *pb.Response {
 		return &pb.Response{
 			Description: "Successful operation",
 		}
-	} else {
-		ref := schema.Ref
-		if ref == "" {
-			log.Printf("WARNING: Unhandled response schema %+v", schema)
-		}
-		return &pb.Response{
-			Description: "Successful operation",
-			Schema: &pb.SchemaItem{
-				Oneof: &pb.SchemaItem_Schema{
-					Schema: &pb.Schema{
-						XRef: "#/definitions/" + ref,
-					},
+	}
+	ref := schema.Ref
+	if ref == "" {
+		log.Printf("WARNING: Unhandled response schema %+v", schema)
+	}
+	return &pb.Response{
+		Description: "Successful operation",
+		Schema: &pb.SchemaItem{
+			Oneof: &pb.SchemaItem_Schema{
+				Schema: &pb.Schema{
+					XRef: "#/definitions/" + ref,
 				},
 			},
-		}
+		},
 	}
 }
 
@@ -222,12 +222,11 @@ func addOpenAPI2PathsForResource(d *pb.Document, resource *Resource) {
 func removeTrailingSlash(path string) string {
 	if path[len(path)-1] == '/' {
 		return path[0 : len(path)-1]
-	} else {
-		return path
 	}
+	return path
 }
 
-// Return an OpenAPI v2 representation of this Discovery document
+// OpenAPIv2 returns an OpenAPI v2 representation of this Discovery document
 func (api *Document) OpenAPIv2() (*pb.Document, error) {
 	d := &pb.Document{}
 	d.Swagger = "2.0"

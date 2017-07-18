@@ -4,6 +4,7 @@
 //
 // Taken with minor modifications from
 //  https://github.com/google/google-api-go-client/blob/master/google-api-go-generator/internal/disco/disco.go
+
 package discovery
 
 import (
@@ -134,11 +135,13 @@ type Schema struct {
 	Kind      Kind    `json:"-"`
 }
 
+// Variant represents part of an API description.
 type Variant struct {
 	Discriminant string
 	Map          []*VariantMapItem
 }
 
+// VariantMapItem represents part of an API description.
 type VariantMapItem struct {
 	TypeValue string `json:"type_value"`
 	Ref       string `json:"$ref"`
@@ -265,13 +268,16 @@ const (
 	ReferenceKind
 )
 
+// Property represents part of an API description.
 type Property struct {
 	Name   string
 	Schema *Schema
 }
 
+// PropertyList represents part of an API description.
 type PropertyList []*Property
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (pl *PropertyList) UnmarshalJSON(data []byte) error {
 	// In the discovery doc, properties are a map. Convert to a list.
 	var m map[string]*Schema
@@ -287,8 +293,10 @@ func (pl *PropertyList) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ResourceList represents part of an API description.
 type ResourceList []*Resource
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (rl *ResourceList) UnmarshalJSON(data []byte) error {
 	// In the discovery doc, resources are a map. Convert to a list.
 	var m map[string]*Resource
@@ -326,8 +334,10 @@ func (r *Resource) init(parentFullName string, topLevelSchemas map[string]*Schem
 	return nil
 }
 
+// MethodList represents part of an API description.
 type MethodList []*Method
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (ml *MethodList) UnmarshalJSON(data []byte) error {
 	// In the discovery doc, resources are a map. Convert to a list.
 	var m map[string]*Method
@@ -361,12 +371,14 @@ type Method struct {
 	JSONMap map[string]interface{} `json:"-"`
 }
 
+// MediaUpload represents part of an API description.
 type MediaUpload struct {
 	Accept    []string
 	MaxSize   string
 	Protocols map[string]Protocol
 }
 
+// Protocol represents part of an API description.
 type Protocol struct {
 	Multipart bool
 	Path      string
@@ -382,6 +394,7 @@ func (m *Method) init(topLevelSchemas map[string]*Schema) error {
 	return nil
 }
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (m *Method) UnmarshalJSON(data []byte) error {
 	type T Method // avoid a recursive call to UnmarshalJSON
 	if err := json.Unmarshal(data, (*T)(m)); err != nil {
@@ -393,8 +406,10 @@ func (m *Method) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &m.JSONMap)
 }
 
+// ParameterList represents part of an API description.
 type ParameterList []*Parameter
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (pl *ParameterList) UnmarshalJSON(data []byte) error {
 	// In the discovery doc, resources are a map. Convert to a list.
 	var m map[string]*Parameter

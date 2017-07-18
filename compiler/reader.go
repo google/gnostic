@@ -53,7 +53,7 @@ func FetchFile(fileurl string) ([]byte, error) {
 		}
 		return bytes, nil
 	}
-	if VERBOSE_READER {
+	if verboseReader {
 		log.Printf("Fetching %s", fileurl)
 	}
 	response, err := http.Get(fileurl)
