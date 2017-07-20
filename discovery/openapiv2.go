@@ -220,7 +220,7 @@ func addOpenAPI2PathsForResource(d *pb.Document, resource *Resource) {
 }
 
 func removeTrailingSlash(path string) string {
-	if path[len(path)-1] == '/' {
+	if len(path) > 1 && path[len(path)-1] == '/' {
 		return path[0 : len(path)-1]
 	}
 	return path

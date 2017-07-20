@@ -38,22 +38,27 @@ func hasResponses(m *ServiceMethod) bool {
 	return m.ResponsesType != nil
 }
 
-func hasPathParameters(m *ServiceMethod) bool {
-	for _, field := range m.ParametersType.Fields {
-		if field.Position == "path" {
-			return true
+func hasParametersWithPosition(m *ServiceMethod, position string) bool {
+	if m.ParametersType != nil {
+		for _, field := range m.ParametersType.Fields {
+			if field.Position == position {
+				return true
+			}
 		}
 	}
 	return false
 }
 
+func hasPathParameters(m *ServiceMethod) bool {
+	return hasParametersWithPosition(m, "path")
+}
+
+func hasQueryParameters(m *ServiceMethod) bool {
+	return hasParametersWithPosition(m, "query")
+}
+
 func hasFormParameters(m *ServiceMethod) bool {
-	for _, field := range m.ParametersType.Fields {
-		if field.Position == "formdata" {
-			return true
-		}
-	}
-	return false
+	return hasParametersWithPosition(m, "formdata")
 }
 
 func goType(openapiType string) string {
@@ -79,9 +84,11 @@ func parameterList(m *ServiceMethod) string {
 }
 
 func bodyParameterName(m *ServiceMethod) string {
-	for _, field := range m.ParametersType.Fields {
-		if field.Position == "body" {
-			return field.JSONName
+	if m.ParametersType != nil {
+		for _, field := range m.ParametersType.Fields {
+			if field.Position == "body" {
+				return field.JSONName
+			}
 		}
 	}
 	return ""
@@ -90,7 +97,7 @@ func bodyParameterName(m *ServiceMethod) string {
 func bodyParameterFieldName(m *ServiceMethod) string {
 	for _, field := range m.ParametersType.Fields {
 		if field.Position == "body" {
-			return field.Name
+			return field.FieldName
 		}
 	}
 	return ""
@@ -114,6 +121,7 @@ func templateHelpers() template.FuncMap {
 		"hasFieldNamedDefault":   hasFieldNamedDefault,
 		"hasParameters":          hasParameters,
 		"hasPathParameters":      hasPathParameters,
+		"hasQueryParameters":     hasQueryParameters,
 		"hasFormParameters":      hasFormParameters,
 		"hasResponses":           hasResponses,
 		"goType":                 goType,

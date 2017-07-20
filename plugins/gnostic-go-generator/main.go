@@ -19,10 +19,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 
@@ -30,30 +32,40 @@ import (
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
-// Helper: if error is not nil, record it, serializes and returns the response and exits
-func sendAndExitIfError(err error, response *plugins.Response) {
+var outputPath string // if nonempty, the plugin is run standalone
+
+// respondAndExitIfError checks an error and if it is non-nil, records it and serializes and returns the response and then exits.
+func respondAndExitIfError(err error, response *plugins.Response) {
 	if err != nil {
 		response.Errors = append(response.Errors, err.Error())
-		sendAndExit(response)
+		respondAndExit(response)
 	}
 }
 
-// Helper: serializes and returns the response
-func sendAndExit(response *plugins.Response) {
-	responseBytes, _ := proto.Marshal(response)
-	os.Stdout.Write(responseBytes)
+// respondAndExit serializes and returns the plugin response and then exits.
+func respondAndExit(response *plugins.Response) {
+	if outputPath != "" {
+		err := plugins.HandleResponse(response, outputPath)
+		if err != nil {
+			log.Printf("%s", err.Error())
+		}
+	} else {
+		responseBytes, _ := proto.Marshal(response)
+		os.Stdout.Write(responseBytes)
+	}
 	os.Exit(0)
 }
 
 // This is the main function for the code generation plugin.
 func main() {
+	invocation := os.Args[0]
 
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
-	switch os.Args[0] {
-	case "gnostic_go_client":
+	switch {
+	case strings.Contains(invocation, "gnostic-go-client"):
 		files = []string{"client.go", "types.go"}
-	case "gnostic_go_server":
+	case strings.Contains(invocation, "gnostic-go-server"):
 		files = []string{"server.go", "provider.go", "types.go"}
 	default:
 		files = []string{"client.go", "server.go", "provider.go", "types.go"}
@@ -61,50 +73,72 @@ func main() {
 
 	// Initialize the plugin response.
 	response := &plugins.Response{}
+	var packageName string
+	var document *openapi.Document
 
-	// Read the plugin input.
-	data, err := ioutil.ReadAll(os.Stdin)
-	sendAndExitIfError(err, response)
-	if len(data) == 0 {
-		sendAndExitIfError(fmt.Errorf("no input data"), response)
-	}
-
-	// Deserialize the input.
-	request := &plugins.Request{}
-	err = proto.Unmarshal(data, request)
-	sendAndExitIfError(err, response)
-
-	// Collect parameters passed to the plugin.
-	invocation := os.Args[0]
-	parameters := request.Parameters
-	packageName := request.OutputPath // the default package name is the output directory
-	for _, parameter := range parameters {
-		invocation += " " + parameter.Name + "=" + parameter.Value
-		if parameter.Name == "package" {
-			packageName = parameter.Value
+	if len(os.Args) == 1 {
+		// Read the plugin input.
+		data, err := ioutil.ReadAll(os.Stdin)
+		respondAndExitIfError(err, response)
+		if len(data) == 0 {
+			respondAndExitIfError(fmt.Errorf("no input data"), response)
 		}
+
+		// Deserialize the input.
+		request := &plugins.Request{}
+		err = proto.Unmarshal(data, request)
+		respondAndExitIfError(err, response)
+
+		// Collect parameters passed to the plugin.
+		parameters := request.Parameters
+		packageName = request.OutputPath // the default package name is the output directory
+		for _, parameter := range parameters {
+			invocation += " " + parameter.Name + "=" + parameter.Value
+			if parameter.Name == "package" {
+				packageName = parameter.Value
+			}
+		}
+
+		// Log the invocation.
+		log.Printf("Running %s(input:%s)", invocation, request.Wrapper.Version)
+
+		// Read the document sent by the plugin.
+		if request.Wrapper.Version != "v2" {
+			err = fmt.Errorf("Unsupported OpenAPI version %s", request.Wrapper.Version)
+			respondAndExitIfError(err, response)
+		}
+		document = &openapi.Document{}
+		err = proto.Unmarshal(request.Wrapper.Value, document)
+		respondAndExitIfError(err, response)
+	} else {
+		input := flag.String("input", "", "OpenAPI input (pb)")
+		output := flag.String("output", "-", "output path")
+		flag.Parse()
+		outputPath = *output
+		packageName = outputPath
+
+		// Read the input document.
+		data, err := ioutil.ReadFile(*input)
+		if len(data) == 0 {
+			respondAndExitIfError(fmt.Errorf("no input data"), response)
+		}
+		document = &openapi.Document{}
+		err = proto.Unmarshal(data, document)
+		respondAndExitIfError(err, response)
 	}
 
-	// Log the invocation.
-	log.Printf("Running %s(input:%s)", invocation, request.Wrapper.Version)
-
-	// Read the document sent by the plugin and use it to generate client/server code.
-	if request.Wrapper.Version != "v2" {
-		err = fmt.Errorf("Unsupported OpenAPI version %s", request.Wrapper.Version)
-		sendAndExitIfError(err, response)
-	}
-	document := &openapi.Document{}
-	err = proto.Unmarshal(request.Wrapper.Value, document)
-	sendAndExitIfError(err, response)
+	// Create the model.
+	model, err := NewServiceModel(document, packageName)
+	respondAndExitIfError(err, response)
 
 	// Create the renderer.
-	renderer, err := NewServiceRenderer(document, packageName)
-	sendAndExitIfError(err, response)
+	renderer, err := NewServiceRenderer(model)
+	respondAndExitIfError(err, response)
 
 	// Run the renderer to generate files and add them to the response object.
 	err = renderer.Generate(response, files)
-	sendAndExitIfError(err, response)
+	respondAndExitIfError(err, response)
 
 	// Return with success.
-	sendAndExit(response)
+	respondAndExit(response)
 }

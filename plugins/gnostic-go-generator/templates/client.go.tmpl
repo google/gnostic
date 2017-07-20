@@ -1,19 +1,21 @@
 // GENERATED FILE: DO NOT EDIT!
 
-package {{.Renderer.Package}}
+package {{.Model.Package}}
 
 import (
   "bytes"
-  "errors"
   "encoding/json"
   "fmt"
+  "io/ioutil"
   "net/http"
+  "net/url"
   "strings"
 )
   
 // API client representation.
 type Client struct {
 	service string
+	APIKey string
 } 
 
 // Create an API client.
@@ -23,20 +25,30 @@ func NewClient(service string) *Client {
 	return client
 }
 
-//-{{range .Renderer.Methods}}
+//-{{range .Model.Methods}}
 {{commentForText .Description}}
 //-{{if eq .ResultTypeName ""}}
 func (client *Client) {{.ClientName}}({{parameterList .}}) (err error) {
 //-{{else}}
-func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTypeName}}, err error) {
+func (client *Client) {{.ClientName}}({{parameterList .}}) (response *{{.ResultTypeName}}, err error) {
 //-{{end}}
 	path := client.service + "{{.Path}}"
-	//-{{if hasParameters .}}
+	//-{{if hasPathParameters .}}
 	//-{{range .ParametersType.Fields}}	
 	//-{{if eq .Position "path"}}
-	path = strings.Replace(path, "{" + "{{.JSONName}}" + "}", fmt.Sprintf("%v", {{.JSONName}}), 1)
+	path = strings.Replace(path, "{" + "{{.Name}}" + "}", fmt.Sprintf("%v", {{.ParameterName}}), 1)
+	//-{{end}}
+   	//-{{end}}
+    //-{{end}}
+   	//-{{if hasQueryParameters .}}
+   	v := url.Values{}
+	//-{{range .ParametersType.Fields}}	
+	//-{{if eq .Position "query"}}
+    v.Set("{{.Name}}", {{.ParameterName}})
 	//-{{end}}
 	//-{{end}}
+    v.Set("key", client.APIKey)
+    path = path + "?" + v.Encode()
 	//-{{end}}
 	//-{{if eq .Method "POST"}}
 	body := new(bytes.Buffer)
@@ -52,16 +64,21 @@ func (client *Client) {{.ClientName}}({{parameterList .}}) (result *{{.ResultTyp
 	if err != nil {
 		return
 	}
+    response = &{{.ResultTypeName}}{}
+	//-{{range .ResponsesType.Fields}}
+	//-{{if eq .Name "Default"}}
 	if resp.StatusCode == 200 {
-		defer resp.Body.Close()
-		//-{{if ne .ResultTypeName ""}}
-		decoder := json.NewDecoder(resp.Body)
-		result = &{{.ResultTypeName}}{}
-		decoder.Decode(result)
-		//-{{end}}
-	} else {
-		err = errors.New(resp.Status)
-	}
+    		defer resp.Body.Close()
+    		body, err := ioutil.ReadAll(resp.Body)
+            fmt.Printf("%v %s\n", err, string(body))
+    		result := &{{.ValueType}}{}
+            err = json.Unmarshal(body, result)
+    		decoder := json.NewDecoder(resp.Body)
+    		err = decoder.Decode(result)
+    		response.{{.Name}} = result
+    }
+	//-{{end}}
+	//-{{end}}
 	return
 }
 

@@ -1,6 +1,6 @@
 // GENERATED FILE: DO NOT EDIT!
 
-package {{.Renderer.Package}}
+package {{.Model.Package}}
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ func intValue(s string) (v int64) {
 var provider Provider
 
 // These handlers serve API methods.
-//-{{range .Renderer.Methods}}
+//-{{range .Model.Methods}}
 
 // Handler
 {{commentForText .Description}}
@@ -50,12 +50,12 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 	//-{{range .ParametersType.Fields}}	
 	//-{{if eq .Position "path"}}
 	if value, ok := vars["{{.JSONName}}"]; ok {
-		parameters.{{.Name}} = intValue(value)
+		parameters.{{.FieldName}} = intValue(value)
 	}
 	//-{{end}}	
 	//-{{if eq .Position "formdata"}}
 	if len(r.Form["{{.JSONName}}"]) > 0 {
-		parameters.{{.Name}} = intValue(r.Form["{{.JSONName}}"][0])
+		parameters.{{.FieldName}} = intValue(r.Form["{{.JSONName}}"][0])
 	}
 	//-{{end}}
 	//-{{end}}
@@ -90,8 +90,9 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 		//-{{end}}
 		//-{{ if .ResponsesType | hasFieldNamedDefault }}		
 		if responses.Default != nil {
-			w.WriteHeader(int(responses.Default.Code))
-			w.Write([]byte(responses.Default.Message + "\n"))
+            // write the normal response
+			encoder := json.NewEncoder(w)
+			encoder.Encode(responses.Default)
 			return
 		}
 		//-{{end}}
@@ -107,7 +108,7 @@ func {{.HandlerName}}(w http.ResponseWriter, r *http.Request) {
 // Initialize the API service.
 func Initialize(p Provider) {
 	provider = p
-	var router = mux.NewRouter(){{range .Renderer.Methods}}
+	var router = mux.NewRouter(){{range .Model.Methods}}
 	router.HandleFunc("{{.Path}}", {{.HandlerName}}).Methods("{{.Method}}"){{end}}
 	http.Handle("/", router)
 }
@@ -115,7 +116,7 @@ func Initialize(p Provider) {
 // Provide the API service over HTTP.
 func ServeHTTP(address string) error {
 	if provider == nil {
-		return errors.New("Use {{.Renderer.Package}}.Initialize() to set a service provider.")
+		return errors.New("Use {{.Model.Package}}.Initialize() to set a service provider.")
 	}
 	return http.ListenAndServe(address, nil)
 }

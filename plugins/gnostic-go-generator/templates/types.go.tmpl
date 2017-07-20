@@ -1,14 +1,15 @@
 // GENERATED FILE: DO NOT EDIT!
 
-package {{.Renderer.Package}}
+package {{.Model.Package}}
 
 // Types used by the API.
-//-{{range .Renderer.Types}}
+//-{{range .Model.Types}}
 
+// {{.Description}}
 //-{{if eq .Kind "struct"}}
 type {{.Name}} struct { 
 //-{{range .Fields}}
-  {{.Name}} {{goType .Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`
+  {{.FieldName}} {{goType .Type}}{{if ne .JSONName ""}} `json:"{{.JSONName}}"`
 //-{{end}}
 //-{{end}}
 }
