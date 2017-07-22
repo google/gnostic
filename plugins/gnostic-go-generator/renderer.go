@@ -73,11 +73,13 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 
 		switch filename {
 		case "client.go":
-			// new renderer
 			file.Data, err = renderer.GenerateClient()
 		case "types.go":
-			// new renderer
 			file.Data, err = renderer.GenerateTypes()
+		case "provider.go":
+			file.Data, err = renderer.GenerateProvider()
+		case "server.go":
+			file.Data, err = renderer.GenerateServer()
 		default:
 			t := renderer.Templates[filename]
 			log.Printf("Generating %s", filename)
