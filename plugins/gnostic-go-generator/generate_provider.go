@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!\n")
@@ -12,32 +14,34 @@ func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
 		f.WriteLine(``)
 		f.WriteLine(`// Provider`)
 		f.WriteLine(commentForText(method.Description))
-		if hasParameters(method) {
-			if hasResponses(method) {
+		if method.hasParameters() {
+			if method.hasResponses() {
 				f.WriteLine(method.ProcessorName +
-					`(parameters *` +
-					method.ParametersTypeName +
-					`, responses *` +
-					method.ResponsesTypeName +
-					`) (err error)`)
+					`(parameters *` + method.ParametersTypeName +
+					`, responses *` + method.ResponsesTypeName + `) (err error)`)
 			} else {
-				f.WriteLine(method.ProcessorName +
-					`(parameters *` +
-					method.ParametersTypeName +
-					`) (err error)`)
+				f.WriteLine(method.ProcessorName + `(parameters *` + method.ParametersTypeName + `) (err error)`)
 			}
 		} else {
-			if hasResponses(method) {
-				f.WriteLine(method.ProcessorName +
-					`(responses *` +
-					method.ResponsesTypeName +
-					`) (err error)`)
+			if method.hasResponses() {
+				f.WriteLine(method.ProcessorName + `(responses *` + method.ResponsesTypeName + `) (err error)`)
 			} else {
-				f.WriteLine(method.ProcessorName +
-					`() (err error)`)
+				f.WriteLine(method.ProcessorName + `() (err error)`)
 			}
 		}
 	}
 	f.WriteLine(`}`)
 	return f.Bytes(), nil
+}
+
+func commentForText(text string) string {
+	result := ""
+	lines := strings.Split(text, "\n")
+	for i, line := range lines {
+		if i > 0 {
+			result += "\n"
+		}
+		result += "// " + line
+	}
+	return result
 }

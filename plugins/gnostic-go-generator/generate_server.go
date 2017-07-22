@@ -2,7 +2,7 @@ package main
 
 func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 	f := NewLineWriter()
-	f.WriteLine("// GENERATED FILE: DO NOT EDIT!\n")
+	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
 	f.WriteLine(``)
 	f.WriteLine("package " + renderer.Model.Package)
 	f.WriteLine(``)
@@ -37,13 +37,13 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 		f.WriteLine(commentForText(method.Description))
 		f.WriteLine(`func ` + method.HandlerName + `(w http.ResponseWriter, r *http.Request) {`)
 		f.WriteLine(`  var err error`)
-		if hasParameters(method) {
+		if method.hasParameters() {
 			f.WriteLine(`// instantiate the parameters structure`)
 			f.WriteLine(`parameters := &` + method.ParametersTypeName + `{}`)
 			if method.Method == "POST" {
 				f.WriteLine(`// deserialize request from post data`)
 				f.WriteLine(`decoder := json.NewDecoder(r.Body)`)
-				f.WriteLine(`err = decoder.Decode(&parameters.` + bodyParameterFieldName(method) + `)`)
+				f.WriteLine(`err = decoder.Decode(&parameters.` + method.bodyParameterFieldName() + `)`)
 				f.WriteLine(`if err != nil {`)
 				f.WriteLine(`	w.WriteHeader(http.StatusBadRequest)`)
 				f.WriteLine(`	w.Write([]byte(err.Error() + "\n"))`)
@@ -51,10 +51,10 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 				f.WriteLine(`}`)
 			}
 			f.WriteLine(`// get request fields in path and query parameters`)
-			if hasPathParameters(method) {
+			if method.hasParametersWithPosition("path") {
 				f.WriteLine(`vars := mux.Vars(r)`)
 			}
-			if hasFormParameters(method) {
+			if method.hasParametersWithPosition("formdata") {
 				f.WriteLine(`r.ParseForm()`)
 			}
 			for _, field := range method.ParametersType.Fields {
@@ -69,27 +69,29 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 				}
 			}
 		}
-		if hasResponses(method) {
+		if method.hasResponses() {
 			f.WriteLine(`// instantiate the responses structure`)
 			f.WriteLine(`responses := &` + method.ResponsesTypeName + `{}`)
 		}
 		f.WriteLine(`// call the service provider`)
-		if hasParameters(method) {
-			if hasResponses(method) {
-				f.WriteLine(`err = provider.` + method.ProcessorName + `(parameters, responses)`)
+		callLine := `err = provider.` + method.ProcessorName
+		if method.hasParameters() {
+			if method.hasResponses() {
+				callLine += `(parameters, responses)`
 			} else {
-				f.WriteLine(`err = provider.` + method.ProcessorName + `(parameters)`)
+				callLine += `(parameters)`
 			}
 		} else {
-			if hasResponses(method) {
-				f.WriteLine(`err = provider.` + method.ProcessorName + `(responses)`)
+			if method.hasResponses() {
+				callLine += `(responses)`
 			} else {
-				f.WriteLine(`err = provider.` + method.ProcessorName + `()`)
+				callLine += `()`
 			}
 		}
+		f.WriteLine(callLine)
 		f.WriteLine(`if err == nil {`)
-		if hasResponses(method) {
-			if hasFieldNamedOK(method.ResponsesType) {
+		if method.hasResponses() {
+			if method.ResponsesType.hasFieldWithName("OK") {
 				f.WriteLine(`if responses.OK != nil {`)
 				f.WriteLine(`  // write the normal response`)
 				f.WriteLine(`  encoder := json.NewEncoder(w)`)
@@ -97,19 +99,17 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 				f.WriteLine(`  return`)
 				f.WriteLine(`}`)
 			}
-			if hasFieldNamedDefault(method.ResponsesType) {
+			if method.ResponsesType.hasFieldWithName("Default") {
 				f.WriteLine(`if responses.Default != nil {`)
 				f.WriteLine(`  // write the error response`)
-				f.WriteLine(`  w.WriteHeader(int(responses.Default.Code))`)
+				if method.ResponsesType.fieldWithName("Default").serviceType(renderer.Model).fieldWithName("Code") != nil {
+					f.WriteLine(`  w.WriteHeader(int(responses.Default.Code))`)
+				}
 				f.WriteLine(`  encoder := json.NewEncoder(w)`)
 				f.WriteLine(`  encoder.Encode(responses.Default)`)
 				f.WriteLine(`  return`)
 				f.WriteLine(`}`)
 			}
-			f.WriteLine(``)
-			f.WriteLine(``)
-			f.WriteLine(``)
-			f.WriteLine(``)
 		}
 		f.WriteLine(`} else {`)
 		f.WriteLine(`  w.WriteHeader(http.StatusInternalServerError)`)

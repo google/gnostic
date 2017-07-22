@@ -24,7 +24,7 @@ import (
 
 const newline = "\n"
 
-// ServiceRenderer reads an OpenAPI document and generates code.
+// ServiceRenderer generates code for a ServiceModel.
 type ServiceRenderer struct {
 	Model     *ServiceModel
 }

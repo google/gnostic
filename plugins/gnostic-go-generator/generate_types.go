@@ -27,3 +27,12 @@ func jsonTag(field *ServiceTypeField) string {
 	}
 	return ""
 }
+
+func goType(openapiType string) string {
+	switch openapiType {
+	case "number":
+		return "int"
+	default:
+		return openapiType
+	}
+}
