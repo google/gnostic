@@ -16,7 +16,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"path"
 	"strings"
 	"unicode"
@@ -219,7 +218,6 @@ func (renderer *ServiceModel) loadServiceTypeFromParameters(name string, paramet
 					f.Type = queryParameter.Type
 					f.NativeType = f.Type
 					f.Position = "query"
-					log.Printf("query parameter %+v\n", f)
 				}
 				pathParameter := nonBodyParameter.GetPathParameterSubSchema()
 				if pathParameter != nil {
@@ -254,8 +252,6 @@ func (renderer *ServiceModel) loadServiceTypeFromResponses(m *ServiceMethod, nam
 	t.Fields = make([]*ServiceTypeField, 0)
 
 	m.ResultTypeName = t.Name
-
-	log.Printf("%+v\n", responses)
 
 	for _, responseCode := range responses.ResponseCode {
 		var f ServiceTypeField

@@ -15,13 +15,9 @@
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
 	"fmt"
-	"log"
 	_ "os"
 	"path/filepath"
-	"text/template"
 
 	plugins "github.com/googleapis/gnostic/plugins"
 )
@@ -30,7 +26,6 @@ const newline = "\n"
 
 // ServiceRenderer reads an OpenAPI document and generates code.
 type ServiceRenderer struct {
-	Templates map[string]*template.Template
 	Model     *ServiceModel
 }
 
@@ -38,39 +33,13 @@ type ServiceRenderer struct {
 func NewServiceRenderer(model *ServiceModel) (renderer *ServiceRenderer, err error) {
 	renderer = &ServiceRenderer{}
 	renderer.Model = model
-	// Load templates.
-	err = renderer.loadTemplates(templates())
-	if err != nil {
-		return nil, err
-	}
 	return renderer, nil
-}
-
-// loadTemplates loads templates that will be used by the renderer.
-func (renderer *ServiceRenderer) loadTemplates(files map[string]string) (err error) {
-	helpers := templateHelpers()
-	renderer.Templates = make(map[string]*template.Template, 0)
-	for filename, encoding := range files {
-		templateData, err := base64.StdEncoding.DecodeString(encoding)
-		if err != nil {
-			return err
-		}
-		t, err := template.New(filename).Funcs(helpers).Parse(string(templateData))
-		if err != nil {
-			return err
-		}
-		renderer.Templates[filename] = t
-	}
-	return err
 }
 
 // Generate runs the renderer to generate the named files.
 func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
 	for _, filename := range files {
-		file := &plugins.File{}
-		file.Name = filename
-		f := new(bytes.Buffer)
-
+		file := &plugins.File{Name: filename}
 		switch filename {
 		case "client.go":
 			file.Data, err = renderer.GenerateClient()
@@ -81,28 +50,14 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 		case "server.go":
 			file.Data, err = renderer.GenerateServer()
 		default:
-			t := renderer.Templates[filename]
-			log.Printf("Generating %s", filename)
-			err = t.Execute(f, struct {
-				Model *ServiceModel
-			}{
-				renderer.Model,
-			})
-			if err != nil {
-				response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
-			}
-			file.Data = f.Bytes()
+			file.Data = nil
 		}
 		if err != nil {
 			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
-		inputBytes := file.Data
 		// run generated Go files through gofmt
 		if filepath.Ext(file.Name) == ".go" {
-			strippedBytes := stripMarkers(inputBytes)
-			file.Data, err = gofmt(file.Name, strippedBytes)
-		} else {
-			file.Data = inputBytes
+			file.Data, err = gofmt(file.Name, file.Data)
 		}
 		response.Files = append(response.Files, file)
 	}
