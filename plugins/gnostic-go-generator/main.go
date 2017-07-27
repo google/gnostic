@@ -62,11 +62,11 @@ func main() {
 	var files []string
 	switch {
 	case strings.Contains(invocation, "gnostic-go-client"):
-		files = []string{"client.go", "types.go"}
+		files = []string{"client.go", "types.go", "constants.go"}
 	case strings.Contains(invocation, "gnostic-go-server"):
-		files = []string{"server.go", "provider.go", "types.go"}
+		files = []string{"server.go", "provider.go", "types.go", "constants.go"}
 	default:
-		files = []string{"client.go", "server.go", "provider.go", "types.go"}
+		files = []string{"client.go", "server.go", "provider.go", "types.go", "constants.go"}
 	}
 
 	// Initialize the plugin response.

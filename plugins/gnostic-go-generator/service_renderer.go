@@ -49,6 +49,8 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 			file.Data, err = renderer.GenerateProvider()
 		case "server.go":
 			file.Data, err = renderer.GenerateServer()
+		case "constants.go":
+			file.Data, err = renderer.GenerateConstants()
 		default:
 			file.Data = nil
 		}
