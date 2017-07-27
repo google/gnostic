@@ -63,6 +63,8 @@ func buildOpenAPI2SchemaForSchema(schema *Schema) *pb.Schema {
 			)
 		}
 	}
+	// assume that all schemas are closed
+	s.AdditionalProperties = &pb.AdditionalPropertiesItem{Oneof: &pb.AdditionalPropertiesItem_Boolean{Boolean: false}}
 	return s
 }
 
@@ -108,6 +110,19 @@ func buildOpenAPI2ParameterForParameter(p *Parameter) *pb.Parameter {
 		}
 	default:
 		return nil
+	}
+}
+
+func buildOpenAPI2ParameterForRequest(p *Schema) *pb.Parameter {
+	return &pb.Parameter{
+		Oneof: &pb.Parameter_BodyParameter{
+			BodyParameter: &pb.BodyParameter{
+				Name:        "resource",
+				In:          "body",
+				Description: p.Description,
+				Schema:      &pb.Schema{XRef: "#/definitions/" + p.Ref},
+			},
+		},
 	}
 }
 
@@ -163,6 +178,14 @@ func buildOpenAPI2OperationForMethod(method *Method) *pb.Operation {
 				},
 			},
 		},
+	}
+	if method.Request != nil {
+		parameter := buildOpenAPI2ParameterForRequest(method.Request)
+		parameters = append(parameters, &pb.ParametersItem{
+			Oneof: &pb.ParametersItem_Parameter{
+				Parameter: parameter,
+			},
+		})
 	}
 	return &pb.Operation{
 		Description: method.Description,
