@@ -3,7 +3,7 @@
   "id": "http://openapis.org/v3/schema.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "description": "This is the root document object of the OpenAPI definition.",
+  "description": "This is the root document object of the OpenAPI document.",
   "required": [
     "openapi",
     "info",
@@ -56,7 +56,7 @@
   "definitions": {
     "info": {
       "type": "object",
-      "description": "The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.",
+      "description": "The object provides metadata about the API. The metadata MAY be used by the clients if needed, and MAY be presented in editing or documentation generation tools for convenience.",
       "required": [
         "title",
         "version"
@@ -498,7 +498,7 @@
           "type": "string"
         },
         "headers": {
-          "$ref": "#/definitions/headers"
+          "$ref": "#/definitions/headersOrReferences"
         },
         "style": {
           "type": "string"
@@ -1126,12 +1126,6 @@
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/exampleOrReference"
-      }
-    },
-    "headers": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/header"
       }
     },
     "headersOrReferences": {
