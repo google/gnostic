@@ -132,7 +132,7 @@ message Document {
 // A single encoding definition applied to a single schema property.
 message Encoding {
   string content_type = 1;
-  Headers headers = 2;
+  HeadersOrReferences headers = 2;
   string style = 3;
   bool explode = 4;
   bool allow_reserved = 5;
@@ -199,15 +199,11 @@ message HeaderOrReference {
   }
 }
 
-message Headers {
-  repeated NamedHeader additional_properties = 1;
-}
-
 message HeadersOrReferences {
   repeated NamedHeaderOrReference additional_properties = 1;
 }
 
-// The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in editing or documentation generation tools for convenience.
+// The object provides metadata about the API. The metadata MAY be used by the clients if needed, and MAY be presented in editing or documentation generation tools for convenience.
 message Info {
   string title = 1;
   string description = 2;
@@ -302,14 +298,6 @@ message NamedExampleOrReference {
   string name = 1;
   // Mapped value
   ExampleOrReference value = 2;
-}
-
-// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
-message NamedHeader {
-  // Map key
-  string name = 1;
-  // Mapped value
-  Header value = 2;
 }
 
 // Automatically-generated message used to represent maps of HeaderOrReference as ordered (name,value) pairs.

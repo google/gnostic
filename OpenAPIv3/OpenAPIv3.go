@@ -742,11 +742,11 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// Headers headers = 2;
+		// HeadersOrReferences headers = 2;
 		v2 := compiler.MapValueForKey(m, "headers")
 		if v2 != nil {
 			var err error
-			x.Headers, err = NewHeaders(v2, compiler.NewContext("headers", context))
+			x.Headers, err = NewHeadersOrReferences(v2, compiler.NewContext("headers", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1323,36 +1323,6 @@ func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrR
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-// NewHeaders creates an object of type Headers if possible, returning an error if not.
-func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
-	errors := make([]error, 0)
-	x := &Headers{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		// repeated NamedHeader additional_properties = 1;
-		// MAP: Header
-		x.AdditionalProperties = make([]*NamedHeader, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
-			if ok {
-				v := item.Value
-				pair := &NamedHeader{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewHeader(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.AdditionalProperties = append(x.AdditionalProperties, pair)
-			}
-		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -2066,44 +2036,6 @@ func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*Nam
 		if v2 != nil {
 			var err error
 			x.Value, err = NewExampleOrReference(v2, compiler.NewContext("value", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-// NewNamedHeader creates an object of type NamedHeader if possible, returning an error if not.
-func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, error) {
-	errors := make([]error, 0)
-	x := &NamedHeader{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// string name = 1;
-		v1 := compiler.MapValueForKey(m, "name")
-		if v1 != nil {
-			x.Name, ok = v1.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// Header value = 2;
-		v2 := compiler.MapValueForKey(m, "value")
-		if v2 != nil {
-			var err error
-			x.Value, err = NewHeader(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -5557,20 +5489,6 @@ func (m *HeaderOrReference) ResolveReferences(root string) (interface{}, error) 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-// ResolveReferences resolves references found inside Headers objects.
-func (m *Headers) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.AdditionalProperties {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 // ResolveReferences resolves references found inside HeadersOrReferences objects.
 func (m *HeadersOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
@@ -5811,18 +5729,6 @@ func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
 
 // ResolveReferences resolves references found inside NamedExampleOrReference objects.
 func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	if m.Value != nil {
-		_, err := m.Value.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-// ResolveReferences resolves references found inside NamedHeader objects.
-func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -7054,7 +6960,7 @@ func (m *Encoding) ToRawInfo() interface{} {
 	if m.Headers != nil {
 		info = append(info, yaml.MapItem{"headers", m.Headers.ToRawInfo()})
 	}
-	// &{Name:headers Type:Headers StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:headers Type:HeadersOrReferences StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Style != "" {
 		info = append(info, yaml.MapItem{"style", m.Style})
 	}
@@ -7236,18 +7142,6 @@ func (m *HeaderOrReference) ToRawInfo() interface{} {
 		return v1.ToRawInfo()
 	}
 	return nil
-}
-
-// ToRawInfo returns a description of Headers suitable for JSON or YAML export.
-func (m *Headers) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if m.AdditionalProperties != nil {
-		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{item.Name, item.Value.ToRawInfo()})
-		}
-	}
-	// &{Name:additionalProperties Type:NamedHeader StringEnumValues:[] MapType:Header Repeated:true Pattern: Implicit:true Description:}
-	return info
 }
 
 // ToRawInfo returns a description of HeadersOrReferences suitable for JSON or YAML export.
@@ -7475,16 +7369,6 @@ func (m *NamedExampleOrReference) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{"name", m.Name})
 	}
 	// &{Name:value Type:ExampleOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
-	return info
-}
-
-// ToRawInfo returns a description of NamedHeader suitable for JSON or YAML export.
-func (m *NamedHeader) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if m.Name != "" {
-		info = append(info, yaml.MapItem{"name", m.Name})
-	}
-	// &{Name:value Type:Header StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
