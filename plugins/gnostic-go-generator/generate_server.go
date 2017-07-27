@@ -21,10 +21,6 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 	f.WriteLine("package " + renderer.Model.Package)
 	f.WriteLine(``)
 	imports := []string{
-		"encoding/json",
-		"errors",
-		"net/http",
-		"strconv",
 		"github.com/gorilla/mux",
 	}
 	f.WriteLine(``)

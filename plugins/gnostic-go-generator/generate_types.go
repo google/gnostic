@@ -37,7 +37,7 @@ func (renderer *ServiceRenderer) GenerateTypes() ([]byte, error) {
 
 func jsonTag(field *ServiceTypeField) string {
 	if field.JSONName != "" {
-		return " `json:" + `"` + field.JSONName + `"` + "`"
+		return " `json:" + `"` + field.JSONName + `,omitempty"` + "`"
 	}
 	return ""
 }

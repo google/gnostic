@@ -17,6 +17,7 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
@@ -30,7 +31,7 @@ const service = "http://localhost:8080"
 
 func TestBookstore(t *testing.T) {
 	// create a client
-	b := bookstore.NewClient(service)
+	b := bookstore.NewClient(service, nil)
 	// reset the service by deleting all shelves
 	{
 		err := b.DeleteShelves()
@@ -46,8 +47,9 @@ func TestBookstore(t *testing.T) {
 			t.Log("list shelves failed")
 			t.Fail()
 		}
-		if (response == nil) || (response.OK == nil) || (response.OK.Shelves == nil) || len(response.OK.Shelves) != 0 {
-			t.Log("list shelves failed")
+		if (response == nil) || (response.OK == nil) || (response.OK.Shelves != nil) {
+			t.Log(fmt.Sprintf("list shelves failed %+v", response.OK))
+			t.Log(fmt.Sprintf("list shelves failed len=%d", len(response.OK.Shelves)))
 			t.Fail()
 		}
 	}

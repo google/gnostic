@@ -20,32 +20,25 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
 	f.WriteLine(``)
 	f.WriteLine("package " + renderer.Model.Package)
-	imports := []string{
-		"bytes",
-		"encoding/json",
-		"errors",
-		"fmt",
-		"io/ioutil",
-		"net/http",
-		"net/url",
-		"strings",
-	}
-	f.WriteLine(`import (`)
-	for _, imp := range imports {
-		f.WriteLine(`"` + imp + `"`)
-	}
-	f.WriteLine(`)`)
+
+	// imports will be automatically added by goimports
 
 	f.WriteLine(`// Client represents an API client.`)
 	f.WriteLine(`type Client struct {`)
-	f.WriteLine(` service string`)
-	f.WriteLine(`	APIKey string`)
+	f.WriteLine(`  service string`)
+	f.WriteLine(`  APIKey string`)
+	f.WriteLine(`  client *http.Client`)
 	f.WriteLine(`}`)
 
 	f.WriteLine(`// NewClient creates an API client.`)
-	f.WriteLine(`func NewClient(service string) *Client {`)
+	f.WriteLine(`func NewClient(service string, c *http.Client) *Client {`)
 	f.WriteLine(`	client := &Client{}`)
 	f.WriteLine(`	client.service = service`)
+	f.WriteLine(`  if c != nil {`)
+	f.WriteLine(`    client.client = c`)
+	f.WriteLine(`  } else {`)
+	f.WriteLine(`    client.client = http.DefaultClient`)
+	f.WriteLine(`  }`)
 	f.WriteLine(`	return client`)
 	f.WriteLine(`}`)
 
@@ -76,24 +69,31 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 			f.WriteLine(`v := url.Values{}`)
 			for _, field := range method.ParametersType.Fields {
 				if field.Position == "query" {
-					f.WriteLine(`v.Set("` + field.Name + `", ` + field.ParameterName + `)`)
+					f.WriteLine(`if (` + field.ParameterName + ` != "") {`)
+					f.WriteLine(`  v.Set("` + field.Name + `", ` + field.ParameterName + `)`)
+					f.WriteLine(`}`)
 				}
 			}
 			f.WriteLine(`if client.APIKey != "" {`)
 			f.WriteLine(`  v.Set("key", client.APIKey)`)
 			f.WriteLine(`}`)
-			f.WriteLine(`path = path + "?" + v.Encode()`)
+			f.WriteLine(`if len(v) > 0 {`)
+			f.WriteLine(`  path = path + "?" + v.Encode()`)
+			f.WriteLine(`}`)
 		}
 
 		if method.Method == "POST" {
 			f.WriteLine(`body := new(bytes.Buffer)`)
 			f.WriteLine(`json.NewEncoder(body).Encode(` + method.bodyParameterName() + `)`)
 			f.WriteLine(`req, err := http.NewRequest("` + method.Method + `", path, body)`)
+			f.WriteLine(`reqHeaders := make(http.Header)`)
+			f.WriteLine(`reqHeaders.Set("Content-Type", "application/json")`)
+			f.WriteLine(`req.Header = reqHeaders`)
 		} else {
 			f.WriteLine(`req, err := http.NewRequest("` + method.Method + `", path, nil)`)
 		}
 		f.WriteLine(`if err != nil {return}`)
-		f.WriteLine(`resp, err := http.DefaultClient.Do(req)`)
+		f.WriteLine(`resp, err := client.client.Do(req)`)
 		f.WriteLine(`if err != nil {return}`)
 		f.WriteLine(`defer resp.Body.Close()`)
 
@@ -139,16 +139,6 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 		f.WriteLine("return")
 		f.WriteLine("}")
 	}
-	f.WriteLine(`
-// refer to imported packages that may or may not be used in generated code
-func forced_package_references() {
-	_ = new(bytes.Buffer)
-	_ = fmt.Sprintf("")
-	_ = strings.Split("","")
-	_ = url.Values{}
-	_ = errors.New("")
-	ioutil.ReadFile("")
-}
-`)
+
 	return f.Bytes(), nil
 }

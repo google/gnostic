@@ -57,7 +57,7 @@ func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []st
 		}
 		// run generated Go files through gofmt
 		if filepath.Ext(file.Name) == ".go" {
-			file.Data, err = gofmt(file.Name, file.Data)
+			file.Data, err = goimports(file.Name, file.Data)
 		}
 		response.Files = append(response.Files, file)
 	}

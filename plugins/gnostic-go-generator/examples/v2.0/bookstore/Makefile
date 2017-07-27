@@ -13,6 +13,7 @@ clean:
 	rm -rf bookstore bookstore.text service/service
 
 test:	all
+	- killall service
 	cd service; go get .; go build; ./service &
 	go test
 	killall service

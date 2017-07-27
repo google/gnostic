@@ -17,17 +17,17 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 )
 
-// Run the gofmt tool to format generated code.
-func gofmt(filename string, inputBytes []byte) (outputBytes []byte, err error) {
+// Run goimports to format and update imports statements in generated code.
+func goimports(filename string, inputBytes []byte) (outputBytes []byte, err error) {
 	if false {
 		return inputBytes, nil
 	}
-	cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
+	cmd := exec.Command(os.Getenv("GOPATH") + "/bin/goimports")
 	input, _ := cmd.StdinPipe()
 	output, _ := cmd.StdoutPipe()
 	cmderr, _ := cmd.StderrPipe()
