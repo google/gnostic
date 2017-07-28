@@ -115,7 +115,7 @@ func (model *ServiceModel) buildServiceMethodFromOperationV3(op *openapiv3.Opera
 	m.HandlerName = "Handle" + m.Name
 	m.ProcessorName = m.Name
 	m.ClientName = m.Name
-	m.ParametersType, err = model.buildServiceTypeFromParametersV3(m.Name, op.Parameters)
+	m.ParametersType, err = model.buildServiceTypeFromParametersV3(m.Name, op.Parameters, op.RequestBody)
 	if m.ParametersType != nil {
 		m.ParametersTypeName = m.ParametersType.Name
 	}
@@ -127,7 +127,9 @@ func (model *ServiceModel) buildServiceMethodFromOperationV3(op *openapiv3.Opera
 	return err
 }
 
-func (model *ServiceModel) buildServiceTypeFromParametersV3(name string, parameters []*openapiv3.ParameterOrReference) (t *ServiceType, err error) {
+func (model *ServiceModel) buildServiceTypeFromParametersV3(name string,
+	parameters []*openapiv3.ParameterOrReference,
+	requestBody *openapiv3.RequestBodyOrReference) (t *ServiceType, err error) {
 	t = &ServiceType{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
@@ -150,6 +152,24 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(name string, paramet
 			t.Fields = append(t.Fields, &f)
 			if f.NativeType == "integer" {
 				f.NativeType = "int64"
+			}
+		}
+	}
+	if requestBody != nil {
+		content := requestBody.GetRequestBody().GetContent()
+		if content != nil {
+			for _, pair2 := range content.GetAdditionalProperties() {
+				log.Printf("request pair: %+v", pair2)
+				var f ServiceTypeField
+				f.Position = "body"
+				f.Name = "resource"
+				f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
+				f.ValueType = typeForSchemaOrReferenceV3(pair2.GetValue().GetSchema())
+				f.Type = "*" + f.ValueType
+				f.NativeType = f.Type
+				f.JSONName = f.Name
+				f.ParameterName = goParameterName(f.FieldName)
+				t.Fields = append(t.Fields, &f)
 			}
 		}
 	}

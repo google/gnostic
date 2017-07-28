@@ -103,6 +103,31 @@ func buildOpenAPI3ParameterForParameter(p *Parameter) *pb.Parameter {
 	}
 }
 
+func buildOpenAPI3RequestBodyForRequest(schema *Schema) *pb.RequestBody {
+	ref := schema.Ref
+	if ref == "" {
+		log.Printf("WARNING: Unhandled request schema %+v", schema)
+	}
+	return &pb.RequestBody{
+		Content: &pb.MediaTypes{
+			AdditionalProperties: []*pb.NamedMediaType{
+				&pb.NamedMediaType{
+					Name: "application/json",
+					Value: &pb.MediaType{
+						Schema: &pb.SchemaOrReference{
+							Oneof: &pb.SchemaOrReference_Reference{
+								Reference: &pb.Reference{
+									XRef: "#/definitions/" + ref,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func buildOpenAPI3ResponseForSchema(schema *Schema) *pb.Response {
 	log.Printf("- RESPONSE %+v\n", schema)
 	if schema == nil {
@@ -117,9 +142,9 @@ func buildOpenAPI3ResponseForSchema(schema *Schema) *pb.Response {
 		return &pb.Response{
 			Description: "Successful operation",
 			Content: &pb.MediaTypes{
-				AdditionalProperties:[]*pb.NamedMediaType{
+				AdditionalProperties: []*pb.NamedMediaType{
 					&pb.NamedMediaType{
-						Name:"application/json",
+						Name: "application/json",
 						Value: &pb.MediaType{
 							Schema: &pb.SchemaOrReference{
 								Oneof: &pb.SchemaOrReference_Reference{
@@ -159,11 +184,21 @@ func buildOpenAPI3OperationForMethod(method *Method) *pb.Operation {
 			},
 		},
 	}
+	var requestBodyOrReference *pb.RequestBodyOrReference
+	if method.Request != nil {
+		requestBody := buildOpenAPI3RequestBodyForRequest(method.Request)
+		requestBodyOrReference = &pb.RequestBodyOrReference{
+			Oneof: &pb.RequestBodyOrReference_RequestBody{
+				RequestBody: requestBody,
+			},
+		}
+	}
 	return &pb.Operation{
 		Description: method.Description,
 		OperationId: method.ID,
 		Parameters:  parameters,
 		Responses:   responses,
+		RequestBody: requestBodyOrReference,
 	}
 }
 
