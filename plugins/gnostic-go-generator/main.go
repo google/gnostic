@@ -26,7 +26,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	openapi "github.com/googleapis/gnostic/OpenAPIv2"
+	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
+	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
@@ -72,7 +73,12 @@ func main() {
 	// Initialize the plugin response.
 	response := &plugins.Response{}
 	var packageName string
-	var document *openapi.Document
+	var documentv2 *openapiv2.Document
+	var documentv3 *openapiv3.Document
+
+	var version string
+	var data []byte
+	var err error
 
 	if len(os.Args) == 1 {
 		// Read the plugin input.
@@ -101,32 +107,55 @@ func main() {
 		log.Printf("Running %s(input:%s)", invocation, request.Wrapper.Version)
 
 		// Read the document sent by the plugin.
-		if request.Wrapper.Version != "v2" {
-			err = fmt.Errorf("Unsupported OpenAPI version %s", request.Wrapper.Version)
-			respondAndExitIfError(err, response)
-		}
-		document = &openapi.Document{}
-		err = proto.Unmarshal(request.Wrapper.Value, document)
-		respondAndExitIfError(err, response)
+		version = request.Wrapper.Version
+		data = request.Wrapper.Value
 	} else {
 		input := flag.String("input", "", "OpenAPI input (pb)")
 		output := flag.String("output", "-", "output path")
+		version2 := flag.Bool("v2", false, "OpenAPI version 2")
+		version3 := flag.Bool("v3", false, "OpenAPI version 3")
+
 		flag.Parse()
 		outputPath = *output
 		packageName = outputPath
 
+		switch {
+		case *version2:
+			version = "v2"
+		case *version3:
+			version = "v3"
+		default:
+			version = "v2"
+		}
+
 		// Read the input document.
-		data, err := ioutil.ReadFile(*input)
+		data, err = ioutil.ReadFile(*input)
 		if len(data) == 0 {
 			respondAndExitIfError(fmt.Errorf("no input data"), response)
 		}
-		document = &openapi.Document{}
-		err = proto.Unmarshal(data, document)
+	}
+
+	switch version {
+	case "v2":
+		documentv2 = &openapiv2.Document{}
+		err = proto.Unmarshal(data, documentv2)
+		respondAndExitIfError(err, response)
+	case "v3":
+		documentv3 = &openapiv3.Document{}
+		err = proto.Unmarshal(data, documentv3)
+		respondAndExitIfError(err, response)
+	default:
+		err = fmt.Errorf("Unsupported OpenAPI version %s", version)
 		respondAndExitIfError(err, response)
 	}
 
 	// Create the model.
-	model, err := NewServiceModel(document, packageName)
+	var model *ServiceModel
+	if documentv2 != nil {
+		model, err = NewServiceModelV2(documentv2, packageName)
+	} else {
+		model, err = NewServiceModelV3(documentv3, packageName)
+	}
 	respondAndExitIfError(err, response)
 
 	// Create the renderer.

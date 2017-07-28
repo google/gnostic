@@ -24,6 +24,9 @@ type ServiceType struct {
 }
 
 func (s *ServiceType) hasFieldWithName(name string) bool {
+	if s == nil || s.Fields == nil {
+		return false
+	}
 	for _, f := range s.Fields {
 		if f.FieldName == name {
 			return true
@@ -33,6 +36,9 @@ func (s *ServiceType) hasFieldWithName(name string) bool {
 }
 
 func (s *ServiceType) fieldWithName(name string) *ServiceTypeField {
+	if s == nil || s.Fields == nil {
+		return nil
+	}
 	for _, f := range s.Fields {
 		if f.FieldName == name {
 			return f
