@@ -260,6 +260,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	// generate the compiler
 	compiler := cc.GenerateCompiler(goPackageName, License, []string{
 		"fmt",
+		"regexp",
 		"strings",
 		"github.com/googleapis/gnostic/compiler",
 		"gopkg.in/yaml.v2",
