@@ -77,20 +77,20 @@ func main() {
 	var documentv3 *openapiv3.Document
 
 	var version string
-	var data []byte
+	var apiData []byte
 	var err error
 
 	if len(os.Args) == 1 {
 		// Read the plugin input.
-		data, err := ioutil.ReadAll(os.Stdin)
+		pluginData, err := ioutil.ReadAll(os.Stdin)
 		respondAndExitIfError(err, response)
-		if len(data) == 0 {
+		if len(pluginData) == 0 {
 			respondAndExitIfError(fmt.Errorf("no input data"), response)
 		}
 
 		// Deserialize the input.
 		request := &plugins.Request{}
-		err = proto.Unmarshal(data, request)
+		err = proto.Unmarshal(pluginData, request)
 		respondAndExitIfError(err, response)
 
 		// Collect parameters passed to the plugin.
@@ -104,11 +104,11 @@ func main() {
 		}
 
 		// Log the invocation.
-		log.Printf("Running %s(input:%s)", invocation, request.Wrapper.Version)
+		log.Printf("Running plugin %s(input:%s)", invocation, request.Wrapper.Version)
 
 		// Read the document sent by the plugin.
 		version = request.Wrapper.Version
-		data = request.Wrapper.Value
+		apiData = request.Wrapper.Value
 	} else {
 		input := flag.String("input", "", "OpenAPI input (pb)")
 		output := flag.String("output", "-", "output path")
@@ -129,8 +129,8 @@ func main() {
 		}
 
 		// Read the input document.
-		data, err = ioutil.ReadFile(*input)
-		if len(data) == 0 {
+		apiData, err = ioutil.ReadFile(*input)
+		if len(apiData) == 0 {
 			respondAndExitIfError(fmt.Errorf("no input data"), response)
 		}
 	}
@@ -138,11 +138,11 @@ func main() {
 	switch version {
 	case "v2":
 		documentv2 = &openapiv2.Document{}
-		err = proto.Unmarshal(data, documentv2)
+		err = proto.Unmarshal(apiData, documentv2)
 		respondAndExitIfError(err, response)
 	case "v3":
 		documentv3 = &openapiv3.Document{}
-		err = proto.Unmarshal(data, documentv3)
+		err = proto.Unmarshal(apiData, documentv3)
 		respondAndExitIfError(err, response)
 	default:
 		err = fmt.Errorf("Unsupported OpenAPI version %s", version)
