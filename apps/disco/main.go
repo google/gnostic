@@ -45,6 +45,7 @@ Usage:
 		fmt.Println(usage)
 		fmt.Println("To learn more about Discovery Format, visit https://developers.google.com/discovery/\n")
 	}
+
 	// List APIs.
 	if arguments["list"].(bool) {
 		// Read the list of APIs from the apis/list service.
@@ -82,7 +83,7 @@ Usage:
 		if arguments["<version>"] != nil {
 			apiVersion = arguments["<version>"].(string)
 		}
-		// Get the description of an API
+		// Get the description of an API.
 		api, err := listResponse.APIWithNameAndVersion(apiName, apiVersion)
 		if err != nil {
 			log.Fatalf("%+v", err)
@@ -92,24 +93,25 @@ Usage:
 		if err != nil {
 			log.Fatalf("%+v", err)
 		}
-		// Export any requested formats
+		// Export any requested formats.
 		handled, err := handleExportArgumentsForBytes(arguments, bytes)
 		if err != nil {
 			log.Fatalf("%+v", err)
 		} else if (!handled) {
+			// If no action was requested, write the document to stdout.
 			os.Stdout.Write(bytes)
 		}
 	}
 
-	// Do something with a local API description
+	// Do something with a local API description.
 	if arguments["<file>"] != nil {
-		// Read the local file
+		// Read the local file.
 		filename := arguments["<file>"].(string)
 		bytes, err := ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatalf("%+v", err)
 		}
-		// Export any requested formats
+		// Export any requested formats.
 		_, err = handleExportArgumentsForBytes(arguments, bytes)
 		if err != nil {
 			log.Fatalf("%+v", err)
@@ -124,6 +126,7 @@ func handleExportArgumentsForBytes(arguments map[string]interface{}, bytes []byt
 		return handled, err
 	}
 	if arguments["--raw"].(bool) {
+		// Write the Discovery document as a JSON file.
 		filename := "disco-" + discoveryDocument.Name + "-" + discoveryDocument.Version + ".json"
 		ioutil.WriteFile(filename, bytes, 0644)
 		handled = true
