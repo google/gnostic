@@ -16,11 +16,53 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/googleapis/gnostic/printer"
 )
+
+// patternNames hands out unique names for a given string.
+type patternNames struct {
+	prefix string
+	values map[string]int
+	last   int
+
+	specialCase map[string]func(variable string) string
+}
+
+// SpecialCaseExpression returns true if the provided regex can be inlined as a faster
+// expression.
+func (p *patternNames) SpecialCaseExpression(value, variable string) (code string, ok bool) {
+	fn, ok := p.specialCase[value]
+	if !ok {
+		return "", false
+	}
+	return fn(variable), ok
+}
+
+// VariableName returns the variable name for the given value.
+func (p *patternNames) VariableName(value string) string {
+	num, ok := p.values[value]
+	if !ok {
+		if p.values == nil {
+			p.values = make(map[string]int)
+		}
+		num = p.last
+		p.last++
+		p.values[value] = num
+	}
+	return fmt.Sprintf("%s%d", p.prefix, num)
+}
+
+func (p *patternNames) Names() map[string]string {
+	names := make(map[string]string)
+	for value, num := range p.values {
+		names[fmt.Sprintf("%s%d", p.prefix, num)] = value
+	}
+	return names
+}
 
 // GenerateCompiler generates the compiler code for a domain.
 func (domain *Domain) GenerateCompiler(packageName string, license string, imports []string) string {
@@ -45,9 +87,18 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 
 	typeNames := domain.sortedTypeNames()
 
+	regexPatterns := &patternNames{
+		prefix: "pattern",
+		specialCase: map[string]func(string) string{
+			"^x-": func(variable string) string { return fmt.Sprintf("strings.HasPrefix(%s, \"x-\")", variable) },
+			"^/":  func(variable string) string { return fmt.Sprintf("strings.HasPrefix(%s, \"/\")", variable) },
+			"^":   func(_ string) string { return "true" },
+		},
+	}
+
 	// generate NewX() constructor functions for each type
 	for _, typeName := range typeNames {
-		domain.generateConstructorForType(code, typeName)
+		domain.generateConstructorForType(code, typeName, regexPatterns)
 	}
 
 	// generate ResolveReferences() methods for each type
@@ -60,6 +111,8 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateToRawInfoMethodForType(code, typeName)
 	}
 
+	domain.generateConstantVariables(code, regexPatterns)
+
 	return code.String()
 }
 
@@ -67,7 +120,19 @@ func escapeSlashes(pattern string) string {
 	return strings.Replace(pattern, "\\", "\\\\", -1)
 }
 
-func (domain *Domain) generateConstructorForType(code *printer.Code, typeName string) {
+var subpatternPattern = regexp.MustCompile("^.*(\\{.*\\}).*$")
+
+func nameForPattern(regexPatterns *patternNames, pattern string) string {
+	if !strings.HasPrefix(pattern, "^") {
+		if matches := subpatternPattern.FindStringSubmatch(pattern); matches != nil {
+			match := string(matches[1])
+			pattern = strings.Replace(pattern, match, ".*", -1)
+		}
+	}
+	return regexPatterns.VariableName(pattern)
+}
+
+func (domain *Domain) generateConstructorForType(code *printer.Code, typeName string, regexPatterns *patternNames) {
 	code.Print("// New%s creates an object of type %s if possible, returning an error if not.", typeName, typeName)
 	code.Print("func New%s(in interface{}, context *compiler.Context) (*%s, error) {", typeName, typeName)
 	code.Print("errors := make([]error, 0)")
@@ -293,14 +358,17 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					if allowedPatternString != "" {
 						allowedPatternString += ","
 					}
-					allowedPatternString += "\""
-					allowedPatternString += escapeSlashes(pattern)
-					allowedPatternString += "\""
+					allowedPatternString += nameForPattern(regexPatterns, pattern)
 				}
 			}
 			// verify that map includes only allowed keys and patterns
 			code.Print("allowedKeys := []string{%s}", allowedKeyString)
-			code.Print("allowedPatterns := []string{%s}", allowedPatternString)
+			if len(allowedPatternString) > 0 {
+				code.Print("allowedPatterns := []*regexp.Regexp{%s}", allowedPatternString)
+			} else {
+				code.Print("var allowedPatterns []*regexp.Regexp")
+
+			}
 			code.Print("invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)")
 			code.Print("if len(invalidKeys) > 0 {")
 			code.Print("  message := fmt.Sprintf(\"has invalid %%s: %%+v\", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, \", \"))")
@@ -509,9 +577,12 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("k, ok := compiler.StringValue(item.Key)")
 					code.Print("if ok {")
 					code.Print("v := item.Value")
-					if propertyModel.Pattern != "" {
-						code.Print("if compiler.PatternMatches(\"%s\", k) {",
-							escapeSlashes(propertyModel.Pattern))
+					if pattern := propertyModel.Pattern; pattern != "" {
+						if inline, ok := regexPatterns.SpecialCaseExpression(pattern, "k"); ok {
+							code.Print("if %s {", inline)
+						} else {
+							code.Print("if %s.MatchString(k) {", nameForPattern(regexPatterns, pattern))
+						}
 					}
 
 					code.Print("pair := &Named" + strings.Title(mapTypeName) + "{}")
@@ -825,4 +896,18 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 		code.Print("return info")
 	}
 	code.Print("}\n")
+}
+
+func (domain *Domain) generateConstantVariables(code *printer.Code, regexPatterns *patternNames) {
+	names := regexPatterns.Names()
+	var sortedNames []string
+	for name, _ := range names {
+		sortedNames = append(sortedNames, name)
+	}
+	sort.Strings(sortedNames)
+	code.Print("var (")
+	for _, name := range sortedNames {
+		code.Print("%s = regexp.MustCompile(\"%s\")", name, escapeSlashes(names[name]))
+	}
+	code.Print(")\n")
 }
