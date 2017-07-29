@@ -177,6 +177,7 @@ func generateOpenAPIModel(version string) error {
 		"fmt",
 		"gopkg.in/yaml.v2",
 		"strings",
+		"regexp",
 		"github.com/googleapis/gnostic/compiler",
 	})
 	goFileName := projectRoot + filename + "/" + filename + ".go"
