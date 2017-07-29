@@ -113,10 +113,19 @@ func goParameterName(name string) string {
 	a := []rune(name)
 	a[0] = unicode.ToLower(a[0])
 	name = string(a)
+	// replace dots with underscores
+	name = strings.Replace(name, ".", "_", -1)
 	// avoid reserved words
 	if name == "type" {
 		return "ttttype"
 	}
+	return name
+}
+
+func goFieldName(name string) string {
+	name = strings.Replace(name, ".", "_", -1)
+	name = strings.Replace(name, "-", "_", -1)
+	name = snakeCaseToCamelCase(name)
 	return name
 }
 

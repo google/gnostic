@@ -17,6 +17,7 @@ package discovery
 import (
 	"log"
 	"net/url"
+	"strings"
 
 	pb "github.com/googleapis/gnostic/OpenAPIv2"
 )
@@ -150,10 +151,7 @@ func buildOpenAPI2ResponseForSchema(schema *Schema) *pb.Response {
 }
 
 func (method *Method) path() string {
-	if method.FlatPath != "" {
-		return "/" + method.FlatPath
-	}
-	return "/" + method.Path
+	return "/" + strings.Replace(method.Path, "{+", "{", -1)
 }
 
 func buildOpenAPI2OperationForMethod(method *Method) *pb.Operation {
@@ -244,7 +242,7 @@ func addOpenAPI2PathsForResource(d *pb.Document, resource *Resource) {
 
 func removeTrailingSlash(path string) string {
 	if len(path) > 1 && path[len(path)-1] == '/' {
-		return path[0 : len(path)-1]
+		return path[0: len(path)-1]
 	}
 	return path
 }

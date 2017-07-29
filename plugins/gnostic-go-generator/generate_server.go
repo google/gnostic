@@ -14,6 +14,10 @@
 
 package main
 
+import (
+	"fmt"
+)
+
 func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
@@ -69,9 +73,16 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 			}
 			for _, field := range method.ParametersType.Fields {
 				if field.Position == "path" {
-					f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
-					f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(value)`)
-					f.WriteLine(`}`)
+					if field.Type == "string" {
+						f.WriteLine(fmt.Sprintf("// %+v", field))
+						f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
+						f.WriteLine(`	parameters.` + field.FieldName + ` = value`)
+						f.WriteLine(`}`)
+					} else {
+						f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
+						f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(value)`)
+						f.WriteLine(`}`)
+					}
 				} else if field.Position == "formdata" {
 					f.WriteLine(`if len(r.Form["` + field.JSONName + `"]) > 0 {`)
 					f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(r.Form["` + field.JSONName + `"][0])`)

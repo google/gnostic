@@ -14,6 +14,8 @@
 
 package main
 
+import "strings"
+
 func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 	f := NewLineWriter()
 
@@ -54,7 +56,9 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 		}
 		f.WriteLine(` ) {`)
 
-		f.WriteLine(`path := client.service + "` + method.Path + `"`)
+		path := method.Path
+		path = strings.Replace(path, "{+", "{",-1)
+		f.WriteLine(`path := client.service + "` + path + `"`)
 
 		if method.hasParametersWithPosition("path") {
 			for _, field := range method.ParametersType.Fields {
@@ -69,9 +73,11 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 			f.WriteLine(`v := url.Values{}`)
 			for _, field := range method.ParametersType.Fields {
 				if field.Position == "query" {
-					f.WriteLine(`if (` + field.ParameterName + ` != "") {`)
-					f.WriteLine(`  v.Set("` + field.Name + `", ` + field.ParameterName + `)`)
-					f.WriteLine(`}`)
+					if field.ValueType == "string" {
+						f.WriteLine(`if (` + field.ParameterName + ` != "") {`)
+						f.WriteLine(`  v.Set("` + field.Name + `", ` + field.ParameterName + `)`)
+						f.WriteLine(`}`)
+					}
 				}
 			}
 			f.WriteLine(`if client.APIKey != "" {`)

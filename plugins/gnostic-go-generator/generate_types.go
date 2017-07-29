@@ -28,8 +28,10 @@ func (renderer *ServiceRenderer) GenerateTypes() ([]byte, error) {
 				f.WriteLine(field.FieldName + ` ` + goType(field.Type) + jsonTag(field))
 			}
 			f.WriteLine(`}`)
-		} else {
+		} else if modelType.Kind != "" {
 			f.WriteLine(`type ` + modelType.Name + ` ` + modelType.Kind)
+		} else {
+			f.WriteLine(`type ` + modelType.Name + ` struct {}`)
 		}
 	}
 	return f.Bytes(), nil

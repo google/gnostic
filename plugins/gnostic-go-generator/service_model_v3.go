@@ -142,7 +142,7 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(name string,
 		if parameter != nil {
 			f.Position = parameter.In
 			f.Name = parameter.Name
-			f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
+			f.FieldName = goFieldName(f.Name)
 			if parameter.GetSchema() != nil && parameter.GetSchema() != nil {
 				f.Type = typeForSchemaOrReferenceV3(parameter.GetSchema())
 				f.NativeType = f.Type
@@ -163,7 +163,7 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(name string,
 				var f ServiceTypeField
 				f.Position = "body"
 				f.Name = "resource"
-				f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
+				f.FieldName = goFieldName(f.Name)
 				f.ValueType = typeForSchemaOrReferenceV3(pair2.GetValue().GetSchema())
 				f.Type = "*" + f.ValueType
 				f.NativeType = f.Type
@@ -237,11 +237,20 @@ func typeForSchemaV3(schema *openapiv3.Schema) (typeName string) {
 		if schema.Type == "number" {
 			return "int"
 		}
+		if schema.Type == "boolean" {
+			return "bool"
+		}
 		if schema.Type == "array" && schema.Items != nil {
 			// we have an array.., but of what?
 			items := schema.Items.SchemaOrReference
-			if len(items) == 1 && items[0].GetReference().GetXRef() != "" {
-				return "[]" + typeForRef(items[0].GetReference().GetXRef())
+			if len(items) == 1 {
+				if items[0].GetReference().GetXRef() != "" {
+					return "[]" + typeForRef(items[0].GetReference().GetXRef())
+				} else if items[0].GetSchema().Type == "string" {
+					return "[]string"
+				} else if items[0].GetSchema().Type == "object" {
+					return "[]interface{}"
+				}
 			}
 		}
 		if schema.Type == "object" && schema.AdditionalProperties == nil {
@@ -257,5 +266,7 @@ func typeForSchemaV3(schema *openapiv3.Schema) (typeName string) {
 		}
 	}
 	// this function is incomplete... so return a string representing anything that we don't handle
-	return fmt.Sprintf("%v", schema)
+	log.Printf("unimplemented: %v", schema)
+
+	return fmt.Sprintf("unimplemented: %v", schema)
 }
