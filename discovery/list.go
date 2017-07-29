@@ -16,6 +16,8 @@ package discovery
 
 import (
 	"encoding/json"
+	"errors"
+	"strings"
 )
 
 // APIsListServiceURL is the URL for the Google APIs Discovery Service
@@ -52,22 +54,26 @@ type API struct {
 	Preferred         bool              `json:"preferred"`
 }
 
-// APIWithName returns the first API with a specified name or nil if none exists.
-func (a *List) APIWithName(name string) *API {
+// APIWithNameAndVersion returns the API with a specified name and version.
+// If version is the empty string, the API name must be unique.
+func (a *List) APIWithNameAndVersion(name string, version string) (*API, error) {
+	var api *API                  // the API to return
+	versions := make([]string, 0) // the matching version names
+	// Scan the list for matching APIs and versions.
 	for _, item := range a.APIs {
 		if item.Name == name {
-			return item
+			if version == "" || version == item.Version {
+				api = item
+				versions = append(versions, item.Version)
+			}
 		}
 	}
-	return nil
-}
-
-// APIWithID returns the first API with a specified ID or nil if none exists.
-func (a *List) APIWithID(id string) *API {
-	for _, item := range a.APIs {
-		if item.ID == id {
-			return item
-		}
+	switch {
+	case len(versions) == 0:
+		return nil, errors.New(name + " was not found.")
+	case len(versions) > 1:
+		return nil, errors.New(name + " has multiple versions: " + strings.Join(versions, ", "))
+	default:
+		return api, nil
 	}
-	return nil
 }

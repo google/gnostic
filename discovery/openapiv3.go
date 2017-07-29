@@ -22,7 +22,6 @@ import (
 )
 
 func addOpenAPI3SchemaForSchema(d *pb.Document, name string, schema *Schema) {
-	log.Printf("SCHEMA %s\n", name)
 	d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
 		&pb.NamedSchemaOrReference{
 			Name:  schema.Name,
@@ -78,7 +77,6 @@ func buildOpenAPI3SchemaOrReferenceForSchema(schema *Schema) *pb.SchemaOrReferen
 }
 
 func buildOpenAPI3ParameterForParameter(p *Parameter) *pb.Parameter {
-	log.Printf("- PARAMETER %+v\n", p.Name)
 	typeName := p.Schema.Type
 	format := p.Schema.Format
 	location := p.Location
@@ -129,7 +127,6 @@ func buildOpenAPI3RequestBodyForRequest(schema *Schema) *pb.RequestBody {
 }
 
 func buildOpenAPI3ResponseForSchema(schema *Schema) *pb.Response {
-	log.Printf("- RESPONSE %+v\n", schema)
 	if schema == nil {
 		return &pb.Response{
 			Description: "Successful operation",
@@ -162,8 +159,6 @@ func buildOpenAPI3ResponseForSchema(schema *Schema) *pb.Response {
 }
 
 func buildOpenAPI3OperationForMethod(method *Method) *pb.Operation {
-	log.Printf("METHOD %s %s %s %s\n", method.Name, method.path(), method.HTTPMethod, method.ID)
-	log.Printf("MAP %+v\n", method.JSONMap)
 	parameters := make([]*pb.ParameterOrReference, 0)
 	for _, p := range method.Parameters {
 		parameters = append(parameters, &pb.ParameterOrReference{
@@ -240,7 +235,6 @@ func addOpenAPI3PathsForMethod(d *pb.Document, method *Method) {
 }
 
 func addOpenAPI3PathsForResource(d *pb.Document, resource *Resource) {
-	log.Printf("RESOURCE %s (%s)\n", resource.Name, resource.FullName)
 	for _, method := range resource.Methods {
 		addOpenAPI3PathsForMethod(d, method)
 	}
@@ -249,7 +243,7 @@ func addOpenAPI3PathsForResource(d *pb.Document, resource *Resource) {
 	}
 }
 
-// OpenAPIv3 returns an OpenAPI v3 representation of this Discovery document
+// OpenAPIv3 returns an OpenAPI v3 representation of a Discovery document
 func (api *Document) OpenAPIv3() (*pb.Document, error) {
 	d := &pb.Document{}
 	d.Openapi = "3.0"
