@@ -105,7 +105,11 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 		f.WriteLine(`if err != nil {return}`)
 		f.WriteLine(`defer resp.Body.Close()`)
 		f.WriteLine(`if resp.StatusCode != 200 {`)
-		f.WriteLine(`	return nil, errors.New(resp.Status)`)
+		if method.ResponsesType != nil {
+			f.WriteLine(`	return nil, errors.New(resp.Status)`)
+		} else {
+			f.WriteLine(`	return errors.New(resp.Status)`)
+		}
 		f.WriteLine(`}`)
 
 		if method.ResponsesType != nil {
