@@ -103,7 +103,6 @@ func (model *ServiceModel) buildServiceTypeFromDefinitionV3(name string, schema 
 }
 
 func (model *ServiceModel) buildServiceMethodFromOperationV3(op *openapiv3.Operation, method string, path string) (err error) {
-	log.Printf("build service method %s %s", method, path)
 	var m ServiceMethod
 	m.Name = cleanupOperationName(op.OperationId)
 	m.Path = path
@@ -159,7 +158,6 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(name string,
 		content := requestBody.GetRequestBody().GetContent()
 		if content != nil {
 			for _, pair2 := range content.GetAdditionalProperties() {
-				log.Printf("request pair: %+v", pair2)
 				var f ServiceTypeField
 				f.Position = "body"
 				f.Name = "resource"
@@ -197,7 +195,6 @@ func (model *ServiceModel) buildServiceTypeFromResponsesV3(m *ServiceMethod, nam
 		response := pair.Value.GetResponse()
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
-				log.Printf("pair: %+v", pair2)
 				f.ValueType = typeForSchemaOrReferenceV3(pair2.GetValue().GetSchema())
 				f.Type = "*" + f.ValueType
 				t.Fields = append(t.Fields, &f)

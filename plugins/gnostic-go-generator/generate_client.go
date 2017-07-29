@@ -14,7 +14,9 @@
 
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 	f := NewLineWriter()
@@ -73,7 +75,7 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 			f.WriteLine(`v := url.Values{}`)
 			for _, field := range method.ParametersType.Fields {
 				if field.Position == "query" {
-					if field.ValueType == "string" {
+					if field.NativeType == "string" {
 						f.WriteLine(`if (` + field.ParameterName + ` != "") {`)
 						f.WriteLine(`  v.Set("` + field.Name + `", ` + field.ParameterName + `)`)
 						f.WriteLine(`}`)
@@ -102,7 +104,9 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 		f.WriteLine(`resp, err := client.client.Do(req)`)
 		f.WriteLine(`if err != nil {return}`)
 		f.WriteLine(`defer resp.Body.Close()`)
-
+		f.WriteLine(`if resp.StatusCode != 200 {`)
+		f.WriteLine(`	return nil, errors.New(resp.Status)`)
+		f.WriteLine(`}`)
 
 		if method.ResponsesType != nil {
 			f.WriteLine(`response = &` + method.ResultTypeName + `{}`)
