@@ -150,7 +150,7 @@ func (p *pluginCall) perform(document proto.Message, openAPIVersion int, sourceN
 		request.Wrapper = wrapper
 		requestBytes, _ := proto.Marshal(request)
 
-		cmd := exec.Command(executableName)
+		cmd := exec.Command(executableName, "-plugin")
 		cmd.Stdin = bytes.NewReader(requestBytes)
 		cmd.Stderr = os.Stderr
 		output, err := cmd.Output()
