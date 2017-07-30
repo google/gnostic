@@ -149,7 +149,7 @@ func (env *Environment) RespondAndExit() {
 		responseBytes, _ := proto.Marshal(env.Response)
 		os.Stdout.Write(responseBytes)
 	} else {
-		err := handleResponse(env.Response, env.OutputPath)
+		err := HandleResponse(env.Response, env.OutputPath)
 		if err != nil {
 			log.Printf("%s", err.Error())
 		}
@@ -157,7 +157,7 @@ func (env *Environment) RespondAndExit() {
 	os.Exit(0)
 }
 
-func handleResponse(response *Response, outputLocation string) error {
+func HandleResponse(response *Response, outputLocation string) error {
 	if response.Errors != nil {
 		return fmt.Errorf("Plugin error: %+v", response.Errors)
 	}
