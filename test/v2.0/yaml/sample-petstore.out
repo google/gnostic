@@ -1,6 +1,6 @@
 
 
-report.txt -------------------- 
+summary.txt -------------------- 
 Swagger: 2.0
 Host: petstore.swagger.io
 BasePath: /v1
