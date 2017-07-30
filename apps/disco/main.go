@@ -31,7 +31,7 @@ func main() {
 Usage:
 	disco help
 	disco list [--raw]
-	disco get <api> [<version>] [--raw] [--openapi2] [--openapi3]
+	disco get [<api>] [<version>] [--raw] [--openapi2] [--openapi3] [--all]
 	disco <file> [--openapi2] [--openapi3]
 	`
 	arguments, err := docopt.Parse(usage, nil, false, "Disco 1.0", false)
@@ -77,29 +77,51 @@ Usage:
 		}
 		// Unpack the apis/list response.
 		listResponse, err := discovery.NewList(bytes)
-		// Find the matching API
-		apiName := arguments["<api>"].(string)
-		var apiVersion string
-		if arguments["<version>"] != nil {
-			apiVersion = arguments["<version>"].(string)
-		}
-		// Get the description of an API.
-		api, err := listResponse.APIWithNameAndVersion(apiName, apiVersion)
-		if err != nil {
-			log.Fatalf("%+v", err)
-		}
-		// Fetch the discovery description of the API.
-		bytes, err = compiler.FetchFile(api.DiscoveryRestURL)
-		if err != nil {
-			log.Fatalf("%+v", err)
-		}
-		// Export any requested formats.
-		handled, err := handleExportArgumentsForBytes(arguments, bytes)
-		if err != nil {
-			log.Fatalf("%+v", err)
-		} else if (!handled) {
-			// If no action was requested, write the document to stdout.
-			os.Stdout.Write(bytes)
+		if arguments["--all"].(bool) {
+			if !arguments["--raw"].(bool) && !arguments["--openapi2"].(bool) && !arguments["--openapi3"].(bool) {
+				log.Fatalf("Please specify an output option.")
+			}
+			for _, api := range listResponse.APIs {
+				log.Printf("%s/%s", api.Name, api.Version)
+				// Fetch the discovery description of the API.
+				bytes, err = compiler.FetchFile(api.DiscoveryRestURL)
+				if err != nil {
+					log.Fatalf("%+v", err)
+				}
+				// Export any requested formats.
+				_, err := handleExportArgumentsForBytes(arguments, bytes)
+				if err != nil {
+					log.Fatalf("%+v", err)
+				}
+			}
+		} else {
+			// Find the matching API
+			var apiName string
+			if arguments["<api>"] != nil {
+				apiName = arguments["<api>"].(string)
+			}
+			var apiVersion string
+			if arguments["<version>"] != nil {
+				apiVersion = arguments["<version>"].(string)
+			}
+			// Get the description of an API.
+			api, err := listResponse.APIWithNameAndVersion(apiName, apiVersion)
+			if err != nil {
+				log.Fatalf("%+v", err)
+			}
+			// Fetch the discovery description of the API.
+			bytes, err = compiler.FetchFile(api.DiscoveryRestURL)
+			if err != nil {
+				log.Fatalf("%+v", err)
+			}
+			// Export any requested formats.
+			handled, err := handleExportArgumentsForBytes(arguments, bytes)
+			if err != nil {
+				log.Fatalf("%+v", err)
+			} else if (!handled) {
+				// If no action was requested, write the document to stdout.
+				os.Stdout.Write(bytes)
+			}
 		}
 	}
 
