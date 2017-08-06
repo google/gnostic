@@ -19,6 +19,7 @@ import (
 type Environment struct {
 	Invocation      string      // string representation of call
 	Document        interface{} // input document
+	DocumentName	string 		// name of input document
 	Response        *Response   // response message
 	OutputPath      string      // output location
 	RunningAsPlugin bool        // true if app is being run as a plugin
@@ -86,6 +87,8 @@ When the -plugin option is specified, these flags are ignored.`)
 		version := request.Wrapper.Version
 		apiData := request.Wrapper.Value
 
+		env.DocumentName = request.Wrapper.Name
+
 		switch version {
 		case "v2":
 			documentv2 := &openapiv2.Document{}
@@ -112,6 +115,8 @@ When the -plugin option is specified, these flags are ignored.`)
 		if len(apiData) == 0 {
 			env.RespondAndExitIfError(fmt.Errorf("no input data"))
 		}
+
+		env.DocumentName = path.Base(*input)
 
 		// first try to unmarshal OpenAPI v2
 		documentv2 := &openapiv2.Document{}

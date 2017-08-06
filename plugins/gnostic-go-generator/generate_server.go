@@ -53,7 +53,7 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 		f.WriteLine(`  var err error`)
 		if method.hasParameters() {
 			f.WriteLine(`// instantiate the parameters structure`)
-			f.WriteLine(`parameters := &` + method.ParametersTypeName + `{}`)
+			f.WriteLine(`parameters := &` + method.ParametersType.Name + `{}`)
 			if method.Method == "POST" {
 				f.WriteLine(`// deserialize request from post data`)
 				f.WriteLine(`decoder := json.NewDecoder(r.Body)`)
@@ -92,7 +92,7 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 		}
 		if method.hasResponses() {
 			f.WriteLine(`// instantiate the responses structure`)
-			f.WriteLine(`responses := &` + method.ResponsesTypeName + `{}`)
+			f.WriteLine(`responses := &` + method.ResponsesType.Name + `{}`)
 		}
 		f.WriteLine(`// call the service provider`)
 		callLine := `err = provider.` + method.ProcessorName

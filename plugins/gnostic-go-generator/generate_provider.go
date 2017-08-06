@@ -31,14 +31,14 @@ func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
 		if method.hasParameters() {
 			if method.hasResponses() {
 				f.WriteLine(method.ProcessorName +
-					`(parameters *` + method.ParametersTypeName +
-					`, responses *` + method.ResponsesTypeName + `) (err error)`)
+					`(parameters *` + method.ParametersType.Name +
+					`, responses *` + method.ResponsesType.Name + `) (err error)`)
 			} else {
-				f.WriteLine(method.ProcessorName + `(parameters *` + method.ParametersTypeName + `) (err error)`)
+				f.WriteLine(method.ProcessorName + `(parameters *` + method.ParametersType.Name + `) (err error)`)
 			}
 		} else {
 			if method.hasResponses() {
-				f.WriteLine(method.ProcessorName + `(responses *` + method.ResponsesTypeName + `) (err error)`)
+				f.WriteLine(method.ProcessorName + `(responses *` + method.ResponsesType.Name + `) (err error)`)
 			} else {
 				f.WriteLine(method.ProcessorName + `() (err error)`)
 			}

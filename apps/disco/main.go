@@ -24,6 +24,7 @@ import (
 	"github.com/googleapis/gnostic/compiler"
 	"github.com/googleapis/gnostic/discovery"
 	"github.com/golang/protobuf/proto"
+	"strings"
 )
 
 func main() {
@@ -31,8 +32,8 @@ func main() {
 Usage:
 	disco help
 	disco list [--raw]
-	disco get [<api>] [<version>] [--raw] [--openapi2] [--openapi3] [--all]
-	disco <file> [--openapi2] [--openapi3]
+	disco get [<api>] [<version>] [--raw] [--openapi2] [--openapi3] [--features] [--all]
+	disco <file> [--openapi2] [--openapi3] [--features]
 	`
 	arguments, err := docopt.Parse(usage, nil, false, "Disco 1.0", false)
 	if err != nil {
@@ -78,7 +79,10 @@ Usage:
 		// Unpack the apis/list response.
 		listResponse, err := discovery.NewList(bytes)
 		if arguments["--all"].(bool) {
-			if !arguments["--raw"].(bool) && !arguments["--openapi2"].(bool) && !arguments["--openapi3"].(bool) {
+			if !arguments["--raw"].(bool) &&
+				!arguments["--openapi2"].(bool) &&
+				!arguments["--openapi3"].(bool) &&
+				!arguments["--features"].(bool) {
 				log.Fatalf("Please specify an output option.")
 			}
 			for _, api := range listResponse.APIs {
@@ -126,17 +130,17 @@ Usage:
 	}
 
 	// Do something with a local API description.
-	if arguments["<file>"] != nil {
+	if arguments["<file>"] != nil{
 		// Read the local file.
-		filename := arguments["<file>"].(string)
+			   filename := arguments["<file>"].(string)
 		bytes, err := ioutil.ReadFile(filename)
 		if err != nil {
-			log.Fatalf("%+v", err)
+		log.Fatalf("%+v", err)
 		}
 		// Export any requested formats.
 		_, err = handleExportArgumentsForBytes(arguments, bytes)
 		if err != nil {
-			log.Fatalf("%+v", err)
+		log.Fatalf("%+v", err)
 		}
 	}
 }
@@ -186,6 +190,14 @@ func handleExportArgumentsForBytes(arguments map[string]interface{}, bytes []byt
 			return handled, err
 		}
 		handled = true
+	}
+	if arguments["--features"].(bool) {
+		if len(discoveryDocument.Features) > 0 {
+			log.Printf("%s/%s features: %s\n",
+				discoveryDocument.Name,
+				discoveryDocument.Version,
+				strings.Join(discoveryDocument.Features, ","))
+		}
 	}
 	return handled, err
 }

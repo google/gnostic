@@ -110,13 +110,7 @@ func (model *ServiceModel) buildServiceMethodFromOperationV2(op *openapiv2.Opera
 	m.ProcessorName = m.Name
 	m.ClientName = m.Name
 	m.ParametersType, err = model.buildServiceTypeFromParametersV2(m.Name, op.Parameters)
-	if m.ParametersType != nil {
-		m.ParametersTypeName = m.ParametersType.Name
-	}
 	m.ResponsesType, err = model.buildServiceTypeFromResponsesV2(&m, m.Name, op.Responses)
-	if m.ResponsesType != nil {
-		m.ResponsesTypeName = m.ResponsesType.Name
-	}
 	model.Methods = append(model.Methods, &m)
 	return err
 }
