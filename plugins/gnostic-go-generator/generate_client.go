@@ -59,7 +59,7 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 		f.WriteLine(` ) {`)
 
 		path := method.Path
-		path = strings.Replace(path, "{+", "{",-1)
+		path = strings.Replace(path, "{+", "{", -1)
 		f.WriteLine(`path := client.service + "` + path + `"`)
 
 		if method.hasParametersWithPosition("path") {

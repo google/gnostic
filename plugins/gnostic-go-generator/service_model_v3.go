@@ -31,19 +31,16 @@ func NewServiceModelV3(document *openapiv3.Document, packageName string) (*Servi
 	model.Types = make([]*ServiceType, 0)
 	model.Methods = make([]*ServiceMethod, 0)
 	err := model.buildServiceV3(document)
-	if err != nil {
-		return nil, err
-	}
-	return model, nil
+	return model, err
 }
 
 // buildServiceV3 builds an API service description, preprocessing its types and methods for code generation.
 func (model *ServiceModel) buildServiceV3(document *openapiv3.Document) (err error) {
-	// Collect service type descriptions from Definitions section.
+	// Collect service type descriptions from Components/Schemas section.
 	if document.Components != nil && document.Components.Schemas != nil {
 		for _, pair := range document.Components.Schemas.AdditionalProperties {
 			if schema := pair.Value.GetSchema(); schema != nil {
-				t, err := model.buildServiceTypeFromDefinitionV3(pair.Name, schema)
+				t, err := model.buildServiceTypeFromSchemaV3(pair.Name, schema)
 				if err != nil {
 					return err
 				}
@@ -70,7 +67,10 @@ func (model *ServiceModel) buildServiceV3(document *openapiv3.Document) (err err
 	return err
 }
 
-func (model *ServiceModel) buildServiceTypeFromDefinitionV3(name string, schema *openapiv3.Schema) (t *ServiceType, err error) {
+// buildServiceTypeFromSchemaV3 builds a service type description from a schema in the API description
+func (model *ServiceModel) buildServiceTypeFromSchemaV3(
+	name string,
+	schema *openapiv3.Schema) (t *ServiceType, err error) {
 	t = &ServiceType{}
 	t.Name = strings.Title(filteredTypeName(name))
 	t.Description = t.Name + " implements the service definition of " + name
@@ -102,7 +102,11 @@ func (model *ServiceModel) buildServiceTypeFromDefinitionV3(name string, schema 
 	return t, err
 }
 
-func (model *ServiceModel) buildServiceMethodFromOperationV3(op *openapiv3.Operation, method string, path string) (err error) {
+// buildServiceMethodFromOperationV3 builds a service method description
+func (model *ServiceModel) buildServiceMethodFromOperationV3(
+	op *openapiv3.Operation,
+	method string,
+	path string) (err error) {
 	var m ServiceMethod
 	m.Name = cleanupOperationName(op.OperationId)
 	m.Path = path
@@ -115,18 +119,14 @@ func (model *ServiceModel) buildServiceMethodFromOperationV3(op *openapiv3.Opera
 	m.ProcessorName = m.Name
 	m.ClientName = m.Name
 	m.ParametersType, err = model.buildServiceTypeFromParametersV3(m.Name, op.Parameters, op.RequestBody)
-	if m.ParametersType != nil {
-		m.ParametersTypeName = m.ParametersType.Name
-	}
 	m.ResponsesType, err = model.buildServiceTypeFromResponsesV3(&m, m.Name, op.Responses)
-	if m.ResponsesType != nil {
-		m.ResponsesTypeName = m.ResponsesType.Name
-	}
 	model.Methods = append(model.Methods, &m)
 	return err
 }
 
-func (model *ServiceModel) buildServiceTypeFromParametersV3(name string,
+// buildServiceTypeFromParametersV3 builds a service type description from the parameters of an API method
+func (model *ServiceModel) buildServiceTypeFromParametersV3(
+	name string,
 	parameters []*openapiv3.ParameterOrReference,
 	requestBody *openapiv3.RequestBodyOrReference) (t *ServiceType, err error) {
 	t = &ServiceType{}
@@ -178,7 +178,11 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(name string,
 	return nil, err
 }
 
-func (model *ServiceModel) buildServiceTypeFromResponsesV3(m *ServiceMethod, name string, responses *openapiv3.Responses) (t *ServiceType, err error) {
+// buildServiceTypeFromResponsesV3 builds a service type description from the responses of an API method
+func (model *ServiceModel) buildServiceTypeFromResponsesV3(
+	m *ServiceMethod,
+	name string,
+	responses *openapiv3.Responses) (t *ServiceType, err error) {
 	t = &ServiceType{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
@@ -209,6 +213,7 @@ func (model *ServiceModel) buildServiceTypeFromResponsesV3(m *ServiceMethod, nam
 	return nil, err
 }
 
+// typeForSchemaOrReferenceV3 determines the language-specific type of a schema or reference
 func typeForSchemaOrReferenceV3(value *openapiv3.SchemaOrReference) (typeName string) {
 	if value.GetSchema() != nil {
 		return typeForSchemaV3(value.GetSchema())
@@ -219,39 +224,42 @@ func typeForSchemaOrReferenceV3(value *openapiv3.SchemaOrReference) (typeName st
 	return "todo"
 }
 
+// typeForSchema determines the language-specific type of a schema
 func typeForSchemaV3(schema *openapiv3.Schema) (typeName string) {
 	if schema.Type != "" {
 		format := schema.Format
-		if schema.Type == "string" {
+		switch schema.Type {
+		case "string":
 			return "string"
-		}
-		if schema.Type == "integer" && format == "int32" {
-			return "int32"
-		}
-		if schema.Type == "integer" {
+		case "integer":
+			if format == "int32" {
+				return "int32"
+			}
 			return "int"
-		}
-		if schema.Type == "number" {
+		case "number":
 			return "int"
-		}
-		if schema.Type == "boolean" {
+		case "boolean":
 			return "bool"
-		}
-		if schema.Type == "array" && schema.Items != nil {
-			// we have an array.., but of what?
-			items := schema.Items.SchemaOrReference
-			if len(items) == 1 {
-				if items[0].GetReference().GetXRef() != "" {
-					return "[]" + typeForRef(items[0].GetReference().GetXRef())
-				} else if items[0].GetSchema().Type == "string" {
-					return "[]string"
-				} else if items[0].GetSchema().Type == "object" {
-					return "[]interface{}"
+		case "array":
+			if schema.Items != nil {
+				// we have an array.., but of what?
+				items := schema.Items.SchemaOrReference
+				if len(items) == 1 {
+					if items[0].GetReference().GetXRef() != "" {
+						return "[]" + typeForRef(items[0].GetReference().GetXRef())
+					} else if items[0].GetSchema().Type == "string" {
+						return "[]string"
+					} else if items[0].GetSchema().Type == "object" {
+						return "[]interface{}"
+					}
 				}
 			}
-		}
-		if schema.Type == "object" && schema.AdditionalProperties == nil {
-			return "map[string]interface{}"
+		case "object":
+			if schema.AdditionalProperties == nil {
+				return "map[string]interface{}"
+			}
+		default:
+
 		}
 	}
 	if schema.AdditionalProperties != nil {
@@ -262,8 +270,7 @@ func typeForSchemaV3(schema *openapiv3.Schema) (typeName string) {
 			}
 		}
 	}
-	// this function is incomplete... so return a string representing anything that we don't handle
+	// this function is incomplete... return a string representing anything that we don't handle
 	log.Printf("unimplemented: %v", schema)
-
 	return fmt.Sprintf("unimplemented: %v", schema)
 }

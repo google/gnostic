@@ -25,8 +25,6 @@ type ServiceMethod struct {
 	ProcessorName      string       // name of the processing function in the service interface
 	ClientName         string       // name of client
 	ResultTypeName     string       // native type name for the result structure
-	ParametersTypeName string       // native type name for the input parameters structure
-	ResponsesTypeName  string       // native type name for the responses
 	ParametersType     *ServiceType // parameters (input), with fields corresponding to input parameters
 	ResponsesType      *ServiceType // responses (output), with fields corresponding to possible response values
 }

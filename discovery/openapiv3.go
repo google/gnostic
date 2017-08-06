@@ -126,7 +126,7 @@ func buildOpenAPI3RequestBodyForRequest(schema *Schema) *pb.RequestBody {
 	}
 }
 
-func buildOpenAPI3ResponseForSchema(schema *Schema) *pb.Response {
+func buildOpenAPI3ResponseForSchema(schema *Schema, hasDataWrapper bool) *pb.Response {
 	if schema == nil {
 		return &pb.Response{
 			Description: "Successful operation",
@@ -158,7 +158,7 @@ func buildOpenAPI3ResponseForSchema(schema *Schema) *pb.Response {
 	}
 }
 
-func buildOpenAPI3OperationForMethod(method *Method) *pb.Operation {
+func buildOpenAPI3OperationForMethod(method *Method, hasDataWrapper bool) *pb.Operation {
 	parameters := make([]*pb.ParameterOrReference, 0)
 	for _, p := range method.Parameters {
 		parameters = append(parameters, &pb.ParameterOrReference{
@@ -173,7 +173,7 @@ func buildOpenAPI3OperationForMethod(method *Method) *pb.Operation {
 				Name: "default",
 				Value: &pb.ResponseOrReference{
 					Oneof: &pb.ResponseOrReference_Response{
-						Response: buildOpenAPI3ResponseForSchema(method.Response),
+						Response: buildOpenAPI3ResponseForSchema(method.Response, hasDataWrapper),
 					},
 				},
 			},
@@ -215,8 +215,8 @@ func getOpenAPI3PathItemForPath(d *pb.Document, path string) *pb.PathItem {
 	return pathItem
 }
 
-func addOpenAPI3PathsForMethod(d *pb.Document, method *Method) {
-	operation := buildOpenAPI3OperationForMethod(method)
+func addOpenAPI3PathsForMethod(d *pb.Document, method *Method, hasDataWrapper bool) {
+	operation := buildOpenAPI3OperationForMethod(method, hasDataWrapper)
 	pathItem := getOpenAPI3PathItemForPath(d, method.path())
 	switch method.HTTPMethod {
 	case "GET":
@@ -234,12 +234,12 @@ func addOpenAPI3PathsForMethod(d *pb.Document, method *Method) {
 	}
 }
 
-func addOpenAPI3PathsForResource(d *pb.Document, resource *Resource) {
+func addOpenAPI3PathsForResource(d *pb.Document, resource *Resource, hasDataWrapper bool) {
 	for _, method := range resource.Methods {
-		addOpenAPI3PathsForMethod(d, method)
+		addOpenAPI3PathsForMethod(d, method, hasDataWrapper)
 	}
 	for _, resource2 := range resource.Resources {
-		addOpenAPI3PathsForResource(d, resource2)
+		addOpenAPI3PathsForResource(d, resource2, hasDataWrapper)
 	}
 }
 
@@ -254,6 +254,13 @@ func (api *Document) OpenAPIv3() (*pb.Document, error) {
 	}
 
 	d.Servers = make([]*pb.Server, 0)
+
+	hasDataWrapper := false
+	for _, feature := range api.Features {
+		if feature == "dataWrapper" {
+			hasDataWrapper = true
+		}
+	}
 
 	url, _ := url.Parse(api.RootURL)
 	host := url.Host
@@ -271,10 +278,10 @@ func (api *Document) OpenAPIv3() (*pb.Document, error) {
 
 	d.Paths = &pb.Paths{}
 	for _, method := range api.Methods {
-		addOpenAPI3PathsForMethod(d, method)
+		addOpenAPI3PathsForMethod(d, method, hasDataWrapper)
 	}
 	for _, resource := range api.Resources {
-		addOpenAPI3PathsForResource(d, resource)
+		addOpenAPI3PathsForResource(d, resource, hasDataWrapper)
 	}
 	return d, nil
 }
