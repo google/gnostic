@@ -20,17 +20,18 @@ import (
 	"path/filepath"
 
 	plugins "github.com/googleapis/gnostic/plugins"
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
 const newline = "\n"
 
 // ServiceRenderer generates code for a ServiceModel.
 type ServiceRenderer struct {
-	Model     *ServiceModel
+	Model     *surface.Model
 }
 
 // NewServiceRenderer creates a renderer.
-func NewServiceRenderer(model *ServiceModel) (renderer *ServiceRenderer, err error) {
+func NewServiceRenderer(model *surface.Model) (renderer *ServiceRenderer, err error) {
 	renderer = &ServiceRenderer{}
 	renderer.Model = model
 	return renderer, nil

@@ -16,6 +16,8 @@ package main
 
 import (
 	"strings"
+
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
 func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
@@ -49,7 +51,7 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 	for _, method := range renderer.Model.Methods {
 		f.WriteLine(commentForText(method.Description))
 		f.WriteLine(`func (client *Client) ` + method.ClientName + `(`)
-		f.WriteLine(method.parameterList() + `) (`)
+		f.WriteLine(method.ParameterList() + `) (`)
 		if method.ResponsesType == nil {
 			f.WriteLine(`err error,`)
 		} else {
@@ -62,19 +64,19 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 		path = strings.Replace(path, "{+", "{", -1)
 		f.WriteLine(`path := client.service + "` + path + `"`)
 
-		if method.hasParametersWithPosition("path") {
+		if method.HasParametersWithPosition(surface.Position_PATH) {
 			for _, field := range method.ParametersType.Fields {
-				if field.Position == "path" {
+				if field.Position == surface.Position_PATH {
 					f.WriteLine(`path = strings.Replace(path, "{` + field.Name + `}", fmt.Sprintf("%v", ` +
 						field.ParameterName + `), 1)`)
 				}
 			}
 		}
 
-		if method.hasParametersWithPosition("query") {
+		if method.HasParametersWithPosition(surface.Position_QUERY) {
 			f.WriteLine(`v := url.Values{}`)
 			for _, field := range method.ParametersType.Fields {
-				if field.Position == "query" {
+				if field.Position == surface.Position_QUERY {
 					if field.NativeType == "string" {
 						f.WriteLine(`if (` + field.ParameterName + ` != "") {`)
 						f.WriteLine(`  v.Set("` + field.Name + `", ` + field.ParameterName + `)`)
@@ -92,7 +94,7 @@ func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
 
 		if method.Method == "POST" {
 			f.WriteLine(`body := new(bytes.Buffer)`)
-			f.WriteLine(`json.NewEncoder(body).Encode(` + method.bodyParameterName() + `)`)
+			f.WriteLine(`json.NewEncoder(body).Encode(` + method.BodyParameterName() + `)`)
 			f.WriteLine(`req, err := http.NewRequest("` + method.Method + `", path, body)`)
 			f.WriteLine(`reqHeaders := make(http.Header)`)
 			f.WriteLine(`reqHeaders.Set("Content-Type", "application/json")`)

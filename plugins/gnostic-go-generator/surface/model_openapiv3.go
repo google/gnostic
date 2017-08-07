@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package gnostic_surface_v1
 
 import (
 	"errors"
@@ -23,25 +23,25 @@ import (
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 )
 
-// NewServiceModelV3 builds a model of an API service for use in code generation.
-func NewServiceModelV3(document *openapiv3.Document, packageName string) (*ServiceModel, error) {
+// NewModelV3 builds a model of an API service for use in code generation.
+func NewModelV3(document *openapiv3.Document, packageName string) (*Model, error) {
 	// Set model properties from passed-in document.
-	model := &ServiceModel{}
+	model := &Model{}
 	model.Name = document.Info.Title
 	model.Package = packageName // Set package name from argument.
-	model.Types = make([]*ServiceType, 0)
-	model.Methods = make([]*ServiceMethod, 0)
-	err := model.buildServiceV3(document)
+	model.Types = make([]*Type, 0)
+	model.Methods = make([]*Method, 0)
+	err := model.buildV3(document)
 	return model, err
 }
 
-// buildServiceV3 builds an API service description, preprocessing its types and methods for code generation.
-func (model *ServiceModel) buildServiceV3(document *openapiv3.Document) (err error) {
+// buildV3 builds an API service description, preprocessing its types and methods for code generation.
+func (model *Model) buildV3(document *openapiv3.Document) (err error) {
 	// Collect service type descriptions from Components/Schemas section.
 	if document.Components != nil && document.Components.Schemas != nil {
 		for _, pair := range document.Components.Schemas.AdditionalProperties {
 
-			t, err := model.buildServiceTypeFromSchemaOrReferenceV3(pair.Name, pair.Value)
+			t, err := model.buildTypeFromSchemaOrReferenceV3(pair.Name, pair.Value)
 			if err != nil {
 				return err
 			}
@@ -51,21 +51,21 @@ func (model *ServiceModel) buildServiceV3(document *openapiv3.Document) (err err
 	// Collect service method descriptions from each PathItem.
 	for _, pair := range document.Paths.Path {
 		for _, method := range []string{"GET", "PUT", "POST", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"} {
-			model.buildServiceMethodFromOperationV3(pair.Name, pair.Value, method)
+			model.buildMethodFromOperationV3(pair.Name, pair.Value, method)
 		}
 	}
 	return err
 }
 
-// buildServiceTypeFromSchemaOrReferenceV3 builds a service type description from a schema in the API description.
-func (model *ServiceModel) buildServiceTypeFromSchemaOrReferenceV3(
+// buildTypeFromSchemaOrReferenceV3 builds a service type description from a schema in the API description.
+func (model *Model) buildTypeFromSchemaOrReferenceV3(
 	name string,
-	schemaOrReference *openapiv3.SchemaOrReference) (t *ServiceType, err error) {
+	schemaOrReference *openapiv3.SchemaOrReference) (t *Type, err error) {
 	if schema := schemaOrReference.GetSchema(); schema != nil {
-		t = &ServiceType{}
+		t = &Type{}
 		t.Name = strings.Title(filteredTypeName(name))
 		t.Description = t.Name + " implements the service definition of " + name
-		t.Fields = make([]*ServiceTypeField, 0)
+		t.Fields = make([]*Field, 0)
 		if schema.Properties != nil {
 			if len(schema.Properties.AdditionalProperties) > 0 {
 				// If the schema has properties, generate a struct.
@@ -73,7 +73,7 @@ func (model *ServiceModel) buildServiceTypeFromSchemaOrReferenceV3(
 			}
 			for _, pair2 := range schema.Properties.AdditionalProperties {
 				if schema := pair2.Value; schema != nil {
-					var f ServiceTypeField
+					var f Field
 					f.Name = strings.Title(pair2.Name)
 					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
 					f.Type = typeForSchemaOrReferenceV3(schema)
@@ -96,8 +96,8 @@ func (model *ServiceModel) buildServiceTypeFromSchemaOrReferenceV3(
 	}
 }
 
-// buildServiceMethodFromOperationV3 builds a service method description
-func (model *ServiceModel) buildServiceMethodFromOperationV3(
+// buildMethodFromOperationV3 builds a service method description
+func (model *Model) buildMethodFromOperationV3(
 	path string,
 	pathItem *openapiv3.PathItem,
 	method string) (err error) {
@@ -123,7 +123,7 @@ func (model *ServiceModel) buildServiceMethodFromOperationV3(
 	if op == nil {
 		return nil
 	}
-	var m ServiceMethod
+	var m Method
 	m.Name = cleanupOperationName(op.OperationId)
 	m.Path = path
 	m.Method = method
@@ -134,28 +134,39 @@ func (model *ServiceModel) buildServiceMethodFromOperationV3(
 	m.HandlerName = "Handle" + m.Name
 	m.ProcessorName = m.Name
 	m.ClientName = m.Name
-	m.ParametersType, err = model.buildServiceTypeFromParametersV3(m.Name, op.Parameters, op.RequestBody)
-	m.ResponsesType, err = model.buildServiceTypeFromResponsesV3(&m, m.Name, op.Responses)
+	m.ParametersType, err = model.buildTypeFromParametersV3(m.Name, op.Parameters, op.RequestBody)
+	m.ResponsesType, err = model.buildTypeFromResponsesV3(&m, m.Name, op.Responses)
 	model.Methods = append(model.Methods, &m)
 	return err
 }
 
-// buildServiceTypeFromParametersV3 builds a service type description from the parameters of an API method
-func (model *ServiceModel) buildServiceTypeFromParametersV3(
+// buildTypeFromParametersV3 builds a service type description from the parameters of an API method
+func (model *Model) buildTypeFromParametersV3(
 	name string,
 	parameters []*openapiv3.ParameterOrReference,
-	requestBody *openapiv3.RequestBodyOrReference) (t *ServiceType, err error) {
-	t = &ServiceType{}
+	requestBody *openapiv3.RequestBodyOrReference) (t *Type, err error) {
+	t = &Type{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
 	t.Kind = "struct"
-	t.Fields = make([]*ServiceTypeField, 0)
+	t.Fields = make([]*Field, 0)
 	for _, parametersItem := range parameters {
-		var f ServiceTypeField
+		var f Field
 		f.Type = fmt.Sprintf("%+v", parametersItem)
 		parameter := parametersItem.GetParameter()
 		if parameter != nil {
-			f.Position = parameter.In
+			switch parameter.In {
+			case "body":
+				f.Position = Position_BODY
+			case "header":
+				f.Position = Position_HEADER
+			case "formdata":
+				f.Position = Position_FORMDATA
+			case "query":
+				f.Position = Position_QUERY
+			case "path":
+				f.Position = Position_PATH
+			}
 			f.Name = parameter.Name
 			f.FieldName = goFieldName(f.Name)
 			if parameter.GetSchema() != nil && parameter.GetSchema() != nil {
@@ -174,8 +185,8 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(
 		content := requestBody.GetRequestBody().GetContent()
 		if content != nil {
 			for _, pair2 := range content.GetAdditionalProperties() {
-				var f ServiceTypeField
-				f.Position = "body"
+				var f Field
+				f.Position = Position_BODY
 				f.Name = "resource"
 				f.FieldName = goFieldName(f.Name)
 				f.ValueType = typeForSchemaOrReferenceV3(pair2.GetValue().GetSchema())
@@ -194,21 +205,21 @@ func (model *ServiceModel) buildServiceTypeFromParametersV3(
 	return nil, err
 }
 
-// buildServiceTypeFromResponsesV3 builds a service type description from the responses of an API method
-func (model *ServiceModel) buildServiceTypeFromResponsesV3(
-	m *ServiceMethod,
+// buildTypeFromResponsesV3 builds a service type description from the responses of an API method
+func (model *Model) buildTypeFromResponsesV3(
+	m *Method,
 	name string,
-	responses *openapiv3.Responses) (t *ServiceType, err error) {
-	t = &ServiceType{}
+	responses *openapiv3.Responses) (t *Type, err error) {
+	t = &Type{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
 	t.Kind = "struct"
-	t.Fields = make([]*ServiceTypeField, 0)
+	t.Fields = make([]*Field, 0)
 
 	m.ResultTypeName = t.Name
 
 	for _, pair := range responses.ResponseOrReference {
-		var f ServiceTypeField
+		var f Field
 		f.Name = pair.Name
 		f.FieldName = propertyNameForResponseCode(pair.Name)
 		f.JSONName = ""
