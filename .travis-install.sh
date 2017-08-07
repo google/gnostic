@@ -14,8 +14,8 @@ cd
 mkdir -p local
 
 # Install swift
-SWIFT_BRANCH=swift-3.0.2-release
-SWIFT_VERSION=swift-3.0.2-RELEASE
+SWIFT_BRANCH=swift-3.1.1-release
+SWIFT_VERSION=swift-3.1.1-RELEASE
 SWIFT_PLATFORM=ubuntu14.04
 SWIFT_URL=https://swift.org/builds/$SWIFT_BRANCH/$(echo "$SWIFT_PLATFORM" | tr -d .)/$SWIFT_VERSION/$SWIFT_VERSION-$SWIFT_PLATFORM.tar.gz
 
