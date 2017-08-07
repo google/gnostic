@@ -17,38 +17,17 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 )
 
-// Remove lines containing only "//-" after templates have been expanded.
-// Code templates use "//-" prefixes to mark template operators
-// that otherwise would add unnecessary blank lines.
-func stripMarkers(inputBytes []byte) (outputBytes []byte) {
-	inputString := string(inputBytes)
-	inputLines := strings.Split(inputString, "\n")
-	outputLines := make([]string, 0)
-	for _, line := range inputLines {
-		if strings.Contains(line, "//-") {
-			removed := strings.TrimSpace(strings.Replace(line, "//-", "", 1))
-			if removed != "" {
-				outputLines = append(outputLines, removed)
-			}
-		} else {
-			outputLines = append(outputLines, line)
-		}
-	}
-	outputString := strings.Join(outputLines, "\n")
-	return []byte(outputString)
-}
-
-// Run the gofmt tool to format generated code.
-func gofmt(filename string, inputBytes []byte) (outputBytes []byte, err error) {
+// Run goimports to format and update imports statements in generated code.
+func goimports(filename string, inputBytes []byte) (outputBytes []byte, err error) {
 	if false {
 		return inputBytes, nil
 	}
-	cmd := exec.Command(runtime.GOROOT() + "/bin/gofmt")
+	cmd := exec.Command(os.Getenv("GOPATH") + "/bin/goimports")
 	input, _ := cmd.StdinPipe()
 	output, _ := cmd.StdoutPipe()
 	cmderr, _ := cmd.StderrPipe()
