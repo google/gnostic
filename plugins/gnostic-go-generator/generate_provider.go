@@ -14,7 +14,9 @@
 
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
 	f := NewLineWriter()
@@ -28,8 +30,8 @@ func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
 		f.WriteLine(``)
 		f.WriteLine(`// Provider`)
 		f.WriteLine(commentForText(method.Description))
-		if method.hasParameters() {
-			if method.hasResponses() {
+		if method.HasParameters() {
+			if method.HasResponses() {
 				f.WriteLine(method.ProcessorName +
 					`(parameters *` + method.ParametersType.Name +
 					`, responses *` + method.ResponsesType.Name + `) (err error)`)
@@ -37,7 +39,7 @@ func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
 				f.WriteLine(method.ProcessorName + `(parameters *` + method.ParametersType.Name + `) (err error)`)
 			}
 		} else {
-			if method.hasResponses() {
+			if method.HasResponses() {
 				f.WriteLine(method.ProcessorName + `(responses *` + method.ResponsesType.Name + `) (err error)`)
 			} else {
 				f.WriteLine(method.ProcessorName + `() (err error)`)

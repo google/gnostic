@@ -22,6 +22,7 @@ import (
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
 // This is the main function for the code generation plugin.
@@ -43,11 +44,11 @@ func main() {
 	}
 
 	// Create the model.
-	var model *ServiceModel
+	var model *surface.Model
 	if documentv2, ok := env.Document.(*openapiv2.Document); ok {
-		model, err = NewServiceModelV2(documentv2, packageName)
+		model, err = surface.NewModelV2(documentv2, packageName)
 	} else if documentv3, ok := env.Document.(*openapiv3.Document); ok {
-		model, err = NewServiceModelV3(documentv3, packageName)
+		model, err = surface.NewModelV3(documentv3, packageName)
 	}
 	env.RespondAndExitIfError(err)
 

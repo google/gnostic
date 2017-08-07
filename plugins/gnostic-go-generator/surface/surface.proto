@@ -1,0 +1,65 @@
+// Copyright 2017 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Model an API surface for code generation.
+
+syntax = "proto3";
+
+package gnostic.surface.v1;
+
+enum Position {
+	BODY = 0;
+	HEADER = 1;
+	FORMDATA = 2;
+	QUERY = 3;
+	PATH = 4;
+}
+
+message Field {
+	string name = 1;
+	string type = 2;
+	string valueType = 3;
+	string nativeType = 4;
+	string fieldName = 5;
+	string parameterName = 6;
+	string JSONName = 7;
+	Position Position = 8;
+}
+
+message Type {
+	string name = 1;
+	string kind = 2;
+	string description = 3;
+	repeated Field fields = 4;
+}
+
+message Method {
+	string name = 1;
+	string path = 2;
+	string method = 3;
+	string description = 4;
+	string handlerName = 5;
+	string processorName = 6;
+	string clientName = 7;
+	string resultTypeName = 8;
+	Type parametersType = 9;
+	Type responsesType = 10;
+}
+
+message Model {
+	string name = 1;
+	string package = 2;
+	repeated Type types = 3;
+	repeated Method methods = 4;
+}

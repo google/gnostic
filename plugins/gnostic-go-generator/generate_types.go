@@ -14,6 +14,10 @@
 
 package main
 
+import (
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+)
+
 func (renderer *ServiceRenderer) GenerateTypes() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine(`// GENERATED FILE: DO NOT EDIT!`)
@@ -37,7 +41,7 @@ func (renderer *ServiceRenderer) GenerateTypes() ([]byte, error) {
 	return f.Bytes(), nil
 }
 
-func jsonTag(field *ServiceTypeField) string {
+func jsonTag(field *surface.Field) string {
 	if field.JSONName != "" {
 		return " `json:" + `"` + field.JSONName + `,omitempty"` + "`"
 	}
