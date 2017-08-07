@@ -13,7 +13,7 @@ clean:
 	rm -rf bookstore bookstore.text service/service
 
 test:	all
-	- killall service
+	killall service; true # ignore errors due to no matching processes
 	cd service; go get .; go build; ./service &
 	go test
 	killall service

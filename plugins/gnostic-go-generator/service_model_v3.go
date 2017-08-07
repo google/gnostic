@@ -16,10 +16,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
-	"log"
 )
 
 // NewServiceModelV3 builds a model of an API service for use in code generation.
