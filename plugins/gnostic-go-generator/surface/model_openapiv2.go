@@ -89,10 +89,9 @@ func (b *OpenAPI2Builder) buildTypeFromDefinition(name string, schema *openapiv2
 		}
 		for _, pair2 := range schema.Properties.AdditionalProperties {
 			var f Field
-			f.Name = strings.Title(pair2.Name)
-			f.FieldName = strings.Replace(f.Name, "-", "_", -1)
+			f.Name = pair2.Name
 			f.Type = b.typeForSchema(pair2.Value)
-			f.JSONName = pair2.Name
+			f.Serialize = true
 			t.addField(&f)
 		}
 	}
@@ -117,9 +116,6 @@ func (b *OpenAPI2Builder) buildMethodFromOperation(op *openapiv2.Operation, meth
 		m.Name = generateOperationName(method, path)
 	}
 	m.Description = op.Description
-	m.HandlerName = "Handle" + m.Name
-	m.ProcessorName = m.Name
-	m.ClientName = m.Name
 	m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters)
 	m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
 	b.model.addMethod(&m)
@@ -140,55 +136,41 @@ func (b *OpenAPI2Builder) buildTypeFromParameters(name string, parameters []*ope
 			bodyParameter := parameter.GetBodyParameter()
 			if bodyParameter != nil {
 				f.Name = bodyParameter.Name
-				f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
 				if bodyParameter.Schema != nil {
 					f.Type = b.typeForSchema(bodyParameter.Schema)
-					f.NativeType = f.Type
-					f.Position = Position_BODY
 				}
+				f.Position = Position_BODY
 			}
 			nonBodyParameter := parameter.GetNonBodyParameter()
 			if nonBodyParameter != nil {
 				headerParameter := nonBodyParameter.GetHeaderParameterSubSchema()
 				if headerParameter != nil {
 					f.Name = headerParameter.Name
-					f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
 					f.Type = headerParameter.Type
-					f.NativeType = f.Type
 					f.Position = Position_HEADER
 				}
 				formDataParameter := nonBodyParameter.GetFormDataParameterSubSchema()
 				if formDataParameter != nil {
 					f.Name = formDataParameter.Name
-					f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
 					f.Type = formDataParameter.Type
-					f.NativeType = f.Type
 					f.Position = Position_FORMDATA
 				}
 				queryParameter := nonBodyParameter.GetQueryParameterSubSchema()
 				if queryParameter != nil {
 					f.Name = queryParameter.Name
-					f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
 					f.Type = queryParameter.Type
-					f.NativeType = f.Type
 					f.Position = Position_QUERY
 				}
 				pathParameter := nonBodyParameter.GetPathParameterSubSchema()
 				if pathParameter != nil {
 					f.Name = pathParameter.Name
-					f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
 					f.Type = pathParameter.Type
-					f.NativeType = f.Type
+					f.Format = pathParameter.Format
 					f.Position = Position_PATH
-					f.Type = typeForName(pathParameter.Type, pathParameter.Format)
 				}
 			}
-			f.JSONName = f.Name
-			f.ParameterName = goParameterName(f.FieldName)
+			f.Serialize = true
 			t.addField(&f)
-			if f.NativeType == "integer" {
-				f.NativeType = "int64"
-			}
 		}
 	}
 	if len(t.Fields) > 0 {
@@ -205,13 +187,10 @@ func (b *OpenAPI2Builder) buildTypeFromResponses(m *Method, name string, respons
 	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
 
-	m.ResultTypeName = t.Name
-
 	for _, responseCode := range responses.ResponseCode {
 		var f Field
 		f.Name = responseCode.Name
-		f.FieldName = propertyNameForResponseCode(responseCode.Name)
-		f.JSONName = ""
+		f.Serialize = false
 		response := responseCode.Value.GetResponse()
 		if response != nil && response.Schema != nil && response.Schema.GetSchema() != nil {
 			f.ValueType = b.typeForSchema(response.Schema.GetSchema())

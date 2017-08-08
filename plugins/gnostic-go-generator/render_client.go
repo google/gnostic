@@ -66,7 +66,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 		if method.ResponsesType == nil {
 			f.WriteLine(`err error,`)
 		} else {
-			f.WriteLine(`response *` + method.ResultTypeName + `,`)
+			f.WriteLine(`response *` + method.ResponsesType.Name + `,`)
 			f.WriteLine(`err error,`)
 		}
 		f.WriteLine(` ) {`)
@@ -105,7 +105,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 
 		if method.Method == "POST" {
 			f.WriteLine(`body := new(bytes.Buffer)`)
-			f.WriteLine(`json.NewEncoder(body).Encode(` + method.BodyParameterField().JSONName + `)`)
+			f.WriteLine(`json.NewEncoder(body).Encode(` + method.BodyParameterField().Name + `)`)
 			f.WriteLine(`req, err := http.NewRequest("` + method.Method + `", path, body)`)
 			f.WriteLine(`reqHeaders := make(http.Header)`)
 			f.WriteLine(`reqHeaders.Set("Content-Type", "application/json")`)
@@ -126,7 +126,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 		f.WriteLine(`}`)
 
 		if method.ResponsesType != nil {
-			f.WriteLine(`response = &` + method.ResultTypeName + `{}`)
+			f.WriteLine(`response = &` + method.ResponsesType.Name + `{}`)
 
 			f.WriteLine(`switch {`)
 			// first handle everything that isn't "default"

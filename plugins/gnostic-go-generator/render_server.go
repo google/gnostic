@@ -77,17 +77,17 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 				if field.Position == surface.Position_PATH {
 					if field.Type == "string" {
 						f.WriteLine(fmt.Sprintf("// %+v", field))
-						f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
+						f.WriteLine(`if value, ok := vars["` + field.Name + `"]; ok {`)
 						f.WriteLine(`	parameters.` + field.FieldName + ` = value`)
 						f.WriteLine(`}`)
 					} else {
-						f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
+						f.WriteLine(`if value, ok := vars["` + field.Name + `"]; ok {`)
 						f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(value)`)
 						f.WriteLine(`}`)
 					}
 				} else if field.Position == surface.Position_FORMDATA {
-					f.WriteLine(`if len(r.Form["` + field.JSONName + `"]) > 0 {`)
-					f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(r.Form["` + field.JSONName + `"][0])`)
+					f.WriteLine(`if len(r.Form["` + field.Name + `"]) > 0 {`)
+					f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(r.Form["` + field.Name + `"][0])`)
 					f.WriteLine(`}`)
 				}
 			}

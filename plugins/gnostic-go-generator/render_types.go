@@ -29,7 +29,7 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 		if modelType.Kind == surface.Kind_STRUCT {
 			f.WriteLine(`type ` + modelType.Name + ` struct {`)
 			for _, field := range modelType.Fields {
-				f.WriteLine(field.FieldName + ` ` + goType(field.Type) + jsonTag(field))
+				f.WriteLine(field.FieldName + ` ` + field.NativeType + jsonTag(field))
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.Kind_MAP {
@@ -42,17 +42,8 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 }
 
 func jsonTag(field *surface.Field) string {
-	if field.JSONName != "" {
-		return " `json:" + `"` + field.JSONName + `,omitempty"` + "`"
+	if field.Serialize {
+		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
 	}
 	return ""
-}
-
-func goType(openapiType string) string {
-	switch openapiType {
-	case "number":
-		return "int"
-	default:
-		return openapiType
-	}
 }
