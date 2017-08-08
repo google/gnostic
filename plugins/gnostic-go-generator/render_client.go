@@ -20,7 +20,7 @@ import (
 	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
-func (renderer *ServiceRenderer) GenerateClient() ([]byte, error) {
+func (renderer *Renderer) RenderClient() ([]byte, error) {
 	f := NewLineWriter()
 
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")

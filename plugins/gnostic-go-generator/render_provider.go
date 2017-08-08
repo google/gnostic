@@ -18,7 +18,7 @@ import (
 	"strings"
 )
 
-func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
+func (renderer *Renderer) RenderProvider() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!\n")
 	f.WriteLine("package " + renderer.Model.Package)
