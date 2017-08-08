@@ -57,7 +57,7 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	// Run the renderer to generate files and add them to the response object.
-	err = renderer.Generate(env.Response, files)
+	err = renderer.Render(env.Response, files)
 	env.RespondAndExitIfError(err)
 
 	// Return with success.

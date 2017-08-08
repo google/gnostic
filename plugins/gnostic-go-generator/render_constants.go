@@ -14,7 +14,7 @@
 
 package main
 
-func (renderer *ServiceRenderer) GenerateConstants() ([]byte, error) {
+func (renderer *Renderer) RenderConstants() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
 	f.WriteLine(``)
