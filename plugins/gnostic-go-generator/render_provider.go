@@ -21,7 +21,7 @@ import (
 func (renderer *Renderer) RenderProvider() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!\n")
-	f.WriteLine("package " + renderer.Model.Package)
+	f.WriteLine("package " + renderer.Package)
 	f.WriteLine(``)
 	f.WriteLine(`// To create a server, first write a class that implements this interface.`)
 	f.WriteLine(`// Then pass an instance of it to Initialize().`)

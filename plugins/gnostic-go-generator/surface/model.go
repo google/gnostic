@@ -21,6 +21,14 @@ import (
 	"unicode/utf8"
 )
 
+func (m *Model) addType(t *Type) {
+	m.Types = append(m.Types, t)
+}
+
+func (m *Model) addMethod(method *Method) {
+	m.Methods = append(m.Methods, method)
+}
+
 func (m *Model) TypeWithName(name string) *Type {
 	for _, t := range m.Types {
 		if t.Name == name {
@@ -38,7 +46,7 @@ func generateOperationName(method, path string) string {
 	return upperFirst(method) + filteredPath
 }
 
-func cleanupOperationName(name string) string {
+func sanitizeOperationName(name string) string {
 	name = strings.Title(name)
 	name = strings.Replace(name, ".", "_", -1)
 	return name

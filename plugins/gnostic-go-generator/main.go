@@ -46,14 +46,17 @@ func main() {
 	// Create the model.
 	var model *surface.Model
 	if documentv2, ok := env.Document.(*openapiv2.Document); ok {
-		model, err = surface.NewModelV2(documentv2, packageName)
+		model, err = surface.NewModelFromOpenAPI2(documentv2)
 	} else if documentv3, ok := env.Document.(*openapiv3.Document); ok {
-		model, err = surface.NewModelV3(documentv3, packageName)
+		model, err = surface.NewModelFromOpenAPI3(documentv3)
 	}
 	env.RespondAndExitIfError(err)
 
+	NewGoLanguageModel().Prepare(model)
+
 	// Create the renderer.
 	renderer, err := NewServiceRenderer(model)
+	renderer.Package = packageName
 	env.RespondAndExitIfError(err)
 
 	// Run the renderer to generate files and add them to the response object.

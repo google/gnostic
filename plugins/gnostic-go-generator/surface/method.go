@@ -14,46 +14,29 @@
 
 package gnostic_surface_v1
 
-const newline = "\n"
-
+// HasParameters returns true if a method has parameters
 func (m *Method) HasParameters() bool {
 	return m.ParametersType != nil
 }
 
+// HasResponses returns true if a method has responses
 func (m *Method) HasResponses() bool {
 	return m.ResponsesType != nil
 }
 
-func (m *Method) ParameterList() string {
-	result := ""
-	if m.ParametersType != nil {
-		for _, field := range m.ParametersType.Fields {
-			result += field.ParameterName + " " + field.NativeType + "," + newline
-		}
-	}
-	return result
-}
-
-func (m *Method) BodyParameterName() string {
+// BodyParameterField returns the body parameter field of a method, if one is present
+func (m *Method) BodyParameterField() *Field {
 	if m.ParametersType != nil {
 		for _, field := range m.ParametersType.Fields {
 			if field.Position == Position_BODY {
-				return field.JSONName
+				return field
 			}
 		}
 	}
-	return ""
+	return nil
 }
 
-func (m *Method) BodyParameterFieldName() string {
-	for _, field := range m.ParametersType.Fields {
-		if field.Position == Position_BODY {
-			return field.FieldName
-		}
-	}
-	return ""
-}
-
+// HasParametersWithPosition returns true if the method has parameters in a specified position.
 func (m *Method) HasParametersWithPosition(position Position) bool {
 	if m.ParametersType != nil {
 		for _, field := range m.ParametersType.Fields {

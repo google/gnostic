@@ -23,42 +23,54 @@ import (
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 )
 
-// NewModelV3 builds a model of an API service for use in code generation.
-func NewModelV3(document *openapiv3.Document, packageName string) (*Model, error) {
-	// Set model properties from passed-in document.
-	model := &Model{}
-	model.Name = document.Info.Title
-	model.Package = packageName // Set package name from argument.
-	model.Types = make([]*Type, 0)
-	model.Methods = make([]*Method, 0)
-	err := model.buildV3(document)
-	return model, err
+// NewModelFromOpenAPIv3 builds a model of an API service for use in code generation.
+func NewModelFromOpenAPI3(document *openapiv3.Document) (*Model, error) {
+	return newOpenAPI3Builder().buildModel(document)
 }
 
-// buildV3 builds an API service description, preprocessing its types and methods for code generation.
-func (model *Model) buildV3(document *openapiv3.Document) (err error) {
-	// Collect service type descriptions from Components/Schemas section.
+type OpenAPI3Builder struct {
+	model *Model
+}
+
+func newOpenAPI3Builder() *OpenAPI3Builder {
+	return &OpenAPI3Builder{model: &Model{}}
+}
+
+func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document) (*Model, error) {
+	// Set model properties from passed-in document.
+	b.model.Name = document.Info.Title
+	b.model.Types = make([]*Type, 0)
+	b.model.Methods = make([]*Method, 0)
+	err := b.build(document)
+	if err != nil {
+		return nil, err
+	}
+	return b.model, nil
+}
+
+// build builds an API service description, preprocessing its types and methods for code generation.
+func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
+	// Collect service type descriptions from Components/Schemas.
 	if document.Components != nil && document.Components.Schemas != nil {
 		for _, pair := range document.Components.Schemas.AdditionalProperties {
-
-			t, err := model.buildTypeFromSchemaOrReferenceV3(pair.Name, pair.Value)
+			t, err := b.buildTypeFromSchemaOrReference(pair.Name, pair.Value)
 			if err != nil {
 				return err
 			}
-			model.Types = append(model.Types, t)
+			if t != nil {
+				b.model.addType(t)
+			}
 		}
 	}
 	// Collect service method descriptions from each PathItem.
 	for _, pair := range document.Paths.Path {
-		for _, method := range []string{"GET", "PUT", "POST", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"} {
-			model.buildMethodFromOperationV3(pair.Name, pair.Value, method)
-		}
+		b.buildMethodFromPathItem(pair.Name, pair.Value)
 	}
 	return err
 }
 
-// buildTypeFromSchemaOrReferenceV3 builds a service type description from a schema in the API description.
-func (model *Model) buildTypeFromSchemaOrReferenceV3(
+// buildTypeFromSchemaOrReference builds a service type description from a schema in the API description.
+func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 	name string,
 	schemaOrReference *openapiv3.SchemaOrReference) (t *Type, err error) {
 	if schema := schemaOrReference.GetSchema(); schema != nil {
@@ -69,16 +81,16 @@ func (model *Model) buildTypeFromSchemaOrReferenceV3(
 		if schema.Properties != nil {
 			if len(schema.Properties.AdditionalProperties) > 0 {
 				// If the schema has properties, generate a struct.
-				t.Kind = "struct"
+				t.Kind = Kind_STRUCT
 			}
 			for _, pair2 := range schema.Properties.AdditionalProperties {
 				if schema := pair2.Value; schema != nil {
 					var f Field
 					f.Name = strings.Title(pair2.Name)
 					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
-					f.Type = typeForSchemaOrReferenceV3(schema)
+					f.Type = b.typeForSchemaOrReference(schema)
 					f.JSONName = pair2.Name
-					t.Fields = append(t.Fields, &f)
+					t.addField(&f)
 				}
 			}
 		}
@@ -87,7 +99,8 @@ func (model *Model) buildTypeFromSchemaOrReferenceV3(
 				// If the schema has no fixed properties and additional properties of a specified type,
 				// generate a map pointing to objects of that type.
 				mapType := typeForRef(schema.AdditionalProperties.GetSchemaOrReference().GetReference().GetXRef())
-				t.Kind = "map[string]" + mapType
+				t.Kind = Kind_MAP
+				t.MapType = mapType
 			}
 		}
 		return t, err
@@ -96,59 +109,60 @@ func (model *Model) buildTypeFromSchemaOrReferenceV3(
 	}
 }
 
-// buildMethodFromOperationV3 builds a service method description
-func (model *Model) buildMethodFromOperationV3(
+// buildMethodFromOperation builds a service method description
+func (b *OpenAPI3Builder) buildMethodFromPathItem(
 	path string,
-	pathItem *openapiv3.PathItem,
-	method string) (err error) {
-	var op *openapiv3.Operation
-	switch method {
-	case "GET":
-		op = pathItem.Get
-	case "PUT":
-		op = pathItem.Put
-	case "POST":
-		op = pathItem.Post
-	case "DELETE":
-		op = pathItem.Delete
-	case "OPTIONS":
-		op = pathItem.Options
-	case "HEAD":
-		op = pathItem.Head
-	case "PATCH":
-		op = pathItem.Patch
-	case "TRACE":
-		op = pathItem.Trace
+	pathItem *openapiv3.PathItem) (err error) {
+	for _, method := range []string{"GET", "PUT", "POST", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"} {
+		var op *openapiv3.Operation
+		switch method {
+		case "GET":
+			op = pathItem.Get
+		case "PUT":
+			op = pathItem.Put
+		case "POST":
+			op = pathItem.Post
+		case "DELETE":
+			op = pathItem.Delete
+		case "OPTIONS":
+			op = pathItem.Options
+		case "HEAD":
+			op = pathItem.Head
+		case "PATCH":
+			op = pathItem.Patch
+		case "TRACE":
+			op = pathItem.Trace
+		}
+		if op == nil {
+			return nil
+		}
+		var m Method
+		m.Name = sanitizeOperationName(op.OperationId)
+		m.Path = path
+		m.Method = method
+		if m.Name == "" {
+			m.Name = generateOperationName(method, path)
+		}
+		m.Description = op.Description
+		m.HandlerName = "Handle" + m.Name
+		m.ProcessorName = m.Name
+		m.ClientName = m.Name
+		m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody)
+		m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
+		b.model.addMethod(&m)
 	}
-	if op == nil {
-		return nil
-	}
-	var m Method
-	m.Name = cleanupOperationName(op.OperationId)
-	m.Path = path
-	m.Method = method
-	if m.Name == "" {
-		m.Name = generateOperationName(method, path)
-	}
-	m.Description = op.Description
-	m.HandlerName = "Handle" + m.Name
-	m.ProcessorName = m.Name
-	m.ClientName = m.Name
-	m.ParametersType, err = model.buildTypeFromParametersV3(m.Name, op.Parameters, op.RequestBody)
-	m.ResponsesType, err = model.buildTypeFromResponsesV3(&m, m.Name, op.Responses)
-	model.Methods = append(model.Methods, &m)
 	return err
 }
 
-// buildTypeFromParametersV3 builds a service type description from the parameters of an API method
-func (model *Model) buildTypeFromParametersV3(
+// buildTypeFromParameters builds a service type description from the parameters of an API method
+func (b *OpenAPI3Builder) buildTypeFromParameters(
 	name string,
 	parameters []*openapiv3.ParameterOrReference,
 	requestBody *openapiv3.RequestBodyOrReference) (t *Type, err error) {
 	t = &Type{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
-	t.Kind = "struct"
+	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
 	for _, parametersItem := range parameters {
 		var f Field
@@ -170,12 +184,12 @@ func (model *Model) buildTypeFromParametersV3(
 			f.Name = parameter.Name
 			f.FieldName = goFieldName(f.Name)
 			if parameter.GetSchema() != nil && parameter.GetSchema() != nil {
-				f.Type = typeForSchemaOrReferenceV3(parameter.GetSchema())
+				f.Type = b.typeForSchemaOrReference(parameter.GetSchema())
 				f.NativeType = f.Type
 			}
 			f.JSONName = f.Name
 			f.ParameterName = goParameterName(f.FieldName)
-			t.Fields = append(t.Fields, &f)
+			t.addField(&f)
 			if f.NativeType == "integer" {
 				f.NativeType = "int64"
 			}
@@ -189,31 +203,31 @@ func (model *Model) buildTypeFromParametersV3(
 				f.Position = Position_BODY
 				f.Name = "resource"
 				f.FieldName = goFieldName(f.Name)
-				f.ValueType = typeForSchemaOrReferenceV3(pair2.GetValue().GetSchema())
+				f.ValueType = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
 				f.Type = "*" + f.ValueType
 				f.NativeType = f.Type
 				f.JSONName = f.Name
 				f.ParameterName = goParameterName(f.FieldName)
-				t.Fields = append(t.Fields, &f)
+				t.addField(&f)
 			}
 		}
 	}
 	if len(t.Fields) > 0 {
-		model.Types = append(model.Types, t)
+		b.model.addType(t)
 		return t, err
 	}
 	return nil, err
 }
 
-// buildTypeFromResponsesV3 builds a service type description from the responses of an API method
-func (model *Model) buildTypeFromResponsesV3(
+// buildTypeFromResponses builds a service type description from the responses of an API method
+func (b *OpenAPI3Builder) buildTypeFromResponses(
 	m *Method,
 	name string,
 	responses *openapiv3.Responses) (t *Type, err error) {
 	t = &Type{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
-	t.Kind = "struct"
+	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
 
 	m.ResultTypeName = t.Name
@@ -226,24 +240,24 @@ func (model *Model) buildTypeFromResponsesV3(
 		response := pair.Value.GetResponse()
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
-				f.ValueType = typeForSchemaOrReferenceV3(pair2.GetValue().GetSchema())
+				f.ValueType = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
 				f.Type = "*" + f.ValueType
-				t.Fields = append(t.Fields, &f)
+				t.addField(&f)
 			}
 		}
 	}
 
 	if len(t.Fields) > 0 {
-		model.Types = append(model.Types, t)
+		b.model.addType(t)
 		return t, err
 	}
 	return nil, err
 }
 
-// typeForSchemaOrReferenceV3 determines the language-specific type of a schema or reference
-func typeForSchemaOrReferenceV3(value *openapiv3.SchemaOrReference) (typeName string) {
+// typeForSchemaOrReference determines the language-specific type of a schema or reference
+func (b *OpenAPI3Builder) typeForSchemaOrReference(value *openapiv3.SchemaOrReference) (typeName string) {
 	if value.GetSchema() != nil {
-		return typeForSchemaV3(value.GetSchema())
+		return b.typeForSchema(value.GetSchema())
 	}
 	if value.GetReference() != nil {
 		return typeForRef(value.GetReference().XRef)
@@ -252,7 +266,7 @@ func typeForSchemaOrReferenceV3(value *openapiv3.SchemaOrReference) (typeName st
 }
 
 // typeForSchema determines the language-specific type of a schema
-func typeForSchemaV3(schema *openapiv3.Schema) (typeName string) {
+func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (typeName string) {
 	if schema.Type != "" {
 		format := schema.Format
 		switch schema.Type {

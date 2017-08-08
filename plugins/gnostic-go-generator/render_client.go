@@ -20,12 +20,23 @@ import (
 	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
+// ParameterList returns a string representation of a method's parameters
+func ParameterList(m *surface.Method) string {
+	result := ""
+	if m.ParametersType != nil {
+		for _, field := range m.ParametersType.Fields {
+			result += field.ParameterName + " " + field.NativeType + "," + "\n"
+		}
+	}
+	return result
+}
+
 func (renderer *Renderer) RenderClient() ([]byte, error) {
 	f := NewLineWriter()
 
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
 	f.WriteLine(``)
-	f.WriteLine("package " + renderer.Model.Package)
+	f.WriteLine("package " + renderer.Package)
 
 	// imports will be automatically added by goimports
 
@@ -51,7 +62,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 	for _, method := range renderer.Model.Methods {
 		f.WriteLine(commentForText(method.Description))
 		f.WriteLine(`func (client *Client) ` + method.ClientName + `(`)
-		f.WriteLine(method.ParameterList() + `) (`)
+		f.WriteLine(ParameterList(method) + `) (`)
 		if method.ResponsesType == nil {
 			f.WriteLine(`err error,`)
 		} else {
@@ -94,7 +105,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 
 		if method.Method == "POST" {
 			f.WriteLine(`body := new(bytes.Buffer)`)
-			f.WriteLine(`json.NewEncoder(body).Encode(` + method.BodyParameterName() + `)`)
+			f.WriteLine(`json.NewEncoder(body).Encode(` + method.BodyParameterField().JSONName + `)`)
 			f.WriteLine(`req, err := http.NewRequest("` + method.Method + `", path, body)`)
 			f.WriteLine(`reqHeaders := make(http.Header)`)
 			f.WriteLine(`reqHeaders.Set("Content-Type", "application/json")`)

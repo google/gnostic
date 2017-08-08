@@ -23,11 +23,10 @@ import (
 	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
-const newline = "\n"
-
 // Renderer generates code for a surface.Model.
 type Renderer struct {
-	Model     *surface.Model
+	Model   *surface.Model
+	Package string // package name
 }
 
 // NewServiceRenderer creates a renderer.
@@ -58,7 +57,7 @@ func (renderer *Renderer) Render(response *plugins.Response, files []string) (er
 		if err != nil {
 			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
-		// run generated Go files through gofmt
+		// run generated Go files through goimports
 		if filepath.Ext(file.Name) == ".go" {
 			file.Data, err = goimports(file.Name, file.Data)
 		}
