@@ -14,16 +14,12 @@
 
 package gnostic_surface_v1
 
+func (t *Type) addField(f *Field) {
+	t.Fields = append(t.Fields, f)
+}
+
 func (s *Type) HasFieldWithName(name string) bool {
-	if s == nil || s.Fields == nil {
-		return false
-	}
-	for _, f := range s.Fields {
-		if f.FieldName == name {
-			return true
-		}
-	}
-	return false
+	return s.FieldWithName(name) != nil
 }
 
 func (s *Type) FieldWithName(name string) *Field {

@@ -22,18 +22,18 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine(`// GENERATED FILE: DO NOT EDIT!`)
 	f.WriteLine(``)
-	f.WriteLine(`package ` + renderer.Model.Package)
+	f.WriteLine(`package ` + renderer.Package)
 	f.WriteLine(`// Types used by the API.`)
 	for _, modelType := range renderer.Model.Types {
 		f.WriteLine(`// ` + modelType.Description)
-		if modelType.Kind == "struct" {
+		if modelType.Kind == surface.Kind_STRUCT {
 			f.WriteLine(`type ` + modelType.Name + ` struct {`)
 			for _, field := range modelType.Fields {
 				f.WriteLine(field.FieldName + ` ` + goType(field.Type) + jsonTag(field))
 			}
 			f.WriteLine(`}`)
-		} else if modelType.Kind != "" {
-			f.WriteLine(`type ` + modelType.Name + ` ` + modelType.Kind)
+		} else if modelType.Kind == surface.Kind_MAP {
+			f.WriteLine(`type ` + modelType.Name + ` map[string]` + modelType.MapType)
 		} else {
 			f.WriteLine(`type ` + modelType.Name + ` struct {}`)
 		}

@@ -24,7 +24,7 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
 	f.WriteLine(``)
-	f.WriteLine("package " + renderer.Model.Package)
+	f.WriteLine("package " + renderer.Package)
 	f.WriteLine(``)
 	imports := []string{
 		"github.com/gorilla/mux",
@@ -59,7 +59,7 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 			if method.Method == "POST" {
 				f.WriteLine(`// deserialize request from post data`)
 				f.WriteLine(`decoder := json.NewDecoder(r.Body)`)
-				f.WriteLine(`err = decoder.Decode(&parameters.` + method.BodyParameterFieldName() + `)`)
+				f.WriteLine(`err = decoder.Decode(&parameters.` + method.BodyParameterField().FieldName + `)`)
 				f.WriteLine(`if err != nil {`)
 				f.WriteLine(`	w.WriteHeader(http.StatusBadRequest)`)
 				f.WriteLine(`	w.Write([]byte(err.Error() + "\n"))`)
@@ -155,7 +155,7 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 	f.WriteLine(`// Provide the API service over HTTP.`)
 	f.WriteLine(`func ServeHTTP(address string) error {`)
 	f.WriteLine(`  if provider == nil {`)
-	f.WriteLine(`    return errors.New("Use ` + renderer.Model.Package + `.Initialize() to set a service provider.")`)
+	f.WriteLine(`    return errors.New("Use ` + renderer.Package + `.Initialize() to set a service provider.")`)
 	f.WriteLine(`  }`)
 	f.WriteLine(`  return http.ListenAndServe(address, nil)`)
 	f.WriteLine(`}`)

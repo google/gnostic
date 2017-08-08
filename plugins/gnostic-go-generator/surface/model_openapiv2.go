@@ -21,53 +21,63 @@ import (
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 )
 
-// NewModelV2 builds a model of an API service for use in code generation.
-func NewModelV2(document *openapiv2.Document, packageName string) (*Model, error) {
+// NewModelFromOpenAPI2 builds a model of an API service for use in code generation.
+func NewModelFromOpenAPI2(document *openapiv2.Document) (*Model, error) {
+	return newOpenAPI2Builder().buildModel(document)
+}
+
+type OpenAPI2Builder struct {
+	model *Model
+}
+
+func newOpenAPI2Builder() *OpenAPI2Builder {
+	return &OpenAPI2Builder{model: &Model{}}
+}
+
+func (b *OpenAPI2Builder) buildModel(document *openapiv2.Document) (*Model, error) {
 	// Set model properties from passed-in document.
-	model := &Model{}
-	model.Name = document.Info.Title
-	model.Package = packageName // Set package name from argument.
-	model.Types = make([]*Type, 0)
-	model.Methods = make([]*Method, 0)
-	err := model.buildV2(document)
+	b.model.Name = document.Info.Title
+	b.model.Types = make([]*Type, 0)
+	b.model.Methods = make([]*Method, 0)
+	err := b.build(document)
 	if err != nil {
 		return nil, err
 	}
-	return model, nil
+	return b.model, nil
 }
 
 // buildV2 builds an API service description, preprocessing its types and methods for code generation.
-func (model *Model) buildV2(document *openapiv2.Document) (err error) {
+func (b *OpenAPI2Builder) build(document *openapiv2.Document) (err error) {
 	// Collect service type descriptions from Definitions section.
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
-			t, err := model.buildTypeFromDefinitionV2(pair.Name, pair.Value)
+			t, err := b.buildTypeFromDefinition(pair.Name, pair.Value)
 			if err != nil {
 				return err
 			}
-			model.Types = append(model.Types, t)
+			b.model.addType(t)
 		}
 	}
 	// Collect service method descriptions from Paths section.
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			model.buildMethodFromOperationV2(v.Get, "GET", pair.Name)
+			b.buildMethodFromOperation(v.Get, "GET", pair.Name)
 		}
 		if v.Post != nil {
-			model.buildMethodFromOperationV2(v.Post, "POST", pair.Name)
+			b.buildMethodFromOperation(v.Post, "POST", pair.Name)
 		}
 		if v.Put != nil {
-			model.buildMethodFromOperationV2(v.Put, "PUT", pair.Name)
+			b.buildMethodFromOperation(v.Put, "PUT", pair.Name)
 		}
 		if v.Delete != nil {
-			model.buildMethodFromOperationV2(v.Delete, "DELETE", pair.Name)
+			b.buildMethodFromOperation(v.Delete, "DELETE", pair.Name)
 		}
 	}
 	return err
 }
 
-func (model *Model) buildTypeFromDefinitionV2(name string, schema *openapiv2.Schema) (t *Type, err error) {
+func (b *OpenAPI2Builder) buildTypeFromDefinition(name string, schema *openapiv2.Schema) (t *Type, err error) {
 	t = &Type{}
 	t.Name = strings.Title(filteredTypeName(name))
 	t.Description = t.Name + " implements the service definition of " + name
@@ -75,15 +85,15 @@ func (model *Model) buildTypeFromDefinitionV2(name string, schema *openapiv2.Sch
 	if schema.Properties != nil {
 		if len(schema.Properties.AdditionalProperties) > 0 {
 			// If the schema has properties, generate a struct.
-			t.Kind = "struct"
+			t.Kind = Kind_STRUCT
 		}
 		for _, pair2 := range schema.Properties.AdditionalProperties {
 			var f Field
 			f.Name = strings.Title(pair2.Name)
 			f.FieldName = strings.Replace(f.Name, "-", "_", -1)
-			f.Type = typeForSchemaV2(pair2.Value)
+			f.Type = b.typeForSchema(pair2.Value)
 			f.JSONName = pair2.Name
-			t.Fields = append(t.Fields, &f)
+			t.addField(&f)
 		}
 	}
 	if len(t.Fields) == 0 {
@@ -91,15 +101,16 @@ func (model *Model) buildTypeFromDefinitionV2(name string, schema *openapiv2.Sch
 			// If the schema has no fixed properties and additional properties of a specified type,
 			// generate a map pointing to objects of that type.
 			mapType := typeForRef(schema.AdditionalProperties.GetSchema().XRef)
-			t.Kind = "map[string]" + mapType
+			t.Kind = Kind_MAP
+			t.MapType = mapType
 		}
 	}
 	return t, err
 }
 
-func (model *Model) buildMethodFromOperationV2(op *openapiv2.Operation, method string, path string) (err error) {
+func (b *OpenAPI2Builder) buildMethodFromOperation(op *openapiv2.Operation, method string, path string) (err error) {
 	var m Method
-	m.Name = cleanupOperationName(op.OperationId)
+	m.Name = sanitizeOperationName(op.OperationId)
 	m.Path = path
 	m.Method = method
 	if m.Name == "" {
@@ -109,17 +120,17 @@ func (model *Model) buildMethodFromOperationV2(op *openapiv2.Operation, method s
 	m.HandlerName = "Handle" + m.Name
 	m.ProcessorName = m.Name
 	m.ClientName = m.Name
-	m.ParametersType, err = model.buildTypeFromParametersV2(m.Name, op.Parameters)
-	m.ResponsesType, err = model.buildTypeFromResponsesV2(&m, m.Name, op.Responses)
-	model.Methods = append(model.Methods, &m)
+	m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters)
+	m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
+	b.model.addMethod(&m)
 	return err
 }
 
-func (model *Model) buildTypeFromParametersV2(name string, parameters []*openapiv2.ParametersItem) (t *Type, err error) {
+func (b *OpenAPI2Builder) buildTypeFromParameters(name string, parameters []*openapiv2.ParametersItem) (t *Type, err error) {
 	t = &Type{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
-	t.Kind = "struct"
+	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
 	for _, parametersItem := range parameters {
 		var f Field
@@ -131,7 +142,7 @@ func (model *Model) buildTypeFromParametersV2(name string, parameters []*openapi
 				f.Name = bodyParameter.Name
 				f.FieldName = snakeCaseToCamelCase(strings.Replace(f.Name, "-", "_", -1))
 				if bodyParameter.Schema != nil {
-					f.Type = typeForSchemaV2(bodyParameter.Schema)
+					f.Type = b.typeForSchema(bodyParameter.Schema)
 					f.NativeType = f.Type
 					f.Position = Position_BODY
 				}
@@ -174,24 +185,24 @@ func (model *Model) buildTypeFromParametersV2(name string, parameters []*openapi
 			}
 			f.JSONName = f.Name
 			f.ParameterName = goParameterName(f.FieldName)
-			t.Fields = append(t.Fields, &f)
+			t.addField(&f)
 			if f.NativeType == "integer" {
 				f.NativeType = "int64"
 			}
 		}
 	}
 	if len(t.Fields) > 0 {
-		model.Types = append(model.Types, t)
+		b.model.addType(t)
 		return t, err
 	}
 	return nil, err
 }
 
-func (model *Model) buildTypeFromResponsesV2(m *Method, name string, responses *openapiv2.Responses) (t *Type, err error) {
+func (b *OpenAPI2Builder) buildTypeFromResponses(m *Method, name string, responses *openapiv2.Responses) (t *Type, err error) {
 	t = &Type{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
-	t.Kind = "struct"
+	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
 
 	m.ResultTypeName = t.Name
@@ -203,20 +214,20 @@ func (model *Model) buildTypeFromResponsesV2(m *Method, name string, responses *
 		f.JSONName = ""
 		response := responseCode.Value.GetResponse()
 		if response != nil && response.Schema != nil && response.Schema.GetSchema() != nil {
-			f.ValueType = typeForSchemaV2(response.Schema.GetSchema())
+			f.ValueType = b.typeForSchema(response.Schema.GetSchema())
 			f.Type = "*" + f.ValueType
-			t.Fields = append(t.Fields, &f)
+			t.addField(&f)
 		}
 	}
 
 	if len(t.Fields) > 0 {
-		model.Types = append(model.Types, t)
+		b.model.addType(t)
 		return t, err
 	}
 	return nil, err
 }
 
-func typeForSchemaV2(schema *openapiv2.Schema) (typeName string) {
+func (b *OpenAPI2Builder) typeForSchema(schema *openapiv2.Schema) (typeName string) {
 	ref := schema.XRef
 	if ref != "" {
 		return typeForRef(ref)

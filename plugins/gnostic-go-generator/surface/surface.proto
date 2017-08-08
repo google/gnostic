@@ -18,6 +18,11 @@ syntax = "proto3";
 
 package gnostic.surface.v1;
 
+enum Kind {
+	STRUCT = 0;
+	MAP = 1;
+}
+
 enum Position {
 	BODY = 0;
 	HEADER = 1;
@@ -26,40 +31,46 @@ enum Position {
 	PATH = 4;
 }
 
+// Field is a field in a definition and can be associated with
+// a position in a request structure.
 message Field {
-	string name = 1;
-	string type = 2;
-	string valueType = 3;
-	string nativeType = 4;
-	string fieldName = 5;
-	string parameterName = 6;
-	string JSONName = 7;
-	Position Position = 8;
+	string name = 1; // the name as specified in the API description
+	string type = 2; // the specified type of the field
+	string valueType = 3; // if Type is a pointer, this is the type of its value
+	string nativeType = 4; // the programming-language native type of the field
+	string fieldName = 5; // the name to use for a data structure field
+	string parameterName = 6; // the name to use for a function parameter
+	string JSONName = 7; // the name to use in JSON serialization
+	Position position = 8; // "body", "header", "formdata", "query", or "path"
 }
 
+// Type typically corresponds to a definition, parameter, or response
+// in an API and is represented by a type in generated code.
 message Type {
-	string name = 1;
-	string kind = 2;
-	string description = 3;
-	repeated Field fields = 4;
+	string name = 1; // the name to use for the type
+	Kind kind = 2; // a meta-description of the type (struct, map, etc)
+	string mapType = 3; // if the type is a map, this is its contents
+	string description = 4; // a comment describing the type
+	repeated Field fields = 5; // the fields of the type
 }
 
+// Method is an operation of an API and typically has associated client and server code.
 message Method {
-	string name = 1;
-	string path = 2;
-	string method = 3;
-	string description = 4;
-	string handlerName = 5;
-	string processorName = 6;
-	string clientName = 7;
-	string resultTypeName = 8;
-	Type parametersType = 9;
-	Type responsesType = 10;
+	string name = 1; // Operation name, possibly generated from method and path
+	string path = 2; // HTTP path
+	string method = 3; // HTTP method name
+	string description = 4; // description of method
+	string handlerName = 5; // name of the generated handler
+	string processorName = 6; // name of the processing function in the service interface
+	string clientName = 7; // name of client
+	string resultTypeName = 8; // native type name for the result structure
+	Type parametersType = 9; // parameters (input), with fields corresponding to input parameters
+	Type responsesType = 10; // responses (output), with fields corresponding to possible response values
 }
 
+// Model represents an API for code generation.
 message Model {
-	string name = 1;
-	string package = 2;
-	repeated Type types = 3;
-	repeated Method methods = 4;
+	string name = 1; // a free-form title for the API
+	repeated Type types = 2; // the types used by the API
+	repeated Method methods = 3; // the methods (functions) of the API
 }
