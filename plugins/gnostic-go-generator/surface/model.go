@@ -62,71 +62,8 @@ func filteredTypeName(typeName string) (name string) {
 	return name
 }
 
-func typeForName(name string, format string) (typeName string) {
-	switch name {
-	case "integer":
-		if format == "int32" {
-			return "int32"
-		} else if format == "int64" {
-			return "int64"
-		} else {
-			return "int32"
-		}
-	default:
-		return name
-	}
-}
-
 func typeForRef(ref string) (typeName string) {
 	return strings.Replace(strings.Title(path.Base(ref)), "-", "_", -1)
-}
-
-func propertyNameForResponseCode(code string) string {
-	if code == "200" {
-		return "OK"
-	}
-	name := strings.Title(code)
-	name = strings.Replace(name, "-", "_", -1)
-	return name
-}
-
-func snakeCaseToCamelCase(snakeCase string) (camelCase string) {
-	isToUpper := false
-	for _, runeValue := range snakeCase {
-		if isToUpper {
-			camelCase += strings.ToUpper(string(runeValue))
-			isToUpper = false
-		} else {
-			if runeValue == '_' {
-				isToUpper = true
-			} else {
-				camelCase += string(runeValue)
-			}
-		}
-	}
-	camelCase = strings.Title(camelCase)
-	return
-}
-
-func goParameterName(name string) string {
-	// lowercase first letter
-	a := []rune(name)
-	a[0] = unicode.ToLower(a[0])
-	name = string(a)
-	// replace dots with underscores
-	name = strings.Replace(name, ".", "_", -1)
-	// avoid reserved words
-	if name == "type" {
-		return "ttttype"
-	}
-	return name
-}
-
-func goFieldName(name string) string {
-	name = strings.Replace(name, ".", "_", -1)
-	name = strings.Replace(name, "-", "_", -1)
-	name = snakeCaseToCamelCase(name)
-	return name
 }
 
 // convert the first character of a string to upper case

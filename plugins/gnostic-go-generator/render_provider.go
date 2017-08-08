@@ -28,7 +28,6 @@ func (renderer *Renderer) RenderProvider() ([]byte, error) {
 	f.WriteLine(`type Provider interface {`)
 	for _, method := range renderer.Model.Methods {
 		f.WriteLine(``)
-		f.WriteLine(`// Provider`)
 		f.WriteLine(commentForText(method.Description))
 		if method.HasParameters() {
 			if method.HasResponses() {

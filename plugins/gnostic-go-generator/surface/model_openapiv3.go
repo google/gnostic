@@ -86,10 +86,9 @@ func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 			for _, pair2 := range schema.Properties.AdditionalProperties {
 				if schema := pair2.Value; schema != nil {
 					var f Field
-					f.Name = strings.Title(pair2.Name)
-					f.FieldName = strings.Replace(f.Name, "-", "_", -1)
+					f.Name = pair2.Name
 					f.Type = b.typeForSchemaOrReference(schema)
-					f.JSONName = pair2.Name
+					f.Serialize = true
 					t.addField(&f)
 				}
 			}
@@ -133,23 +132,22 @@ func (b *OpenAPI3Builder) buildMethodFromPathItem(
 		case "TRACE":
 			op = pathItem.Trace
 		}
-		if op == nil {
-			return nil
+		if op != nil {
+			var m Method
+			m.Name = sanitizeOperationName(op.OperationId)
+			m.Path = path
+			m.Method = method
+			if m.Name == "" {
+				m.Name = generateOperationName(method, path)
+			}
+			m.Description = op.Description
+			m.HandlerName = "Handle" + m.Name
+			m.ProcessorName = m.Name
+			m.ClientName = m.Name
+			m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody)
+			m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
+			b.model.addMethod(&m)
 		}
-		var m Method
-		m.Name = sanitizeOperationName(op.OperationId)
-		m.Path = path
-		m.Method = method
-		if m.Name == "" {
-			m.Name = generateOperationName(method, path)
-		}
-		m.Description = op.Description
-		m.HandlerName = "Handle" + m.Name
-		m.ProcessorName = m.Name
-		m.ClientName = m.Name
-		m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody)
-		m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
-		b.model.addMethod(&m)
 	}
 	return err
 }
@@ -182,17 +180,11 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 				f.Position = Position_PATH
 			}
 			f.Name = parameter.Name
-			f.FieldName = goFieldName(f.Name)
 			if parameter.GetSchema() != nil && parameter.GetSchema() != nil {
 				f.Type = b.typeForSchemaOrReference(parameter.GetSchema())
-				f.NativeType = f.Type
 			}
-			f.JSONName = f.Name
-			f.ParameterName = goParameterName(f.FieldName)
+			f.Serialize = true
 			t.addField(&f)
-			if f.NativeType == "integer" {
-				f.NativeType = "int64"
-			}
 		}
 	}
 	if requestBody != nil {
@@ -202,12 +194,9 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 				var f Field
 				f.Position = Position_BODY
 				f.Name = "resource"
-				f.FieldName = goFieldName(f.Name)
 				f.ValueType = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
 				f.Type = "*" + f.ValueType
-				f.NativeType = f.Type
-				f.JSONName = f.Name
-				f.ParameterName = goParameterName(f.FieldName)
+				f.Serialize = true
 				t.addField(&f)
 			}
 		}
@@ -230,13 +219,10 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
 
-	m.ResultTypeName = t.Name
-
 	for _, pair := range responses.ResponseOrReference {
 		var f Field
 		f.Name = pair.Name
-		f.FieldName = propertyNameForResponseCode(pair.Name)
-		f.JSONName = ""
+		f.Serialize = false
 		response := pair.Value.GetResponse()
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
