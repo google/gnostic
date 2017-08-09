@@ -32,12 +32,12 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 
 	for _, t := range model.Types {
 		log.Printf("%s", t.Name)
+		// determine the type used for Go language implementation of the type
+		t.TypeName = strings.Title(filteredTypeName(t.Name))
 		for _, f := range t.Fields {
 			log.Printf("  %s %s %s", f.Name, f.Type, f.Format)
-
 			f.FieldName = goFieldName(f.Name)
 			f.ParameterName = goParameterName(f.Name)
-
 			f.NativeType = f.Type
 			if f.NativeType == "number" {
 				f.NativeType = "int"
@@ -49,14 +49,15 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 
 	for _, m := range model.Methods {
 		log.Printf("%s %s", m.Method, m.Path)
-
+		parametersType := model.TypeWithTypeName(m.ParametersTypeName)
+		responsesType := model.TypeWithTypeName(m.ResponsesTypeName)
 		p1 := "?"
 		p2 := "?"
-		if m.ParametersType != nil {
-			p1 = m.ParametersType.Name
+		if parametersType != nil {
+			p1 = parametersType.Name
 		}
-		if m.ResponsesType != nil {
-			p2 = m.ResponsesType.Name
+		if responsesType != nil {
+			p2 = responsesType.Name
 		}
 
 		log.Printf("  %s %s", p1, p2)
@@ -107,6 +108,16 @@ func snakeCaseToCamelCaseWithCapitalizedFirstLetter(snakeCase string) (camelCase
 	}
 	camelCase = strings.Title(camelCase)
 	return
+}
+
+func filteredTypeName(typeName string) (name string) {
+	// first take the last path segment
+	parts := strings.Split(typeName, "/")
+	name = parts[len(parts)-1]
+	// then take the last part of a dotted name
+	parts = strings.Split(name, ".")
+	name = parts[len(parts)-1]
+	return name
 }
 
 // unused

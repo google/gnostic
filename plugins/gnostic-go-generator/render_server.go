@@ -49,17 +49,21 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 	f.WriteLine(``)
 
 	for _, method := range renderer.Model.Methods {
+		parametersType := renderer.Model.TypeWithTypeName(method.ParametersTypeName)
+		responsesType := renderer.Model.TypeWithTypeName(method.ResponsesTypeName)
+
 		f.WriteLine(`// Handler`)
 		f.WriteLine(commentForText(method.Description))
 		f.WriteLine(`func ` + method.HandlerName + `(w http.ResponseWriter, r *http.Request) {`)
 		f.WriteLine(`  var err error`)
-		if method.HasParameters() {
+		if parametersType != nil {
 			f.WriteLine(`// instantiate the parameters structure`)
-			f.WriteLine(`parameters := &` + method.ParametersType.Name + `{}`)
+			f.WriteLine(`parameters := &` + parametersType.Name + `{}`)
 			if method.Method == "POST" {
 				f.WriteLine(`// deserialize request from post data`)
 				f.WriteLine(`decoder := json.NewDecoder(r.Body)`)
-				f.WriteLine(`err = decoder.Decode(&parameters.` + method.BodyParameterField().FieldName + `)`)
+				f.WriteLine(`err = decoder.Decode(&parameters.` +
+					parametersType.FieldWithPosition(surface.Position_BODY).FieldName + `)`)
 				f.WriteLine(`if err != nil {`)
 				f.WriteLine(`	w.WriteHeader(http.StatusBadRequest)`)
 				f.WriteLine(`	w.Write([]byte(err.Error() + "\n"))`)
@@ -67,13 +71,13 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 				f.WriteLine(`}`)
 			}
 			f.WriteLine(`// get request fields in path and query parameters`)
-			if method.HasParametersWithPosition(surface.Position_PATH) {
+			if parametersType.HasFieldWithPosition(surface.Position_PATH) {
 				f.WriteLine(`vars := mux.Vars(r)`)
 			}
-			if method.HasParametersWithPosition(surface.Position_FORMDATA) {
+			if parametersType.HasFieldWithPosition(surface.Position_FORMDATA) {
 				f.WriteLine(`r.ParseForm()`)
 			}
-			for _, field := range method.ParametersType.Fields {
+			for _, field := range parametersType.Fields {
 				if field.Position == surface.Position_PATH {
 					if field.Type == "string" {
 						f.WriteLine(fmt.Sprintf("// %+v", field))
@@ -92,20 +96,20 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 				}
 			}
 		}
-		if method.HasResponses() {
+		if responsesType != nil {
 			f.WriteLine(`// instantiate the responses structure`)
-			f.WriteLine(`responses := &` + method.ResponsesType.Name + `{}`)
+			f.WriteLine(`responses := &` + method.ResponsesTypeName + `{}`)
 		}
 		f.WriteLine(`// call the service provider`)
 		callLine := `err = provider.` + method.ProcessorName
-		if method.HasParameters() {
-			if method.HasResponses() {
+		if parametersType != nil {
+			if responsesType != nil {
 				callLine += `(parameters, responses)`
 			} else {
 				callLine += `(parameters)`
 			}
 		} else {
-			if method.HasResponses() {
+			if responsesType != nil {
 				callLine += `(responses)`
 			} else {
 				callLine += `()`
@@ -113,8 +117,8 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 		}
 		f.WriteLine(callLine)
 		f.WriteLine(`if err == nil {`)
-		if method.HasResponses() {
-			if method.ResponsesType.HasFieldWithName("OK") {
+		if responsesType != nil {
+			if responsesType.HasFieldWithName("OK") {
 				f.WriteLine(`if responses.OK != nil {`)
 				f.WriteLine(`  // write the normal response`)
 				f.WriteLine(`  encoder := json.NewEncoder(w)`)
@@ -122,10 +126,10 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 				f.WriteLine(`  return`)
 				f.WriteLine(`}`)
 			}
-			if method.ResponsesType.HasFieldWithName("Default") {
+			if responsesType.HasFieldWithName("Default") {
 				f.WriteLine(`if responses.Default != nil {`)
 				f.WriteLine(`  // write the error response`)
-				if method.ResponsesType.FieldWithName("Default").ServiceType(renderer.Model).FieldWithName("Code") != nil {
+				if responsesType.FieldWithName("Default").ServiceType(renderer.Model).FieldWithName("Code") != nil {
 					f.WriteLine(`  w.WriteHeader(int(responses.Default.Code))`)
 				}
 				f.WriteLine(`  encoder := json.NewEncoder(w)`)
@@ -159,6 +163,5 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 	f.WriteLine(`  }`)
 	f.WriteLine(`  return http.ListenAndServe(address, nil)`)
 	f.WriteLine(`}`)
-
 	return f.Bytes(), nil
 }

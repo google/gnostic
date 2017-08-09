@@ -27,19 +27,21 @@ func (renderer *Renderer) RenderProvider() ([]byte, error) {
 	f.WriteLine(`// Then pass an instance of it to Initialize().`)
 	f.WriteLine(`type Provider interface {`)
 	for _, method := range renderer.Model.Methods {
+		parametersType := renderer.Model.TypeWithTypeName(method.ParametersTypeName)
+		responsesType := renderer.Model.TypeWithTypeName(method.ResponsesTypeName)
 		f.WriteLine(``)
 		f.WriteLine(commentForText(method.Description))
-		if method.HasParameters() {
-			if method.HasResponses() {
+		if parametersType != nil {
+			if responsesType != nil {
 				f.WriteLine(method.ProcessorName +
-					`(parameters *` + method.ParametersType.Name +
-					`, responses *` + method.ResponsesType.Name + `) (err error)`)
+					`(parameters *` + parametersType.Name +
+					`, responses *` + responsesType.Name + `) (err error)`)
 			} else {
-				f.WriteLine(method.ProcessorName + `(parameters *` + method.ParametersType.Name + `) (err error)`)
+				f.WriteLine(method.ProcessorName + `(parameters *` + parametersType.Name + `) (err error)`)
 			}
 		} else {
-			if method.HasResponses() {
-				f.WriteLine(method.ProcessorName + `(responses *` + method.ResponsesType.Name + `) (err error)`)
+			if responsesType != nil {
+				f.WriteLine(method.ProcessorName + `(responses *` + responsesType.Name + `) (err error)`)
 			} else {
 				f.WriteLine(method.ProcessorName + `() (err error)`)
 			}

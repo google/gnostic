@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 )
@@ -75,8 +74,8 @@ func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 	schemaOrReference *openapiv3.SchemaOrReference) (t *Type, err error) {
 	if schema := schemaOrReference.GetSchema(); schema != nil {
 		t = &Type{}
-		t.Name = strings.Title(filteredTypeName(name))
-		t.Description = t.Name + " implements the service definition of " + name
+		t.Name = name
+		t.Description = "implements the service definition of " + name
 		t.Fields = make([]*Field, 0)
 		if schema.Properties != nil {
 			if len(schema.Properties.AdditionalProperties) > 0 {
@@ -141,11 +140,8 @@ func (b *OpenAPI3Builder) buildMethodFromPathItem(
 				m.Name = generateOperationName(method, path)
 			}
 			m.Description = op.Description
-			m.HandlerName = "Handle" + m.Name
-			m.ProcessorName = m.Name
-			m.ClientName = m.Name
-			m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody)
-			m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
+			m.ParametersTypeName, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody)
+			m.ResponsesTypeName, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
 			b.model.addMethod(&m)
 		}
 	}
@@ -156,8 +152,8 @@ func (b *OpenAPI3Builder) buildMethodFromPathItem(
 func (b *OpenAPI3Builder) buildTypeFromParameters(
 	name string,
 	parameters []*openapiv3.ParameterOrReference,
-	requestBody *openapiv3.RequestBodyOrReference) (t *Type, err error) {
-	t = &Type{}
+	requestBody *openapiv3.RequestBodyOrReference) (typeName string, err error) {
+	t := &Type{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
 	t.Kind = Kind_STRUCT
@@ -203,17 +199,17 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 	}
 	if len(t.Fields) > 0 {
 		b.model.addType(t)
-		return t, err
+		return t.Name, err
 	}
-	return nil, err
+	return "", err
 }
 
 // buildTypeFromResponses builds a service type description from the responses of an API method
 func (b *OpenAPI3Builder) buildTypeFromResponses(
 	m *Method,
 	name string,
-	responses *openapiv3.Responses) (t *Type, err error) {
-	t = &Type{}
+	responses *openapiv3.Responses) (typeName string, err error) {
+	t := &Type{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
 	t.Kind = Kind_STRUCT
@@ -235,9 +231,9 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 
 	if len(t.Fields) > 0 {
 		b.model.addType(t)
-		return t, err
+		return t.Name, err
 	}
-	return nil, err
+	return "", err
 }
 
 // typeForSchemaOrReference determines the language-specific type of a schema or reference
