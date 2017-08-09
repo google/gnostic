@@ -23,11 +23,27 @@ func (s *Type) HasFieldWithName(name string) bool {
 }
 
 func (s *Type) FieldWithName(name string) *Field {
-	if s == nil || s.Fields == nil {
+	if s == nil || s.Fields == nil || name == "" {
 		return nil
 	}
 	for _, f := range s.Fields {
 		if f.FieldName == name {
+			return f
+		}
+	}
+	return nil
+}
+
+func (s *Type) HasFieldWithPosition(position Position) bool {
+	return s.FieldWithPosition(position) != nil
+}
+
+func (s *Type) FieldWithPosition(position Position) *Field {
+	if s == nil || s.Fields == nil {
+		return nil
+	}
+	for _, f := range s.Fields {
+		if f.Position == position {
 			return f
 		}
 	}

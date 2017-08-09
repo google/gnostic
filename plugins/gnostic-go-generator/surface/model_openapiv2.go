@@ -16,7 +16,6 @@ package gnostic_surface_v1
 
 import (
 	"fmt"
-	"strings"
 
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 )
@@ -79,8 +78,8 @@ func (b *OpenAPI2Builder) build(document *openapiv2.Document) (err error) {
 
 func (b *OpenAPI2Builder) buildTypeFromDefinition(name string, schema *openapiv2.Schema) (t *Type, err error) {
 	t = &Type{}
-	t.Name = strings.Title(filteredTypeName(name))
-	t.Description = t.Name + " implements the service definition of " + name
+	t.Name = name
+	t.Description = "implements the service definition of " + name
 	t.Fields = make([]*Field, 0)
 	if schema.Properties != nil {
 		if len(schema.Properties.AdditionalProperties) > 0 {
@@ -116,14 +115,14 @@ func (b *OpenAPI2Builder) buildMethodFromOperation(op *openapiv2.Operation, meth
 		m.Name = generateOperationName(method, path)
 	}
 	m.Description = op.Description
-	m.ParametersType, err = b.buildTypeFromParameters(m.Name, op.Parameters)
-	m.ResponsesType, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
+	m.ParametersTypeName, err = b.buildTypeFromParameters(m.Name, op.Parameters)
+	m.ResponsesTypeName, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
 	b.model.addMethod(&m)
 	return err
 }
 
-func (b *OpenAPI2Builder) buildTypeFromParameters(name string, parameters []*openapiv2.ParametersItem) (t *Type, err error) {
-	t = &Type{}
+func (b *OpenAPI2Builder) buildTypeFromParameters(name string, parameters []*openapiv2.ParametersItem) (typeName string, err error) {
+	t := &Type{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
 	t.Kind = Kind_STRUCT
@@ -175,13 +174,13 @@ func (b *OpenAPI2Builder) buildTypeFromParameters(name string, parameters []*ope
 	}
 	if len(t.Fields) > 0 {
 		b.model.addType(t)
-		return t, err
+		return t.Name, err
 	}
-	return nil, err
+	return "", err
 }
 
-func (b *OpenAPI2Builder) buildTypeFromResponses(m *Method, name string, responses *openapiv2.Responses) (t *Type, err error) {
-	t = &Type{}
+func (b *OpenAPI2Builder) buildTypeFromResponses(m *Method, name string, responses *openapiv2.Responses) (typeName string, err error) {
+	t := &Type{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
 	t.Kind = Kind_STRUCT
@@ -201,9 +200,9 @@ func (b *OpenAPI2Builder) buildTypeFromResponses(m *Method, name string, respons
 
 	if len(t.Fields) > 0 {
 		b.model.addType(t)
-		return t, err
+		return t.Name, err
 	}
-	return nil, err
+	return "", err
 }
 
 func (b *OpenAPI2Builder) typeForSchema(schema *openapiv2.Schema) (typeName string) {

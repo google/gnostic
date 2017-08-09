@@ -29,9 +29,12 @@ func (m *Model) addMethod(method *Method) {
 	m.Methods = append(m.Methods, method)
 }
 
-func (m *Model) TypeWithName(name string) *Type {
+func (m *Model) TypeWithTypeName(name string) *Type {
+	if name == "" {
+		return nil
+	}
 	for _, t := range m.Types {
-		if t.Name == name {
+		if t.TypeName == name {
 			return t
 		}
 	}
@@ -49,16 +52,6 @@ func generateOperationName(method, path string) string {
 func sanitizeOperationName(name string) string {
 	name = strings.Title(name)
 	name = strings.Replace(name, ".", "_", -1)
-	return name
-}
-
-func filteredTypeName(typeName string) (name string) {
-	// first take the last path segment
-	parts := strings.Split(typeName, "/")
-	name = parts[len(parts)-1]
-	// then take the last part of a dotted name
-	parts = strings.Split(name, ".")
-	name = parts[len(parts)-1]
 	return name
 }
 

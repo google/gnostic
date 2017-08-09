@@ -56,6 +56,8 @@ message Type {
 	string mapType = 3; // if the type is a map, this is its contents
 	string description = 4; // a comment describing the type
 	repeated Field fields = 5; // the fields of the type
+
+	string typeName = 6; // language-specific type name
 }
 
 // Method is an operation of an API and typically has associated client and server code.
@@ -69,8 +71,8 @@ message Method {
 	string processorName = 6; // name of the processing function in the service interface
 	string clientName = 7; // name of client
 
-	Type parametersType = 9; // parameters (input), with fields corresponding to input parameters
-	Type responsesType = 10; // responses (output), with fields corresponding to possible response values
+	string parametersTypeName = 9; // parameters (input), with fields corresponding to input parameters
+	string responsesTypeName = 10; // responses (output), with fields corresponding to possible response values
 }
 
 // Model represents an API for code generation.

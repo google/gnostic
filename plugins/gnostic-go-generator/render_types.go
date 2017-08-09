@@ -27,15 +27,15 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 	for _, modelType := range renderer.Model.Types {
 		f.WriteLine(`// ` + modelType.Description)
 		if modelType.Kind == surface.Kind_STRUCT {
-			f.WriteLine(`type ` + modelType.Name + ` struct {`)
+			f.WriteLine(`type ` + modelType.TypeName + ` struct {`)
 			for _, field := range modelType.Fields {
 				f.WriteLine(field.FieldName + ` ` + field.NativeType + jsonTag(field))
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.Kind_MAP {
-			f.WriteLine(`type ` + modelType.Name + ` map[string]` + modelType.MapType)
+			f.WriteLine(`type ` + modelType.TypeName + ` map[string]` + modelType.MapType)
 		} else {
-			f.WriteLine(`type ` + modelType.Name + ` struct {}`)
+			f.WriteLine(`type ` + modelType.TypeName + ` struct {}`)
 		}
 	}
 	return f.Bytes(), nil
