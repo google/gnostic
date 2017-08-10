@@ -18,7 +18,6 @@ import (
 	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 	"unicode"
 	"strings"
-	"log"
 )
 
 type GoLanguageModel struct{}
@@ -31,14 +30,12 @@ func NewGoLanguageModel() *GoLanguageModel {
 func (language *GoLanguageModel) Prepare(model *surface.Model) {
 
 	for _, t := range model.Types {
-		log.Printf("%s", t.Name)
 		// determine the type used for Go language implementation of the type
 		t.TypeName = strings.Title(filteredTypeName(t.Name))
+
 		for _, f := range t.Fields {
-			log.Printf("  %s %s (%s)", f.Name, f.Type, f.Format)
 			f.FieldName = goFieldName(f.Name)
 			f.ParameterName = goParameterName(f.Name)
-
 			switch f.Type {
 			case "number":
 				f.NativeType = "int"
@@ -57,19 +54,6 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 	}
 
 	for _, m := range model.Methods {
-		log.Printf("%s %s", m.Method, m.Path)
-		parametersType := model.TypeWithTypeName(m.ParametersTypeName)
-		responsesType := model.TypeWithTypeName(m.ResponsesTypeName)
-		p1 := "?"
-		p2 := "?"
-		if parametersType != nil {
-			p1 = parametersType.Name
-		}
-		if responsesType != nil {
-			p2 = responsesType.Name
-		}
-
-		log.Printf("  %s %s", p1, p2)
 		m.HandlerName = "Handle" + m.Name
 		m.ProcessorName = m.Name
 		m.ClientName = m.Name

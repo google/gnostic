@@ -215,9 +215,7 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 	t.Description = t.Name + " holds responses of " + name
 	t.Kind = Kind_STRUCT
 	t.Fields = make([]*Field, 0)
-
-	log.Printf("%s\n%+v", t.Name, responses)
-
+	
 	addResponse := func(name string, value *openapiv3.ResponseOrReference) {
 		var f Field
 		f.Name = name
