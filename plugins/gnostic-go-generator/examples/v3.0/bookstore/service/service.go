@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/googleapis/gnostic/plugins/gnostic-go-generator/examples/v2.0/bookstore/bookstore"
+	"github.com/googleapis/gnostic/plugins/gnostic-go-generator/examples/v3.0/bookstore/bookstore"
 )
 
 //
@@ -64,7 +64,7 @@ func (service *Service) CreateShelf(parameters *bookstore.CreateShelfParameters,
 	service.Mutex.Lock()
 	defer service.Mutex.Unlock()
 	// assign an id and name to a shelf and add it to the Shelves map.
-	shelf := parameters.Shelf
+	shelf := parameters.Resource
 	service.LastShelfID++
 	sid := service.LastShelfID
 	shelf.Name = fmt.Sprintf("shelves/%d", sid)
@@ -139,7 +139,7 @@ func (service *Service) CreateBook(parameters *bookstore.CreateBookParameters, r
 	// assign an id and name to a book and add it to the Books map.
 	service.LastBookID++
 	bid := service.LastBookID
-	book := parameters.Book
+	book := parameters.Resource
 	book.Name = fmt.Sprintf("%s/books/%d", shelf.Name, bid)
 	if service.Books[parameters.Shelf] == nil {
 		service.Books[parameters.Shelf] = make(map[int64]*bookstore.Book)

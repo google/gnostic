@@ -17,8 +17,6 @@ package gnostic_surface_v1
 import (
 	"path"
 	"strings"
-	"unicode"
-	"unicode/utf8"
 )
 
 func (m *Model) addType(t *Type) {
@@ -46,7 +44,7 @@ func generateOperationName(method, path string) string {
 	filteredPath = strings.Replace(filteredPath, ".", "_", -1)
 	filteredPath = strings.Replace(filteredPath, "{", "", -1)
 	filteredPath = strings.Replace(filteredPath, "}", "", -1)
-	return upperFirst(method) + filteredPath
+	return strings.Title(method) + filteredPath
 }
 
 func sanitizeOperationName(name string) string {
@@ -56,14 +54,9 @@ func sanitizeOperationName(name string) string {
 }
 
 func typeForRef(ref string) (typeName string) {
-	return strings.Replace(strings.Title(path.Base(ref)), "-", "_", -1)
-}
-
-// convert the first character of a string to upper case
-func upperFirst(s string) string {
-	if s == "" {
-		return ""
+	if false {
+		return path.Base(ref)
+	} else {
+		return strings.Replace(strings.Title(path.Base(ref)), "-", "_", -1)
 	}
-	r, n := utf8.DecodeRuneInString(s)
-	return string(unicode.ToUpper(r)) + strings.ToLower(s[n:])
 }

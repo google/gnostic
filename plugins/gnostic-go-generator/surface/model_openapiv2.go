@@ -108,13 +108,16 @@ func (b *OpenAPI2Builder) buildTypeFromDefinition(name string, schema *openapiv2
 
 func (b *OpenAPI2Builder) buildMethodFromOperation(op *openapiv2.Operation, method string, path string) (err error) {
 	var m Method
-	m.Name = sanitizeOperationName(op.OperationId)
+	m.Operation = op.OperationId
 	m.Path = path
 	m.Method = method
+	m.Description = op.Description
+
+	m.Name = sanitizeOperationName(op.OperationId)
 	if m.Name == "" {
 		m.Name = generateOperationName(method, path)
 	}
-	m.Description = op.Description
+
 	m.ParametersTypeName, err = b.buildTypeFromParameters(m.Name, op.Parameters)
 	m.ResponsesTypeName, err = b.buildTypeFromResponses(&m, m.Name, op.Responses)
 	b.model.addMethod(&m)

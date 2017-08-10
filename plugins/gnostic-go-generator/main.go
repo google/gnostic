@@ -18,6 +18,7 @@ package main
 
 import (
 	"strings"
+	"encoding/json"
 
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
@@ -53,6 +54,10 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	NewGoLanguageModel().Prepare(model)
+
+	modelJSON, _ := json.MarshalIndent(model, "", "  ")
+	modelFile := &plugins.File{Name: "model.json", Data: modelJSON}
+	env.Response.Files = append(env.Response.Files, modelFile)
 
 	// Create the renderer.
 	renderer, err := NewServiceRenderer(model)
