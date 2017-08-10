@@ -98,7 +98,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/"
+                  "$ref": "#/components/schemas/error"
                 }
               }
             }
@@ -159,7 +159,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/"
+                  "$ref": "#/components/schemas/error"
                 }
               }
             }
@@ -197,7 +197,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/"
+                  "$ref": "#/components/schemas/error"
                 }
               }
             }
@@ -258,7 +258,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/"
+                  "$ref": "#/components/schemas/error"
                 }
               }
             }

@@ -35,14 +35,23 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 		// determine the type used for Go language implementation of the type
 		t.TypeName = strings.Title(filteredTypeName(t.Name))
 		for _, f := range t.Fields {
-			log.Printf("  %s %s %s", f.Name, f.Type, f.Format)
+			log.Printf("  %s %s (%s)", f.Name, f.Type, f.Format)
 			f.FieldName = goFieldName(f.Name)
 			f.ParameterName = goParameterName(f.Name)
-			f.NativeType = f.Type
-			if f.NativeType == "number" {
+
+			switch f.Type {
+			case "number":
 				f.NativeType = "int"
-			} else if f.NativeType == "integer" {
-				f.NativeType = "int64"
+			case "integer":
+				if f.Format == "int32" {
+					f.NativeType = "int32"
+				} else if f.Format == "int64" {
+					f.NativeType = "int64"
+				} else {
+					f.NativeType = "int64"
+				}
+			default:
+				f.NativeType = f.Type
 			}
 		}
 	}
@@ -120,7 +129,6 @@ func filteredTypeName(typeName string) (name string) {
 	return name
 }
 
-// unused
 func typeForName(name string, format string) (typeName string) {
 	switch name {
 	case "integer":

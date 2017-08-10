@@ -62,11 +62,12 @@ message Type {
 
 // Method is an operation of an API and typically has associated client and server code.
 message Method {
-	string name = 1; // Operation name, possibly generated from method and path
+	string operation = 11; // Operation ID
 	string path = 2; // HTTP path
 	string method = 3; // HTTP method name
 	string description = 4; // description of method
 
+	string name = 1; // Operation name, possibly generated from method and path
 	string handlerName = 5; // name of the generated handler
 	string processorName = 6; // name of the processing function in the service interface
 	string clientName = 7; // name of client
