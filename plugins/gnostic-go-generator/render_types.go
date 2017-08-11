@@ -26,13 +26,17 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 	f.WriteLine(`// Types used by the API.`)
 	for _, modelType := range renderer.Model.Types {
 		f.WriteLine(`// ` + modelType.Description)
-		if modelType.Kind == surface.Kind_STRUCT {
+		if modelType.Kind == surface.TypeKind_STRUCT {
 			f.WriteLine(`type ` + modelType.TypeName + ` struct {`)
 			for _, field := range modelType.Fields {
-				f.WriteLine(field.FieldName + ` ` + field.NativeType + jsonTag(field))
+				prefix := ""
+				if field.Kind == surface.FieldKind_REFERENCE {
+					prefix = "*"
+				}
+				f.WriteLine(field.FieldName + ` ` + prefix + field.NativeType + jsonTag(field))
 			}
 			f.WriteLine(`}`)
-		} else if modelType.Kind == surface.Kind_MAP {
+		} else if modelType.Kind == surface.TypeKind_OBJECT {
 			f.WriteLine(`type ` + modelType.TypeName + ` map[string]` + modelType.MapType)
 		} else {
 			f.WriteLine(`type ` + modelType.TypeName + ` struct {}`)

@@ -40,15 +40,20 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 			case "number":
 				f.NativeType = "int"
 			case "integer":
-				if f.Format == "int32" {
+				switch f.Format {
+				case "int32":
 					f.NativeType = "int32"
-				} else if f.Format == "int64" {
+				case "int64":
 					f.NativeType = "int64"
-				} else {
+				default:
 					f.NativeType = "int64"
 				}
 			default:
-				f.NativeType = f.Type
+				if f.Kind == surface.FieldKind_REFERENCE {
+					f.NativeType = f.Type
+				} else {
+					f.NativeType = f.Type
+				}
 			}
 		}
 	}
@@ -67,9 +72,11 @@ func goParameterName(name string) string {
 	name = string(a)
 	// replace dots with underscores
 	name = strings.Replace(name, ".", "_", -1)
+	// replaces dashes with underscores
+	name = strings.Replace(name, "-", "_", -1)
 	// avoid reserved words
 	if name == "type" {
-		return "ttttype"
+		return "myType"
 	}
 	return name
 }
@@ -111,19 +118,4 @@ func filteredTypeName(typeName string) (name string) {
 	parts = strings.Split(name, ".")
 	name = parts[len(parts)-1]
 	return name
-}
-
-func typeForName(name string, format string) (typeName string) {
-	switch name {
-	case "integer":
-		if format == "int32" {
-			return "int32"
-		} else if format == "int64" {
-			return "int64"
-		} else {
-			return "int32"
-		}
-	default:
-		return name
-	}
 }
