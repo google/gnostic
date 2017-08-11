@@ -20,6 +20,7 @@ import (
 	"log"
 
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
+	"strings"
 )
 
 // NewModelFromOpenAPIv3 builds a model of an API service for use in code generation.
@@ -80,13 +81,13 @@ func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 		if schema.Properties != nil {
 			if len(schema.Properties.AdditionalProperties) > 0 {
 				// If the schema has properties, generate a struct.
-				t.Kind = Kind_STRUCT
+				t.Kind = TypeKind_STRUCT
 			}
 			for _, pair2 := range schema.Properties.AdditionalProperties {
 				if schema := pair2.Value; schema != nil {
 					var f Field
 					f.Name = pair2.Name
-					f.Type, f.Format = b.typeForSchemaOrReference(schema)
+					f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(schema)
 					f.Serialize = true
 					t.addField(&f)
 				}
@@ -97,7 +98,7 @@ func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 				// If the schema has no fixed properties and additional properties of a specified type,
 				// generate a map pointing to objects of that type.
 				mapType := typeForRef(schema.AdditionalProperties.GetSchemaOrReference().GetReference().GetXRef())
-				t.Kind = Kind_MAP
+				t.Kind = TypeKind_OBJECT
 				t.MapType = mapType
 			}
 		}
@@ -157,7 +158,7 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 	t := &Type{}
 	t.Name = name + "Parameters"
 	t.Description = t.Name + " holds parameters to " + name
-	t.Kind = Kind_STRUCT
+	t.Kind = TypeKind_STRUCT
 	t.Fields = make([]*Field, 0)
 	for _, parametersItem := range parameters {
 		var f Field
@@ -178,7 +179,7 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 			}
 			f.Name = parameter.Name
 			if parameter.GetSchema() != nil && parameter.GetSchema() != nil {
-				f.Type, f.Format = b.typeForSchemaOrReference(parameter.GetSchema())
+				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(parameter.GetSchema())
 			}
 			f.Serialize = true
 			t.addField(&f)
@@ -190,9 +191,8 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 			for _, pair2 := range content.GetAdditionalProperties() {
 				var f Field
 				f.Position = Position_BODY
-				f.Name = "resource"
-				f.ValueType, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
-				f.Type = f.ValueType
+				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
+				f.Name = strings.ToLower(f.Type) // use the schema name as the parameter name, since none is directly specified
 				f.Serialize = true
 				t.addField(&f)
 			}
@@ -213,9 +213,9 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 	t := &Type{}
 	t.Name = name + "Responses"
 	t.Description = t.Name + " holds responses of " + name
-	t.Kind = Kind_STRUCT
+	t.Kind = TypeKind_STRUCT
 	t.Fields = make([]*Field, 0)
-	
+
 	addResponse := func(name string, value *openapiv3.ResponseOrReference) {
 		var f Field
 		f.Name = name
@@ -223,8 +223,8 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 		response := value.GetResponse()
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
-				f.ValueType, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
-				f.Type = "*" + f.ValueType
+				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
+				f.Kind = FieldKind_REFERENCE
 				t.addField(&f)
 			}
 		}
@@ -245,46 +245,46 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 }
 
 // typeForSchemaOrReference determines the language-specific type of a schema or reference
-func (b *OpenAPI3Builder) typeForSchemaOrReference(value *openapiv3.SchemaOrReference) (typeName, format string) {
+func (b *OpenAPI3Builder) typeForSchemaOrReference(value *openapiv3.SchemaOrReference) (kind FieldKind, typeName, format string) {
 	if value.GetSchema() != nil {
 		return b.typeForSchema(value.GetSchema())
 	}
 	if value.GetReference() != nil {
-		return typeForRef(value.GetReference().XRef), ""
+		return FieldKind_SCALAR, typeForRef(value.GetReference().XRef), ""
 	}
-	return "todo", ""
+	return FieldKind_SCALAR, "todo", ""
 }
 
 // typeForSchema determines the language-specific type of a schema
-func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (typeName, format string) {
+func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKind, typeName, format string) {
 	if schema.Type != "" {
 		format := schema.Format
 		switch schema.Type {
 		case "string":
-			return "string", format
+			return FieldKind_SCALAR, "string", format
 		case "integer":
-			return "integer", format
+			return FieldKind_SCALAR, "integer", format
 		case "number":
-			return "number", format
+			return FieldKind_SCALAR, "number", format
 		case "boolean":
-			return "boolean", format
+			return FieldKind_SCALAR, "boolean", format
 		case "array":
 			if schema.Items != nil {
 				// we have an array.., but of what?
 				items := schema.Items.SchemaOrReference
 				if len(items) == 1 {
 					if items[0].GetReference().GetXRef() != "" {
-						return "[]" + typeForRef(items[0].GetReference().GetXRef()), format
+						return FieldKind_ARRAY, "[]" + typeForRef(items[0].GetReference().GetXRef()), format
 					} else if items[0].GetSchema().Type == "string" {
-						return "[]string", format
+						return FieldKind_ARRAY, "[]string", format
 					} else if items[0].GetSchema().Type == "object" {
-						return "[]interface{}", format
+						return FieldKind_ARRAY, "[]interface{}", format
 					}
 				}
 			}
 		case "object":
 			if schema.AdditionalProperties == nil {
-				return "map[string]interface{}", format
+				return FieldKind_MAP, "map[string]interface{}", format
 			}
 		default:
 
@@ -294,11 +294,11 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (typeName, for
 		additionalProperties := schema.AdditionalProperties
 		if propertySchema := additionalProperties.GetSchemaOrReference().GetReference(); propertySchema != nil {
 			if ref := propertySchema.XRef; ref != "" {
-				return "map[string]" + typeForRef(ref), ""
+				return FieldKind_MAP, "map[string]" + typeForRef(ref), ""
 			}
 		}
 	}
 	// this function is incomplete... return a string representing anything that we don't handle
 	log.Printf("unimplemented: %v", schema)
-	return fmt.Sprintf("unimplemented: %v", schema), ""
+	return FieldKind_SCALAR, fmt.Sprintf("unimplemented: %v", schema), ""
 }
