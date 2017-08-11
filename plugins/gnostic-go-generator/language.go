@@ -48,12 +48,12 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 				default:
 					f.NativeType = "int64"
 				}
+			case "object":
+				f.NativeType = "{}interface"
+			case "string":
+				f.NativeType = "string"
 			default:
-				if f.Kind == surface.FieldKind_REFERENCE {
-					f.NativeType = f.Type
-				} else {
-					f.NativeType = f.Type
-				}
+				f.NativeType = strings.Title(f.Type)
 			}
 		}
 	}

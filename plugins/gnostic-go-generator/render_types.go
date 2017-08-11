@@ -32,6 +32,10 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 				prefix := ""
 				if field.Kind == surface.FieldKind_REFERENCE {
 					prefix = "*"
+				} else if field.Kind == surface.FieldKind_ARRAY {
+					prefix = "[]"
+				} else if field.Kind == surface.FieldKind_MAP {
+					prefix = "map[string]"
 				}
 				f.WriteLine(field.FieldName + ` ` + prefix + field.NativeType + jsonTag(field))
 			}
