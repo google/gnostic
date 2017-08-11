@@ -232,18 +232,18 @@ func (b *OpenAPI2Builder) typeForSchema(schema *openapiv2.Schema) (kind FieldKin
 			// we have an array.., but of what?
 			items := schema.Items.Schema
 			if len(items) == 1 && items[0].XRef != "" {
-				return FieldKind_ARRAY, "[]" + typeForRef(items[0].XRef), format
+				return FieldKind_ARRAY, typeForRef(items[0].XRef), format
 			}
 		}
 		if len(types) == 1 && types[0] == "object" && schema.AdditionalProperties == nil {
-			return FieldKind_MAP, "map[string]interface{}", format
+			return FieldKind_MAP, "object", format
 		}
 	}
 	if schema.AdditionalProperties != nil {
 		additionalProperties := schema.AdditionalProperties
 		if propertySchema := additionalProperties.GetSchema(); propertySchema != nil {
 			if ref := propertySchema.XRef; ref != "" {
-				return FieldKind_MAP, "map[string]" + typeForRef(ref), format
+				return FieldKind_MAP, typeForRef(ref), format
 			}
 		}
 	}

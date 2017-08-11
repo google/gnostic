@@ -230,11 +230,11 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 		}
 	}
 
-	if responses.Default != nil {
-		addResponse("default", responses.Default)
-	}
 	for _, pair := range responses.ResponseOrReference {
 		addResponse(pair.Name, pair.Value)
+	}
+	if responses.Default != nil {
+		addResponse("default", responses.Default)
 	}
 
 	if len(t.Fields) > 0 {
@@ -274,17 +274,17 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 				items := schema.Items.SchemaOrReference
 				if len(items) == 1 {
 					if items[0].GetReference().GetXRef() != "" {
-						return FieldKind_ARRAY, "[]" + typeForRef(items[0].GetReference().GetXRef()), format
+						return FieldKind_ARRAY,  typeForRef(items[0].GetReference().GetXRef()), format
 					} else if items[0].GetSchema().Type == "string" {
-						return FieldKind_ARRAY, "[]string", format
+						return FieldKind_ARRAY, "string", format
 					} else if items[0].GetSchema().Type == "object" {
-						return FieldKind_ARRAY, "[]interface{}", format
+						return FieldKind_ARRAY, "interface{}", format
 					}
 				}
 			}
 		case "object":
 			if schema.AdditionalProperties == nil {
-				return FieldKind_MAP, "map[string]interface{}", format
+				return FieldKind_MAP, "object", format
 			}
 		default:
 

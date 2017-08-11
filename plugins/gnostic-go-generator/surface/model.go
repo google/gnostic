@@ -54,9 +54,5 @@ func sanitizeOperationName(name string) string {
 }
 
 func typeForRef(ref string) (typeName string) {
-	if false {
-		return path.Base(ref)
-	} else {
-		return strings.Replace(strings.Title(path.Base(ref)), "-", "_", -1)
-	}
+	return path.Base(ref)
 }

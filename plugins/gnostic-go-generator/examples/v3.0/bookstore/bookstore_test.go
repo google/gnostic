@@ -55,17 +55,17 @@ func TestBookstore(t *testing.T) {
 	}
 	// attempting to get a shelf should return an error
 	{
-		_, err := b.GetShelf(1)
+		response, err := b.GetShelf(1)
 		if err == nil {
-			t.Log("get shelf failed to return an error")
+			t.Logf("get shelf failed to return an error (%+v)", response.OK)
 			t.Fail()
 		}
 	}
 	// attempting to get a book should return an error
 	{
-		_, err := b.GetBook(1, 2)
+		response, err := b.GetBook(1, 2)
 		if err == nil {
-			t.Log("get book failed to return an error")
+			t.Logf("get book failed to return an error (%+v)", response.OK)
 			t.Fail()
 		}
 	}

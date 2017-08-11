@@ -28,6 +28,7 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 	f.WriteLine(``)
 	imports := []string{
 		"github.com/gorilla/mux",
+		"net/http",
 	}
 	f.WriteLine(``)
 	f.WriteLine(`import (`)
