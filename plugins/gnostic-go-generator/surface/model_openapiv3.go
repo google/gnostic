@@ -97,9 +97,8 @@ func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 			if schema.AdditionalProperties != nil {
 				// If the schema has no fixed properties and additional properties of a specified type,
 				// generate a map pointing to objects of that type.
-				mapType := typeForRef(schema.AdditionalProperties.GetSchemaOrReference().GetReference().GetXRef())
 				t.Kind = TypeKind_OBJECT
-				t.MapType = mapType
+				t.ContentType = typeForRef(schema.AdditionalProperties.GetSchemaOrReference().GetReference().GetXRef())
 			}
 		}
 		return t, err

@@ -41,7 +41,7 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.TypeKind_OBJECT {
-			f.WriteLine(`type ` + modelType.TypeName + ` map[string]` + modelType.MapType)
+			f.WriteLine(`type ` + modelType.TypeName + ` map[string]` + modelType.ContentType)
 		} else {
 			f.WriteLine(`type ` + modelType.TypeName + ` struct {}`)
 		}

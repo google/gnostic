@@ -32,8 +32,8 @@ func main() {
 Usage:
 	disco help
 	disco list [--raw]
-	disco get [<api>] [<version>] [--raw] [--openapi2] [--openapi3] [--features] [--all]
-	disco <file> [--openapi2] [--openapi3] [--features]
+	disco get [<api>] [<version>] [--raw] [--openapi2] [--openapi3] [--features] [--schemas] [--all]
+	disco <file> [--openapi2] [--openapi3] [--features] [--schemas]
 	`
 	arguments, err := docopt.Parse(usage, nil, false, "Disco 1.0", false)
 	if err != nil {
@@ -82,7 +82,8 @@ Usage:
 			if !arguments["--raw"].(bool) &&
 				!arguments["--openapi2"].(bool) &&
 				!arguments["--openapi3"].(bool) &&
-				!arguments["--features"].(bool) {
+				!arguments["--features"].(bool) &&
+				!arguments["--schemas"].(bool) {
 				log.Fatalf("Please specify an output option.")
 			}
 			for _, api := range listResponse.APIs {
@@ -130,17 +131,17 @@ Usage:
 	}
 
 	// Do something with a local API description.
-	if arguments["<file>"] != nil{
+	if arguments["<file>"] != nil {
 		// Read the local file.
-			   filename := arguments["<file>"].(string)
+		filename := arguments["<file>"].(string)
 		bytes, err := ioutil.ReadFile(filename)
 		if err != nil {
-		log.Fatalf("%+v", err)
+			log.Fatalf("%+v", err)
 		}
 		// Export any requested formats.
 		_, err = handleExportArgumentsForBytes(arguments, bytes)
 		if err != nil {
-		log.Fatalf("%+v", err)
+			log.Fatalf("%+v", err)
 		}
 	}
 }
@@ -199,5 +200,46 @@ func handleExportArgumentsForBytes(arguments map[string]interface{}, bytes []byt
 				strings.Join(discoveryDocument.Features, ","))
 		}
 	}
+	if arguments["--schemas"].(bool) {
+		for schemaName, schema := range discoveryDocument.Schemas {
+			checkSchema(schemaName, schema, 0)
+		}
+	}
 	return handled, err
+}
+
+func checkSchema(schemaName string, schema *discovery.Schema, depth int) {
+	switch schema.Type {
+	case "string":
+	case "number":
+	case "integer":
+	case "boolean":
+	case "object": // only objects should have properties...
+	case "array":
+	case "null":
+		log.Printf("NULL TYPE %s %s", schemaName, schema.Type)
+	case "any":
+		//log.Printf("ANY TYPE %s/%s %s", schemaName, property.Name, propertySchema.Type)
+	default:
+		//log.Printf("UNKNOWN TYPE %s/%s %s", schemaName, property.Name, propertySchema.Type)
+	}
+	if len(schema.Properties) > 0 {
+		if depth > 0 {
+			log.Printf("ANONYMOUS SCHEMA %s", schemaName)
+		}
+		for _, property := range schema.Properties {
+			propertySchema := property.Schema
+			ref := propertySchema.Ref
+			if ref != "" {
+				//log.Printf("REF: %s", ref)
+				// assert (propertySchema.Type == "")
+			} else {
+				checkSchema(schemaName+"/"+property.Name, propertySchema, depth + 1)
+			}
+		}
+	}
+	if schema.AdditionalProperties != nil {
+		log.Printf("ADDITIONAL PROPERTIES %s", schemaName)
+		checkSchema(schemaName+"/*", schema.AdditionalProperties, depth + 1)
+	}
 }
