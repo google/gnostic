@@ -40,7 +40,7 @@ Usage:
 
 	// list
 	if arguments["list"].(bool) {
-		response, err := c.Urlshortener_Url_List("","")
+		response, err := c.Urlshortener_Url_List("", "")
 		if err != nil {
 			log.Fatalf("%+v", err)
 		}
@@ -53,7 +53,7 @@ Usage:
 	if arguments["insert"].(bool) {
 		var url urlshortener.Url
 		url.LongUrl = arguments["<url>"].(string)
-		response, err := c.Urlshortener_Url_Insert(&url)
+		response, err := c.Urlshortener_Url_Insert(url)
 		if err != nil {
 			log.Fatalf("%+v", err)
 		}
