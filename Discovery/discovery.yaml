@@ -65,6 +65,12 @@ properties:
   ownerName:
     type: string
   version_module:
+    type: boolean
+  canonicalName:
+    type: string
+  fullyEncodeReservedExpansion:
+    type: boolean
+  packagePath:
     type: string
 definitions:
   icons:
@@ -179,6 +185,8 @@ definitions:
         type: string
       annotations:
         $ref: '#/definitions/annotations'
+      readOnly:
+        type: boolean
   methods:
     type: object
     additionalProperties:
@@ -205,6 +213,8 @@ definitions:
         properties:
           $ref:
             type: string
+          parameterName:
+            type: string
       response:
         type: object
         properties:
@@ -214,9 +224,11 @@ definitions:
         type: array
         items:
           type: string
-      supportsMediaDownoad:
+      supportsMediaDownload:
         type: boolean
       supportsMediaUpload:
+        type: boolean
+      useMediaDownloadService:
         type: boolean
       mediaUpload:
         $ref: '#/definitions/mediaUpload'
@@ -224,6 +236,8 @@ definitions:
         type: boolean
       flatPath:
         type: string
+      etagRequired:
+        type: boolean
   resources:
     type: object
     additionalProperties:
@@ -258,7 +272,7 @@ definitions:
         type: array
         items:
           type: string
-      maxsize:
+      maxSize:
         type: string
       protocols:
         type: object
@@ -279,6 +293,3 @@ definitions:
                 type: string
       supportsSubscription:
         type: boolean
-
-
-

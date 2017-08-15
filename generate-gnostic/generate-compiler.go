@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"sort"
 	"strings"
@@ -399,7 +400,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			}
 			code.Print("// " + line)
 
-			fieldName := strings.Title(propertyName)
+			fieldName := strings.Title(snakeCaseToCamelCase(propertyName))
+			log.Printf("FIELD NAME for %s is %s", propertyName, fieldName)
 			if propertyName == "$ref" {
 				fieldName = "XRef"
 			}

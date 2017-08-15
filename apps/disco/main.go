@@ -21,9 +21,9 @@ import (
 	"os"
 
 	"github.com/docopt/docopt-go"
-	"github.com/googleapis/gnostic/compiler"
-	"github.com/googleapis/gnostic/discovery"
 	"github.com/golang/protobuf/proto"
+	"github.com/googleapis/gnostic/compiler"
+	discovery "github.com/googleapis/gnostic/disco"
 	"strings"
 )
 
@@ -91,12 +91,14 @@ Usage:
 				// Fetch the discovery description of the API.
 				bytes, err = compiler.FetchFile(api.DiscoveryRestURL)
 				if err != nil {
-					log.Fatalf("%+v", err)
+					log.Printf("%+v", err)
+					continue
 				}
 				// Export any requested formats.
 				_, err := handleExportArgumentsForBytes(arguments, bytes)
 				if err != nil {
-					log.Fatalf("%+v", err)
+					log.Printf("%+v", err)
+					continue
 				}
 			}
 		} else {
@@ -123,7 +125,7 @@ Usage:
 			handled, err := handleExportArgumentsForBytes(arguments, bytes)
 			if err != nil {
 				log.Fatalf("%+v", err)
-			} else if (!handled) {
+			} else if !handled {
 				// If no action was requested, write the document to stdout.
 				os.Stdout.Write(bytes)
 			}
@@ -234,12 +236,12 @@ func checkSchema(schemaName string, schema *discovery.Schema, depth int) {
 				//log.Printf("REF: %s", ref)
 				// assert (propertySchema.Type == "")
 			} else {
-				checkSchema(schemaName+"/"+property.Name, propertySchema, depth + 1)
+				checkSchema(schemaName+"/"+property.Name, propertySchema, depth+1)
 			}
 		}
 	}
 	if schema.AdditionalProperties != nil {
 		log.Printf("ADDITIONAL PROPERTIES %s", schemaName)
-		checkSchema(schemaName+"/*", schema.AdditionalProperties, depth + 1)
+		checkSchema(schemaName+"/*", schema.AdditionalProperties, depth+1)
 	}
 }
