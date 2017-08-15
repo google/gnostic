@@ -113,7 +113,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"auth", "basePath", "baseUrl", "batchPath", "description", "discoveryVersion", "documentationLink", "etag", "features", "icons", "id", "kind", "labels", "methods", "name", "ownerDomain", "ownerName", "parameters", "protocol", "resources", "revision", "rootUrl", "schemas", "servicePath", "title", "version", "version_module"}
+		allowedKeys := []string{"auth", "basePath", "baseUrl", "batchPath", "canonicalName", "description", "discoveryVersion", "documentationLink", "etag", "features", "fullyEncodeReservedExpansion", "icons", "id", "kind", "labels", "methods", "name", "ownerDomain", "ownerName", "packagePath", "parameters", "protocol", "resources", "revision", "rootUrl", "schemas", "servicePath", "title", "version", "version_module"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -358,12 +358,39 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string version_module = 27;
+		// bool version_module = 27;
 		v27 := compiler.MapValueForKey(m, "version_module")
 		if v27 != nil {
-			x.VersionModule, ok = v27.(string)
+			x.VersionModule, ok = v27.(bool)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for version_module: %+v (%T)", v27, v27)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string canonical_name = 28;
+		v28 := compiler.MapValueForKey(m, "canonicalName")
+		if v28 != nil {
+			x.CanonicalName, ok = v28.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for canonicalName: %+v (%T)", v28, v28)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool fully_encode_reserved_expansion = 29;
+		v29 := compiler.MapValueForKey(m, "fullyEncodeReservedExpansion")
+		if v29 != nil {
+			x.FullyEncodeReservedExpansion, ok = v29.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for fullyEncodeReservedExpansion: %+v (%T)", v29, v29)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string package_path = 30;
+		v30 := compiler.MapValueForKey(m, "packagePath")
+		if v30 != nil {
+			x.PackagePath, ok = v30.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for packagePath: %+v (%T)", v30, v30)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -424,7 +451,7 @@ func NewMediaUpload(in interface{}, context *compiler.Context) (*MediaUpload, er
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"accept", "maxsize", "protocols", "supportsSubscription"}
+		allowedKeys := []string{"accept", "maxSize", "protocols", "supportsSubscription"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -442,12 +469,12 @@ func NewMediaUpload(in interface{}, context *compiler.Context) (*MediaUpload, er
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string maxsize = 2;
-		v2 := compiler.MapValueForKey(m, "maxsize")
+		// string max_size = 2;
+		v2 := compiler.MapValueForKey(m, "maxSize")
 		if v2 != nil {
-			x.Maxsize, ok = v2.(string)
+			x.MaxSize, ok = v2.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for maxsize: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for maxSize: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -482,7 +509,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"description", "flatPath", "httpMethod", "id", "mediaUpload", "parameterOrder", "parameters", "path", "request", "response", "scopes", "supportsMediaDownoad", "supportsMediaUpload", "supportsSubscription"}
+		allowedKeys := []string{"description", "etagRequired", "flatPath", "httpMethod", "id", "mediaUpload", "parameterOrder", "parameters", "path", "request", "response", "scopes", "supportsMediaDownload", "supportsMediaUpload", "supportsSubscription", "useMediaDownloadService"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -574,12 +601,12 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// bool supports_media_downoad = 10;
-		v10 := compiler.MapValueForKey(m, "supportsMediaDownoad")
+		// bool supports_media_download = 10;
+		v10 := compiler.MapValueForKey(m, "supportsMediaDownload")
 		if v10 != nil {
-			x.SupportsMediaDownoad, ok = v10.(bool)
+			x.SupportsMediaDownload, ok = v10.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for supportsMediaDownoad: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for supportsMediaDownload: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -592,30 +619,48 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// MediaUpload media_upload = 12;
-		v12 := compiler.MapValueForKey(m, "mediaUpload")
+		// bool use_media_download_service = 12;
+		v12 := compiler.MapValueForKey(m, "useMediaDownloadService")
 		if v12 != nil {
+			x.UseMediaDownloadService, ok = v12.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for useMediaDownloadService: %+v (%T)", v12, v12)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// MediaUpload media_upload = 13;
+		v13 := compiler.MapValueForKey(m, "mediaUpload")
+		if v13 != nil {
 			var err error
-			x.MediaUpload, err = NewMediaUpload(v12, compiler.NewContext("mediaUpload", context))
+			x.MediaUpload, err = NewMediaUpload(v13, compiler.NewContext("mediaUpload", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
 		}
-		// bool supports_subscription = 13;
-		v13 := compiler.MapValueForKey(m, "supportsSubscription")
-		if v13 != nil {
-			x.SupportsSubscription, ok = v13.(bool)
+		// bool supports_subscription = 14;
+		v14 := compiler.MapValueForKey(m, "supportsSubscription")
+		if v14 != nil {
+			x.SupportsSubscription, ok = v14.(bool)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for supportsSubscription: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for supportsSubscription: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// string flat_path = 14;
-		v14 := compiler.MapValueForKey(m, "flatPath")
-		if v14 != nil {
-			x.FlatPath, ok = v14.(string)
+		// string flat_path = 15;
+		v15 := compiler.MapValueForKey(m, "flatPath")
+		if v15 != nil {
+			x.FlatPath, ok = v15.(string)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flatPath: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for flatPath: %+v (%T)", v15, v15)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// bool etag_required = 16;
+		v16 := compiler.MapValueForKey(m, "etagRequired")
+		if v16 != nil {
+			x.EtagRequired, ok = v16.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for etagRequired: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1106,7 +1151,7 @@ func NewRequest(in interface{}, context *compiler.Context) (*Request, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"$ref"}
+		allowedKeys := []string{"$ref", "parameterName"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1119,6 +1164,15 @@ func NewRequest(in interface{}, context *compiler.Context) (*Request, error) {
 			x.XRef, ok = v1.(string)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string parameter_name = 2;
+		v2 := compiler.MapValueForKey(m, "parameterName")
+		if v2 != nil {
+			x.ParameterName, ok = v2.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for parameterName: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1270,7 +1324,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"$ref", "additionalProperties", "annotations", "default", "description", "enum", "enumDescriptions", "format", "id", "items", "location", "maximum", "minimum", "pattern", "properties", "repeated", "required", "type"}
+		allowedKeys := []string{"$ref", "additionalProperties", "annotations", "default", "description", "enum", "enumDescriptions", "format", "id", "items", "location", "maximum", "minimum", "pattern", "properties", "readOnly", "repeated", "required", "type"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1441,6 +1495,15 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			x.Annotations, err = NewAnnotations(v18, compiler.NewContext("annotations", context))
 			if err != nil {
 				errors = append(errors, err)
+			}
+		}
+		// bool read_only = 19;
+		v19 := compiler.MapValueForKey(m, "readOnly")
+		if v19 != nil {
+			x.ReadOnly, ok = v19.(bool)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v19, v19)
+				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
 	}
@@ -1863,6 +1926,13 @@ func (m *Request) ResolveReferences(root string) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
+		if info != nil {
+			replacement, err := NewRequest(info, nil)
+			if err == nil {
+				*m = *replacement
+				return m.ResolveReferences(root)
+			}
+		}
 		return info, nil
 	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
@@ -2136,8 +2206,17 @@ func (m *Document) ToRawInfo() interface{} {
 	if m.OwnerName != "" {
 		info = append(info, yaml.MapItem{"ownerName", m.OwnerName})
 	}
-	if m.VersionModule != "" {
+	if m.VersionModule != false {
 		info = append(info, yaml.MapItem{"version_module", m.VersionModule})
+	}
+	if m.CanonicalName != "" {
+		info = append(info, yaml.MapItem{"canonicalName", m.CanonicalName})
+	}
+	if m.FullyEncodeReservedExpansion != false {
+		info = append(info, yaml.MapItem{"fullyEncodeReservedExpansion", m.FullyEncodeReservedExpansion})
+	}
+	if m.PackagePath != "" {
+		info = append(info, yaml.MapItem{"packagePath", m.PackagePath})
 	}
 	return info
 }
@@ -2160,8 +2239,8 @@ func (m *MediaUpload) ToRawInfo() interface{} {
 	if len(m.Accept) != 0 {
 		info = append(info, yaml.MapItem{"accept", m.Accept})
 	}
-	if m.Maxsize != "" {
-		info = append(info, yaml.MapItem{"maxsize", m.Maxsize})
+	if m.MaxSize != "" {
+		info = append(info, yaml.MapItem{"maxSize", m.MaxSize})
 	}
 	if m.Protocols != nil {
 		info = append(info, yaml.MapItem{"protocols", m.Protocols.ToRawInfo()})
@@ -2206,11 +2285,14 @@ func (m *Method) ToRawInfo() interface{} {
 	if len(m.Scopes) != 0 {
 		info = append(info, yaml.MapItem{"scopes", m.Scopes})
 	}
-	if m.SupportsMediaDownoad != false {
-		info = append(info, yaml.MapItem{"supportsMediaDownoad", m.SupportsMediaDownoad})
+	if m.SupportsMediaDownload != false {
+		info = append(info, yaml.MapItem{"supportsMediaDownload", m.SupportsMediaDownload})
 	}
 	if m.SupportsMediaUpload != false {
 		info = append(info, yaml.MapItem{"supportsMediaUpload", m.SupportsMediaUpload})
+	}
+	if m.UseMediaDownloadService != false {
+		info = append(info, yaml.MapItem{"useMediaDownloadService", m.UseMediaDownloadService})
 	}
 	if m.MediaUpload != nil {
 		info = append(info, yaml.MapItem{"mediaUpload", m.MediaUpload.ToRawInfo()})
@@ -2221,6 +2303,9 @@ func (m *Method) ToRawInfo() interface{} {
 	}
 	if m.FlatPath != "" {
 		info = append(info, yaml.MapItem{"flatPath", m.FlatPath})
+	}
+	if m.EtagRequired != false {
+		info = append(info, yaml.MapItem{"etagRequired", m.EtagRequired})
 	}
 	return info
 }
@@ -2383,6 +2468,9 @@ func (m *Request) ToRawInfo() interface{} {
 	if m.XRef != "" {
 		info = append(info, yaml.MapItem{"$ref", m.XRef})
 	}
+	if m.ParameterName != "" {
+		info = append(info, yaml.MapItem{"parameterName", m.ParameterName})
+	}
 	return info
 }
 
@@ -2494,6 +2582,9 @@ func (m *Schema) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{"annotations", m.Annotations.ToRawInfo()})
 	}
 	// &{Name:annotations Type:Annotations StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.ReadOnly != false {
+		info = append(info, yaml.MapItem{"readOnly", m.ReadOnly})
+	}
 	return info
 }
 

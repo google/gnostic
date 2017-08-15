@@ -95,6 +95,15 @@
       "type": "string"
     },
     "version_module": {
+      "type": "boolean"
+    },
+    "canonicalName": {
+      "type": "string"
+    },
+    "fullyEncodeReservedExpansion": {
+      "type": "boolean"
+    },
+    "packagePath": {
       "type": "string"
     }
   },
@@ -265,6 +274,9 @@
         },
         "annotations": {
           "$ref": "#/definitions/annotations"
+        },
+        "readOnly": {
+          "type": "boolean"
         }
       }
     },
@@ -303,6 +315,9 @@
           "properties": {
             "$ref": {
               "type": "string"
+            },
+            "parameterName": {
+              "type": "string"
             }
           }
         },
@@ -320,10 +335,13 @@
             "type": "string"
           }
         },
-        "supportsMediaDownoad": {
+        "supportsMediaDownload": {
           "type": "boolean"
         },
         "supportsMediaUpload": {
+          "type": "boolean"
+        },
+        "useMediaDownloadService": {
           "type": "boolean"
         },
         "mediaUpload": {
@@ -334,6 +352,9 @@
         },
         "flatPath": {
           "type": "string"
+        },
+        "etagRequired": {
+          "type": "boolean"
         }
       }
     },
@@ -388,7 +409,7 @@
             "type": "string"
           }
         },
-        "maxsize": {
+        "maxSize": {
           "type": "string"
         },
         "protocols": {
