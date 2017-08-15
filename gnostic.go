@@ -73,6 +73,10 @@ func getOpenAPIVersionFromInfo(info interface{}) int {
 	if ok && strings.HasPrefix(openapi, "3.0") {
 		return openAPIv3
 	}
+	kind, ok := compiler.MapValueForKey(m, "kind").(string)
+	if ok && kind == "discovery#restDescription" {
+		return discoveryFormat
+	}
 	return openAPIvUnknown
 }
 
@@ -342,9 +346,9 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	}
 	// Determine the OpenAPI version.
 	g.openAPIVersion = getOpenAPIVersionFromInfo(info)
-	//	if g.openAPIVersion == openAPIvUnknown {
-	//		return nil, errors.New("unable to identify OpenAPI version")
-	//	}
+	if g.openAPIVersion == openAPIvUnknown {
+		return nil, errors.New("unable to identify OpenAPI version")
+	}
 	// Compile to the proto model.
 	if g.openAPIVersion == openAPIv2 {
 		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
