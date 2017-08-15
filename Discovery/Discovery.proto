@@ -78,6 +78,10 @@ message Document {
   Schemas schemas = 21;
   Methods methods = 22;
   Resources resources = 23;
+  string etag = 24;
+  string owner_domain = 25;
+  string owner_name = 26;
+  string version_module = 27;
 }
 
 // Icons that represent the API.
@@ -107,6 +111,7 @@ message Method {
   bool supports_media_upload = 11;
   MediaUpload media_upload = 12;
   bool supports_subscription = 13;
+  string flat_path = 14;
 }
 
 message Methods {
@@ -222,7 +227,8 @@ message Schema {
   Schemas properties = 14;
   Schema additional_properties = 15;
   Schema items = 16;
-  Annotations annotations = 17;
+  string _ref = 17;
+  Annotations annotations = 18;
 }
 
 message Schemas {
