@@ -84,6 +84,18 @@
     },
     "resources": {
       "$ref": "#/definitions/resources"
+    },
+    "etag": {
+      "type": "string"
+    },
+    "ownerDomain": {
+      "type": "string"
+    },
+    "ownerName": {
+      "type": "string"
+    },
+    "version_module": {
+      "type": "string"
     }
   },
   "definitions": {
@@ -248,6 +260,9 @@
         "items": {
           "$ref": "#/definitions/schema"
         },
+        "$ref": {
+          "type": "string"
+        },
         "annotations": {
           "$ref": "#/definitions/annotations"
         }
@@ -316,6 +331,9 @@
         },
         "supportsSubscription": {
           "type": "boolean"
+        },
+        "flatPath": {
+          "type": "string"
         }
       }
     },

@@ -58,6 +58,14 @@ properties:
     $ref: '#/definitions/methods'
   resources:
     $ref: '#/definitions/resources'
+  etag:
+    type: string
+  ownerDomain:
+    type: string
+  ownerName:
+    type: string
+  version_module:
+    type: string
 definitions:
   icons:
     type: object
@@ -167,6 +175,8 @@ definitions:
         $ref: '#/definitions/schema'
       items:
         $ref: '#/definitions/schema'
+      $ref: 
+        type: string
       annotations:
         $ref: '#/definitions/annotations'
   methods:
@@ -212,6 +222,8 @@ definitions:
         $ref: '#/definitions/mediaUpload'
       supportsSubscription:
         type: boolean
+      flatPath:
+        type: string
   resources:
     type: object
     additionalProperties:

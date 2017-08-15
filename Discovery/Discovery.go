@@ -113,7 +113,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"auth", "basePath", "baseUrl", "batchPath", "description", "discoveryVersion", "documentationLink", "features", "icons", "id", "kind", "labels", "methods", "name", "parameters", "protocol", "resources", "revision", "rootUrl", "schemas", "servicePath", "title", "version"}
+		allowedKeys := []string{"auth", "basePath", "baseUrl", "batchPath", "description", "discoveryVersion", "documentationLink", "etag", "features", "icons", "id", "kind", "labels", "methods", "name", "ownerDomain", "ownerName", "parameters", "protocol", "resources", "revision", "rootUrl", "schemas", "servicePath", "title", "version", "version_module"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -331,6 +331,42 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 				errors = append(errors, err)
 			}
 		}
+		// string etag = 24;
+		v24 := compiler.MapValueForKey(m, "etag")
+		if v24 != nil {
+			x.Etag, ok = v24.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for etag: %+v (%T)", v24, v24)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string owner_domain = 25;
+		v25 := compiler.MapValueForKey(m, "ownerDomain")
+		if v25 != nil {
+			x.OwnerDomain, ok = v25.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for ownerDomain: %+v (%T)", v25, v25)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string owner_name = 26;
+		v26 := compiler.MapValueForKey(m, "ownerName")
+		if v26 != nil {
+			x.OwnerName, ok = v26.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for ownerName: %+v (%T)", v26, v26)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string version_module = 27;
+		v27 := compiler.MapValueForKey(m, "version_module")
+		if v27 != nil {
+			x.VersionModule, ok = v27.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for version_module: %+v (%T)", v27, v27)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -446,7 +482,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"description", "httpMethod", "id", "mediaUpload", "parameterOrder", "parameters", "path", "request", "response", "scopes", "supportsMediaDownoad", "supportsMediaUpload", "supportsSubscription"}
+		allowedKeys := []string{"description", "flatPath", "httpMethod", "id", "mediaUpload", "parameterOrder", "parameters", "path", "request", "response", "scopes", "supportsMediaDownoad", "supportsMediaUpload", "supportsSubscription"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -571,6 +607,15 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 			x.SupportsSubscription, ok = v13.(bool)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for supportsSubscription: %+v (%T)", v13, v13)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string flat_path = 14;
+		v14 := compiler.MapValueForKey(m, "flatPath")
+		if v14 != nil {
+			x.FlatPath, ok = v14.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for flatPath: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1225,7 +1270,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"additionalProperties", "annotations", "default", "description", "enum", "enumDescriptions", "format", "id", "items", "location", "maximum", "minimum", "pattern", "properties", "repeated", "required", "type"}
+		allowedKeys := []string{"$ref", "additionalProperties", "annotations", "default", "description", "enum", "enumDescriptions", "format", "id", "items", "location", "maximum", "minimum", "pattern", "properties", "repeated", "required", "type"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1380,11 +1425,20 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, err)
 			}
 		}
-		// Annotations annotations = 17;
-		v17 := compiler.MapValueForKey(m, "annotations")
+		// string _ref = 17;
+		v17 := compiler.MapValueForKey(m, "$ref")
 		if v17 != nil {
+			x.XRef, ok = v17.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v17, v17)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// Annotations annotations = 18;
+		v18 := compiler.MapValueForKey(m, "annotations")
+		if v18 != nil {
 			var err error
-			x.Annotations, err = NewAnnotations(v17, compiler.NewContext("annotations", context))
+			x.Annotations, err = NewAnnotations(v18, compiler.NewContext("annotations", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1886,6 +1940,20 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
+	if m.XRef != "" {
+		info, err := compiler.ReadInfoForRef(root, m.XRef)
+		if err != nil {
+			return nil, err
+		}
+		if info != nil {
+			replacement, err := NewSchema(info, nil)
+			if err == nil {
+				*m = *replacement
+				return m.ResolveReferences(root)
+			}
+		}
+		return info, nil
+	}
 	if m.Annotations != nil {
 		_, err := m.Annotations.ResolveReferences(root)
 		if err != nil {
@@ -2059,6 +2127,18 @@ func (m *Document) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{"resources", m.Resources.ToRawInfo()})
 	}
 	// &{Name:resources Type:Resources StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.Etag != "" {
+		info = append(info, yaml.MapItem{"etag", m.Etag})
+	}
+	if m.OwnerDomain != "" {
+		info = append(info, yaml.MapItem{"ownerDomain", m.OwnerDomain})
+	}
+	if m.OwnerName != "" {
+		info = append(info, yaml.MapItem{"ownerName", m.OwnerName})
+	}
+	if m.VersionModule != "" {
+		info = append(info, yaml.MapItem{"version_module", m.VersionModule})
+	}
 	return info
 }
 
@@ -2138,6 +2218,9 @@ func (m *Method) ToRawInfo() interface{} {
 	// &{Name:mediaUpload Type:MediaUpload StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.SupportsSubscription != false {
 		info = append(info, yaml.MapItem{"supportsSubscription", m.SupportsSubscription})
+	}
+	if m.FlatPath != "" {
+		info = append(info, yaml.MapItem{"flatPath", m.FlatPath})
 	}
 	return info
 }
@@ -2404,6 +2487,9 @@ func (m *Schema) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{"items", m.Items.ToRawInfo()})
 	}
 	// &{Name:items Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.XRef != "" {
+		info = append(info, yaml.MapItem{"$ref", m.XRef})
+	}
 	if m.Annotations != nil {
 		info = append(info, yaml.MapItem{"annotations", m.Annotations.ToRawInfo()})
 	}

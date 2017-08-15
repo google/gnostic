@@ -43,6 +43,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/googleapis/gnostic/Discovery"
 	"github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"
@@ -55,6 +56,7 @@ const ( // OpenAPI Version
 	openAPIvUnknown = 0
 	openAPIv2       = 2
 	openAPIv3       = 3
+	discoveryFormat = 4
 )
 
 // Determine the version of an OpenAPI description read from JSON or YAML.
@@ -340,9 +342,9 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	}
 	// Determine the OpenAPI version.
 	g.openAPIVersion = getOpenAPIVersionFromInfo(info)
-	if g.openAPIVersion == openAPIvUnknown {
-		return nil, errors.New("unable to identify OpenAPI version")
-	}
+	//	if g.openAPIVersion == openAPIvUnknown {
+	//		return nil, errors.New("unable to identify OpenAPI version")
+	//	}
 	// Compile to the proto model.
 	if g.openAPIVersion == openAPIv2 {
 		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
@@ -352,6 +354,12 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 		message = document
 	} else if g.openAPIVersion == openAPIv3 {
 		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		if err != nil {
+			return nil, err
+		}
+		message = document
+	} else {
+		document, err := discovery_v1.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
@@ -375,6 +383,13 @@ func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err err
 	if err == nil && strings.HasPrefix(documentV2.Swagger, "2.0") {
 		g.openAPIVersion = openAPIv2
 		return documentV2, nil
+	}
+	// if that failed, try to read a Discovery Format document
+	discoveryDocument := &discovery_v1.Document{}
+	err = proto.Unmarshal(data, discoveryDocument)
+	if err == nil { // && strings.HasPrefix(documentV2.Swagger, "2.0") {
+		g.openAPIVersion = discoveryFormat
+		return discoveryDocument, nil
 	}
 	return nil, err
 }
@@ -410,6 +425,12 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 		}
 	} else if g.openAPIVersion == openAPIv3 {
 		document := message.(*openapi_v3.Document)
+		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
+		if !ok {
+			rawInfo = nil
+		}
+	} else if g.openAPIVersion == discoveryFormat {
+		document := message.(*discovery_v1.Document)
 		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
 		if !ok {
 			rawInfo = nil
