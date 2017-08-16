@@ -31,4 +31,4 @@ OpenAPIv3/OpenAPIv3.proto
 
 protoc \
 --go_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any:. \
-Discovery/Discovery.proto 
+discovery/discovery.proto 

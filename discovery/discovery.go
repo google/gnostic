@@ -85,11 +85,11 @@ func NewAuth(in interface{}, context *compiler.Context) (*Auth, error) {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		// Any oauth2 = 1;
+		// Oauth2 oauth2 = 1;
 		v1 := compiler.MapValueForKey(m, "oauth2")
 		if v1 != nil {
 			var err error
-			x.Oauth2, err = NewAny(v1, compiler.NewContext("oauth2", context))
+			x.Oauth2, err = NewOauth2(v1, compiler.NewContext("oauth2", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -880,6 +880,35 @@ func NewNamedScope(in interface{}, context *compiler.Context) (*NamedScope, erro
 		if v2 != nil {
 			var err error
 			x.Value, err = NewScope(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+// NewOauth2 creates an object of type Oauth2 if possible, returning an error if not.
+func NewOauth2(in interface{}, context *compiler.Context) (*Oauth2, error) {
+	errors := make([]error, 0)
+	x := &Oauth2{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"scopes"}
+		var allowedPatterns []*regexp.Regexp
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// Scopes scopes = 1;
+		v1 := compiler.MapValueForKey(m, "scopes")
+		if v1 != nil {
+			var err error
+			x.Scopes, err = NewScopes(v1, compiler.NewContext("scopes", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1842,6 +1871,18 @@ func (m *NamedScope) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Oauth2 objects.
+func (m *Oauth2) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Scopes != nil {
+		_, err := m.Scopes.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
 // ResolveReferences resolves references found inside Parameter objects.
 func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
@@ -2115,7 +2156,7 @@ func (m *Auth) ToRawInfo() interface{} {
 	if m.Oauth2 != nil {
 		info = append(info, yaml.MapItem{"oauth2", m.Oauth2.ToRawInfo()})
 	}
-	// &{Name:oauth2 Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:oauth2 Type:Oauth2 StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -2369,6 +2410,16 @@ func (m *NamedScope) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{"name", m.Name})
 	}
 	// &{Name:value Type:Scope StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
+	return info
+}
+
+// ToRawInfo returns a description of Oauth2 suitable for JSON or YAML export.
+func (m *Oauth2) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m.Scopes != nil {
+		info = append(info, yaml.MapItem{"scopes", m.Scopes.ToRawInfo()})
+	}
+	// &{Name:scopes Type:Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 

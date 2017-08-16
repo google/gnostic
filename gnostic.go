@@ -43,7 +43,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/Discovery"
+	"github.com/googleapis/gnostic/discovery"
 	"github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"

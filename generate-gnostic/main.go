@@ -100,7 +100,7 @@ func generateOpenAPIModel(version string) error {
 		protoPackageName = "openapi.v3"
 	case "discovery":
 		input = "discovery.json"
-		filename = "Discovery"
+		filename = "discovery"
 		protoPackageName = "discovery.v1"
 	default:
 		return fmt.Errorf("Unknown OpenAPI version %s", version)
