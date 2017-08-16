@@ -14,41 +14,44 @@
 
 package main
 
-func (renderer *ServiceRenderer) GenerateTypes() ([]byte, error) {
+import (
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+)
+
+func (renderer *Renderer) RenderTypes() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine(`// GENERATED FILE: DO NOT EDIT!`)
 	f.WriteLine(``)
-	f.WriteLine(`package ` + renderer.Model.Package)
+	f.WriteLine(`package ` + renderer.Package)
 	f.WriteLine(`// Types used by the API.`)
 	for _, modelType := range renderer.Model.Types {
 		f.WriteLine(`// ` + modelType.Description)
-		if modelType.Kind == "struct" {
-			f.WriteLine(`type ` + modelType.Name + ` struct {`)
+		if modelType.Kind == surface.TypeKind_STRUCT {
+			f.WriteLine(`type ` + modelType.TypeName + ` struct {`)
 			for _, field := range modelType.Fields {
-				f.WriteLine(field.FieldName + ` ` + goType(field.Type) + jsonTag(field))
+				prefix := ""
+				if field.Kind == surface.FieldKind_REFERENCE {
+					prefix = "*"
+				} else if field.Kind == surface.FieldKind_ARRAY {
+					prefix = "[]"
+				} else if field.Kind == surface.FieldKind_MAP {
+					prefix = "map[string]"
+				}
+				f.WriteLine(field.FieldName + ` ` + prefix + field.NativeType + jsonTag(field))
 			}
 			f.WriteLine(`}`)
-		} else if modelType.Kind != "" {
-			f.WriteLine(`type ` + modelType.Name + ` ` + modelType.Kind)
+		} else if modelType.Kind == surface.TypeKind_OBJECT {
+			f.WriteLine(`type ` + modelType.TypeName + ` map[string]` + modelType.ContentType)
 		} else {
-			f.WriteLine(`type ` + modelType.Name + ` struct {}`)
+			f.WriteLine(`type ` + modelType.TypeName + ` struct {}`)
 		}
 	}
 	return f.Bytes(), nil
 }
 
-func jsonTag(field *ServiceTypeField) string {
-	if field.JSONName != "" {
-		return " `json:" + `"` + field.JSONName + `,omitempty"` + "`"
+func jsonTag(field *surface.Field) string {
+	if field.Serialize {
+		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
 	}
 	return ""
-}
-
-func goType(openapiType string) string {
-	switch openapiType {
-	case "number":
-		return "int"
-	default:
-		return openapiType
-	}
 }
