@@ -20,44 +20,44 @@ import (
 	"path/filepath"
 
 	plugins "github.com/googleapis/gnostic/plugins"
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
-const newline = "\n"
-
-// ServiceRenderer generates code for a ServiceModel.
-type ServiceRenderer struct {
-	Model     *ServiceModel
+// Renderer generates code for a surface.Model.
+type Renderer struct {
+	Model   *surface.Model
+	Package string // package name
 }
 
 // NewServiceRenderer creates a renderer.
-func NewServiceRenderer(model *ServiceModel) (renderer *ServiceRenderer, err error) {
-	renderer = &ServiceRenderer{}
+func NewServiceRenderer(model *surface.Model) (renderer *Renderer, err error) {
+	renderer = &Renderer{}
 	renderer.Model = model
 	return renderer, nil
 }
 
 // Generate runs the renderer to generate the named files.
-func (renderer *ServiceRenderer) Generate(response *plugins.Response, files []string) (err error) {
+func (renderer *Renderer) Render(response *plugins.Response, files []string) (err error) {
 	for _, filename := range files {
 		file := &plugins.File{Name: filename}
 		switch filename {
 		case "client.go":
-			file.Data, err = renderer.GenerateClient()
+			file.Data, err = renderer.RenderClient()
 		case "types.go":
-			file.Data, err = renderer.GenerateTypes()
+			file.Data, err = renderer.RenderTypes()
 		case "provider.go":
-			file.Data, err = renderer.GenerateProvider()
+			file.Data, err = renderer.RenderProvider()
 		case "server.go":
-			file.Data, err = renderer.GenerateServer()
+			file.Data, err = renderer.RenderServer()
 		case "constants.go":
-			file.Data, err = renderer.GenerateConstants()
+			file.Data, err = renderer.RenderConstants()
 		default:
 			file.Data = nil
 		}
 		if err != nil {
 			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
-		// run generated Go files through gofmt
+		// run generated Go files through goimports
 		if filepath.Ext(file.Name) == ".go" {
 			file.Data, err = goimports(file.Name, file.Data)
 		}

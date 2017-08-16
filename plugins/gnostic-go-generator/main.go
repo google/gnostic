@@ -18,10 +18,12 @@ package main
 
 import (
 	"strings"
+	"encoding/json"
 
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
 // This is the main function for the code generation plugin.
@@ -43,20 +45,27 @@ func main() {
 	}
 
 	// Create the model.
-	var model *ServiceModel
+	var model *surface.Model
 	if documentv2, ok := env.Document.(*openapiv2.Document); ok {
-		model, err = NewServiceModelV2(documentv2, packageName)
+		model, err = surface.NewModelFromOpenAPI2(documentv2)
 	} else if documentv3, ok := env.Document.(*openapiv3.Document); ok {
-		model, err = NewServiceModelV3(documentv3, packageName)
+		model, err = surface.NewModelFromOpenAPI3(documentv3)
 	}
 	env.RespondAndExitIfError(err)
 
+	NewGoLanguageModel().Prepare(model)
+
+	modelJSON, _ := json.MarshalIndent(model, "", "  ")
+	modelFile := &plugins.File{Name: "model.json", Data: modelJSON}
+	env.Response.Files = append(env.Response.Files, modelFile)
+
 	// Create the renderer.
 	renderer, err := NewServiceRenderer(model)
+	renderer.Package = packageName
 	env.RespondAndExitIfError(err)
 
 	// Run the renderer to generate files and add them to the response object.
-	err = renderer.Generate(env.Response, files)
+	err = renderer.Render(env.Response, files)
 	env.RespondAndExitIfError(err)
 
 	// Return with success.

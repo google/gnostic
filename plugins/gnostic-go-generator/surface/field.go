@@ -12,19 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package gnostic_surface_v1
 
-func (renderer *ServiceRenderer) GenerateConstants() ([]byte, error) {
-	f := NewLineWriter()
-	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
-	f.WriteLine(``)
-	f.WriteLine("package " + renderer.Model.Package)
-	f.WriteLine(``)
-	f.WriteLine(`// ServicePath is the base URL of the service.`)
-	f.WriteLine(`const ServicePath = "` + `"`)
-	f.WriteLine(``)
-	f.WriteLine(`// OAuthScopes lists the OAuth scopes required by the service.`)
-	f.WriteLine(`const OAuthScopes = "` + `"`)
-
-	return f.Bytes(), nil
+// ServiceType returns the Type associated with a field.
+func (f *Field) ServiceType(m *Model) *Type {
+	return m.TypeWithTypeName(f.NativeType)
 }

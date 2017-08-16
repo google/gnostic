@@ -43,6 +43,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/googleapis/gnostic/discovery"
 	"github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"
@@ -55,6 +56,7 @@ const ( // OpenAPI Version
 	openAPIvUnknown = 0
 	openAPIv2       = 2
 	openAPIv3       = 3
+	discoveryFormat = 4
 )
 
 // Determine the version of an OpenAPI description read from JSON or YAML.
@@ -70,6 +72,10 @@ func getOpenAPIVersionFromInfo(info interface{}) int {
 	openapi, ok := compiler.MapValueForKey(m, "openapi").(string)
 	if ok && strings.HasPrefix(openapi, "3.0") {
 		return openAPIv3
+	}
+	kind, ok := compiler.MapValueForKey(m, "kind").(string)
+	if ok && kind == "discovery#restDescription" {
+		return discoveryFormat
 	}
 	return openAPIvUnknown
 }
@@ -356,6 +362,12 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 			return nil, err
 		}
 		message = document
+	} else {
+		document, err := discovery_v1.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		if err != nil {
+			return nil, err
+		}
+		message = document
 	}
 	return message, err
 }
@@ -375,6 +387,13 @@ func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err err
 	if err == nil && strings.HasPrefix(documentV2.Swagger, "2.0") {
 		g.openAPIVersion = openAPIv2
 		return documentV2, nil
+	}
+	// if that failed, try to read a Discovery Format document
+	discoveryDocument := &discovery_v1.Document{}
+	err = proto.Unmarshal(data, discoveryDocument)
+	if err == nil { // && strings.HasPrefix(documentV2.Swagger, "2.0") {
+		g.openAPIVersion = discoveryFormat
+		return discoveryDocument, nil
 	}
 	return nil, err
 }
@@ -410,6 +429,12 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 		}
 	} else if g.openAPIVersion == openAPIv3 {
 		document := message.(*openapi_v3.Document)
+		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
+		if !ok {
+			rawInfo = nil
+		}
+	} else if g.openAPIVersion == discoveryFormat {
+		document := message.(*discovery_v1.Document)
 		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
 		if !ok {
 			rawInfo = nil

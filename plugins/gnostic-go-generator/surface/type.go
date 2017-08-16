@@ -12,35 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package gnostic_surface_v1
 
-// ServiceType typically corresponds to a definition, parameter,
-// or response in the API and is represented by a type in generated code.
-type ServiceType struct {
-	Name        string              // the name to use for the type
-	Kind        string              // a "meta" description of the type (struct, map, etc)
-	Description string              // a comment describing the type
-	Fields      []*ServiceTypeField // the fields of the type
+func (t *Type) addField(f *Field) {
+	t.Fields = append(t.Fields, f)
 }
 
-func (s *ServiceType) hasFieldWithName(name string) bool {
-	if s == nil || s.Fields == nil {
-		return false
-	}
-	for _, f := range s.Fields {
-		if f.FieldName == name {
-			return true
-		}
-	}
-	return false
+func (s *Type) HasFieldWithName(name string) bool {
+	return s.FieldWithName(name) != nil
 }
 
-func (s *ServiceType) fieldWithName(name string) *ServiceTypeField {
-	if s == nil || s.Fields == nil {
+func (s *Type) FieldWithName(name string) *Field {
+	if s == nil || s.Fields == nil || name == "" {
 		return nil
 	}
 	for _, f := range s.Fields {
 		if f.FieldName == name {
+			return f
+		}
+	}
+	return nil
+}
+
+func (s *Type) HasFieldWithPosition(position Position) bool {
+	return s.FieldWithPosition(position) != nil
+}
+
+func (s *Type) FieldWithPosition(position Position) *Field {
+	if s == nil || s.Fields == nil {
+		return nil
+	}
+	for _, f := range s.Fields {
+		if f.Position == position {
 			return f
 		}
 	}

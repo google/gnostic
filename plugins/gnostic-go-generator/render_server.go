@@ -16,16 +16,19 @@ package main
 
 import (
 	"fmt"
+
+	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
-func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
+func (renderer *Renderer) RenderServer() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!")
 	f.WriteLine(``)
-	f.WriteLine("package " + renderer.Model.Package)
+	f.WriteLine("package " + renderer.Package)
 	f.WriteLine(``)
 	imports := []string{
 		"github.com/gorilla/mux",
+		"net/http",
 	}
 	f.WriteLine(``)
 	f.WriteLine(`import (`)
@@ -47,17 +50,21 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 	f.WriteLine(``)
 
 	for _, method := range renderer.Model.Methods {
+		parametersType := renderer.Model.TypeWithTypeName(method.ParametersTypeName)
+		responsesType := renderer.Model.TypeWithTypeName(method.ResponsesTypeName)
+
 		f.WriteLine(`// Handler`)
 		f.WriteLine(commentForText(method.Description))
 		f.WriteLine(`func ` + method.HandlerName + `(w http.ResponseWriter, r *http.Request) {`)
 		f.WriteLine(`  var err error`)
-		if method.hasParameters() {
+		if parametersType != nil {
 			f.WriteLine(`// instantiate the parameters structure`)
-			f.WriteLine(`parameters := &` + method.ParametersType.Name + `{}`)
+			f.WriteLine(`parameters := &` + parametersType.Name + `{}`)
 			if method.Method == "POST" {
 				f.WriteLine(`// deserialize request from post data`)
 				f.WriteLine(`decoder := json.NewDecoder(r.Body)`)
-				f.WriteLine(`err = decoder.Decode(&parameters.` + method.bodyParameterFieldName() + `)`)
+				f.WriteLine(`err = decoder.Decode(&parameters.` +
+					parametersType.FieldWithPosition(surface.Position_BODY).FieldName + `)`)
 				f.WriteLine(`if err != nil {`)
 				f.WriteLine(`	w.WriteHeader(http.StatusBadRequest)`)
 				f.WriteLine(`	w.Write([]byte(err.Error() + "\n"))`)
@@ -65,45 +72,45 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 				f.WriteLine(`}`)
 			}
 			f.WriteLine(`// get request fields in path and query parameters`)
-			if method.hasParametersWithPosition("path") {
+			if parametersType.HasFieldWithPosition(surface.Position_PATH) {
 				f.WriteLine(`vars := mux.Vars(r)`)
 			}
-			if method.hasParametersWithPosition("formdata") {
+			if parametersType.HasFieldWithPosition(surface.Position_FORMDATA) {
 				f.WriteLine(`r.ParseForm()`)
 			}
-			for _, field := range method.ParametersType.Fields {
-				if field.Position == "path" {
+			for _, field := range parametersType.Fields {
+				if field.Position == surface.Position_PATH {
 					if field.Type == "string" {
 						f.WriteLine(fmt.Sprintf("// %+v", field))
-						f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
+						f.WriteLine(`if value, ok := vars["` + field.Name + `"]; ok {`)
 						f.WriteLine(`	parameters.` + field.FieldName + ` = value`)
 						f.WriteLine(`}`)
 					} else {
-						f.WriteLine(`if value, ok := vars["` + field.JSONName + `"]; ok {`)
+						f.WriteLine(`if value, ok := vars["` + field.Name + `"]; ok {`)
 						f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(value)`)
 						f.WriteLine(`}`)
 					}
-				} else if field.Position == "formdata" {
-					f.WriteLine(`if len(r.Form["` + field.JSONName + `"]) > 0 {`)
-					f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(r.Form["` + field.JSONName + `"][0])`)
+				} else if field.Position == surface.Position_FORMDATA {
+					f.WriteLine(`if len(r.Form["` + field.Name + `"]) > 0 {`)
+					f.WriteLine(`	parameters.` + field.FieldName + ` = intValue(r.Form["` + field.Name + `"][0])`)
 					f.WriteLine(`}`)
 				}
 			}
 		}
-		if method.hasResponses() {
+		if responsesType != nil {
 			f.WriteLine(`// instantiate the responses structure`)
-			f.WriteLine(`responses := &` + method.ResponsesType.Name + `{}`)
+			f.WriteLine(`responses := &` + method.ResponsesTypeName + `{}`)
 		}
 		f.WriteLine(`// call the service provider`)
 		callLine := `err = provider.` + method.ProcessorName
-		if method.hasParameters() {
-			if method.hasResponses() {
+		if parametersType != nil {
+			if responsesType != nil {
 				callLine += `(parameters, responses)`
 			} else {
 				callLine += `(parameters)`
 			}
 		} else {
-			if method.hasResponses() {
+			if responsesType != nil {
 				callLine += `(responses)`
 			} else {
 				callLine += `()`
@@ -111,8 +118,8 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 		}
 		f.WriteLine(callLine)
 		f.WriteLine(`if err == nil {`)
-		if method.hasResponses() {
-			if method.ResponsesType.hasFieldWithName("OK") {
+		if responsesType != nil {
+			if responsesType.HasFieldWithName("OK") {
 				f.WriteLine(`if responses.OK != nil {`)
 				f.WriteLine(`  // write the normal response`)
 				f.WriteLine(`  encoder := json.NewEncoder(w)`)
@@ -120,10 +127,10 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 				f.WriteLine(`  return`)
 				f.WriteLine(`}`)
 			}
-			if method.ResponsesType.hasFieldWithName("Default") {
+			if responsesType.HasFieldWithName("Default") {
 				f.WriteLine(`if responses.Default != nil {`)
 				f.WriteLine(`  // write the error response`)
-				if method.ResponsesType.fieldWithName("Default").serviceType(renderer.Model).fieldWithName("Code") != nil {
+				if responsesType.FieldWithName("Default").ServiceType(renderer.Model).FieldWithName("Code") != nil {
 					f.WriteLine(`  w.WriteHeader(int(responses.Default.Code))`)
 				}
 				f.WriteLine(`  encoder := json.NewEncoder(w)`)
@@ -153,10 +160,9 @@ func (renderer *ServiceRenderer) GenerateServer() ([]byte, error) {
 	f.WriteLine(`// Provide the API service over HTTP.`)
 	f.WriteLine(`func ServeHTTP(address string) error {`)
 	f.WriteLine(`  if provider == nil {`)
-	f.WriteLine(`    return errors.New("Use ` + renderer.Model.Package + `.Initialize() to set a service provider.")`)
+	f.WriteLine(`    return errors.New("Use ` + renderer.Package + `.Initialize() to set a service provider.")`)
 	f.WriteLine(`  }`)
 	f.WriteLine(`  return http.ListenAndServe(address, nil)`)
 	f.WriteLine(`}`)
-
 	return f.Bytes(), nil
 }

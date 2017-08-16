@@ -14,31 +14,34 @@
 
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
-func (renderer *ServiceRenderer) GenerateProvider() ([]byte, error) {
+func (renderer *Renderer) RenderProvider() ([]byte, error) {
 	f := NewLineWriter()
 	f.WriteLine("// GENERATED FILE: DO NOT EDIT!\n")
-	f.WriteLine("package " + renderer.Model.Package)
+	f.WriteLine("package " + renderer.Package)
 	f.WriteLine(``)
 	f.WriteLine(`// To create a server, first write a class that implements this interface.`)
 	f.WriteLine(`// Then pass an instance of it to Initialize().`)
 	f.WriteLine(`type Provider interface {`)
 	for _, method := range renderer.Model.Methods {
+		parametersType := renderer.Model.TypeWithTypeName(method.ParametersTypeName)
+		responsesType := renderer.Model.TypeWithTypeName(method.ResponsesTypeName)
 		f.WriteLine(``)
-		f.WriteLine(`// Provider`)
 		f.WriteLine(commentForText(method.Description))
-		if method.hasParameters() {
-			if method.hasResponses() {
+		if parametersType != nil {
+			if responsesType != nil {
 				f.WriteLine(method.ProcessorName +
-					`(parameters *` + method.ParametersType.Name +
-					`, responses *` + method.ResponsesType.Name + `) (err error)`)
+					`(parameters *` + parametersType.Name +
+					`, responses *` + responsesType.Name + `) (err error)`)
 			} else {
-				f.WriteLine(method.ProcessorName + `(parameters *` + method.ParametersType.Name + `) (err error)`)
+				f.WriteLine(method.ProcessorName + `(parameters *` + parametersType.Name + `) (err error)`)
 			}
 		} else {
-			if method.hasResponses() {
-				f.WriteLine(method.ProcessorName + `(responses *` + method.ResponsesType.Name + `) (err error)`)
+			if responsesType != nil {
+				f.WriteLine(method.ProcessorName + `(responses *` + responsesType.Name + `) (err error)`)
 			} else {
 				f.WriteLine(method.ProcessorName + `() (err error)`)
 			}
