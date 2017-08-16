@@ -200,8 +200,11 @@
       "type": "object",
       "properties": {
         "oauth2": {
-          "scopes": {
-            "$ref": "#/definitions/scopes"
+          "type": "object",
+          "properties": {
+            "scopes": {
+              "$ref": "#/definitions/scopes"
+            }
           }
         }
       }
@@ -368,10 +371,10 @@
       "type": "object",
       "properties": {
         "methods": {
-          "$ref": "#/defintions/methods"
+          "$ref": "#/definitions/methods"
         },
         "resources": {
-          "$ref": "#/defintions/resources"
+          "$ref": "#/definitions/resources"
         }
       }
     },

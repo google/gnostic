@@ -51,7 +51,7 @@ message Any {
 }
 
 message Auth {
-  Any oauth2 = 1;
+  Oauth2 oauth2 = 1;
 }
 
 message Document {
@@ -161,6 +161,10 @@ message NamedScope {
   string name = 1;
   // Mapped value
   Scope value = 2;
+}
+
+message Oauth2 {
+  Scopes scopes = 1;
 }
 
 message Parameter {
