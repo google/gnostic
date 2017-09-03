@@ -15,8 +15,6 @@
 package statistics
 
 import (
-	"fmt"
-
 	openapi "github.com/googleapis/gnostic/OpenAPIv3"
 )
 
@@ -31,10 +29,12 @@ func NewDocumentStatisticsV3(source string, document *openapi.Document) *Documen
 	s.DefinitionPrimitiveTypes = make(map[string]int, 0)
 	s.AnonymousOperations = make([]string, 0)
 	s.AnonymousObjects = make([]string, 0)
-	s.analyzeDocumentV3(source, document)
+	// TODO
+	//s.analyzeDocumentV3(source, document)
 	return s
 }
 
+/*
 func (s *DocumentStatistics) analyzeOperationV3(method string, path string, operation *openapi.Operation) {
 	s.addOperation(method)
 	s.addOperation("total")
@@ -124,4 +124,4 @@ func (s *DocumentStatistics) analyzeDocumentV3(source string, document *openapi.
 		}
 	}
 }
-
+*/
