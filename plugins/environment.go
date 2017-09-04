@@ -1,13 +1,13 @@
-package openapi_plugin_v1
+package gnostic_plugin_v1
 
 import (
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"path"
-	"log"
-	"flag"
-	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
 
@@ -17,12 +17,13 @@ import (
 
 // Environment contains the environment of a plugin call.
 type Environment struct {
-	Invocation      string      // string representation of call
-	Document        interface{} // input document
-	DocumentName	string 		// name of input document
-	Response        *Response   // response message
-	OutputPath      string      // output location
-	RunningAsPlugin bool        // true if app is being run as a plugin
+	Invocation string // string representation of call
+	Wrapper    *Wrapper
+	//Document        interface{} // input document
+	DocumentName    string    // name of input document
+	Response        *Response // response message
+	OutputPath      string    // output location
+	RunningAsPlugin bool      // true if app is being run as a plugin
 }
 
 // NewEnvironment creates a plugin context from arguments and standard input.
@@ -81,34 +82,16 @@ When the -plugin option is specified, these flags are ignored.`)
 		}
 
 		// Log the invocation.
-		log.Printf("Running plugin %s(input:%s)", env.Invocation, request.Wrapper.Version)
+		log.Printf("Running plugin %s", env.Invocation)
 
-		// Read the document sent by the plugin.
-		version := request.Wrapper.Version
-		apiData := request.Wrapper.Value
-
-		env.DocumentName = request.Wrapper.Name
-
-		switch version {
-		case "v2":
-			documentv2 := &openapiv2.Document{}
-			err = proto.Unmarshal(apiData, documentv2)
-			env.RespondAndExitIfError(err)
-			env.Document = documentv2
-		case "v3":
-			documentv3 := &openapiv3.Document{}
-			err = proto.Unmarshal(apiData, documentv3)
-			env.RespondAndExitIfError(err)
-			env.Document = documentv3
-		default:
-			err = fmt.Errorf("Unsupported OpenAPI version %s", version)
-			env.RespondAndExitIfError(err)
-		}
+		env.Wrapper = request.Wrapper
 
 	} else {
 		// handle invocation from the command line.
 
 		env.OutputPath = *output
+
+		env.Wrapper = &Wrapper{}
 
 		// Read the input document.
 		apiData, err := ioutil.ReadFile(*input)
@@ -122,7 +105,7 @@ When the -plugin option is specified, these flags are ignored.`)
 		documentv2 := &openapiv2.Document{}
 		err = proto.Unmarshal(apiData, documentv2)
 		if err == nil {
-			env.Document = documentv2
+			env.Wrapper.Openapi2 = documentv2
 		} else {
 			// ignore deserialization errors
 		}
@@ -131,7 +114,7 @@ When the -plugin option is specified, these flags are ignored.`)
 		documentv3 := &openapiv3.Document{}
 		err = proto.Unmarshal(apiData, documentv3)
 		if err == nil {
-			env.Document = documentv3
+			env.Wrapper.Openapi3 = documentv3
 		} else {
 			// ignore deserialization errors
 		}

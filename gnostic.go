@@ -43,10 +43,10 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/discovery"
 	"github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/googleapis/gnostic/OpenAPIv3"
 	"github.com/googleapis/gnostic/compiler"
+	"github.com/googleapis/gnostic/discovery"
 	"github.com/googleapis/gnostic/jsonwriter"
 	plugins "github.com/googleapis/gnostic/plugins"
 	"gopkg.in/yaml.v2"
@@ -145,14 +145,11 @@ func (p *pluginCall) perform(document proto.Message, openAPIVersion int, sourceN
 		wrapper.Name = sourceName
 		switch openAPIVersion {
 		case openAPIv2:
-			wrapper.Version = "v2"
+			wrapper.Openapi2 = document.(*openapi_v2.Document)
 		case openAPIv3:
-			wrapper.Version = "v3"
+			wrapper.Openapi3 = document.(*openapi_v3.Document)
 		default:
-			wrapper.Version = "unknown"
 		}
-		protoBytes, _ := proto.Marshal(document)
-		wrapper.Value = protoBytes
 		request.Wrapper = wrapper
 		requestBytes, _ := proto.Marshal(request)
 
