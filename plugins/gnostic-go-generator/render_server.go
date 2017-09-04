@@ -17,7 +17,7 @@ package main
 import (
 	"fmt"
 
-	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+	surface "github.com/googleapis/gnostic/surface"
 )
 
 func (renderer *Renderer) RenderServer() ([]byte, error) {

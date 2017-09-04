@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	plugins "github.com/googleapis/gnostic/plugins"
-	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+	surface "github.com/googleapis/gnostic/surface"
 )
 
 // This is the main function for the code generation plugin.

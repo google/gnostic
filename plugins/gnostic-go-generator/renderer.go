@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 
 	plugins "github.com/googleapis/gnostic/plugins"
-	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+	surface "github.com/googleapis/gnostic/surface"
 )
 
 // Renderer generates code for a surface.Model.
