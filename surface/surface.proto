@@ -16,7 +16,7 @@
 
 syntax = "proto3";
 
-package gnostic.surface.v1;
+package surface.v1;
 
 enum FieldKind {
     SCALAR = 0;

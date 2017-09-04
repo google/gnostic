@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gnostic_surface_v1
+package surface_v1
 
 func (t *Type) addField(f *Field) {
 	t.Fields = append(t.Fields, f)
