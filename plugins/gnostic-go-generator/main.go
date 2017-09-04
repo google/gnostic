@@ -17,11 +17,9 @@
 package main
 
 import (
-	"strings"
 	"encoding/json"
+	"strings"
 
-	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
-	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
 	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
@@ -46,10 +44,10 @@ func main() {
 
 	// Create the model.
 	var model *surface.Model
-	if documentv2, ok := env.Document.(*openapiv2.Document); ok {
-		model, err = surface.NewModelFromOpenAPI2(documentv2)
-	} else if documentv3, ok := env.Document.(*openapiv3.Document); ok {
-		model, err = surface.NewModelFromOpenAPI3(documentv3)
+	if env.Wrapper.Openapi2 != nil {
+		model, err = surface.NewModelFromOpenAPI2(env.Wrapper.Openapi2)
+	} else if env.Wrapper.Openapi3 != nil {
+		model, err = surface.NewModelFromOpenAPI3(env.Wrapper.Openapi3)
 	}
 	env.RespondAndExitIfError(err)
 

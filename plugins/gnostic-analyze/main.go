@@ -26,18 +26,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
-
-	openapi2 "github.com/googleapis/gnostic/OpenAPIv2"
-	openapi3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
+	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
 )
 
 // Record an error, then serialize and return a response.
@@ -55,66 +50,20 @@ func sendAndExit(response *plugins.Response) {
 	os.Exit(0)
 }
 
-func xmain() {
-	// Initialize the response.
-	response := &plugins.Response{}
-
-	// Read the request.
-	data, err := ioutil.ReadAll(os.Stdin)
-	sendAndExitIfError(err, response)
-	if len(data) == 0 {
-		sendAndExitIfError(fmt.Errorf("no input data"), response)
-	}
-
-	// Unmarshal the request.
-	request := &plugins.Request{}
-	err = proto.Unmarshal(data, request)
-	sendAndExitIfError(err, response)
-
-	// Verify that the passed-in description is supported.
-	wrapper := request.Wrapper
-	if wrapper.Version != "v2" {
-		err = fmt.Errorf("%s requires an OpenAPI v2 description.",
-			os.Args[0])
-		sendAndExitIfError(err, response)
-	}
-
-	// Unmarshal the description.
-	document := &openapi2.Document{}
-	err = proto.Unmarshal(wrapper.Value, document)
-	sendAndExitIfError(err, response)
-
-	// Analyze the API document.
-	stats := statistics.NewDocumentStatistics(wrapper.Name, document)
-
-	// Return the analysis results with an appropriate filename.
-	// Results are in files named "summary.json" in the same relative
-	// locations as the description source files.
-	file := &plugins.File{}
-	file.Name = strings.Replace(stats.Name, path.Base(stats.Name), "summary.json", -1)
-	file.Data, err = json.MarshalIndent(stats, "", "  ")
-	file.Data = append(file.Data, []byte("\n")...)
-	sendAndExitIfError(err, response)
-	response.Files = append(response.Files, file)
-
-	// Send the final results. Success!
-	sendAndExit(response)
-}
-
 // This is the main function for the plugin.
 func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
 
 	var stats *statistics.DocumentStatistics
-	if documentv2, ok := env.Document.(*openapi2.Document); ok {
+	if env.Wrapper.Openapi2 != nil {
 		// Analyze the API document.
-		stats = statistics.NewDocumentStatistics(env.DocumentName, documentv2)
+		stats = statistics.NewDocumentStatistics(env.DocumentName, env.Wrapper.Openapi2)
 	}
 
-	if documentv3, ok := env.Document.(*openapi3.Document); ok {
+	if env.Wrapper.Openapi3 != nil {
 		// Analyze the API document.
-		stats = statistics.NewDocumentStatisticsV3(env.DocumentName, documentv3)
+		stats = statistics.NewDocumentStatisticsV3(env.DocumentName, env.Wrapper.Openapi3)
 	}
 
 	if stats != nil {
@@ -128,7 +77,6 @@ func main() {
 		env.RespondAndExitIfError(err)
 		env.Response.Files = append(env.Response.Files, file)
 	}
-
 
 	env.RespondAndExit()
 }
