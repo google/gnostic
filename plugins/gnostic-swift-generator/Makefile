@@ -10,4 +10,4 @@ all:
 
 clean:
 	rm -rf .build Packages
-	rm -rf gnostic-swift-client gnostic-swift-service
+	rm -rf gnostic-swift-client gnostic-swift-server gnostic-swift-generator
