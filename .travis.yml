@@ -35,14 +35,12 @@ script:
   - pushd plugins/gnostic-go-generator/examples/v3.0/bookstore
   - make test
   - popd
-
-# temporarily disable swift tests
-#  - export PATH=.:$HOME/local/bin:$PATH
-#  - export LD_LIBRARY_PATH=$HOME/local/lib
-#  - pushd plugins/gnostic-swift-generator
-#  - make
-#  - cd examples/bookstore
-#  - make
-#  - .build/debug/Server &
-#  - make test
+  - export PATH=.:$HOME/local/bin:$PATH
+  - export LD_LIBRARY_PATH=$HOME/local/lib
+  - pushd plugins/gnostic-swift-generator
+  - make
+  - cd examples/bookstore
+  - make
+  - .build/debug/Server &
+  - make test
   
