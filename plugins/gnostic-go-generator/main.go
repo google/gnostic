@@ -29,7 +29,7 @@ func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
 
-	packageName := env.OutputPath
+	packageName := env.Request.OutputPath
 
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
@@ -44,10 +44,10 @@ func main() {
 
 	// Create the model.
 	var model *surface.Model
-	if env.Wrapper.Openapi2 != nil {
-		model, err = surface.NewModelFromOpenAPI2(env.Wrapper.Openapi2)
-	} else if env.Wrapper.Openapi3 != nil {
-		model, err = surface.NewModelFromOpenAPI3(env.Wrapper.Openapi3)
+	if env.Request.Openapi2 != nil {
+		model, err = surface.NewModelFromOpenAPI2(env.Request.Openapi2)
+	} else if env.Request.Openapi3 != nil {
+		model, err = surface.NewModelFromOpenAPI3(env.Request.Openapi3)
 	}
 	env.RespondAndExitIfError(err)
 

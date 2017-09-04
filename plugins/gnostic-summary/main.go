@@ -95,10 +95,10 @@ func main() {
 
 	code := &printer.Code{}
 	switch {
-	case env.Wrapper.Openapi2 != nil:
-		printDocumentV2(code, env.Wrapper.Openapi2)
-	case env.Wrapper.Openapi3 != nil:
-		printDocumentV3(code, env.Wrapper.Openapi3)
+	case env.Request.Openapi2 != nil:
+		printDocumentV2(code, env.Request.Openapi2)
+	case env.Request.Openapi3 != nil:
+		printDocumentV3(code, env.Request.Openapi3)
 	default:
 	}
 	file := &plugins.File{
