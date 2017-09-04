@@ -141,16 +141,14 @@ func (p *pluginCall) perform(document proto.Message, openAPIVersion int, sourceN
 
 		request.OutputPath = outputLocation
 
-		wrapper := &plugins.Wrapper{}
-		wrapper.Name = sourceName
+		request.SourceName = sourceName
 		switch openAPIVersion {
 		case openAPIv2:
-			wrapper.Openapi2 = document.(*openapi_v2.Document)
+			request.Openapi2 = document.(*openapi_v2.Document)
 		case openAPIv3:
-			wrapper.Openapi3 = document.(*openapi_v3.Document)
+			request.Openapi3 = document.(*openapi_v3.Document)
 		default:
 		}
-		request.Wrapper = wrapper
 		requestBytes, _ := proto.Marshal(request)
 
 		cmd := exec.Command(executableName, "-plugin")

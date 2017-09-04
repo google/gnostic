@@ -72,8 +72,8 @@ message Parameter {
 // An encoded Request is written to the plugin's stdin.
 message Request {
 
-  // Wrapped API description to process.
-  Wrapper wrapper = 1;
+  // filename or URL of the original source document
+  string source_name = 1;
   
   // Output path specified in the plugin invocation.
   string output_path = 2;
@@ -81,8 +81,17 @@ message Request {
   // Plugin parameters parsed from the invocation string.
   repeated Parameter parameters = 3;
 
-  // The version number of openapi compiler.
+  // The version number of gnostic.
   Version compiler_version = 4;
+  
+  // OpenAPI v2 API representation
+  openapi.v2.Document openapi2 = 5;
+
+  // OpenAPI v3 API representation
+  openapi.v3.Document openapi3 = 6;
+
+  // Discovery API representation
+  discovery.v1.Document discovery = 7;
 }
 
 // The plugin writes an encoded Response to stdout.
@@ -113,18 +122,4 @@ message File {
   bytes data = 2; 
 }
 
-// Wrapper wraps an API description with its type.
-message Wrapper {
 
-  // filename or URL of the original document
-  string name = 1;
-  
-  // OpenAPI v2 API representation
-  openapi.v2.Document openapi2 = 2;
-
-  // OpenAPI v3 API representation
-  openapi.v3.Document openapi3 = 3;
-
-  // Discovery API representation
-  discovery.v1.Document discovery = 4;
-}

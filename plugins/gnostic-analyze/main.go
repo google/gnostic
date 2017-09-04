@@ -56,14 +56,14 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	var stats *statistics.DocumentStatistics
-	if env.Wrapper.Openapi2 != nil {
+	if env.Request.Openapi2 != nil {
 		// Analyze the API document.
-		stats = statistics.NewDocumentStatistics(env.DocumentName, env.Wrapper.Openapi2)
+		stats = statistics.NewDocumentStatistics(env.Request.SourceName, env.Request.Openapi2)
 	}
 
-	if env.Wrapper.Openapi3 != nil {
+	if env.Request.Openapi3 != nil {
 		// Analyze the API document.
-		stats = statistics.NewDocumentStatisticsV3(env.DocumentName, env.Wrapper.Openapi3)
+		stats = statistics.NewDocumentStatisticsV3(env.Request.SourceName, env.Request.Openapi3)
 	}
 
 	if stats != nil {
