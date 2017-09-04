@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gnostic_surface_v1
+package surface_v1
 
 // ServiceType returns the Type associated with a field.
 func (f *Field) ServiceType(m *Model) *Type {
