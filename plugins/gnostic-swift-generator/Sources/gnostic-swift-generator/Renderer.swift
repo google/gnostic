@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Stencil
+import Gnostic
 
 extension String {
   func capitalizingFirstLetter() -> String {
@@ -294,14 +295,14 @@ class ServiceRenderer {
     }
   }
 
-  public func generate(filenames : [String], response : inout Openapi_Plugin_V1_Response) throws {
+  public func generate(filenames : [String], response : inout Gnostic_Plugin_V1_Response) throws {
     let context = ["renderer": self]
 
     for filename in filenames {
       let clientcode = try templateEnvironment.renderTemplate(name:filename,
                                                               context:context)
       if let data = stripMarkers(clientcode).data(using:.utf8) {
-        var clientfile = Openapi_Plugin_V1_File()
+        var clientfile = Gnostic_Plugin_V1_File()
         clientfile.name = filename
         clientfile.data = data
         response.files.append(clientfile)

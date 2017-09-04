@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Foundation
+import Gnostic
 
 func Log(_ message : String) {
   FileHandle.standardError.write((message + "\n").data(using:.utf8)!)
@@ -22,15 +23,16 @@ func main() throws {
   
   // read the OpenAPI document
   let rawRequest = try Stdin.readall()
-  let request = try Openapi_Plugin_V1_Request(serializedData:rawRequest)
-  let wrapper = request.wrapper
-  let document = try Openapi_V2_Document(serializedData:wrapper.value)
+  let request = try Gnostic_Plugin_V1_Request(serializedData:rawRequest)
+  var response = Gnostic_Plugin_V1_Response()
+  
+  if request.hasOpenapi2 {
+  let document = request.openapi2
 
   // build the service renderer
   let renderer = ServiceRenderer(document:document)
 
   // generate the desired files
-  var response = Openapi_Plugin_V1_Response()
 
   var filenames : [String]
   switch CommandLine.arguments[0] {
@@ -42,6 +44,7 @@ func main() throws {
     filenames = ["client.swift", "server.swift", "types.swift", "fetch.swift"]
   }
   try renderer.generate(filenames:filenames, response:&response)
+}
 
   // return the results
   let serializedResponse = try response.serializedData()
