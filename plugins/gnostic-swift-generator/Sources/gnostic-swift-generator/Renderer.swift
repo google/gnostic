@@ -146,7 +146,7 @@ class ServiceRenderer {
   private var types : [ServiceType] = []
   private var methods : [ServiceMethod] = []
 
-  public init(document : Openapi_V2_Document) {
+  public init(surface : Surface_V1_Model, document : Openapi_V2_Document) {
     templateEnvironment = Environment(loader:TemplateLoader(), extensions:[TemplateExtensions()])
     loadService(document:document)
   }

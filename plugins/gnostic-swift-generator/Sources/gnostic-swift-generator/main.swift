@@ -21,30 +21,33 @@ func Log(_ message : String) {
 
 func main() throws {
   
-  // read the OpenAPI document
+  // read the code generation request
   let rawRequest = try Stdin.readall()
   let request = try Gnostic_Plugin_V1_Request(serializedData:rawRequest)
+
   var response = Gnostic_Plugin_V1_Response()
-  
-  if request.hasOpenapi2 {
-  let document = request.openapi2
 
-  // build the service renderer
-  let renderer = ServiceRenderer(document:document)
+  if request.hasOpenapi2 && request.hasSurface {
+    let document = request.openapi2
+    let surface = request.surface
 
-  // generate the desired files
+    Log("\(request.surface)")
 
-  var filenames : [String]
-  switch CommandLine.arguments[0] {
-  case "openapi_swift_client":
-    filenames = ["client.swift", "types.swift", "fetch.swift"]
-  case "openapi_swift_server":
-    filenames = ["server.swift", "types.swift"]
-  default:
-    filenames = ["client.swift", "server.swift", "types.swift", "fetch.swift"]
+    // build the service renderer
+    let renderer = ServiceRenderer(surface:surface, document:document)
+
+    // generate the desired files
+    var filenames : [String]
+    switch CommandLine.arguments[0] {
+    case "openapi_swift_client":
+      filenames = ["client.swift", "types.swift", "fetch.swift"]
+    case "openapi_swift_server":
+      filenames = ["server.swift", "types.swift"]
+    default:
+      filenames = ["client.swift", "server.swift", "types.swift", "fetch.swift"]
+    }
+    try renderer.generate(filenames:filenames, response:&response)
   }
-  try renderer.generate(filenames:filenames, response:&response)
-}
 
   // return the results
   let serializedResponse = try response.serializedData()
