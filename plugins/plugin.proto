@@ -25,6 +25,7 @@ syntax = "proto3";
 import "github.com/googleapis/gnostic/OpenAPIv2/OpenAPIv2.proto";
 import "github.com/googleapis/gnostic/OpenAPIv3/OpenAPIv3.proto";
 import "github.com/googleapis/gnostic/discovery/discovery.proto";
+import "github.com/googleapis/gnostic/surface/surface.proto";
 
 package gnostic.plugin.v1;
 
@@ -92,6 +93,9 @@ message Request {
 
   // Discovery API representation
   discovery.v1.Document discovery = 7;
+  
+  // generated code surface representation
+  surface.v1.Model surface = 8;
 }
 
 // The plugin writes an encoded Response to stdout.
