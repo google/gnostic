@@ -17,10 +17,10 @@
 package main
 
 import (
-	"github.com/googleapis/gnostic/printer"
-	plugins "github.com/googleapis/gnostic/plugins"
 	openapi2 "github.com/googleapis/gnostic/OpenAPIv2"
 	openapi3 "github.com/googleapis/gnostic/OpenAPIv3"
+	plugins "github.com/googleapis/gnostic/plugins"
+	"github.com/googleapis/gnostic/printer"
 )
 
 // generate a simple report of an OpenAPI document's contents
@@ -94,11 +94,12 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	code := &printer.Code{}
-	if documentv2, ok := env.Document.(*openapi2.Document); ok {
-		printDocumentV2(code, documentv2)
-	}
-	if documentv3, ok := env.Document.(*openapi3.Document); ok {
-		printDocumentV3(code, documentv3)
+	switch {
+	case env.Request.Openapi2 != nil:
+		printDocumentV2(code, env.Request.Openapi2)
+	case env.Request.Openapi3 != nil:
+		printDocumentV3(code, env.Request.Openapi3)
+	default:
 	}
 	file := &plugins.File{
 		Name: "summary.txt",

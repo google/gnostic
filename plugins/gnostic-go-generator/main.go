@@ -17,13 +17,11 @@
 package main
 
 import (
-	"strings"
 	"encoding/json"
+	"errors"
+	"strings"
 
-	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
-	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
-	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
 )
 
 // This is the main function for the code generation plugin.
@@ -31,7 +29,7 @@ func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
 
-	packageName := env.OutputPath
+	packageName := env.Request.OutputPath
 
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
@@ -44,15 +42,15 @@ func main() {
 		files = []string{"client.go", "server.go", "provider.go", "types.go", "constants.go"}
 	}
 
-	// Create the model.
-	var model *surface.Model
-	if documentv2, ok := env.Document.(*openapiv2.Document); ok {
-		model, err = surface.NewModelFromOpenAPI2(documentv2)
-	} else if documentv3, ok := env.Document.(*openapiv3.Document); ok {
-		model, err = surface.NewModelFromOpenAPI3(documentv3)
-	}
-	env.RespondAndExitIfError(err)
+	// Get the code surface model.
+	model := env.Request.Surface
 
+	if model == nil {
+		err = errors.New("No generated code surface model is available.")
+		env.RespondAndExitIfError(err)
+	}
+
+	// Customize the code surface model for Go
 	NewGoLanguageModel().Prepare(model)
 
 	modelJSON, _ := json.MarshalIndent(model, "", "  ")

@@ -15,7 +15,7 @@
 package main
 
 import (
-	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+	surface "github.com/googleapis/gnostic/surface"
 	"unicode"
 	"strings"
 )

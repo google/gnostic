@@ -1,13 +1,13 @@
-package openapi_plugin_v1
+package gnostic_plugin_v1
 
 import (
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"path"
-	"log"
-	"flag"
-	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
 
@@ -17,12 +17,10 @@ import (
 
 // Environment contains the environment of a plugin call.
 type Environment struct {
-	Invocation      string      // string representation of call
-	Document        interface{} // input document
-	DocumentName	string 		// name of input document
-	Response        *Response   // response message
-	OutputPath      string      // output location
-	RunningAsPlugin bool        // true if app is being run as a plugin
+	Request         *Request  // plugin request object
+	Response        *Response // response message
+	Invocation      string    // string representation of call
+	RunningAsPlugin bool      // true if app is being run as a plugin
 }
 
 // NewEnvironment creates a plugin context from arguments and standard input.
@@ -32,7 +30,7 @@ func NewEnvironment() (env *Environment, err error) {
 		Response:   &Response{},
 	}
 
-	input := flag.String("input", "", "OpenAPI description (in binary protocol buffer form)")
+	input := flag.String("input", "", "API description (in binary protocol buffer form)")
 	output := flag.String("output", "-", "Output file or directory")
 	plugin := flag.Bool("plugin", false, "Run as a gnostic plugin (other flags are ignored).")
 	flag.Parse()
@@ -58,7 +56,7 @@ When the -plugin option is specified, these flags are ignored.`)
 	}
 
 	if env.RunningAsPlugin {
-		// handle invocation as a plugin.
+		// Handle invocation as a plugin.
 
 		// Read the plugin input.
 		pluginData, err := ioutil.ReadAll(os.Stdin)
@@ -72,8 +70,6 @@ When the -plugin option is specified, these flags are ignored.`)
 		err = proto.Unmarshal(pluginData, request)
 		env.RespondAndExitIfError(err)
 
-		env.OutputPath = request.OutputPath
-
 		// Collect parameters passed to the plugin.
 		parameters := request.Parameters
 		for _, parameter := range parameters {
@@ -81,34 +77,12 @@ When the -plugin option is specified, these flags are ignored.`)
 		}
 
 		// Log the invocation.
-		log.Printf("Running plugin %s(input:%s)", env.Invocation, request.Wrapper.Version)
+		log.Printf("Running plugin %s", env.Invocation)
 
-		// Read the document sent by the plugin.
-		version := request.Wrapper.Version
-		apiData := request.Wrapper.Value
-
-		env.DocumentName = request.Wrapper.Name
-
-		switch version {
-		case "v2":
-			documentv2 := &openapiv2.Document{}
-			err = proto.Unmarshal(apiData, documentv2)
-			env.RespondAndExitIfError(err)
-			env.Document = documentv2
-		case "v3":
-			documentv3 := &openapiv3.Document{}
-			err = proto.Unmarshal(apiData, documentv3)
-			env.RespondAndExitIfError(err)
-			env.Document = documentv3
-		default:
-			err = fmt.Errorf("Unsupported OpenAPI version %s", version)
-			env.RespondAndExitIfError(err)
-		}
+		env.Request = request
 
 	} else {
-		// handle invocation from the command line.
-
-		env.OutputPath = *output
+		// Handle invocation from the command line.
 
 		// Read the input document.
 		apiData, err := ioutil.ReadFile(*input)
@@ -116,22 +90,24 @@ When the -plugin option is specified, these flags are ignored.`)
 			env.RespondAndExitIfError(fmt.Errorf("no input data"))
 		}
 
-		env.DocumentName = path.Base(*input)
+		env.Request = &Request{}
+		env.Request.OutputPath = *output
+		env.Request.SourceName = path.Base(*input)
 
-		// first try to unmarshal OpenAPI v2
+		// First try to unmarshal OpenAPI v2.
 		documentv2 := &openapiv2.Document{}
 		err = proto.Unmarshal(apiData, documentv2)
 		if err == nil {
-			env.Document = documentv2
+			env.Request.Openapi2 = documentv2
 		} else {
 			// ignore deserialization errors
 		}
 
-		// then try to unmarshal OpenAPI v3
+		// Then try to unmarshal OpenAPI v3.
 		documentv3 := &openapiv3.Document{}
 		err = proto.Unmarshal(apiData, documentv3)
 		if err == nil {
-			env.Document = documentv3
+			env.Request.Openapi3 = documentv3
 		} else {
 			// ignore deserialization errors
 		}
@@ -154,7 +130,7 @@ func (env *Environment) RespondAndExit() {
 		responseBytes, _ := proto.Marshal(env.Response)
 		os.Stdout.Write(responseBytes)
 	} else {
-		err := HandleResponse(env.Response, env.OutputPath)
+		err := HandleResponse(env.Response, env.Request.OutputPath)
 		if err != nil {
 			log.Printf("%s", err.Error())
 		}
