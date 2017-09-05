@@ -13,6 +13,16 @@
 // limitations under the License.
 
 import Foundation
+import Gnostic
+
+extension ServiceRenderer {
+
+    func renderFetch() -> String {
+        var code = CodePrinter()
+        code.print(header)
+
+        code.print("""
+import Foundation
 import Dispatch
 import KituraNet
 
@@ -89,23 +99,23 @@ public func fetch(_ urlRequest: URLRequest, callback:@escaping (Data?, HTTPURLRe
   let error: Error? = nil // make this mutable when we start using it
   guard let method = urlRequest.httpMethod else {
     callback (data, urlResponse, error)
-	return
+    return
   }
   guard let url = urlRequest.url else {
     callback (data, urlResponse, error)
-	return
+    return
   }
   guard let scheme = url.scheme else {
     callback (data, urlResponse, error)
-	return
+    return
   }
   guard let host = url.host else {
     callback (data, urlResponse, error)
-	return
+    return
   }
   guard let port = url.port else {
     callback (data, urlResponse, error)
-	return
+    return
   }
   let options : [ClientRequest.Options] = [
     .method(method),
@@ -140,4 +150,8 @@ public func fetch(_ urlRequest: URLRequest, callback:@escaping (Data?, HTTPURLRe
     request.write(from:requestData)
   }
   request.end() // send the request
+}
+""")
+        return code.content
+    }
 }
