@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import Foundation
+import Gnostic
 
 func printDocument(document:Openapi_V2_Document,
-                   name:String,
-                   version:String) -> String {
+                   name:String) -> String {
   var code = CodePrinter()
-  code.print("READING \(name) (\(version))\n")
+  code.print("READING \(name)\n")
   code.print("Swagger: \(document.swagger)\n")
   code.print("Host: \(document.host)\n")
   code.print("BasePath: \(document.basePath)\n")
@@ -52,17 +52,18 @@ func printDocument(document:Openapi_V2_Document,
 }
 
 func main() throws {
-  var response = Openapi_Plugin_V1_Response()
+  var response = Gnostic_Plugin_V1_Response()
   let rawRequest = try Stdin.readall()
-  let request = try Openapi_Plugin_V1_Request(serializedData: rawRequest)
-  let wrapper = request.wrapper 
-  let document = try Openapi_V2_Document(serializedData:wrapper.value)
-  let report = printDocument(document:document, name:wrapper.name, version:wrapper.version)
-  if let reportData = report.data(using:.utf8) {
-    var file = Openapi_Plugin_V1_File()
-    file.name = "report.txt"
-    file.data = reportData
-    response.files.append(file)
+  let request = try Gnostic_Plugin_V1_Request(serializedData: rawRequest)
+  if request.hasOpenapi2 {
+    let document = request.openapi2
+    let report = printDocument(document:document, name:request.sourceName)
+    if let reportData = report.data(using:.utf8) {
+      var file = Gnostic_Plugin_V1_File()
+      file.name = "report.txt"
+      file.data = reportData
+      response.files.append(file)
+    }
   }
   let serializedResponse = try response.serializedData()
   Stdout.write(bytes: serializedResponse)

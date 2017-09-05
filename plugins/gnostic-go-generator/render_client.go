@@ -17,7 +17,7 @@ package main
 import (
 	"strings"
 
-	surface "github.com/googleapis/gnostic/plugins/gnostic-go-generator/surface"
+	surface "github.com/googleapis/gnostic/surface"
 )
 
 // ParameterList returns a string representation of a method's parameters
