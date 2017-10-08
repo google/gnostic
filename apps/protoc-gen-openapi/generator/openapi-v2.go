@@ -21,7 +21,7 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	v2 "github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/golang/protobuf/proto"
-	options "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
@@ -50,14 +50,33 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 			log.Printf(" OPTIONS %+v", *method.Options)
 			log.Printf(" EXTENSIONS %+v", method.Options.XXX_InternalExtensions)
 
-			extension, err := proto.GetExtension(method.Options, options.E_Http)
+			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
 			log.Printf(" extensions: %T %+v (%+v)", extension, extension, err)
+			var path string
 			if extension != nil {
-				rule := extension.(*options.HttpRule)
+				rule := extension.(*annotations.HttpRule)
 				log.Printf("  PATTERN %T %v", rule.Pattern, rule.Pattern)
 				log.Printf("  SELECTOR %s", rule.Selector)
 				log.Printf("  BODY %s", rule.Body)
 				log.Printf("  BINDINGS %s", rule.AdditionalBindings)
+
+				switch pattern := rule.Pattern.(type) {
+				case *annotations.HttpRule_Get:
+					path = pattern.Get
+				case *annotations.HttpRule_Post:
+					path = pattern.Post
+				case *annotations.HttpRule_Put:
+					path = pattern.Put
+				case *annotations.HttpRule_Delete:
+					path = pattern.Delete
+				case *annotations.HttpRule_Patch:
+					path = pattern.Patch
+				case *annotations.HttpRule_Custom:
+					path = "custom-unsupported"
+				default:
+					path = "unknown-unsupported"
+				}
+				log.Printf("  PATH %s", path)
 			}
 
 			var methodName string
@@ -75,9 +94,12 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 				methodName = "UNKNOWN"
 			}
 			log.Printf("%s", methodName)
+
+			op := g.BuildOperation()
+
+			g.AddOperation(d, op, path, methodName)
 		}
 	}
-	g.BuildSamplePaths(d)
 
 	// for each message, generate a definition
 	d.Definitions = &v2.Definitions{}
@@ -131,192 +153,64 @@ func (g *Generator) definitionReferenceForTypeName(typeName string) string {
 	return "#/definitions/" + lastPart
 }
 
-func (g *Generator) BuildSamplePaths(d *v2.Document) {
-	d.Paths.Path = append(d.Paths.Path,
-		&v2.NamedPathItem{
-			Name: "/pets",
-			Value: &v2.PathItem{
-				Get: &v2.Operation{
-					Summary:     "List all pets",
-					OperationId: "listPets",
-					Tags:        []string{"pets"},
-					Parameters: []*v2.ParametersItem{
-						&v2.ParametersItem{
-							Oneof: &v2.ParametersItem_Parameter{
-								Parameter: &v2.Parameter{
-									Oneof: &v2.Parameter_NonBodyParameter{
-										NonBodyParameter: &v2.NonBodyParameter{
-											Oneof: &v2.NonBodyParameter_QueryParameterSubSchema{
-												QueryParameterSubSchema: &v2.QueryParameterSubSchema{
-													Name:        "limit",
-													In:          "query",
-													Description: "How many items to return at one time (max 100)",
-													Required:    false,
-													Type:        "integer",
-													Format:      "int32",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					Responses: &v2.Responses{
-						ResponseCode: []*v2.NamedResponseValue{
-							&v2.NamedResponseValue{
-								Name: "200",
-								Value: &v2.ResponseValue{
-									Oneof: &v2.ResponseValue_Response{
-										Response: &v2.Response{
-											Description: "An paged array of pets", // [sic] match other examples
-											Schema: &v2.SchemaItem{
-												Oneof: &v2.SchemaItem_Schema{
-													Schema: &v2.Schema{
-														XRef: "#/definitions/Pets",
-													},
-												},
-											},
-											Headers: &v2.Headers{
-												AdditionalProperties: []*v2.NamedHeader{
-													&v2.NamedHeader{
-														Name: "x-next",
-														Value: &v2.Header{
-															Type:        "string",
-															Description: "A link to the next page of responses",
-														},
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-							&v2.NamedResponseValue{
-								Name: "default",
-								Value: &v2.ResponseValue{
-									Oneof: &v2.ResponseValue_Response{
-										Response: &v2.Response{
-											Description: "unexpected error",
-											Schema: &v2.SchemaItem{
-												Oneof: &v2.SchemaItem_Schema{
-													Schema: &v2.Schema{
-														XRef: "#/definitions/Error",
-													},
-												},
-											},
-										},
+
+func (g *Generator) BuildOperation() *v2.Operation {
+	return &v2.Operation{
+		Summary:     "Summary",
+		OperationId: "OperationId",
+		Tags:        []string{"tag"},
+		Parameters: []*v2.ParametersItem{
+			&v2.ParametersItem{
+				Oneof: &v2.ParametersItem_Parameter{
+					Parameter: &v2.Parameter{
+						Oneof: &v2.Parameter_NonBodyParameter{
+							NonBodyParameter: &v2.NonBodyParameter{
+								Oneof: &v2.NonBodyParameter_QueryParameterSubSchema{
+									QueryParameterSubSchema: &v2.QueryParameterSubSchema{
+										Name:        "limit",
+										In:          "query",
+										Description: "How many items to return at one time (max 100)",
+										Required:    false,
+										Type:        "integer",
+										Format:      "int32",
 									},
 								},
 							},
 						},
 					},
 				},
-				Post: &v2.Operation{
-					Summary:     "Create a pet",
-					OperationId: "createPets",
-					Tags:        []string{"pets"},
-					Parameters:  []*v2.ParametersItem{},
-					Responses: &v2.Responses{
-						ResponseCode: []*v2.NamedResponseValue{
-							&v2.NamedResponseValue{
-								Name: "201",
-								Value: &v2.ResponseValue{
-									Oneof: &v2.ResponseValue_Response{
-										Response: &v2.Response{
-											Description: "Null response",
-										},
-									},
-								},
-							},
-							&v2.NamedResponseValue{
-								Name: "default",
-								Value: &v2.ResponseValue{
-									Oneof: &v2.ResponseValue_Response{
-										Response: &v2.Response{
-											Description: "unexpected error",
-											Schema: &v2.SchemaItem{
-												Oneof: &v2.SchemaItem_Schema{
-													Schema: &v2.Schema{
-														XRef: "#/definitions/Error",
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			}})
-	d.Paths.Path = append(d.Paths.Path,
-		&v2.NamedPathItem{
-			Name: "/pets/{petId}",
-			Value: &v2.PathItem{
-				Get: &v2.Operation{
-					Summary:     "Info for a specific pet",
-					OperationId: "showPetById",
-					Tags:        []string{"pets"},
-					Parameters: []*v2.ParametersItem{
-						&v2.ParametersItem{
-							Oneof: &v2.ParametersItem_Parameter{
-								Parameter: &v2.Parameter{
-									Oneof: &v2.Parameter_NonBodyParameter{
-										NonBodyParameter: &v2.NonBodyParameter{
-											Oneof: &v2.NonBodyParameter_PathParameterSubSchema{
-												PathParameterSubSchema: &v2.PathParameterSubSchema{
-													Name:        "petId",
-													In:          "path",
-													Description: "The id of the pet to retrieve",
-													Required:    true,
-													Type:        "string",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					Responses: &v2.Responses{
-						ResponseCode: []*v2.NamedResponseValue{
-							&v2.NamedResponseValue{
-								Name: "200",
-								Value: &v2.ResponseValue{
-									Oneof: &v2.ResponseValue_Response{
-										Response: &v2.Response{
-											Description: "Expected response to a valid request",
-											Schema: &v2.SchemaItem{
-												Oneof: &v2.SchemaItem_Schema{
-													Schema: &v2.Schema{
-														XRef: "#/definitions/Pets",
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-							&v2.NamedResponseValue{
-								Name: "default",
-								Value: &v2.ResponseValue{
-									Oneof: &v2.ResponseValue_Response{
-										Response: &v2.Response{
-											Description: "unexpected error",
-											Schema: &v2.SchemaItem{
-												Oneof: &v2.SchemaItem_Schema{
-													Schema: &v2.Schema{
-														XRef: "#/definitions/Error",
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			}})
+			},
+		},
+	}
+}
+
+func (g *Generator) AddOperation(d *v2.Document, op *v2.Operation, path string, methodName string) {
+	for _, namedPathItem := range d.Paths.Path {
+		if namedPathItem.Name == path {
+			switch methodName {
+			case "GET":
+				namedPathItem.Value.Get = op
+			case "POST":
+				namedPathItem.Value.Post = op
+			case "PUT":
+				namedPathItem.Value.Put = op
+			case "DELETE":
+				namedPathItem.Value.Delete = op
+			}
+			return
+		}
+	}
+	// if we get here, we need to create a path item
+	namedPathItem := &v2.NamedPathItem{Name:path, Value:&v2.PathItem{}}
+	switch methodName {
+	case "GET":
+		namedPathItem.Value.Get = op
+	case "POST":
+		namedPathItem.Value.Post = op
+	case "PUT":
+		namedPathItem.Value.Put = op
+	case "DELETE":
+		namedPathItem.Value.Delete = op
+	}
+	d.Paths.Path = append(d.Paths.Path, namedPathItem)
 }
