@@ -642,7 +642,7 @@ func main() {
 
 	// manually set a few fields
 	schema.Title = stringptr("A JSON Schema for OpenAPI 3.0.")
-	schema.ID = stringptr("http://openapis.org/v3/schema.json#")
+	schema.Id = stringptr("http://openapis.org/v3/schema.json#")
 	schema.Schema = stringptr("http://json-schema.org/draft-04/schema#")
 
 	// loop over all models and create the corresponding schema objects
@@ -835,6 +835,19 @@ func main() {
 		contentObject.PatternProperties = &pairs
 		namedSchema := &jsonschema.NamedSchema{Name: "^", Value: &jsonschema.Schema{Ref: stringptr("#/definitions/mediaType")}}
 		*(contentObject.PatternProperties) = append(*(contentObject.PatternProperties), namedSchema)
+	}
+
+	// fix the contact object
+	contactObject := schema.DefinitionWithName("contact")
+	if contactObject != nil {
+		emailProperty := contactObject.PropertyWithName("email")
+		if emailProperty != nil {
+			emailProperty.Format = stringptr("email");
+		}
+		urlProperty := contactObject.PropertyWithName("url")
+		if urlProperty != nil {
+			urlProperty.Format = stringptr("uri");
+		}
 	}
 
 	// write the updated schema
