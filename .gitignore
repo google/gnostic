@@ -1,3 +1,5 @@
+# IntelliJ IDEA
+.idea
 # Eclipse
 .checkstyle
 .project
@@ -12,3 +14,5 @@ Packages
 .DS_Store
 *~
 Package.resolved
+# Sample files
+extensions/sample/generated
