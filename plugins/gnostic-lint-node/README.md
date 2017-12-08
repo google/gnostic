@@ -5,8 +5,7 @@ It is built using [dcodeIO/Protobuf.js](https://github.com/dcodeIO/ProtoBuf.js).
 ### SETUP
 
 - Install node.
-- Install protobufjs with `npm install protobufjs`.
-- Install get-stdin with `npm install get-stdin`.
+- Run `make setup` to install node dependencies.
 
 ### TRY IT
 
