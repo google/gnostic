@@ -25,6 +25,9 @@ import (
 	"path"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
+	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
+	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
@@ -38,12 +41,22 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	var linter DocumentLinter
-	if env.Request.Openapi2 != nil {
-		linter = NewDocumentLinterV2(env.Request.Openapi2)
-	}
 
-	if env.Request.Openapi3 != nil {
-		linter = NewDocumentLinterV3(env.Request.Openapi3)
+	for _, model := range env.Request.Models {
+		switch model.TypeUrl {
+		case "openapi.v2.Document":
+			documentv2 := &openapiv2.Document{}
+			err = proto.Unmarshal(model.Value, documentv2)
+			if err == nil {
+				linter = NewDocumentLinterV2(documentv2)
+			}
+		case "openapi.v3.Document":
+			documentv3 := &openapiv3.Document{}
+			err = proto.Unmarshal(model.Value, documentv3)
+			if err == nil {
+				linter = NewDocumentLinterV3(documentv3)
+			}
+		}
 	}
 
 	if linter != nil {
