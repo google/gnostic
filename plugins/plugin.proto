@@ -22,10 +22,7 @@
 
 syntax = "proto3";
 
-import "github.com/googleapis/gnostic/OpenAPIv2/OpenAPIv2.proto";
-import "github.com/googleapis/gnostic/OpenAPIv3/OpenAPIv3.proto";
-import "github.com/googleapis/gnostic/discovery/discovery.proto";
-import "github.com/googleapis/gnostic/surface/surface.proto";
+import "google/protobuf/any.proto";
 
 package gnostic.plugin.v1;
 
@@ -85,17 +82,8 @@ message Request {
   // The version number of gnostic.
   Version compiler_version = 4;
   
-  // OpenAPI v2 API representation
-  openapi.v2.Document openapi2 = 5;
-
-  // OpenAPI v3 API representation
-  openapi.v3.Document openapi3 = 6;
-
-  // Discovery API representation
-  discovery.v1.Document discovery = 7;
-  
-  // generated code surface representation
-  surface.v1.Model surface = 8;
+  // API models
+  repeated google.protobuf.Any models = 5;
 }
 
 // The plugin writes an encoded Response to stdout.

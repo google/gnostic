@@ -6,21 +6,24 @@ const getStdin = require('get-stdin')
 const root = protobuf.Root.fromJSON(require("./bundle.json"))
 const Request = root.lookupType("gnostic.plugin.v1.Request")
 const Response = root.lookupType("gnostic.plugin.v1.Response")
+const Document = root.lookupType("openapi.v2.Document")
 
 getStdin.buffer().then(buffer => {
 	const request = Request.decode(buffer)
-	console.error('message: %s\n\n', JSON.stringify(request))
-
-	const openapi2 = request.openapi2
-	const paths = openapi2.paths.path
-
-	for (var i in paths) {
-		const path = paths[i]
-		console.error('path %s\n\n', path.name)
-		const getOperation = path.value.get
-		console.error('get %s\n\n', JSON.stringify(getOperation))
+	for (var j in request.models) {
+		const m = request.models[j]
+		if (m.type_url == "openapi.v2.Document") {
+			const openapi2 = Document.decode(m.value)
+			const paths = openapi2.paths.path
+			for (var i in paths) {
+				const path = paths[i]
+				console.error('path %s\n\n', path.name)
+				const getOperation = path.value.get
+				console.error('get %s\n\n', JSON.stringify(getOperation))
+			}
+		}
 	}
-
+	
 	const payload = {
 		errors: ["ok"],
 		files: [{

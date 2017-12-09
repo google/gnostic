@@ -11,7 +11,7 @@ To build the plugin:
 
 The plugin can be invoked like this:
 
-	gnostic bookstore.json --lint_out=.
+	gnostic bookstore.json --lint_out=-
 
-This will write analysis results to a file in the current directory.
+This will write analysis results to standard output.
 
