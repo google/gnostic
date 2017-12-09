@@ -46,7 +46,7 @@ func main() {
 
 	for _, model := range env.Request.Models {
 		switch model.TypeUrl {
-		case "surface.v1.Document":
+		case "surface.v1.Model":
 			surfaceModel := &surface.Model{}
 			err = proto.Unmarshal(model.Value, surfaceModel)
 			if err == nil {

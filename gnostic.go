@@ -148,15 +148,15 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 			request.AddModel("openapi.v2.Document", document)
 			// include experimental API surface model
 			surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document))
-			if err != nil {
-				request.AddModel("surface.v1.Document", surfaceModel)
+			if err == nil {
+				request.AddModel("surface.v1.Model", surfaceModel)
 			}
 		case SourceFormatOpenAPI3:
 			request.AddModel("openapi.v3.Document", document)
 			// include experimental API surface model
 			surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document))
-			if err != nil {
-				request.AddModel("surface.v1.Document", surfaceModel)
+			if err == nil {
+				request.AddModel("surface.v1.Model", surfaceModel)
 			}
 		case SourceFormatDiscovery:
 			request.AddModel("discovery.v1.Document", document)
