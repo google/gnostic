@@ -1,7 +1,7 @@
 
 TGT=gnostic-swift-sample
 
-BINDIR=.build/x86_64-apple-macosx10.10/debug
+BINDIR=.build/debug
 
 all:
 	swift build
