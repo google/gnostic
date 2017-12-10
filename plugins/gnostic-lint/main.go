@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// gnostic_analyze is a tool for analyzing OpenAPI descriptions.
+// gnostic_lint is a tool for analyzing OpenAPI descriptions.
 //
-// It scans an API description and evaluates properties
-// that influence the ease and quality of code generation.
-//  - The number of HTTP operations of each method (GET, POST, etc).
-//  - The number of HTTP operations with no OperationId value.
-//  - The parameter types used and their frequencies.
-//  - The response types used and their frequencies.
-//  - The types used in definition objects and arrays and their frequencies.
+// It scans an API description and checks it against a set of
+// coding style guidelines.
+//
 // Results are returned in a JSON structure.
 package main
 
 import (
 	"encoding/json"
-	"os"
 	"path"
 	"strings"
-
-	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
 
 	"github.com/golang/protobuf/proto"
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
@@ -38,19 +31,8 @@ import (
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
-// Record an error, then serialize and return a response.
-func sendAndExitIfError(err error, response *plugins.Response) {
-	if err != nil {
-		response.Errors = append(response.Errors, err.Error())
-		sendAndExit(response)
-	}
-}
-
-// Serialize and return a response.
-func sendAndExit(response *plugins.Response) {
-	responseBytes, _ := proto.Marshal(response)
-	os.Stdout.Write(responseBytes)
-	os.Exit(0)
+type DocumentLinter interface {
+	Run()
 }
 
 // This is the main function for the plugin.
@@ -58,7 +40,7 @@ func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
 
-	var stats *statistics.DocumentStatistics
+	var linter DocumentLinter
 
 	for _, model := range env.Request.Models {
 		switch model.TypeUrl {
@@ -66,26 +48,25 @@ func main() {
 			documentv2 := &openapiv2.Document{}
 			err = proto.Unmarshal(model.Value, documentv2)
 			if err == nil {
-				// Analyze the API document.
-				stats = statistics.NewDocumentStatistics(env.Request.SourceName, documentv2)
+				linter = NewDocumentLinterV2(documentv2)
 			}
 		case "openapi.v3.Document":
 			documentv3 := &openapiv3.Document{}
 			err = proto.Unmarshal(model.Value, documentv3)
 			if err == nil {
-				// Analyze the API document.
-				stats = statistics.NewDocumentStatisticsV3(env.Request.SourceName, documentv3)
+				linter = NewDocumentLinterV3(documentv3)
 			}
 		}
 	}
 
-	if stats != nil {
+	if linter != nil {
+		linter.Run()
 		// Return the analysis results with an appropriate filename.
-		// Results are in files named "summary.json" in the same relative
+		// Results are in files named "lint.json" in the same relative
 		// locations as the description source files.
 		file := &plugins.File{}
-		file.Name = strings.Replace(stats.Name, path.Base(stats.Name), "summary.json", -1)
-		file.Data, err = json.MarshalIndent(stats, "", "  ")
+		file.Name = strings.Replace(env.Request.SourceName, path.Base(env.Request.SourceName), "lint.json", -1)
+		file.Data, err = json.MarshalIndent(linter, "", "  ")
 		file.Data = append(file.Data, []byte("\n")...)
 		env.RespondAndExitIfError(err)
 		env.Response.Files = append(env.Response.Files, file)
