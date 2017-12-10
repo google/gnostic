@@ -238,13 +238,13 @@ public struct Gnostic_Plugin_V1_Response: SwiftProtobuf.Message {
   /// even if it reports an error in this way.
   ///
   /// This should be used to indicate errors which prevent the plugin from 
-  /// operating as intended.  Errors which indicate a problem in openapic 
+  /// operating as intended.  Errors which indicate a problem in gnostic 
   /// itself -- such as the input Document being unparseable -- should be 
   /// reported by writing a message to stderr and exiting with a non-zero 
   /// status code.
   public var errors: [String] = []
 
-  /// file output, each file will be written by openapic to an appropriate location.
+  /// file output, each file will be written by gnostic to an appropriate location.
   public var files: [Gnostic_Plugin_V1_File] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()

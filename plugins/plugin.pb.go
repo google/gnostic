@@ -163,12 +163,12 @@ type Response struct {
 	// even if it reports an error in this way.
 	//
 	// This should be used to indicate errors which prevent the plugin from
-	// operating as intended.  Errors which indicate a problem in openapic
+	// operating as intended.  Errors which indicate a problem in gnostic
 	// itself -- such as the input Document being unparseable -- should be
 	// reported by writing a message to stderr and exiting with a non-zero
 	// status code.
 	Errors []string `protobuf:"bytes,1,rep,name=errors" json:"errors,omitempty"`
-	// file output, each file will be written by openapic to an appropriate location.
+	// file output, each file will be written by gnostic to an appropriate location.
 	Files []*File `protobuf:"bytes,2,rep,name=files" json:"files,omitempty"`
 }
 
