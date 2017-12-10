@@ -66,7 +66,7 @@ and the Go protoc plugin.
 You can get protoc [here](https://github.com/google/protobuf).
 You can install the plugin with this command:
 
-	go get -u github.com/golang/protobuf/protoc-gen-go
+        go get -u github.com/golang/protobuf/protoc-gen-go
 
 Then use the following to recompile the Gnostic Protocol Buffer models:
 
