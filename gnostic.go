@@ -175,9 +175,11 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		response := &plugins.Response{}
 		err = proto.Unmarshal(output, response)
 		if err != nil {
-			return err
+			// Gnostic expects plugins to only write the
+			// response message to stdout. Be sure that
+			// any logging messages are written to stderr only.
+			return errors.New("Invalid plugin response (plugins must write log messages to stderr, not stdout).")
 		}
-
 		plugins.HandleResponse(response, outputLocation)
 	}
 	return nil
