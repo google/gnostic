@@ -16,14 +16,15 @@ package main
 
 import (
 	openapi "github.com/googleapis/gnostic/OpenAPIv3"
+        plugins "github.com/googleapis/gnostic/plugins"
 )
 
 // DocumentLinter contains information collected about an API description.
 type DocumentLinterV3 struct {
 }
 
-func (d *DocumentLinterV3) Run() {
-
+func (d *DocumentLinterV3) Run() []*plugins.Message {
+	return nil
 }
 
 // NewDocumentLinter builds a new DocumentLinter object.

@@ -32,7 +32,7 @@ import (
 )
 
 type DocumentLinter interface {
-	Run()
+	Run() []*plugins.Message
 }
 
 // This is the main function for the plugin.
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	if linter != nil {
-		linter.Run()
+		messages := linter.Run()
 		// Return the analysis results with an appropriate filename.
 		// Results are in files named "lint.json" in the same relative
 		// locations as the description source files.
@@ -69,6 +69,7 @@ func main() {
 		file.Data, err = json.MarshalIndent(linter, "", "  ")
 		file.Data = append(file.Data, []byte("\n")...)
 		env.RespondAndExitIfError(err)
+		env.Response.Messages = messages
 		env.Response.Files = append(env.Response.Files, file)
 	}
 
