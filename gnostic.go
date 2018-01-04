@@ -92,7 +92,7 @@ type pluginCall struct {
 }
 
 // Invokes a plugin.
-func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string) error {
+func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string) ([]*plugins.Message, error) {
 	if p.Name != "" {
 		request := &plugins.Request{}
 
@@ -112,7 +112,7 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		//
 		invocationRegex := regexp.MustCompile(`^([\w-_\/\.]+=[\w-_\/\.]+(,[\w-_\/\.]+=[\w-_\/\.]+)*:)?[^,:=]+$`)
 		if !invocationRegex.Match([]byte(p.Invocation)) {
-			return fmt.Errorf("Invalid invocation of %s: %s", executableName, invocation)
+			return nil, fmt.Errorf("Invalid invocation of %s: %s", executableName, invocation)
 		}
 
 		invocationParts := strings.Split(p.Invocation, ":")
@@ -170,7 +170,7 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		cmd.Stderr = os.Stderr
 		output, err := cmd.Output()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		response := &plugins.Response{}
 		err = proto.Unmarshal(output, response)
@@ -178,11 +178,12 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 			// Gnostic expects plugins to only write the
 			// response message to stdout. Be sure that
 			// any logging messages are written to stderr only.
-			return errors.New("Invalid plugin response (plugins must write log messages to stderr, not stdout).")
+			return nil, errors.New("Invalid plugin response (plugins must write log messages to stderr, not stdout).")
 		}
 		plugins.HandleResponse(response, outputLocation)
+		return response.Messages, nil
 	}
-	return nil
+	return nil, nil
 }
 
 func isFile(path string) bool {
@@ -502,16 +503,24 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 	if g.textOutputPath != "" {
 		g.writeTextOutput(message)
 	}
-	// Optionaly write document in yaml and/or json formats.
+	// Optionally write document in yaml and/or json formats.
 	if g.yamlOutputPath != "" || g.jsonOutputPath != "" {
 		g.writeJSONYAMLOutput(message)
 	}
 	// Call all specified plugins.
+	messages := make([]*plugins.Message, 0)
 	for _, p := range g.pluginCalls {
-		err := p.perform(message, g.sourceFormat, g.sourceName)
+		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName)
 		if err != nil {
 			writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 			defer os.Exit(-1) // run all plugins, even when some have errors
+		}
+		messages = append(messages, pluginMessages...)
+	}
+	// Print any messages from the plugins
+	if len(messages) > 0 {
+		for _, message := range messages {
+			fmt.Printf("%+v\n", message)
 		}
 	}
 	return nil

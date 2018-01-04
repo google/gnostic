@@ -1,4 +1,3 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +14,8 @@
 package main
 
 import (
-	"log"
-
 	openapi "github.com/googleapis/gnostic/OpenAPIv2"
+	plugins "github.com/googleapis/gnostic/plugins"
 )
 
 // DocumentLinter contains information collected about an API description.
@@ -25,8 +23,8 @@ type DocumentLinterV2 struct {
 	document *openapi.Document `json:"-"`
 }
 
-func (d *DocumentLinterV2) Run() {
-	d.analyzeDocument(d.document)
+func (d *DocumentLinterV2) Run() []*plugins.Message {
+	return d.analyzeDocument(d.document)
 }
 
 // NewDocumentLinter builds a new DocumentLinter object.
@@ -37,62 +35,95 @@ func NewDocumentLinterV2(document *openapi.Document) *DocumentLinterV2 {
 // Analyze an OpenAPI description.
 // Collect information about types used in the API.
 // This should be called exactly once per DocumentLinter object.
-func (s *DocumentLinterV2) analyzeDocument(document *openapi.Document) {
+func (s *DocumentLinterV2) analyzeDocument(document *openapi.Document) []*plugins.Message {
+	messages := make([]*plugins.Message, 0, 0)
 
 	for _, pair := range document.Paths.Path {
 		path := pair.Value
 		if path.Get != nil {
-			s.analyzeOperation("get", "paths"+pair.Name, path.Get)
+			messages = append(messages, s.analyzeOperation("get", "paths"+pair.Name, path.Get)...)
 		}
 		if path.Post != nil {
-			s.analyzeOperation("post", "paths"+pair.Name, path.Post)
+			messages = append(messages, s.analyzeOperation("post", "paths"+pair.Name, path.Post)...)
 		}
 		if path.Put != nil {
-			s.analyzeOperation("put", "paths"+pair.Name, path.Put)
+			messages = append(messages, s.analyzeOperation("put", "paths"+pair.Name, path.Put)...)
 		}
 		if path.Delete != nil {
-			s.analyzeOperation("delete", "paths"+pair.Name, path.Delete)
+			messages = append(messages, s.analyzeOperation("delete", "paths"+pair.Name, path.Delete)...)
 		}
 	}
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			definition := pair.Value
-			s.analyzeDefinition("definitions/"+pair.Name, definition)
+			messages = append(messages, s.analyzeDefinition("definitions/"+pair.Name, definition)...)
 		}
 	}
+	return messages
 }
 
-func (s *DocumentLinterV2) analyzeOperation(method string, path string, operation *openapi.Operation) {
+func (s *DocumentLinterV2) analyzeOperation(method string, path string, operation *openapi.Operation) []*plugins.Message {
+	messages := make([]*plugins.Message, 0)
 
 	fullname := method + " " + path
 
 	if operation.Description == "" {
-		log.Printf("%s has no description", fullname)
+		messages = append(messages,
+			&plugins.Message{
+				Level: plugins.Message_WARNING,
+				Code:  "NODESCRIPTION",
+				Text:  "Operation has no description.",
+				Path:  fullname})
 	}
 	for _, parameter := range operation.Parameters {
 		p := parameter.GetParameter()
 		if p != nil {
 			b := p.GetBodyParameter()
 			if b != nil && b.Description == "" {
-				log.Printf("%s %s parameter has no description", fullname, b.Name)
+				messages = append(messages,
+					&plugins.Message{
+						Level: plugins.Message_WARNING,
+						Code:  "NODESCRIPTION",
+						Text:  "Parameter has no description.",
+						Path:  fullname + "/" + b.Name})
 			}
 			n := p.GetNonBodyParameter()
 			if n != nil {
 				hp := n.GetHeaderParameterSubSchema()
 				if hp != nil && hp.Description == "" {
-					log.Printf("%s %s parameter has no description", fullname, hp.Name)
+					messages = append(messages,
+						&plugins.Message{
+							Level: plugins.Message_WARNING,
+							Code:  "NODESCRIPTION",
+							Text:  "Parameter has no description.",
+							Path:  fullname + "/" + hp.Name})
 				}
 				fp := n.GetFormDataParameterSubSchema()
 				if fp != nil && fp.Description == "" {
-					log.Printf("%s %s parameter has no description", fullname, fp.Name)
+					messages = append(messages,
+						&plugins.Message{
+							Level: plugins.Message_WARNING,
+							Code:  "NODESCRIPTION",
+							Text:  "Parameter has no description.",
+							Path:  fullname + "/" + fp.Name})
 				}
 				qp := n.GetQueryParameterSubSchema()
 				if qp != nil && qp.Description == "" {
-					log.Printf("%s %s parameter has no description", fullname, qp.Name)
+					messages = append(messages,
+						&plugins.Message{
+							Level: plugins.Message_WARNING,
+							Code:  "NODESCRIPTION",
+							Text:  "Parameter has no description.",
+							Path:  fullname + "/" + qp.Name})
 				}
 				pp := n.GetPathParameterSubSchema()
 				if pp != nil && pp.Description == "" {
-					log.Printf("%s %s parameter has no description", fullname, pp.Name)
+					messages = append(messages,
+						&plugins.Message{
+							Level: plugins.Message_WARNING,
+							Code:  "NODESCRIPTION",
+							Text:  "Parameter has no description.",
+							Path:  fullname + "/" + pp.Name})
 				}
 			}
 		}
@@ -104,30 +135,53 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 			responseSchema := response.Schema
 			responseSchemaSchema := responseSchema.GetSchema()
 			if responseSchemaSchema != nil && responseSchemaSchema.Description == "" {
-				log.Printf("%s %s response has no description", fullname, pair.Name)
+				messages = append(messages,
+					&plugins.Message{
+						Level: plugins.Message_WARNING,
+						Code:  "NODESCRIPTION",
+						Text:  "Response has no description.",
+						Path:  fullname + "/" + pair.Name})
 			}
 			responseFileSchema := responseSchema.GetFileSchema()
 			if responseFileSchema != nil && responseFileSchema.Description == "" {
-				log.Printf("%s %s response has no description", fullname, pair.Name)
+				messages = append(messages,
+					&plugins.Message{
+						Level: plugins.Message_WARNING,
+						Code:  "NODESCRIPTION",
+						Text:  "Response has no description.",
+						Path:  fullname + "/" + pair.Name})
 			}
 		}
 	}
+	return messages
 }
 
 // Analyze a definition in an OpenAPI description.
 // Collect information about the definition type and any subsidiary types,
 // such as the types of object fields or array elements.
-func (s *DocumentLinterV2) analyzeDefinition(path string, definition *openapi.Schema) {
+func (s *DocumentLinterV2) analyzeDefinition(path string, definition *openapi.Schema) []*plugins.Message {
+	messages := make([]*plugins.Message, 0)
 	if definition.Description == "" {
-		log.Printf("%s has no description", path)
+		messages = append(messages,
+			&plugins.Message{
+				Level: plugins.Message_WARNING,
+				Code:  "NODESCRIPTION",
+				Text:  "Definition has no description.",
+				Path:  path})
 	}
 
 	if definition.Properties != nil {
 		for _, pair := range definition.Properties.AdditionalProperties {
 			propertySchema := pair.Value
 			if propertySchema.Description == "" {
-				log.Printf("%s %s property has no description", path, pair.Name)
+				messages = append(messages,
+					&plugins.Message{
+						Level: plugins.Message_WARNING,
+						Code:  "NODESCRIPTION",
+						Text:  "Property has no description.",
+						Path:  path + "/" + pair.Name})
 			}
 		}
 	}
+	return messages
 }
