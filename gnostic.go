@@ -265,8 +265,11 @@ Options:
   --json-out=PATH     Write a json API description to the specified location.
   --yaml-out=PATH     Write a yaml API description to the specified location.
   --errors-out=PATH   Write compilation errors to the specified location.
-  --PLUGIN-out=PATH   Run the plugin named gnostic_PLUGIN and write results
+  --PLUGIN-out=PATH   Run the plugin named gnostic-PLUGIN and write results
                       to the specified location.
+  --PLUGIN            Run the plugin named gnostic-PLUGIN but don't write any
+                      results. Used for plugins that return messages only.
+                      PLUGIN must not match any other gnostic option.
   --x-EXTENSION       Use the extension named gnostic-x-EXTENSION
                       to process OpenAPI specification extensions.
   --resolve-refs      Explicitly resolve $ref references.
