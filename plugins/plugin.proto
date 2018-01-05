@@ -106,8 +106,8 @@ message Message {
    // message text
    string text = 3;
 
-   // an associated path in an API description
-   string path = 4;
+   // an associated key path in an API description
+   repeated string keys = 4;
 }
 
 // The plugin writes an encoded Response to stdout.

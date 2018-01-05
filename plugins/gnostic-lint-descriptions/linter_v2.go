@@ -33,39 +33,34 @@ func NewDocumentLinterV2(document *openapi.Document) *DocumentLinterV2 {
 }
 
 // Analyze an OpenAPI description.
-// Collect information about types used in the API.
-// This should be called exactly once per DocumentLinter object.
 func (s *DocumentLinterV2) analyzeDocument(document *openapi.Document) []*plugins.Message {
 	messages := make([]*plugins.Message, 0, 0)
-
 	for _, pair := range document.Paths.Path {
 		path := pair.Value
 		if path.Get != nil {
-			messages = append(messages, s.analyzeOperation("get", "paths"+pair.Name, path.Get)...)
+			messages = append(messages, s.analyzeOperation([]string{"paths", pair.Name, "get"}, path.Get)...)
 		}
 		if path.Post != nil {
-			messages = append(messages, s.analyzeOperation("post", "paths"+pair.Name, path.Post)...)
+			messages = append(messages, s.analyzeOperation([]string{"paths", pair.Name, "post"}, path.Post)...)
 		}
 		if path.Put != nil {
-			messages = append(messages, s.analyzeOperation("put", "paths"+pair.Name, path.Put)...)
+			messages = append(messages, s.analyzeOperation([]string{"paths", pair.Name, "put"}, path.Put)...)
 		}
 		if path.Delete != nil {
-			messages = append(messages, s.analyzeOperation("delete", "paths"+pair.Name, path.Delete)...)
+			messages = append(messages, s.analyzeOperation([]string{"paths", pair.Name, "delete"}, path.Delete)...)
 		}
 	}
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			definition := pair.Value
-			messages = append(messages, s.analyzeDefinition("definitions/"+pair.Name, definition)...)
+			messages = append(messages, s.analyzeDefinition([]string{"definitions", pair.Name}, definition)...)
 		}
 	}
 	return messages
 }
 
-func (s *DocumentLinterV2) analyzeOperation(method string, path string, operation *openapi.Operation) []*plugins.Message {
+func (s *DocumentLinterV2) analyzeOperation(keys []string, operation *openapi.Operation) []*plugins.Message {
 	messages := make([]*plugins.Message, 0)
-
-	fullname := method + " " + path
 
 	if operation.Description == "" {
 		messages = append(messages,
@@ -73,7 +68,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 				Level: plugins.Message_WARNING,
 				Code:  "NODESCRIPTION",
 				Text:  "Operation has no description.",
-				Path:  fullname})
+				Keys:  keys})
 	}
 	for _, parameter := range operation.Parameters {
 		p := parameter.GetParameter()
@@ -85,7 +80,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 						Level: plugins.Message_WARNING,
 						Code:  "NODESCRIPTION",
 						Text:  "Parameter has no description.",
-						Path:  fullname + "/" + b.Name})
+						Keys:  append(keys, []string{"responses", b.Name}...)})
 			}
 			n := p.GetNonBodyParameter()
 			if n != nil {
@@ -96,7 +91,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 							Level: plugins.Message_WARNING,
 							Code:  "NODESCRIPTION",
 							Text:  "Parameter has no description.",
-							Path:  fullname + "/" + hp.Name})
+							Keys:  append(keys, []string{"responses", hp.Name}...)})
 				}
 				fp := n.GetFormDataParameterSubSchema()
 				if fp != nil && fp.Description == "" {
@@ -105,7 +100,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 							Level: plugins.Message_WARNING,
 							Code:  "NODESCRIPTION",
 							Text:  "Parameter has no description.",
-							Path:  fullname + "/" + fp.Name})
+							Keys:  append(keys, []string{"responses", fp.Name}...)})
 				}
 				qp := n.GetQueryParameterSubSchema()
 				if qp != nil && qp.Description == "" {
@@ -114,7 +109,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 							Level: plugins.Message_WARNING,
 							Code:  "NODESCRIPTION",
 							Text:  "Parameter has no description.",
-							Path:  fullname + "/" + qp.Name})
+							Keys:  append(keys, []string{"responses", qp.Name}...)})
 				}
 				pp := n.GetPathParameterSubSchema()
 				if pp != nil && pp.Description == "" {
@@ -123,7 +118,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 							Level: plugins.Message_WARNING,
 							Code:  "NODESCRIPTION",
 							Text:  "Parameter has no description.",
-							Path:  fullname + "/" + pp.Name})
+							Keys:  append(keys, []string{"responses", pp.Name}...)})
 				}
 			}
 		}
@@ -140,7 +135,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 						Level: plugins.Message_WARNING,
 						Code:  "NODESCRIPTION",
 						Text:  "Response has no description.",
-						Path:  fullname + "/" + pair.Name})
+						Keys:  append(keys, []string{"responses", pair.Name}...)})
 			}
 			responseFileSchema := responseSchema.GetFileSchema()
 			if responseFileSchema != nil && responseFileSchema.Description == "" {
@@ -149,7 +144,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 						Level: plugins.Message_WARNING,
 						Code:  "NODESCRIPTION",
 						Text:  "Response has no description.",
-						Path:  fullname + "/" + pair.Name})
+						Keys:  append(keys, []string{"responses", pair.Name}...)})
 			}
 		}
 	}
@@ -157,9 +152,7 @@ func (s *DocumentLinterV2) analyzeOperation(method string, path string, operatio
 }
 
 // Analyze a definition in an OpenAPI description.
-// Collect information about the definition type and any subsidiary types,
-// such as the types of object fields or array elements.
-func (s *DocumentLinterV2) analyzeDefinition(path string, definition *openapi.Schema) []*plugins.Message {
+func (s *DocumentLinterV2) analyzeDefinition(keys []string, definition *openapi.Schema) []*plugins.Message {
 	messages := make([]*plugins.Message, 0)
 	if definition.Description == "" {
 		messages = append(messages,
@@ -167,7 +160,7 @@ func (s *DocumentLinterV2) analyzeDefinition(path string, definition *openapi.Sc
 				Level: plugins.Message_WARNING,
 				Code:  "NODESCRIPTION",
 				Text:  "Definition has no description.",
-				Path:  path})
+				Keys:  keys})
 	}
 
 	if definition.Properties != nil {
@@ -179,7 +172,7 @@ func (s *DocumentLinterV2) analyzeDefinition(path string, definition *openapi.Sc
 						Level: plugins.Message_WARNING,
 						Code:  "NODESCRIPTION",
 						Text:  "Property has no description.",
-						Path:  path + "/" + pair.Name})
+						Keys:  append(keys, []string{"properties", pair.Name}...)})
 			}
 		}
 	}
