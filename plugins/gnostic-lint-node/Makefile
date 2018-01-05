@@ -9,7 +9,7 @@ plugin:
 	node_modules/.bin/nexe gnostic-lint-node.js
 
 run:	plugin
-	gnostic ../../examples/v2.0/yaml/petstore.yaml --lint-node-out=-
+	gnostic ../../examples/v2.0/yaml/petstore.yaml --lint-node
 
 setup:
 	npm install protobufjs
