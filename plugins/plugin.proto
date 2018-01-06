@@ -110,6 +110,10 @@ message Message {
    repeated string keys = 4;
 }
 
+message Messages {
+   repeated Message messages = 1;
+}
+
 // The plugin writes an encoded Response to stdout.
 message Response {
 
