@@ -9,10 +9,10 @@ plugin:
 		$(GNOSTIC)/surface/surface.proto \
 		$(GNOSTIC)/plugins/plugin.proto \
 		> bundle.json
-	node_modules/.bin/nexe gnostic-lint-node.js
+	node_modules/.bin/nexe gnostic-lint-operations.js
 
 run:	plugin
-	gnostic $(GNOSTIC)/examples/v2.0/yaml/petstore.yaml --lint-node
+	gnostic $(GNOSTIC)/examples/v2.0/yaml/petstore.yaml --lint-operations
 
 setup:
 	npm install protobufjs
