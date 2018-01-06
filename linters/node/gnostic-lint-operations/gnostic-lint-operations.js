@@ -18,9 +18,15 @@ getStdin.buffer().then(buffer => {
 			const paths = openapi2.paths.path
 			for (var i in paths) {
 				const path = paths[i]
-				messages.push({level:1, code:"NODE-PATH", text:path.name, keys:["paths"]})
 				//console.error('path %s\n\n', path.name)
 				const getOperation = path.value.get
+				if (getOperation && getOperation.operationId == "") {
+					messages.push({level:3, code:"NOOPERATIONID", text:"No operation id.", keys:["paths", path.name, "get"]})
+				}
+				const postOperation = path.value.post
+				if (postOperation && postOperation.operationId == "") {
+					messages.push({level:3, code:"NOOPERATIONID", text:"No operation id.", keys:["paths", path.name, "post"]})
+				}
 				//console.error('get %s\n\n', JSON.stringify(getOperation))
 			}
 		}
