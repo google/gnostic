@@ -6,4 +6,4 @@ API automation.
 
 The plugin can be invoked like this:
 
-	gnostic bookstore.json --lint-paths-out=.
+	gnostic bookstore.json --lint-paths
