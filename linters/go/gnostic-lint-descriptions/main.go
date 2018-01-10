@@ -21,10 +21,6 @@
 package main
 
 import (
-	"encoding/json"
-	"path"
-	"strings"
-
 	"github.com/golang/protobuf/proto"
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
@@ -32,7 +28,7 @@ import (
 )
 
 type DocumentLinter interface {
-	Run()
+	Run() []*plugins.Message
 }
 
 // This is the main function for the plugin.
@@ -49,27 +45,16 @@ func main() {
 			err = proto.Unmarshal(model.Value, documentv2)
 			if err == nil {
 				linter = NewDocumentLinterV2(documentv2)
+				env.Response.Messages = linter.Run()
 			}
 		case "openapi.v3.Document":
 			documentv3 := &openapiv3.Document{}
 			err = proto.Unmarshal(model.Value, documentv3)
 			if err == nil {
 				linter = NewDocumentLinterV3(documentv3)
+				env.Response.Messages = linter.Run()
 			}
 		}
-	}
-
-	if linter != nil {
-		linter.Run()
-		// Return the analysis results with an appropriate filename.
-		// Results are in files named "lint.json" in the same relative
-		// locations as the description source files.
-		file := &plugins.File{}
-		file.Name = strings.Replace(env.Request.SourceName, path.Base(env.Request.SourceName), "lint.json", -1)
-		file.Data, err = json.MarshalIndent(linter, "", "  ")
-		file.Data = append(file.Data, []byte("\n")...)
-		env.RespondAndExitIfError(err)
-		env.Response.Files = append(env.Response.Files, file)
 	}
 
 	env.RespondAndExit()
