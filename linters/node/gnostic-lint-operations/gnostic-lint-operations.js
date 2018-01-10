@@ -10,6 +10,7 @@ const Document = root.lookupType("openapi.v2.Document")
 
 getStdin.buffer().then(buffer => {
 	const request = Request.decode(buffer)
+	messages = []
 	for (var j in request.models) {
 		const m = request.models[j]
 		if (m.type_url == "openapi.v2.Document") {
@@ -17,19 +18,22 @@ getStdin.buffer().then(buffer => {
 			const paths = openapi2.paths.path
 			for (var i in paths) {
 				const path = paths[i]
-				console.error('path %s\n\n', path.name)
+				//console.error('path %s\n\n', path.name)
 				const getOperation = path.value.get
-				console.error('get %s\n\n', JSON.stringify(getOperation))
+				if (getOperation && getOperation.operationId == "") {
+					messages.push({level:3, code:"NOOPERATIONID", text:"No operation id.", keys:["paths", path.name, "get"]})
+				}
+				const postOperation = path.value.post
+				if (postOperation && postOperation.operationId == "") {
+					messages.push({level:3, code:"NOOPERATIONID", text:"No operation id.", keys:["paths", path.name, "post"]})
+				}
+				//console.error('get %s\n\n', JSON.stringify(getOperation))
 			}
 		}
 	}
 	
 	const payload = {
-		errors: ["ok"],
-		files: [{
-			name: "report.txt",
-			data: Buffer.from("testing 123\n", 'utf8')
-		}]
+		messages: messages
 	}
 
 	// Verify the payload if necessary (i.e. when possibly incomplete or invalid)

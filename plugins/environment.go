@@ -81,7 +81,7 @@ When the -plugin option is specified, these flags are ignored.`)
 		}
 
 		// Log the invocation.
-		log.Printf("Running plugin %s", env.Invocation)
+		//log.Printf("Running plugin %s", env.Invocation)
 
 		env.Request = request
 
