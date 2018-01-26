@@ -106,7 +106,7 @@ func renderStringArray(array []string, indent string) (result string) {
 	return result
 }
 
-func render(info yaml.MapSlice) string {
+func Render(info yaml.MapSlice) string {
 	return renderMap(info, "") + "\n"
 }
 
@@ -330,5 +330,5 @@ func (schema *Schema) jsonValue() yaml.MapSlice {
 // JSONString returns a json representation of a schema.
 func (schema *Schema) JSONString() string {
 	info := schema.jsonValue()
-	return render(info)
+	return Render(info)
 }
