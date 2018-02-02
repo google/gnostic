@@ -32,6 +32,9 @@ script:
   - pushd plugins/gnostic-go-generator/examples/v2.0/bookstore
   - make test
   - popd
+  - pushd plugins/gnostic-go-generator/examples/v2.0/sample
+  - make test
+  - popd
   - pushd plugins/gnostic-go-generator/examples/v3.0/bookstore
   - make test
   - popd
