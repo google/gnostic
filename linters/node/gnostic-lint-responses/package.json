@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Gnostic linter plugin to check responses",
   "main": "gnostic-lint-responses.js",
+  "repository": "git@github.com:googleapis/gnostic.git",
+  "author": "Mike Kistler",
+  "license": "Apache-2.0",
   "dependencies": {
     "get-stdin": "^5.0.1",
     "lodash": "^4.17.5",
@@ -12,7 +15,5 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }
