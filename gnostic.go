@@ -41,6 +41,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/gnostic/OpenAPIv2"
@@ -92,7 +93,7 @@ type pluginCall struct {
 }
 
 // Invokes a plugin.
-func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string) ([]*plugins.Message, error) {
+func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool) ([]*plugins.Message, error) {
 	if p.Name != "" {
 		request := &plugins.Request{}
 
@@ -168,7 +169,12 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		cmd := exec.Command(executableName, "-plugin")
 		cmd.Stdin = bytes.NewReader(requestBytes)
 		cmd.Stderr = os.Stderr
+		pluginStartTime := time.Now()
 		output, err := cmd.Output()
+		pluginElapsedTime := time.Since(pluginStartTime)
+		if timePlugins {
+			fmt.Printf("> %s (%s)\n", executableName, pluginElapsedTime)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -251,6 +257,7 @@ type Gnostic struct {
 	pluginCalls       []*pluginCall
 	extensionHandlers []compiler.ExtensionHandler
 	sourceFormat      int
+	timePlugins       bool
 }
 
 // Initialize a structure to store global application state.
@@ -278,6 +285,7 @@ Options:
                       to process OpenAPI specification extensions.
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
+  --time-plugins      Report plugin runtimes.
 `
 	// Initialize internal structures.
 	g.pluginCalls = make([]*pluginCall, 0)
@@ -324,6 +332,8 @@ func (g *Gnostic) readOptions() {
 			g.extensionHandlers = append(g.extensionHandlers, extensionHandler)
 		} else if arg == "--resolve-refs" {
 			g.resolveReferences = true
+		} else if arg == "--time-plugins" {
+			g.timePlugins = true
 		} else if arg[0] == '-' && arg[1] == '-' {
 			// try letting the option specify a plugin with no output files (or unwanted output files)
 			// this is useful for calling plugins like linters that only return messages
@@ -535,7 +545,7 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 	// Call all specified plugins.
 	messages := make([]*plugins.Message, 0)
 	for _, p := range g.pluginCalls {
-		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName)
+		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins)
 		if err != nil {
 			writeFile(g.errorOutputPath, g.errorBytes(err), g.sourceName, "errors")
 			defer os.Exit(-1) // run all plugins, even when some have errors
