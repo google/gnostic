@@ -822,18 +822,7 @@
           "$ref": "#/definitions/schema"
         },
         "items": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/schemaOrReference"
-            },
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/schemaOrReference"
-              },
-              "minItems": 1
-            }
-          ]
+          "$ref": "#/definitions/schemaOrReference"
         },
         "properties": {
           "type": "object",

@@ -1469,25 +1469,6 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-// NewItemsItem creates an object of type ItemsItem if possible, returning an error if not.
-func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
-	errors := make([]error, 0)
-	x := &ItemsItem{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value for item array: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		x.SchemaOrReference = make([]*SchemaOrReference, 0)
-		y, err := NewSchemaOrReference(m, compiler.NewContext("<array>", context))
-		if err != nil {
-			return nil, err
-		}
-		x.SchemaOrReference = append(x.SchemaOrReference, y)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 // NewLicense creates an object of type License if possible, returning an error if not.
 func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	errors := make([]error, 0)
@@ -4185,11 +4166,11 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, err)
 			}
 		}
-		// ItemsItem items = 30;
+		// SchemaOrReference items = 30;
 		v30 := compiler.MapValueForKey(m, "items")
 		if v30 != nil {
 			var err error
-			x.Items, err = NewItemsItem(v30, compiler.NewContext("items", context))
+			x.Items, err = NewSchemaOrReference(v30, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -5520,20 +5501,6 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 		}
 	}
 	for _, item := range m.SpecificationExtension {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
-// ResolveReferences resolves references found inside ItemsItem objects.
-func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.SchemaOrReference {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -7189,20 +7156,6 @@ func (m *Info) ToRawInfo() interface{} {
 	return info
 }
 
-// ToRawInfo returns a description of ItemsItem suitable for JSON or YAML export.
-func (m *ItemsItem) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if len(m.SchemaOrReference) != 0 {
-		items := make([]interface{}, 0)
-		for _, item := range m.SchemaOrReference {
-			items = append(items, item.ToRawInfo())
-		}
-		info = append(info, yaml.MapItem{Key: "schemaOrReference", Value: items})
-	}
-	// &{Name:schemaOrReference Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
-	return info
-}
-
 // ToRawInfo returns a description of License suitable for JSON or YAML export.
 func (m *License) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
@@ -8054,13 +8007,9 @@ func (m *Schema) ToRawInfo() interface{} {
 	}
 	// &{Name:not Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
-		items := make([]interface{}, 0)
-		for _, item := range m.Items.SchemaOrReference {
-			items = append(items, item.ToRawInfo())
-		}
-		info = append(info, yaml.MapItem{Key: "items", Value: items[0]})
+		info = append(info, yaml.MapItem{Key: "items", Value: m.Items.ToRawInfo()})
 	}
-	// &{Name:items Type:ItemsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:items Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Properties != nil {
 		info = append(info, yaml.MapItem{Key: "properties", Value: m.Properties.ToRawInfo()})
 	}
