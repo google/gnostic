@@ -312,14 +312,10 @@ func buildDocumentV3() *v3.Document {
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
 								Type: "array",
-								Items: &v3.ItemsItem{
-									SchemaOrReference: []*v3.SchemaOrReference{
-										&v3.SchemaOrReference{
-											Oneof: &v3.SchemaOrReference_Reference{
-												Reference: &v3.Reference{
-													XRef: "#/components/schemas/Pet",
-												},
-											},
+								Items: &v3.SchemaOrReference{
+									Oneof: &v3.SchemaOrReference_Reference{
+										Reference: &v3.Reference{
+											XRef: "#/components/schemas/Pet",
 										},
 									},
 								},
