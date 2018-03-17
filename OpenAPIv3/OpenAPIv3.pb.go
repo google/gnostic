@@ -3671,7 +3671,7 @@ func (m *SchemaOrReference) GetOneof() isSchemaOrReference_Oneof {
 	return nil
 }
 
-func (m *SchemaOrReference) GetSchema() *Schema {.
+func (m *SchemaOrReference) GetSchema() *Schema {
 	if x, ok := m.GetOneof().(*SchemaOrReference_Schema); ok {
 		return x.Schema
 	}
