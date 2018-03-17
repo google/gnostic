@@ -227,10 +227,8 @@ components: <
         schema: <
           type: "array"
           items: <
-            schema_or_reference: <
-              reference: <
-                _ref: "#/components/schemas/Pet"
-              >
+            reference: <
+              _ref: "#/components/schemas/Pet"
             >
           >
         >
