@@ -29,18 +29,18 @@ install:
 
 script:
   - go test . -v
-  - pushd plugins/gnostic-go-generator/examples/v2.0/bookstore
+  - pushd generators/gnostic-go-generator/examples/v2.0/bookstore
   - make test
   - popd
-  - pushd plugins/gnostic-go-generator/examples/v2.0/sample
+  - pushd generators/gnostic-go-generator/examples/v2.0/sample
   - make test
   - popd
-  - pushd plugins/gnostic-go-generator/examples/v3.0/bookstore
+  - pushd generators/gnostic-go-generator/examples/v3.0/bookstore
   - make test
   - popd
   - export PATH=.:$HOME/local/bin:$PATH
   - export LD_LIBRARY_PATH=$HOME/local/lib
-  - pushd plugins/gnostic-swift-generator
+  - pushd generators/gnostic-swift-generator
   - make install
   - cd examples/bookstore
   - make
