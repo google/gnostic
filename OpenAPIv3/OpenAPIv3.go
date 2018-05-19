@@ -971,26 +971,6 @@ func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleO
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
-// NewExamples creates an object of type Examples if possible, returning an error if not.
-func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
-	errors := make([]error, 0)
-	x := &Examples{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{}
-		var allowedPatterns []*regexp.Regexp
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
 // NewExamplesOrReferences creates an object of type ExamplesOrReferences if possible, returning an error if not.
 func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*ExamplesOrReferences, error) {
 	errors := make([]error, 0)
@@ -1465,6 +1445,25 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 				}
 			}
 		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+// NewItemsItem creates an object of type ItemsItem if possible, returning an error if not.
+func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
+	errors := make([]error, 0)
+	x := &ItemsItem{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value for item array: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		x.SchemaOrReference = make([]*SchemaOrReference, 0)
+		y, err := NewSchemaOrReference(m, compiler.NewContext("<array>", context))
+		if err != nil {
+			return nil, err
+		}
+		x.SchemaOrReference = append(x.SchemaOrReference, y)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4166,11 +4165,11 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 				errors = append(errors, err)
 			}
 		}
-		// SchemaOrReference items = 30;
+		// ItemsItem items = 30;
 		v30 := compiler.MapValueForKey(m, "items")
 		if v30 != nil {
 			var err error
-			x.Items, err = NewSchemaOrReference(v30, compiler.NewContext("items", context))
+			x.Items, err = NewItemsItem(v30, compiler.NewContext("items", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -5361,12 +5360,6 @@ func (m *ExampleOrReference) ResolveReferences(root string) (interface{}, error)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-// ResolveReferences resolves references found inside Examples objects.
-func (m *Examples) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 // ResolveReferences resolves references found inside ExamplesOrReferences objects.
 func (m *ExamplesOrReferences) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
@@ -5501,6 +5494,20 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 		}
 	}
 	for _, item := range m.SpecificationExtension {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+// ResolveReferences resolves references found inside ItemsItem objects.
+func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	for _, item := range m.SchemaOrReference {
 		if item != nil {
 			_, err := item.ResolveReferences(root)
 			if err != nil {
@@ -6998,12 +7005,6 @@ func (m *ExampleOrReference) ToRawInfo() interface{} {
 	return nil
 }
 
-// ToRawInfo returns a description of Examples suitable for JSON or YAML export.
-func (m *Examples) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	return info
-}
-
 // ToRawInfo returns a description of ExamplesOrReferences suitable for JSON or YAML export.
 func (m *ExamplesOrReferences) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
@@ -7153,6 +7154,20 @@ func (m *Info) ToRawInfo() interface{} {
 		}
 	}
 	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
+	return info
+}
+
+// ToRawInfo returns a description of ItemsItem suitable for JSON or YAML export.
+func (m *ItemsItem) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if len(m.SchemaOrReference) != 0 {
+		items := make([]interface{}, 0)
+		for _, item := range m.SchemaOrReference {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{Key: "schemaOrReference", Value: items})
+	}
+	// &{Name:schemaOrReference Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:true Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -8007,9 +8022,13 @@ func (m *Schema) ToRawInfo() interface{} {
 	}
 	// &{Name:not Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
-		info = append(info, yaml.MapItem{Key: "items", Value: m.Items.ToRawInfo()})
+		items := make([]interface{}, 0)
+		for _, item := range m.Items.SchemaOrReference {
+			items = append(items, item.ToRawInfo())
+		}
+		info = append(info, yaml.MapItem{Key: "items", Value: items[0]})
 	}
-	// &{Name:items Type:SchemaOrReference StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:items Type:ItemsItem StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Properties != nil {
 		info = append(info, yaml.MapItem{Key: "properties", Value: m.Properties.ToRawInfo()})
 	}
