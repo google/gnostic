@@ -59,7 +59,9 @@ func buildOpenAPI3SchemaOrReferenceForSchema(schema *discovery.Schema) *openapi3
 		}
 	}
 	if schema.Items != nil {
-		s.Items = buildOpenAPI3SchemaOrReferenceForSchema(schema.Items)
+		s.Items = &openapi3.ItemsItem{
+			SchemaOrReference: []*openapi3.SchemaOrReference{buildOpenAPI3SchemaOrReferenceForSchema(schema.Items)},
+		}
 	}
 	if (schema.Properties != nil) && (len(schema.Properties.AdditionalProperties) > 0) {
 		s.Properties = &openapi3.Properties{}

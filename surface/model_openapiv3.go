@@ -273,11 +273,12 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 				// we have an array.., but of what?
 				items := schema.Items
 				if items != nil {
-					if items.GetReference().GetXRef() != "" {
-						return FieldKind_ARRAY, typeForRef(items.GetReference().GetXRef()), format
-					} else if items.GetSchema().Type == "string" {
+					a := items.GetSchemaOrReference()
+					if a[0].GetReference().GetXRef() != "" {
+						return FieldKind_ARRAY, typeForRef(a[0].GetReference().GetXRef()), format
+					} else if a[0].GetSchema().Type == "string" {
 						return FieldKind_ARRAY, "string", format
-					} else if items.GetSchema().Type == "object" {
+					} else if a[0].GetSchema().Type == "object" {
 						return FieldKind_ARRAY, "interface{}", format
 					}
 				}
