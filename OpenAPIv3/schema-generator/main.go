@@ -303,7 +303,7 @@ func (m *SchemaModel) objectWithID(id string) *SchemaObject {
 // NewSchemaModel returns a new SchemaModel.
 func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
-	b, err := ioutil.ReadFile("3.0.md")
+	b, err := ioutil.ReadFile("3.0.1.md")
 	if err != nil {
 		return nil, err
 	}
