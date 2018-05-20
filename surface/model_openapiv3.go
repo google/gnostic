@@ -64,8 +64,10 @@ func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
 		}
 	}
 	// Collect service method descriptions from each PathItem.
-	for _, pair := range document.Paths.Path {
-		b.buildMethodFromPathItem(pair.Name, pair.Value)
+	if document.Paths != nil {
+		for _, pair := range document.Paths.Path {
+			b.buildMethodFromPathItem(pair.Name, pair.Value)
+		}
 	}
 	return err
 }
