@@ -21,6 +21,7 @@ import (
 
 	plugins "github.com/googleapis/gnostic/plugins"
 	surface "github.com/googleapis/gnostic/surface"
+	"golang.org/x/tools/imports"
 )
 
 // Renderer generates code for a surface.Model.
@@ -57,9 +58,9 @@ func (renderer *Renderer) Render(response *plugins.Response, files []string) (er
 		if err != nil {
 			response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
 		}
-		// run generated Go files through goimports
+		// run generated Go files through imports pkg
 		if filepath.Ext(file.Name) == ".go" {
-			file.Data, err = goimports(file.Name, file.Data)
+			file.Data, err = imports.Process(file.Name, file.Data, nil)
 		}
 		response.Files = append(response.Files, file)
 	}
