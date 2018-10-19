@@ -13,12 +13,6 @@
 cd
 mkdir -p local
 
-# Install swift
-SWIFT_URL=https://swift.org/builds/swift-4.2-release/ubuntu1404/swift-4.2-RELEASE/swift-4.2-RELEASE-ubuntu14.04.tar.gz
-echo $SWIFT_URL
-curl -fSsL $SWIFT_URL -o swift.tar.gz 
-tar -xzf swift.tar.gz --strip-components=2 --directory=local
-
 # Install protoc
 PROTOC_URL=https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-linux-x86_64.zip
 echo $PROTOC_URL
