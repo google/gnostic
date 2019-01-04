@@ -231,6 +231,9 @@ func (b *OpenAPI2Builder) typeForSchema(schema *openapiv2.Schema) (kind FieldKin
 		if len(types) == 1 && types[0] == "number" {
 			return FieldKind_SCALAR, "number", format
 		}
+		if len(types) == 1 && types[0] == "boolean" {
+			return FieldKind_SCALAR, "boolean", format
+		}
 		if len(types) == 1 && types[0] == "array" && schema.Items != nil {
 			// we have an array.., but of what?
 			items := schema.Items.Schema
