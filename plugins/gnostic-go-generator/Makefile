@@ -1,6 +1,6 @@
 
 build:	
-	go get golang.org/x/tools/cmd/goimports
+	go get
 	go install github.com/googleapis/gnostic
 	go install github.com/googleapis/gnostic/plugins/gnostic-go-generator
 	rm -f $(GOPATH)/bin/gnostic-go-client $(GOPATH)/bin/gnostic-go-server
