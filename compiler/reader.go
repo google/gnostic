@@ -73,8 +73,8 @@ func RemoveFromInfoCache(filename string) {
 // FetchFile gets a specified file from the local filesystem or a remote location.
 func FetchFile(fileurl string) ([]byte, error) {
 	var bytes []byte
+	initializeFileCache()
 	if fileCacheEnable {
-		initializeFileCache()
 		bytes, ok := fileCache[fileurl]
 		if ok {
 			if verboseReader {
@@ -95,7 +95,7 @@ func FetchFile(fileurl string) ([]byte, error) {
 	}
 	defer response.Body.Close()
 	bytes, err = ioutil.ReadAll(response.Body)
-	if err == nil {
+	if fileCacheEnable && err == nil {
 		fileCache[fileurl] = bytes
 	}
 	return bytes, err
@@ -123,8 +123,8 @@ func ReadBytesForFile(filename string) ([]byte, error) {
 
 // ReadInfoFromBytes unmarshals a file as a yaml.MapSlice.
 func ReadInfoFromBytes(filename string, bytes []byte) (interface{}, error) {
+	initializeInfoCache()
 	if infoCacheEnable {
-		initializeInfoCache()
 		cachedInfo, ok := infoCache[filename]
 		if ok {
 			if verboseReader {
@@ -141,7 +141,7 @@ func ReadInfoFromBytes(filename string, bytes []byte) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(filename) > 0 {
+	if infoCacheEnable && len(filename) > 0 {
 		infoCache[filename] = info
 	}
 	return info, nil
@@ -149,16 +149,14 @@ func ReadInfoFromBytes(filename string, bytes []byte) (interface{}, error) {
 
 // ReadInfoForRef reads a file and return the fragment needed to resolve a $ref.
 func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
+	initializeInfoCache()
 	if infoCacheEnable {
-		initializeInfoCache()
-		{
-			info, ok := infoCache[ref]
-			if ok {
-				if verboseReader {
-					log.Printf("Cache hit for ref %s#%s", basefile, ref)
-				}
-				return info, nil
+		info, ok := infoCache[ref]
+		if ok {
+			if verboseReader {
+				log.Printf("Cache hit for ref %s#%s", basefile, ref)
 			}
+			return info, nil
 		}
 		if verboseReader {
 			log.Printf("Reading info for ref %s#%s", basefile, ref)
@@ -203,6 +201,8 @@ func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
 			}
 		}
 	}
-	infoCache[ref] = info
+	if infoCacheEnable {
+		infoCache[ref] = info
+	}
 	return info, nil
 }
