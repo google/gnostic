@@ -19,6 +19,8 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"go/format"
+	"path/filepath"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -31,7 +33,8 @@ func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
 
-	packageName := env.Request.OutputPath
+	packageName, err := resolvePackageName(env.Request.OutputPath)
+	env.RespondAndExitIfError(err)
 
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
@@ -73,4 +76,16 @@ func main() {
 	}
 	err = errors.New("No generated code surface model is available.")
 	env.RespondAndExitIfError(err)
+}
+
+func resolvePackageName(p string) (string, error) {
+	p, err := filepath.Abs(p)
+	if err == nil {
+		p = filepath.Base(p)
+		_, err = format.Source([]byte("package " + p))
+	}
+	if err != nil {
+		return "", errors.New("invalid package name " + p)
+	}
+	return p, nil
 }
