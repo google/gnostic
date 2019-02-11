@@ -301,7 +301,7 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 			}
 		}
 	}
-	// this function is incomplete... return a string representing anything that we don't handle
+	// this function is incomplete... use generic interface{} for now
 	log.Printf("unimplemented: %v", schema)
-	return FieldKind_SCALAR, fmt.Sprintf("unimplemented: %v", schema), ""
+	return FieldKind_SCALAR, "object", ""
 }
