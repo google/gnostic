@@ -109,7 +109,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 
 		if method.Method == "POST" {
 			f.WriteLine(`body := new(bytes.Buffer)`)
-			if parametersType != nil {
+			if parametersType != nil && parametersType.FieldWithPosition(surface.Position_BODY) != nil {
 				f.WriteLine(`json.NewEncoder(body).Encode(` + parametersType.FieldWithPosition(surface.Position_BODY).ParameterName + `)`)
 			}
 			f.WriteLine(`req, err := http.NewRequest("` + method.Method + `", path, body)`)

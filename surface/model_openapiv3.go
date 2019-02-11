@@ -191,6 +191,10 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 		content := requestBody.GetRequestBody().GetContent()
 		if content != nil {
 			for _, pair2 := range content.GetAdditionalProperties() {
+				if pair2.Name != "application/json" {
+					log.Printf("unimplemented: %q requestBody(%s)", name, pair2.Name)
+					continue
+				}
 				var f Field
 				f.Position = Position_BODY
 				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
