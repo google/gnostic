@@ -60,7 +60,7 @@ func (renderer *Renderer) RenderServer() ([]byte, error) {
 		if parametersType != nil {
 			f.WriteLine(`// instantiate the parameters structure`)
 			f.WriteLine(`parameters := &` + parametersType.Name + `{}`)
-			if method.Method == "POST" {
+			if method.Method == "POST" && parametersType.FieldWithPosition(surface.Position_BODY) != nil {
 				f.WriteLine(`// deserialize request from post data`)
 				f.WriteLine(`decoder := json.NewDecoder(r.Body)`)
 				f.WriteLine(`err = decoder.Decode(&parameters.` +
