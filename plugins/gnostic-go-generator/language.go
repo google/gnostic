@@ -56,7 +56,7 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 			case "string":
 				f.NativeType = "string"
 			default:
-				f.NativeType = strings.Title(f.Type)
+				f.NativeType = strings.Title(filteredTypeName(f.Type))
 			}
 		}
 	}
