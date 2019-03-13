@@ -97,8 +97,8 @@ Protocol Buffer description. This is mainly for use in testing and debugging.
 that reports some basic information about an API. The "-" causes the plugin to 
 write its output to stdout.
 
-        go install github.com/googleapis/gnostic/plugins/gnostic-go-sample
-        gnostic examples/v2.0/json/petstore.json --go-sample-out=-
+        go install github.com/googleapis/gnostic/plugins/gnostic-go-generator
+        gnostic examples/v2.0/json/petstore.json --go-generator-out=-
 
 ## Copyright
 
