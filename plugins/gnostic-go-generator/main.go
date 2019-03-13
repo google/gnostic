@@ -79,7 +79,7 @@ func main() {
 }
 
 // resolvePackageName converts a path to a valid package name or
-// error if path can't be resolved or resolves to an invalid package name
+// error if path can't be resolved or resolves to an invalid package name.
 func resolvePackageName(p string) (string, error) {
 	p, err := filepath.Abs(p)
 	if err == nil {
