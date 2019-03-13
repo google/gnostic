@@ -191,6 +191,10 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 		content := requestBody.GetRequestBody().GetContent()
 		if content != nil {
 			for _, pair2 := range content.GetAdditionalProperties() {
+				if pair2.Name != "application/json" {
+					log.Printf("unimplemented: %q requestBody(%s)", name, pair2.Name)
+					continue
+				}
 				var f Field
 				f.Position = Position_BODY
 				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
@@ -281,7 +285,7 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 					} else if a[0].GetSchema().Type == "string" {
 						return FieldKind_ARRAY, "string", format
 					} else if a[0].GetSchema().Type == "object" {
-						return FieldKind_ARRAY, "interface{}", format
+						return FieldKind_ARRAY, "object", format
 					}
 				}
 			}
@@ -301,7 +305,7 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 			}
 		}
 	}
-	// this function is incomplete... return a string representing anything that we don't handle
+	// this function is incomplete... use generic interface{} for now
 	log.Printf("unimplemented: %v", schema)
-	return FieldKind_SCALAR, fmt.Sprintf("unimplemented: %v", schema), ""
+	return FieldKind_SCALAR, "object", ""
 }
