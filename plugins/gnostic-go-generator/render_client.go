@@ -15,6 +15,7 @@
 package main
 
 import (
+	"sort"
 	"strings"
 
 	surface "github.com/googleapis/gnostic/surface"
@@ -22,13 +23,14 @@ import (
 
 // ParameterList returns a string representation of a method's parameters
 func ParameterList(parametersType *surface.Type) string {
-	result := ""
+	parameters := make([]string, len(parametersType.Fields))
 	if parametersType != nil {
-		for _, field := range parametersType.Fields {
-			result += field.ParameterName + " " + field.NativeType + "," + "\n"
+		for i, field := range parametersType.Fields {
+			parameters[i] = field.ParameterName + " " + field.NativeType + ","
 		}
 	}
-	return result
+	sort.Strings(parameters)
+	return strings.Join(parameters, "\n") + "\n"
 }
 
 func (renderer *Renderer) RenderClient() ([]byte, error) {
