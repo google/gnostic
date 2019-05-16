@@ -22,14 +22,19 @@ import (
 )
 
 // ParameterList returns a string representation of a method's parameters
-func ParameterList(parametersType *surface.Type) string {
-	parameters := make([]string, len(parametersType.Fields))
-	if parametersType != nil {
-		for i, field := range parametersType.Fields {
-			parameters[i] = field.ParameterName + " " + field.NativeType + ","
-		}
+func (renderer *Renderer) ParameterList(parametersType *surface.Type) string {
+	if parametersType == nil ||
+		parametersType.Fields == nil ||
+		len(parametersType.Fields) == 0 {
+		return ""
 	}
-	sort.Strings(parameters)
+	parameters := make([]string, len(parametersType.Fields))
+	for i, field := range parametersType.Fields {
+		parameters[i] = field.ParameterName + " " + field.NativeType + ","
+	}
+	if renderer.SortParameterList {
+		sort.Strings(parameters)
+	}
 	return strings.Join(parameters, "\n") + "\n"
 }
 
@@ -67,7 +72,7 @@ func (renderer *Renderer) RenderClient() ([]byte, error) {
 
 		f.WriteLine(commentForText(method.Description))
 		f.WriteLine(`func (client *Client) ` + method.ClientName + `(`)
-		f.WriteLine(ParameterList(parametersType) + `) (`)
+		f.WriteLine(renderer.ParameterList(parametersType) + `) (`)
 		if method.ResponsesTypeName == "" {
 			f.WriteLine(`err error,`)
 		} else {

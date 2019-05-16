@@ -16,3 +16,5 @@ By default, both client and server code will be generated. If the `gnostic-go-ge
 	gnostic bookstore.json --go-server-out=bookstore
 
 For example usage, see the [examples/v2.0/bookstore](examples/v2.0/bookstore) directory.
+
+If the env variable ```GNOSTIC_GO_SORTCLIENTPARAMETERLIST``` is set to anything, the order of the parameter list for the rendered client will be sorted alphabetically.

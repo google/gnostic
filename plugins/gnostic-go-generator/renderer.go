@@ -26,14 +26,16 @@ import (
 
 // Renderer generates code for a surface.Model.
 type Renderer struct {
-	Model   *surface.Model
-	Package string // package name
+	Model             *surface.Model
+	Package           string // package name
+	SortParameterList bool
 }
 
 // NewServiceRenderer creates a renderer.
 func NewServiceRenderer(model *surface.Model) (renderer *Renderer, err error) {
 	renderer = &Renderer{}
 	renderer.Model = model
+	renderer.SortParameterList = false // default
 	return renderer, nil
 }
 

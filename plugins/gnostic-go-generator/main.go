@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"go/format"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -35,6 +36,8 @@ func main() {
 
 	packageName, err := resolvePackageName(env.Request.OutputPath)
 	env.RespondAndExitIfError(err)
+
+	_, sortClientParamerList := os.LookupEnv("GNOSTIC_GO_SORTCLIENTPARAMETERLIST")
 
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
@@ -63,6 +66,7 @@ func main() {
 				// Create the renderer.
 				renderer, err := NewServiceRenderer(surfaceModel)
 				renderer.Package = packageName
+				renderer.SortParameterList = sortClientParamerList
 				env.RespondAndExitIfError(err)
 
 				// Run the renderer to generate files and add them to the response object.
