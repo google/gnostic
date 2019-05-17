@@ -62,7 +62,7 @@ func (renderer *Renderer) Render(response *plugins.Response, files []string) (er
 		if filepath.Ext(file.Name) == ".go" {
 			file.Data, err = imports.Process(file.Name, file.Data, nil)
 			if err != nil {
-				response.Errors = append(response.Errors, fmt.Sprintf("ERROR %v", err))
+				response.Errors = append(response.Errors, err.Error())
 			}
 		}
 		response.Files = append(response.Files, file)
