@@ -61,6 +61,9 @@ func (renderer *Renderer) Render(response *plugins.Response, files []string) (er
 		// run generated Go files through imports pkg
 		if filepath.Ext(file.Name) == ".go" {
 			file.Data, err = imports.Process(file.Name, file.Data, nil)
+			if err != nil {
+				response.Errors = append(response.Errors, err.Error())
+			}
 		}
 		response.Files = append(response.Files, file)
 	}
