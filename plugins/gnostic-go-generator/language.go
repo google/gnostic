@@ -53,6 +53,8 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 				}
 			case "object":
 				f.NativeType = "interface{}"
+			case "any":
+				f.NativeType = "interface{}"
 			case "string":
 				f.NativeType = "string"
 			default:
