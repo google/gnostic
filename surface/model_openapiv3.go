@@ -293,6 +293,8 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 			if schema.AdditionalProperties == nil {
 				return FieldKind_MAP, "object", format
 			}
+		case "any":
+			return FieldKind_ANY, "any", format
 		default:
 
 		}
