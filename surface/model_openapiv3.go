@@ -383,7 +383,7 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 						return FieldKind_ARRAY, typeForRef(a[0].GetReference().GetXRef()), format
 					} else if knownTypes[a[0].GetSchema().Type] {
 						// The items of the array is one of the known types.
-						return FieldKind_ARRAY, a[0].GetSchema().Type, format
+						return FieldKind_ARRAY, a[0].GetSchema().Type, a[0].GetSchema().Format
 					}
 				}
 			}
