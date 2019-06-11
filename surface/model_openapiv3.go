@@ -24,6 +24,8 @@ import (
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 )
 
+var knownTypes = map[string]bool{"string": true, "integer": true, "number": true, "boolean": true, "array": true, "object": true}
+
 // NewModelFromOpenAPIv3 builds a model of an API service for use in code generation.
 func NewModelFromOpenAPI3(document *openapiv3.Document) (*Model, error) {
 	return newOpenAPI3Builder().buildModel(document)
@@ -68,8 +70,12 @@ func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
 // buildTypesFromComponents builds multiple service type description from the "Components" section
 // in the OpenAPI specification.
 func (b *OpenAPI3Builder) buildTypesFromComponents(components *openapiv3.Components) (err error) {
+	if components == nil {
+		return err
+	}
+
 	// Collect service type descriptions from Components/Schemas.
-	if components != nil && components.Schemas != nil {
+	if components.Schemas != nil {
 		for _, pair := range components.Schemas.AdditionalProperties {
 			t, err := b.buildTypeFromSchemaOrReference(pair.Name, pair.Value)
 			if err != nil {
@@ -81,7 +87,7 @@ func (b *OpenAPI3Builder) buildTypesFromComponents(components *openapiv3.Compone
 		}
 	}
 	// Collect service type descriptions from Components/Parameters.
-	if components != nil && components.Parameters != nil {
+	if components.Parameters != nil {
 		for _, pair := range components.Parameters.AdditionalProperties {
 			parameters := []*openapiv3.ParameterOrReference{pair.Value}
 			_, err := b.buildTypeFromParameters(pair.Name, parameters, nil, true)
@@ -91,7 +97,7 @@ func (b *OpenAPI3Builder) buildTypesFromComponents(components *openapiv3.Compone
 		}
 	}
 	// Collect service type descriptions from Components/requestBodies
-	if components != nil && components.RequestBodies != nil {
+	if components.RequestBodies != nil {
 		for _, pair := range components.RequestBodies.AdditionalProperties {
 			t, err := b.buildTypeFromRequestBody(pair.Name, pair.Value, nil)
 
@@ -104,7 +110,7 @@ func (b *OpenAPI3Builder) buildTypesFromComponents(components *openapiv3.Compone
 		}
 	}
 	// Collect service type descriptions from Components/responses
-	if components != nil && components.Responses != nil {
+	if components.Responses != nil {
 		for _, pair := range components.Responses.AdditionalProperties {
 			namedResponseOrReference := []*openapiv3.NamedResponseOrReference{pair}
 			responses := &openapiv3.Responses{ResponseOrReference: namedResponseOrReference}
@@ -131,10 +137,11 @@ func (b *OpenAPI3Builder) buildTypeFromSchemaOrReference(
 			}
 			for _, pair2 := range schema.Properties.AdditionalProperties {
 				if schema := pair2.Value; schema != nil {
-					var f Field
-					f.Name = pair2.Name
+					f := Field{
+						Name:      pair2.Name,
+						Serialize: true,
+					}
 					f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(schema)
-					f.Serialize = true
 					t.addField(&f)
 				}
 			}
@@ -178,15 +185,16 @@ func (b *OpenAPI3Builder) buildMethodFromPathItem(
 			op = pathItem.Trace
 		}
 		if op != nil {
-			var m Method
-			m.Operation = op.OperationId
-			m.Path = path
-			m.Method = method
-			m.Name = sanitizeOperationName(op.OperationId)
+			m := Method{
+				Operation:   op.OperationId,
+				Path:        path,
+				Method:      method,
+				Name:        sanitizeOperationName(op.OperationId),
+				Description: op.Description,
+			}
 			if m.Name == "" {
 				m.Name = generateOperationName(method, path)
 			}
-			m.Description = op.Description
 			m.ParametersTypeName, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody, false)
 			m.ResponsesTypeName, err = b.buildTypeFromResponses(m.Name, op.Responses, false)
 			b.model.addMethod(&m)
@@ -201,18 +209,21 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 	parameters []*openapiv3.ParameterOrReference,
 	requestBody *openapiv3.RequestBodyOrReference,
 	fromComponent bool) (typeName string, err error) {
-	t := &Type{}
-	t.Name = name + "Parameters"
+	t := &Type{
+		Name:   name + "Parameters",
+		Kind:   TypeKind_STRUCT,
+		Fields: make([]*Field, 0),
+	}
 	t.Description = t.Name + " holds parameters to " + name
+
 	if fromComponent {
 		t.Name = name
 		t.Description = t.Name + " is a parameter"
 	}
-	t.Kind = TypeKind_STRUCT
-	t.Fields = make([]*Field, 0)
 	for _, parametersItem := range parameters {
-		var f Field
-		f.Type = fmt.Sprintf("%+v", parametersItem)
+		f := Field{
+			Type: fmt.Sprintf("%+v", parametersItem),
+		}
 		parameter := parametersItem.GetParameter()
 		if parameter != nil {
 			switch parameter.In {
@@ -236,7 +247,6 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 		} else if parameterRef := parametersItem.GetReference(); parameterRef != nil {
 			f.Type = typeForRef(parameterRef.GetXRef())
 			f.Name = strings.ToLower(f.Type)
-			f.Serialize = false
 			f.Kind = FieldKind_REFERENCE
 			t.addField(&f)
 		}
@@ -254,18 +264,20 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 // buildTypeFromRequestBody builds a service type description from the request bodies of an OpenAPI
 // description. If tIn is not given, a new type is created. Otherwise tIn is used.
 func (b *OpenAPI3Builder) buildTypeFromRequestBody(name string, requestBody *openapiv3.RequestBodyOrReference, tIn *Type) (tOut *Type, err error) {
-	if tIn == nil {
-		tOut = &Type{}
-		tOut.Name = name
-	} else {
+	tOut = &Type{
+		Name: name,
+	}
+
+	if tIn != nil {
 		tOut = tIn
 	}
 
 	if requestBody != nil {
 		content := requestBody.GetRequestBody().GetContent()
-		var f Field
-		f.Position = Position_BODY
-		f.Serialize = true
+		f := Field{
+			Position:  Position_BODY,
+			Serialize: true,
+		}
 
 		if content != nil {
 			for _, pair := range content.GetAdditionalProperties() {
@@ -293,8 +305,11 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 	name string,
 	responses *openapiv3.Responses,
 	fromComponent bool) (typeName string, err error) {
-	t := &Type{}
-	t.Name = name + "Responses"
+	t := &Type{
+		Name:   name + "Responses",
+		Kind:   TypeKind_STRUCT,
+		Fields: make([]*Field, 0),
+	}
 	t.Description = t.Name + " holds responses of " + name
 
 	if fromComponent {
@@ -302,13 +317,11 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 		t.Description = t.Name + " is a response"
 	}
 
-	t.Kind = TypeKind_STRUCT
-	t.Fields = make([]*Field, 0)
-
 	addResponse := func(name string, value *openapiv3.ResponseOrReference) {
-		var f Field
-		f.Name = name
-		f.Serialize = false
+		f := Field{
+			Name:      name,
+			Serialize: false,
+		}
 		response := value.GetResponse()
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
@@ -368,12 +381,9 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 					a := items.GetSchemaOrReference()
 					if a[0].GetReference().GetXRef() != "" {
 						return FieldKind_ARRAY, typeForRef(a[0].GetReference().GetXRef()), format
-					} else {
-						// Determine whether the items of the array is a known type
-						types := map[string]bool{"string": true, "integer": true, "number": true, "boolean": true, "array": true, "object": true}
-						if types[a[0].GetSchema().Type] {
-							return FieldKind_ARRAY, a[0].GetSchema().Type, format
-						}
+					} else if knownTypes[a[0].GetSchema().Type] {
+						// The items of the array is one of the known types.
+						return FieldKind_ARRAY, a[0].GetSchema().Type, format
 					}
 				}
 			}
