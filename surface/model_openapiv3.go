@@ -250,6 +250,8 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 			f.Type = typeForRef(parameterRef.GetXRef())
 			f.Name = strings.ToLower(f.Type)
 			f.Kind = FieldKind_REFERENCE
+			f.Position = b.positionForType(f.Type)
+
 			t.addField(&f)
 		}
 	}
@@ -412,4 +414,15 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 	// this function is incomplete... use generic interface{} for now
 	log.Printf("unimplemented: %v", schema)
 	return FieldKind_SCALAR, "object", ""
+}
+
+// Searches all types that have been created so far for the type with 'typeName' and
+// returns the position of the first field. Returns Position_BODY if there is no such type.
+func (b *OpenAPI3Builder) positionForType(typeName string) Position {
+	for _, t := range b.model.Types {
+		if t.Name == typeName {
+			return t.Fields[0].Position
+		}
+	}
+	return Position_BODY
 }
