@@ -407,12 +407,17 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 		}
 	}
 	if schema.AdditionalProperties != nil {
-		additionalProperties := schema.AdditionalProperties
-		if propertySchema := additionalProperties.GetSchemaOrReference().GetReference(); propertySchema != nil {
-			if ref := propertySchema.XRef; ref != "" {
-				return FieldKind_MAP, "map[string]" + typeForRef(ref), ""
-			}
+		schemarOrReference := schema.AdditionalProperties.GetSchemaOrReference()
+		k, t, f := b.typeForSchemaOrReference(schemarOrReference)
+		mapValueType := ""
+		if k == FieldKind_ARRAY {
+			mapValueType = "[]"
 		}
+		if f != "" {
+			t = f
+		}
+		mapValueType = mapValueType + t
+		return FieldKind_MAP, "map[string]" + mapValueType, ""
 	}
 	// this function is incomplete... use generic interface{} for now
 	log.Printf("unimplemented: %v", schema)
