@@ -407,8 +407,8 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 		}
 	}
 	if schema.AdditionalProperties != nil {
-		schemarOrReference := schema.AdditionalProperties.GetSchemaOrReference()
-		k, t, f := b.typeForSchemaOrReference(schemarOrReference)
+		schemaOrReference := schema.AdditionalProperties.GetSchemaOrReference()
+		k, t, f := b.typeForSchemaOrReference(schemaOrReference)
 		mapValueType := ""
 		if k == FieldKind_ARRAY {
 			mapValueType = "[]"
@@ -416,7 +416,7 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 		if f != "" {
 			t = f
 		}
-		mapValueType = mapValueType + t
+		mapValueType += t
 		return FieldKind_MAP, "map[string]" + mapValueType, ""
 	}
 	// this function is incomplete... use generic interface{} for now
