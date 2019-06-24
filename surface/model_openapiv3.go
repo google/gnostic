@@ -332,7 +332,10 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
 				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
-				t.addField(&f)
+
+				if !t.HasFieldWithName(f.Name) {
+					t.addField(&f)
+				}
 			}
 		} else if responseRef := value.GetReference(); responseRef != nil {
 			schemaOrReference := openapiv3.SchemaOrReference{&openapiv3.SchemaOrReference_Reference{Reference: responseRef}}
