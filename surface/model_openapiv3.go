@@ -250,6 +250,8 @@ func (b *OpenAPI3Builder) buildTypeFromParameters(
 			f.Type = typeForRef(parameterRef.GetXRef())
 			f.Name = strings.ToLower(f.Type)
 			f.Kind = FieldKind_REFERENCE
+			f.Position = b.positionForType(f.Type)
+
 			t.addField(&f)
 		}
 	}
@@ -330,7 +332,10 @@ func (b *OpenAPI3Builder) buildTypeFromResponses(
 		if response != nil && response.GetContent() != nil {
 			for _, pair2 := range response.GetContent().GetAdditionalProperties() {
 				f.Kind, f.Type, f.Format = b.typeForSchemaOrReference(pair2.GetValue().GetSchema())
-				t.addField(&f)
+
+				if !t.HasFieldWithName(f.Name) {
+					t.addField(&f)
+				}
 			}
 		} else if responseRef := value.GetReference(); responseRef != nil {
 			schemaOrReference := openapiv3.SchemaOrReference{&openapiv3.SchemaOrReference_Reference{Reference: responseRef}}
@@ -402,14 +407,30 @@ func (b *OpenAPI3Builder) typeForSchema(schema *openapiv3.Schema) (kind FieldKin
 		}
 	}
 	if schema.AdditionalProperties != nil {
-		additionalProperties := schema.AdditionalProperties
-		if propertySchema := additionalProperties.GetSchemaOrReference().GetReference(); propertySchema != nil {
-			if ref := propertySchema.XRef; ref != "" {
-				return FieldKind_MAP, "map[string]" + typeForRef(ref), ""
-			}
+		schemaOrReference := schema.AdditionalProperties.GetSchemaOrReference()
+		k, t, f := b.typeForSchemaOrReference(schemaOrReference)
+		mapValueType := ""
+		if k == FieldKind_ARRAY {
+			mapValueType = "[]"
 		}
+		if f != "" {
+			t = f
+		}
+		mapValueType += t
+		return FieldKind_MAP, "map[string]" + mapValueType, ""
 	}
 	// this function is incomplete... use generic interface{} for now
 	log.Printf("unimplemented: %v", schema)
 	return FieldKind_SCALAR, "object", ""
+}
+
+// Searches all types that have been created so far for the type with 'typeName' and
+// returns the position of the first field. Returns Position_BODY if there is no such type.
+func (b *OpenAPI3Builder) positionForType(typeName string) Position {
+	for _, t := range b.model.Types {
+		if t.Name == typeName {
+			return t.Fields[0].Position
+		}
+	}
+	return Position_BODY
 }
