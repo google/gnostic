@@ -17,6 +17,7 @@ package surface_v1
 import (
 	"errors"
 	"fmt"
+	"github.com/googleapis/gnostic/compiler"
 	"log"
 
 	"strings"
@@ -27,8 +28,8 @@ import (
 var knownTypes = map[string]bool{"string": true, "integer": true, "number": true, "boolean": true, "array": true, "object": true}
 
 // NewModelFromOpenAPIv3 builds a model of an API service for use in code generation.
-func NewModelFromOpenAPI3(document *openapiv3.Document) (*Model, error) {
-	return newOpenAPI3Builder().buildModel(document)
+func NewModelFromOpenAPI3(document *openapiv3.Document, sourceName string) (*Model, error) {
+	return newOpenAPI3Builder().buildModel(document, sourceName)
 }
 
 type OpenAPI3Builder struct {
@@ -39,11 +40,12 @@ func newOpenAPI3Builder() *OpenAPI3Builder {
 	return &OpenAPI3Builder{model: &Model{}}
 }
 
-func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document) (*Model, error) {
+func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document, sourceName string) (*Model, error) {
 	// Set model properties from passed-in document.
 	b.model.Name = document.Info.Title
 	b.model.Types = make([]*Type, 0)
 	b.model.Methods = make([]*Method, 0)
+	b.model.SourceName = sourceName
 	err := b.build(document)
 	if err != nil {
 		return nil, err
@@ -61,10 +63,42 @@ func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
 	// Collect service method descriptions from each PathItem.
 	if document.Paths != nil {
 		for _, pair := range document.Paths.Path {
-			b.buildMethodFromPathItem(pair.Name, pair.Value)
+			err = b.buildMethodFromPathItem(pair.Name, pair.Value)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	return err
+
+	// Collects external dependencies: URLs to other OpenAPI descriptions
+	err = b.buildDependencies(document)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Retrieves all external dependencies from the compiler cache.
+func (b *OpenAPI3Builder) buildDependencies(document *openapiv3.Document) (err error) {
+	cache := compiler.GetInfoCache()
+	if len(cache) == 0 {
+		// Fills the compiler cache with dependencies.
+		_, err := document.ResolveReferences(b.model.SourceName)
+		if err != nil {
+			return err
+		}
+		cache = compiler.GetInfoCache()
+	}
+
+	for dep := range cache {
+		if b.isExternalDependency(dep) {
+			b.model.Dependencies = append(b.model.Dependencies, dep)
+		}
+	}
+	// Clear compiler cache for recursive calls
+	compiler.ClearInfoCache()
+	return nil
 }
 
 // buildTypesFromComponents builds multiple service type description from the "Components" section
@@ -114,7 +148,10 @@ func (b *OpenAPI3Builder) buildTypesFromComponents(components *openapiv3.Compone
 		for _, pair := range components.Responses.AdditionalProperties {
 			namedResponseOrReference := []*openapiv3.NamedResponseOrReference{pair}
 			responses := &openapiv3.Responses{ResponseOrReference: namedResponseOrReference}
-			b.buildTypeFromResponses(pair.Name, responses, true)
+			_, err := b.buildTypeFromResponses(pair.Name, responses, true)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -433,4 +470,14 @@ func (b *OpenAPI3Builder) positionForType(typeName string) Position {
 		}
 	}
 	return Position_BODY
+}
+
+func (b *OpenAPI3Builder) isExternalDependency(s string) bool {
+	if strings.Contains(s, "http://") {
+		return true
+	}
+	if strings.Contains(s, "https://") {
+		return true
+	}
+	return false
 }
