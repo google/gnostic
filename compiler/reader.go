@@ -21,10 +21,9 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"strings"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 var fileCache map[string][]byte
@@ -69,6 +68,17 @@ func RemoveFromInfoCache(filename string) {
 	}
 	initializeInfoCache()
 	delete(infoCache, filename)
+}
+
+func GetInfoCache() map[string]interface{} {
+	if infoCache == nil {
+		initializeInfoCache()
+	}
+	return infoCache
+}
+
+func ClearInfoCache() {
+	infoCache = make(map[string]interface{})
 }
 
 // FetchFile gets a specified file from the local filesystem or a remote location.
@@ -164,11 +174,10 @@ func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
 		}
 	}
 	count = count + 1
-	basedir, _ := filepath.Split(basefile)
 	parts := strings.Split(ref, "#")
 	var filename string
 	if parts[0] != "" {
-		filename = basedir + parts[0]
+		filename = parts[0]
 	} else {
 		filename = basefile
 	}
