@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"github.com/googleapis/gnostic/compiler"
 	"log"
-
+	"net/url"
 	"strings"
 
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
@@ -472,12 +472,11 @@ func (b *OpenAPI3Builder) positionForType(typeName string) Position {
 	return Position_BODY
 }
 
+// Returns true if s is a valid URL.
 func (b *OpenAPI3Builder) isExternalDependency(s string) bool {
-	if strings.Contains(s, "http://") {
-		return true
+	_, err := url.ParseRequestURI(s)
+	if err != nil {
+		return false
 	}
-	if strings.Contains(s, "https://") {
-		return true
-	}
-	return false
+	return true
 }
