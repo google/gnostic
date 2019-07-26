@@ -70,8 +70,8 @@ func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
 		}
 	}
 
-	// Collects external dependencies: URLs to other OpenAPI descriptions
-	err = b.buildDependencies(document)
+	// Collects symbolic references: URLs to other OpenAPI descriptions
+	err = b.buildSymbolicReferences(document)
 	if err != nil {
 		return err
 	}
@@ -79,11 +79,11 @@ func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
 	return nil
 }
 
-// Retrieves all external dependencies from the compiler cache.
-func (b *OpenAPI3Builder) buildDependencies(document *openapiv3.Document) (err error) {
+// buildSymbolicReferences build als symbolic references. A symbolic reference is an URL to another OpenAPI description.
+func (b *OpenAPI3Builder) buildSymbolicReferences(document *openapiv3.Document) (err error) {
 	cache := compiler.GetInfoCache()
 	if len(cache) == 0 {
-		// Fills the compiler cache with dependencies.
+		// Fills the compiler cache with all kind of references.
 		_, err := document.ResolveReferences(b.model.SourceName)
 		if err != nil {
 			return err
@@ -91,9 +91,9 @@ func (b *OpenAPI3Builder) buildDependencies(document *openapiv3.Document) (err e
 		cache = compiler.GetInfoCache()
 	}
 
-	for dep := range cache {
-		if b.isExternalDependency(dep) {
-			b.model.Dependencies = append(b.model.Dependencies, dep)
+	for ref := range cache {
+		if b.isSymbolicReference(ref) {
+			b.model.SymbolicReferences = append(b.model.SymbolicReferences, ref)
 		}
 	}
 	// Clear compiler cache for recursive calls
@@ -473,7 +473,7 @@ func (b *OpenAPI3Builder) positionForType(typeName string) Position {
 }
 
 // Returns true if s is a valid URL.
-func (b *OpenAPI3Builder) isExternalDependency(s string) bool {
+func (b *OpenAPI3Builder) isSymbolicReference(s string) bool {
 	_, err := url.ParseRequestURI(s)
 	if err != nil {
 		return false

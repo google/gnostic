@@ -88,6 +88,6 @@ message Model {
     string name = 1; // a free-form title for the API
     repeated Type types = 2; // the types used by the API
     repeated Method methods = 3; // the methods (functions) of the API
-    repeated string dependencies = 4; // dependencies to other OpenAPI files
+    repeated string symbolicReferences = 4; // references to other OpenAPI files
     string sourceName = 5; // source name of the OpenAPI description (.yaml or .json)
 }
