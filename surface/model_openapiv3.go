@@ -79,7 +79,7 @@ func (b *OpenAPI3Builder) build(document *openapiv3.Document) (err error) {
 	return nil
 }
 
-// buildSymbolicReferences build als symbolic references. A symbolic reference is an URL to another OpenAPI description.
+// buildSymbolicReferences builds all symbolic references. A symbolic reference is an URL to another OpenAPI description.
 func (b *OpenAPI3Builder) buildSymbolicReferences(document *openapiv3.Document) (err error) {
 	cache := compiler.GetInfoCache()
 	if len(cache) == 0 {
