@@ -179,11 +179,10 @@ func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
 	parts := strings.Split(ref, "#")
 	var filename string
 	if parts[0] != "" {
+		filename = parts[0]
 		if _, err := url.ParseRequestURI(parts[0]); err != nil {
 			// It is not an URL, so the file is local
 			filename = basedir + parts[0]
-		} else {
-			filename = parts[0]
 		}
 	} else {
 		filename = basefile
