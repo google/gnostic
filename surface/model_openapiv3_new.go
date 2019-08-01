@@ -1,9 +1,11 @@
 package surface_v1
 
 import (
-	"fmt"
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
 	"log"
+	nethttp "net/http"
+	"strconv"
+	"strings"
 )
 
 type FieldInfo struct {
@@ -39,22 +41,7 @@ func (b *OpenAPI3Builder) buildNew(document *openapiv3.Document) (err error) {
 }
 
 func (b *OpenAPI3Builder) buildFromPaths(paths *openapiv3.Paths) {
-	//m := &Method{
-	//	Operation:   op.OperationId,
-	//	Path:        path,
-	//	Method:      method,
-	//	Name:        sanitizeOperationName(op.OperationId),
-	//	Description: op.Description,
-	//}
-	//if m.Name == "" {
-	//	m.Name = generateOperationName(method, path)
-	//}
-	//m.ParametersTypeName, err = b.buildTypeFromParameters(m.Name, op.Parameters, op.RequestBody, false)
-	//m.ResponsesTypeName, err = b.buildTypeFromResponses(m.Name, op.Responses, false)
-	//b.model.addMethod(m)
-
 	for _, path := range paths.Path {
-		// TODO: build method here
 		b.buildFromNamedPath(path.Name, path.Value)
 	}
 }
@@ -81,12 +68,23 @@ func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.Pa
 			op = pathItem.Trace
 		}
 		if op != nil {
-			b.buildFromNamedOperation(method, op)
+			m := &Method{
+				Operation:   op.OperationId,
+				Path:        name,
+				Method:      method,
+				Name:        sanitizeOperationName(op.OperationId),
+				Description: op.Description,
+			}
+			if m.Name == "" {
+				m.Name = generateOperationName(method, name)
+			}
+			m.ParametersTypeName, m.ResponsesTypeName = b.buildFromNamedOperation(m.Name, op)
+			b.model.addMethod(m)
 		}
 	}
 }
 
-func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openapiv3.Operation) {
+func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openapiv3.Operation) (parametersTypeName string, responseTypeName string) {
 	//TODO: n could be empty string  --> generate name
 	n := sanitizeOperationName(operation.OperationId)
 
@@ -95,36 +93,30 @@ func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openap
 	for _, paramOrRef := range operation.Parameters {
 		name = b.getOpenAPINameFieldForParameter(paramOrRef)
 		fieldInfo := b.buildFromNamedParameter(name, paramOrRef)
-		if fieldInfo != nil {
-			f := &Field{Name: name}
-			f.Type, f.Kind, f.Format, f.Position = fieldInfo.fieldType, fieldInfo.fieldKind, fieldInfo.fieldFormat, fieldInfo.fieldPosition
-			operationParameters.Fields = append(operationParameters.Fields, f)
-		}
+		b.makeFieldAndAppendToType(fieldInfo, operationParameters, name)
 	}
 	if len(operationParameters.Fields) > 0 {
 		b.model.addType(operationParameters)
+		parametersTypeName = operationParameters.Name
 	}
 
 	if responses := operation.Responses; responses != nil {
 		operationResponses := b.makeType(n + "Responses")
 		operationResponses.Description = operationResponses.Name + " holds responses of " + name
 		for _, namedResponse := range responses.ResponseOrReference {
-			fieldInfo := b.buildFromResponseOrRef(namedResponse.Name, namedResponse.Value)
-			if fieldInfo != nil {
-				f := &Field{Name: namedResponse.Name}
-				f.Type, f.Kind, f.Format = fieldInfo.fieldType, fieldInfo.fieldKind, fieldInfo.fieldFormat
-				operationResponses.Fields = append(operationResponses.Fields, f)
-			}
+			fieldInfo := b.buildFromResponseOrRef(convertStatusCodes(namedResponse.Name), namedResponse.Value)
+			b.makeFieldAndAppendToType(fieldInfo, operationResponses, namedResponse.Name)
 		}
+
+		//TODO request bodies
+
 		if len(operationResponses.Fields) > 0 {
 			b.model.addType(operationResponses)
+			responseTypeName = operationResponses.Name
 		}
 	}
 
-	//TODO request bodies
-
-	fmt.Println("HELLOW")
-
+	return parametersTypeName, responseTypeName
 }
 
 func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) (err error) {
@@ -175,8 +167,34 @@ func (b *OpenAPI3Builder) buildFromNamedParameter(name string, paramOrRef *opena
 	return fInfo
 }
 
-func (b *OpenAPI3Builder) buildFromNamedRequestBody(name string, requestBodyOrRef *openapiv3.RequestBodyOrReference) {
+func (b *OpenAPI3Builder) buildFromNamedRequestBody(name string, requestBodyOrRef *openapiv3.RequestBodyOrReference) (fInfo *FieldInfo) {
+	fInfo = b.buildFromRequestBodyOrReference(name, requestBodyOrRef)
+	return fInfo
+}
 
+func (b *OpenAPI3Builder) buildFromRequestBodyOrReference(name string, reqBodyOrRef *openapiv3.RequestBodyOrReference) (fInfo *FieldInfo) {
+	fInfo = &FieldInfo{}
+	if requestBody := reqBodyOrRef.GetRequestBody(); requestBody != nil {
+		fInfo = b.buildFromRequestBody(name, requestBody)
+		return fInfo
+	} else if ref := reqBodyOrRef.GetReference(); ref != nil {
+		// TOOD: handle ref
+	}
+	return nil
+}
+
+func (b *OpenAPI3Builder) buildFromRequestBody(name string, reqBody *openapiv3.RequestBody) (fInfo *FieldInfo) {
+	fInfo = &FieldInfo{}
+	if reqBody.Content != nil {
+		schemaType := b.makeType(name)
+		for _, namedMediaType := range reqBody.Content.AdditionalProperties {
+			fieldInfo := b.buildFromNamedMediaType(namedMediaType.Name, namedMediaType.Value)
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, namedMediaType.Name)
+		}
+		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
+		return fInfo
+	}
+	return nil
 }
 
 func (b *OpenAPI3Builder) buildFromSchemaOrReference(name string, schemaOrReference *openapiv3.SchemaOrReference) (fInfo *FieldInfo) {
@@ -196,7 +214,7 @@ func (b *OpenAPI3Builder) buildFromParamOrRef(paramOrRef *openapiv3.ParameterOrR
 		fInfo = b.buildFromParam(param)
 		return fInfo
 	} else if ref := paramOrRef.GetReference(); ref != nil {
-		// buildFromReference
+		// TODO buildFromReference
 	}
 	return nil
 }
@@ -206,7 +224,7 @@ func (b *OpenAPI3Builder) buildFromResponseOrRef(name string, responseOrRef *ope
 		fieldInfo = b.buildFromResponse(name, response)
 		return fieldInfo
 	} else if ref := responseOrRef.GetReference(); ref != nil {
-
+		// TODO: build from ref
 	}
 	return nil
 }
@@ -237,11 +255,7 @@ func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Res
 		schemaType := b.makeType(name)
 		for _, namedMediaType := range response.Content.AdditionalProperties {
 			fieldInfo := b.buildFromNamedMediaType(namedMediaType.Name, namedMediaType.Value)
-			if fieldInfo != nil {
-				f := &Field{Name: namedMediaType.Name}
-				f.Type, f.Kind, f.Format = fieldInfo.fieldType, fieldInfo.fieldKind, fieldInfo.fieldFormat
-				schemaType.Fields = append(schemaType.Fields, f)
-			}
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, namedMediaType.Name)
 		}
 		b.model.addType(schemaType)
 		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
@@ -288,11 +302,7 @@ func (b *OpenAPI3Builder) buildTypeFromSchema(name string, schema *openapiv3.Sch
 			schemaType := b.makeType(name)
 			for _, namedSchema := range schema.Properties.AdditionalProperties {
 				fieldInfo := b.buildFromNamedSchema(namedSchema.Name, namedSchema.Value)
-				if fieldInfo != nil {
-					f := &Field{Name: namedSchema.Name}
-					f.Kind, f.Type, f.Format = fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldFormat
-					schemaType.Fields = append(schemaType.Fields, f)
-				}
+				b.makeFieldAndAppendToType(fieldInfo, schemaType, namedSchema.Name)
 			}
 			b.model.addType(schemaType)
 			fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_REFERENCE, schemaType.Name, ""
@@ -311,4 +321,25 @@ func (b *OpenAPI3Builder) buildTypeFromSchema(name string, schema *openapiv3.Sch
 	}
 	log.Printf("Could not find field info for schema: %v", schema)
 	return nil
+}
+
+func convertStatusCodes(name string) string {
+	code, err := strconv.Atoi(name)
+	if err == nil {
+		statusText := nethttp.StatusText(code)
+		if statusText == "" {
+			log.Println("It seems like you have an status code that is currently not known to net.http.StatusText.")
+			statusText = "unknownStatusCode"
+		}
+		name = strings.Replace(statusText, " ", "_", -1)
+	}
+	return name
+}
+
+func (b *OpenAPI3Builder) makeFieldAndAppendToType(info *FieldInfo, schemaType *Type, fieldName string) {
+	if info != nil {
+		f := &Field{Name: fieldName}
+		f.Type, f.Kind, f.Format = info.fieldType, info.fieldKind, info.fieldFormat
+		schemaType.Fields = append(schemaType.Fields, f)
+	}
 }
