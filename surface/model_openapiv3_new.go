@@ -51,8 +51,14 @@ func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) 
 	if parameters := components.Parameters; parameters != nil {
 		for _, namedParameter := range parameters.AdditionalProperties {
 			// Parameters in OpenAPI have a name field. See: https://swagger.io/specification/#parameterObject
-			// We use that later the buildFromParam method to name the type we build.
-			b.buildFromParamOrRef(namedParameter.Value)
+			// We use that later in the buildFromParam method to name the field we build. However, a type with that
+			// parameter was never created, so we still need to do that.
+			t := b.makeType(namedParameter.Name)
+			fInfo := b.buildFromParamOrRef(namedParameter.Value)
+			b.makeFieldAndAppendToType(fInfo, t, fInfo.fieldName)
+			if len(t.Fields) > 0 {
+				b.model.addType(t)
+			}
 		}
 	}
 
@@ -124,7 +130,7 @@ func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openap
 	}
 
 	if operation.RequestBody != nil {
-		fInfo := b.buildFromRequestBodyOrRef(name+"RequestBody", operation.RequestBody)
+		fInfo := b.buildFromRequestBodyOrRef(operation.OperationId+"RequestBody", operation.RequestBody)
 		b.makeFieldAndAppendToType(fInfo, operationParameters, "request_body")
 	}
 
@@ -138,7 +144,7 @@ func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openap
 		operationResponses := b.makeType(name + "Responses")
 		operationResponses.Description = operationResponses.Name + " holds responses of " + name
 		for _, namedResponse := range responses.ResponseOrReference {
-			fieldInfo := b.buildFromResponseOrRef(convertStatusCodes(namedResponse.Name), namedResponse.Value)
+			fieldInfo := b.buildFromResponseOrRef(operation.OperationId+convertStatusCodes(namedResponse.Name), namedResponse.Value)
 			b.makeFieldAndAppendToType(fieldInfo, operationResponses, namedResponse.Name)
 		}
 		if len(operationResponses.Fields) > 0 {
@@ -155,8 +161,15 @@ func (b *OpenAPI3Builder) buildFromParamOrRef(paramOrRef *openapiv3.ParameterOrR
 		fInfo = b.buildFromParam(param)
 		return fInfo
 	} else if ref := paramOrRef.GetReference(); ref != nil {
+		t := findTypeForRef(b.model.Types, typeForRef(ref.XRef))
+		if t != nil {
+			fInfo.fieldKind, fInfo.fieldType, fInfo.fieldName, fInfo.fieldPosition = FieldKind_REFERENCE, typeForRef(ref.XRef), t.Name, t.Fields[0].Position
+			return fInfo
+		}
+		// TODO: This might happen for symbolic references
+		log.Printf("Not able to find parameter information for: %v", ref)
 		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, typeForRef(ref.XRef)
-		return fInfo
+		return fInfo // Lets return fInfo for now otherwise we may get null pointer exception
 	}
 	return nil
 }
@@ -226,7 +239,7 @@ func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Res
 	if response.Content != nil && response.Content.AdditionalProperties != nil {
 		schemaType := b.makeType(name)
 		for _, namedMediaType := range response.Content.AdditionalProperties {
-			fieldInfo := b.buildFromNamedMediaType(namedMediaType.Name, namedMediaType.Value)
+			fieldInfo := b.buildFromNamedMediaType(name+namedMediaType.Name, namedMediaType.Value)
 			b.makeFieldAndAppendToType(fieldInfo, schemaType, namedMediaType.Name)
 		}
 		b.model.addType(schemaType)
@@ -263,14 +276,23 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 	case "":
 		fallthrough
 	case "object":
+		schemaType := b.makeType(name)
 		if schema.Properties != nil && schema.Properties.AdditionalProperties != nil {
-			schemaType := b.makeType(name)
 			for _, namedSchema := range schema.Properties.AdditionalProperties {
 				fieldInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
 				b.makeFieldAndAppendToType(fieldInfo, schemaType, namedSchema.Name)
 			}
+		}
+		if schemaOrRef := schema.AdditionalProperties.GetSchemaOrReference(); schemaOrRef != nil {
+			// AdditionalProperties are represented as map
+			fieldInfo := b.buildFromSchemaOrReference(name+"AdditionalProperties", schemaOrRef)
+			mapValueType := b.makeMapValueType(*fieldInfo)
+			fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldFormat = FieldKind_MAP, "map[string]"+mapValueType, ""
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, "additional_properties")
+		}
+		if len(schemaType.Fields) > 0 {
 			b.model.addType(schemaType)
-			fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_REFERENCE, schemaType.Name, ""
+			fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
 			return fInfo
 		}
 	case "array":
@@ -284,7 +306,7 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 		fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_SCALAR, schema.Type, schema.Format
 		return fInfo
 	}
-	log.Printf("Could not find field info for schema: %v", schema)
+	log.Printf("Unimplemented: could not find field info for schema: %v", schema)
 	return nil
 }
 
@@ -305,6 +327,17 @@ func (b *OpenAPI3Builder) makeFieldAndAppendToType(info *FieldInfo, schemaType *
 	}
 }
 
+func (b *OpenAPI3Builder) makeMapValueType(fInfo FieldInfo) (mapValueType string) {
+	if fInfo.fieldKind == FieldKind_ARRAY {
+		mapValueType = "[]"
+	}
+	if fInfo.fieldFormat != "" {
+		fInfo.fieldType = fInfo.fieldFormat
+	}
+	mapValueType += fInfo.fieldType
+	return mapValueType
+}
+
 func convertStatusCodes(c string) (statusText string) {
 	code, err := strconv.Atoi(c)
 	if err == nil {
@@ -316,4 +349,13 @@ func convertStatusCodes(c string) (statusText string) {
 		statusText = strings.Replace(statusText, " ", "_", -1)
 	}
 	return statusText
+}
+
+func findTypeForRef(types []*Type, typeName string) *Type {
+	for _, t := range types {
+		if typeName == t.Name {
+			return t
+		}
+	}
+	return nil
 }
