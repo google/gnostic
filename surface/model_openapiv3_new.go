@@ -120,7 +120,7 @@ func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.Pa
 }
 
 func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openapiv3.Operation) (parametersTypeName string, responseTypeName string) {
-	// At first, we build the operations input parameters first. This includes parameters (like PATH or QUERY parameters) and a request body
+	// At first, we build the operations input parameters. This includes parameters (like PATH or QUERY parameters) and a request body
 	operationParameters := b.makeType(name + "Parameters")
 	operationParameters.Description = operationParameters.Name + " holds parameters to " + name
 	for _, paramOrRef := range operation.Parameters {
@@ -146,6 +146,10 @@ func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openap
 		for _, namedResponse := range responses.ResponseOrReference {
 			fieldInfo := b.buildFromResponseOrRef(operation.OperationId+convertStatusCodes(namedResponse.Name), namedResponse.Value)
 			b.makeFieldAndAppendToType(fieldInfo, operationResponses, namedResponse.Name)
+		}
+		if responses.Default != nil {
+			fieldInfo := b.buildFromResponseOrRef(operation.OperationId+"Default", responses.Default)
+			b.makeFieldAndAppendToType(fieldInfo, operationResponses, "default")
 		}
 		if len(operationResponses.Fields) > 0 {
 			b.model.addType(operationResponses)
