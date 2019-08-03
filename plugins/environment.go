@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/any"
@@ -115,8 +116,16 @@ When the -plugin option is specified, these flags are ignored.`)
 		err = proto.Unmarshal(apiData, documentv3)
 		if err == nil {
 			env.Request.AddModel("openapi.v3.Document", documentv3)
+			sourceName := strings.Replace(*input, ".pb", ".yaml", -1)
+			if _, err := os.Stat(sourceName); os.IsNotExist(err) {
+				// sourceName does not exist. Lets try .json instead
+				sourceName = strings.Replace(*input, ".pb", ".json", -1)
+				if _, err := os.Stat(sourceName); os.IsNotExist(err) {
+					return nil, err
+				}
+			}
 			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI3(documentv3)
+			surfaceModel, err := surface.NewModelFromOpenAPI3(documentv3, sourceName)
 			if err == nil {
 				env.Request.AddModel("surface.v1.Model", surfaceModel)
 			}

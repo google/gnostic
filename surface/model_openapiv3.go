@@ -16,8 +16,10 @@ package surface_v1
 
 import (
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
+	"github.com/googleapis/gnostic/compiler"
 	"log"
 	nethttp "net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -36,20 +38,24 @@ type FieldInfo struct {
 }
 
 // NewModelFromOpenAPIv3 builds a model of an API service for use in code generation.
-func NewModelFromOpenAPI3(document *openapiv3.Document) (*Model, error) {
-	return newOpenAPI3Builder().buildModel(document)
+func NewModelFromOpenAPI3(document *openapiv3.Document, sourceName string) (*Model, error) {
+	return newOpenAPI3Builder().buildModel(document, sourceName)
 }
 
 func newOpenAPI3Builder() *OpenAPI3Builder {
 	return &OpenAPI3Builder{model: &Model{}}
 }
 
-func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document) (*Model, error) {
+func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document, sourceName string) (*Model, error) {
 	b.model.Types = make([]*Type, 0)
 	b.model.Methods = make([]*Method, 0)
 	// Set model properties from passed-in document.
 	b.model.Name = document.Info.Title
 	b.buildFromDocument(document)
+	err := b.buildSymbolicReferences(document, sourceName)
+	if err != nil {
+		return nil, err
+	}
 	return b.model, nil
 }
 
@@ -101,6 +107,28 @@ func (b *OpenAPI3Builder) buildFromPaths(paths *openapiv3.Paths) {
 	for _, path := range paths.Path {
 		b.buildFromNamedPath(path.Name, path.Value)
 	}
+}
+
+// buildSymbolicReferences builds all symbolic references. A symbolic reference is an URL to another OpenAPI description.
+func (b *OpenAPI3Builder) buildSymbolicReferences(document *openapiv3.Document, sourceName string) (err error) {
+	cache := compiler.GetInfoCache()
+	if len(cache) == 0 {
+		// Fills the compiler cache with all kind of references.
+		_, err := document.ResolveReferences(sourceName)
+		if err != nil {
+			return err
+		}
+		cache = compiler.GetInfoCache()
+	}
+
+	for ref := range cache {
+		if isSymbolicReference(ref) {
+			b.model.SymbolicReferences = append(b.model.SymbolicReferences, ref)
+		}
+	}
+	// Clear compiler cache for recursive calls
+	compiler.ClearInfoCache()
+	return nil
 }
 
 func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.PathItem) {
@@ -384,4 +412,13 @@ func findTypeForRef(types []*Type, typeName string) *Type {
 		}
 	}
 	return nil
+}
+
+// Returns true if s is a valid URL.
+func isSymbolicReference(s string) bool {
+	_, err := url.ParseRequestURI(s)
+	if err != nil {
+		return false
+	}
+	return true
 }
