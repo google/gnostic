@@ -46,6 +46,13 @@ func newOpenAPI3Builder() *OpenAPI3Builder {
 	return &OpenAPI3Builder{model: &Model{}}
 }
 
+// Fills the surface model with information from a parsed OpenAPI description. The surface model provides that information
+// in a way  that is more processable by plugins like gnostic-go-generator or gnostic-grpc.
+// Since OpenAPI schemas can be indefinitely nested, it is a recursive approach to build all Types and Methods.
+// The basic idea is that whenever we have "named OpenAPI object" (e.g.: NamedSchemaOrReference, NamedMediaType) we:
+//	1. Create a Type
+//	2. Recursively execute according methods on child schemas (see buildFromSchema function)
+// 	3. Return a FieldInfo object that describes how the created Type should be represented inside another Type as field.
 func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document, sourceName string) (*Model, error) {
 	b.model.Types = make([]*Type, 0)
 	b.model.Methods = make([]*Method, 0)
@@ -59,12 +66,12 @@ func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document, sourceName st
 	return b.model, nil
 }
 
-// build builds an API service description, preprocessing its types and methods for code generation.
 func (b *OpenAPI3Builder) buildFromDocument(document *openapiv3.Document) {
 	b.buildFromComponents(document.Components)
 	b.buildFromPaths(document.Paths)
 }
 
+// Builds all Types from an "OpenAPI component" section
 func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) {
 	if components == nil {
 		return
@@ -103,13 +110,15 @@ func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) 
 	}
 }
 
+// Builds Methods and Types (parameters, request bodies, responses) from all paths
 func (b *OpenAPI3Builder) buildFromPaths(paths *openapiv3.Paths) {
 	for _, path := range paths.Path {
 		b.buildFromNamedPath(path.Name, path.Value)
 	}
 }
 
-// buildSymbolicReferences builds all symbolic references. A symbolic reference is an URL to another OpenAPI description.
+// Builds all symbolic references. A symbolic reference is an URL to another OpenAPI description. We call "document.ResolveReferences"
+// inside that method. This has the same effect like: "gnostic --resolve-refs"
 func (b *OpenAPI3Builder) buildSymbolicReferences(document *openapiv3.Document, sourceName string) (err error) {
 	cache := compiler.GetInfoCache()
 	if len(cache) == 0 {
@@ -131,6 +140,7 @@ func (b *OpenAPI3Builder) buildSymbolicReferences(document *openapiv3.Document, 
 	return nil
 }
 
+// Builds a Method and adds it to the surface model
 func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.PathItem) {
 	for _, method := range []string{"GET", "PUT", "POST", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"} {
 		var op *openapiv3.Operation
@@ -169,6 +179,8 @@ func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.Pa
 	}
 }
 
+// Builds the "Parameters" and "Responses" types for an operation, adds them to the model, and returns the names of the types.
+// If no such Type is added to the model an empty string is returned.
 func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openapiv3.Operation) (parametersTypeName string, responseTypeName string) {
 	// At first, we build the operations input parameters. This includes parameters (like PATH or QUERY parameters) and a request body
 	operationParameters := b.makeType(name + "Parameters")
@@ -194,7 +206,7 @@ func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openap
 		operationResponses := b.makeType(name + "Responses")
 		operationResponses.Description = operationResponses.Name + " holds responses of " + name
 		for _, namedResponse := range responses.ResponseOrReference {
-			fieldInfo := b.buildFromResponseOrRef(operation.OperationId+convertStatusCodes(namedResponse.Name), namedResponse.Value)
+			fieldInfo := b.buildFromResponseOrRef(operation.OperationId+convertStatusCodeToText(namedResponse.Name), namedResponse.Value)
 			b.makeFieldAndAppendToType(fieldInfo, operationResponses, namedResponse.Name)
 		}
 		if responses.Default != nil {
@@ -209,6 +221,8 @@ func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openap
 	return parametersTypeName, responseTypeName
 }
 
+// A helper method to differentiate between references and actual objects.
+// The actual Field and Type are created in the functions which call this function
 func (b *OpenAPI3Builder) buildFromParamOrRef(paramOrRef *openapiv3.ParameterOrReference) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	if param := paramOrRef.GetParameter(); param != nil {
@@ -228,6 +242,7 @@ func (b *OpenAPI3Builder) buildFromParamOrRef(paramOrRef *openapiv3.ParameterOrR
 	return nil
 }
 
+// Returns information on how to represent 'parameter' as field. This information gets propagated up the callstack.
 func (b *OpenAPI3Builder) buildFromParam(parameter *openapiv3.Parameter) (fInfo *FieldInfo) {
 	if schemaOrRef := parameter.Schema; schemaOrRef != nil {
 		fInfo = b.buildFromSchemaOrReference(parameter.Name, schemaOrRef)
@@ -249,6 +264,7 @@ func (b *OpenAPI3Builder) buildFromParam(parameter *openapiv3.Parameter) (fInfo 
 	return nil
 }
 
+// A helper method to differentiate between references and actual objects
 func (b *OpenAPI3Builder) buildFromRequestBodyOrRef(name string, reqBodyOrRef *openapiv3.RequestBodyOrReference) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	if requestBody := reqBodyOrRef.GetRequestBody(); requestBody != nil {
@@ -261,6 +277,7 @@ func (b *OpenAPI3Builder) buildFromRequestBodyOrRef(name string, reqBodyOrRef *o
 	return nil
 }
 
+// Builds a Type for 'reqBody' and returns information on how to use this Type as field.
 func (b *OpenAPI3Builder) buildFromRequestBody(name string, reqBody *openapiv3.RequestBody) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	if reqBody.Content != nil {
@@ -276,6 +293,7 @@ func (b *OpenAPI3Builder) buildFromRequestBody(name string, reqBody *openapiv3.R
 	return nil
 }
 
+// A helper method to differentiate between references and actual objects
 func (b *OpenAPI3Builder) buildFromResponseOrRef(name string, responseOrRef *openapiv3.ResponseOrReference) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	if response := responseOrRef.GetResponse(); response != nil {
@@ -288,6 +306,7 @@ func (b *OpenAPI3Builder) buildFromResponseOrRef(name string, responseOrRef *ope
 	return nil
 }
 
+// Builds a Type for 'response' and returns information on how to use this Type as field.
 func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Response) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	if response.Content != nil && response.Content.AdditionalProperties != nil {
@@ -304,6 +323,7 @@ func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Res
 	return nil
 }
 
+// A helper method to keep code organized
 func (b *OpenAPI3Builder) buildFromNamedMediaType(name string, mediaType *openapiv3.MediaType) (fInfo *FieldInfo) {
 	if schemaOrRef := mediaType.Schema; schemaOrRef != nil {
 		fInfo = b.buildFromSchemaOrReference(name, schemaOrRef)
@@ -311,6 +331,7 @@ func (b *OpenAPI3Builder) buildFromNamedMediaType(name string, mediaType *openap
 	return fInfo
 }
 
+// A helper method to differentiate between references and actual objects
 func (b *OpenAPI3Builder) buildFromSchemaOrReference(name string, schemaOrReference *openapiv3.SchemaOrReference) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	if schema := schemaOrReference.GetSchema(); schema != nil {
@@ -323,6 +344,12 @@ func (b *OpenAPI3Builder) buildFromSchemaOrReference(name string, schemaOrRefere
 	return nil
 }
 
+// Given an OpenAPI schema there are two possibilities:
+//  1. 	The schema is an object/array: We create a type for the object, recursively call according methods for child
+//  	schemas, and then return information on how to use the created Type as field.
+//	2. 	The schema has a scalar type: We return information on how to represent a scalar schema as Field. Fields are
+//		created whenever Types are created (higher up in the callstack). This possibility can be considered as the "base condition"
+//		for the recursive approach.
 func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 	// Data types according to: https://swagger.io/docs/specification/data-models/data-types/
@@ -340,7 +367,7 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 		if schemaOrRef := schema.AdditionalProperties.GetSchemaOrReference(); schemaOrRef != nil {
 			// AdditionalProperties are represented as map
 			fieldInfo := b.buildFromSchemaOrReference(name+"AdditionalProperties", schemaOrRef)
-			mapValueType := b.makeMapValueType(*fieldInfo)
+			mapValueType := b.determineMapValueType(*fieldInfo)
 			fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldFormat = FieldKind_MAP, "map[string]"+mapValueType, ""
 			b.makeFieldAndAppendToType(fieldInfo, schemaType, "additional_properties")
 		}
@@ -350,6 +377,10 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			return fInfo
 		}
 	case "array":
+		// I do believe there is a bug inside of OpenAPIv3.proto. I think the type of "schema.Items.SchemaOrReference"
+		// shouldn't be an array of pointers but rather a single pointer.
+		// According to: https://swagger.io/specification/#schemaObject
+		// The 'items' "Value MUST be an object and not an array" and "Inline or referenced schema MUST be of a Schema Object"
 		for _, schemaOrRef := range schema.Items.SchemaOrReference {
 			arrayFieldInfo := b.buildFromSchemaOrReference("", schemaOrRef)
 			fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat
@@ -364,6 +395,7 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 	return nil
 }
 
+// Helper method to build a surface model Type
 func (b *OpenAPI3Builder) makeType(name string) *Type {
 	t := &Type{
 		Name:   name,
@@ -373,6 +405,7 @@ func (b *OpenAPI3Builder) makeType(name string) *Type {
 	return t
 }
 
+// Helper method to build a surface model Field
 func (b *OpenAPI3Builder) makeFieldAndAppendToType(info *FieldInfo, schemaType *Type, fieldName string) {
 	if info != nil {
 		f := &Field{Name: fieldName}
@@ -381,7 +414,8 @@ func (b *OpenAPI3Builder) makeFieldAndAppendToType(info *FieldInfo, schemaType *
 	}
 }
 
-func (b *OpenAPI3Builder) makeMapValueType(fInfo FieldInfo) (mapValueType string) {
+// Helper method to determine the type of the value property for a map.
+func (b *OpenAPI3Builder) determineMapValueType(fInfo FieldInfo) (mapValueType string) {
 	if fInfo.fieldKind == FieldKind_ARRAY {
 		mapValueType = "[]"
 	}
@@ -392,7 +426,8 @@ func (b *OpenAPI3Builder) makeMapValueType(fInfo FieldInfo) (mapValueType string
 	return mapValueType
 }
 
-func convertStatusCodes(c string) (statusText string) {
+// Converts a string status code like: "504" into the corresponding text ("Gateway Timeout")
+func convertStatusCodeToText(c string) (statusText string) {
 	code, err := strconv.Atoi(c)
 	if err == nil {
 		statusText = nethttp.StatusText(code)
@@ -405,6 +440,7 @@ func convertStatusCodes(c string) (statusText string) {
 	return statusText
 }
 
+// Searches all created types so far and returns the Type where 'typeName' matches.
 func findTypeForRef(types []*Type, typeName string) *Type {
 	for _, t := range types {
 		if typeName == t.Name {
