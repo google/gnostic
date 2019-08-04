@@ -79,7 +79,14 @@ func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) 
 
 	if schemas := components.Schemas; schemas != nil {
 		for _, namedSchema := range schemas.AdditionalProperties {
-			_ = b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+			fInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
+			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
+			if t := findType(b.model.Types, namedSchema.Name); t == nil {
+				t = b.makeType(namedSchema.Name)
+				b.makeFieldAndAppendToType(fInfo, t, "value")
+				b.model.addType(t)
+			}
 		}
 	}
 
@@ -99,13 +106,27 @@ func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) 
 
 	if responses := components.Responses; responses != nil {
 		for _, namedResponses := range responses.AdditionalProperties {
-			b.buildFromResponseOrRef(namedResponses.Name, namedResponses.Value)
+			fInfo := b.buildFromResponseOrRef(namedResponses.Name, namedResponses.Value)
+			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
+			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
+			if t := findType(b.model.Types, namedResponses.Name); t == nil {
+				t = b.makeType(namedResponses.Name)
+				b.makeFieldAndAppendToType(fInfo, t, "value")
+				b.model.addType(t)
+			}
 		}
 	}
 
 	if requestBodies := components.RequestBodies; requestBodies != nil {
 		for _, namedRequestBody := range requestBodies.AdditionalProperties {
-			b.buildFromRequestBodyOrRef(namedRequestBody.Name, namedRequestBody.Value)
+			fInfo := b.buildFromRequestBodyOrRef(namedRequestBody.Name, namedRequestBody.Value)
+			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
+			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
+			if t := findType(b.model.Types, namedRequestBody.Name); t == nil {
+				t = b.makeType(namedRequestBody.Name)
+				b.makeFieldAndAppendToType(fInfo, t, "value")
+				b.model.addType(t)
+			}
 		}
 	}
 }
@@ -229,12 +250,12 @@ func (b *OpenAPI3Builder) buildFromParamOrRef(paramOrRef *openapiv3.ParameterOrR
 		fInfo = b.buildFromParam(param)
 		return fInfo
 	} else if ref := paramOrRef.GetReference(); ref != nil {
-		t := findTypeForRef(b.model.Types, typeForRef(ref.XRef))
+		t := findType(b.model.Types, typeForRef(ref.XRef))
 		if t != nil {
 			fInfo.fieldKind, fInfo.fieldType, fInfo.fieldName, fInfo.fieldPosition = FieldKind_REFERENCE, typeForRef(ref.XRef), t.Name, t.Fields[0].Position
 			return fInfo
 		}
-		// TODO: This might happen for symbolic references
+		// TODO: This might happen for symbolic references --> fInfo.Position defaults to 'BODY' which is wrong.
 		log.Printf("Not able to find parameter information for: %v", ref)
 		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, typeForRef(ref.XRef)
 		return fInfo // Lets return fInfo for now otherwise we may get null pointer exception
@@ -371,6 +392,36 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldFormat = FieldKind_MAP, "map[string]"+mapValueType, ""
 			b.makeFieldAndAppendToType(fieldInfo, schemaType, "additional_properties")
 		}
+
+		for idx, schemaOrRef := range schema.AnyOf {
+			fieldInfo := b.buildFromSchemaOrReference(name+"AnyOf"+strconv.Itoa(idx+1), schemaOrRef)
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, "any_of_"+strconv.Itoa(idx+1))
+		}
+
+		for idx, schemaOrRef := range schema.OneOf {
+			fieldInfo := b.buildFromSchemaOrReference(name+"OneOf"+strconv.Itoa(idx+1), schemaOrRef)
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, "one_of_"+strconv.Itoa(idx+1))
+		}
+
+		for idx, schemaOrRef := range schema.AllOf {
+			fieldInfo := b.buildFromSchemaOrReference(name+"AllOf"+strconv.Itoa(idx+1), schemaOrRef)
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, "all_of_"+strconv.Itoa(idx+1))
+		}
+
+		if schema.Items != nil {
+			for _, schemaOrRef := range schema.Items.SchemaOrReference {
+				fieldInfo := b.buildFromSchemaOrReference(name+"Items", schemaOrRef)
+				b.makeFieldAndAppendToType(fieldInfo, schemaType, "items")
+			}
+		}
+
+		if schema.Enum != nil {
+			// TODO: It is not defined how enums should be represented inside the surface model
+			fieldInfo := &FieldInfo{}
+			fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldName = FieldKind_ANY, "string", "enum"
+			b.makeFieldAndAppendToType(fieldInfo, schemaType, fieldInfo.fieldName)
+		}
+
 		if len(schemaType.Fields) > 0 {
 			b.model.addType(schemaType)
 			fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
@@ -382,10 +433,12 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 		// According to: https://swagger.io/specification/#schemaObject
 		// The 'items' "Value MUST be an object and not an array" and "Inline or referenced schema MUST be of a Schema Object"
 		for _, schemaOrRef := range schema.Items.SchemaOrReference {
-			arrayFieldInfo := b.buildFromSchemaOrReference("", schemaOrRef)
-			fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat
+			arrayFieldInfo := b.buildFromSchemaOrReference(name, schemaOrRef)
+			if arrayFieldInfo != nil {
+				fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat
+				return fInfo
+			}
 		}
-		return fInfo
 	default:
 		// We go a scalar value
 		fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_SCALAR, schema.Type, schema.Format
@@ -441,7 +494,7 @@ func convertStatusCodeToText(c string) (statusText string) {
 }
 
 // Searches all created types so far and returns the Type where 'typeName' matches.
-func findTypeForRef(types []*Type, typeName string) *Type {
+func findType(types []*Type, typeName string) *Type {
 	for _, t := range types {
 		if typeName == t.Name {
 			return t
