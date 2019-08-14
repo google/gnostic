@@ -1,5 +1,6 @@
 
-build:	
+build:
+	./COMPILE-PROTOS.sh
 	go get
 	go install
 	cd generate-gnostic; go get; go install
