@@ -44,9 +44,14 @@ and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
 
 ## Installation
 
-1. Get this package by downloading it with `go get`.
+The following instructions are for installing gnostic using
+[Go modules](https://blog.golang.org/using-go-modules),
+supported by Go 1.11 and later.
 
-        go get github.com/googleapis/gnostic
+1. Get this package by downloading it with `git clone`.
+
+        git clone https://github.com/googleapis/gnostic
+        cd gnostic
   
 2. [Optional] Build and run the gnostic compiler generator. 
 This uses JSON schemas to generate Protocol Buffer language files
@@ -57,9 +62,7 @@ the generated protocol buffer models.
 Pre-generated versions of these files are checked into the directories
 named OpenAPIv2, OpenAPIv3, and discovery.
 
-        cd $GOPATH/src/github.com/googleapis/gnostic/generate-gnostic
-        go install
-        cd ..
+        go install ./generate-gnostic
         generate-gnostic --v2
         generate-gnostic --v3
         generate-gnostic --discovery
@@ -70,15 +73,15 @@ and the Go protoc plugin.
 You can get protoc [here](https://github.com/google/protobuf).
 You can install the plugin with this command:
 
-        go get -u github.com/golang/protobuf/protoc-gen-go
+        go get github.com/golang/protobuf/protoc-gen-go
 
-Then use the following to compile the Gnostic Protocol Buffer models:
+Then use the following to compile the gnostic Protocol Buffer models:
 
         ./COMPILE-PROTOS.sh
 
 4. Build **gnostic**. 
 
-        go install github.com/googleapis/gnostic
+        go install .
 
 5. Run **gnostic**. This sample invocation creates a file in the current directory named "petstore.pb" that contains a binary
 Protocol Buffer description of a sample API.
@@ -93,7 +96,7 @@ Protocol Buffer description. This is mainly for use in testing and debugging.
 
 7. For a sample application, see apps/report.
 
-        go install github.com/googleapis/gnostic/apps/report
+        go install ./apps/report
         report petstore.pb
 
 8. **gnostic** supports plugins. Some are already implemented in the `plugins` directory.
