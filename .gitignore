@@ -19,4 +19,4 @@ bundle.json
 *~
 Package.resolved
 extensions/sample/generated
-.pb.go
+*.pb.go
