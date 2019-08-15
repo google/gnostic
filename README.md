@@ -48,19 +48,23 @@ and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
 
         go get github.com/googleapis/gnostic
   
-2. [Optional] Build and run the compiler generator. 
-This uses the OpenAPI JSON schema to generate a Protocol Buffer language file 
-that describes the OpenAPI specification and a Go-language file of code that 
-will read a JSON or YAML OpenAPI representation into the generated protocol 
-buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
+2. [Optional] Build and run the gnostic compiler generator. 
+This uses JSON schemas to generate Protocol Buffer language files
+that describes supported API specification formats and Go-language
+files of code that will read JSON or YAML API descriptions into
+the generated protocol buffer models. 
+
+Pre-generated versions of these files are checked into the directories
+named OpenAPIv2, OpenAPIv3, and discovery.
 
         cd $GOPATH/src/github.com/googleapis/gnostic/generate-gnostic
         go install
         cd ..
         generate-gnostic --v2
+        generate-gnostic --v3
+        generate-gnostic --discovery
 
-3. [Optional] Generate Protocol Buffer support code. 
-A pre-generated version of this file is checked into the OpenAPIv2 directory.
+3. Generate Protocol Buffer support code. 
 This step requires a local installation of protoc, the Protocol Buffer Compiler,
 and the Go protoc plugin.
 You can get protoc [here](https://github.com/google/protobuf).
@@ -68,16 +72,15 @@ You can install the plugin with this command:
 
         go get -u github.com/golang/protobuf/protoc-gen-go
 
-Then use the following to recompile the Gnostic Protocol Buffer models:
+Then use the following to compile the Gnostic Protocol Buffer models:
 
         ./COMPILE-PROTOS.sh
 
-4. [Optional] Rebuild **gnostic**. This is only necessary if you've performed steps
-2 or 3 above.
+4. Build **gnostic**. 
 
         go install github.com/googleapis/gnostic
 
-5. Run **gnostic**. This will create a file in the current directory named "petstore.pb" that contains a binary
+5. Run **gnostic**. This sample invocation creates a file in the current directory named "petstore.pb" that contains a binary
 Protocol Buffer description of a sample API.
 
         gnostic --pb-out=. examples/v2.0/json/petstore.json
