@@ -131,9 +131,9 @@ func (b *OpenAPI3Builder) buildFromPaths(paths *openapiv3.Paths) {
 // inside that method. This has the same effect like: "gnostic --resolve-refs"
 func (b *OpenAPI3Builder) buildSymbolicReferences(document *openapiv3.Document, sourceName string) (err error) {
 	cache := compiler.GetInfoCache()
-	if len(cache) == 0 {
+	if len(cache) == 0 && sourceName != "" {
 		// Fills the compiler cache with all kind of references.
-		_, err := document.ResolveReferences(sourceName)
+		_, err = document.ResolveReferences(sourceName)
 		if err != nil {
 			return err
 		}
@@ -413,11 +413,13 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			makeFieldAndAppendToType(fieldInfo, schemaType, fieldInfo.fieldName)
 		}
 
-		if len(schemaType.Fields) > 0 {
-			b.model.addType(schemaType)
-			fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
-			return fInfo
+		if len(schemaType.Fields) == 0 {
+			schemaType.Kind = TypeKind_OBJECT
+			schemaType.ContentType = "interface{}"
 		}
+		b.model.addType(schemaType)
+		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
+		return fInfo
 	case "array":
 		// I do believe there is a bug inside of OpenAPIv3.proto. I think the type of "schema.Items.SchemaOrReference"
 		// shouldn't be an array of pointers but rather a single pointer.
