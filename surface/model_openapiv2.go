@@ -122,9 +122,9 @@ func (b *OpenAPI2Builder) buildFromResponseDefinitions(responses *openapiv2.Resp
 // inside that method. This has the same effect like: "gnostic --resolve-refs"
 func (b *OpenAPI2Builder) buildSymbolicReferences(document *openapiv2.Document, sourceName string) (err error) {
 	cache := compiler.GetInfoCache()
-	if len(cache) == 0 {
+	if len(cache) == 0 && sourceName != "" {
 		// Fills the compiler cache with all kind of references.
-		_, err := document.ResolveReferences(sourceName)
+		_, err = document.ResolveReferences(sourceName)
 		if err != nil {
 			return err
 		}
@@ -410,11 +410,13 @@ func (b *OpenAPI2Builder) buildFromSchema(name string, schema *openapiv2.Schema)
 			makeFieldAndAppendToType(fieldInfo, schemaType, fieldInfo.fieldName)
 		}
 
-		if len(schemaType.Fields) > 0 {
-			b.model.addType(schemaType)
-			fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
-			return fInfo
+		if len(schemaType.Fields) == 0 {
+			schemaType.Kind = TypeKind_OBJECT
+			schemaType.ContentType = "interface{}"
 		}
+		b.model.addType(schemaType)
+		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
+		return fInfo
 	case "array":
 		// Same as for OpenAPI v3. I believe this is a bug: schema.Items.Schema should not be an array
 		// but rather a single object describing the values of the array. Printing 'len(schema.Items.Schema)'
