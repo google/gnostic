@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2019 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -24,7 +23,7 @@ import (
 
 	"github.com/docopt/docopt-go"
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/compiler"
+	"github.com/googleapis/gnostic/conversions"
 	discovery "github.com/googleapis/gnostic/discovery"
 )
 
@@ -51,7 +50,7 @@ Usage:
 	// List APIs.
 	if arguments["list"].(bool) {
 		// Read the list of APIs from the apis/list service.
-		bytes, err := compiler.FetchFile(APIsListServiceURL)
+		bytes, err := discovery.FetchListBytes()
 		if err != nil {
 			log.Fatalf("%+v", err)
 		}
@@ -59,7 +58,7 @@ Usage:
 			ioutil.WriteFile("disco-list.json", bytes, 0644)
 		} else {
 			// Unpack the apis/list response.
-			listResponse, err := NewList(bytes)
+			listResponse, err := discovery.ParseList(bytes)
 			if err != nil {
 				log.Fatalf("%+v", err)
 			}
@@ -73,12 +72,10 @@ Usage:
 	// Get an API description.
 	if arguments["get"].(bool) {
 		// Read the list of APIs from the apis/list service.
-		bytes, err := compiler.FetchFile(APIsListServiceURL)
+		listResponse, err := discovery.FetchList()
 		if err != nil {
 			log.Fatalf("%+v", err)
 		}
-		// Unpack the apis/list response
-		listResponse, err := NewList(bytes)
 		if arguments["--all"].(bool) {
 			if !arguments["--raw"].(bool) &&
 				!arguments["--openapi2"].(bool) &&
@@ -90,13 +87,13 @@ Usage:
 			for _, api := range listResponse.APIs {
 				log.Printf("%s/%s", api.Name, api.Version)
 				// Fetch the discovery description of the API.
-				bytes, err = compiler.FetchFile(api.DiscoveryRestURL)
+				bytes, err := discovery.FetchDocumentBytes(api.DiscoveryRestURL)
 				if err != nil {
 					log.Printf("%+v", err)
 					continue
 				}
 				// Export any requested formats.
-				_, err := handleExportArgumentsForBytes(arguments, bytes)
+				_, err = handleExportArgumentsForBytes(arguments, bytes)
 				if err != nil {
 					log.Printf("%+v", err)
 					continue
@@ -118,7 +115,7 @@ Usage:
 				log.Fatalf("%+v", err)
 			}
 			// Fetch the discovery description of the API.
-			bytes, err = compiler.FetchFile(api.DiscoveryRestURL)
+			bytes, err := discovery.FetchDocumentBytes(api.DiscoveryRestURL)
 			if err != nil {
 				log.Fatalf("%+v", err)
 			}
@@ -151,16 +148,10 @@ Usage:
 
 func handleExportArgumentsForBytes(arguments map[string]interface{}, bytes []byte) (handled bool, err error) {
 	// Unpack the discovery document.
-	info, err := compiler.ReadInfoFromBytes("", bytes)
+	document, err := discovery.ParseDocument(bytes)
 	if err != nil {
 		return true, err
 	}
-	m, ok := compiler.UnpackMap(info)
-	if !ok {
-		log.Printf("%s", string(bytes))
-		return true, errors.New("Invalid input")
-	}
-	document, err := discovery.NewDocument(m, compiler.NewContext("$root", nil))
 	if arguments["--raw"].(bool) {
 		// Write the Discovery document as a JSON file.
 		filename := "disco-" + document.Name + "-" + document.Version + ".json"
@@ -182,7 +173,7 @@ func handleExportArgumentsForBytes(arguments map[string]interface{}, bytes []byt
 	}
 	if arguments["--openapi3"].(bool) {
 		// Generate the OpenAPI 3 equivalent.
-		openAPIDocument, err := OpenAPIv3(document)
+		openAPIDocument, err := conversions.OpenAPIv3(document)
 		if err != nil {
 			return handled, err
 		}
@@ -199,7 +190,7 @@ func handleExportArgumentsForBytes(arguments map[string]interface{}, bytes []byt
 	}
 	if arguments["--openapi2"].(bool) {
 		// Generate the OpenAPI 2 equivalent.
-		openAPIDocument, err := OpenAPIv2(document)
+		openAPIDocument, err := conversions.OpenAPIv2(document)
 		if err != nil {
 			return handled, err
 		}
@@ -233,7 +224,7 @@ func checkSchema(schemaName string, schema *discovery.Schema, depth int) {
 	default:
 		//log.Printf("UNKNOWN TYPE %s/%s %s", schemaName, property.Name, propertySchema.Type)
 	}
-	if len(schema.Properties.AdditionalProperties) > 0 {
+	if (schema.Properties != nil) && (len(schema.Properties.AdditionalProperties) > 0) {
 		if depth > 0 {
 			log.Printf("ANONYMOUS SCHEMA %s", schemaName)
 		}
