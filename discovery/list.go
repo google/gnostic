@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2019 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package discovery_v1
 
 import (
 	"encoding/json"
 	"errors"
 	"strings"
+
+	"github.com/googleapis/gnostic/compiler"
 )
 
 // APIsListServiceURL is the URL for the Google APIs Discovery Service
@@ -31,14 +33,27 @@ type List struct {
 	APIs             []*API `json:"items"`
 }
 
-// NewList unmarshals the bytes into a Document.
-func NewList(bytes []byte) (*List, error) {
+func FetchListBytes() ([]byte, error) {
+	return compiler.FetchFile(APIsListServiceURL)
+}
+
+// Read the list of APIs from the apis/list service.
+func FetchList() (*List, error) {
+	bytes, err := FetchListBytes()
+	if err != nil {
+		return nil, err
+	}
+	return ParseList(bytes)
+}
+
+// ParseList unmarshals the bytes into a Document.
+func ParseList(bytes []byte) (*List, error) {
 	var listResponse List
 	err := json.Unmarshal(bytes, &listResponse)
 	return &listResponse, err
 }
 
-// An API represents the an API description returned by the apis/list API.
+// An API represents an API description returned by the apis/list API.
 type API struct {
 	Kind              string            `json:"kind"`
 	ID                string            `json:"id"`

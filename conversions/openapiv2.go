@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2019 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package conversions
 
 import (
 	"log"
 	"net/url"
 
-	discovery "github.com/googleapis/gnostic/discovery"
 	openapi2 "github.com/googleapis/gnostic/OpenAPIv2"
+	discovery "github.com/googleapis/gnostic/discovery"
 )
 
 func addOpenAPI2SchemaForSchema(d *openapi2.Document, name string, schema *discovery.Schema) {
@@ -246,7 +246,7 @@ func addOpenAPI2PathsForResource(d *openapi2.Document, name string, resource *di
 
 func removeTrailingSlash(path string) string {
 	if len(path) > 1 && path[len(path)-1] == '/' {
-		return path[0: len(path)-1]
+		return path[0 : len(path)-1]
 	}
 	return path
 }
