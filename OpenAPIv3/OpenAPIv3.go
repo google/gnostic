@@ -540,7 +540,7 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"mapping", "propertyName"}
-		var allowedPatterns []*regexp.Regexp
+		allowedPatterns := []*regexp.Regexp{pattern1}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -562,6 +562,37 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 			x.Mapping, err = NewStrings(v2, compiler.NewContext("mapping", context))
 			if err != nil {
 				errors = append(errors, err)
+			}
+		}
+		// repeated NamedAny specification_extension = 3;
+		// MAP: Any ^x-
+		x.SpecificationExtension = make([]*NamedAny, 0)
+		for _, item := range m {
+			k, ok := compiler.StringValue(item.Key)
+			if ok {
+				v := item.Value
+				if strings.HasPrefix(k, "x-") {
+					pair := &NamedAny{}
+					pair.Name = k
+					result := &Any{}
+					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					if handled {
+						if err != nil {
+							errors = append(errors, err)
+						} else {
+							bytes, _ := yaml.Marshal(v)
+							result.Yaml = string(bytes)
+							result.Value = resultFromExt
+							pair.Value = result
+						}
+					} else {
+						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						if err != nil {
+							errors = append(errors, err)
+						}
+					}
+					x.SpecificationExtension = append(x.SpecificationExtension, pair)
+				}
 			}
 		}
 	}
@@ -1353,7 +1384,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
+		allowedKeys := []string{"contact", "description", "license", "summary", "termsOfService", "title", "version"}
 		allowedPatterns := []*regexp.Regexp{pattern1}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -1414,7 +1445,16 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// repeated NamedAny specification_extension = 7;
+		// string summary = 7;
+		v7 := compiler.MapValueForKey(m, "summary")
+		if v7 != nil {
+			x.Summary, ok = v7.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v7, v7)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// repeated NamedAny specification_extension = 8;
 		// MAP: Any ^x-
 		x.SpecificationExtension = make([]*NamedAny, 0)
 		for _, item := range m {
@@ -5217,6 +5257,14 @@ func (m *Discriminator) ResolveReferences(root string) (interface{}, error) {
 			errors = append(errors, err)
 		}
 	}
+	for _, item := range m.SpecificationExtension {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -6885,6 +6933,12 @@ func (m *Discriminator) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{Key: "mapping", Value: m.Mapping.ToRawInfo()})
 	}
 	// &{Name:mapping Type:Strings StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	if m.SpecificationExtension != nil {
+		for _, item := range m.SpecificationExtension {
+			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:SpecificationExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
 
@@ -7189,6 +7243,9 @@ func (m *Info) ToRawInfo() interface{} {
 	// &{Name:license Type:License StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	// always include this required field.
 	info = append(info, yaml.MapItem{Key: "version", Value: m.Version})
+	if m.Summary != "" {
+		info = append(info, yaml.MapItem{Key: "summary", Value: m.Summary})
+	}
 	if m.SpecificationExtension != nil {
 		for _, item := range m.SpecificationExtension {
 			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
