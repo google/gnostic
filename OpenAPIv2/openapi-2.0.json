@@ -203,7 +203,7 @@
       "additionalProperties": {
         "$ref": "#/definitions/response"
       },
-      "description": "One or more JSON representations for parameters"
+      "description": "One or more JSON representations for responses"
     },
     "externalDocs": {
       "type": "object",
@@ -1002,7 +1002,7 @@
           "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
         },
         "additionalProperties": {
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/definitions/schema"
             },
@@ -1599,9 +1599,6 @@
       "additionalProperties": false,
       "properties": {
         "$ref": {
-          "type": "string"
-        },
-        "description": {
           "type": "string"
         }
       }
