@@ -329,7 +329,6 @@ func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Res
 		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
 		return fInfo
 	}
-	log.Printf("Response has no content: %v", name)
 	return nil
 }
 
