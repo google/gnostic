@@ -341,7 +341,6 @@ func (b *OpenAPI2Builder) buildFromResponse(name string, response *openapiv2.Res
 		fInfo = b.buildFromSchemaOrReference(name, response.Schema.GetSchema())
 		return fInfo
 	}
-	log.Printf("Couldn't build from response: %v", response)
 	return nil
 }
 
