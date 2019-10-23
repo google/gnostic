@@ -95,7 +95,7 @@ func generateOpenAPIModel(version string) error {
 		filename = "OpenAPIv2"
 		protoPackageName = "openapi.v2"
 	case "v3":
-		input = "openapi-3.0.json"
+		input = "openapi-3.1.json"
 		filename = "OpenAPIv3"
 		protoPackageName = "openapi.v3"
 	case "discovery":
@@ -117,6 +117,7 @@ func generateOpenAPIModel(version string) error {
 	baseSchema.ResolveRefs()
 	baseSchema.ResolveAllOfs()
 
+	projectRoot = "./"
 	openapiSchema, err := jsonschema.NewSchemaFromFile(projectRoot + filename + "/" + input)
 	if err != nil {
 		return err

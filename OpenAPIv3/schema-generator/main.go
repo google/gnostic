@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // schema-generator is a support tool that generates the OpenAPI v3 JSON schema.
-// Yes, it's gross, but the OpenAPI 3.0 spec, which defines REST APIs with a
+// Yes, it's gross, but the OpenAPI 3 spec, which defines REST APIs with a
 // rigorous JSON schema, is itself defined with a Markdown file. Ironic?
 package main
 
@@ -303,7 +303,7 @@ func (m *SchemaModel) objectWithID(id string) *SchemaObject {
 // NewSchemaModel returns a new SchemaModel.
 func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
-	b, err := ioutil.ReadFile("3.0.1.md")
+	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -620,7 +620,7 @@ func arrayOfSchema() *jsonschema.Schema {
 
 func main() {
 	// read and parse the text specification into a model structure
-	model, err := NewSchemaModel("3.0.md")
+	model, err := NewSchemaModel("3.1.0.md")
 	if err != nil {
 		panic(err)
 	}
