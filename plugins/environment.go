@@ -26,6 +26,7 @@ type Environment struct {
 	Response        *Response // response message
 	Invocation      string    // string representation of call
 	RunningAsPlugin bool      // true if app is being run as a plugin
+	Verbose         bool      // if true, plugin should log details to stderr
 }
 
 // NewEnvironment creates a plugin context from arguments and standard input.
@@ -38,9 +39,11 @@ func NewEnvironment() (env *Environment, err error) {
 	input := flag.String("input", "", "API description (in binary protocol buffer form)")
 	output := flag.String("output", "-", "Output file or directory")
 	plugin := flag.Bool("plugin", false, "Run as a gnostic plugin (other flags are ignored).")
+	verbose := flag.Bool("verbose", false, "Write details to stderr.")
 	flag.Parse()
 
 	env.RunningAsPlugin = *plugin
+	env.Verbose = *verbose
 	programName := path.Base(os.Args[0])
 
 	if (*input == "") && !*plugin {
