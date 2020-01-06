@@ -18,7 +18,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -28,22 +27,6 @@ import (
 	surface "github.com/googleapis/gnostic/surface"
 )
 
-// Record an error, then serialize and return a response.
-func sendAndExitIfError(err error, response *plugins.Response) {
-	if err != nil {
-		response.Errors = append(response.Errors, err.Error())
-		sendAndExit(response)
-	}
-}
-
-// Serialize and return a response.
-func sendAndExit(response *plugins.Response) {
-	responseBytes, _ := proto.Marshal(response)
-	os.Stdout.Write(responseBytes)
-	os.Exit(0)
-}
-
-// This is the main function for the plugin.
 func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
