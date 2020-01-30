@@ -7,6 +7,6 @@ all:
 
 test:
 	go test . -v
-	cd plugins; go test . -v
-	cd extensions; go test . -v
-	cd apps/petstore-builder; go test . -v
+	go test ./plugins -v
+	go test ./extensions -v
+	go test ./apps/petstore-builder -v
