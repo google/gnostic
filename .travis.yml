@@ -28,4 +28,4 @@ install:
   - make
 
 script:
-  - go test . -v
+  - make test

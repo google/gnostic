@@ -17,8 +17,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/golang/protobuf/proto"
 	openapiv2 "github.com/googleapis/gnostic/OpenAPIv2"
 	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
@@ -97,7 +95,6 @@ func main() {
 	env.RespondAndExitIfError(err)
 	code := &printer.Code{}
 	for _, model := range env.Request.Models {
-		log.Printf("model %s", model.TypeUrl)
 		switch model.TypeUrl {
 		case "openapi.v2.Document":
 			documentv2 := &openapiv2.Document{}
@@ -113,10 +110,10 @@ func main() {
 			}
 		}
 	}
-	file := &plugins.File{
+	f := &plugins.File{
 		Name: "summary.txt",
 		Data: []byte(code.String()),
 	}
-	env.Response.Files = append(env.Response.Files, file)
+	env.Response.Files = append(env.Response.Files, f)
 	env.RespondAndExit()
 }
