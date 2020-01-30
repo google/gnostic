@@ -11,7 +11,7 @@ func TestErrorExtensionGeneratorUnsupportedPrimitive(t *testing.T) {
 	var err error
 
 	output, err := exec.Command(
-		"generator",
+		"generate-gnostic",
 		"--extension",
 		"test/x-unsupportedprimitives.json",
 		"--out_dir=/tmp",
@@ -33,7 +33,7 @@ func TestErrorExtensionGeneratorNameCollision(t *testing.T) {
 	var err error
 
 	output, err := exec.Command(
-		"generator",
+		"generate-gnostic",
 		"--extension",
 		"test/x-extension-name-collision.json",
 		"--out_dir=/tmp",

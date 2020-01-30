@@ -7,6 +7,9 @@ sudo: false
 
 language: go
 
+go:
+- "1.13"
+
 addons:
   apt:
     packages:
