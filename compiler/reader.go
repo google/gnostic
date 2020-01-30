@@ -47,6 +47,14 @@ func initializeInfoCache() {
 	}
 }
 
+func EnableFileCache() {
+	fileCacheEnable = true
+}
+
+func EnableInfoCache() {
+	infoCacheEnable = true
+}
+
 func DisableFileCache() {
 	fileCacheEnable = false
 }

@@ -44,7 +44,8 @@ Usage:
 	if arguments["help"].(bool) {
 		fmt.Println("\nRead and process Google's Discovery Format for APIs.")
 		fmt.Println(usage)
-		fmt.Println("To learn more about Discovery Format, visit https://developers.google.com/discovery/\n")
+		fmt.Println("To learn more about Discovery Format, visit https://developers.google.com/discovery/.")
+		fmt.Println()
 	}
 
 	// List APIs.
