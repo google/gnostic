@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.3.3
 	gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405
 	gopkg.in/yaml.v2 v2.2.2
 )
