@@ -71,6 +71,7 @@ func (s *ReaderTestingSuite) TestDisableInfoCache(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(petstore, NotNil)
 	c.Assert(len(infoCache), Equals, 0)
+	EnableInfoCache()
 }
 
 func (s *ReaderTestingSuite) TestRemoveFromFileCache(c *C) {
@@ -90,4 +91,5 @@ func (s *ReaderTestingSuite) TestDisableFileCache(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(len(yamlBytes) > 0, Equals, true)
 	c.Assert(len(fileCache), Equals, 0)
+	EnableFileCache()
 }
