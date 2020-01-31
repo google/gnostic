@@ -15,7 +15,7 @@
 package surface_v1
 
 import (
-	openapiv3 "github.com/googleapis/gnostic/OpenAPIv3"
+	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 	"github.com/googleapis/gnostic/compiler"
 	"log"
 	"strconv"

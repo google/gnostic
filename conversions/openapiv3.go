@@ -19,7 +19,7 @@ import (
 	"net/url"
 	"strings"
 
-	openapi3 "github.com/googleapis/gnostic/OpenAPIv3"
+	openapi3 "github.com/googleapis/gnostic/openapiv3"
 	discovery "github.com/googleapis/gnostic/discovery"
 )
 
