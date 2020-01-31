@@ -18,7 +18,7 @@ import (
 	"log"
 	"net/url"
 
-	openapi2 "github.com/googleapis/gnostic/OpenAPIv2"
+	openapi2 "github.com/googleapis/gnostic/openapiv2"
 	discovery "github.com/googleapis/gnostic/discovery"
 )
 

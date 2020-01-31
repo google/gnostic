@@ -27,8 +27,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	openapi_v2 "github.com/googleapis/gnostic/OpenAPIv2"
-	openapi_v3 "github.com/googleapis/gnostic/OpenAPIv3"
+	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
+	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 	"github.com/googleapis/gnostic/compiler"
 	discovery_v1 "github.com/googleapis/gnostic/discovery"
 	"github.com/googleapis/gnostic/jsonwriter"
