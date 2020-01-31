@@ -14,7 +14,7 @@
 package main
 
 import (
-	openapi "github.com/googleapis/gnostic/OpenAPIv2"
+	openapi "github.com/googleapis/gnostic/openapiv2"
 	plugins "github.com/googleapis/gnostic/plugins"
 )
 
