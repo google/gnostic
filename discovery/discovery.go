@@ -113,7 +113,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"auth", "basePath", "baseUrl", "batchPath", "canonicalName", "description", "discoveryVersion", "documentationLink", "etag", "features", "fullyEncodeReservedExpansion", "icons", "id", "kind", "labels", "methods", "name", "ownerDomain", "ownerName", "packagePath", "parameters", "protocol", "resources", "revision", "rootUrl", "schemas", "servicePath", "title", "version", "version_module"}
+		allowedKeys := []string{"auth", "basePath", "baseUrl", "batchPath", "canonicalName", "description", "discoveryVersion", "documentationLink", "etag", "features", "fullyEncodeReservedExpansion", "icons", "id", "kind", "labels", "methods", "mtlsRootUrl", "name", "ownerDomain", "ownerName", "packagePath", "parameters", "protocol", "resources", "revision", "rootUrl", "schemas", "servicePath", "title", "version", "version_module"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -391,6 +391,15 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			x.PackagePath, ok = v30.(string)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for packagePath: %+v (%T)", v30, v30)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string mtls_root_url = 31;
+		v31 := compiler.MapValueForKey(m, "mtlsRootUrl")
+		if v31 != nil {
+			x.MtlsRootUrl, ok = v31.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for mtlsRootUrl: %+v (%T)", v31, v31)
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2265,6 +2274,9 @@ func (m *Document) ToRawInfo() interface{} {
 	}
 	if m.PackagePath != "" {
 		info = append(info, yaml.MapItem{Key: "packagePath", Value: m.PackagePath})
+	}
+	if m.MtlsRootUrl != "" {
+		info = append(info, yaml.MapItem{Key: "mtlsRootUrl", Value: m.MtlsRootUrl})
 	}
 	return info
 }
