@@ -92,11 +92,11 @@ func generateOpenAPIModel(version string) error {
 	switch version {
 	case "v2":
 		input = "openapi-2.0.json"
-		filename = "OpenAPIv2"
+		filename = "openapiv2"
 		protoPackageName = "openapi.v2"
 	case "v3":
 		input = "openapi-3.1.json"
-		filename = "OpenAPIv3"
+		filename = "openapiv3"
 		protoPackageName = "openapi.v3"
 	case "discovery":
 		input = "discovery.json"
