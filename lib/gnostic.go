@@ -27,11 +27,11 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
-	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 	"github.com/googleapis/gnostic/compiler"
 	discovery_v1 "github.com/googleapis/gnostic/discovery"
 	"github.com/googleapis/gnostic/jsonwriter"
+	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
+	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 	plugins "github.com/googleapis/gnostic/plugins"
 	surface "github.com/googleapis/gnostic/surface"
 	"gopkg.in/yaml.v2"
@@ -276,11 +276,17 @@ Options:
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
   --time-plugins      Report plugin runtimes.
+  --help              Print usage information and exit.
 `
 	// Initialize internal structures.
 	g.pluginCalls = make([]*pluginCall, 0)
 	g.extensionHandlers = make([]compiler.ExtensionHandler, 0)
 	return g
+}
+
+// Usage returns usage information.
+func (g *Gnostic) Usage() string {
+	return g.usage
 }
 
 // Parse command-line options.
@@ -563,6 +569,13 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 
 // Main is the main program for Gnostic.
 func (g *Gnostic) Main() error {
+	// if help is requested, print usage and immediately exit
+	for _, arg := range g.args {
+		if arg == "--help" {
+			fmt.Printf("%s", g.usage)
+			return nil
+		}
+	}
 
 	compiler.ClearCaches()
 
