@@ -35,6 +35,14 @@ var infoCache map[string]interface{}
 var fileCacheEnable = true
 var infoCacheEnable = true
 
+// These locks are used to synchronize accesses to the fileCache and infoCache
+// maps (above). They are global state and can throw thread-related errors
+// when modified from separate goroutines. The general strategy is to protect
+// all public functions in this file with mutex Lock() calls. As a result, to
+// avoid deadlock, these public functions should not call other public
+// functions, so some public functions have private equivalents.
+// In the future, we might consider replacing the maps with sync.Map and
+// eliminating these mutexes.
 var fileCacheMutex sync.Mutex
 var infoCacheMutex sync.Mutex
 
