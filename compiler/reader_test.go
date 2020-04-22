@@ -15,10 +15,11 @@
 package compiler
 
 import (
-	"gopkg.in/check.v1"
 	"io"
 	"net/http"
 	"testing"
+
+	"gopkg.in/check.v1"
 )
 
 // Hook up gocheck into the "go test" runner.
@@ -33,11 +34,11 @@ type ReaderTestingSuite struct{}
 var _ = check.Suite(&ReaderTestingSuite{})
 
 func (s *ReaderTestingSuite) SetUpSuite(c *check.C) {
+	// prefetch to avoid deadlocking in concurrent calls to ReadBytesForFile
+	yamlBytes, err := ReadBytesForFile("testdata/petstore.yaml")
+	c.Assert(err, check.IsNil)
 	mockServer = &http.Server{Addr: "127.0.0.1:8080", Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		yamlBytes, err := ReadBytesForFile("testdata/petstore.yaml")
-		c.Assert(err, check.IsNil)
 		io.WriteString(w, string(yamlBytes))
-
 	})}
 	go func() {
 		mockServer.ListenAndServe()
