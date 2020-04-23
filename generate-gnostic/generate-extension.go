@@ -247,7 +247,13 @@ func GenerateExtension(schemaFile string, outDir string) error {
 				"// is to use an abbreviation of the package name. Something short, but\n" +
 				"// hopefully unique enough to not conflict with things that may come along in\n" +
 				"// the future. 'GPB' is reserved for the protocol buffer implementation itself.",
-		})
+		},
+		ProtoOption{
+			Name:    "go_package",
+			Value:   ".;" + strings.ToLower(protoPackage),
+			Comment: "// The Go package path.",
+		},
+	)
 
 	proto := cc.generateProto(protoPackageName, License, protoOptions, nil)
 	protoFilename := path.Join(protoOutDirectory, outFileBaseName+".proto")
