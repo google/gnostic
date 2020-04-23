@@ -18,6 +18,9 @@ syntax = "proto3";
 
 package surface.v1;
 
+// The Go package name.
+option go_package = "surface;surface_v1";
+
 enum FieldKind {
     SCALAR = 0;
     MAP = 1;
