@@ -41,6 +41,9 @@ option java_package = "org.discovery_v1";
 // the future. 'GPB' is reserved for the protocol buffer implementation itself.
 option objc_class_prefix = "OAS";
 
+// The Go package name.
+option go_package = "discovery;discovery_v1";
+
 message Annotations {
   repeated string required = 1;
 }

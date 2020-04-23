@@ -47,7 +47,7 @@ const License = "" +
 	"// See the License for the specific language governing permissions and\n" +
 	"// limitations under the License.\n"
 
-func protoOptions(packageName string) []ProtoOption {
+func protoOptions(directoryName string, packageName string) []ProtoOption {
 	return []ProtoOption{
 		ProtoOption{
 			Name:  "java_multiple_files",
@@ -81,6 +81,12 @@ func protoOptions(packageName string) []ProtoOption {
 				"// hopefully unique enough to not conflict with things that may come along in\n" +
 				"// the future. 'GPB' is reserved for the protocol buffer implementation itself.",
 		},
+
+		ProtoOption{
+			Name:    "go_package",
+			Value:   directoryName + ";" + packageName,
+			Comment: "// The Go package name.",
+		},
 	}
 }
 
@@ -88,20 +94,24 @@ func generateOpenAPIModel(version string) error {
 	var input string
 	var filename string
 	var protoPackageName string
+	var directoryName string
 
 	switch version {
 	case "v2":
 		input = "openapi-2.0.json"
 		filename = "OpenAPIv2"
 		protoPackageName = "openapi.v2"
+		directoryName = "openapiv2"
 	case "v3":
 		input = "openapi-3.1.json"
 		filename = "OpenAPIv3"
 		protoPackageName = "openapi.v3"
+		directoryName = "openapiv3"
 	case "discovery":
 		input = "discovery.json"
 		filename = "discovery"
 		protoPackageName = "discovery.v1"
+		directoryName = "discovery"
 	default:
 		return fmt.Errorf("Unknown OpenAPI version %s", version)
 	}
@@ -118,7 +128,7 @@ func generateOpenAPIModel(version string) error {
 	baseSchema.ResolveAllOfs()
 
 	projectRoot = "./"
-	openapiSchema, err := jsonschema.NewSchemaFromFile(projectRoot + filename + "/" + input)
+	openapiSchema, err := jsonschema.NewSchemaFromFile(projectRoot + directoryName + "/" + input)
 	if err != nil {
 		return err
 	}
@@ -164,7 +174,7 @@ func generateOpenAPIModel(version string) error {
 	}
 
 	// ensure that the target directory exists
-	err = os.MkdirAll(projectRoot+filename, 0755)
+	err = os.MkdirAll(projectRoot+directoryName, 0755)
 	if err != nil {
 		return err
 	}
@@ -172,8 +182,8 @@ func generateOpenAPIModel(version string) error {
 	// generate the protocol buffer description
 	log.Printf("Generating protocol buffer description")
 	proto := cc.generateProto(protoPackageName, License,
-		protoOptions(goPackageName), []string{"google/protobuf/any.proto"})
-	protoFileName := projectRoot + filename + "/" + filename + ".proto"
+		protoOptions(directoryName, goPackageName), []string{"google/protobuf/any.proto"})
+	protoFileName := projectRoot + directoryName + "/" + filename + ".proto"
 	err = ioutil.WriteFile(protoFileName, []byte(proto), 0644)
 	if err != nil {
 		return err
@@ -188,7 +198,7 @@ func generateOpenAPIModel(version string) error {
 		"regexp",
 		"github.com/googleapis/gnostic/compiler",
 	})
-	goFileName := projectRoot + filename + "/" + filename + ".go"
+	goFileName := projectRoot + directoryName + "/" + filename + ".go"
 	err = ioutil.WriteFile(goFileName, []byte(compiler), 0644)
 	if err != nil {
 		return err
