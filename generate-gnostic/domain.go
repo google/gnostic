@@ -52,7 +52,6 @@ func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 // TypeNameForStub returns a capitalized name to use for a generated type.
 func (domain *Domain) TypeNameForStub(stub string) string {
 
-
 	return domain.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
 }
 
@@ -271,6 +270,8 @@ func (domain *Domain) buildPatternPropertyAccessors(typeModel *TypeModel, schema
 				property.Repeated = true
 				domain.MapTypeRequests[property.MapType] = property.MapType
 				typeModel.addProperty(property)
+			} else {
+				log.Printf("unhandled pattern property %+v", pair)
 			}
 		}
 	}
@@ -535,6 +536,10 @@ func (domain *Domain) Build() (err error) {
 			typeName := domain.TypeNameForStub(definitionName)
 			typeModel := domain.BuildTypeForDefinition(typeName, definitionName, definitionSchema)
 			if typeModel != nil {
+				// open the reference types ($ref) to allow other fields to be specified but ignored
+				if definitionName == "reference" || definitionName == "jsonReference" {
+					typeModel.Open = true
+				}
 				domain.TypeModels[typeName] = typeModel
 			}
 		}

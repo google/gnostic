@@ -63,10 +63,6 @@ message AnyOrExpression {
   }
 }
 
-message AnysOrExpressions {
-  repeated NamedAnyOrExpression additional_properties = 1;
-}
-
 // A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 message Callback {
   repeated NamedPathItem path = 1;
@@ -231,7 +227,7 @@ message License {
 message Link {
   string operation_ref = 1;
   string operation_id = 2;
-  AnysOrExpressions parameters = 3;
+  AnyOrExpression parameters = 3;
   AnyOrExpression request_body = 4;
   string description = 5;
   Server server = 6;
@@ -268,14 +264,6 @@ message NamedAny {
   string name = 1;
   // Mapped value
   Any value = 2;
-}
-
-// Automatically-generated message used to represent maps of AnyOrExpression as ordered (name,value) pairs.
-message NamedAnyOrExpression {
-  // Map key
-  string name = 1;
-  // Mapped value
-  AnyOrExpression value = 2;
 }
 
 // Automatically-generated message used to represent maps of CallbackOrReference as ordered (name,value) pairs.
@@ -388,6 +376,14 @@ message NamedString {
   string name = 1;
   // Mapped value
   string value = 2;
+}
+
+// Automatically-generated message used to represent maps of StringArray as ordered (name,value) pairs.
+message NamedStringArray {
+  // Map key
+  string name = 1;
+  // Mapped value
+  StringArray value = 2;
 }
 
 // Configuration details for a supported OAuth Flow
@@ -590,6 +586,7 @@ message SchemasOrReferences {
 
 // Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the OpenAPI Object or Operation Object, only one of the Security Requirement Objects in the list needs to be satisfied to authorize the request.
 message SecurityRequirement {
+  repeated NamedStringArray additional_properties = 1;
 }
 
 // Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header, a cookie parameter or as a query parameter), mutual TLS (use of a client certificate), OAuth2's common flows (implicit, password, application and access code) as defined in RFC6749, and OpenID Connect.   Please note that currently (2019) the implicit flow is about to be deprecated OAuth 2.0 Security Best Current Practice. Recommended for most use case is Authorization Code Grant flow with PKCE.

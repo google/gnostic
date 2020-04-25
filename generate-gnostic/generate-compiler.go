@@ -553,6 +553,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("boolValue, ok := in.(bool)")
 					code.Print("if ok {")
 					code.Print("  x.Oneof = &%s_%s{%s: boolValue}", parentTypeName, propertyName, propertyName)
+					code.Print("  matched = true")
 					code.Print("}")
 				} else {
 					code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
@@ -634,6 +635,13 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("if matched {")
 			code.Print("    // since the oneof matched one of its possibilities, discard any matching errors")
 			code.Print("	errors = make([]error, 0)")
+			generateMatchErrors := false // TODO: enable this and update tests for new error messages
+			if generateMatchErrors {
+				code.Print("} else {")
+				code.Print("    message := fmt.Sprintf(\"failed to match %s with %%+v\", compiler.Description(in))", typeName)
+				code.Print("    err := compiler.NewError(context, message)")
+				code.Print("    errors = append(errors, err)")
+			}
 			code.Print("}")
 		}
 	}

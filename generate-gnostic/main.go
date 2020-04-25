@@ -189,15 +189,16 @@ func generateOpenAPIModel(version string) error {
 		return err
 	}
 
-	// generate the compiler
-	log.Printf("Generating compiler support code")
-	compiler := cc.GenerateCompiler(goPackageName, License, []string{
+	packageImports := []string{
 		"fmt",
 		"gopkg.in/yaml.v2",
 		"strings",
 		"regexp",
 		"github.com/googleapis/gnostic/compiler",
-	})
+	}
+	// generate the compiler
+	log.Printf("Generating compiler support code")
+	compiler := cc.GenerateCompiler(goPackageName, License, packageImports)
 	goFileName := projectRoot + directoryName + "/" + filename + ".go"
 	err = ioutil.WriteFile(goFileName, []byte(compiler), 0644)
 	if err != nil {

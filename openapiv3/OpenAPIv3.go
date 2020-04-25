@@ -52,6 +52,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 	boolValue, ok := in.(bool)
 	if ok {
 		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: boolValue}
+		matched = true
 	}
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
@@ -105,36 +106,6 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-// NewAnysOrExpressions creates an object of type AnysOrExpressions if possible, returning an error if not.
-func NewAnysOrExpressions(in interface{}, context *compiler.Context) (*AnysOrExpressions, error) {
-	errors := make([]error, 0)
-	x := &AnysOrExpressions{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		// repeated NamedAnyOrExpression additional_properties = 1;
-		// MAP: AnyOrExpression
-		x.AdditionalProperties = make([]*NamedAnyOrExpression, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
-			if ok {
-				v := item.Value
-				pair := &NamedAnyOrExpression{}
-				pair.Name = k
-				var err error
-				pair.Value, err = NewAnyOrExpression(v, compiler.NewContext(k, context))
-				if err != nil {
-					errors = append(errors, err)
-				}
-				x.AdditionalProperties = append(x.AdditionalProperties, pair)
-			}
-		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -1617,11 +1588,11 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
-		// AnysOrExpressions parameters = 3;
+		// AnyOrExpression parameters = 3;
 		v3 := compiler.MapValueForKey(m, "parameters")
 		if v3 != nil {
 			var err error
-			x.Parameters, err = NewAnysOrExpressions(v3, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewAnyOrExpression(v3, compiler.NewContext("parameters", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1905,44 +1876,6 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 		if v2 != nil {
 			var err error
 			x.Value, err = NewAny(v2, compiler.NewContext("value", context))
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return x, compiler.NewErrorGroupOrNil(errors)
-}
-
-// NewNamedAnyOrExpression creates an object of type NamedAnyOrExpression if possible, returning an error if not.
-func NewNamedAnyOrExpression(in interface{}, context *compiler.Context) (*NamedAnyOrExpression, error) {
-	errors := make([]error, 0)
-	x := &NamedAnyOrExpression{}
-	m, ok := compiler.UnpackMap(in)
-	if !ok {
-		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		allowedKeys := []string{"name", "value"}
-		var allowedPatterns []*regexp.Regexp
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
-		// string name = 1;
-		v1 := compiler.MapValueForKey(m, "name")
-		if v1 != nil {
-			x.Name, ok = v1.(string)
-			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
-				errors = append(errors, compiler.NewError(context, message))
-			}
-		}
-		// AnyOrExpression value = 2;
-		v2 := compiler.MapValueForKey(m, "value")
-		if v2 != nil {
-			var err error
-			x.Value, err = NewAnyOrExpression(v2, compiler.NewContext("value", context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2477,6 +2410,44 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for value: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+	}
+	return x, compiler.NewErrorGroupOrNil(errors)
+}
+
+// NewNamedStringArray creates an object of type NamedStringArray if possible, returning an error if not.
+func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStringArray, error) {
+	errors := make([]error, 0)
+	x := &NamedStringArray{}
+	m, ok := compiler.UnpackMap(in)
+	if !ok {
+		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
+		errors = append(errors, compiler.NewError(context, message))
+	} else {
+		allowedKeys := []string{"name", "value"}
+		var allowedPatterns []*regexp.Regexp
+		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
+		if len(invalidKeys) > 0 {
+			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
+			errors = append(errors, compiler.NewError(context, message))
+		}
+		// string name = 1;
+		v1 := compiler.MapValueForKey(m, "name")
+		if v1 != nil {
+			x.Name, ok = v1.(string)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// StringArray value = 2;
+		v2 := compiler.MapValueForKey(m, "value")
+		if v2 != nil {
+			var err error
+			x.Value, err = NewStringArray(v2, compiler.NewContext("value", context))
+			if err != nil {
+				errors = append(errors, err)
 			}
 		}
 	}
@@ -3428,13 +3399,6 @@ func NewReference(in interface{}, context *compiler.Context) (*Reference, error)
 			message := fmt.Sprintf("is missing required %s: %+v", compiler.PluralProperties(len(missingKeys)), strings.Join(missingKeys, ", "))
 			errors = append(errors, compiler.NewError(context, message))
 		}
-		allowedKeys := []string{"$ref"}
-		var allowedPatterns []*regexp.Regexp
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
-		}
 		// string _ref = 1;
 		v1 := compiler.MapValueForKey(m, "$ref")
 		if v1 != nil {
@@ -4373,12 +4337,22 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{}
-		allowedPatterns := []*regexp.Regexp{pattern4}
-		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
-		if len(invalidKeys) > 0 {
-			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
-			errors = append(errors, compiler.NewError(context, message))
+		// repeated NamedStringArray additional_properties = 1;
+		// MAP: StringArray
+		x.AdditionalProperties = make([]*NamedStringArray, 0)
+		for _, item := range m {
+			k, ok := compiler.StringValue(item.Key)
+			if ok {
+				v := item.Value
+				pair := &NamedStringArray{}
+				pair.Name = k
+				var err error
+				pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
+				if err != nil {
+					errors = append(errors, err)
+				}
+				x.AdditionalProperties = append(x.AdditionalProperties, pair)
+			}
 		}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
@@ -5086,20 +5060,6 @@ func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-// ResolveReferences resolves references found inside AnysOrExpressions objects.
-func (m *AnysOrExpressions) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	for _, item := range m.AdditionalProperties {
-		if item != nil {
-			_, err := item.ResolveReferences(root)
-			if err != nil {
-				errors = append(errors, err)
-			}
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 // ResolveReferences resolves references found inside Callback objects.
 func (m *Callback) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
@@ -5714,18 +5674,6 @@ func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
-// ResolveReferences resolves references found inside NamedAnyOrExpression objects.
-func (m *NamedAnyOrExpression) ResolveReferences(root string) (interface{}, error) {
-	errors := make([]error, 0)
-	if m.Value != nil {
-		_, err := m.Value.ResolveReferences(root)
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	return nil, compiler.NewErrorGroupOrNil(errors)
-}
-
 // ResolveReferences resolves references found inside NamedCallbackOrReference objects.
 func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
@@ -5885,6 +5833,18 @@ func (m *NamedServerVariable) ResolveReferences(root string) (interface{}, error
 // ResolveReferences resolves references found inside NamedString objects.
 func (m *NamedString) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	return nil, compiler.NewErrorGroupOrNil(errors)
+}
+
+// ResolveReferences resolves references found inside NamedStringArray objects.
+func (m *NamedStringArray) ResolveReferences(root string) (interface{}, error) {
+	errors := make([]error, 0)
+	if m.Value != nil {
+		_, err := m.Value.ResolveReferences(root)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -6536,6 +6496,14 @@ func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error
 // ResolveReferences resolves references found inside SecurityRequirement objects.
 func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
+	for _, item := range m.AdditionalProperties {
+		if item != nil {
+			_, err := item.ResolveReferences(root)
+			if err != nil {
+				errors = append(errors, err)
+			}
+		}
+	}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
@@ -6757,21 +6725,6 @@ func (m *AnyOrExpression) ToRawInfo() interface{} {
 		return v1.ToRawInfo()
 	}
 	return nil
-}
-
-// ToRawInfo returns a description of AnysOrExpressions suitable for JSON or YAML export.
-func (m *AnysOrExpressions) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if m == nil {
-		return info
-	}
-	if m.AdditionalProperties != nil {
-		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
-		}
-	}
-	// &{Name:additionalProperties Type:NamedAnyOrExpression StringEnumValues:[] MapType:AnyOrExpression Repeated:true Pattern: Implicit:true Description:}
-	return info
 }
 
 // ToRawInfo returns a description of Callback suitable for JSON or YAML export.
@@ -7307,7 +7260,7 @@ func (m *Link) ToRawInfo() interface{} {
 	if m.Parameters != nil {
 		info = append(info, yaml.MapItem{Key: "parameters", Value: m.Parameters.ToRawInfo()})
 	}
-	// &{Name:parameters Type:AnysOrExpressions StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
+	// &{Name:parameters Type:AnyOrExpression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.RequestBody != nil {
 		info = append(info, yaml.MapItem{Key: "requestBody", Value: m.RequestBody.ToRawInfo()})
 	}
@@ -7416,19 +7369,6 @@ func (m *NamedAny) ToRawInfo() interface{} {
 		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
 	}
 	// &{Name:value Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
-	return info
-}
-
-// ToRawInfo returns a description of NamedAnyOrExpression suitable for JSON or YAML export.
-func (m *NamedAnyOrExpression) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
-	if m == nil {
-		return info
-	}
-	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
-	}
-	// &{Name:value Type:AnyOrExpression StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
@@ -7613,6 +7553,19 @@ func (m *NamedString) ToRawInfo() interface{} {
 	if m.Value != "" {
 		info = append(info, yaml.MapItem{Key: "value", Value: m.Value})
 	}
+	return info
+}
+
+// ToRawInfo returns a description of NamedStringArray suitable for JSON or YAML export.
+func (m *NamedStringArray) ToRawInfo() interface{} {
+	info := yaml.MapSlice{}
+	if m == nil {
+		return info
+	}
+	if m.Name != "" {
+		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+	}
+	// &{Name:value Type:StringArray StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
@@ -8299,6 +8252,12 @@ func (m *SecurityRequirement) ToRawInfo() interface{} {
 	if m == nil {
 		return info
 	}
+	if m.AdditionalProperties != nil {
+		for _, item := range m.AdditionalProperties {
+			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+		}
+	}
+	// &{Name:additionalProperties Type:NamedStringArray StringEnumValues:[] MapType:StringArray Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
@@ -8528,5 +8487,4 @@ var (
 	pattern1 = regexp.MustCompile("^x-")
 	pattern2 = regexp.MustCompile("^/")
 	pattern3 = regexp.MustCompile("^([0-9X]{3})$")
-	pattern4 = regexp.MustCompile("^[a-zA-Z0-9\\.\\-_]+$")
 )
