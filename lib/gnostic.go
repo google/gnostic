@@ -40,16 +40,16 @@ import (
 // UsageError is a response to invalid command-line inputs
 // and should trigger display of usage (help) information.
 type UsageError struct {
-	Message string
+	message string
 }
 
 func (e *UsageError) Error() string {
-	return fmt.Sprintf("%s", e.Message)
+	return e.message
 }
 
 // NewUsageError returns a new usage error with the specified message.
-func NewUsageError(message string) error {
-	return &UsageError{Message: message}
+func NewUsageError(m string) error {
+	return &UsageError{message: m}
 }
 
 const (
