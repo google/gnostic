@@ -556,7 +556,7 @@ message Response {
   repeated NamedAny vendor_extension = 5;
 }
 
-// One or more JSON representations for parameters
+// One or more JSON representations for responses
 message ResponseDefinitions {
   repeated NamedResponse additional_properties = 1;
 }

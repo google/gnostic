@@ -43,9 +43,11 @@ func main() {
 	g := lib.NewGnostic(os.Args)
 	err := g.Main()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
-		// print usage information after any error report.
-		fmt.Fprintf(os.Stderr, "%s\n", g.Usage())
+		// only print UsageErrors; other errors are written to the specified error output
+		if _, ok := err.(*lib.UsageError); ok {
+			fmt.Fprintf(os.Stdout, "%s\n", err.Error())
+			fmt.Fprintf(os.Stdout, "%s\n", g.Usage())
+		}
 		os.Exit(-1)
 	}
 }

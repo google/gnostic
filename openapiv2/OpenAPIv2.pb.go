@@ -4317,7 +4317,7 @@ func (x *Response) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
-// One or more JSON representations for parameters
+// One or more JSON representations for responses
 type ResponseDefinitions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

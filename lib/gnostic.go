@@ -37,6 +37,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// UsageError is a response to invalid command-line inputs
+// and should trigger display of usage (help) information.
+type UsageError struct {
+	message string
+}
+
+func (e *UsageError) Error() string {
+	return e.message
+}
+
+// NewUsageError returns a new usage error with the specified message.
+func NewUsageError(m string) error {
+	return &UsageError{message: m}
+}
+
 const (
 	// SourceFormatUnknown represents an unrecognized source format
 	SourceFormatUnknown = 0
@@ -336,7 +351,7 @@ func (g *Gnostic) readOptions() error {
 			p := &pluginCall{Name: arg[2:len(arg)], Invocation: "!"}
 			g.pluginCalls = append(g.pluginCalls, p)
 		} else if arg[0] == '-' {
-			return fmt.Errorf("unknown option: %s", arg)
+			return NewUsageError(fmt.Sprintf("unknown option: %s", arg))
 		} else {
 			g.sourceName = arg
 		}
@@ -352,10 +367,10 @@ func (g *Gnostic) validateOptions() error {
 		g.jsonOutputPath == "" &&
 		g.errorOutputPath == "" &&
 		len(g.pluginCalls) == 0 {
-		return fmt.Errorf("missing output directives")
+		return NewUsageError("missing output directives")
 	}
 	if g.sourceName == "" {
-		return fmt.Errorf("no input specified")
+		return NewUsageError("no input specified")
 	}
 	// If we get here and the error output is unspecified, write errors to stderr.
 	if g.errorOutputPath == "" {
