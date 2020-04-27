@@ -52,7 +52,6 @@ func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 // TypeNameForStub returns a capitalized name to use for a generated type.
 func (domain *Domain) TypeNameForStub(stub string) string {
 
-
 	return domain.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
 }
 
@@ -271,6 +270,8 @@ func (domain *Domain) buildPatternPropertyAccessors(typeModel *TypeModel, schema
 				property.Repeated = true
 				domain.MapTypeRequests[property.MapType] = property.MapType
 				typeModel.addProperty(property)
+			} else {
+				log.Printf("unhandled pattern property %+v", pair)
 			}
 		}
 	}
@@ -526,7 +527,6 @@ func (domain *Domain) Build() (err error) {
 	if len(typeModel.Properties) > 0 {
 		domain.TypeModels[typeName] = typeModel
 	}
-
 	// create a type for each object defined in the schema
 	if domain.Schema.Definitions != nil {
 		for _, pair := range *(domain.Schema.Definitions) {
@@ -535,14 +535,27 @@ func (domain *Domain) Build() (err error) {
 			typeName := domain.TypeNameForStub(definitionName)
 			typeModel := domain.BuildTypeForDefinition(typeName, definitionName, definitionSchema)
 			if typeModel != nil {
+				// open the reference types ($ref) to allow other fields to be specified but ignored
+				if definitionName == "reference" || definitionName == "jsonReference" {
+					typeModel.Open = true
+				}
 				domain.TypeModels[typeName] = typeModel
 			}
 		}
 	}
+
 	// iterate over anonymous object types to be instantiated and generate a type for each
-	for typeName, typeRequest := range domain.ObjectTypeRequests {
-		domain.TypeModels[typeRequest.Name] =
-			domain.buildTypeForDefinitionObject(typeName, typeRequest.PropertyName, typeRequest.Schema)
+	// we loop because these implied types could imply other types.
+	// when implied types are instantiated (with buildTypeForDefinitionObject),
+	// new requests might be added to domain.ObjectTypeRequests
+	for len(domain.ObjectTypeRequests) > 0 {
+		typeRequests := domain.ObjectTypeRequests
+		domain.ObjectTypeRequests = make(map[string]*TypeRequest, 0)
+		for typeName, typeRequest := range typeRequests {
+			// this could add to domain.ObjectTypeRequests
+			domain.TypeModels[typeRequest.Name] =
+				domain.buildTypeForDefinitionObject(typeName, typeRequest.PropertyName, typeRequest.Schema)
+		}
 	}
 
 	// iterate over map item types to be instantiated and generate a type for each
