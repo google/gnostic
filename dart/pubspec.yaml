@@ -1,0 +1,13 @@
+name: gnostic
+description: Dart sample gnostic applications.
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  args: ^1.5.1
+  protobuf: ^1.0.1
+
+dev_dependencies:
+  test: ^1.3.0
+
