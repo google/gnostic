@@ -1,4 +1,4 @@
-This directory contains demonstration gnostic applications written in Dart.
+This directory contains a demonstration gnostic application written in Dart.
 
 Build instructions:
 
