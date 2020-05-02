@@ -8,7 +8,10 @@ Build instructions:
 - compile protobuf source files
 	./COMPILE-PROTOS.sh
 
-- run a Dart program
+- fetch Dart dependencies
+	pub get
+
+- run the Dart program
 	dart bin/summarize.dart <filename>
 
 Here <filename> should be a binary-encoded protobuf representation of an OpenAPI description.

@@ -21,14 +21,14 @@ protoc  \
 	/usr/include/google/protobuf/any.proto \
 	/usr/include/google/protobuf/empty.proto \
 	--proto_path=${ANNOTATIONS} \
-	--proto_path=../openapiv2 \
-	--proto_path=../openapiv3 \
-	--proto_path=../discovery \
-	--proto_path=../surface \
-	--proto_path=../plugins \
-	../openapiv2/OpenAPIv2.proto \
-	../openapiv3/OpenAPIv3.proto \
-	../discovery/discovery.proto \
-	../surface/surface.proto \
-	../plugins/plugin.proto \
+	--proto_path=../../openapiv2 \
+	--proto_path=../../openapiv3 \
+	--proto_path=../../discovery \
+	--proto_path=../../surface \
+	--proto_path=../../plugins \
+	../../openapiv2/OpenAPIv2.proto \
+	../../openapiv3/OpenAPIv3.proto \
+	../../discovery/discovery.proto \
+	../../surface/surface.proto \
+	../../plugins/plugin.proto \
 	--dart_out=grpc:lib/generated
