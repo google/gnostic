@@ -13,13 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This should point to the .proto files distributed with protoc.
+export PROTO_PROTOS="$HOME/local/include"
+
+# This is a local directory containing .proto files used by many APIs.
 export ANNOTATIONS="third_party/api-common-protos"
 
 echo "Generating dart support code."
 protoc  \
-	/usr/include/google/protobuf/timestamp.proto \
-	/usr/include/google/protobuf/any.proto \
-	/usr/include/google/protobuf/empty.proto \
+	${PROTO_PROTOS}/google/protobuf/timestamp.proto \
+	${PROTO_PROTOS}/google/protobuf/any.proto \
+	${PROTO_PROTOS}/google/protobuf/empty.proto \
 	--proto_path=${ANNOTATIONS} \
 	--proto_path=../../openapiv2 \
 	--proto_path=../../openapiv3 \
