@@ -15,10 +15,10 @@
 package surface_v1
 
 import (
-	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 	"github.com/googleapis/gnostic/compiler"
+	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 	"log"
-	"strconv"
+	"strings"
 )
 
 type OpenAPI3Builder struct {
@@ -383,19 +383,16 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			}
 		}
 
-		for idx, schemaOrRef := range schema.AnyOf {
-			fieldInfo := b.buildFromSchemaOrReference(name+"AnyOf"+strconv.Itoa(idx+1), schemaOrRef)
-			makeFieldAndAppendToType(fieldInfo, schemaType, "any_of_"+strconv.Itoa(idx+1))
+		for _, schemaOrRef := range schema.AnyOf {
+			b.buildFromOneOfAnyOfAndAllOf(schemaOrRef, schemaType)
 		}
 
-		for idx, schemaOrRef := range schema.OneOf {
-			fieldInfo := b.buildFromSchemaOrReference(name+"OneOf"+strconv.Itoa(idx+1), schemaOrRef)
-			makeFieldAndAppendToType(fieldInfo, schemaType, "one_of_"+strconv.Itoa(idx+1))
+		for _, schemaOrRef := range schema.OneOf {
+			b.buildFromOneOfAnyOfAndAllOf(schemaOrRef, schemaType)
 		}
 
-		for idx, schemaOrRef := range schema.AllOf {
-			fieldInfo := b.buildFromSchemaOrReference(name+"AllOf"+strconv.Itoa(idx+1), schemaOrRef)
-			makeFieldAndAppendToType(fieldInfo, schemaType, "all_of_"+strconv.Itoa(idx+1))
+		for _, schemaOrRef := range schema.AllOf {
+			b.buildFromOneOfAnyOfAndAllOf(schemaOrRef, schemaType)
 		}
 
 		if schema.Items != nil {
@@ -438,4 +435,35 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 	}
 	log.Printf("Unimplemented: could not find field info for schema: %v", schema)
 	return nil
+}
+
+// buildFromOneOfAnyOfAndAllOf adds appropriate fields to the 'schemaType' given a new 'schemaOrRef'.
+func (b *OpenAPI3Builder) buildFromOneOfAnyOfAndAllOf(schemaOrRef *openapiv3.SchemaOrReference, schemaType *Type) {
+	// Related: https://github.com/googleapis/gnostic-grpc/issues/22
+	if schema := schemaOrRef.GetSchema(); schema != nil {
+		fieldInfo := b.buildFromSchemaOrReference("ATemporaryTypeThatWillBeRemoved", schemaOrRef)
+		if t := findType(b.model.Types, "ATemporaryTypeThatWillBeRemoved"); t != nil {
+			for _, f := range t.Fields {
+				schemaType.Fields = append(schemaType.Fields, f)
+			}
+			b.removeType(t)
+		} else {
+			// schemaOrRef is some kind of primitive schema (e.g. of type string)
+			makeFieldAndAppendToType(fieldInfo, schemaType, "value")
+		}
+	} else if ref := schemaOrRef.GetReference(); ref != nil {
+		fieldInfo := b.buildFromSchemaOrReference("", schemaOrRef)
+		makeFieldAndAppendToType(fieldInfo, schemaType, strings.ToLower(fieldInfo.fieldType))
+	}
+}
+
+// removeType removes the Type 'toRemove' from the model.
+func (b *OpenAPI3Builder) removeType(toRemove *Type) {
+	res := make([]*Type, 0)
+	for _, t := range b.model.Types {
+		if t != toRemove {
+			res = append(res, t)
+		}
+	}
+	b.model.Types = res
 }
