@@ -189,11 +189,11 @@ func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.Pa
 	}
 }
 
-// Builds the "Parameters" and "Responses" types for an operation, adds them to the model, and returns the names of the types.
+// Builds the "Request" and "Responses" types for an operation, adds them to the model, and returns the names of the types.
 // If no such Type is added to the model an empty string is returned.
 func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openapiv3.Operation) (parametersTypeName string, responseTypeName string) {
 	// At first, we build the operations input parameters. This includes parameters (like PATH or QUERY parameters) and a request body
-	operationParameters := makeType(name + "Parameters")
+	operationParameters := makeType(name + "Request")
 	operationParameters.Description = operationParameters.Name + " holds parameters to " + name
 	for _, paramOrRef := range operation.Parameters {
 		fieldInfo := b.buildFromParamOrRef(paramOrRef)
