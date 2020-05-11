@@ -163,11 +163,11 @@ func (b *OpenAPI3Builder) buildFromNamedPath(name string, pathItem *openapiv3.Pa
 	}
 }
 
-// Builds the "Request" and "Responses" types for an operation, adds them to the model, and returns the names of the types.
+// Builds the "Parameters" and "Responses" types for an operation, adds them to the model, and returns the names of the types.
 // If no such Type is added to the model an empty string is returned.
 func (b *OpenAPI3Builder) buildFromNamedOperation(name string, operation *openapiv3.Operation) (parametersTypeName string, responseTypeName string) {
 	// At first, we build the operations input parameters. This includes parameters (like PATH or QUERY parameters) and a request body
-	operationParameters := makeType(name + "Request")
+	operationParameters := makeType(name + "Parameters")
 	operationParameters.Description = operationParameters.Name + " holds parameters to " + name
 	for _, paramOrRef := range operation.Parameters {
 		fieldInfo := b.buildFromParamOrRef(paramOrRef)
@@ -410,30 +410,29 @@ func (b *OpenAPI3Builder) buildFromOneOfAnyOfAndAllOf(schemaOrRef *openapiv3.Sch
 	// Related: https://github.com/googleapis/gnostic-grpc/issues/22
 	if schema := schemaOrRef.GetSchema(); schema != nil {
 		// Build a temporary type that has the required fields; add the fields to the current schema; remove the
-		// current type
+		// temporary type
 		fieldInfo := b.buildFromSchemaOrReference("ATemporaryTypeThatWillBeRemoved", schemaOrRef)
-		if t := findType(b.model.Types, "ATemporaryTypeThatWillBeRemoved"); t != nil {
-			for _, f := range t.Fields {
-				schemaType.Fields = append(schemaType.Fields, f)
-			}
-			b.removeType(t)
-		} else {
+		t := findType(b.model.Types, "ATemporaryTypeThatWillBeRemoved")
+		if t == nil {
 			// schemaOrRef is some kind of primitive schema (e.g. of type string)
 			makeFieldAndAppendToType(fieldInfo, schemaType, "value")
+			return
 		}
+		schemaType.Fields = append(schemaType.Fields, t.Fields...)
+		b.removeType(t)
 	} else if ref := schemaOrRef.GetReference(); ref != nil {
 		referencedSchemaName := validTypeForRef(ref.XRef)
 		// Make sure that the referenced type exists, before we add the fields to the current schema
 		for _, namedSchema := range b.document.GetComponents().GetSchemas().GetAdditionalProperties() {
 			if referencedSchemaName == namedSchema.Name {
-				b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+				fInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+				b.checkForExistence(namedSchema.Name, fInfo)
+				break
 			}
 		}
 
 		if t := findType(b.model.Types, referencedSchemaName); t != nil {
-			for _, f := range t.Fields {
-				schemaType.Fields = append(schemaType.Fields, f)
-			}
+			schemaType.Fields = append(schemaType.Fields, t.Fields...)
 		}
 	}
 }
