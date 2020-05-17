@@ -430,10 +430,12 @@ func (b *OpenAPI3Builder) buildFromOneOfAnyOfAndAllOf(schemaOrRef *openapiv3.Sch
 				break
 			}
 		}
-
-		if t := findType(b.model.Types, referencedSchemaName); t != nil {
-			schemaType.Fields = append(schemaType.Fields, t.Fields...)
+		t := findType(b.model.Types, referencedSchemaName)
+		if t == nil {
+			log.Printf("Unable to construct OneOf, AnyOf, or AllOf. References schema not found: %v", ref)
+			return
 		}
+		schemaType.Fields = append(schemaType.Fields, t.Fields...)
 	}
 }
 
