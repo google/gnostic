@@ -368,13 +368,6 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			}
 		}
 
-		if schema.Enum != nil {
-			// TODO: It is not defined how enums should be represented inside the surface model
-			fieldInfo := &FieldInfo{}
-			fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldName = FieldKind_ANY, "string", "enum"
-			makeFieldAndAppendToType(fieldInfo, schemaType, fieldInfo.fieldName)
-		}
-
 		if len(schemaType.Fields) == 0 {
 			schemaType.Kind = TypeKind_OBJECT
 			schemaType.ContentType = "interface{}"
@@ -397,6 +390,9 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			}
 		}
 	default:
+		for _, enum := range schema.GetEnum() {
+			fInfo.enumValues = append(fInfo.enumValues, enum.Yaml)
+		}
 		// We go a scalar value
 		fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_SCALAR, schema.Type, schema.Format
 		return fInfo

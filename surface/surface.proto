@@ -56,6 +56,8 @@ message Field {
     string parameter_name = 8; // the name to use for a function parameter
 
     bool serialize = 9; // true if this field should be serialized (to JSON, etc)
+
+    repeated string enum_values = 10; // enum values as specified in the API description
 }
 
 // Type typically corresponds to a definition, parameter, or response
