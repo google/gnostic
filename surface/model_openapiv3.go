@@ -18,6 +18,7 @@ import (
 	"github.com/googleapis/gnostic/compiler"
 	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 	"log"
+	"strings"
 )
 
 type OpenAPI3Builder struct {
@@ -385,13 +386,13 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 		for _, schemaOrRef := range schema.Items.SchemaOrReference {
 			arrayFieldInfo := b.buildFromSchemaOrReference(name, schemaOrRef)
 			if arrayFieldInfo != nil {
-				fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat
+				fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat, fInfo.enumValues = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat, arrayFieldInfo.enumValues
 				return fInfo
 			}
 		}
 	default:
 		for _, enum := range schema.GetEnum() {
-			fInfo.enumValues = append(fInfo.enumValues, enum.Yaml)
+			fInfo.enumValues = append(fInfo.enumValues, strings.TrimSuffix(enum.Yaml, "\n"))
 		}
 		// We go a scalar value
 		fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_SCALAR, schema.Type, schema.Format
