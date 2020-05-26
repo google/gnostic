@@ -143,6 +143,15 @@ func printDocument(document *pb.Document, schemas map[string]int, operationId ma
 		if v.Post != nil {
 			printOperation(v.Post, operationId, names)
 		}
+		if v.Put != nil {
+			printOperation(v.Put, operationId, names)
+		}
+		if v.Patch != nil {
+			printOperation(v.Patch, operationId, names)
+		}
+		if v.Delete != nil {
+			printOperation(v.Delete, operationId, names)
+		}
 	}
 }
 
