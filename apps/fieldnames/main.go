@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,12 +42,12 @@ func readDocumentFromFileWithName(filename string) (*pb.Document, error) {
 	}
 	return document, nil
 }
-func addToMap(word string, names map[string]int) {
-	_, ok := names[word]
+func addToMap(word string, mapName map[string]int) {
+	_, ok := mapName[word]
 	if ok {
-		names[word] += 1
+		mapName[word] += 1
 	} else {
-		names[word] = 1
+		mapName[word] = 1
 	}
 }
 
@@ -127,27 +127,31 @@ func createCSV(names map[string]int) {
 	f4.Close()
 }
 
-func printDocument(document *pb.Document, names map[string]int) {
+func printDocument(document *pb.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
 	//Start
 	if document.Definitions != nil && document.Definitions.AdditionalProperties != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
-			printSchema(pair.Value, names)
+			addToMap(pair.Name, schemas)
+			printSchema(pair.Value, properties)
 		}
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			printOperation(v.Get, names)
+			printOperation(v.Get, operationId, names)
 		}
 		if v.Post != nil {
-			printOperation(v.Post, names)
+			printOperation(v.Post, operationId, names)
 		}
 	}
 }
 
 //^^^ Get rid of print post/get/indent
 
-func printOperation(operation *pb.Operation, names map[string]int) {
+func printOperation(operation *pb.Operation, operationId map[string]int, names map[string]int) {
+	if operation.OperationId != "" {
+		addToMap(operation.OperationId, operationId)
+	}
 	for _, item := range operation.Parameters {
 		switch t := item.Oneof.(type) {
 		case *pb.ParametersItem_Parameter:
@@ -170,10 +174,10 @@ func printOperation(operation *pb.Operation, names map[string]int) {
 	}
 }
 
-func printSchema(schema *pb.Schema, names map[string]int) {
+func printSchema(schema *pb.Schema, properties map[string]int) {
 	if schema.Properties != nil {
 		for _, pair := range schema.Properties.AdditionalProperties {
-			addToMap(pair.Name, names)
+			addToMap(pair.Name, properties)
 		}
 	}
 }
@@ -189,11 +193,25 @@ func main() {
 		os.Exit(-1)
 	}
 
+	var schemas map[string]int
+	schemas = make(map[string]int)
+
+	var operationId map[string]int
+	operationId = make(map[string]int)
+
 	var names map[string]int
 	names = make(map[string]int)
 
-	printDocument(document, names)
+	var properties map[string]int
+	properties = make(map[string]int)
 
-	createCSV(names)
+	printDocument(document, schemas, operationId, names, properties)
+
+	fmt.Println("OperationId:", operationId)
+	fmt.Println("Schemas: ", schemas)
+	fmt.Println("Field Names: ", names)
+	fmt.Println("Properties: ", properties)
+
+	//createCSV(names)
 
 }
