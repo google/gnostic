@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// report is a demo application that displays information about an
-// OpenAPI description.
 package main
 
 import (
@@ -40,17 +38,11 @@ func readDocumentFromFileWithName(filename string) (*pb.Document, error) {
 	return document, nil
 }
 func addToMap(word string, mapName map[string]int) {
-	_, ok := mapName[word]
-	if ok {
-		mapName[word] += 1
-	} else {
-		mapName[word] = 1
-	}
+	mapName[word] += 1
 }
 
 func processDocument(document *pb.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
-	//Start
-	if document.Definitions != nil && document.Definitions.AdditionalProperties != nil {
+	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			addToMap(pair.Name, schemas)
 			processSchema(pair.Value, properties)
@@ -75,8 +67,6 @@ func processDocument(document *pb.Document, schemas map[string]int, operationId 
 		}
 	}
 }
-
-//^^^ Get rid of print post/get/indent
 
 func processOperation(operation *pb.Operation, operationId map[string]int, names map[string]int) {
 	if operation.OperationId != "" {
@@ -105,10 +95,11 @@ func processOperation(operation *pb.Operation, operationId map[string]int, names
 }
 
 func processSchema(schema *pb.Schema, properties map[string]int) {
-	if schema.Properties != nil {
-		for _, pair := range schema.Properties.AdditionalProperties {
-			addToMap(pair.Name, properties)
-		}
+	if schema.Properties == nil {
+		return
+	}
+	for _, pair := range schema.Properties.AdditionalProperties {
+		addToMap(pair.Name, properties)
 	}
 }
 
@@ -120,7 +111,7 @@ func main() {
 
 	if err != nil {
 		log.Printf("Error reading %s. This sample expects OpenAPI v2.", args[0])
-		os.Exit(-1)
+		os.Exit(1)
 	}
 
 	var schemas map[string]int
@@ -174,7 +165,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile("vocabulary_results.pb", bytes, 0644)
+	err = ioutil.WriteFile("vocabulary_data.pb", bytes, 0644)
 	if err != nil {
 		panic(err)
 	}

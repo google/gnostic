@@ -26,4 +26,5 @@ message Vocabulary{
     repeated WordCount properties = 2;
     repeated WordCount operations = 3;
     repeated WordCount paramaters = 4;
+    
 }
