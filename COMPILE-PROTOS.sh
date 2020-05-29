@@ -23,3 +23,4 @@ protoc --go_out=. discovery/discovery.proto
 protoc --go_out=. plugins/plugin.proto
 protoc --go_out=. extensions/extension.proto
 protoc --go_out=. surface/surface.proto
+protoc --go_out=. metrics/vocabulary.proto
