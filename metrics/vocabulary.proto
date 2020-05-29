@@ -16,6 +16,9 @@
 syntax = "proto3";
 package gnostic.metrics.v1;
 
+// The Go package name.
+option go_package = "metrics;gnostic_metrics_v1";
+
 message WordCount{
     string word = 1;
     int32 count = 2;

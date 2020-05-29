@@ -20,31 +20,31 @@ import (
 	"log"
 	"os"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 
-	pb "github.com/googleapis/gnostic/openapiv2"
+	metrics "github.com/googleapis/gnostic/metrics"
+	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
 
-func readDocumentFromFileWithName(filename string) (*pb.Document, error) {
+func readDocumentFromFileWithName(filename string) (*openapi_v2.Document, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	document := &pb.Document{}
+	document := &openapi_v2.Document{}
 	err = proto.Unmarshal(data, document)
 	if err != nil {
 		return nil, err
 	}
 	return document, nil
-}
-func addToMap(word string, mapName map[string]int) {
-	mapName[word] += 1
+
 }
 
-func processDocument(document *pb.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
+func processDocument(document *openapi_v2.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
-			addToMap(pair.Name, schemas)
+			schemas[pair.Name] += 1
 			processSchema(pair.Value, properties)
 		}
 	}
@@ -68,39 +68,57 @@ func processDocument(document *pb.Document, schemas map[string]int, operationId 
 	}
 }
 
-func processOperation(operation *pb.Operation, operationId map[string]int, names map[string]int) {
+func processOperation(operation *openapi_v2.Operation, operationId map[string]int, names map[string]int) {
 	if operation.OperationId != "" {
-		addToMap(operation.OperationId, operationId)
+		operationId[operation.OperationId] += 1
 	}
 	for _, item := range operation.Parameters {
 		switch t := item.Oneof.(type) {
-		case *pb.ParametersItem_Parameter:
+		case *openapi_v2.ParametersItem_Parameter:
 			switch t2 := t.Parameter.Oneof.(type) {
-			case *pb.Parameter_BodyParameter:
-				addToMap(t2.BodyParameter.Name, names)
-			case *pb.Parameter_NonBodyParameter:
-				switch t3 := t2.NonBodyParameter.Oneof.(type) {
-				case *pb.NonBodyParameter_FormDataParameterSubSchema:
-					addToMap(t3.FormDataParameterSubSchema.Name, names)
-				case *pb.NonBodyParameter_HeaderParameterSubSchema:
-					addToMap(t3.HeaderParameterSubSchema.Name, names)
-				case *pb.NonBodyParameter_PathParameterSubSchema:
-					addToMap(t3.PathParameterSubSchema.Name, names)
-				case *pb.NonBodyParameter_QueryParameterSubSchema:
-					addToMap(t3.QueryParameterSubSchema.Name, names)
-				}
+			case *openapi_v2.Parameter_BodyParameter:
+				names[t2.BodyParameter.Name] += 1
+			case *openapi_v2.Parameter_NonBodyParameter:
+				nonBodyParam := t2.NonBodyParameter
+				processOperationParamaters(operation, names, nonBodyParam)
+
 			}
 		}
 	}
 }
 
-func processSchema(schema *pb.Schema, properties map[string]int) {
+func processOperationParamaters(operation *openapi_v2.Operation, names map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
+	switch t3 := nonBodyParam.Oneof.(type) {
+	case *openapi_v2.NonBodyParameter_FormDataParameterSubSchema:
+		names[t3.FormDataParameterSubSchema.Name] += 1
+	case *openapi_v2.NonBodyParameter_HeaderParameterSubSchema:
+		names[t3.HeaderParameterSubSchema.Name] += 1
+	case *openapi_v2.NonBodyParameter_PathParameterSubSchema:
+		names[t3.PathParameterSubSchema.Name] += 1
+	case *openapi_v2.NonBodyParameter_QueryParameterSubSchema:
+		names[t3.QueryParameterSubSchema.Name] += 1
+	}
+}
+
+func processSchema(schema *openapi_v2.Schema, properties map[string]int) {
 	if schema.Properties == nil {
 		return
 	}
 	for _, pair := range schema.Properties.AdditionalProperties {
-		addToMap(pair.Name, properties)
+		properties[pair.Name] += 1
 	}
+}
+
+func fillProtoStructures(m map[string]int) []*metrics.WordCount {
+	counts := make([]*metrics.WordCount, 0)
+	for k, v := range m {
+		temp := &metrics.WordCount{
+			Word:  k,
+			Count: int32(v),
+		}
+		counts = append(counts, temp)
+	}
+	return counts
 }
 
 func main() {
@@ -128,46 +146,24 @@ func main() {
 
 	processDocument(document, schemas, operationId, names, properties)
 
-	vocab := &Vocabulary{}
-	for k, v := range schemas {
-		temp := &WordCount{
-			Word:  k,
-			Count: int32(v),
-		}
-		vocab.Schemas = append(vocab.Schemas, temp)
-	}
-
-	for k, v := range operationId {
-		temp := &WordCount{
-			Word:  k,
-			Count: int32(v),
-		}
-		vocab.Operations = append(vocab.Operations, temp)
-	}
-
-	for k, v := range names {
-		temp := &WordCount{
-			Word:  k,
-			Count: int32(v),
-		}
-		vocab.Paramaters = append(vocab.Paramaters, temp)
-	}
-
-	for k, v := range properties {
-		temp := &WordCount{
-			Word:  k,
-			Count: int32(v),
-		}
-		vocab.Properties = append(vocab.Properties, temp)
+	vocab := &metrics.Vocabulary{
+		Schemas:    fillProtoStructures(schemas),
+		Operations: fillProtoStructures(operationId),
+		Paramaters: fillProtoStructures(names),
+		Properties: fillProtoStructures(properties),
 	}
 
 	bytes, err := proto.Marshal(vocab)
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile("vocabulary_data.pb", bytes, 0644)
+	err = ioutil.WriteFile("vocabulary.pb", bytes, 0644)
 	if err != nil {
 		panic(err)
 	}
 
+	m := jsonpb.Marshaler{Indent: " "}
+	s, err := m.MarshalToString(vocab)
+	jsonOutput := []byte(s)
+	err = ioutil.WriteFile("vocabulary.json", jsonOutput, os.ModePerm)
 }
