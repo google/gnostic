@@ -22,34 +22,34 @@ func readDocumentFromFileWithName(filename string) (*openapi_v2.Document, error)
 
 }
 
-func processDocument(document *openapi_v2.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
+func processDocumentV2(document *openapi_v2.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			schemas[pair.Name] += 1
-			processSchema(pair.Value, properties)
+			processSchemaV2(pair.Value, properties)
 		}
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperation(v.Get, operationId, names)
+			processOperationV2(v.Get, operationId, names)
 		}
 		if v.Post != nil {
-			processOperation(v.Post, operationId, names)
+			processOperationV2(v.Post, operationId, names)
 		}
 		if v.Put != nil {
-			processOperation(v.Put, operationId, names)
+			processOperationV2(v.Put, operationId, names)
 		}
 		if v.Patch != nil {
-			processOperation(v.Patch, operationId, names)
+			processOperationV2(v.Patch, operationId, names)
 		}
 		if v.Delete != nil {
-			processOperation(v.Delete, operationId, names)
+			processOperationV2(v.Delete, operationId, names)
 		}
 	}
 }
 
-func processOperation(operation *openapi_v2.Operation, operationId map[string]int, names map[string]int) {
+func processOperationV2(operation *openapi_v2.Operation, operationId map[string]int, names map[string]int) {
 	if operation.OperationId != "" {
 		operationId[operation.OperationId] += 1
 	}
@@ -61,14 +61,14 @@ func processOperation(operation *openapi_v2.Operation, operationId map[string]in
 				names[t2.BodyParameter.Name] += 1
 			case *openapi_v2.Parameter_NonBodyParameter:
 				nonBodyParam := t2.NonBodyParameter
-				processOperationParamaters(operation, names, nonBodyParam)
+				processOperationParamatersV2(operation, names, nonBodyParam)
 
 			}
 		}
 	}
 }
 
-func processOperationParamaters(operation *openapi_v2.Operation, names map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
+func processOperationParamatersV2(operation *openapi_v2.Operation, names map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
 	switch t3 := nonBodyParam.Oneof.(type) {
 	case *openapi_v2.NonBodyParameter_FormDataParameterSubSchema:
 		names[t3.FormDataParameterSubSchema.Name] += 1
@@ -81,7 +81,7 @@ func processOperationParamaters(operation *openapi_v2.Operation, names map[strin
 	}
 }
 
-func processSchema(schema *openapi_v2.Schema, properties map[string]int) {
+func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 	if schema.Properties == nil {
 		return
 	}

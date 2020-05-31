@@ -23,8 +23,6 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	metrics "github.com/googleapis/gnostic/metrics"
-	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
-	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -38,12 +36,6 @@ func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 		counts = append(counts, temp)
 	}
 	return counts
-}
-func runV2(document *openapi_v2.Document) {
-
-}
-func runV3(document *openapi_v3.Document) {
-
 }
 
 func main() {
@@ -62,6 +54,7 @@ func main() {
 	var properties map[string]int
 	properties = make(map[string]int)
 
+	//Temporary, for now using filename ot check file type
 	version_flag := strings.Contains(args[0], "swagger")
 	switch version_flag {
 	case true:
@@ -70,7 +63,7 @@ func main() {
 			log.Printf("Error reading %s.", args[0])
 			os.Exit(1)
 		}
-		processDocument(document, schemas, operationId, names, properties)
+		processDocumentV2(document, schemas, operationId, names, properties)
 	default:
 		document, err := readDocumentFromFileWithNameV3(args[0])
 		if err != nil {

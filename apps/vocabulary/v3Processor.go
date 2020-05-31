@@ -24,13 +24,8 @@ func readDocumentFromFileWithNameV3(filename string) (*openapi_v3.Document, erro
 
 func processDocumentV3(document *openapi_v3.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
 	if document.Components != nil {
-		for _, pair := range document.Components.Parameters.AdditionalProperties {
-			schemas[pair.Name] += 1
-			switch t := pair.Value.Oneof.(type) {
-			case *openapi_v3.ParameterOrReference_Parameter:
-				properties[t.Parameter.Name] += 1
-			}
-		}
+		processSchemaV3(document.Components, schemas, properties)
+
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
@@ -61,5 +56,21 @@ func processOperationV3(operation *openapi_v3.Operation, operationId map[string]
 		case *openapi_v3.ParameterOrReference_Parameter:
 			names[t.Parameter.Name] += 1
 		}
+	}
+}
+
+func processSchemaV3(components *openapi_v3.Components, schemas map[string]int, properties map[string]int) {
+	for _, pair := range components.Parameters.AdditionalProperties {
+		schemas[pair.Name] += 1
+		switch t := pair.Value.Oneof.(type) {
+		case *openapi_v3.ParameterOrReference_Parameter:
+			properties[t.Parameter.Name] += 1
+		}
+	}
+	for _, pair := range components.Schemas.AdditionalProperties {
+		schemas[pair.Name] += 1
+	}
+	for _, pair := range components.Responses.AdditionalProperties {
+		schemas[pair.Name] += 1
 	}
 }
