@@ -1,0 +1,101 @@
+// Copyright 2020 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+package main
+
+import (
+	"encoding/json"
+	"os"
+
+	"github.com/golang/protobuf/proto"
+	metrics "github.com/googleapis/gnostic/metrics"
+	openapiv2 "github.com/googleapis/gnostic/openapiv2"
+	openapiv3 "github.com/googleapis/gnostic/openapiv3"
+	plugins "github.com/googleapis/gnostic/plugins"
+)
+
+// Record an error, then serialize and return a response.
+func sendAndExitIfError(err error, response *plugins.Response) {
+	if err != nil {
+		response.Errors = append(response.Errors, err.Error())
+		sendAndExit(response)
+	}
+}
+
+// Serialize and return a response.
+func sendAndExit(response *plugins.Response) {
+	responseBytes, _ := proto.Marshal(response)
+	os.Stdout.Write(responseBytes)
+	os.Exit(0)
+}
+
+// This is the main function for the plugin.
+func main() {
+	env, err := plugins.NewEnvironment()
+	env.RespondAndExitIfError(err)
+
+	var vocab *metrics.Vocabulary
+
+	var schemas map[string]int
+	schemas = make(map[string]int)
+
+	var operationId map[string]int
+	operationId = make(map[string]int)
+
+	var names map[string]int
+	names = make(map[string]int)
+
+	var properties map[string]int
+	properties = make(map[string]int)
+
+	for _, model := range env.Request.Models {
+		switch model.TypeUrl {
+		case "openapi.v2.Document":
+			documentv2 := &openapiv2.Document{}
+			err = proto.Unmarshal(model.Value, documentv2)
+			if err == nil {
+				// Analyze the API document.
+				vocab = processDocumentV2(documentv2, schemas, operationId, names, properties)
+			}
+		case "openapi.v3.Document":
+			documentv3 := &openapiv3.Document{}
+			err = proto.Unmarshal(model.Value, documentv3)
+			if err == nil {
+				// Analyze the API document.
+				vocab = processDocumentV3(documentv3, schemas, operationId, names, properties)
+			}
+		}
+	}
+
+	if vocab != nil {
+		// Return the analysis results with an appropriate filename.
+		// Results are in files named "summary.json" in the same relative
+		// locations as the description source files.
+
+		file2 := &plugins.File{}
+		file2.Name = "vocabulary.pb"
+		file2.Data, err = proto.Marshal(vocab)
+		env.RespondAndExitIfError(err)
+		env.Response.Files = append(env.Response.Files, file2)
+
+		file := &plugins.File{}
+		file.Name = "vocabulary.json"
+		file.Data, err = json.MarshalIndent(vocab, "", "  ")
+		file.Data = append(file.Data, []byte("\n")...)
+		env.RespondAndExitIfError(err)
+		env.Response.Files = append(env.Response.Files, file)
+
+	}
+
+	env.RespondAndExit()
+}

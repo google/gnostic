@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	metrics "github.com/googleapis/gnostic/metrics"
 	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
 
@@ -21,32 +22,16 @@ func readDocumentFromFileWithNameV2(filename string) (*openapi_v2.Document, erro
 	return document, nil
 
 }
-
-func processDocumentV2(document *openapi_v2.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
-	if document.Definitions != nil {
-		for _, pair := range document.Definitions.AdditionalProperties {
-			schemas[pair.Name] += 1
-			processSchemaV2(pair.Value, properties)
+func fillProtoStructuresV2(m map[string]int) []*metrics.WordCount {
+	counts := make([]*metrics.WordCount, 0)
+	for k, v := range m {
+		temp := &metrics.WordCount{
+			Word:  k,
+			Count: int32(v),
 		}
+		counts = append(counts, temp)
 	}
-	for _, pair := range document.Paths.Path {
-		v := pair.Value
-		if v.Get != nil {
-			processOperationV2(v.Get, operationId, names)
-		}
-		if v.Post != nil {
-			processOperationV2(v.Post, operationId, names)
-		}
-		if v.Put != nil {
-			processOperationV2(v.Put, operationId, names)
-		}
-		if v.Patch != nil {
-			processOperationV2(v.Patch, operationId, names)
-		}
-		if v.Delete != nil {
-			processOperationV2(v.Delete, operationId, names)
-		}
-	}
+	return counts
 }
 
 func processOperationV2(operation *openapi_v2.Operation, operationId map[string]int, names map[string]int) {
@@ -88,4 +73,40 @@ func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 	for _, pair := range schema.Properties.AdditionalProperties {
 		properties[pair.Name] += 1
 	}
+}
+
+func processDocumentV2(document *openapi_v2.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) *metrics.Vocabulary {
+	if document.Definitions != nil {
+		for _, pair := range document.Definitions.AdditionalProperties {
+			schemas[pair.Name] += 1
+			processSchemaV2(pair.Value, properties)
+		}
+	}
+	for _, pair := range document.Paths.Path {
+		v := pair.Value
+		if v.Get != nil {
+			processOperationV2(v.Get, operationId, names)
+		}
+		if v.Post != nil {
+			processOperationV2(v.Post, operationId, names)
+		}
+		if v.Put != nil {
+			processOperationV2(v.Put, operationId, names)
+		}
+		if v.Patch != nil {
+			processOperationV2(v.Patch, operationId, names)
+		}
+		if v.Delete != nil {
+			processOperationV2(v.Delete, operationId, names)
+		}
+	}
+
+	vocab := &metrics.Vocabulary{
+		Schemas:    fillProtoStructuresV2(schemas),
+		Operations: fillProtoStructuresV2(operationId),
+		Paramaters: fillProtoStructuresV2(names),
+		Properties: fillProtoStructuresV2(properties),
+	}
+
+	return vocab
 }

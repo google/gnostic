@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	metrics "github.com/googleapis/gnostic/metrics"
 	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 )
 
@@ -22,29 +23,16 @@ func readDocumentFromFileWithNameV3(filename string) (*openapi_v3.Document, erro
 
 }
 
-func processDocumentV3(document *openapi_v3.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
-	if document.Components != nil {
-		processComponentsV3(document.Components, schemas, properties)
-
+func fillProtoStructuresV3(m map[string]int) []*metrics.WordCount {
+	counts := make([]*metrics.WordCount, 0)
+	for k, v := range m {
+		temp := &metrics.WordCount{
+			Word:  k,
+			Count: int32(v),
+		}
+		counts = append(counts, temp)
 	}
-	for _, pair := range document.Paths.Path {
-		v := pair.Value
-		if v.Get != nil {
-			processOperationV3(v.Get, operationId, names)
-		}
-		if v.Post != nil {
-			processOperationV3(v.Post, operationId, names)
-		}
-		if v.Put != nil {
-			processOperationV3(v.Put, operationId, names)
-		}
-		if v.Patch != nil {
-			processOperationV3(v.Patch, operationId, names)
-		}
-		if v.Delete != nil {
-			processOperationV3(v.Delete, operationId, names)
-		}
-	}
+	return counts
 }
 
 func processOperationV3(operation *openapi_v3.Operation, operationId map[string]int, names map[string]int) {
@@ -86,4 +74,38 @@ func processResponsesV3(components *openapi_v3.Components, schemas map[string]in
 	for _, pair := range components.Responses.AdditionalProperties {
 		schemas[pair.Name] += 1
 	}
+}
+
+func processDocumentV3(document *openapi_v3.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) *metrics.Vocabulary {
+	if document.Components != nil {
+		processComponentsV3(document.Components, schemas, properties)
+
+	}
+	for _, pair := range document.Paths.Path {
+		v := pair.Value
+		if v.Get != nil {
+			processOperationV3(v.Get, operationId, names)
+		}
+		if v.Post != nil {
+			processOperationV3(v.Post, operationId, names)
+		}
+		if v.Put != nil {
+			processOperationV3(v.Put, operationId, names)
+		}
+		if v.Patch != nil {
+			processOperationV3(v.Patch, operationId, names)
+		}
+		if v.Delete != nil {
+			processOperationV3(v.Delete, operationId, names)
+		}
+	}
+
+	vocab := &metrics.Vocabulary{
+		Schemas:    fillProtoStructuresV3(schemas),
+		Operations: fillProtoStructuresV3(operationId),
+		Paramaters: fillProtoStructuresV3(names),
+		Properties: fillProtoStructuresV3(properties),
+	}
+
+	return vocab
 }

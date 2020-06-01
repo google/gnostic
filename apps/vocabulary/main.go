@@ -15,11 +15,8 @@
 package main
 
 import (
-	"flag"
 	"io/ioutil"
-	"log"
 	"os"
-	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 	metrics "github.com/googleapis/gnostic/metrics"
@@ -38,49 +35,7 @@ func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func main() {
-	flag.Parse()
-	args := flag.Args()
-
-	var schemas map[string]int
-	schemas = make(map[string]int)
-
-	var operationId map[string]int
-	operationId = make(map[string]int)
-
-	var names map[string]int
-	names = make(map[string]int)
-
-	var properties map[string]int
-	properties = make(map[string]int)
-
-	//Temporary, for now using filename to check file type
-	version_flag := strings.Contains(args[0], "swagger")
-	switch version_flag {
-	case true:
-		document, err := readDocumentFromFileWithNameV2(args[0])
-		if err != nil {
-			log.Printf("Error reading %s.", args[0])
-			os.Exit(1)
-		}
-		processDocumentV2(document, schemas, operationId, names, properties)
-	default:
-		document, err := readDocumentFromFileWithNameV3(args[0])
-		if err != nil {
-			log.Printf("Error reading %s.", args[0])
-			os.Exit(1)
-		}
-		processDocumentV3(document, schemas, operationId, names, properties)
-
-	}
-
-	vocab := &metrics.Vocabulary{
-		Schemas:    fillProtoStructures(schemas),
-		Operations: fillProtoStructures(operationId),
-		Paramaters: fillProtoStructures(names),
-		Properties: fillProtoStructures(properties),
-	}
-
+func serializeProto(vocab *metrics.Vocabulary) {
 	bytes, err := proto.Marshal(vocab)
 	if err != nil {
 		panic(err)
@@ -94,4 +49,44 @@ func main() {
 	s, err := m.MarshalToString(vocab)
 	jsonOutput := []byte(s)
 	err = ioutil.WriteFile("vocabulary.json", jsonOutput, os.ModePerm)
+}
+
+func main() {
+	// flag.Parse()
+	// args := flag.Args()
+
+	// var schemas map[string]int
+	// schemas = make(map[string]int)
+
+	// var operationId map[string]int
+	// operationId = make(map[string]int)
+
+	// var names map[string]int
+	// names = make(map[string]int)
+
+	// var properties map[string]int
+	// properties = make(map[string]int)
+
+	// //Temporary, for now using filename to check file type
+	// version_flag := strings.Contains(args[0], "swagger")
+	// switch version_flag {
+	// case true:
+	// 	document, err := readDocumentFromFileWithNameV2(args[0])
+	// 	if err != nil {
+	// 		log.Printf("Error reading %s.", args[0])
+	// 		os.Exit(1)
+	// 	}
+	// 	vocab := processDocumentV2(document, schemas, operationId, names, properties)
+	// 	serializeProto(vocab)
+	// default:
+	// 	document, err := readDocumentFromFileWithNameV3(args[0])
+	// 	if err != nil {
+	// 		log.Printf("Error reading %s.", args[0])
+	// 		os.Exit(1)
+	// 	}
+	// 	vocab := processDocumentV3(document, schemas, operationId, names, properties)
+	// 	serializeProto(vocab)
+
+	// }
+
 }
