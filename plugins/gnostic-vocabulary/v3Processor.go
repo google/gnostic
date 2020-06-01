@@ -35,7 +35,7 @@ func fillProtoStructuresV3(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func processOperationV3(operation *openapi_v3.Operation, operationId map[string]int, names map[string]int) {
+func processOperationV3(operation *openapi_v3.Operation, operationId, names map[string]int) {
 	if operation.OperationId != "" {
 		operationId[operation.OperationId] += 1
 	}
@@ -47,14 +47,14 @@ func processOperationV3(operation *openapi_v3.Operation, operationId map[string]
 	}
 }
 
-func processComponentsV3(components *openapi_v3.Components, schemas map[string]int, properties map[string]int) {
+func processComponentsV3(components *openapi_v3.Components, schemas, properties map[string]int) {
 	processParametersV3(components, schemas, properties)
 	processSchemasV3(components, schemas)
 	processResponsesV3(components, schemas)
 
 }
 
-func processParametersV3(components *openapi_v3.Components, schemas map[string]int, properties map[string]int) {
+func processParametersV3(components *openapi_v3.Components, schemas, properties map[string]int) {
 	for _, pair := range components.Parameters.AdditionalProperties {
 		schemas[pair.Name] += 1
 		switch t := pair.Value.Oneof.(type) {
@@ -76,7 +76,7 @@ func processResponsesV3(components *openapi_v3.Components, schemas map[string]in
 	}
 }
 
-func processDocumentV3(document *openapi_v3.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) *metrics.Vocabulary {
+func processDocumentV3(document *openapi_v3.Document, schemas, operationId, names, properties map[string]int) *metrics.Vocabulary {
 	if document.Components != nil {
 		processComponentsV3(document.Components, schemas, properties)
 

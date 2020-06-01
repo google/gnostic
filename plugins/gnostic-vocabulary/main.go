@@ -81,19 +81,18 @@ func main() {
 		// Return the analysis results with an appropriate filename.
 		// Results are in files named "summary.json" in the same relative
 		// locations as the description source files.
-
-		file2 := &plugins.File{}
-		file2.Name = "vocabulary.pb"
-		file2.Data, err = proto.Marshal(vocab)
-		env.RespondAndExitIfError(err)
-		env.Response.Files = append(env.Response.Files, file2)
-
 		file := &plugins.File{}
 		file.Name = "vocabulary.json"
 		file.Data, err = json.MarshalIndent(vocab, "", "  ")
 		file.Data = append(file.Data, []byte("\n")...)
 		env.RespondAndExitIfError(err)
 		env.Response.Files = append(env.Response.Files, file)
+
+		file2 := &plugins.File{}
+		file2.Name = "vocabulary.pb"
+		file2.Data, err = proto.Marshal(vocab)
+		env.RespondAndExitIfError(err)
+		env.Response.Files = append(env.Response.Files, file2)
 
 	}
 

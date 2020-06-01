@@ -34,7 +34,7 @@ func fillProtoStructuresV2(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func processOperationV2(operation *openapi_v2.Operation, operationId map[string]int, names map[string]int) {
+func processOperationV2(operation *openapi_v2.Operation, operationId, names map[string]int) {
 	if operation.OperationId != "" {
 		operationId[operation.OperationId] += 1
 	}
@@ -75,7 +75,7 @@ func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 	}
 }
 
-func processDocumentV2(document *openapi_v2.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) *metrics.Vocabulary {
+func processDocumentV2(document *openapi_v2.Document, schemas, operationId, names, properties map[string]int) *metrics.Vocabulary {
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			schemas[pair.Name] += 1
