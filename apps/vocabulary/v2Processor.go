@@ -8,7 +8,7 @@ import (
 	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
 
-func readDocumentFromFileWithName(filename string) (*openapi_v2.Document, error) {
+func readDocumentFromFileWithNameV2(filename string) (*openapi_v2.Document, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err

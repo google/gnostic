@@ -24,7 +24,7 @@ func readDocumentFromFileWithNameV3(filename string) (*openapi_v3.Document, erro
 
 func processDocumentV3(document *openapi_v3.Document, schemas map[string]int, operationId map[string]int, names map[string]int, properties map[string]int) {
 	if document.Components != nil {
-		processSchemaV3(document.Components, schemas, properties)
+		processComponentsV3(document.Components, schemas, properties)
 
 	}
 	for _, pair := range document.Paths.Path {
@@ -59,7 +59,14 @@ func processOperationV3(operation *openapi_v3.Operation, operationId map[string]
 	}
 }
 
-func processSchemaV3(components *openapi_v3.Components, schemas map[string]int, properties map[string]int) {
+func processComponentsV3(components *openapi_v3.Components, schemas map[string]int, properties map[string]int) {
+	processParametersV3(components, schemas, properties)
+	processSchemasV3(components, schemas)
+	processResponsesV3(components, schemas)
+
+}
+
+func processParametersV3(components *openapi_v3.Components, schemas map[string]int, properties map[string]int) {
 	for _, pair := range components.Parameters.AdditionalProperties {
 		schemas[pair.Name] += 1
 		switch t := pair.Value.Oneof.(type) {
@@ -67,9 +74,15 @@ func processSchemaV3(components *openapi_v3.Components, schemas map[string]int, 
 			properties[t.Parameter.Name] += 1
 		}
 	}
+}
+
+func processSchemasV3(components *openapi_v3.Components, schemas map[string]int) {
 	for _, pair := range components.Schemas.AdditionalProperties {
 		schemas[pair.Name] += 1
 	}
+}
+
+func processResponsesV3(components *openapi_v3.Components, schemas map[string]int) {
 	for _, pair := range components.Responses.AdditionalProperties {
 		schemas[pair.Name] += 1
 	}

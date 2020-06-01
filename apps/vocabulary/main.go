@@ -54,11 +54,11 @@ func main() {
 	var properties map[string]int
 	properties = make(map[string]int)
 
-	//Temporary, for now using filename ot check file type
+	//Temporary, for now using filename to check file type
 	version_flag := strings.Contains(args[0], "swagger")
 	switch version_flag {
 	case true:
-		document, err := readDocumentFromFileWithName(args[0])
+		document, err := readDocumentFromFileWithNameV2(args[0])
 		if err != nil {
 			log.Printf("Error reading %s.", args[0])
 			os.Exit(1)
