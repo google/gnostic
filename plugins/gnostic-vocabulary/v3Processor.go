@@ -1,28 +1,11 @@
 package main
 
 import (
-	"io/ioutil"
 	"sort"
-
-	"github.com/golang/protobuf/proto"
 
 	metrics "github.com/googleapis/gnostic/metrics"
 	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 )
-
-func readDocumentFromFileWithNameV3(filename string) (*openapi_v3.Document, error) {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	document := &openapi_v3.Document{}
-	err = proto.Unmarshal(data, document)
-	if err != nil {
-		return nil, err
-	}
-	return document, nil
-
-}
 
 func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 	key_names := make([]string, 0, len(m))
@@ -58,7 +41,6 @@ func processComponentsV3(components *openapi_v3.Components, schemas, properties 
 	processParametersV3(components, schemas, properties)
 	processSchemasV3(components, schemas)
 	processResponsesV3(components, schemas)
-
 }
 
 func processParametersV3(components *openapi_v3.Components, schemas, properties map[string]int) {
@@ -92,7 +74,19 @@ func processResponsesV3(components *openapi_v3.Components, schemas map[string]in
 	}
 }
 
-func processDocumentV3(document *openapi_v3.Document, schemas, operationId, names, properties map[string]int) *metrics.Vocabulary {
+func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
+	var schemas map[string]int
+	schemas = make(map[string]int)
+
+	var operationId map[string]int
+	operationId = make(map[string]int)
+
+	var names map[string]int
+	names = make(map[string]int)
+
+	var properties map[string]int
+	properties = make(map[string]int)
+
 	if document.Components != nil {
 		processComponentsV3(document.Components, schemas, properties)
 

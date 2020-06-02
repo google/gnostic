@@ -1,27 +1,9 @@
 package main
 
 import (
-	"io/ioutil"
-
-	"github.com/golang/protobuf/proto"
-
 	metrics "github.com/googleapis/gnostic/metrics"
 	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
-
-func readDocumentFromFileWithNameV2(filename string) (*openapi_v2.Document, error) {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	document := &openapi_v2.Document{}
-	err = proto.Unmarshal(data, document)
-	if err != nil {
-		return nil, err
-	}
-	return document, nil
-
-}
 
 func processOperationV2(operation *openapi_v2.Operation, operationId, names map[string]int) {
 	if operation.OperationId != "" {
@@ -36,7 +18,6 @@ func processOperationV2(operation *openapi_v2.Operation, operationId, names map[
 			case *openapi_v2.Parameter_NonBodyParameter:
 				nonBodyParam := t2.NonBodyParameter
 				processOperationParamatersV2(operation, names, nonBodyParam)
-
 			}
 		}
 	}
@@ -64,7 +45,19 @@ func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 	}
 }
 
-func processDocumentV2(document *openapi_v2.Document, schemas, operationId, names, properties map[string]int) *metrics.Vocabulary {
+func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
+	var schemas map[string]int
+	schemas = make(map[string]int)
+
+	var operationId map[string]int
+	operationId = make(map[string]int)
+
+	var names map[string]int
+	names = make(map[string]int)
+
+	var properties map[string]int
+	properties = make(map[string]int)
+
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			schemas[pair.Name] += 1

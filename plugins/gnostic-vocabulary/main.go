@@ -47,18 +47,6 @@ func main() {
 
 	var vocab *metrics.Vocabulary
 
-	var schemas map[string]int
-	schemas = make(map[string]int)
-
-	var operationId map[string]int
-	operationId = make(map[string]int)
-
-	var names map[string]int
-	names = make(map[string]int)
-
-	var properties map[string]int
-	properties = make(map[string]int)
-
 	for _, model := range env.Request.Models {
 		switch model.TypeUrl {
 		case "openapi.v2.Document":
@@ -66,22 +54,19 @@ func main() {
 			err = proto.Unmarshal(model.Value, documentv2)
 			if err == nil {
 				// Analyze the API document.
-				vocab = processDocumentV2(documentv2, schemas, operationId, names, properties)
+				vocab = processDocumentV2(documentv2)
 			}
 		case "openapi.v3.Document":
 			documentv3 := &openapiv3.Document{}
 			err = proto.Unmarshal(model.Value, documentv3)
 			if err == nil {
 				// Analyze the API document.
-				vocab = processDocumentV3(documentv3, schemas, operationId, names, properties)
+				vocab = processDocumentV3(documentv3)
 			}
 		}
 	}
 
 	if vocab != nil {
-		// Return the analysis results with an appropriate filename.
-		// Results are in files named "summary.json" in the same relative
-		// locations as the description source files.
 		outputName1 := filepath.Join(
 			filepath.Dir(env.Request.SourceName), "vocabulary.json")
 		outputName2 := filepath.Join(
@@ -90,8 +75,8 @@ func main() {
 
 		file.Name = outputName1
 		file.Data, err = json.MarshalIndent(vocab, "", "  ")
-		file.Data = append(file.Data, []byte("\n")...)
 		env.RespondAndExitIfError(err)
+		file.Data = append(file.Data, []byte("\n")...)
 		env.Response.Files = append(env.Response.Files, file)
 
 		file2 := &plugins.File{}
