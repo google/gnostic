@@ -1,6 +1,6 @@
 
 
-/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/examples/v2.0/yaml/vocabulary.json -------------------- 
+/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/examples/v3.0/yaml/vocabulary.json -------------------- 
 {
   "schemas": [
     {
@@ -13,28 +13,6 @@
     },
     {
       "word": "Pets",
-      "count": 1
-    }
-  ],
-  "properties": [
-    {
-      "word": "code",
-      "count": 1
-    },
-    {
-      "word": "id",
-      "count": 1
-    },
-    {
-      "word": "message",
-      "count": 1
-    },
-    {
-      "word": "name",
-      "count": 1
-    },
-    {
-      "word": "tag",
       "count": 1
     }
   ],
@@ -65,19 +43,14 @@
 }
 
 
-/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/examples/v2.0/yaml/vocabulary.pb -------------------- 
+/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/examples/v3.0/yaml/vocabulary.pb -------------------- 
 
 	
 Error
 
 Pet
 
-Pets
-code
-id
-message
-name
-tag
+Pets
 
 createPets
 listPets

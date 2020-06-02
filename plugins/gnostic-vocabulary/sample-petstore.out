@@ -18,15 +18,7 @@
   ],
   "properties": [
     {
-      "word": "code",
-      "count": 1
-    },
-    {
       "word": "id",
-      "count": 1
-    },
-    {
-      "word": "message",
       "count": 1
     },
     {
@@ -36,15 +28,23 @@
     {
       "word": "tag",
       "count": 1
+    },
+    {
+      "word": "code",
+      "count": 1
+    },
+    {
+      "word": "message",
+      "count": 1
     }
   ],
   "operations": [
     {
-      "word": "createPets",
+      "word": "listPets",
       "count": 1
     },
     {
-      "word": "listPets",
+      "word": "createPets",
       "count": 1
     },
     {
@@ -72,15 +72,15 @@
 
 Pet
 
-Pets
-code
-id
-message
+Pets
+id
 name
-tag
+tag
+code
+message
+listPets
 
-createPets
-listPets
+createPets
 showPetById"	
 limit"	
 petId

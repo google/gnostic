@@ -16,6 +16,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 
 	"github.com/golang/protobuf/proto"
 	metrics "github.com/googleapis/gnostic/metrics"
@@ -81,15 +82,20 @@ func main() {
 		// Return the analysis results with an appropriate filename.
 		// Results are in files named "summary.json" in the same relative
 		// locations as the description source files.
+		outputName1 := filepath.Join(
+			filepath.Dir(env.Request.SourceName), "vocabulary.json")
+		outputName2 := filepath.Join(
+			filepath.Dir(env.Request.SourceName), "vocabulary.pb")
 		file := &plugins.File{}
-		file.Name = "vocabulary.json"
+
+		file.Name = outputName1
 		file.Data, err = json.MarshalIndent(vocab, "", "  ")
 		file.Data = append(file.Data, []byte("\n")...)
 		env.RespondAndExitIfError(err)
 		env.Response.Files = append(env.Response.Files, file)
 
 		file2 := &plugins.File{}
-		file2.Name = "vocabulary.pb"
+		file2.Name = outputName2
 		file2.Data, err = proto.Marshal(vocab)
 		env.RespondAndExitIfError(err)
 		env.Response.Files = append(env.Response.Files, file2)

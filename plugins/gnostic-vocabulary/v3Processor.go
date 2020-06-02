@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"sort"
 
 	"github.com/golang/protobuf/proto"
 
@@ -23,12 +24,18 @@ func readDocumentFromFileWithNameV3(filename string) (*openapi_v3.Document, erro
 
 }
 
-func fillProtoStructuresV3(m map[string]int) []*metrics.WordCount {
+func fillProtoStructures(m map[string]int) []*metrics.WordCount {
+	key_names := make([]string, 0, len(m))
+	for key := range m {
+		key_names = append(key_names, key)
+	}
+	sort.Strings(key_names)
+
 	counts := make([]*metrics.WordCount, 0)
-	for k, v := range m {
+	for _, k := range key_names {
 		temp := &metrics.WordCount{
 			Word:  k,
-			Count: int32(v),
+			Count: int32(m[k]),
 		}
 		counts = append(counts, temp)
 	}
@@ -55,6 +62,9 @@ func processComponentsV3(components *openapi_v3.Components, schemas, properties 
 }
 
 func processParametersV3(components *openapi_v3.Components, schemas, properties map[string]int) {
+	if components.Parameters == nil {
+		return
+	}
 	for _, pair := range components.Parameters.AdditionalProperties {
 		schemas[pair.Name] += 1
 		switch t := pair.Value.Oneof.(type) {
@@ -65,12 +75,18 @@ func processParametersV3(components *openapi_v3.Components, schemas, properties 
 }
 
 func processSchemasV3(components *openapi_v3.Components, schemas map[string]int) {
+	if components.Schemas == nil {
+		return
+	}
 	for _, pair := range components.Schemas.AdditionalProperties {
 		schemas[pair.Name] += 1
 	}
 }
 
 func processResponsesV3(components *openapi_v3.Components, schemas map[string]int) {
+	if components.Responses == nil {
+		return
+	}
 	for _, pair := range components.Responses.AdditionalProperties {
 		schemas[pair.Name] += 1
 	}
@@ -101,10 +117,10 @@ func processDocumentV3(document *openapi_v3.Document, schemas, operationId, name
 	}
 
 	vocab := &metrics.Vocabulary{
-		Schemas:    fillProtoStructuresV3(schemas),
-		Operations: fillProtoStructuresV3(operationId),
-		Paramaters: fillProtoStructuresV3(names),
-		Properties: fillProtoStructuresV3(properties),
+		Schemas:    fillProtoStructures(schemas),
+		Operations: fillProtoStructures(operationId),
+		Paramaters: fillProtoStructures(names),
+		Properties: fillProtoStructures(properties),
 	}
 
 	return vocab

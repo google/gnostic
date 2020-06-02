@@ -22,17 +22,6 @@ func readDocumentFromFileWithNameV2(filename string) (*openapi_v2.Document, erro
 	return document, nil
 
 }
-func fillProtoStructuresV2(m map[string]int) []*metrics.WordCount {
-	counts := make([]*metrics.WordCount, 0)
-	for k, v := range m {
-		temp := &metrics.WordCount{
-			Word:  k,
-			Count: int32(v),
-		}
-		counts = append(counts, temp)
-	}
-	return counts
-}
 
 func processOperationV2(operation *openapi_v2.Operation, operationId, names map[string]int) {
 	if operation.OperationId != "" {
@@ -102,10 +91,10 @@ func processDocumentV2(document *openapi_v2.Document, schemas, operationId, name
 	}
 
 	vocab := &metrics.Vocabulary{
-		Schemas:    fillProtoStructuresV2(schemas),
-		Operations: fillProtoStructuresV2(operationId),
-		Paramaters: fillProtoStructuresV2(names),
-		Properties: fillProtoStructuresV2(properties),
+		Schemas:    fillProtoStructures(schemas),
+		Operations: fillProtoStructures(operationId),
+		Paramaters: fillProtoStructures(names),
+		Properties: fillProtoStructures(properties),
 	}
 
 	return vocab
