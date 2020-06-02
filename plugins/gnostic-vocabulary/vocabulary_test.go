@@ -48,17 +48,15 @@ func testPlugin(t *testing.T, plugin string, inputFile string, outputFile string
 func TestSamplePluginWithPetstoreV2(t *testing.T) {
 	testPlugin(t,
 		"vocabulary",
-		"/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/examples/v2.0/yaml/petstore.yaml",
-		"sample-petstorev2.out",
-		"/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/testdata/v2.0/yaml/sample-petstore.out")
-
+		"../../examples/v2.0/yaml/petstore.yaml",
+		"vocabulary-petstore-v2.out",
+		"../../testdata/v2.0/yaml/vocabulary-petstore.out")
 }
 
 func TestSamplePluginWithPetstoreV3(t *testing.T) {
 	testPlugin(t,
 		"vocabulary",
-		"/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/examples/v3.0/yaml/petstore.yaml",
-		"sample-petstorev3.out",
-		"/usr/local/google/home/nicolegizzo/Desktop/fields/gnostic/testdata/v3.0/yaml/sample-petstore.out")
-
+		"../../examples/v3.0/yaml/petstore.yaml",
+		"vocabulary-petstore-v3.out",
+		"../../testdata/v3.0/yaml/vocabulary-petstore.out")
 }

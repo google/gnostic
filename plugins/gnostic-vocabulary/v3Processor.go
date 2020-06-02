@@ -111,11 +111,10 @@ func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
 	}
 
 	vocab := &metrics.Vocabulary{
+		Properties: fillProtoStructures(properties),
 		Schemas:    fillProtoStructures(schemas),
 		Operations: fillProtoStructures(operationId),
 		Paramaters: fillProtoStructures(names),
-		Properties: fillProtoStructures(properties),
 	}
-
 	return vocab
 }
