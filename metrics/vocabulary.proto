@@ -28,6 +28,6 @@ message Vocabulary{
     repeated WordCount schemas = 1;
     repeated WordCount properties = 2;
     repeated WordCount operations = 3;
-    repeated WordCount paramaters = 4;
+    repeated WordCount parameters = 4;
     
 }
