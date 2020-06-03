@@ -17,13 +17,13 @@ func processOperationV2(operation *openapi_v2.Operation, operationId, parameters
 				parameters[t2.BodyParameter.Name] += 1
 			case *openapi_v2.Parameter_NonBodyParameter:
 				nonBodyParam := t2.NonBodyParameter
-				processOperationParamatersV2(operation, parameters, nonBodyParam)
+				processOperationParametersV2(operation, parameters, nonBodyParam)
 			}
 		}
 	}
 }
 
-func processOperationParamatersV2(operation *openapi_v2.Operation, parameters map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
+func processOperationParametersV2(operation *openapi_v2.Operation, parameters map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
 	switch t3 := nonBodyParam.Oneof.(type) {
 	case *openapi_v2.NonBodyParameter_FormDataParameterSubSchema:
 		parameters[t3.FormDataParameterSubSchema.Name] += 1
