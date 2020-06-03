@@ -25,14 +25,14 @@ func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func processOperationV3(operation *openapi_v3.Operation, operationId, names map[string]int) {
+func processOperationV3(operation *openapi_v3.Operation, operationId, parameters map[string]int) {
 	if operation.OperationId != "" {
 		operationId[operation.OperationId] += 1
 	}
 	for _, item := range operation.Parameters {
 		switch t := item.Oneof.(type) {
 		case *openapi_v3.ParameterOrReference_Parameter:
-			names[t.Parameter.Name] += 1
+			parameters[t.Parameter.Name] += 1
 		}
 	}
 }
@@ -81,8 +81,8 @@ func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
 	var operationId map[string]int
 	operationId = make(map[string]int)
 
-	var names map[string]int
-	names = make(map[string]int)
+	var parameters map[string]int
+	parameters = make(map[string]int)
 
 	var properties map[string]int
 	properties = make(map[string]int)
@@ -94,19 +94,19 @@ func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperationV3(v.Get, operationId, names)
+			processOperationV3(v.Get, operationId, parameters)
 		}
 		if v.Post != nil {
-			processOperationV3(v.Post, operationId, names)
+			processOperationV3(v.Post, operationId, parameters)
 		}
 		if v.Put != nil {
-			processOperationV3(v.Put, operationId, names)
+			processOperationV3(v.Put, operationId, parameters)
 		}
 		if v.Patch != nil {
-			processOperationV3(v.Patch, operationId, names)
+			processOperationV3(v.Patch, operationId, parameters)
 		}
 		if v.Delete != nil {
-			processOperationV3(v.Delete, operationId, names)
+			processOperationV3(v.Delete, operationId, parameters)
 		}
 	}
 
@@ -114,7 +114,7 @@ func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
 		Properties: fillProtoStructures(properties),
 		Schemas:    fillProtoStructures(schemas),
 		Operations: fillProtoStructures(operationId),
-		Paramaters: fillProtoStructures(names),
+		Parameters: fillProtoStructures(parameters),
 	}
 	return vocab
 }

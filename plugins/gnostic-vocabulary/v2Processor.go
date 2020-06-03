@@ -5,7 +5,7 @@ import (
 	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
 
-func processOperationV2(operation *openapi_v2.Operation, operationId, names map[string]int) {
+func processOperationV2(operation *openapi_v2.Operation, operationId, parameters map[string]int) {
 	if operation.OperationId != "" {
 		operationId[operation.OperationId] += 1
 	}
@@ -14,25 +14,25 @@ func processOperationV2(operation *openapi_v2.Operation, operationId, names map[
 		case *openapi_v2.ParametersItem_Parameter:
 			switch t2 := t.Parameter.Oneof.(type) {
 			case *openapi_v2.Parameter_BodyParameter:
-				names[t2.BodyParameter.Name] += 1
+				parameters[t2.BodyParameter.Name] += 1
 			case *openapi_v2.Parameter_NonBodyParameter:
 				nonBodyParam := t2.NonBodyParameter
-				processOperationParamatersV2(operation, names, nonBodyParam)
+				processOperationParamatersV2(operation, parameters, nonBodyParam)
 			}
 		}
 	}
 }
 
-func processOperationParamatersV2(operation *openapi_v2.Operation, names map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
+func processOperationParamatersV2(operation *openapi_v2.Operation, parameters map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
 	switch t3 := nonBodyParam.Oneof.(type) {
 	case *openapi_v2.NonBodyParameter_FormDataParameterSubSchema:
-		names[t3.FormDataParameterSubSchema.Name] += 1
+		parameters[t3.FormDataParameterSubSchema.Name] += 1
 	case *openapi_v2.NonBodyParameter_HeaderParameterSubSchema:
-		names[t3.HeaderParameterSubSchema.Name] += 1
+		parameters[t3.HeaderParameterSubSchema.Name] += 1
 	case *openapi_v2.NonBodyParameter_PathParameterSubSchema:
-		names[t3.PathParameterSubSchema.Name] += 1
+		parameters[t3.PathParameterSubSchema.Name] += 1
 	case *openapi_v2.NonBodyParameter_QueryParameterSubSchema:
-		names[t3.QueryParameterSubSchema.Name] += 1
+		parameters[t3.QueryParameterSubSchema.Name] += 1
 	}
 }
 
@@ -52,8 +52,8 @@ func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
 	var operationId map[string]int
 	operationId = make(map[string]int)
 
-	var names map[string]int
-	names = make(map[string]int)
+	var parameters map[string]int
+	parameters = make(map[string]int)
 
 	var properties map[string]int
 	properties = make(map[string]int)
@@ -67,26 +67,26 @@ func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperationV2(v.Get, operationId, names)
+			processOperationV2(v.Get, operationId, parameters)
 		}
 		if v.Post != nil {
-			processOperationV2(v.Post, operationId, names)
+			processOperationV2(v.Post, operationId, parameters)
 		}
 		if v.Put != nil {
-			processOperationV2(v.Put, operationId, names)
+			processOperationV2(v.Put, operationId, parameters)
 		}
 		if v.Patch != nil {
-			processOperationV2(v.Patch, operationId, names)
+			processOperationV2(v.Patch, operationId, parameters)
 		}
 		if v.Delete != nil {
-			processOperationV2(v.Delete, operationId, names)
+			processOperationV2(v.Delete, operationId, parameters)
 		}
 	}
 
 	vocab := &metrics.Vocabulary{
 		Schemas:    fillProtoStructures(schemas),
 		Operations: fillProtoStructures(operationId),
-		Paramaters: fillProtoStructures(names),
+		Parameters: fillProtoStructures(parameters),
 		Properties: fillProtoStructures(properties),
 	}
 
