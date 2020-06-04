@@ -325,7 +325,6 @@ Options:
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
   --time-plugins      Report plugin runtimes.
-  --surface           Include surface model in calls to plugins (default).
   --no-surface        Exclude surface model from calls to plugins.
   --help              Print usage information and exit.
 `
@@ -381,8 +380,6 @@ func (g *Gnostic) readOptions() error {
 			g.resolveReferences = true
 		} else if arg == "--time-plugins" {
 			g.timePlugins = true
-		} else if arg == "--surface" {
-			g.excludeSurface = false
 		} else if arg == "--no-surface" {
 			g.excludeSurface = true
 		} else if arg[0] == '-' && arg[1] == '-' {
