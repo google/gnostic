@@ -1,6 +1,6 @@
 
 
-summary.txt -------------------- 
+../examples/v2.0/yaml/summary.txt -------------------- 
 Swagger: 2.0
 Host: petstore.swagger.io
 BasePath: /v1
