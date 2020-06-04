@@ -20,7 +20,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"sort"
 
@@ -42,19 +41,19 @@ func pbToCSV(vocab *metrics.Vocabulary) {
 		return
 	}
 	for _, s := range vocab.Schemas {
-		temp := fmt.Sprintf("%s,%s,%d\n", "Schemas", s.Word, int(s.Count))
+		temp := fmt.Sprintf("%s,%s,%d\n", "schemas", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
 	for _, s := range vocab.Properties {
-		temp := fmt.Sprintf("%s,%s,%d\n", "Properties", s.Word, int(s.Count))
+		temp := fmt.Sprintf("%s,%s,%d\n", "properties", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
 	for _, s := range vocab.Operations {
-		temp := fmt.Sprintf("%s,%s,%d\n", "Operations", s.Word, int(s.Count))
+		temp := fmt.Sprintf("%s,%s,%d\n", "operations", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
 	for _, s := range vocab.Parameters {
-		temp := fmt.Sprintf("%s,%s,%d\n", "Parameters", s.Word, int(s.Count))
+		temp := fmt.Sprintf("%s,%s,%d\n", "parameters", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
 	f4.Close()
@@ -71,17 +70,13 @@ func pbOutput(combinedVocab *metrics.Vocabulary) {
 	}
 }
 
-func openCombinedPbResults(filename string) *metrics.Vocabulary {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	scanner := bufio.NewScanner(file)
+func openCombinedPbResults() *metrics.Vocabulary {
+	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		readVocabularyFromFileWithName(scanner.Text())
 	}
-	file.Close()
+
 	vocab := &metrics.Vocabulary{
 		Properties: fillProtoStructures(properties),
 		Schemas:    fillProtoStructures(schemas),
@@ -141,28 +136,22 @@ func unpackageVocabulary(vocab *metrics.Vocabulary) {
 }
 
 func main() {
-	// outputPtr := flag.String("output", "NIL", "output type")
+	csvPtr := flag.Bool("csv", false, "generate csv output")
+	pbPtr := flag.Bool("pb", false, "generate pb output")
+
 	flag.Parse()
-	args := flag.Args()
 
 	schemas = make(map[string]int)
 	operationId = make(map[string]int)
 	parameters = make(map[string]int)
 	properties = make(map[string]int)
 
-	combinedVocab := openCombinedPbResults(args[0])
+	combinedVocab := openCombinedPbResults()
 
-	if len(args) == 1 {
-		return
-	}
-	switch args[1] {
-	case "--csv":
-		pbToCSV(combinedVocab)
-		return
-	case "--pb":
+	if *pbPtr {
 		pbOutput(combinedVocab)
-		return
-	default:
-		return
+	}
+	if *csvPtr {
+		pbToCSV(combinedVocab)
 	}
 }
