@@ -17,6 +17,9 @@
 package main
 
 import (
+	"log"
+	"path/filepath"
+
 	"github.com/golang/protobuf/proto"
 	openapiv2 "github.com/googleapis/gnostic/openapiv2"
 	openapiv3 "github.com/googleapis/gnostic/openapiv3"
@@ -110,8 +113,11 @@ func main() {
 			}
 		}
 	}
+	outputName := filepath.Join(
+		filepath.Dir(env.Request.SourceName), "summary.txt")
+	log.Printf("generating %+v", outputName)
 	f := &plugins.File{
-		Name: "summary.txt",
+		Name: outputName,
 		Data: []byte(code.String()),
 	}
 	env.Response.Files = append(env.Response.Files, f)
