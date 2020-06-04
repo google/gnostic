@@ -19,6 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -212,6 +214,18 @@ func isDirectory(path string) bool {
 	return fileInfo.IsDir()
 }
 
+func isURL(path string) bool {
+	_, err := url.ParseRequestURI(path)
+	if err != nil {
+		return false
+	}
+	u, err := url.Parse(path)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
+}
+
 // Write bytes to a named file.
 // Certain names have special meaning:
 //   ! writes nothing
@@ -227,12 +241,23 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = os.Stdout
 	} else if name == "=" {
 		writer = os.Stderr
+	} else if isDirectory(name) && !isURL(source) {
+		base := source
+		// Remove the original source extension.
+		base = base[0 : len(base)-len(filepath.Ext(base))]
+		// Build the path that puts the result in the passed-in directory.
+		filename := base + "." + extension
+		log.Printf("WRITING %s", filename)
+		file, _ := os.Create(filename)
+		defer file.Close()
+		writer = file
 	} else if isDirectory(name) {
 		base := filepath.Base(source)
 		// Remove the original source extension.
 		base = base[0 : len(base)-len(filepath.Ext(base))]
 		// Build the path that puts the result in the passed-in directory.
 		filename := name + "/" + base + "." + extension
+		log.Printf("WRITING %s", filename)
 		file, _ := os.Create(filename)
 		defer file.Close()
 		writer = file
