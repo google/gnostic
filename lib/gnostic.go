@@ -246,8 +246,13 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		// Remove the original source extension.
 		base = base[0 : len(base)-len(filepath.Ext(base))]
 		// Build the path that puts the result in the passed-in directory.
-		filename := base + "." + extension
-		log.Printf("WRITING %s", filename)
+		filename := name + "/" + base + "." + extension
+		// Make sure that the necessary output directory exists
+		err := os.MkdirAll(filepath.Dir(filename), os.ModePerm)
+		if err != nil {
+			log.Printf("error creating %s: %s", filepath.Dir(filename), err.Error())
+		}
+		// Write the file
 		file, _ := os.Create(filename)
 		defer file.Close()
 		writer = file
@@ -257,7 +262,6 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		base = base[0 : len(base)-len(filepath.Ext(base))]
 		// Build the path that puts the result in the passed-in directory.
 		filename := name + "/" + base + "." + extension
-		log.Printf("WRITING %s", filename)
 		file, _ := os.Create(filename)
 		defer file.Close()
 		writer = file
