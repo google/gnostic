@@ -97,7 +97,7 @@ type pluginCall struct {
 }
 
 // Invokes a plugin.
-func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool) ([]*plugins.Message, error) {
+func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool, generateSurface bool) ([]*plugins.Message, error) {
 	if p.Name != "" {
 		request := &plugins.Request{}
 
@@ -151,17 +151,21 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		switch sourceFormat {
 		case SourceFormatOpenAPI2:
 			request.AddModel("openapi.v2.Document", document)
-			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document), sourceName)
-			if err == nil {
-				request.AddModel("surface.v1.Model", surfaceModel)
+			if generateSurface {
+				// include experimental API surface model
+				surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document), sourceName)
+				if err == nil {
+					request.AddModel("surface.v1.Model", surfaceModel)
+				}
 			}
 		case SourceFormatOpenAPI3:
 			request.AddModel("openapi.v3.Document", document)
-			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document), sourceName)
-			if err == nil {
-				request.AddModel("surface.v1.Model", surfaceModel)
+			if generateSurface {
+				// include experimental API surface model
+				surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document), sourceName)
+				if err == nil {
+					request.AddModel("surface.v1.Model", surfaceModel)
+				}
 			}
 		case SourceFormatDiscovery:
 			request.AddModel("discovery.v1.Document", document)
@@ -292,6 +296,7 @@ type Gnostic struct {
 	extensionHandlers []compiler.ExtensionHandler
 	sourceFormat      int
 	timePlugins       bool
+	generateSurface   bool
 }
 
 // NewGnostic initializes a structure to store global application state.
@@ -320,6 +325,7 @@ Options:
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
   --time-plugins      Report plugin runtimes.
+  --generate-surface  Generate and include surface model in calls to plugins.
   --help              Print usage information and exit.
 `
 	// Initialize internal structures.
@@ -374,6 +380,8 @@ func (g *Gnostic) readOptions() error {
 			g.resolveReferences = true
 		} else if arg == "--time-plugins" {
 			g.timePlugins = true
+		} else if arg == "--generate-surface" {
+			g.generateSurface = true
 		} else if arg[0] == '-' && arg[1] == '-' {
 			// try letting the option specify a plugin with no output files (or unwanted output files)
 			// this is useful for calling plugins like linters that only return messages
@@ -588,7 +596,7 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 	messages := make([]*plugins.Message, 0)
 	errors := make([]error, 0)
 	for _, p := range g.pluginCalls {
-		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins)
+		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins, g.generateSurface)
 		if err != nil {
 			// we don't exit or fail here so that we run all plugins even when some have errors
 			errors = append(errors, err)
