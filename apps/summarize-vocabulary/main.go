@@ -27,39 +27,43 @@ import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
+/*
+These variables were made globally because multiple
+functions will be accessing and mutating them.
+*/
 var schemas map[string]int
 var operationId map[string]int
 var parameters map[string]int
 var properties map[string]int
 
-func pbToCSV(vocab *metrics.Vocabulary) {
+func writeCSV(v *metrics.Vocabulary) {
 	f4, ferror := os.Create("summarize-vocabulary.csv")
 	if ferror != nil {
 		fmt.Println(ferror)
 		f4.Close()
 		return
 	}
-	for _, s := range vocab.Schemas {
+	for _, s := range v.Schemas {
 		temp := fmt.Sprintf("%s,%s,%d\n", "schemas", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
-	for _, s := range vocab.Properties {
+	for _, s := range v.Properties {
 		temp := fmt.Sprintf("%s,%s,%d\n", "properties", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
-	for _, s := range vocab.Operations {
+	for _, s := range v.Operations {
 		temp := fmt.Sprintf("%s,%s,%d\n", "operations", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
-	for _, s := range vocab.Parameters {
+	for _, s := range v.Parameters {
 		temp := fmt.Sprintf("%s,%s,%d\n", "parameters", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
 	f4.Close()
 }
 
-func pbOutput(combinedVocab *metrics.Vocabulary) {
-	bytes, err := proto.Marshal(combinedVocab)
+func writePb(v *metrics.Vocabulary) {
+	bytes, err := proto.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
@@ -69,20 +73,20 @@ func pbOutput(combinedVocab *metrics.Vocabulary) {
 	}
 }
 
-func openCombinedPbResults() *metrics.Vocabulary {
+func combineVocabularies() *metrics.Vocabulary {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		readVocabularyFromFileWithName(scanner.Text())
 	}
 
-	vocab := &metrics.Vocabulary{
+	v := &metrics.Vocabulary{
 		Properties: fillProtoStructures(properties),
 		Schemas:    fillProtoStructures(schemas),
 		Operations: fillProtoStructures(operationId),
 		Parameters: fillProtoStructures(parameters),
 	}
-	return vocab
+	return v
 
 }
 
@@ -111,25 +115,25 @@ func readVocabularyFromFileWithName(filename string) {
 		os.Exit(1)
 	}
 
-	vocab := &metrics.Vocabulary{}
-	err = proto.Unmarshal(data, vocab)
+	v := &metrics.Vocabulary{}
+	err = proto.Unmarshal(data, v)
 	if err != nil {
 		panic(err)
 	}
-	unpackageVocabulary(vocab)
+	unpackageVocabulary(v)
 }
 
-func unpackageVocabulary(vocab *metrics.Vocabulary) {
-	for _, s := range vocab.Schemas {
+func unpackageVocabulary(v *metrics.Vocabulary) {
+	for _, s := range v.Schemas {
 		schemas[s.Word] += int(s.Count)
 	}
-	for _, op := range vocab.Operations {
+	for _, op := range v.Operations {
 		operationId[op.Word] += int(op.Count)
 	}
-	for _, param := range vocab.Parameters {
+	for _, param := range v.Parameters {
 		parameters[param.Word] += int(param.Count)
 	}
-	for _, prop := range vocab.Properties {
+	for _, prop := range v.Properties {
 		properties[prop.Word] += int(prop.Count)
 	}
 }
@@ -140,17 +144,23 @@ func main() {
 
 	flag.Parse()
 
+	if !*pbPtr && !*csvPtr {
+		flag.PrintDefaults()
+		fmt.Printf("Please use one of the above command line arguments.\n")
+		os.Exit(-1)
+		return
+	}
 	schemas = make(map[string]int)
 	operationId = make(map[string]int)
 	parameters = make(map[string]int)
 	properties = make(map[string]int)
 
-	combinedVocab := openCombinedPbResults()
+	combinedVocab := combineVocabularies()
 
 	if *pbPtr {
-		pbOutput(combinedVocab)
+		writePb(combinedVocab)
 	}
 	if *csvPtr {
-		pbToCSV(combinedVocab)
+		writeCSV(combinedVocab)
 	}
 }
