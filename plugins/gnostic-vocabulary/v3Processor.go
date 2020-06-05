@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sort"
 
 	metrics "github.com/googleapis/gnostic/metrics"
@@ -59,7 +60,7 @@ func processParametersV3(components *openapi_v3.Components, schemas, properties 
 func processSchemasV3(components *openapi_v3.Components, schemas map[string]int) {
 	if components.Schemas == nil {
 		return
-	}
+	
 	for _, pair := range components.Schemas.AdditionalProperties {
 		schemas[pair.Name] += 1
 	}
