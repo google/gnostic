@@ -16,6 +16,28 @@
       "count": 1
     }
   ],
+  "properties": [
+    {
+      "word": "code",
+      "count": 1
+    },
+    {
+      "word": "id",
+      "count": 1
+    },
+    {
+      "word": "message",
+      "count": 1
+    },
+    {
+      "word": "name",
+      "count": 1
+    },
+    {
+      "word": "tag",
+      "count": 1
+    }
+  ],
   "operations": [
     {
       "word": "createPets",
@@ -50,7 +72,12 @@
 
 Pet
 
-Pets
+Pets
+code
+id
+message
+name
+tag
 
 createPets
 listPets

@@ -8,14 +8,14 @@ import (
 )
 
 func fillProtoStructures(m map[string]int) []*metrics.WordCount {
-	key_names := make([]string, 0, len(m))
+	keyNames := make([]string, 0, len(m))
 	for key := range m {
-		key_names = append(key_names, key)
+		keyNames = append(keyNames, key)
 	}
-	sort.Strings(key_names)
+	sort.Strings(keyNames)
 
 	counts := make([]*metrics.WordCount, 0)
-	for _, k := range key_names {
+	for _, k := range keyNames {
 		temp := &metrics.WordCount{
 			Word:  k,
 			Count: int32(m[k]),
@@ -25,43 +25,59 @@ func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func processOperationV3(operation *openapi_v3.Operation, operationId, parameters map[string]int) {
+func processOperationV3(operation *openapi_v3.Operation, operationID, parameters map[string]int) {
 	if operation.OperationId != "" {
-		operationId[operation.OperationId] += 1
+		operationID[operation.OperationId]++
 	}
 	for _, item := range operation.Parameters {
 		switch t := item.Oneof.(type) {
 		case *openapi_v3.ParameterOrReference_Parameter:
-			parameters[t.Parameter.Name] += 1
+			parameters[t.Parameter.Name]++
 		}
 	}
 }
 
-func processComponentsV3(components *openapi_v3.Components, schemas, properties map[string]int) {
-	processParametersV3(components, schemas, properties)
-	processSchemasV3(components, schemas)
+func processComponentsV3(components *openapi_v3.Components, schemas, parameters, properties map[string]int) {
+	processParametersV3(components, schemas, parameters)
+	processSchemasV3(components, schemas, properties)
 	processResponsesV3(components, schemas)
 }
 
-func processParametersV3(components *openapi_v3.Components, schemas, properties map[string]int) {
+func processParametersV3(components *openapi_v3.Components, schemas, parameters map[string]int) {
 	if components.Parameters == nil {
 		return
 	}
 	for _, pair := range components.Parameters.AdditionalProperties {
-		schemas[pair.Name] += 1
 		switch t := pair.Value.Oneof.(type) {
 		case *openapi_v3.ParameterOrReference_Parameter:
-			properties[t.Parameter.Name] += 1
+			parameters[t.Parameter.Name]++
 		}
 	}
 }
 
-func processSchemasV3(components *openapi_v3.Components, schemas map[string]int) {
+func processSchemasV3(components *openapi_v3.Components, schemas, properties map[string]int) {
 	if components.Schemas == nil {
 		return
 	}
 	for _, pair := range components.Schemas.AdditionalProperties {
-		schemas[pair.Name] += 1
+		schemas[pair.Name]++
+		processSchemaV3(pair.Value, properties)
+	}
+}
+
+func processSchemaV3(schema *openapi_v3.SchemaOrReference, properties map[string]int) {
+	if schema == nil {
+		return
+	}
+	switch t := schema.Oneof.(type) {
+	case *openapi_v3.SchemaOrReference_Reference:
+		return
+	case *openapi_v3.SchemaOrReference_Schema:
+		if t.Schema.Properties != nil {
+			for _, pair := range t.Schema.Properties.AdditionalProperties {
+				properties[pair.Name]++
+			}
+		}
 	}
 }
 
@@ -70,50 +86,43 @@ func processResponsesV3(components *openapi_v3.Components, schemas map[string]in
 		return
 	}
 	for _, pair := range components.Responses.AdditionalProperties {
-		schemas[pair.Name] += 1
+		schemas[pair.Name]++
 	}
 }
 
 func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
-	var schemas map[string]int
-	schemas = make(map[string]int)
-
-	var operationId map[string]int
-	operationId = make(map[string]int)
-
-	var parameters map[string]int
-	parameters = make(map[string]int)
-
-	var properties map[string]int
-	properties = make(map[string]int)
+	schemas := make(map[string]int)
+	operationID := make(map[string]int)
+	parameters := make(map[string]int)
+	properties := make(map[string]int)
 
 	if document.Components != nil {
-		processComponentsV3(document.Components, schemas, properties)
+		processComponentsV3(document.Components, schemas, parameters, properties)
 
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperationV3(v.Get, operationId, parameters)
+			processOperationV3(v.Get, operationID, parameters)
 		}
 		if v.Post != nil {
-			processOperationV3(v.Post, operationId, parameters)
+			processOperationV3(v.Post, operationID, parameters)
 		}
 		if v.Put != nil {
-			processOperationV3(v.Put, operationId, parameters)
+			processOperationV3(v.Put, operationID, parameters)
 		}
 		if v.Patch != nil {
-			processOperationV3(v.Patch, operationId, parameters)
+			processOperationV3(v.Patch, operationID, parameters)
 		}
 		if v.Delete != nil {
-			processOperationV3(v.Delete, operationId, parameters)
+			processOperationV3(v.Delete, operationID, parameters)
 		}
 	}
 
 	vocab := &metrics.Vocabulary{
 		Properties: fillProtoStructures(properties),
 		Schemas:    fillProtoStructures(schemas),
-		Operations: fillProtoStructures(operationId),
+		Operations: fillProtoStructures(operationID),
 		Parameters: fillProtoStructures(parameters),
 	}
 	return vocab

@@ -5,16 +5,16 @@ import (
 	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
 
-func processOperationV2(operation *openapi_v2.Operation, operationId, parameters map[string]int) {
+func processOperationV2(operation *openapi_v2.Operation, operationID, parameters map[string]int) {
 	if operation.OperationId != "" {
-		operationId[operation.OperationId] += 1
+		operationID[operation.OperationId]++
 	}
 	for _, item := range operation.Parameters {
 		switch t := item.Oneof.(type) {
 		case *openapi_v2.ParametersItem_Parameter:
 			switch t2 := t.Parameter.Oneof.(type) {
 			case *openapi_v2.Parameter_BodyParameter:
-				parameters[t2.BodyParameter.Name] += 1
+				parameters[t2.BodyParameter.Name]++
 			case *openapi_v2.Parameter_NonBodyParameter:
 				nonBodyParam := t2.NonBodyParameter
 				processOperationParametersV2(operation, parameters, nonBodyParam)
@@ -26,13 +26,13 @@ func processOperationV2(operation *openapi_v2.Operation, operationId, parameters
 func processOperationParametersV2(operation *openapi_v2.Operation, parameters map[string]int, nonBodyParam *openapi_v2.NonBodyParameter) {
 	switch t3 := nonBodyParam.Oneof.(type) {
 	case *openapi_v2.NonBodyParameter_FormDataParameterSubSchema:
-		parameters[t3.FormDataParameterSubSchema.Name] += 1
+		parameters[t3.FormDataParameterSubSchema.Name]++
 	case *openapi_v2.NonBodyParameter_HeaderParameterSubSchema:
-		parameters[t3.HeaderParameterSubSchema.Name] += 1
+		parameters[t3.HeaderParameterSubSchema.Name]++
 	case *openapi_v2.NonBodyParameter_PathParameterSubSchema:
-		parameters[t3.PathParameterSubSchema.Name] += 1
+		parameters[t3.PathParameterSubSchema.Name]++
 	case *openapi_v2.NonBodyParameter_QueryParameterSubSchema:
-		parameters[t3.QueryParameterSubSchema.Name] += 1
+		parameters[t3.QueryParameterSubSchema.Name]++
 	}
 }
 
@@ -41,51 +41,44 @@ func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 		return
 	}
 	for _, pair := range schema.Properties.AdditionalProperties {
-		properties[pair.Name] += 1
+		properties[pair.Name]++
 	}
 }
 
 func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
-	var schemas map[string]int
-	schemas = make(map[string]int)
-
-	var operationId map[string]int
-	operationId = make(map[string]int)
-
-	var parameters map[string]int
-	parameters = make(map[string]int)
-
-	var properties map[string]int
-	properties = make(map[string]int)
+	schemas := make(map[string]int)
+	operationID := make(map[string]int)
+	parameters := make(map[string]int)
+	properties := make(map[string]int)
 
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
-			schemas[pair.Name] += 1
+			schemas[pair.Name]++
 			processSchemaV2(pair.Value, properties)
 		}
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperationV2(v.Get, operationId, parameters)
+			processOperationV2(v.Get, operationID, parameters)
 		}
 		if v.Post != nil {
-			processOperationV2(v.Post, operationId, parameters)
+			processOperationV2(v.Post, operationID, parameters)
 		}
 		if v.Put != nil {
-			processOperationV2(v.Put, operationId, parameters)
+			processOperationV2(v.Put, operationID, parameters)
 		}
 		if v.Patch != nil {
-			processOperationV2(v.Patch, operationId, parameters)
+			processOperationV2(v.Patch, operationID, parameters)
 		}
 		if v.Delete != nil {
-			processOperationV2(v.Delete, operationId, parameters)
+			processOperationV2(v.Delete, operationID, parameters)
 		}
 	}
 
 	vocab := &metrics.Vocabulary{
 		Schemas:    fillProtoStructures(schemas),
-		Operations: fillProtoStructures(operationId),
+		Operations: fillProtoStructures(operationID),
 		Parameters: fillProtoStructures(parameters),
 		Properties: fillProtoStructures(properties),
 	}
