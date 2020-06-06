@@ -73,8 +73,10 @@ func processSchemaV3(schema *openapi_v3.SchemaOrReference, properties map[string
 	case *openapi_v3.SchemaOrReference_Reference:
 		return
 	case *openapi_v3.SchemaOrReference_Schema:
-		for _, pair := range t.Schema.Properties.AdditionalProperties {
-			properties[pair.Name]++
+		if t.Schema.Properties != nil {
+			for _, pair := range t.Schema.Properties.AdditionalProperties {
+				properties[pair.Name]++
+			}
 		}
 	}
 }
