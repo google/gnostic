@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:generate go run generate-base.go
+
 package jsonschema
 
 import (
@@ -24,6 +26,20 @@ import (
 // This is a global map of all known Schemas.
 // It is initialized when the first Schema is created and inserted.
 var schemas map[string]*Schema
+
+// NewBaseSchema builds a schema object from an embedded json representation.
+func NewBaseSchema() (schema *Schema, err error) {
+	b, err := baseSchemaBytes()
+	if err != nil {
+		return nil, err
+	}
+	var info yaml.MapSlice
+	err = yaml.Unmarshal(b, &info)
+	if err != nil {
+		return nil, err
+	}
+	return NewSchemaFromObject(info), nil
+}
 
 // NewSchemaFromFile reads a schema from a file.
 // Currently this assumes that schemas are stored in the source distribution of this project.
