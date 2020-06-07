@@ -159,8 +159,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	protoOutDirectory := outDir + "/" + "proto"
 	var err error
 
-	projectRoot := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/"
-	baseSchema, err := jsonschema.NewSchemaFromFile(projectRoot + "jsonschema/schema.json")
+	baseSchema, err := jsonschema.NewBaseSchema()
 	if err != nil {
 		return err
 	}
