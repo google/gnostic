@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"sort"
 
 	"github.com/golang/protobuf/proto"
 
@@ -32,46 +31,9 @@ These variables were made globally because multiple
 functions will be accessing and mutating them.
 */
 var schemas map[string]int
-var operationId map[string]int
+var operationID map[string]int
 var parameters map[string]int
 var properties map[string]int
-
-func writeCSV(v *metrics.Vocabulary) {
-	f4, ferror := os.Create("summarize-vocabulary.csv")
-	if ferror != nil {
-		fmt.Println(ferror)
-		f4.Close()
-		return
-	}
-	for _, s := range v.Schemas {
-		temp := fmt.Sprintf("%s,%s,%d\n", "schemas", s.Word, int(s.Count))
-		f4.WriteString(temp)
-	}
-	for _, s := range v.Properties {
-		temp := fmt.Sprintf("%s,%s,%d\n", "properties", s.Word, int(s.Count))
-		f4.WriteString(temp)
-	}
-	for _, s := range v.Operations {
-		temp := fmt.Sprintf("%s,%s,%d\n", "operations", s.Word, int(s.Count))
-		f4.WriteString(temp)
-	}
-	for _, s := range v.Parameters {
-		temp := fmt.Sprintf("%s,%s,%d\n", "parameters", s.Word, int(s.Count))
-		f4.WriteString(temp)
-	}
-	f4.Close()
-}
-
-func writePb(v *metrics.Vocabulary) {
-	bytes, err := proto.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	err = ioutil.WriteFile("summarize-vocabulary.pb", bytes, 0644)
-	if err != nil {
-		panic(err)
-	}
-}
 
 func combineVocabularies() *metrics.Vocabulary {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -81,31 +43,13 @@ func combineVocabularies() *metrics.Vocabulary {
 	}
 
 	v := &metrics.Vocabulary{
-		Properties: fillProtoStructures(properties),
-		Schemas:    fillProtoStructures(schemas),
-		Operations: fillProtoStructures(operationId),
-		Parameters: fillProtoStructures(parameters),
+		Properties: FillProtoStructures(properties),
+		Schemas:    FillProtoStructures(schemas),
+		Operations: FillProtoStructures(operationID),
+		Parameters: FillProtoStructures(parameters),
 	}
 	return v
 
-}
-
-func fillProtoStructures(m map[string]int) []*metrics.WordCount {
-	key_names := make([]string, 0, len(m))
-	for key := range m {
-		key_names = append(key_names, key)
-	}
-	sort.Strings(key_names)
-
-	counts := make([]*metrics.WordCount, 0)
-	for _, k := range key_names {
-		temp := &metrics.WordCount{
-			Word:  k,
-			Count: int32(m[k]),
-		}
-		counts = append(counts, temp)
-	}
-	return counts
 }
 
 func readVocabularyFromFileWithName(filename string) {
@@ -120,22 +64,7 @@ func readVocabularyFromFileWithName(filename string) {
 	if err != nil {
 		panic(err)
 	}
-	unpackageVocabulary(v)
-}
-
-func unpackageVocabulary(v *metrics.Vocabulary) {
-	for _, s := range v.Schemas {
-		schemas[s.Word] += int(s.Count)
-	}
-	for _, op := range v.Operations {
-		operationId[op.Word] += int(op.Count)
-	}
-	for _, param := range v.Parameters {
-		parameters[param.Word] += int(param.Count)
-	}
-	for _, prop := range v.Properties {
-		properties[prop.Word] += int(prop.Count)
-	}
+	UnpackageVocabulary(v)
 }
 
 func main() {
@@ -151,16 +80,16 @@ func main() {
 		return
 	}
 	schemas = make(map[string]int)
-	operationId = make(map[string]int)
+	operationID = make(map[string]int)
 	parameters = make(map[string]int)
 	properties = make(map[string]int)
 
 	combinedVocab := combineVocabularies()
 
 	if *pbPtr {
-		writePb(combinedVocab)
+		WritePb(combinedVocab)
 	}
 	if *csvPtr {
-		writeCSV(combinedVocab)
+		WriteCSV(combinedVocab)
 	}
 }

@@ -120,7 +120,7 @@ func generateOpenAPIModel(version string) error {
 
 	projectRoot := "./"
 
-	baseSchema, err := jsonschema.NewSchemaFromFile(projectRoot + "jsonschema/schema.json")
+	baseSchema, err := jsonschema.NewBaseSchema()
 	if err != nil {
 		return err
 	}

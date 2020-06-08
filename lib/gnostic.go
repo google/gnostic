@@ -19,6 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -95,7 +97,7 @@ type pluginCall struct {
 }
 
 // Invokes a plugin.
-func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool) ([]*plugins.Message, error) {
+func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool, excludeSurface bool) ([]*plugins.Message, error) {
 	if p.Name != "" {
 		request := &plugins.Request{}
 
@@ -149,17 +151,21 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		switch sourceFormat {
 		case SourceFormatOpenAPI2:
 			request.AddModel("openapi.v2.Document", document)
-			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document), sourceName)
-			if err == nil {
-				request.AddModel("surface.v1.Model", surfaceModel)
+			if !excludeSurface {
+				// include experimental API surface model
+				surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document), sourceName)
+				if err == nil {
+					request.AddModel("surface.v1.Model", surfaceModel)
+				}
 			}
 		case SourceFormatOpenAPI3:
 			request.AddModel("openapi.v3.Document", document)
-			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document), sourceName)
-			if err == nil {
-				request.AddModel("surface.v1.Model", surfaceModel)
+			if !excludeSurface {
+				// include experimental API surface model
+				surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document), sourceName)
+				if err == nil {
+					request.AddModel("surface.v1.Model", surfaceModel)
+				}
 			}
 		case SourceFormatDiscovery:
 			request.AddModel("discovery.v1.Document", document)
@@ -212,6 +218,18 @@ func isDirectory(path string) bool {
 	return fileInfo.IsDir()
 }
 
+func isURL(path string) bool {
+	_, err := url.ParseRequestURI(path)
+	if err != nil {
+		return false
+	}
+	u, err := url.Parse(path)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
+}
+
 // Write bytes to a named file.
 // Certain names have special meaning:
 //   ! writes nothing
@@ -227,6 +245,21 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = os.Stdout
 	} else if name == "=" {
 		writer = os.Stderr
+	} else if isDirectory(name) && !isURL(source) {
+		base := source
+		// Remove the original source extension.
+		base = base[0 : len(base)-len(filepath.Ext(base))]
+		// Build the path that puts the result in the passed-in directory.
+		filename := name + "/" + base + "." + extension
+		// Make sure that the necessary output directory exists
+		err := os.MkdirAll(filepath.Dir(filename), os.ModePerm)
+		if err != nil {
+			log.Printf("error creating %s: %s", filepath.Dir(filename), err.Error())
+		}
+		// Write the file
+		file, _ := os.Create(filename)
+		defer file.Close()
+		writer = file
 	} else if isDirectory(name) {
 		base := filepath.Base(source)
 		// Remove the original source extension.
@@ -263,6 +296,7 @@ type Gnostic struct {
 	extensionHandlers []compiler.ExtensionHandler
 	sourceFormat      int
 	timePlugins       bool
+	excludeSurface    bool
 }
 
 // NewGnostic initializes a structure to store global application state.
@@ -291,6 +325,7 @@ Options:
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
   --time-plugins      Report plugin runtimes.
+  --no-surface        Exclude surface model from calls to plugins.
   --help              Print usage information and exit.
 `
 	// Initialize internal structures.
@@ -345,6 +380,8 @@ func (g *Gnostic) readOptions() error {
 			g.resolveReferences = true
 		} else if arg == "--time-plugins" {
 			g.timePlugins = true
+		} else if arg == "--no-surface" {
+			g.excludeSurface = true
 		} else if arg[0] == '-' && arg[1] == '-' {
 			// try letting the option specify a plugin with no output files (or unwanted output files)
 			// this is useful for calling plugins like linters that only return messages
@@ -559,7 +596,7 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 	messages := make([]*plugins.Message, 0)
 	errors := make([]error, 0)
 	for _, p := range g.pluginCalls {
-		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins)
+		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins, g.excludeSurface)
 		if err != nil {
 			// we don't exit or fail here so that we run all plugins even when some have errors
 			errors = append(errors, err)

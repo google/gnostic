@@ -15,6 +15,7 @@
 package main
 
 import (
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,10 +25,27 @@ import (
 	"github.com/googleapis/gnostic/lib"
 )
 
+func isURL(path string) bool {
+	_, err := url.ParseRequestURI(path)
+	if err != nil {
+		return false
+	}
+	u, err := url.Parse(path)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
+}
+
 func testCompiler(t *testing.T, inputFile string, referenceFile string, expectErrors bool) {
 	outputFormat := filepath.Ext(referenceFile)[1:]
-	outputFile := strings.Replace(filepath.Base(inputFile), filepath.Ext(inputFile), "."+outputFormat, 1)
-	errorsFile := strings.Replace(filepath.Base(inputFile), filepath.Ext(inputFile), ".errors", 1)
+	outputFile := strings.Replace(inputFile, filepath.Ext(inputFile), "."+outputFormat, 1)
+	errorsFile := strings.Replace(inputFile, filepath.Ext(inputFile), ".errors", 1)
+	if isURL(inputFile) {
+		// put outputs in the current directory
+		outputFile = filepath.Base(outputFile)
+		errorsFile = filepath.Base(errorsFile)
+	}
 	// remove any preexisting output files
 	os.Remove(outputFile)
 	os.Remove(errorsFile)
