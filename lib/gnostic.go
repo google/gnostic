@@ -382,7 +382,7 @@ func (g *Gnostic) readOptions() error {
 			g.timePlugins = true
 		} else if arg == "--no-surface" {
 			g.excludeSurface = true
-		} else if arg[0] == '-' && arg[1] == '-' {
+		} else if len(arg) > 2 && arg[0] == '-' && arg[1] == '-' {
 			// try letting the option specify a plugin with no output files (or unwanted output files)
 			// this is useful for calling plugins like linters that only return messages
 			p := &pluginCall{Name: arg[2:len(arg)], Invocation: "!"}
