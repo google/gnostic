@@ -11,6 +11,10 @@ import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
+/*
+These variables were made globally because multiple
+functions will be accessing and mutating them.
+*/
 var schemas map[string]int
 var operationID map[string]int
 var parameters map[string]int
@@ -74,15 +78,15 @@ func main() {
 	}
 
 	if *unionPtr {
-		WritePb(vocabularyUnion(v))
+		writePb(vocabularyUnion(v))
 	}
 	if *intersectionPtr {
-		WritePb(vocabularyIntersection(v))
+		writePb(vocabularyIntersection(v))
 	}
 	if *differencePtr {
-		WritePb(vocabularyDifference(v))
+		writePb(vocabularyDifference(v))
 	}
 	if *exportPtr {
-		WriteCSV(v[0])
+		writeCSV(v[0])
 	}
 }

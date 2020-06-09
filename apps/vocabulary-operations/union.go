@@ -4,11 +4,6 @@ import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
-/*
-These variables were made globally because multiple
-functions will be accessing and mutating them.
-*/
-
 func vocabularyUnion(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)
@@ -20,10 +15,10 @@ func vocabularyUnion(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
 	}
 
 	combinedVocab := &metrics.Vocabulary{
-		Properties: FillProtoStructures(properties),
-		Schemas:    FillProtoStructures(schemas),
-		Operations: FillProtoStructures(operationID),
-		Parameters: FillProtoStructures(parameters),
+		Properties: fillProtoStructure(properties),
+		Schemas:    fillProtoStructure(schemas),
+		Operations: fillProtoStructure(operationID),
+		Parameters: fillProtoStructure(parameters),
 	}
 
 	return combinedVocab

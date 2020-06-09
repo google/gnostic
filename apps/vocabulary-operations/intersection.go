@@ -4,26 +4,6 @@ import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
-/*
-These variables were made globally because multiple
-functions will be accessing and mutating them.
-*/
-
-func unpackageVocabulary(v *metrics.Vocabulary) {
-	for _, s := range v.Schemas {
-		schemas[s.Word] += int(s.Count)
-	}
-	for _, op := range v.Operations {
-		operationID[op.Word] += int(op.Count)
-	}
-	for _, param := range v.Parameters {
-		parameters[param.Word] += int(param.Count)
-	}
-	for _, prop := range v.Properties {
-		properties[prop.Word] += int(prop.Count)
-	}
-}
-
 func mapIntersection(v *metrics.Vocabulary) {
 	schemastemp := make(map[string]int)
 	operationIDTemp := make(map[string]int)
@@ -71,10 +51,10 @@ func vocabularyIntersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabula
 	}
 
 	v := &metrics.Vocabulary{
-		Properties: FillProtoStructures(properties),
-		Schemas:    FillProtoStructures(schemas),
-		Operations: FillProtoStructures(operationID),
-		Parameters: FillProtoStructures(parameters),
+		Properties: fillProtoStructure(properties),
+		Schemas:    fillProtoStructure(schemas),
+		Operations: fillProtoStructure(operationID),
+		Parameters: fillProtoStructure(parameters),
 	}
 	return v
 }

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func WriteCSV(v *metrics.Vocabulary) {
+func writeCSV(v *metrics.Vocabulary) {
 	f4, ferror := os.Create("vocabulary-operation.csv")
 	if ferror != nil {
 		fmt.Println(ferror)
@@ -37,7 +37,7 @@ func WriteCSV(v *metrics.Vocabulary) {
 	f4.Close()
 }
 
-func WritePb(v *metrics.Vocabulary) {
+func writePb(v *metrics.Vocabulary) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
 		panic(err)
@@ -49,15 +49,15 @@ func WritePb(v *metrics.Vocabulary) {
 	}
 }
 
-func FillProtoStructures(m map[string]int) []*metrics.WordCount {
-	key_names := make([]string, 0, len(m))
+func fillProtoStructure(m map[string]int) []*metrics.WordCount {
+	keyNames := make([]string, 0, len(m))
 	for key := range m {
-		key_names = append(key_names, key)
+		keyNames = append(keyNames, key)
 	}
-	sort.Strings(key_names)
+	sort.Strings(keyNames)
 
 	counts := make([]*metrics.WordCount, 0)
-	for _, k := range key_names {
+	for _, k := range keyNames {
 		temp := &metrics.WordCount{
 			Word:  k,
 			Count: int32(m[k]),
@@ -67,7 +67,7 @@ func FillProtoStructures(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func UnpackageVocabulary(v *metrics.Vocabulary) {
+func unpackageVocabulary(v *metrics.Vocabulary) {
 	for _, s := range v.Schemas {
 		schemas[s.Word] += int(s.Count)
 	}
@@ -90,10 +90,10 @@ func combineVocabularies() *metrics.Vocabulary {
 	}
 
 	v := &metrics.Vocabulary{
-		Properties: FillProtoStructures(properties),
-		Schemas:    FillProtoStructures(schemas),
-		Operations: FillProtoStructures(operationID),
-		Parameters: FillProtoStructures(parameters),
+		Properties: fillProtoStructure(properties),
+		Schemas:    fillProtoStructure(schemas),
+		Operations: fillProtoStructure(operationID),
+		Parameters: fillProtoStructure(parameters),
 	}
 	return v
 
@@ -111,5 +111,5 @@ func readVocabularyFromFileWithName(filename string) {
 	if err != nil {
 		panic(err)
 	}
-	UnpackageVocabulary(v)
+	unpackageVocabulary(v)
 }
