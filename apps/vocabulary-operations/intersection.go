@@ -1,9 +1,28 @@
+// Copyright 2020 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
+// mapIntersection finds the intersection between two Vocabularies.
+// This function takes a Vocabulary and checks if the words within
+// the current Vocabulary already exist within the global Vocabulary.
+// If the word exists in both structures it is added to a temp Vocabulary
+// which replaces the old Vocabulary.
 func mapIntersection(v *metrics.Vocabulary) {
 	schemastemp := make(map[string]int)
 	operationIDTemp := make(map[string]int)
@@ -39,6 +58,9 @@ func mapIntersection(v *metrics.Vocabulary) {
 	properties = propertiesTemp
 }
 
+// vocabularyIntersection implements the intersection operation between multiple Vocabularies.
+// The function accepts a slice of Vocabularies and returns a single Vocabulary
+// struct which that contains words that were found in all of the Vocabularies.
 func vocabularyIntersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)

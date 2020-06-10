@@ -1,3 +1,17 @@
+// Copyright 2020 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
@@ -11,6 +25,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// writeCSV converts a Vocabulary pb file to a user-friendly readable CSV file.
+// The format of the CSV file is as follows: "group","word","frequency"
 func writeCSV(v *metrics.Vocabulary) {
 	f4, ferror := os.Create("vocabulary-operation.csv")
 	if ferror != nil {
@@ -37,6 +53,7 @@ func writeCSV(v *metrics.Vocabulary) {
 	f4.Close()
 }
 
+// writePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
 func writePb(v *metrics.Vocabulary) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
@@ -49,6 +66,8 @@ func writePb(v *metrics.Vocabulary) {
 	}
 }
 
+// fillProtoStructure adds data to the Word Count structure.
+// The Word Count structure can then be added to the Vocabulary protocol buffer.
 func fillProtoStructure(m map[string]int) []*metrics.WordCount {
 	keyNames := make([]string, 0, len(m))
 	for key := range m {
@@ -67,6 +86,8 @@ func fillProtoStructure(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
+// unpackageVocabulary unravels the Vocabulary struct by converting their
+// fields to maps in order to perform operations on the data.
 func unpackageVocabulary(v *metrics.Vocabulary) {
 	for _, s := range v.Schemas {
 		schemas[s.Word] += int(s.Count)
@@ -82,6 +103,10 @@ func unpackageVocabulary(v *metrics.Vocabulary) {
 	}
 }
 
+// combineVocabularies scans for Vocabulary structures using standard input.
+// The structures are then combined into one large Vocabulary.
+// This function utilizes the readVocabularyFromFileWithName() function to
+// open the Vocabulary protocol buffers.
 func combineVocabularies() *metrics.Vocabulary {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
@@ -99,6 +124,8 @@ func combineVocabularies() *metrics.Vocabulary {
 
 }
 
+// readVocabularyFromFileWithNametakes the filename of a Vocabulary protocol
+// buffer file and parses the wire-format message into a Vocabulary struct.
 func readVocabularyFromFileWithName(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {

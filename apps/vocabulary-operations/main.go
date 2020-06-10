@@ -1,3 +1,17 @@
+// Copyright 2020 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
@@ -20,6 +34,10 @@ var operationID map[string]int
 var parameters map[string]int
 var properties map[string]int
 
+// openVocabularyFiles uses standard input to create a slice of
+// Vocabulary protocol buffer filenames.
+// The slice of filenames is returned and will be used to createe
+// Vocabulary structures.
 func openVocabularyFiles() []string {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
@@ -30,6 +48,8 @@ func openVocabularyFiles() []string {
 	return v
 }
 
+// readVocabularyFromFilename accepts the filename of a Vocabulary pb
+// and parses the data in the file which is then added to a Vocabulary struct.
 func readVocabularyFromFilename(filename string) *metrics.Vocabulary {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -43,6 +63,30 @@ func readVocabularyFromFilename(filename string) *metrics.Vocabulary {
 		panic(err)
 	}
 	return v
+}
+
+// processInputs determines whether the application will be using cmd line args or stdin.
+// The function takes the cmd lines arguments, if any, and a flag which is true if stdin
+// will be the source of input.
+func processInputs(args []string, stdinFlag bool) []*metrics.Vocabulary {
+	v := make([]*metrics.Vocabulary, 0)
+	switch stdinFlag {
+	case true:
+		files := openVocabularyFiles()
+		for _, file := range files {
+			v = append(v, readVocabularyFromFilename(file))
+		}
+		return v
+	default:
+		files := make([]string, 0)
+		for _, arg := range args {
+			files = append(files, arg)
+		}
+		for _, file := range files {
+			v = append(v, readVocabularyFromFilename(file))
+		}
+		return v
+	}
 }
 
 func main() {
@@ -63,18 +107,9 @@ func main() {
 	v := make([]*metrics.Vocabulary, 0)
 	switch arguments := len(args); arguments {
 	case 0:
-		files := openVocabularyFiles()
-		for _, file := range files {
-			v = append(v, readVocabularyFromFilename(file))
-		}
+		v = processInputs(args, true)
 	default:
-		files := make([]string, 0)
-		for _, arg := range args {
-			files = append(files, arg)
-		}
-		for _, file := range files {
-			v = append(v, readVocabularyFromFilename(file))
-		}
+		v = processInputs(nil, false)
 	}
 
 	if *unionPtr {
