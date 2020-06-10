@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Package gnostic_vocabulary provides operation for Vocabulary structs
-package gnostic_vocabulary
+package vocabulary
 
 import (
 	"bufio"
@@ -149,4 +149,11 @@ func readVocabularyFromFileWithName(filename string) {
 		panic(err)
 	}
 	unpackageVocabulary(v)
+}
+
+func isEmpty(v *metrics.Vocabulary) bool {
+	if len(v.Schemas) == 0 && len(v.Properties) == 0 && len(v.Operations) == 0 && len(v.Parameters) == 0 {
+		return true
+	}
+	return false
 }

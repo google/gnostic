@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gnostic_vocabulary
+package vocabulary
 
 import (
 	metrics "github.com/googleapis/gnostic/metrics"
