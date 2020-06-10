@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package gnostic_vocabulary
 
 import (
 	metrics "github.com/googleapis/gnostic/metrics"
@@ -21,7 +21,7 @@ import (
 // vocabularyUnion implements the union operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
 // struct which contains all of the data from the Vocabularies.
-func vocabularyUnion(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
+func VocabularyUnion(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)
 	parameters = make(map[string]int)

@@ -12,64 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package gnostic_vocabulary
 
 import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
-// mapIntersection finds the intersection between two Vocabularies.
+// mapDifference finds the difference between two Vocabularies.
 // This function takes a Vocabulary and checks if the words within
 // the current Vocabulary already exist within the global Vocabulary.
-// If the word exists in both structures it is added to a temp Vocabulary
-// which replaces the old Vocabulary.
-func mapIntersection(v *metrics.Vocabulary) {
-	schemastemp := make(map[string]int)
-	operationIDTemp := make(map[string]int)
-	parametersTemp := make(map[string]int)
-	propertiesTemp := make(map[string]int)
+// If the word exists in both structures it is removed from the
+// Vocabulary structure.
+func mapDifference(v *metrics.Vocabulary) {
 	for _, s := range v.Schemas {
-		value, ok := schemas[s.Word]
+		_, ok := schemas[s.Word]
 		if ok {
-			schemastemp[s.Word] += (value + int(s.Count))
+			delete(schemas, s.Word)
 		}
 	}
 	for _, op := range v.Operations {
-		value, ok := operationID[op.Word]
+		_, ok := operationID[op.Word]
 		if ok {
-			operationIDTemp[op.Word] += (value + int(op.Count))
+			delete(operationID, op.Word)
 		}
 	}
 	for _, param := range v.Parameters {
-		value, ok := parameters[param.Word]
+		_, ok := parameters[param.Word]
 		if ok {
-			parametersTemp[param.Word] += (value + int(param.Count))
+			delete(parameters, param.Word)
 		}
 	}
 	for _, prop := range v.Properties {
-		value, ok := properties[prop.Word]
+		_, ok := properties[prop.Word]
 		if ok {
-			propertiesTemp[prop.Word] += (value + int(prop.Count))
+			delete(properties, prop.Word)
 		}
 	}
-	schemas = schemastemp
-	operationID = operationIDTemp
-	parameters = parametersTemp
-	properties = propertiesTemp
 }
 
-// vocabularyIntersection implements the intersection operation between multiple Vocabularies.
+// vocabularyDifference implements the difference operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
-// struct which that contains words that were found in all of the Vocabularies.
-func vocabularyIntersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabulary {
+// struct which that contains words that were unique to the first Vocabulary in the slice.
+func VocabularyDifference(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)
 	parameters = make(map[string]int)
 	properties = make(map[string]int)
 
-	unpackageVocabulary(vocabSlices[0])
-	for i := 1; i < len(vocabSlices); i++ {
-		mapIntersection(vocabSlices[i])
+	unpackageVocabulary(vocab[0])
+	for i := 1; i < len(vocab); i++ {
+		mapDifference(vocab[i])
 	}
 
 	v := &metrics.Vocabulary{

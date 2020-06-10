@@ -23,16 +23,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	metrics "github.com/googleapis/gnostic/metrics"
+	vocabulary "github.com/googleapis/gnostic/vocabulary"
 )
-
-/*
-These variables were made globally because multiple
-functions will be accessing and mutating them.
-*/
-var schemas map[string]int
-var operationID map[string]int
-var parameters map[string]int
-var properties map[string]int
 
 // openVocabularyFiles uses standard input to create a slice of
 // Vocabulary protocol buffer filenames.
@@ -97,7 +89,6 @@ func main() {
 
 	flag.Parse()
 	args := flag.Args()
-
 	if !*unionPtr && !*intersectionPtr && !*differencePtr && !*exportPtr {
 		flag.PrintDefaults()
 		fmt.Printf("Please use one of the above command line arguments.\n")
@@ -109,19 +100,22 @@ func main() {
 	case 0:
 		v = processInputs(args, true)
 	default:
-		v = processInputs(nil, false)
+		v = processInputs(args, false)
 	}
 
 	if *unionPtr {
-		writePb(vocabularyUnion(v))
+		vocab := vocabulary.VocabularyUnion(v)
+		vocabulary.WritePb(vocab)
 	}
 	if *intersectionPtr {
-		writePb(vocabularyIntersection(v))
+		vocab := vocabulary.VocabularyIntersection(v)
+		vocabulary.WritePb(vocab)
 	}
 	if *differencePtr {
-		writePb(vocabularyDifference(v))
+		vocab := vocabulary.VocabularyDifference(v)
+		vocabulary.WritePb(vocab)
 	}
 	if *exportPtr {
-		writeCSV(v[0])
+		vocabulary.WriteCSV(v[0])
 	}
 }

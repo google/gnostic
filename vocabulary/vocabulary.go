@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+// Package gnostic_vocabulary provides operation for Vocabulary structs
+package gnostic_vocabulary
 
 import (
 	"bufio"
@@ -25,9 +26,18 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+/*
+These variables were made globally because multiple
+functions will be accessing and mutating them.
+*/
+var schemas map[string]int
+var operationID map[string]int
+var parameters map[string]int
+var properties map[string]int
+
 // writeCSV converts a Vocabulary pb file to a user-friendly readable CSV file.
 // The format of the CSV file is as follows: "group","word","frequency"
-func writeCSV(v *metrics.Vocabulary) {
+func WriteCSV(v *metrics.Vocabulary) {
 	f4, ferror := os.Create("vocabulary-operation.csv")
 	if ferror != nil {
 		fmt.Println(ferror)
@@ -54,7 +64,7 @@ func writeCSV(v *metrics.Vocabulary) {
 }
 
 // writePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
-func writePb(v *metrics.Vocabulary) {
+func WritePb(v *metrics.Vocabulary) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
 		panic(err)
