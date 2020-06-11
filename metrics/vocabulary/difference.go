@@ -50,10 +50,10 @@ func mapDifference(v *metrics.Vocabulary) {
 	}
 }
 
-// vocabularyDifference implements the difference operation between multiple Vocabularies.
+// Difference implements the difference operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
 // struct which that contains words that were unique to the first Vocabulary in the slice.
-func VocabularyDifference(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
+func Difference(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)
 	parameters = make(map[string]int)

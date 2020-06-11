@@ -35,10 +35,13 @@ var operationID map[string]int
 var parameters map[string]int
 var properties map[string]int
 
-// writeCSV converts a Vocabulary pb file to a user-friendly readable CSV file.
+// WriteCSV converts a Vocabulary pb file to a user-friendly readable CSV file.
 // The format of the CSV file is as follows: "group","word","frequency"
-func WriteCSV(v *metrics.Vocabulary) {
-	f4, ferror := os.Create("vocabulary-operation.csv")
+func WriteCSV(v *metrics.Vocabulary, filename string) {
+	if filename == "" {
+		filename = "vocabulary-operation.csv"
+	}
+	f4, ferror := os.Create(filename)
 	if ferror != nil {
 		fmt.Println(ferror)
 		f4.Close()
@@ -63,7 +66,7 @@ func WriteCSV(v *metrics.Vocabulary) {
 	f4.Close()
 }
 
-// writePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
+// WritePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
 func WritePb(v *metrics.Vocabulary) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {

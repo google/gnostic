@@ -58,10 +58,10 @@ func mapIntersection(v *metrics.Vocabulary) {
 	properties = propertiesTemp
 }
 
-// vocabularyIntersection implements the intersection operation between multiple Vocabularies.
+// Intersection implements the intersection operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
 // struct which that contains words that were found in all of the Vocabularies.
-func VocabularyIntersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabulary {
+func Intersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)
 	parameters = make(map[string]int)

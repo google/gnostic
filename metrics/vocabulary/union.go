@@ -18,10 +18,10 @@ import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
-// vocabularyUnion implements the union operation between multiple Vocabularies.
+// Union implements the union operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
 // struct which contains all of the data from the Vocabularies.
-func VocabularyUnion(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
+func Union(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
 	schemas = make(map[string]int)
 	operationID = make(map[string]int)
 	parameters = make(map[string]int)

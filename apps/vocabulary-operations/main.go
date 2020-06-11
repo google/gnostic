@@ -45,7 +45,7 @@ func openVocabularyFiles() []string {
 func readVocabularyFromFilename(filename string) *metrics.Vocabulary {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("File error: %v\n", err)
+		fmt.Printf("File %s error: %v\n", filename, err)
 		os.Exit(1)
 	}
 
@@ -86,10 +86,11 @@ func main() {
 	intersectionPtr := flag.Bool("intersection", false, "generates the intersection of pb files")
 	differencePtr := flag.Bool("difference", false, "generates the difference of pb files")
 	exportPtr := flag.Bool("export", false, "export a given pb file as a csv file")
+	companyPtr := flag.Bool("company", false, "egenerates uniqueness within company")
 
 	flag.Parse()
 	args := flag.Args()
-	if !*unionPtr && !*intersectionPtr && !*differencePtr && !*exportPtr {
+	if !*unionPtr && !*intersectionPtr && !*differencePtr && !*exportPtr && !*companyPtr {
 		flag.PrintDefaults()
 		fmt.Printf("Please use one of the above command line arguments.\n")
 		os.Exit(-1)
@@ -104,18 +105,22 @@ func main() {
 	}
 
 	if *unionPtr {
-		vocab := vocabulary.VocabularyUnion(v)
+		vocab := vocabulary.Union(v)
 		vocabulary.WritePb(vocab)
 	}
 	if *intersectionPtr {
-		vocab := vocabulary.VocabularyIntersection(v)
+		vocab := vocabulary.Intersection(v)
 		vocabulary.WritePb(vocab)
 	}
 	if *differencePtr {
-		vocab := vocabulary.VocabularyDifference(v)
+		vocab := vocabulary.Difference(v)
 		vocabulary.WritePb(vocab)
 	}
 	if *exportPtr {
-		vocabulary.WriteCSV(v[0])
+		vocabulary.WriteCSV(v[0], "")
+	}
+	if *companyPtr {
+		vocab := vocabulary.FilterCommon(v)
+		vocabulary.WritePb(vocab[0])
 	}
 }
