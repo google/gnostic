@@ -61,8 +61,8 @@ func TestSampleVocabularyUnion(t *testing.T) {
 		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
-	vocab := make([]*metrics.Vocabulary, 0)
-	vocab = append(vocab, &v1, &v2)
+	vocabularies := make([]*metrics.Vocabulary, 0)
+	vocabularies = append(vocabularies, &v1, &v2)
 
 	reference := metrics.Vocabulary{
 		Schemas:    fillTestProtoStructue([]string{"Hello", "funcName", "google", "heelo", "random", "status"}, []int{5, 3, 8, 1, 8, 1}),
@@ -71,7 +71,7 @@ func TestSampleVocabularyUnion(t *testing.T) {
 		Parameters: fillTestProtoStructue([]string{"id", "name", "suggester", "tag"}, []int{2, 10, 30, 2}),
 	}
 
-	unionResult := Union(vocab)
+	unionResult := Union(vocabularies)
 
 	testVocabulary(t,
 		unionResult,
@@ -94,8 +94,8 @@ func TestSampleVocabularyIntersection(t *testing.T) {
 		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
-	combinedVocab := make([]*metrics.Vocabulary, 0)
-	combinedVocab = append(combinedVocab, &v1, &v2)
+	vocabularies := make([]*metrics.Vocabulary, 0)
+	vocabularies = append(vocabularies, &v1, &v2)
 
 	reference := metrics.Vocabulary{
 		Schemas:    fillTestProtoStructue([]string{"google", "random"}, []int{8, 8}),
@@ -104,7 +104,7 @@ func TestSampleVocabularyIntersection(t *testing.T) {
 		Parameters: fillTestProtoStructue([]string{"id", "name", "suggester", "tag"}, []int{2, 10, 30, 2}),
 	}
 
-	intersectionResult := Intersection(combinedVocab)
+	intersectionResult := Intersection(vocabularies)
 
 	testVocabulary(t,
 		intersectionResult,
@@ -126,8 +126,8 @@ func TestSampleVocabularyDifference(t *testing.T) {
 		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
-	combinedVocab := make([]*metrics.Vocabulary, 0)
-	combinedVocab = append(combinedVocab, &v1, &v2)
+	vocabularies := make([]*metrics.Vocabulary, 0)
+	vocabularies = append(vocabularies, &v1, &v2)
 
 	reference := metrics.Vocabulary{
 		Schemas:    fillTestProtoStructue([]string{"funcName", "heelo"}, []int{3, 1}),
@@ -135,7 +135,7 @@ func TestSampleVocabularyDifference(t *testing.T) {
 		Operations: fillTestProtoStructue([]string{"countGreetings"}, []int{12}),
 	}
 
-	differenceResult := Difference(combinedVocab)
+	differenceResult := Difference(vocabularies)
 
 	testVocabulary(t,
 		differenceResult,
