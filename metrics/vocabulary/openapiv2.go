@@ -1,4 +1,4 @@
-package main
+package vocabulary
 
 import (
 	metrics "github.com/googleapis/gnostic/metrics"
@@ -45,7 +45,7 @@ func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 	}
 }
 
-func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
+func NewVocabularyFromOpenAPIv2(document *openapi_v2.Document) *metrics.Vocabulary {
 	schemas := make(map[string]int)
 	operationID := make(map[string]int)
 	parameters := make(map[string]int)

@@ -1,4 +1,4 @@
-package main
+package vocabulary
 
 import (
 	"sort"
@@ -90,7 +90,7 @@ func processResponsesV3(components *openapi_v3.Components, schemas map[string]in
 	}
 }
 
-func processDocumentV3(document *openapi_v3.Document) *metrics.Vocabulary {
+func NewVocabularyFromOpenAPIv3(document *openapi_v3.Document) *metrics.Vocabulary {
 	schemas := make(map[string]int)
 	operationID := make(map[string]int)
 	parameters := make(map[string]int)

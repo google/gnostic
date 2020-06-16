@@ -11,13 +11,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Linter does this
 type Linter struct {
 	LinterErrors   ErrorResult   `json:"errors"`
 	LinterWarnings WarningResult `json:"warnings"`
 }
 
-// ErrorResult does this
 type ErrorResult struct {
 	Parameters []EMessage `json:"parameters-ibm"`
 	PathsIBM   []EMessage `json:"paths-ibm"`
@@ -27,7 +25,6 @@ type ErrorResult struct {
 	WalkerIBM  []EMessage `json:"walker-ibm"`
 }
 
-// WarningResult does this
 type WarningResult struct {
 	OperationID      []WMessage `json:"operation-ids"`
 	Operations       []WMessage `json:"operation"`
@@ -41,14 +38,12 @@ type WarningResult struct {
 	ParametersIBM    []EMessage `json:"parameters-ibm"`
 }
 
-// EMessage does this
 type EMessage struct {
 	Path    []string `json:"path"`
 	Message string   `json:"message"`
 	Line    int      `json:"line"`
 }
 
-// WMessage does this
 type WMessage struct {
 	Path    string `json:"path"`
 	Message string `json:"message"`
