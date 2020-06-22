@@ -1,32 +1,30 @@
-package main
+package lint
 
-import(
-	"os"
+import (
+	"bufio"
 	"fmt"
 	"log"
-	"bufio"
+	"os"
 	"regexp"
 	"strconv"
-
-	linter "github.com/googleapis/gnostic/metrics/linterResult"
 )
 
-func parseOutput(output []string) []*linter.Message{
-	messages := make([]*linter.Message, 0)
-	for _, line := range output{
+func parseOutput(output []string) []*Message {
+	messages := make([]*Message, 0)
+	for _, line := range output {
 		array := regexp.MustCompile("[]: *]").Split(line, 6)
-		line,_ := strconv.ParseInt(array[1], 0, 64)
-		temp := &linter.Message{
+		line, _ := strconv.ParseInt(array[1], 0, 64)
+		temp := &Message{
 			Type:    array[3],
 			Message: array[5],
 			Line:    int32(line),
 		}
-		messages = append(messages,temp)
+		messages = append(messages, temp)
 	}
 	return messages
 }
 
-func openAndReadTxt(filename string) []string{
+func openAndReadTxt(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -46,10 +44,10 @@ func openAndReadTxt(filename string) []string{
 	return output
 }
 
-func lintSpectral(filename string) {
+func LintSpectral(filename string) {
 	output := openAndReadTxt(filename)
 	messages := parseOutput(output)
-	linterResult := &linter.Linter{
+	linterResult := &Linter{
 		LinterResults: messages,
 	}
 	fmt.Printf("%+v", linterResult)

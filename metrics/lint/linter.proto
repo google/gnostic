@@ -14,7 +14,7 @@
 
 
 syntax = "proto3";
-package linter;
+package lint;
 
 // The Go package name.
 option go_package = "linter";

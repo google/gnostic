@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	lint "github.com/googleapis/gnostic/metrics/lint"
 )
 
 func main() {
@@ -26,11 +28,11 @@ func main() {
 	}
 
 	if *ibmPtr {
-		lintIBM(args[0])
+		lint.LintIBM(args[0])
 	}
 
 	if *spectralPtr {
-		lintSpectral(args[0])
+		lint.LintSpectral(args[0])
 	}
 
 }

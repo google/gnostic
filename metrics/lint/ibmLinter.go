@@ -1,4 +1,4 @@
-package main
+package lint
 
 import (
 	"encoding/json"
@@ -7,11 +7,10 @@ import (
 	"os"
 	"strings"
 
-	linter "github.com/googleapis/gnostic/metrics/linterResult"
 	"google.golang.org/protobuf/proto"
 )
 
-type Linter struct {
+type Lint struct {
 	LinterErrors   ErrorResult   `json:"errors"`
 	LinterWarnings WarningResult `json:"warnings"`
 }
@@ -50,7 +49,7 @@ type WMessage struct {
 	Line    int    `json:"line"`
 }
 
-func writePb(v *linter.Linter) {
+func writePb(v *Linter) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
 		panic(err)
@@ -62,8 +61,8 @@ func writePb(v *linter.Linter) {
 	}
 }
 
-func addToMessages(mtype string, message string, path string, line int) *linter.Message {
-	temp := &linter.Message{
+func addToMessages(mtype string, message string, path string, line int) *Message {
+	temp := &Message{
 		Type:    mtype,
 		Message: message,
 		Path:    path,
@@ -72,8 +71,8 @@ func addToMessages(mtype string, message string, path string, line int) *linter.
 	return temp
 }
 
-func fillMessageProtoStructureIBM(lint Linter) []*linter.Message {
-	messages := make([]*linter.Message, 0)
+func fillMessageProtoStructureIBM(lint Lint) []*Message {
+	messages := make([]*Message, 0)
 	for _, v := range lint.LinterErrors.Parameters {
 		temp := addToMessages("Error", v.Message, strings.Join(v.Path, "."), v.Line)
 		messages = append(messages, temp)
@@ -142,7 +141,7 @@ func fillMessageProtoStructureIBM(lint Linter) []*linter.Message {
 	return messages
 }
 
-func openAndReadJSON(filename string) Linter {
+func openAndReadJSON(filename string) Lint {
 	jsonFile, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
@@ -150,18 +149,18 @@ func openAndReadJSON(filename string) Linter {
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var lint Linter
+	var lint Lint
 
 	json.Unmarshal(byteValue, &lint)
 
 	return lint
 }
 
-func lintIBM(filename string) {
+func LintIBM(filename string) {
 	lint := openAndReadJSON(filename)
 	messages := fillMessageProtoStructureIBM(lint)
 
-	linterResult := &linter.Linter{
+	linterResult := &Linter{
 		LinterResults: messages,
 	}
 
