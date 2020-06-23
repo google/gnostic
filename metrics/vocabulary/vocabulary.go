@@ -67,18 +67,17 @@ func WriteCSV(v *metrics.Vocabulary, filename string) {
 }
 
 // WritePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
-func WritePb(v *metrics.Vocabulary) {
+func WritePb(v *metrics.Vocabulary) error {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
-		fmt.Printf("Proto error: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
 	err = ioutil.WriteFile("vocabulary-operation.pb", bytes, 0644)
 	if err != nil {
-		fmt.Printf("File error: %v\n", err)
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
 
 // fillProtoStructure adds data to the Word Count structure.
