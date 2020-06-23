@@ -67,9 +67,6 @@ func WriteCSV(v *metrics.Vocabulary, filename string) {
 }
 
 // WritePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
-/*
-	remove panic, mayve generate an error output and exit with non 0
-*/
 func WritePb(v *metrics.Vocabulary) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
