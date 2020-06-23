@@ -20,6 +20,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	metrics "github.com/googleapis/gnostic/metrics"
+	vocabulary "github.com/googleapis/gnostic/metrics/vocabulary"
 	openapiv2 "github.com/googleapis/gnostic/openapiv2"
 	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 	plugins "github.com/googleapis/gnostic/plugins"
@@ -54,14 +55,14 @@ func main() {
 			err = proto.Unmarshal(model.Value, documentv2)
 			if err == nil {
 				// Analyze the API document.
-				vocab = processDocumentV2(documentv2)
+				vocab = vocabulary.NewVocabularyFromOpenAPIv2(documentv2)
 			}
 		case "openapi.v3.Document":
 			documentv3 := &openapiv3.Document{}
 			err = proto.Unmarshal(model.Value, documentv3)
 			if err == nil {
 				// Analyze the API document.
-				vocab = processDocumentV3(documentv3)
+				vocab = vocabulary.NewVocabularyFromOpenAPIv3(documentv3)
 			}
 		}
 	}
