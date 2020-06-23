@@ -15,7 +15,6 @@
 package vocabulary
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -191,9 +190,6 @@ func TestSampleVocabularyFilterCommon(t *testing.T) {
 	}
 
 	differenceResult := FilterCommon(vocabularies)
-
-	fmt.Printf("%+v\n", differenceResult[0])
-	fmt.Printf("%+v\n", differenceResult[1])
 
 	testVocabulary(t,
 		differenceResult[0],
