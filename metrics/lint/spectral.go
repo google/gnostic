@@ -2,7 +2,6 @@ package lint
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -50,6 +49,5 @@ func LintSpectral(filename string) {
 	linterResult := &Linter{
 		LinterResults: messages,
 	}
-	fmt.Printf("%+v", linterResult)
 	writePb(linterResult)
 }
