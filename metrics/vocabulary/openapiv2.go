@@ -1,4 +1,4 @@
-package main
+package vocabulary
 
 import (
 	metrics "github.com/googleapis/gnostic/metrics"
@@ -45,7 +45,7 @@ func processSchemaV2(schema *openapi_v2.Schema, properties map[string]int) {
 	}
 }
 
-func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
+func NewVocabularyFromOpenAPIv2(document *openapi_v2.Document) *metrics.Vocabulary {
 	schemas := make(map[string]int)
 	operationID := make(map[string]int)
 	parameters := make(map[string]int)
@@ -57,22 +57,24 @@ func processDocumentV2(document *openapi_v2.Document) *metrics.Vocabulary {
 			processSchemaV2(pair.Value, properties)
 		}
 	}
-	for _, pair := range document.Paths.Path {
-		v := pair.Value
-		if v.Get != nil {
-			processOperationV2(v.Get, operationID, parameters)
-		}
-		if v.Post != nil {
-			processOperationV2(v.Post, operationID, parameters)
-		}
-		if v.Put != nil {
-			processOperationV2(v.Put, operationID, parameters)
-		}
-		if v.Patch != nil {
-			processOperationV2(v.Patch, operationID, parameters)
-		}
-		if v.Delete != nil {
-			processOperationV2(v.Delete, operationID, parameters)
+	if document.Paths != nil {
+		for _, pair := range document.Paths.Path {
+			v := pair.Value
+			if v.Get != nil {
+				processOperationV2(v.Get, operationID, parameters)
+			}
+			if v.Post != nil {
+				processOperationV2(v.Post, operationID, parameters)
+			}
+			if v.Put != nil {
+				processOperationV2(v.Put, operationID, parameters)
+			}
+			if v.Patch != nil {
+				processOperationV2(v.Patch, operationID, parameters)
+			}
+			if v.Delete != nil {
+				processOperationV2(v.Delete, operationID, parameters)
+			}
 		}
 	}
 

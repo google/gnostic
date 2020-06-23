@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,13 +15,18 @@
 package vocabulary
 
 import (
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	metrics "github.com/googleapis/gnostic/metrics"
+	openapiv2 "github.com/googleapis/gnostic/openapiv2"
+	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 )
 
-func fillTestProtoStructue(words []string, count []int) []*metrics.WordCount {
+func fillTestProtoStructure(words []string, count []int) []*metrics.WordCount {
 	counts := make([]*metrics.WordCount, 0)
 	for i := 0; i < len(words); i++ {
 		temp := &metrics.WordCount{
@@ -46,29 +51,40 @@ func testVocabulary(t *testing.T, outputVocab *metrics.Vocabulary, referencePb *
 	}
 }
 
+func testVocabularyOutput(t *testing.T, outputFile string, referenceFile string) {
+	err := exec.Command("diff", outputFile, referenceFile).Run()
+	if err != nil {
+		t.Logf("Diff failed: %s vs %s %+v", outputFile, referenceFile, err)
+		t.FailNow()
+	} else {
+		// if the test succeeded, clean up
+		os.Remove(outputFile)
+	}
+}
+
 func TestSampleVocabularyUnion(t *testing.T) {
 	v1 := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
-		Properties: fillTestProtoStructue([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
-		Operations: fillTestProtoStructue([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
-		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+		Schemas:    fillTestProtoStructure([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
+		Properties: fillTestProtoStructure([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
+		Operations: fillTestProtoStructure([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
 	v2 := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
-		Properties: fillTestProtoStructue([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
-		Operations: fillTestProtoStructue([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
-		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+		Schemas:    fillTestProtoStructure([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
+		Properties: fillTestProtoStructure([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
+		Operations: fillTestProtoStructure([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
 	vocabularies := make([]*metrics.Vocabulary, 0)
 	vocabularies = append(vocabularies, &v1, &v2)
 
 	reference := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"Hello", "funcName", "google", "heelo", "random", "status"}, []int{5, 3, 8, 1, 8, 1}),
-		Properties: fillTestProtoStructue([]string{"Hello", "cat", "dog", "funcName", "thing"}, []int{4, 5, 6, 2, 2}),
-		Operations: fillTestProtoStructue([]string{"countGreetings", "countPrint", "funcName", "print"}, []int{12, 17, 23, 23}),
-		Parameters: fillTestProtoStructue([]string{"id", "name", "suggester", "tag"}, []int{2, 10, 30, 2}),
+		Schemas:    fillTestProtoStructure([]string{"Hello", "funcName", "google", "heelo", "random", "status"}, []int{5, 3, 8, 1, 8, 1}),
+		Properties: fillTestProtoStructure([]string{"Hello", "cat", "dog", "funcName", "thing"}, []int{4, 5, 6, 2, 2}),
+		Operations: fillTestProtoStructure([]string{"countGreetings", "countPrint", "funcName", "print"}, []int{12, 17, 23, 23}),
+		Parameters: fillTestProtoStructure([]string{"id", "name", "suggester", "tag"}, []int{2, 10, 30, 2}),
 	}
 
 	unionResult := Union(vocabularies)
@@ -81,27 +97,27 @@ func TestSampleVocabularyUnion(t *testing.T) {
 
 func TestSampleVocabularyIntersection(t *testing.T) {
 	v1 := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
-		Properties: fillTestProtoStructue([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
-		Operations: fillTestProtoStructue([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
-		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+		Schemas:    fillTestProtoStructure([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
+		Properties: fillTestProtoStructure([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
+		Operations: fillTestProtoStructure([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
 	v2 := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
-		Properties: fillTestProtoStructue([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
-		Operations: fillTestProtoStructue([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
-		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+		Schemas:    fillTestProtoStructure([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
+		Properties: fillTestProtoStructure([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
+		Operations: fillTestProtoStructure([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
 	vocabularies := make([]*metrics.Vocabulary, 0)
 	vocabularies = append(vocabularies, &v1, &v2)
 
 	reference := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"google", "random"}, []int{8, 8}),
-		Properties: fillTestProtoStructue([]string{"cat", "dog"}, []int{5, 6}),
-		Operations: fillTestProtoStructue([]string{"funcName", "print"}, []int{23, 23}),
-		Parameters: fillTestProtoStructue([]string{"id", "name", "suggester", "tag"}, []int{2, 10, 30, 2}),
+		Schemas:    fillTestProtoStructure([]string{"google", "random"}, []int{8, 8}),
+		Properties: fillTestProtoStructure([]string{"cat", "dog"}, []int{5, 6}),
+		Operations: fillTestProtoStructure([]string{"funcName", "print"}, []int{23, 23}),
+		Parameters: fillTestProtoStructure([]string{"id", "name", "suggester", "tag"}, []int{2, 10, 30, 2}),
 	}
 
 	intersectionResult := Intersection(vocabularies)
@@ -113,32 +129,126 @@ func TestSampleVocabularyIntersection(t *testing.T) {
 }
 func TestSampleVocabularyDifference(t *testing.T) {
 	v1 := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
-		Properties: fillTestProtoStructue([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
-		Operations: fillTestProtoStructue([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
-		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+		Schemas:    fillTestProtoStructure([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
+		Properties: fillTestProtoStructure([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
+		Operations: fillTestProtoStructure([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
 	v2 := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
-		Properties: fillTestProtoStructue([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
-		Operations: fillTestProtoStructue([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
-		Parameters: fillTestProtoStructue([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+		Schemas:    fillTestProtoStructure([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
+		Properties: fillTestProtoStructure([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
+		Operations: fillTestProtoStructure([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
 	}
 
 	vocabularies := make([]*metrics.Vocabulary, 0)
 	vocabularies = append(vocabularies, &v1, &v2)
 
 	reference := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructue([]string{"funcName", "heelo"}, []int{3, 1}),
-		Properties: fillTestProtoStructue([]string{"Hello", "funcName"}, []int{4, 2}),
-		Operations: fillTestProtoStructue([]string{"countGreetings"}, []int{12}),
+		Schemas:    fillTestProtoStructure([]string{"funcName", "heelo"}, []int{3, 1}),
+		Properties: fillTestProtoStructure([]string{"Hello", "funcName"}, []int{4, 2}),
+		Operations: fillTestProtoStructure([]string{"countGreetings"}, []int{12}),
 	}
 
 	differenceResult := Difference(vocabularies)
 
 	testVocabulary(t,
 		differenceResult,
+		&reference,
+	)
+}
+
+func TestSampleVocabularyFilterCommon(t *testing.T) {
+	v1 := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
+		Properties: fillTestProtoStructure([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
+		Operations: fillTestProtoStructure([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+	}
+
+	v2 := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"Hello", "random", "status", "google"}, []int{5, 6, 1, 4}),
+		Properties: fillTestProtoStructure([]string{"cat", "dog", "thing"}, []int{4, 3, 2}),
+		Operations: fillTestProtoStructure([]string{"countPrint", "print", "funcName"}, []int{17, 12, 19}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+	}
+
+	vocabularies := make([]*metrics.Vocabulary, 0)
+	vocabularies = append(vocabularies, &v1, &v2)
+
+	reference := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"funcName", "heelo"}, []int{3, 1}),
+		Properties: fillTestProtoStructure([]string{"Hello", "funcName"}, []int{4, 2}),
+		Operations: fillTestProtoStructure([]string{"countGreetings"}, []int{12}),
+	}
+
+	reference2 := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"Hello", "status"}, []int{5, 1}),
+		Properties: fillTestProtoStructure([]string{"thing"}, []int{2}),
+		Operations: fillTestProtoStructure([]string{"countPrint"}, []int{17}),
+	}
+
+	differenceResult := FilterCommon(vocabularies)
+
+	testVocabulary(t,
+		differenceResult[0],
+		&reference,
+	)
+
+	testVocabulary(t,
+		differenceResult[1],
+		&reference2,
+	)
+
+}
+
+func TestSampleVocabularyCSV(t *testing.T) {
+	v1 := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"heelo", "random", "funcName", "google"}, []int{1, 2, 3, 4}),
+		Properties: fillTestProtoStructure([]string{"Hello", "dog", "funcName", "cat"}, []int{4, 3, 2, 1}),
+		Operations: fillTestProtoStructure([]string{"countGreetings", "print", "funcName"}, []int{12, 11, 4}),
+		Parameters: fillTestProtoStructure([]string{"name", "id", "tag", "suggester"}, []int{5, 1, 1, 15}),
+	}
+
+	WriteCSV(&v1, "")
+
+	testVocabularyOutput(t,
+		"vocabulary-operation.csv",
+		"../../testdata/v3.0/csv/sample-vocabulary.csv",
+	)
+}
+
+func TestSampleVocabularyV2(t *testing.T) {
+	data, _ := ioutil.ReadFile("../../examples/v2.0/pb/petstore.pb")
+	documentv2 := &openapiv2.Document{}
+	proto.Unmarshal(data, documentv2)
+	v1 := NewVocabularyFromOpenAPIv2(documentv2)
+	reference := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"Error", "Pet", "Pets"}, []int{1, 1, 1}),
+		Properties: fillTestProtoStructure([]string{"code", "id", "message", "name", "tag"}, []int{1, 1, 1, 1, 1}),
+		Operations: fillTestProtoStructure([]string{"createPets", "listPets", "showPetById"}, []int{1, 1, 1}),
+		Parameters: fillTestProtoStructure([]string{"limit", "petId"}, []int{1, 1}),
+	}
+	testVocabulary(t,
+		v1,
+		&reference,
+	)
+}
+
+func TestSampleVocabularyV3(t *testing.T) {
+	data, _ := ioutil.ReadFile("../../examples/v3.0/pb/petstore.pb")
+	documentv3 := &openapiv3.Document{}
+	proto.Unmarshal(data, documentv3)
+	v1 := NewVocabularyFromOpenAPIv3(documentv3)
+	reference := metrics.Vocabulary{
+		Schemas:    fillTestProtoStructure([]string{"Error", "Pet", "Pets"}, []int{1, 1, 1}),
+		Properties: fillTestProtoStructure([]string{"code", "id", "message", "name", "tag"}, []int{1, 1, 1, 1, 1}),
+		Operations: fillTestProtoStructure([]string{"createPets", "listPets", "showPetById"}, []int{1, 1, 1}),
+		Parameters: fillTestProtoStructure([]string{"limit", "petId"}, []int{1, 1}),
+	}
+	testVocabulary(t,
+		v1,
 		&reference,
 	)
 }

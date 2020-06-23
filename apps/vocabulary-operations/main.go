@@ -104,23 +104,30 @@ func main() {
 		vocabularies = processInputs(args, false)
 	}
 
+	var err error
+
 	if *unionPtr {
 		vocab := vocabulary.Union(vocabularies)
-		vocabulary.WritePb(vocab)
+		err = vocabulary.WritePb(vocab)
 	}
 	if *intersectionPtr {
 		vocab := vocabulary.Intersection(vocabularies)
-		vocabulary.WritePb(vocab)
+		err = vocabulary.WritePb(vocab)
 	}
 	if *differencePtr {
 		vocab := vocabulary.Difference(vocabularies)
-		vocabulary.WritePb(vocab)
+		err = vocabulary.WritePb(vocab)
 	}
 	if *exportPtr {
-		vocabulary.WriteCSV(vocabularies[0], "")
+		err = vocabulary.WriteCSV(vocabularies[0], "")
 	}
 	if *filterCommonPtr {
 		vocab := vocabulary.FilterCommon(vocabularies)
-		vocabulary.WritePb(vocab[0])
+		err = vocabulary.WritePb(vocab[0])
+	}
+
+	if err != nil {
+		fmt.Printf("Error: %+v", err)
+		os.Exit(-1)
 	}
 }
