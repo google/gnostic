@@ -37,15 +37,14 @@ var properties map[string]int
 
 // WriteCSV converts a Vocabulary pb file to a user-friendly readable CSV file.
 // The format of the CSV file is as follows: "group","word","frequency"
-func WriteCSV(v *metrics.Vocabulary, filename string) {
+func WriteCSV(v *metrics.Vocabulary, filename string) error {
 	if filename == "" {
 		filename = "vocabulary-operation.csv"
 	}
 	f4, ferror := os.Create(filename)
+	defer f4.Close()
 	if ferror != nil {
-		fmt.Println(ferror)
-		f4.Close()
-		return
+		return ferror
 	}
 	for _, s := range v.Schemas {
 		temp := fmt.Sprintf("%s,\"%s\",%d\n", "schemas", s.Word, int(s.Count))
@@ -63,7 +62,7 @@ func WriteCSV(v *metrics.Vocabulary, filename string) {
 		temp := fmt.Sprintf("%s,\"%s\",%d\n", "parameters", s.Word, int(s.Count))
 		f4.WriteString(temp)
 	}
-	f4.Close()
+	return nil
 }
 
 // WritePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
