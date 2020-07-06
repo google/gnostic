@@ -27,7 +27,7 @@ func fillProtoStructure(m []rules.MessageType) []*Message {
 		temp := &Message{
 			Type:    message.Message[0],
 			Message: message.Message[1],
-			Path:    message.Path,
+			Keys:    message.Path,
 		}
 		if message.Message[2] != "" {
 			temp.Suggestion = message.Message[2]
@@ -88,7 +88,9 @@ func processParametersV2(operation *pb.Operation, path []string) []rules.Field {
 	return parameters
 }
 
-func AIPLinterV2(document *pb.Document) (*Linter, int) {
+//AIPLintV2 accepts an OpenAPI v2 document and will call the individual AIP rules
+//on the document.
+func AIPLintV2(document *pb.Document) (*Linter, int) {
 	fields := gatherParametersV2(document)
 	messages := make([]rules.MessageType, 0)
 	for _, field := range fields {
@@ -98,7 +100,7 @@ func AIPLinterV2(document *pb.Document) (*Linter, int) {
 	m := fillProtoStructure(messages)
 
 	linterResult := &Linter{
-		LinterResults: m,
+		Messages: m,
 	}
 	return linterResult, len(messages)
 }

@@ -94,7 +94,9 @@ func gatherParameters(document *openapi_v3.Document) []rules.Field {
 	return p
 }
 
-func AIPLinterV3(document *openapi_v3.Document) (*Linter, int) {
+//AIPLintV3 accepts an OpenAPI v2 document and will call the individual AIP rules
+//on the document.
+func AIPLintV3(document *openapi_v3.Document) (*Linter, int) {
 	fields := gatherParameters(document)
 	messages := make([]rules.MessageType, 0)
 	for _, field := range fields {
@@ -104,7 +106,7 @@ func AIPLinterV3(document *openapi_v3.Document) (*Linter, int) {
 	m := fillProtoStructure(messages)
 
 	linterResult := &Linter{
-		LinterResults: m,
+		Messages: m,
 	}
 	return linterResult, len(messages)
 }

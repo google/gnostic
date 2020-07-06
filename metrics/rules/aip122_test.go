@@ -19,14 +19,14 @@ import (
 )
 
 func TestNameSuffix(t *testing.T) {
-	if pass, suggestion := nameSuffix("author_name"); !pass {
-		t.Error("Given \"author_name\", nameSuffix() returned false, expected true")
+	if pass, suggestion := checkNameSuffix("author_name"); !pass {
+		t.Error("Given \"author_name\", checkNameSuffix() returned false, expected true")
 	} else if suggestion != "author" {
 		t.Errorf("Expected suggestion \"author\", received %s instead", suggestion)
 	}
 
-	if pass, suggestion := nameSuffix("author"); pass {
-		t.Error("Given \"author\", nameSuffix() returned true, expected false")
+	if pass, suggestion := checkNameSuffix("author"); pass {
+		t.Error("Given \"author\", checkNameSuffix() returned true, expected false")
 	} else if suggestion != "author" {
 		t.Errorf("Expected suggestion \"author\", received %s instead", suggestion)
 	}

@@ -15,7 +15,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -47,12 +46,6 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	var linter *lint.Linter
-	f, err := os.OpenFile("results.txt",
-		os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Println(err)
-	}
-	defer f.Close()
 
 	for _, model := range env.Request.Models {
 		switch model.TypeUrl {
@@ -60,38 +53,31 @@ func main() {
 			documentv2 := &openapiv2.Document{}
 			err = proto.Unmarshal(model.Value, documentv2)
 			if err == nil {
-				// Analyze the API document.
-				linter, _ = lint.AIPLinterV2(documentv2)
-				// num := strconv.Itoa(numErrors)
-				// if _, err := f.WriteString(env.Request.SourceName + "," + num + "\n"); err != nil {
-				// 	log.Println(err)
-				// }
+				// Analyze the API v2 document.
+				linter, _ = lint.AIPLintV2(documentv2)
 			}
 		case "openapi.v3.Document":
 			documentv3 := &openapiv3.Document{}
 			err = proto.Unmarshal(model.Value, documentv3)
 			if err == nil {
-				// Analyze the API document.
-				linter, _ = lint.AIPLinterV3(documentv3)
+				// Analyze the API v3 document.
+				linter, _ = lint.AIPLintV3(documentv3)
 			}
 		}
 	}
 
 	if linter != nil {
-		outputName1 := filepath.Join(
-			filepath.Dir(env.Request.SourceName), "linter.json")
-		outputName2 := filepath.Join(
-			filepath.Dir(env.Request.SourceName), "linter.pb")
 		file := &plugins.File{}
-
-		file.Name = outputName1
+		file.Name = filepath.Join(
+			filepath.Dir(env.Request.SourceName), "linter.json")
 		file.Data, err = json.MarshalIndent(linter, "", "  ")
 		env.RespondAndExitIfError(err)
 		file.Data = append(file.Data, []byte("\n")...)
 		env.Response.Files = append(env.Response.Files, file)
 
 		file2 := &plugins.File{}
-		file2.Name = outputName2
+		file2.Name = filepath.Join(
+			filepath.Dir(env.Request.SourceName), "linter.pb")
 		file2.Data, err = proto.Marshal(linter)
 		env.RespondAndExitIfError(err)
 		env.Response.Files = append(env.Response.Files, file2)

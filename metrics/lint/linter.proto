@@ -17,16 +17,16 @@ syntax = "proto3";
 package linter;
 
 // The Go package name.
-option go_package = "linter";
+option go_package = ".;linter";
 
 message Message{
-    string Type = 1;
-    string Message = 2;
-    string Suggestion = 3;
-    repeated string Path = 4;
-    int32 Line = 5;
+    string type = 1;
+    string message = 2;
+    string suggestion = 3;
+    repeated string keys = 4;
+    int32 line = 5;
 }
 
 message Linter{
-    repeated Message linterResults = 1;
+    repeated Message messages = 1;
 }

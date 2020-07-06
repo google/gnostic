@@ -29,7 +29,7 @@ type MessageType struct {
 	Path    []string
 }
 
-func nameSuffix(name string) (bool, string) {
+func checkNameSuffix(name string) (bool, string) {
 	if strings.HasSuffix(name, "_name") {
 		return true, name[:len(name)-5]
 	}
@@ -39,7 +39,7 @@ func nameSuffix(name string) (bool, string) {
 // AIP122Driver calls all functions for AIP rule 122
 func AIP122Driver(f Field) []MessageType {
 	messages := make([]MessageType, 0)
-	val, sugg := nameSuffix(f.Name)
+	val, sugg := checkNameSuffix(f.Name)
 	if val {
 		m := []string{"Error", "Message: Parameters must not use the suffix \"_name\"\n",
 			fmt.Sprintf("Suggestion: Rename field %s to %s\n", f.Name, sugg)}

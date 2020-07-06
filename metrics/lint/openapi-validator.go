@@ -10,7 +10,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type Lint struct {
+//The Lint struct is used to parse the structured json data from the IBM linter output.
+//Documentation for IBM's openapi-validator results: https://github.com/IBM/openapi-validator#validation-results
+type IBMLint struct {
 	LinterErrors   ErrorResult   `json:"errors"`
 	LinterWarnings WarningResult `json:"warnings"`
 }
@@ -65,13 +67,13 @@ func addToMessages(mtype string, message string, path []string, line int) *Messa
 	temp := &Message{
 		Type:    mtype,
 		Message: message,
-		Path:    path,
+		Keys:    path,
 		Line:    int32(line),
 	}
 	return temp
 }
 
-func fillMessageProtoStructureIBM(lint Lint) []*Message {
+func fillMessageProtoStructureIBM(lint IBMLint) []*Message {
 	messages := make([]*Message, 0)
 	for _, v := range lint.LinterErrors.Parameters {
 		temp := addToMessages("Error", v.Message, v.Path, v.Line)
@@ -141,7 +143,7 @@ func fillMessageProtoStructureIBM(lint Lint) []*Message {
 	return messages
 }
 
-func openAndReadJSON(filename string) Lint {
+func openAndReadJSON(filename string) IBMLint {
 	jsonFile, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
@@ -149,7 +151,7 @@ func openAndReadJSON(filename string) Lint {
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var lint Lint
+	var lint IBMLint
 
 	json.Unmarshal(byteValue, &lint)
 
@@ -161,7 +163,7 @@ func LintIBM(filename string) {
 	messages := fillMessageProtoStructureIBM(lint)
 
 	linterResult := &Linter{
-		LinterResults: messages,
+		Messages: messages,
 	}
 
 	writePb(linterResult)

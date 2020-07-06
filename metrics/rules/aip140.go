@@ -23,14 +23,14 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-func snakeCase(field string) (bool, string) {
+func checkSnakeCase(field string) (bool, string) {
 	snake := strcase.SnakeCase(field)
 	snake = strings.ToLower(snake)
 
 	return snake == field, snake
 }
 
-func abbreviation(field string) (bool, string) {
+func checkAbbreviation(field string) (bool, string) {
 	var expectedAbbreviations = map[string]string{
 		"configuration": "config",
 		"identifier":    "id",
@@ -45,7 +45,7 @@ func abbreviation(field string) (bool, string) {
 	return false, field
 }
 
-func numbers(field string) bool {
+func checkNumbers(field string) bool {
 	var numberStart = regexp.MustCompile("^[0-9]")
 	for _, segment := range strings.Split(field, "_") {
 		if numberStart.MatchString(segment) {
@@ -55,7 +55,7 @@ func numbers(field string) bool {
 	return false
 }
 
-func reservedWords(field string) bool {
+func checkReservedWords(field string) bool {
 	reservedWordsSet := []string{"abstract", "and", "arguments", "as", "assert", "async", "await", "boolean", "break", "byte",
 		"case", "catch", "char", "class", "const", "continue", "debugger", "def", "default", "del", "delete", "do", "double", "elif",
 		"else", "enum", "eval", "except", "export", "extends", "false", "final", "finally", "float", "for", "from", "function", "global",
@@ -73,7 +73,7 @@ func reservedWords(field string) bool {
 	return false
 }
 
-func prepositions(field string) bool {
+func checkPrepositions(field string) bool {
 	preps := []string{"after", "at", "before", "between", "but", "by", "except",
 		"for", "from", "in", "including", "into", "of", "over", "since", "to",
 		"toward", "under", "upon", "with", "within", "without"}
@@ -89,14 +89,14 @@ func prepositions(field string) bool {
 // AIP140Driver calls all functions for AIP rule 140
 func AIP140Driver(f Field) []MessageType {
 	messages := make([]MessageType, 0)
-	val, sugg := snakeCase(f.Name)
+	val, sugg := checkSnakeCase(f.Name)
 	if !val {
 		m := []string{"Error", "Parameter names must follow case convention: lower_snake_case\n",
 			fmt.Sprintf("Rename field %s to %s\n", f.Name, sugg)}
 		temp := MessageType{Message: m, Path: f.Path}
 		messages = append(messages, temp)
 	}
-	val, sugg = abbreviation(f.Name)
+	val, sugg = checkAbbreviation(f.Name)
 	if val {
 		m := []string{"Error", "Parameters should use common abbreviations if applicable\n",
 			fmt.Sprintf("Rename field %s to %s\n", f.Name, sugg)}
@@ -104,7 +104,7 @@ func AIP140Driver(f Field) []MessageType {
 		messages = append(messages, temp)
 
 	}
-	val = numbers(f.Name)
+	val = checkNumbers(f.Name)
 	if val {
 		m := []string{"Error", fmt.Sprintf("Parameters must not begin with a number: %s\n", f.Name),
 			""}
@@ -112,7 +112,7 @@ func AIP140Driver(f Field) []MessageType {
 		messages = append(messages, temp)
 
 	}
-	val = reservedWords(f.Name)
+	val = checkReservedWords(f.Name)
 	if val {
 		m := []string{"Error", fmt.Sprintf("Parameter names must not be reserved words: %s\n", f.Name),
 			""}
@@ -120,7 +120,7 @@ func AIP140Driver(f Field) []MessageType {
 		messages = append(messages, temp)
 
 	}
-	val = prepositions(f.Name)
+	val = checkPrepositions(f.Name)
 	if val {
 		m := []string{"Error", fmt.Sprintf("Parameter must not include prepositions in their names: %s\n", f.Name),
 			""}
