@@ -17,11 +17,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/googleapis/gnostic/jsonschema"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/googleapis/gnostic/jsonschema"
+	"gopkg.in/yaml.v3"
 )
 
 func usage() {
@@ -41,15 +42,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var info yaml.MapSlice
-	err = yaml.Unmarshal(file, &info)
+	var node yaml.Node
+	err = yaml.Unmarshal(file, &node)
 
 	switch os.Args[2] {
 	case "--json":
-		result := jsonschema.Render(info)
+		result := jsonschema.Render(&node)
 		fmt.Printf("%s", result)
 	case "--yaml":
-		result, err := yaml.Marshal(info)
+		result, err := yaml.Marshal(&node)
 		if err != nil {
 			panic(err)
 		}

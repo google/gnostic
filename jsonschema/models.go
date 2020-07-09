@@ -16,6 +16,8 @@
 // of JSON Schemas.
 package jsonschema
 
+import "gopkg.in/yaml.v3"
+
 // The Schema struct models a JSON Schema and, because schemas are
 // defined hierarchically, contains many references to itself.
 // All fields are pointers and are nil if the associated values
@@ -66,7 +68,7 @@ type Schema struct {
 	// 6.  Metadata keywords
 	Title       *string
 	Description *string
-	Default     *interface{}
+	Default     *yaml.Node
 
 	// 7.  Semantic validation with "format"
 	Format *string

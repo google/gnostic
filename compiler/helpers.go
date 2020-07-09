@@ -22,6 +22,7 @@ import (
 
 	"github.com/googleapis/gnostic/jsonschema"
 	"gopkg.in/yaml.v2"
+	yamlv3 "gopkg.in/yaml.v3"
 )
 
 // compiler helper functions, usually called from generated code
@@ -200,7 +201,7 @@ func StringValue(item interface{}) (value string, ok bool) {
 
 // Description returns a human-readable represention of an item.
 func Description(item interface{}) string {
-	value, ok := item.(yaml.MapSlice)
+	value, ok := item.(*yamlv3.Node)
 	if ok {
 		return jsonschema.Render(value)
 	}

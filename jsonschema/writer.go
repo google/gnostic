@@ -218,7 +218,7 @@ func nodeForSequence(content []*yaml.Node) *yaml.Node {
 func nodeForString(value string) *yaml.Node {
 	return &yaml.Node{
 		Kind:  yaml.ScalarNode,
-		Tag:   "!!string",
+		Tag:   "!!str",
 		Value: value,
 	}
 }
