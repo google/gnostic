@@ -21,15 +21,14 @@ import (
 	"strconv"
 
 	"github.com/googleapis/gnostic/jsonschema"
-	"gopkg.in/yaml.v2"
-	yamlv3 "gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v3"
 )
 
 // compiler helper functions, usually called from generated code
 
-// UnpackMap gets a yaml.MapSlice if possible.
-func UnpackMap(in interface{}) (yaml.MapSlice, bool) {
-	m, ok := in.(yaml.MapSlice)
+// UnpackMap gets a *yaml.Node if possible.
+func UnpackMap(in interface{}) (*yaml.Node, bool) {
+	m, ok := in.(*yaml.Node)
 	if ok {
 		return m, true
 	}
@@ -37,38 +36,47 @@ func UnpackMap(in interface{}) (yaml.MapSlice, bool) {
 	a, ok := in.([]interface{})
 	if ok && len(a) == 0 {
 		// if so, return an empty map
-		return yaml.MapSlice{}, true
+		return &yaml.Node{
+			Kind:    yaml.MappingNode,
+			Content: make([]*yaml.Node, 0),
+		}, true
 	}
 	return nil, false
 }
 
-// SortedKeysForMap returns the sorted keys of a yaml.MapSlice.
-func SortedKeysForMap(m yaml.MapSlice) []string {
+// SortedKeysForMap returns the sorted keys of a yamlv2.MapSlice.
+func SortedKeysForMap(m *yaml.Node) []string {
 	keys := make([]string, 0)
-	for _, item := range m {
-		keys = append(keys, item.Key.(string))
+	if m.Kind == yaml.MappingNode {
+		for i := 0; i < len(m.Content); i += 2 {
+			keys = append(keys, m.Content[i].Value)
+		}
 	}
 	sort.Strings(keys)
 	return keys
 }
 
-// MapHasKey returns true if a yaml.MapSlice contains a specified key.
-func MapHasKey(m yaml.MapSlice, key string) bool {
-	for _, item := range m {
-		itemKey, ok := item.Key.(string)
-		if ok && key == itemKey {
-			return true
+// MapHasKey returns true if a yamlv2.MapSlice contains a specified key.
+func MapHasKey(m *yaml.Node, key string) bool {
+	if m.Kind == yaml.MappingNode {
+		for i := 0; i < len(m.Content); i += 2 {
+			itemKey := m.Content[i].Value
+			if key == itemKey {
+				return true
+			}
 		}
 	}
 	return false
 }
 
 // MapValueForKey gets the value of a map value for a specified key.
-func MapValueForKey(m yaml.MapSlice, key string) interface{} {
-	for _, item := range m {
-		itemKey, ok := item.Key.(string)
-		if ok && key == itemKey {
-			return item.Value
+func MapValueForKey(m *yaml.Node, key string) *yaml.Node {
+	if m.Kind == yaml.MappingNode {
+		for i := 0; i < len(m.Content); i += 2 {
+			itemKey := m.Content[i].Value
+			if key == itemKey {
+				return m.Content[i+1]
+			}
 		}
 	}
 	return nil
@@ -87,7 +95,7 @@ func ConvertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
 }
 
 // MissingKeysInMap identifies which keys from a list of required keys are not in a map.
-func MissingKeysInMap(m yaml.MapSlice, requiredKeys []string) []string {
+func MissingKeysInMap(m *yaml.Node, requiredKeys []string) []string {
 	missingKeys := make([]string, 0)
 	for _, k := range requiredKeys {
 		if !MapHasKey(m, k) {
@@ -98,31 +106,28 @@ func MissingKeysInMap(m yaml.MapSlice, requiredKeys []string) []string {
 }
 
 // InvalidKeysInMap returns keys in a map that don't match a list of allowed keys and patterns.
-func InvalidKeysInMap(m yaml.MapSlice, allowedKeys []string, allowedPatterns []*regexp.Regexp) []string {
+func InvalidKeysInMap(m *yaml.Node, allowedKeys []string, allowedPatterns []*regexp.Regexp) []string {
 	invalidKeys := make([]string, 0)
-	for _, item := range m {
-		itemKey, ok := item.Key.(string)
-		if ok {
-			key := itemKey
-			found := false
-			// does the key match an allowed key?
-			for _, allowedKey := range allowedKeys {
-				if key == allowedKey {
+	for i := 0; i < len(m.Content); i += 2 {
+		key := m.Content[i].Value
+		found := false
+		// does the key match an allowed key?
+		for _, allowedKey := range allowedKeys {
+			if key == allowedKey {
+				found = true
+				break
+			}
+		}
+		if !found {
+			// does the key match an allowed pattern?
+			for _, allowedPattern := range allowedPatterns {
+				if allowedPattern.MatchString(key) {
 					found = true
 					break
 				}
 			}
 			if !found {
-				// does the key match an allowed pattern?
-				for _, allowedPattern := range allowedPatterns {
-					if allowedPattern.MatchString(key) {
-						found = true
-						break
-					}
-				}
-				if !found {
-					invalidKeys = append(invalidKeys, key)
-				}
+				invalidKeys = append(invalidKeys, key)
 			}
 		}
 	}
@@ -201,7 +206,7 @@ func StringValue(item interface{}) (value string, ok bool) {
 
 // Description returns a human-readable represention of an item.
 func Description(item interface{}) string {
-	value, ok := item.(*yamlv3.Node)
+	value, ok := item.(*yaml.Node)
 	if ok {
 		return jsonschema.Render(value)
 	}
