@@ -18,11 +18,10 @@ package openapi_v2
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
-
 	"github.com/googleapis/gnostic/compiler"
 	"gopkg.in/yaml.v3"
+	"regexp"
+	"strings"
 )
 
 // Version returns the package name (and OpenAPI version).
@@ -98,13 +97,13 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [apiKey]
 			if ok && !compiler.StringArrayContainsValue([]string{"apiKey"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -113,7 +112,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v2 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -122,13 +121,13 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v3 != nil {
 			x.In, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [header query]
 			if ok && !compiler.StringArrayContainsValue([]string{"header", "query"}, x.In) {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -137,7 +136,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 		if v4 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -203,13 +202,13 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [basic]
 			if ok && !compiler.StringArrayContainsValue([]string{"basic"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -218,7 +217,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -284,7 +283,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -293,7 +292,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v2 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -302,13 +301,13 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v3 != nil {
 			x.In, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [body]
 			if ok && !compiler.StringArrayContainsValue([]string{"body"}, x.In) {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -317,7 +316,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 		if v4 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -386,7 +385,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -395,7 +394,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v2 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -404,7 +403,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v3 != nil {
 			x.Email, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for email: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for email: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -542,13 +541,13 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v1 != nil {
 			x.Swagger, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for swagger: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for swagger: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [2.0]
 			if ok && !compiler.StringArrayContainsValue([]string{"2.0"}, x.Swagger) {
-				message := fmt.Sprintf("has unexpected value for swagger: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for swagger: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -566,7 +565,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v3 != nil {
 			x.Host, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for host: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for host: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -575,7 +574,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v4 != nil {
 			x.BasePath, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for basePath: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for basePath: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -586,13 +585,13 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if ok {
 				x.Schemes = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for schemes: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for schemes: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [http https ws wss]
 			if ok && !compiler.StringArrayContainsValues([]string{"http", "https", "ws", "wss"}, x.Schemes) {
-				message := fmt.Sprintf("has unexpected value for schemes: %+v", v5)
+				message := fmt.Sprintf("has unexpected value for schemes: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -603,7 +602,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if ok {
 				x.Consumes = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for consumes: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for consumes: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -614,7 +613,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			if ok {
 				x.Produces = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for produces: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for produces: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -808,7 +807,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -817,7 +816,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		if v2 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -883,7 +882,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v1 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -892,7 +891,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v2 != nil {
 			x.Title, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for title: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -901,7 +900,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -921,7 +920,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 			if ok {
 				x.Required = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -930,13 +929,13 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v6 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [file]
 			if ok && !compiler.StringArrayContainsValue([]string{"file"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -945,7 +944,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 		if v7 != nil {
 			x.ReadOnly, ok = compiler.BoolForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for readOnly: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1023,7 +1022,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v1 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1032,13 +1031,13 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v2 != nil {
 			x.In, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [formData]
 			if ok && !compiler.StringArrayContainsValue([]string{"formData"}, x.In) {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1047,7 +1046,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1056,7 +1055,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v4 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1065,7 +1064,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v5 != nil {
 			x.AllowEmptyValue, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1074,13 +1073,13 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v6 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [string number boolean integer array file]
 			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array", "file"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1089,7 +1088,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v7 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1107,13 +1106,13 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v9 != nil {
 			x.CollectionFormat, ok = compiler.StringForScalarNode(v9)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [csv ssv tsv pipes multi]
 			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes", "multi"}, x.CollectionFormat) {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1133,7 +1132,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1142,7 +1141,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v12 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v12)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1153,7 +1152,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1162,7 +1161,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v14 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v14)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1173,7 +1172,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1184,7 +1183,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v16))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1193,7 +1192,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v17 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v17)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1204,7 +1203,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1215,7 +1214,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v19))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1224,7 +1223,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		if v20 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v20)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v20, v20)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v20))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1251,7 +1250,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v22, v22)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v22))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1317,13 +1316,13 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [string number integer boolean array]
 			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "integer", "boolean", "array"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1332,7 +1331,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v2 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1350,13 +1349,13 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v4 != nil {
 			x.CollectionFormat, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [csv ssv tsv pipes]
 			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1376,7 +1375,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1385,7 +1384,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v7 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1396,7 +1395,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1405,7 +1404,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v9 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v9)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1416,7 +1415,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1427,7 +1426,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1436,7 +1435,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v12 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v12)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1447,7 +1446,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1458,7 +1457,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1467,7 +1466,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v15 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v15)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1494,7 +1493,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1503,7 +1502,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v18 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v18)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1563,7 +1562,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v1 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1572,13 +1571,13 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v2 != nil {
 			x.In, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [header]
 			if ok && !compiler.StringArrayContainsValue([]string{"header"}, x.In) {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1587,7 +1586,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1596,7 +1595,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v4 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1605,13 +1604,13 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v5 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [string number boolean integer array]
 			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1620,7 +1619,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v6 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1638,13 +1637,13 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v8 != nil {
 			x.CollectionFormat, ok = compiler.StringForScalarNode(v8)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [csv ssv tsv pipes]
 			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1664,7 +1663,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1673,7 +1672,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v11 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v11)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1684,7 +1683,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1693,7 +1692,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v13 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v13)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1704,7 +1703,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1715,7 +1714,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1724,7 +1723,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v16 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v16)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v16))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1735,7 +1734,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1746,7 +1745,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1755,7 +1754,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		if v19 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v19)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v19))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1782,7 +1781,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v21, v21)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v21))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1878,7 +1877,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v1 != nil {
 			x.Title, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for title: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1887,7 +1886,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v2 != nil {
 			x.Version, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for version: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for version: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1896,7 +1895,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1905,7 +1904,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v4 != nil {
 			x.TermsOfService, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for termsOfService: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for termsOfService: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2001,7 +2000,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 		if v1 != nil {
 			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2010,7 +2009,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2045,7 +2044,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2054,7 +2053,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		if v2 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2114,7 +2113,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2152,7 +2151,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2190,7 +2189,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2228,7 +2227,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2266,7 +2265,7 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2304,7 +2303,7 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2342,7 +2341,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2380,7 +2379,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2418,7 +2417,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2427,7 +2426,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		if v2 != nil {
 			x.Value, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for value: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for value: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2456,7 +2455,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2568,13 +2567,13 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [oauth2]
 			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2583,13 +2582,13 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v2 != nil {
 			x.Flow, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [accessCode]
 			if ok && !compiler.StringArrayContainsValue([]string{"accessCode"}, x.Flow) {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2607,7 +2606,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v4 != nil {
 			x.AuthorizationUrl, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for authorizationUrl: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2616,7 +2615,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v5 != nil {
 			x.TokenUrl, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2625,7 +2624,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 		if v6 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2691,13 +2690,13 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [oauth2]
 			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2706,13 +2705,13 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v2 != nil {
 			x.Flow, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [application]
 			if ok && !compiler.StringArrayContainsValue([]string{"application"}, x.Flow) {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2730,7 +2729,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v4 != nil {
 			x.TokenUrl, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2739,7 +2738,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 		if v5 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2805,13 +2804,13 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [oauth2]
 			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2820,13 +2819,13 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v2 != nil {
 			x.Flow, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [implicit]
 			if ok && !compiler.StringArrayContainsValue([]string{"implicit"}, x.Flow) {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2844,7 +2843,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v4 != nil {
 			x.AuthorizationUrl, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for authorizationUrl: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2853,7 +2852,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v5 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2919,13 +2918,13 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [oauth2]
 			if ok && !compiler.StringArrayContainsValue([]string{"oauth2"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2934,13 +2933,13 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v2 != nil {
 			x.Flow, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [password]
 			if ok && !compiler.StringArrayContainsValue([]string{"password"}, x.Flow) {
-				message := fmt.Sprintf("has unexpected value for flow: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for flow: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2958,7 +2957,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v4 != nil {
 			x.TokenUrl, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2967,7 +2966,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 		if v5 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3061,7 +3060,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Tags = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for tags: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for tags: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3070,7 +3069,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v2 != nil {
 			x.Summary, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for summary: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3079,7 +3078,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3097,7 +3096,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v5 != nil {
 			x.OperationId, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for operationId: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for operationId: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3108,7 +3107,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Produces = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for produces: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for produces: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3119,7 +3118,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Consumes = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for consumes: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for consumes: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3155,13 +3154,13 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Schemes = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for schemes: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for schemes: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [http https ws wss]
 			if ok && !compiler.StringArrayContainsValues([]string{"http", "https", "ws", "wss"}, x.Schemes) {
-				message := fmt.Sprintf("has unexpected value for schemes: %+v", v10)
+				message := fmt.Sprintf("has unexpected value for schemes: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3170,7 +3169,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v11 != nil {
 			x.Deprecated, ok = compiler.BoolForScalarNode(v11)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for deprecated: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3356,7 +3355,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		if v1 != nil {
 			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3501,7 +3500,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v1 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3510,13 +3509,13 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v2 != nil {
 			x.In, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [path]
 			if ok && !compiler.StringArrayContainsValue([]string{"path"}, x.In) {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3525,7 +3524,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3534,7 +3533,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v4 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3543,13 +3542,13 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v5 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [string number boolean integer array]
 			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3558,7 +3557,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v6 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3576,13 +3575,13 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v8 != nil {
 			x.CollectionFormat, ok = compiler.StringForScalarNode(v8)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [csv ssv tsv pipes]
 			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3602,7 +3601,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3611,7 +3610,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v11 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v11)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3622,7 +3621,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3631,7 +3630,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v13 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v13)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3642,7 +3641,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3653,7 +3652,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3662,7 +3661,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v16 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v16)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v16))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3673,7 +3672,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3684,7 +3683,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3693,7 +3692,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 		if v19 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v19)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v19))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3720,7 +3719,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v21, v21)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v21))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3850,13 +3849,13 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [string number integer boolean array]
 			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "integer", "boolean", "array"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3865,7 +3864,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v2 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3883,13 +3882,13 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v4 != nil {
 			x.CollectionFormat, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [csv ssv tsv pipes]
 			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes"}, x.CollectionFormat) {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3909,7 +3908,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3918,7 +3917,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v7 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3929,7 +3928,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3938,7 +3937,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v9 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v9)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3949,7 +3948,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3960,7 +3959,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3969,7 +3968,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v12 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v12)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3980,7 +3979,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3991,7 +3990,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4000,7 +3999,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		if v15 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v15)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4027,7 +4026,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4117,7 +4116,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v1 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4126,13 +4125,13 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v2 != nil {
 			x.In, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [query]
 			if ok && !compiler.StringArrayContainsValue([]string{"query"}, x.In) {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4141,7 +4140,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4150,7 +4149,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v4 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4159,7 +4158,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v5 != nil {
 			x.AllowEmptyValue, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4168,13 +4167,13 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v6 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [string number boolean integer array]
 			if ok && !compiler.StringArrayContainsValue([]string{"string", "number", "boolean", "integer", "array"}, x.Type) {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4183,7 +4182,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v7 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4201,13 +4200,13 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v9 != nil {
 			x.CollectionFormat, ok = compiler.StringForScalarNode(v9)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 			// check for valid enum values
 			// [csv ssv tsv pipes multi]
 			if ok && !compiler.StringArrayContainsValue([]string{"csv", "ssv", "tsv", "pipes", "multi"}, x.CollectionFormat) {
-				message := fmt.Sprintf("has unexpected value for collectionFormat: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for collectionFormat: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4227,7 +4226,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4236,7 +4235,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v12 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v12)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4247,7 +4246,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4256,7 +4255,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v14 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v14)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4267,7 +4266,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4278,7 +4277,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v16))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4287,7 +4286,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v17 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v17)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4298,7 +4297,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4309,7 +4308,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v19))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4318,7 +4317,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		if v20 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v20)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v20, v20)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v20))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4345,7 +4344,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v22, v22)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v22))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4411,7 +4410,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4638,7 +4637,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v1 != nil {
 			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4647,7 +4646,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v2 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4656,7 +4655,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v3 != nil {
 			x.Title, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for title: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4665,7 +4664,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v4 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4685,7 +4684,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4696,7 +4695,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4705,7 +4704,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v8 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v8)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4716,7 +4715,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4725,7 +4724,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v10 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v10)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4736,7 +4735,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4747,7 +4746,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4756,7 +4755,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v13 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v13)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4767,7 +4766,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4778,7 +4777,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4787,7 +4786,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v16 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v16)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v16))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4798,7 +4797,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxProperties: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for maxProperties: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4809,7 +4808,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minProperties: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for minProperties: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4820,7 +4819,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Required = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v19))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4897,7 +4896,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v26 != nil {
 			x.Discriminator, ok = compiler.StringForScalarNode(v26)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for discriminator: %+v (%T)", v26, v26)
+				message := fmt.Sprintf("has unexpected value for discriminator: %s", compiler.Display(v26))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4906,7 +4905,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v27 != nil {
 			x.ReadOnly, ok = compiler.BoolForScalarNode(v27)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v27, v27)
+				message := fmt.Sprintf("has unexpected value for readOnly: %s", compiler.Display(v27))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5212,7 +5211,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5221,7 +5220,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5360,7 +5359,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5369,7 +5368,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v2 != nil {
 			x.Namespace, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for namespace: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for namespace: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5378,7 +5377,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v3 != nil {
 			x.Prefix, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for prefix: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for prefix: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5387,7 +5386,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v4 != nil {
 			x.Attribute, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for attribute: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for attribute: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -5396,7 +5395,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v5 != nil {
 			x.Wrapped, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for wrapped: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for wrapped: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -8647,6 +8646,9 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		items := compiler.NewSequenceNode()
 		for _, item := range m.Items.Schema {
 			items.Content = append(items.Content, item.ToRawInfo())
+		}
+		if len(items.Content) == 1 {
+			items = items.Content[0]
 		}
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("items"))
 		info.Content = append(info.Content, items)

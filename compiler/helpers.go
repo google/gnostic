@@ -373,3 +373,15 @@ func Description(item interface{}) string {
 	}
 	return fmt.Sprintf("%+v", item)
 }
+
+// Display returns a description of a node for use in error messages.
+func Display(node *yaml.Node) string {
+	switch node.Kind {
+	case yaml.ScalarNode:
+		switch node.Tag {
+		case "!!str":
+			return fmt.Sprintf("%s (string)", node.Value)
+		}
+	}
+	return fmt.Sprintf("%+v (%T)", node, node)
+}

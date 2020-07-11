@@ -463,7 +463,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("  if ok {")
 					code.Print("    x.%s = compiler.StringArrayForSequenceNode(v)", fieldName)
 					code.Print("  } else {")
-					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("}")
 
@@ -480,7 +480,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						}
 						stringArrayLiteral += "}"
 						code.Print("if ok && !compiler.StringArrayContainsValues(%s, x.%s) {", stringArrayLiteral, fieldName)
-						code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+						code.Print("  message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 						code.Print("  errors = append(errors, compiler.NewError(context, message))")
 						code.Print("}")
 					}
@@ -491,7 +491,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("  x.%s, ok = compiler.StringForScalarNode(v%d)", fieldName, fieldNumber)
 					code.Print("  if !ok {")
-					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("  }")
 
@@ -509,7 +509,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						stringArrayLiteral += "}"
 
 						code.Print("if ok && !compiler.StringArrayContainsValue(%s, x.%s) {", stringArrayLiteral, fieldName)
-						code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+						code.Print("  message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 						code.Print("  errors = append(errors, compiler.NewError(context, message))")
 						code.Print("}")
 					}
@@ -522,7 +522,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				code.Print("  if ok {")
 				code.Print("    x.%s = v", fieldName)
 				code.Print("  } else {")
-				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 				code.Print("    errors = append(errors, compiler.NewError(context, message))")
 				code.Print("  }")
 				code.Print("}")
@@ -533,7 +533,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				code.Print("  if ok {")
 				code.Print("    x.%s = int64(t)", fieldName)
 				code.Print("  } else {")
-				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 				code.Print("    errors = append(errors, compiler.NewError(context, message))")
 				code.Print("  }")
 				code.Print("}")
@@ -550,7 +550,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("  x.%s, ok = compiler.BoolForScalarNode(v%d)", fieldName, fieldNumber)
 					code.Print("  if !ok {")
-					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("  }")
 					code.Print("}")
@@ -871,6 +871,9 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 						}
 						code.Print("	items.Content = append(items.Content, item.ToRawInfo())")
 						code.Print("}")
+
+						code.Print("if len(items.Content) == 1 {items = items.Content[0]}")
+
 						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"items\"))")
 						code.Print("info.Content = append(info.Content, items)")
 					} else {

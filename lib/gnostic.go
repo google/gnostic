@@ -538,6 +538,10 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	if g.jsonOutputPath != "" {
 		var bytes []byte
 		if rawInfo != nil {
+			rawInfo := &yaml.Node{
+				Kind:    yaml.DocumentNode,
+				Content: []*yaml.Node{rawInfo},
+			}
 			bytes, _ = jsonwriter.Marshal(rawInfo)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating json output %s\n", err.Error())

@@ -403,7 +403,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -412,7 +412,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v2 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -421,7 +421,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		if v3 != nil {
 			x.Email, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for email: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for email: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -522,7 +522,7 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 		if v1 != nil {
 			x.PropertyName, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for propertyName: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for propertyName: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -597,7 +597,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		if v1 != nil {
 			x.Openapi, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for openapi: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for openapi: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -741,7 +741,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 		if v1 != nil {
 			x.ContentType, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for contentType: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for contentType: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -759,7 +759,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 		if v3 != nil {
 			x.Style, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for style: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for style: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -768,7 +768,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 		if v4 != nil {
 			x.Explode, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for explode: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for explode: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -777,7 +777,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 		if v5 != nil {
 			x.AllowReserved, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowReserved: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for allowReserved: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -867,7 +867,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 		if v1 != nil {
 			x.Summary, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for summary: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -876,7 +876,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -894,7 +894,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 		if v4 != nil {
 			x.ExternalValue, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for externalValue: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for externalValue: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1072,7 +1072,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1081,7 +1081,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 		if v2 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1141,7 +1141,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1150,7 +1150,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v2 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1159,7 +1159,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v3 != nil {
 			x.Deprecated, ok = compiler.BoolForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for deprecated: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1168,7 +1168,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v4 != nil {
 			x.AllowEmptyValue, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1177,7 +1177,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v5 != nil {
 			x.Style, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for style: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for style: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1186,7 +1186,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v6 != nil {
 			x.Explode, ok = compiler.BoolForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for explode: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for explode: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1195,7 +1195,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 		if v7 != nil {
 			x.AllowReserved, ok = compiler.BoolForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowReserved: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for allowReserved: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1367,7 +1367,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v1 != nil {
 			x.Title, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for title: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1376,7 +1376,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1385,7 +1385,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v3 != nil {
 			x.TermsOfService, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for termsOfService: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for termsOfService: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1412,7 +1412,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v6 != nil {
 			x.Version, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for version: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for version: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1421,7 +1421,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 		if v7 != nil {
 			x.Summary, ok = compiler.StringForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for summary: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1506,7 +1506,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1515,7 +1515,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 		if v2 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1575,7 +1575,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		if v1 != nil {
 			x.OperationRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for operationRef: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for operationRef: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1584,7 +1584,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		if v2 != nil {
 			x.OperationId, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for operationId: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for operationId: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1611,7 +1611,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 		if v5 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1867,7 +1867,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1905,7 +1905,7 @@ func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*Na
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1943,7 +1943,7 @@ func NewNamedEncoding(in interface{}, context *compiler.Context) (*NamedEncoding
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -1981,7 +1981,7 @@ func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*Nam
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2019,7 +2019,7 @@ func NewNamedHeaderOrReference(in interface{}, context *compiler.Context) (*Name
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2057,7 +2057,7 @@ func NewNamedLinkOrReference(in interface{}, context *compiler.Context) (*NamedL
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2095,7 +2095,7 @@ func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaTy
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2133,7 +2133,7 @@ func NewNamedParameterOrReference(in interface{}, context *compiler.Context) (*N
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2171,7 +2171,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2209,7 +2209,7 @@ func NewNamedRequestBodyOrReference(in interface{}, context *compiler.Context) (
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2247,7 +2247,7 @@ func NewNamedResponseOrReference(in interface{}, context *compiler.Context) (*Na
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2285,7 +2285,7 @@ func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*Name
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2323,7 +2323,7 @@ func NewNamedSecuritySchemeOrReference(in interface{}, context *compiler.Context
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2361,7 +2361,7 @@ func NewNamedServerVariable(in interface{}, context *compiler.Context) (*NamedSe
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2399,7 +2399,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2408,7 +2408,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		if v2 != nil {
 			x.Value, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for value: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for value: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2437,7 +2437,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2475,7 +2475,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 		if v1 != nil {
 			x.AuthorizationUrl, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for authorizationUrl: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for authorizationUrl: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2484,7 +2484,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 		if v2 != nil {
 			x.TokenUrl, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for tokenUrl: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for tokenUrl: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2493,7 +2493,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 		if v3 != nil {
 			x.RefreshUrl, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for refreshUrl: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for refreshUrl: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2699,7 +2699,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			if ok {
 				x.Tags = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for tags: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for tags: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2708,7 +2708,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v2 != nil {
 			x.Summary, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for summary: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2717,7 +2717,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2735,7 +2735,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v5 != nil {
 			x.OperationId, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for operationId: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for operationId: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2787,7 +2787,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 		if v10 != nil {
 			x.Deprecated, ok = compiler.BoolForScalarNode(v10)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for deprecated: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2885,7 +2885,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2894,7 +2894,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v2 != nil {
 			x.In, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2903,7 +2903,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2912,7 +2912,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v4 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2921,7 +2921,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v5 != nil {
 			x.Deprecated, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for deprecated: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2930,7 +2930,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v6 != nil {
 			x.AllowEmptyValue, ok = compiler.BoolForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for allowEmptyValue: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2939,7 +2939,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v7 != nil {
 			x.Style, ok = compiler.StringForScalarNode(v7)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for style: %+v (%T)", v7, v7)
+				message := fmt.Sprintf("has unexpected value for style: %s", compiler.Display(v7))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2948,7 +2948,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v8 != nil {
 			x.Explode, ok = compiler.BoolForScalarNode(v8)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for explode: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for explode: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2957,7 +2957,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		if v9 != nil {
 			x.AllowReserved, ok = compiler.BoolForScalarNode(v9)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for allowReserved: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for allowReserved: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3123,7 +3123,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		if v1 != nil {
 			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3132,7 +3132,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		if v2 != nil {
 			x.Summary, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for summary: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for summary: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3141,7 +3141,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3404,7 +3404,7 @@ func NewReference(in interface{}, context *compiler.Context) (*Reference, error)
 		if v1 != nil {
 			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for $ref: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3469,7 +3469,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3487,7 +3487,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 		if v3 != nil {
 			x.Required, ok = compiler.BoolForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3593,7 +3593,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		if v1 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3829,7 +3829,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v1 != nil {
 			x.Nullable, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for nullable: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for nullable: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3847,7 +3847,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v3 != nil {
 			x.ReadOnly, ok = compiler.BoolForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for readOnly: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3856,7 +3856,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v4 != nil {
 			x.WriteOnly, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for writeOnly: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for writeOnly: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3892,7 +3892,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v8 != nil {
 			x.Deprecated, ok = compiler.BoolForScalarNode(v8)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for deprecated: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for deprecated: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3901,7 +3901,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v9 != nil {
 			x.Title, ok = compiler.StringForScalarNode(v9)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v9, v9)
+				message := fmt.Sprintf("has unexpected value for title: %s", compiler.Display(v9))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3912,7 +3912,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MultipleOf = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for multipleOf: %+v (%T)", v10, v10)
+				message := fmt.Sprintf("has unexpected value for multipleOf: %s", compiler.Display(v10))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3923,7 +3923,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Maximum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v11, v11)
+				message := fmt.Sprintf("has unexpected value for maximum: %s", compiler.Display(v11))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3932,7 +3932,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v12 != nil {
 			x.ExclusiveMaximum, ok = compiler.BoolForScalarNode(v12)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %+v (%T)", v12, v12)
+				message := fmt.Sprintf("has unexpected value for exclusiveMaximum: %s", compiler.Display(v12))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3943,7 +3943,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Minimum = v
 			} else {
-				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v13, v13)
+				message := fmt.Sprintf("has unexpected value for minimum: %s", compiler.Display(v13))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3952,7 +3952,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v14 != nil {
 			x.ExclusiveMinimum, ok = compiler.BoolForScalarNode(v14)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %+v (%T)", v14, v14)
+				message := fmt.Sprintf("has unexpected value for exclusiveMinimum: %s", compiler.Display(v14))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3963,7 +3963,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxLength: %+v (%T)", v15, v15)
+				message := fmt.Sprintf("has unexpected value for maxLength: %s", compiler.Display(v15))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3974,7 +3974,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinLength = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minLength: %+v (%T)", v16, v16)
+				message := fmt.Sprintf("has unexpected value for minLength: %s", compiler.Display(v16))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3983,7 +3983,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v17 != nil {
 			x.Pattern, ok = compiler.StringForScalarNode(v17)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v17, v17)
+				message := fmt.Sprintf("has unexpected value for pattern: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -3994,7 +3994,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxItems: %+v (%T)", v18, v18)
+				message := fmt.Sprintf("has unexpected value for maxItems: %s", compiler.Display(v18))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4005,7 +4005,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinItems = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minItems: %+v (%T)", v19, v19)
+				message := fmt.Sprintf("has unexpected value for minItems: %s", compiler.Display(v19))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4014,7 +4014,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v20 != nil {
 			x.UniqueItems, ok = compiler.BoolForScalarNode(v20)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for uniqueItems: %+v (%T)", v20, v20)
+				message := fmt.Sprintf("has unexpected value for uniqueItems: %s", compiler.Display(v20))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4025,7 +4025,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MaxProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for maxProperties: %+v (%T)", v21, v21)
+				message := fmt.Sprintf("has unexpected value for maxProperties: %s", compiler.Display(v21))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4036,7 +4036,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.MinProperties = int64(t)
 			} else {
-				message := fmt.Sprintf("has unexpected value for minProperties: %+v (%T)", v22, v22)
+				message := fmt.Sprintf("has unexpected value for minProperties: %s", compiler.Display(v22))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4047,7 +4047,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			if ok {
 				x.Required = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v23, v23)
+				message := fmt.Sprintf("has unexpected value for required: %s", compiler.Display(v23))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4072,7 +4072,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v25 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v25)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v25, v25)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v25))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4174,7 +4174,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v34 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v34)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v34, v34)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v34))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4183,7 +4183,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		if v35 != nil {
 			x.Format, ok = compiler.StringForScalarNode(v35)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v35, v35)
+				message := fmt.Sprintf("has unexpected value for format: %s", compiler.Display(v35))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4349,7 +4349,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v1 != nil {
 			x.Type, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for type: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4358,7 +4358,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4367,7 +4367,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v3 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4376,7 +4376,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v4 != nil {
 			x.In, ok = compiler.StringForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for in: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for in: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4385,7 +4385,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v5 != nil {
 			x.Scheme, ok = compiler.StringForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for scheme: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for scheme: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4394,7 +4394,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v6 != nil {
 			x.BearerFormat, ok = compiler.StringForScalarNode(v6)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for bearerFormat: %+v (%T)", v6, v6)
+				message := fmt.Sprintf("has unexpected value for bearerFormat: %s", compiler.Display(v6))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4412,7 +4412,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 		if v8 != nil {
 			x.OpenIdConnectUrl, ok = compiler.StringForScalarNode(v8)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for openIdConnectUrl: %+v (%T)", v8, v8)
+				message := fmt.Sprintf("has unexpected value for openIdConnectUrl: %s", compiler.Display(v8))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4548,7 +4548,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 		if v1 != nil {
 			x.Url, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for url: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for url: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4557,7 +4557,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4634,7 +4634,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 			if ok {
 				x.Enum = compiler.StringArrayForSequenceNode(v)
 			} else {
-				message := fmt.Sprintf("has unexpected value for enum: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for enum: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4643,7 +4643,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 		if v2 != nil {
 			x.Default, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for default: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for default: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4652,7 +4652,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 		if v3 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4826,7 +4826,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4835,7 +4835,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 		if v2 != nil {
 			x.Description, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for description: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4904,7 +4904,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v1 != nil {
 			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
+				message := fmt.Sprintf("has unexpected value for name: %s", compiler.Display(v1))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4913,7 +4913,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v2 != nil {
 			x.Namespace, ok = compiler.StringForScalarNode(v2)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for namespace: %+v (%T)", v2, v2)
+				message := fmt.Sprintf("has unexpected value for namespace: %s", compiler.Display(v2))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4922,7 +4922,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v3 != nil {
 			x.Prefix, ok = compiler.StringForScalarNode(v3)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for prefix: %+v (%T)", v3, v3)
+				message := fmt.Sprintf("has unexpected value for prefix: %s", compiler.Display(v3))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4931,7 +4931,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v4 != nil {
 			x.Attribute, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for attribute: %+v (%T)", v4, v4)
+				message := fmt.Sprintf("has unexpected value for attribute: %s", compiler.Display(v4))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -4940,7 +4940,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		if v5 != nil {
 			x.Wrapped, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
-				message := fmt.Sprintf("has unexpected value for wrapped: %+v (%T)", v5, v5)
+				message := fmt.Sprintf("has unexpected value for wrapped: %s", compiler.Display(v5))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -8338,6 +8338,9 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		items := compiler.NewSequenceNode()
 		for _, item := range m.Items.SchemaOrReference {
 			items.Content = append(items.Content, item.ToRawInfo())
+		}
+		if len(items.Content) == 1 {
+			items = items.Content[0]
 		}
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("items"))
 		info.Content = append(info.Content, items)
