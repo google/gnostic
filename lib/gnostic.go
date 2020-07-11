@@ -36,7 +36,7 @@ import (
 	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 	plugins "github.com/googleapis/gnostic/plugins"
 	surface "github.com/googleapis/gnostic/surface"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // UsageError is a response to invalid command-line inputs
@@ -71,18 +71,26 @@ func getOpenAPIVersionFromInfo(info interface{}) int {
 	if !ok {
 		return SourceFormatUnknown
 	}
-	swagger, ok := compiler.MapValueForKey(m, "swagger").(string)
+
+	if m.Kind == yaml.DocumentNode {
+		return getOpenAPIVersionFromInfo(m.Content[0])
+	}
+
+	swagger, ok := compiler.StringForScalarNode(compiler.MapValueForKey(m, "swagger"))
 	if ok && strings.HasPrefix(swagger, "2.0") {
 		return SourceFormatOpenAPI2
 	}
-	openapi, ok := compiler.MapValueForKey(m, "openapi").(string)
+
+	openapi, ok := compiler.StringForScalarNode(compiler.MapValueForKey(m, "openapi"))
 	if ok && strings.HasPrefix(openapi, "3.0") {
 		return SourceFormatOpenAPI3
 	}
-	kind, ok := compiler.MapValueForKey(m, "kind").(string)
+
+	kind, ok := compiler.StringForScalarNode(compiler.MapValueForKey(m, "kind"))
 	if ok && kind == "discovery#restDescription" {
 		return SourceFormatDiscovery
 	}
+
 	return SourceFormatUnknown
 }
 
@@ -434,13 +442,13 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	}
 	// Compile to the proto model.
 	if g.sourceFormat == SourceFormatOpenAPI2 {
-		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		document, err := openapi_v2.NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
 	} else if g.sourceFormat == SourceFormatOpenAPI3 {
-		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		document, err := openapi_v3.NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
@@ -501,27 +509,17 @@ func (g *Gnostic) writeTextOutput(message proto.Message) {
 // Write JSON/YAML OpenAPI representations.
 func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	// Convert the OpenAPI document into an exportable MapSlice.
-	var rawInfo yaml.MapSlice
-	var ok bool
+	var rawInfo *yaml.Node
 	var err error
 	if g.sourceFormat == SourceFormatOpenAPI2 {
 		document := message.(*openapi_v2.Document)
-		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			rawInfo = nil
-		}
+		rawInfo = document.ToRawInfo()
 	} else if g.sourceFormat == SourceFormatOpenAPI3 {
 		document := message.(*openapi_v3.Document)
-		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			rawInfo = nil
-		}
+		rawInfo = document.ToRawInfo()
 	} else if g.sourceFormat == SourceFormatDiscovery {
 		document := message.(*discovery_v1.Document)
-		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			rawInfo = nil
-		}
+		rawInfo = document.ToRawInfo()
 	}
 	// Optionally write description in yaml format.
 	if g.yamlOutputPath != "" {

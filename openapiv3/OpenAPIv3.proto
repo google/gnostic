@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -208,8 +208,8 @@ message Info {
   Contact contact = 4;
   License license = 5;
   string version = 6;
-  repeated NamedAny specification_extension = 7;
-  string summary = 8;
+  string summary = 7;
+  repeated NamedAny specification_extension = 8;
 }
 
 message ItemsItem {

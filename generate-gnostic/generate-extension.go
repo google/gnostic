@@ -268,7 +268,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"regexp",
 		"strings",
 		"github.com/googleapis/gnostic/compiler",
-		"gopkg.in/yaml.v2",
+		"gopkg.in/yaml.v3",
 	})
 	goFilename := path.Join(protoOutDirectory, outFileBaseName+".go")
 	err = ioutil.WriteFile(goFilename, []byte(compiler), 0644)

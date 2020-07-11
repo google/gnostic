@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package discovery_v1
 import (
 	"fmt"
 	"github.com/googleapis/gnostic/compiler"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"regexp"
 	"strings"
 )
@@ -48,9 +48,9 @@ func NewAnnotations(in interface{}, context *compiler.Context) (*Annotations, er
 		// repeated string required = 1;
 		v1 := compiler.MapValueForKey(m, "required")
 		if v1 != nil {
-			v, ok := v1.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v1)
 			if ok {
-				x.Required = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Required = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -123,7 +123,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string kind = 1;
 		v1 := compiler.MapValueForKey(m, "kind")
 		if v1 != nil {
-			x.Kind, ok = v1.(string)
+			x.Kind, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for kind: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -132,7 +132,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string discovery_version = 2;
 		v2 := compiler.MapValueForKey(m, "discoveryVersion")
 		if v2 != nil {
-			x.DiscoveryVersion, ok = v2.(string)
+			x.DiscoveryVersion, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for discoveryVersion: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -141,7 +141,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string id = 3;
 		v3 := compiler.MapValueForKey(m, "id")
 		if v3 != nil {
-			x.Id, ok = v3.(string)
+			x.Id, ok = compiler.StringForScalarNode(v3)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for id: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
@@ -150,7 +150,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string name = 4;
 		v4 := compiler.MapValueForKey(m, "name")
 		if v4 != nil {
-			x.Name, ok = v4.(string)
+			x.Name, ok = compiler.StringForScalarNode(v4)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
@@ -159,7 +159,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string version = 5;
 		v5 := compiler.MapValueForKey(m, "version")
 		if v5 != nil {
-			x.Version, ok = v5.(string)
+			x.Version, ok = compiler.StringForScalarNode(v5)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for version: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
@@ -168,7 +168,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string revision = 6;
 		v6 := compiler.MapValueForKey(m, "revision")
 		if v6 != nil {
-			x.Revision, ok = v6.(string)
+			x.Revision, ok = compiler.StringForScalarNode(v6)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for revision: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
@@ -177,7 +177,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string title = 7;
 		v7 := compiler.MapValueForKey(m, "title")
 		if v7 != nil {
-			x.Title, ok = v7.(string)
+			x.Title, ok = compiler.StringForScalarNode(v7)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for title: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
@@ -186,7 +186,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string description = 8;
 		v8 := compiler.MapValueForKey(m, "description")
 		if v8 != nil {
-			x.Description, ok = v8.(string)
+			x.Description, ok = compiler.StringForScalarNode(v8)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
@@ -204,7 +204,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string documentation_link = 10;
 		v10 := compiler.MapValueForKey(m, "documentationLink")
 		if v10 != nil {
-			x.DocumentationLink, ok = v10.(string)
+			x.DocumentationLink, ok = compiler.StringForScalarNode(v10)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for documentationLink: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
@@ -213,9 +213,9 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// repeated string labels = 11;
 		v11 := compiler.MapValueForKey(m, "labels")
 		if v11 != nil {
-			v, ok := v11.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v11)
 			if ok {
-				x.Labels = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Labels = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for labels: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
@@ -224,7 +224,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string protocol = 12;
 		v12 := compiler.MapValueForKey(m, "protocol")
 		if v12 != nil {
-			x.Protocol, ok = v12.(string)
+			x.Protocol, ok = compiler.StringForScalarNode(v12)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for protocol: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
@@ -233,7 +233,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string base_url = 13;
 		v13 := compiler.MapValueForKey(m, "baseUrl")
 		if v13 != nil {
-			x.BaseUrl, ok = v13.(string)
+			x.BaseUrl, ok = compiler.StringForScalarNode(v13)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for baseUrl: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
@@ -242,7 +242,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string base_path = 14;
 		v14 := compiler.MapValueForKey(m, "basePath")
 		if v14 != nil {
-			x.BasePath, ok = v14.(string)
+			x.BasePath, ok = compiler.StringForScalarNode(v14)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for basePath: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
@@ -251,7 +251,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string root_url = 15;
 		v15 := compiler.MapValueForKey(m, "rootUrl")
 		if v15 != nil {
-			x.RootUrl, ok = v15.(string)
+			x.RootUrl, ok = compiler.StringForScalarNode(v15)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for rootUrl: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
@@ -260,7 +260,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string service_path = 16;
 		v16 := compiler.MapValueForKey(m, "servicePath")
 		if v16 != nil {
-			x.ServicePath, ok = v16.(string)
+			x.ServicePath, ok = compiler.StringForScalarNode(v16)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for servicePath: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
@@ -269,7 +269,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string batch_path = 17;
 		v17 := compiler.MapValueForKey(m, "batchPath")
 		if v17 != nil {
-			x.BatchPath, ok = v17.(string)
+			x.BatchPath, ok = compiler.StringForScalarNode(v17)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for batchPath: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
@@ -296,9 +296,9 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// repeated string features = 20;
 		v20 := compiler.MapValueForKey(m, "features")
 		if v20 != nil {
-			v, ok := v20.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v20)
 			if ok {
-				x.Features = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Features = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for features: %+v (%T)", v20, v20)
 				errors = append(errors, compiler.NewError(context, message))
@@ -334,7 +334,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string etag = 24;
 		v24 := compiler.MapValueForKey(m, "etag")
 		if v24 != nil {
-			x.Etag, ok = v24.(string)
+			x.Etag, ok = compiler.StringForScalarNode(v24)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for etag: %+v (%T)", v24, v24)
 				errors = append(errors, compiler.NewError(context, message))
@@ -343,7 +343,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string owner_domain = 25;
 		v25 := compiler.MapValueForKey(m, "ownerDomain")
 		if v25 != nil {
-			x.OwnerDomain, ok = v25.(string)
+			x.OwnerDomain, ok = compiler.StringForScalarNode(v25)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for ownerDomain: %+v (%T)", v25, v25)
 				errors = append(errors, compiler.NewError(context, message))
@@ -352,7 +352,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string owner_name = 26;
 		v26 := compiler.MapValueForKey(m, "ownerName")
 		if v26 != nil {
-			x.OwnerName, ok = v26.(string)
+			x.OwnerName, ok = compiler.StringForScalarNode(v26)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for ownerName: %+v (%T)", v26, v26)
 				errors = append(errors, compiler.NewError(context, message))
@@ -361,7 +361,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// bool version_module = 27;
 		v27 := compiler.MapValueForKey(m, "version_module")
 		if v27 != nil {
-			x.VersionModule, ok = v27.(bool)
+			x.VersionModule, ok = compiler.BoolForScalarNode(v27)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for version_module: %+v (%T)", v27, v27)
 				errors = append(errors, compiler.NewError(context, message))
@@ -370,7 +370,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string canonical_name = 28;
 		v28 := compiler.MapValueForKey(m, "canonicalName")
 		if v28 != nil {
-			x.CanonicalName, ok = v28.(string)
+			x.CanonicalName, ok = compiler.StringForScalarNode(v28)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for canonicalName: %+v (%T)", v28, v28)
 				errors = append(errors, compiler.NewError(context, message))
@@ -379,7 +379,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// bool fully_encode_reserved_expansion = 29;
 		v29 := compiler.MapValueForKey(m, "fullyEncodeReservedExpansion")
 		if v29 != nil {
-			x.FullyEncodeReservedExpansion, ok = v29.(bool)
+			x.FullyEncodeReservedExpansion, ok = compiler.BoolForScalarNode(v29)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for fullyEncodeReservedExpansion: %+v (%T)", v29, v29)
 				errors = append(errors, compiler.NewError(context, message))
@@ -388,7 +388,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string package_path = 30;
 		v30 := compiler.MapValueForKey(m, "packagePath")
 		if v30 != nil {
-			x.PackagePath, ok = v30.(string)
+			x.PackagePath, ok = compiler.StringForScalarNode(v30)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for packagePath: %+v (%T)", v30, v30)
 				errors = append(errors, compiler.NewError(context, message))
@@ -397,7 +397,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 		// string mtls_root_url = 31;
 		v31 := compiler.MapValueForKey(m, "mtlsRootUrl")
 		if v31 != nil {
-			x.MtlsRootUrl, ok = v31.(string)
+			x.MtlsRootUrl, ok = compiler.StringForScalarNode(v31)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for mtlsRootUrl: %+v (%T)", v31, v31)
 				errors = append(errors, compiler.NewError(context, message))
@@ -432,7 +432,7 @@ func NewIcons(in interface{}, context *compiler.Context) (*Icons, error) {
 		// string x16 = 1;
 		v1 := compiler.MapValueForKey(m, "x16")
 		if v1 != nil {
-			x.X16, ok = v1.(string)
+			x.X16, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for x16: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -441,7 +441,7 @@ func NewIcons(in interface{}, context *compiler.Context) (*Icons, error) {
 		// string x32 = 2;
 		v2 := compiler.MapValueForKey(m, "x32")
 		if v2 != nil {
-			x.X32, ok = v2.(string)
+			x.X32, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for x32: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -470,9 +470,9 @@ func NewMediaUpload(in interface{}, context *compiler.Context) (*MediaUpload, er
 		// repeated string accept = 1;
 		v1 := compiler.MapValueForKey(m, "accept")
 		if v1 != nil {
-			v, ok := v1.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v1)
 			if ok {
-				x.Accept = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Accept = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for accept: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -481,7 +481,7 @@ func NewMediaUpload(in interface{}, context *compiler.Context) (*MediaUpload, er
 		// string max_size = 2;
 		v2 := compiler.MapValueForKey(m, "maxSize")
 		if v2 != nil {
-			x.MaxSize, ok = v2.(string)
+			x.MaxSize, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for maxSize: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -499,7 +499,7 @@ func NewMediaUpload(in interface{}, context *compiler.Context) (*MediaUpload, er
 		// bool supports_subscription = 4;
 		v4 := compiler.MapValueForKey(m, "supportsSubscription")
 		if v4 != nil {
-			x.SupportsSubscription, ok = v4.(bool)
+			x.SupportsSubscription, ok = compiler.BoolForScalarNode(v4)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for supportsSubscription: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
@@ -528,7 +528,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// string id = 1;
 		v1 := compiler.MapValueForKey(m, "id")
 		if v1 != nil {
-			x.Id, ok = v1.(string)
+			x.Id, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for id: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -537,7 +537,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// string path = 2;
 		v2 := compiler.MapValueForKey(m, "path")
 		if v2 != nil {
-			x.Path, ok = v2.(string)
+			x.Path, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for path: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -546,7 +546,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// string http_method = 3;
 		v3 := compiler.MapValueForKey(m, "httpMethod")
 		if v3 != nil {
-			x.HttpMethod, ok = v3.(string)
+			x.HttpMethod, ok = compiler.StringForScalarNode(v3)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for httpMethod: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
@@ -555,7 +555,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// string description = 4;
 		v4 := compiler.MapValueForKey(m, "description")
 		if v4 != nil {
-			x.Description, ok = v4.(string)
+			x.Description, ok = compiler.StringForScalarNode(v4)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
@@ -573,9 +573,9 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// repeated string parameter_order = 6;
 		v6 := compiler.MapValueForKey(m, "parameterOrder")
 		if v6 != nil {
-			v, ok := v6.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v6)
 			if ok {
-				x.ParameterOrder = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.ParameterOrder = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for parameterOrder: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
@@ -602,9 +602,9 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// repeated string scopes = 9;
 		v9 := compiler.MapValueForKey(m, "scopes")
 		if v9 != nil {
-			v, ok := v9.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v9)
 			if ok {
-				x.Scopes = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Scopes = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for scopes: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
@@ -613,7 +613,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// bool supports_media_download = 10;
 		v10 := compiler.MapValueForKey(m, "supportsMediaDownload")
 		if v10 != nil {
-			x.SupportsMediaDownload, ok = v10.(bool)
+			x.SupportsMediaDownload, ok = compiler.BoolForScalarNode(v10)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for supportsMediaDownload: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
@@ -622,7 +622,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// bool supports_media_upload = 11;
 		v11 := compiler.MapValueForKey(m, "supportsMediaUpload")
 		if v11 != nil {
-			x.SupportsMediaUpload, ok = v11.(bool)
+			x.SupportsMediaUpload, ok = compiler.BoolForScalarNode(v11)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for supportsMediaUpload: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
@@ -631,7 +631,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// bool use_media_download_service = 12;
 		v12 := compiler.MapValueForKey(m, "useMediaDownloadService")
 		if v12 != nil {
-			x.UseMediaDownloadService, ok = v12.(bool)
+			x.UseMediaDownloadService, ok = compiler.BoolForScalarNode(v12)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for useMediaDownloadService: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
@@ -649,7 +649,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// bool supports_subscription = 14;
 		v14 := compiler.MapValueForKey(m, "supportsSubscription")
 		if v14 != nil {
-			x.SupportsSubscription, ok = v14.(bool)
+			x.SupportsSubscription, ok = compiler.BoolForScalarNode(v14)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for supportsSubscription: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
@@ -658,7 +658,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// string flat_path = 15;
 		v15 := compiler.MapValueForKey(m, "flatPath")
 		if v15 != nil {
-			x.FlatPath, ok = v15.(string)
+			x.FlatPath, ok = compiler.StringForScalarNode(v15)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for flatPath: %+v (%T)", v15, v15)
 				errors = append(errors, compiler.NewError(context, message))
@@ -667,7 +667,7 @@ func NewMethod(in interface{}, context *compiler.Context) (*Method, error) {
 		// bool etag_required = 16;
 		v16 := compiler.MapValueForKey(m, "etagRequired")
 		if v16 != nil {
-			x.EtagRequired, ok = v16.(bool)
+			x.EtagRequired, ok = compiler.BoolForScalarNode(v16)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for etagRequired: %+v (%T)", v16, v16)
 				errors = append(errors, compiler.NewError(context, message))
@@ -689,10 +689,10 @@ func NewMethods(in interface{}, context *compiler.Context) (*Methods, error) {
 		// repeated NamedMethod additional_properties = 1;
 		// MAP: Method
 		x.AdditionalProperties = make([]*NamedMethod, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
+		for i := 0; i < len(m.Content); i += 2 {
+			k, ok := compiler.StringForScalarNode(m.Content[i])
 			if ok {
-				v := item.Value
+				v := m.Content[i+1]
 				pair := &NamedMethod{}
 				pair.Name = k
 				var err error
@@ -726,7 +726,7 @@ func NewNamedMethod(in interface{}, context *compiler.Context) (*NamedMethod, er
 		// string name = 1;
 		v1 := compiler.MapValueForKey(m, "name")
 		if v1 != nil {
-			x.Name, ok = v1.(string)
+			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -764,7 +764,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 		// string name = 1;
 		v1 := compiler.MapValueForKey(m, "name")
 		if v1 != nil {
-			x.Name, ok = v1.(string)
+			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -802,7 +802,7 @@ func NewNamedResource(in interface{}, context *compiler.Context) (*NamedResource
 		// string name = 1;
 		v1 := compiler.MapValueForKey(m, "name")
 		if v1 != nil {
-			x.Name, ok = v1.(string)
+			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -840,7 +840,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 		// string name = 1;
 		v1 := compiler.MapValueForKey(m, "name")
 		if v1 != nil {
-			x.Name, ok = v1.(string)
+			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -878,7 +878,7 @@ func NewNamedScope(in interface{}, context *compiler.Context) (*NamedScope, erro
 		// string name = 1;
 		v1 := compiler.MapValueForKey(m, "name")
 		if v1 != nil {
-			x.Name, ok = v1.(string)
+			x.Name, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for name: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -945,7 +945,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string id = 1;
 		v1 := compiler.MapValueForKey(m, "id")
 		if v1 != nil {
-			x.Id, ok = v1.(string)
+			x.Id, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for id: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -954,7 +954,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string type = 2;
 		v2 := compiler.MapValueForKey(m, "type")
 		if v2 != nil {
-			x.Type, ok = v2.(string)
+			x.Type, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -963,7 +963,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string _ref = 3;
 		v3 := compiler.MapValueForKey(m, "$ref")
 		if v3 != nil {
-			x.XRef, ok = v3.(string)
+			x.XRef, ok = compiler.StringForScalarNode(v3)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
@@ -972,7 +972,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string description = 4;
 		v4 := compiler.MapValueForKey(m, "description")
 		if v4 != nil {
-			x.Description, ok = v4.(string)
+			x.Description, ok = compiler.StringForScalarNode(v4)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
@@ -981,7 +981,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string default = 5;
 		v5 := compiler.MapValueForKey(m, "default")
 		if v5 != nil {
-			x.Default, ok = v5.(string)
+			x.Default, ok = compiler.StringForScalarNode(v5)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for default: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
@@ -990,7 +990,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// bool required = 6;
 		v6 := compiler.MapValueForKey(m, "required")
 		if v6 != nil {
-			x.Required, ok = v6.(bool)
+			x.Required, ok = compiler.BoolForScalarNode(v6)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
@@ -999,7 +999,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string format = 7;
 		v7 := compiler.MapValueForKey(m, "format")
 		if v7 != nil {
-			x.Format, ok = v7.(string)
+			x.Format, ok = compiler.StringForScalarNode(v7)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1008,7 +1008,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string pattern = 8;
 		v8 := compiler.MapValueForKey(m, "pattern")
 		if v8 != nil {
-			x.Pattern, ok = v8.(string)
+			x.Pattern, ok = compiler.StringForScalarNode(v8)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1017,7 +1017,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string minimum = 9;
 		v9 := compiler.MapValueForKey(m, "minimum")
 		if v9 != nil {
-			x.Minimum, ok = v9.(string)
+			x.Minimum, ok = compiler.StringForScalarNode(v9)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1026,7 +1026,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string maximum = 10;
 		v10 := compiler.MapValueForKey(m, "maximum")
 		if v10 != nil {
-			x.Maximum, ok = v10.(string)
+			x.Maximum, ok = compiler.StringForScalarNode(v10)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1035,9 +1035,9 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// repeated string enum = 11;
 		v11 := compiler.MapValueForKey(m, "enum")
 		if v11 != nil {
-			v, ok := v11.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v11)
 			if ok {
-				x.Enum = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Enum = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for enum: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1046,9 +1046,9 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// repeated string enum_descriptions = 12;
 		v12 := compiler.MapValueForKey(m, "enumDescriptions")
 		if v12 != nil {
-			v, ok := v12.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v12)
 			if ok {
-				x.EnumDescriptions = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.EnumDescriptions = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for enumDescriptions: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1057,7 +1057,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// bool repeated = 13;
 		v13 := compiler.MapValueForKey(m, "repeated")
 		if v13 != nil {
-			x.Repeated, ok = v13.(bool)
+			x.Repeated, ok = compiler.BoolForScalarNode(v13)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for repeated: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1066,7 +1066,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		// string location = 14;
 		v14 := compiler.MapValueForKey(m, "location")
 		if v14 != nil {
-			x.Location, ok = v14.(string)
+			x.Location, ok = compiler.StringForScalarNode(v14)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for location: %+v (%T)", v14, v14)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1124,10 +1124,10 @@ func NewParameters(in interface{}, context *compiler.Context) (*Parameters, erro
 		// repeated NamedParameter additional_properties = 1;
 		// MAP: Parameter
 		x.AdditionalProperties = make([]*NamedParameter, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
+		for i := 0; i < len(m.Content); i += 2 {
+			k, ok := compiler.StringForScalarNode(m.Content[i])
 			if ok {
-				v := item.Value
+				v := m.Content[i+1]
 				pair := &NamedParameter{}
 				pair.Name = k
 				var err error
@@ -1199,7 +1199,7 @@ func NewRequest(in interface{}, context *compiler.Context) (*Request, error) {
 		// string _ref = 1;
 		v1 := compiler.MapValueForKey(m, "$ref")
 		if v1 != nil {
-			x.XRef, ok = v1.(string)
+			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1208,7 +1208,7 @@ func NewRequest(in interface{}, context *compiler.Context) (*Request, error) {
 		// string parameter_name = 2;
 		v2 := compiler.MapValueForKey(m, "parameterName")
 		if v2 != nil {
-			x.ParameterName, ok = v2.(string)
+			x.ParameterName, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for parameterName: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1268,10 +1268,10 @@ func NewResources(in interface{}, context *compiler.Context) (*Resources, error)
 		// repeated NamedResource additional_properties = 1;
 		// MAP: Resource
 		x.AdditionalProperties = make([]*NamedResource, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
+		for i := 0; i < len(m.Content); i += 2 {
+			k, ok := compiler.StringForScalarNode(m.Content[i])
 			if ok {
-				v := item.Value
+				v := m.Content[i+1]
 				pair := &NamedResource{}
 				pair.Name = k
 				var err error
@@ -1305,7 +1305,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 		// string _ref = 1;
 		v1 := compiler.MapValueForKey(m, "$ref")
 		if v1 != nil {
-			x.XRef, ok = v1.(string)
+			x.XRef, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1334,7 +1334,7 @@ func NewResumable(in interface{}, context *compiler.Context) (*Resumable, error)
 		// bool multipart = 1;
 		v1 := compiler.MapValueForKey(m, "multipart")
 		if v1 != nil {
-			x.Multipart, ok = v1.(bool)
+			x.Multipart, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for multipart: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1343,7 +1343,7 @@ func NewResumable(in interface{}, context *compiler.Context) (*Resumable, error)
 		// string path = 2;
 		v2 := compiler.MapValueForKey(m, "path")
 		if v2 != nil {
-			x.Path, ok = v2.(string)
+			x.Path, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for path: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1372,7 +1372,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string id = 1;
 		v1 := compiler.MapValueForKey(m, "id")
 		if v1 != nil {
-			x.Id, ok = v1.(string)
+			x.Id, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for id: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1381,7 +1381,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string type = 2;
 		v2 := compiler.MapValueForKey(m, "type")
 		if v2 != nil {
-			x.Type, ok = v2.(string)
+			x.Type, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for type: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1390,7 +1390,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string description = 3;
 		v3 := compiler.MapValueForKey(m, "description")
 		if v3 != nil {
-			x.Description, ok = v3.(string)
+			x.Description, ok = compiler.StringForScalarNode(v3)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v3, v3)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1399,7 +1399,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string default = 4;
 		v4 := compiler.MapValueForKey(m, "default")
 		if v4 != nil {
-			x.Default, ok = v4.(string)
+			x.Default, ok = compiler.StringForScalarNode(v4)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for default: %+v (%T)", v4, v4)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1408,7 +1408,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// bool required = 5;
 		v5 := compiler.MapValueForKey(m, "required")
 		if v5 != nil {
-			x.Required, ok = v5.(bool)
+			x.Required, ok = compiler.BoolForScalarNode(v5)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for required: %+v (%T)", v5, v5)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1417,7 +1417,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string format = 6;
 		v6 := compiler.MapValueForKey(m, "format")
 		if v6 != nil {
-			x.Format, ok = v6.(string)
+			x.Format, ok = compiler.StringForScalarNode(v6)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for format: %+v (%T)", v6, v6)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1426,7 +1426,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string pattern = 7;
 		v7 := compiler.MapValueForKey(m, "pattern")
 		if v7 != nil {
-			x.Pattern, ok = v7.(string)
+			x.Pattern, ok = compiler.StringForScalarNode(v7)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for pattern: %+v (%T)", v7, v7)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1435,7 +1435,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string minimum = 8;
 		v8 := compiler.MapValueForKey(m, "minimum")
 		if v8 != nil {
-			x.Minimum, ok = v8.(string)
+			x.Minimum, ok = compiler.StringForScalarNode(v8)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for minimum: %+v (%T)", v8, v8)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1444,7 +1444,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string maximum = 9;
 		v9 := compiler.MapValueForKey(m, "maximum")
 		if v9 != nil {
-			x.Maximum, ok = v9.(string)
+			x.Maximum, ok = compiler.StringForScalarNode(v9)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for maximum: %+v (%T)", v9, v9)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1453,9 +1453,9 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// repeated string enum = 10;
 		v10 := compiler.MapValueForKey(m, "enum")
 		if v10 != nil {
-			v, ok := v10.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v10)
 			if ok {
-				x.Enum = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.Enum = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for enum: %+v (%T)", v10, v10)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1464,9 +1464,9 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// repeated string enum_descriptions = 11;
 		v11 := compiler.MapValueForKey(m, "enumDescriptions")
 		if v11 != nil {
-			v, ok := v11.([]interface{})
+			v, ok := compiler.SequenceNodeForNode(v11)
 			if ok {
-				x.EnumDescriptions = compiler.ConvertInterfaceArrayToStringArray(v)
+				x.EnumDescriptions = compiler.StringArrayForSequenceNode(v)
 			} else {
 				message := fmt.Sprintf("has unexpected value for enumDescriptions: %+v (%T)", v11, v11)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1475,7 +1475,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// bool repeated = 12;
 		v12 := compiler.MapValueForKey(m, "repeated")
 		if v12 != nil {
-			x.Repeated, ok = v12.(bool)
+			x.Repeated, ok = compiler.BoolForScalarNode(v12)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for repeated: %+v (%T)", v12, v12)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1484,7 +1484,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string location = 13;
 		v13 := compiler.MapValueForKey(m, "location")
 		if v13 != nil {
-			x.Location, ok = v13.(string)
+			x.Location, ok = compiler.StringForScalarNode(v13)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for location: %+v (%T)", v13, v13)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1520,7 +1520,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// string _ref = 17;
 		v17 := compiler.MapValueForKey(m, "$ref")
 		if v17 != nil {
-			x.XRef, ok = v17.(string)
+			x.XRef, ok = compiler.StringForScalarNode(v17)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for $ref: %+v (%T)", v17, v17)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1538,7 +1538,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		// bool read_only = 19;
 		v19 := compiler.MapValueForKey(m, "readOnly")
 		if v19 != nil {
-			x.ReadOnly, ok = v19.(bool)
+			x.ReadOnly, ok = compiler.BoolForScalarNode(v19)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for readOnly: %+v (%T)", v19, v19)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1560,10 +1560,10 @@ func NewSchemas(in interface{}, context *compiler.Context) (*Schemas, error) {
 		// repeated NamedSchema additional_properties = 1;
 		// MAP: Schema
 		x.AdditionalProperties = make([]*NamedSchema, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
+		for i := 0; i < len(m.Content); i += 2 {
+			k, ok := compiler.StringForScalarNode(m.Content[i])
 			if ok {
-				v := item.Value
+				v := m.Content[i+1]
 				pair := &NamedSchema{}
 				pair.Name = k
 				var err error
@@ -1597,7 +1597,7 @@ func NewScope(in interface{}, context *compiler.Context) (*Scope, error) {
 		// string description = 1;
 		v1 := compiler.MapValueForKey(m, "description")
 		if v1 != nil {
-			x.Description, ok = v1.(string)
+			x.Description, ok = compiler.StringForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for description: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1619,10 +1619,10 @@ func NewScopes(in interface{}, context *compiler.Context) (*Scopes, error) {
 		// repeated NamedScope additional_properties = 1;
 		// MAP: Scope
 		x.AdditionalProperties = make([]*NamedScope, 0)
-		for _, item := range m {
-			k, ok := compiler.StringValue(item.Key)
+		for i := 0; i < len(m.Content); i += 2 {
+			k, ok := compiler.StringForScalarNode(m.Content[i])
 			if ok {
-				v := item.Value
+				v := m.Content[i+1]
 				pair := &NamedScope{}
 				pair.Name = k
 				var err error
@@ -1656,7 +1656,7 @@ func NewSimple(in interface{}, context *compiler.Context) (*Simple, error) {
 		// bool multipart = 1;
 		v1 := compiler.MapValueForKey(m, "multipart")
 		if v1 != nil {
-			x.Multipart, ok = v1.(bool)
+			x.Multipart, ok = compiler.BoolForScalarNode(v1)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for multipart: %+v (%T)", v1, v1)
 				errors = append(errors, compiler.NewError(context, message))
@@ -1665,7 +1665,7 @@ func NewSimple(in interface{}, context *compiler.Context) (*Simple, error) {
 		// string path = 2;
 		v2 := compiler.MapValueForKey(m, "path")
 		if v2 != nil {
-			x.Path, ok = v2.(string)
+			x.Path, ok = compiler.StringForScalarNode(v2)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for path: %+v (%T)", v2, v2)
 				errors = append(errors, compiler.NewError(context, message))
@@ -2130,262 +2130,308 @@ func (m *StringArray) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ToRawInfo returns a description of Annotations suitable for JSON or YAML export.
-func (m *Annotations) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Annotations) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if len(m.Required) != 0 {
-		info = append(info, yaml.MapItem{Key: "required", Value: m.Required})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Required))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Any suitable for JSON or YAML export.
-func (m *Any) ToRawInfo() interface{} {
+func (m *Any) ToRawInfo() *yaml.Node {
 	var err error
-	var info1 []yaml.MapSlice
-	err = yaml.Unmarshal([]byte(m.Yaml), &info1)
+	var node yaml.Node
+	err = yaml.Unmarshal([]byte(m.Yaml), &node)
 	if err == nil {
-		return info1
-	}
-	var info2 yaml.MapSlice
-	err = yaml.Unmarshal([]byte(m.Yaml), &info2)
-	if err == nil {
-		return info2
-	}
-	var info3 interface{}
-	err = yaml.Unmarshal([]byte(m.Yaml), &info3)
-	if err == nil {
-		return info3
+		return &node
 	}
 	return nil
 }
 
 // ToRawInfo returns a description of Auth suitable for JSON or YAML export.
-func (m *Auth) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Auth) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Oauth2 != nil {
-		info = append(info, yaml.MapItem{Key: "oauth2", Value: m.Oauth2.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("oauth2"))
+		info.Content = append(info.Content, m.Oauth2.ToRawInfo())
 	}
 	// &{Name:oauth2 Type:Oauth2 StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
 // ToRawInfo returns a description of Document suitable for JSON or YAML export.
-func (m *Document) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Document) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	// always include this required field.
-	info = append(info, yaml.MapItem{Key: "kind", Value: m.Kind})
+	info.Content = append(info.Content, compiler.NewScalarNodeForString("kind"))
+	info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Kind))
 	// always include this required field.
-	info = append(info, yaml.MapItem{Key: "discoveryVersion", Value: m.DiscoveryVersion})
+	info.Content = append(info.Content, compiler.NewScalarNodeForString("discoveryVersion"))
+	info.Content = append(info.Content, compiler.NewScalarNodeForString(m.DiscoveryVersion))
 	if m.Id != "" {
-		info = append(info, yaml.MapItem{Key: "id", Value: m.Id})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("id"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Id))
 	}
 	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
 	if m.Version != "" {
-		info = append(info, yaml.MapItem{Key: "version", Value: m.Version})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("version"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Version))
 	}
 	if m.Revision != "" {
-		info = append(info, yaml.MapItem{Key: "revision", Value: m.Revision})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("revision"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Revision))
 	}
 	if m.Title != "" {
-		info = append(info, yaml.MapItem{Key: "title", Value: m.Title})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("title"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Title))
 	}
 	if m.Description != "" {
-		info = append(info, yaml.MapItem{Key: "description", Value: m.Description})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("description"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Description))
 	}
 	if m.Icons != nil {
-		info = append(info, yaml.MapItem{Key: "icons", Value: m.Icons.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("icons"))
+		info.Content = append(info.Content, m.Icons.ToRawInfo())
 	}
 	// &{Name:icons Type:Icons StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.DocumentationLink != "" {
-		info = append(info, yaml.MapItem{Key: "documentationLink", Value: m.DocumentationLink})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("documentationLink"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.DocumentationLink))
 	}
 	if len(m.Labels) != 0 {
-		info = append(info, yaml.MapItem{Key: "labels", Value: m.Labels})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("labels"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Labels))
 	}
 	if m.Protocol != "" {
-		info = append(info, yaml.MapItem{Key: "protocol", Value: m.Protocol})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("protocol"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Protocol))
 	}
 	if m.BaseUrl != "" {
-		info = append(info, yaml.MapItem{Key: "baseUrl", Value: m.BaseUrl})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("baseUrl"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.BaseUrl))
 	}
 	if m.BasePath != "" {
-		info = append(info, yaml.MapItem{Key: "basePath", Value: m.BasePath})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("basePath"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.BasePath))
 	}
 	if m.RootUrl != "" {
-		info = append(info, yaml.MapItem{Key: "rootUrl", Value: m.RootUrl})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("rootUrl"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.RootUrl))
 	}
 	if m.ServicePath != "" {
-		info = append(info, yaml.MapItem{Key: "servicePath", Value: m.ServicePath})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("servicePath"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.ServicePath))
 	}
 	if m.BatchPath != "" {
-		info = append(info, yaml.MapItem{Key: "batchPath", Value: m.BatchPath})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("batchPath"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.BatchPath))
 	}
 	if m.Parameters != nil {
-		info = append(info, yaml.MapItem{Key: "parameters", Value: m.Parameters.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameters"))
+		info.Content = append(info.Content, m.Parameters.ToRawInfo())
 	}
 	// &{Name:parameters Type:Parameters StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Auth != nil {
-		info = append(info, yaml.MapItem{Key: "auth", Value: m.Auth.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("auth"))
+		info.Content = append(info.Content, m.Auth.ToRawInfo())
 	}
 	// &{Name:auth Type:Auth StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if len(m.Features) != 0 {
-		info = append(info, yaml.MapItem{Key: "features", Value: m.Features})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("features"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Features))
 	}
 	if m.Schemas != nil {
-		info = append(info, yaml.MapItem{Key: "schemas", Value: m.Schemas.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("schemas"))
+		info.Content = append(info.Content, m.Schemas.ToRawInfo())
 	}
 	// &{Name:schemas Type:Schemas StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Methods != nil {
-		info = append(info, yaml.MapItem{Key: "methods", Value: m.Methods.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("methods"))
+		info.Content = append(info.Content, m.Methods.ToRawInfo())
 	}
 	// &{Name:methods Type:Methods StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Resources != nil {
-		info = append(info, yaml.MapItem{Key: "resources", Value: m.Resources.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("resources"))
+		info.Content = append(info.Content, m.Resources.ToRawInfo())
 	}
 	// &{Name:resources Type:Resources StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Etag != "" {
-		info = append(info, yaml.MapItem{Key: "etag", Value: m.Etag})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("etag"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Etag))
 	}
 	if m.OwnerDomain != "" {
-		info = append(info, yaml.MapItem{Key: "ownerDomain", Value: m.OwnerDomain})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("ownerDomain"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.OwnerDomain))
 	}
 	if m.OwnerName != "" {
-		info = append(info, yaml.MapItem{Key: "ownerName", Value: m.OwnerName})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("ownerName"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.OwnerName))
 	}
 	if m.VersionModule != false {
-		info = append(info, yaml.MapItem{Key: "version_module", Value: m.VersionModule})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("version_module"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.VersionModule))
 	}
 	if m.CanonicalName != "" {
-		info = append(info, yaml.MapItem{Key: "canonicalName", Value: m.CanonicalName})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("canonicalName"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.CanonicalName))
 	}
 	if m.FullyEncodeReservedExpansion != false {
-		info = append(info, yaml.MapItem{Key: "fullyEncodeReservedExpansion", Value: m.FullyEncodeReservedExpansion})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("fullyEncodeReservedExpansion"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.FullyEncodeReservedExpansion))
 	}
 	if m.PackagePath != "" {
-		info = append(info, yaml.MapItem{Key: "packagePath", Value: m.PackagePath})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("packagePath"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.PackagePath))
 	}
 	if m.MtlsRootUrl != "" {
-		info = append(info, yaml.MapItem{Key: "mtlsRootUrl", Value: m.MtlsRootUrl})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("mtlsRootUrl"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.MtlsRootUrl))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Icons suitable for JSON or YAML export.
-func (m *Icons) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Icons) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	// always include this required field.
-	info = append(info, yaml.MapItem{Key: "x16", Value: m.X16})
+	info.Content = append(info.Content, compiler.NewScalarNodeForString("x16"))
+	info.Content = append(info.Content, compiler.NewScalarNodeForString(m.X16))
 	// always include this required field.
-	info = append(info, yaml.MapItem{Key: "x32", Value: m.X32})
+	info.Content = append(info.Content, compiler.NewScalarNodeForString("x32"))
+	info.Content = append(info.Content, compiler.NewScalarNodeForString(m.X32))
 	return info
 }
 
 // ToRawInfo returns a description of MediaUpload suitable for JSON or YAML export.
-func (m *MediaUpload) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *MediaUpload) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if len(m.Accept) != 0 {
-		info = append(info, yaml.MapItem{Key: "accept", Value: m.Accept})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("accept"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Accept))
 	}
 	if m.MaxSize != "" {
-		info = append(info, yaml.MapItem{Key: "maxSize", Value: m.MaxSize})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("maxSize"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.MaxSize))
 	}
 	if m.Protocols != nil {
-		info = append(info, yaml.MapItem{Key: "protocols", Value: m.Protocols.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("protocols"))
+		info.Content = append(info.Content, m.Protocols.ToRawInfo())
 	}
 	// &{Name:protocols Type:Protocols StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.SupportsSubscription != false {
-		info = append(info, yaml.MapItem{Key: "supportsSubscription", Value: m.SupportsSubscription})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsSubscription"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsSubscription))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Method suitable for JSON or YAML export.
-func (m *Method) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Method) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Id != "" {
-		info = append(info, yaml.MapItem{Key: "id", Value: m.Id})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("id"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Id))
 	}
 	if m.Path != "" {
-		info = append(info, yaml.MapItem{Key: "path", Value: m.Path})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("path"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Path))
 	}
 	if m.HttpMethod != "" {
-		info = append(info, yaml.MapItem{Key: "httpMethod", Value: m.HttpMethod})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("httpMethod"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.HttpMethod))
 	}
 	if m.Description != "" {
-		info = append(info, yaml.MapItem{Key: "description", Value: m.Description})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("description"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Description))
 	}
 	if m.Parameters != nil {
-		info = append(info, yaml.MapItem{Key: "parameters", Value: m.Parameters.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameters"))
+		info.Content = append(info.Content, m.Parameters.ToRawInfo())
 	}
 	// &{Name:parameters Type:Parameters StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if len(m.ParameterOrder) != 0 {
-		info = append(info, yaml.MapItem{Key: "parameterOrder", Value: m.ParameterOrder})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameterOrder"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.ParameterOrder))
 	}
 	if m.Request != nil {
-		info = append(info, yaml.MapItem{Key: "request", Value: m.Request.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("request"))
+		info.Content = append(info.Content, m.Request.ToRawInfo())
 	}
 	// &{Name:request Type:Request StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Response != nil {
-		info = append(info, yaml.MapItem{Key: "response", Value: m.Response.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("response"))
+		info.Content = append(info.Content, m.Response.ToRawInfo())
 	}
 	// &{Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if len(m.Scopes) != 0 {
-		info = append(info, yaml.MapItem{Key: "scopes", Value: m.Scopes})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("scopes"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Scopes))
 	}
 	if m.SupportsMediaDownload != false {
-		info = append(info, yaml.MapItem{Key: "supportsMediaDownload", Value: m.SupportsMediaDownload})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsMediaDownload"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsMediaDownload))
 	}
 	if m.SupportsMediaUpload != false {
-		info = append(info, yaml.MapItem{Key: "supportsMediaUpload", Value: m.SupportsMediaUpload})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsMediaUpload"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsMediaUpload))
 	}
 	if m.UseMediaDownloadService != false {
-		info = append(info, yaml.MapItem{Key: "useMediaDownloadService", Value: m.UseMediaDownloadService})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("useMediaDownloadService"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UseMediaDownloadService))
 	}
 	if m.MediaUpload != nil {
-		info = append(info, yaml.MapItem{Key: "mediaUpload", Value: m.MediaUpload.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("mediaUpload"))
+		info.Content = append(info.Content, m.MediaUpload.ToRawInfo())
 	}
 	// &{Name:mediaUpload Type:MediaUpload StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.SupportsSubscription != false {
-		info = append(info, yaml.MapItem{Key: "supportsSubscription", Value: m.SupportsSubscription})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsSubscription"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsSubscription))
 	}
 	if m.FlatPath != "" {
-		info = append(info, yaml.MapItem{Key: "flatPath", Value: m.FlatPath})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("flatPath"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.FlatPath))
 	}
 	if m.EtagRequired != false {
-		info = append(info, yaml.MapItem{Key: "etagRequired", Value: m.EtagRequired})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("etagRequired"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.EtagRequired))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Methods suitable for JSON or YAML export.
-func (m *Methods) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Methods) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.AdditionalProperties != nil {
 		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+			info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))
+			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
 	// &{Name:additionalProperties Type:NamedMethod StringEnumValues:[] MapType:Method Repeated:true Pattern: Implicit:true Description:}
@@ -2393,159 +2439,184 @@ func (m *Methods) ToRawInfo() interface{} {
 }
 
 // ToRawInfo returns a description of NamedMethod suitable for JSON or YAML export.
-func (m *NamedMethod) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *NamedMethod) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
 	// &{Name:value Type:Method StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 // ToRawInfo returns a description of NamedParameter suitable for JSON or YAML export.
-func (m *NamedParameter) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *NamedParameter) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
 	// &{Name:value Type:Parameter StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 // ToRawInfo returns a description of NamedResource suitable for JSON or YAML export.
-func (m *NamedResource) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *NamedResource) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
 	// &{Name:value Type:Resource StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 // ToRawInfo returns a description of NamedSchema suitable for JSON or YAML export.
-func (m *NamedSchema) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *NamedSchema) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
 	// &{Name:value Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 // ToRawInfo returns a description of NamedScope suitable for JSON or YAML export.
-func (m *NamedScope) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *NamedScope) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Name != "" {
-		info = append(info, yaml.MapItem{Key: "name", Value: m.Name})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
 	// &{Name:value Type:Scope StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:Mapped value}
 	return info
 }
 
 // ToRawInfo returns a description of Oauth2 suitable for JSON or YAML export.
-func (m *Oauth2) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Oauth2) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Scopes != nil {
-		info = append(info, yaml.MapItem{Key: "scopes", Value: m.Scopes.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("scopes"))
+		info.Content = append(info.Content, m.Scopes.ToRawInfo())
 	}
 	// &{Name:scopes Type:Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
 // ToRawInfo returns a description of Parameter suitable for JSON or YAML export.
-func (m *Parameter) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Parameter) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Id != "" {
-		info = append(info, yaml.MapItem{Key: "id", Value: m.Id})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("id"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Id))
 	}
 	if m.Type != "" {
-		info = append(info, yaml.MapItem{Key: "type", Value: m.Type})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("type"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Type))
 	}
 	if m.XRef != "" {
-		info = append(info, yaml.MapItem{Key: "$ref", Value: m.XRef})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("$ref"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.XRef))
 	}
 	if m.Description != "" {
-		info = append(info, yaml.MapItem{Key: "description", Value: m.Description})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("description"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Description))
 	}
 	if m.Default != "" {
-		info = append(info, yaml.MapItem{Key: "default", Value: m.Default})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("default"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Default))
 	}
 	if m.Required != false {
-		info = append(info, yaml.MapItem{Key: "required", Value: m.Required})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
 	if m.Format != "" {
-		info = append(info, yaml.MapItem{Key: "format", Value: m.Format})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("format"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Format))
 	}
 	if m.Pattern != "" {
-		info = append(info, yaml.MapItem{Key: "pattern", Value: m.Pattern})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("pattern"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Pattern))
 	}
 	if m.Minimum != "" {
-		info = append(info, yaml.MapItem{Key: "minimum", Value: m.Minimum})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Minimum))
 	}
 	if m.Maximum != "" {
-		info = append(info, yaml.MapItem{Key: "maximum", Value: m.Maximum})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Maximum))
 	}
 	if len(m.Enum) != 0 {
-		info = append(info, yaml.MapItem{Key: "enum", Value: m.Enum})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("enum"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Enum))
 	}
 	if len(m.EnumDescriptions) != 0 {
-		info = append(info, yaml.MapItem{Key: "enumDescriptions", Value: m.EnumDescriptions})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("enumDescriptions"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.EnumDescriptions))
 	}
 	if m.Repeated != false {
-		info = append(info, yaml.MapItem{Key: "repeated", Value: m.Repeated})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("repeated"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Repeated))
 	}
 	if m.Location != "" {
-		info = append(info, yaml.MapItem{Key: "location", Value: m.Location})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("location"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Location))
 	}
 	if m.Properties != nil {
-		info = append(info, yaml.MapItem{Key: "properties", Value: m.Properties.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("properties"))
+		info.Content = append(info.Content, m.Properties.ToRawInfo())
 	}
 	// &{Name:properties Type:Schemas StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.AdditionalProperties != nil {
-		info = append(info, yaml.MapItem{Key: "additionalProperties", Value: m.AdditionalProperties.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("additionalProperties"))
+		info.Content = append(info.Content, m.AdditionalProperties.ToRawInfo())
 	}
 	// &{Name:additionalProperties Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
-		info = append(info, yaml.MapItem{Key: "items", Value: m.Items.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("items"))
+		info.Content = append(info.Content, m.Items.ToRawInfo())
 	}
 	// &{Name:items Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Annotations != nil {
-		info = append(info, yaml.MapItem{Key: "annotations", Value: m.Annotations.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("annotations"))
+		info.Content = append(info.Content, m.Annotations.ToRawInfo())
 	}
 	// &{Name:annotations Type:Annotations StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
 // ToRawInfo returns a description of Parameters suitable for JSON or YAML export.
-func (m *Parameters) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Parameters) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.AdditionalProperties != nil {
 		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+			info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))
+			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
 	// &{Name:additionalProperties Type:NamedParameter StringEnumValues:[] MapType:Parameter Repeated:true Pattern: Implicit:true Description:}
@@ -2553,63 +2624,70 @@ func (m *Parameters) ToRawInfo() interface{} {
 }
 
 // ToRawInfo returns a description of Protocols suitable for JSON or YAML export.
-func (m *Protocols) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Protocols) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Simple != nil {
-		info = append(info, yaml.MapItem{Key: "simple", Value: m.Simple.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("simple"))
+		info.Content = append(info.Content, m.Simple.ToRawInfo())
 	}
 	// &{Name:simple Type:Simple StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Resumable != nil {
-		info = append(info, yaml.MapItem{Key: "resumable", Value: m.Resumable.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("resumable"))
+		info.Content = append(info.Content, m.Resumable.ToRawInfo())
 	}
 	// &{Name:resumable Type:Resumable StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
 // ToRawInfo returns a description of Request suitable for JSON or YAML export.
-func (m *Request) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Request) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.XRef != "" {
-		info = append(info, yaml.MapItem{Key: "$ref", Value: m.XRef})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("$ref"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.XRef))
 	}
 	if m.ParameterName != "" {
-		info = append(info, yaml.MapItem{Key: "parameterName", Value: m.ParameterName})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameterName"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.ParameterName))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Resource suitable for JSON or YAML export.
-func (m *Resource) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Resource) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Methods != nil {
-		info = append(info, yaml.MapItem{Key: "methods", Value: m.Methods.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("methods"))
+		info.Content = append(info.Content, m.Methods.ToRawInfo())
 	}
 	// &{Name:methods Type:Methods StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Resources != nil {
-		info = append(info, yaml.MapItem{Key: "resources", Value: m.Resources.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("resources"))
+		info.Content = append(info.Content, m.Resources.ToRawInfo())
 	}
 	// &{Name:resources Type:Resources StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
 // ToRawInfo returns a description of Resources suitable for JSON or YAML export.
-func (m *Resources) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Resources) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.AdditionalProperties != nil {
 		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+			info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))
+			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
 	// &{Name:additionalProperties Type:NamedResource StringEnumValues:[] MapType:Resource Repeated:true Pattern: Implicit:true Description:}
@@ -2617,111 +2695,134 @@ func (m *Resources) ToRawInfo() interface{} {
 }
 
 // ToRawInfo returns a description of Response suitable for JSON or YAML export.
-func (m *Response) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Response) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.XRef != "" {
-		info = append(info, yaml.MapItem{Key: "$ref", Value: m.XRef})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("$ref"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.XRef))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Resumable suitable for JSON or YAML export.
-func (m *Resumable) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Resumable) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Multipart != false {
-		info = append(info, yaml.MapItem{Key: "multipart", Value: m.Multipart})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("multipart"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Multipart))
 	}
 	if m.Path != "" {
-		info = append(info, yaml.MapItem{Key: "path", Value: m.Path})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("path"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Path))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Schema suitable for JSON or YAML export.
-func (m *Schema) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Schema) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Id != "" {
-		info = append(info, yaml.MapItem{Key: "id", Value: m.Id})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("id"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Id))
 	}
 	if m.Type != "" {
-		info = append(info, yaml.MapItem{Key: "type", Value: m.Type})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("type"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Type))
 	}
 	if m.Description != "" {
-		info = append(info, yaml.MapItem{Key: "description", Value: m.Description})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("description"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Description))
 	}
 	if m.Default != "" {
-		info = append(info, yaml.MapItem{Key: "default", Value: m.Default})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("default"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Default))
 	}
 	if m.Required != false {
-		info = append(info, yaml.MapItem{Key: "required", Value: m.Required})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
 	if m.Format != "" {
-		info = append(info, yaml.MapItem{Key: "format", Value: m.Format})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("format"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Format))
 	}
 	if m.Pattern != "" {
-		info = append(info, yaml.MapItem{Key: "pattern", Value: m.Pattern})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("pattern"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Pattern))
 	}
 	if m.Minimum != "" {
-		info = append(info, yaml.MapItem{Key: "minimum", Value: m.Minimum})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Minimum))
 	}
 	if m.Maximum != "" {
-		info = append(info, yaml.MapItem{Key: "maximum", Value: m.Maximum})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Maximum))
 	}
 	if len(m.Enum) != 0 {
-		info = append(info, yaml.MapItem{Key: "enum", Value: m.Enum})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("enum"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Enum))
 	}
 	if len(m.EnumDescriptions) != 0 {
-		info = append(info, yaml.MapItem{Key: "enumDescriptions", Value: m.EnumDescriptions})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("enumDescriptions"))
+		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.EnumDescriptions))
 	}
 	if m.Repeated != false {
-		info = append(info, yaml.MapItem{Key: "repeated", Value: m.Repeated})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("repeated"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Repeated))
 	}
 	if m.Location != "" {
-		info = append(info, yaml.MapItem{Key: "location", Value: m.Location})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("location"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Location))
 	}
 	if m.Properties != nil {
-		info = append(info, yaml.MapItem{Key: "properties", Value: m.Properties.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("properties"))
+		info.Content = append(info.Content, m.Properties.ToRawInfo())
 	}
 	// &{Name:properties Type:Schemas StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.AdditionalProperties != nil {
-		info = append(info, yaml.MapItem{Key: "additionalProperties", Value: m.AdditionalProperties.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("additionalProperties"))
+		info.Content = append(info.Content, m.AdditionalProperties.ToRawInfo())
 	}
 	// &{Name:additionalProperties Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
-		info = append(info, yaml.MapItem{Key: "items", Value: m.Items.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("items"))
+		info.Content = append(info.Content, m.Items.ToRawInfo())
 	}
 	// &{Name:items Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.XRef != "" {
-		info = append(info, yaml.MapItem{Key: "$ref", Value: m.XRef})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("$ref"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.XRef))
 	}
 	if m.Annotations != nil {
-		info = append(info, yaml.MapItem{Key: "annotations", Value: m.Annotations.ToRawInfo()})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("annotations"))
+		info.Content = append(info.Content, m.Annotations.ToRawInfo())
 	}
 	// &{Name:annotations Type:Annotations StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.ReadOnly != false {
-		info = append(info, yaml.MapItem{Key: "readOnly", Value: m.ReadOnly})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("readOnly"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ReadOnly))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Schemas suitable for JSON or YAML export.
-func (m *Schemas) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Schemas) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.AdditionalProperties != nil {
 		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+			info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))
+			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
 	// &{Name:additionalProperties Type:NamedSchema StringEnumValues:[] MapType:Schema Repeated:true Pattern: Implicit:true Description:}
@@ -2729,26 +2830,28 @@ func (m *Schemas) ToRawInfo() interface{} {
 }
 
 // ToRawInfo returns a description of Scope suitable for JSON or YAML export.
-func (m *Scope) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Scope) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Description != "" {
-		info = append(info, yaml.MapItem{Key: "description", Value: m.Description})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("description"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Description))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of Scopes suitable for JSON or YAML export.
-func (m *Scopes) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Scopes) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.AdditionalProperties != nil {
 		for _, item := range m.AdditionalProperties {
-			info = append(info, yaml.MapItem{Key: item.Name, Value: item.Value.ToRawInfo()})
+			info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))
+			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
 	// &{Name:additionalProperties Type:NamedScope StringEnumValues:[] MapType:Scope Repeated:true Pattern: Implicit:true Description:}
@@ -2756,23 +2859,23 @@ func (m *Scopes) ToRawInfo() interface{} {
 }
 
 // ToRawInfo returns a description of Simple suitable for JSON or YAML export.
-func (m *Simple) ToRawInfo() interface{} {
-	info := yaml.MapSlice{}
+func (m *Simple) ToRawInfo() *yaml.Node {
+	info := compiler.NewMappingNode()
 	if m == nil {
 		return info
 	}
 	if m.Multipart != false {
-		info = append(info, yaml.MapItem{Key: "multipart", Value: m.Multipart})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("multipart"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Multipart))
 	}
 	if m.Path != "" {
-		info = append(info, yaml.MapItem{Key: "path", Value: m.Path})
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("path"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Path))
 	}
 	return info
 }
 
 // ToRawInfo returns a description of StringArray suitable for JSON or YAML export.
-func (m *StringArray) ToRawInfo() interface{} {
-	return m.Value
+func (m *StringArray) ToRawInfo() *yaml.Node {
+	return compiler.NewSequenceNodeForStringArray(m.Value)
 }
-
-var ()
