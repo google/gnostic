@@ -27,29 +27,11 @@ import (
 // compiler helper functions, usually called from generated code
 
 // UnpackMap gets a *yaml.Node if possible.
-func UnpackMap(in interface{}) (*yaml.Node, bool) {
+func UnpackMap(in *yaml.Node) (*yaml.Node, bool) {
 	if in == nil {
 		return nil, false
 	}
-	m, ok := in.(*yaml.Node)
-	if ok {
-		if m == nil {
-			return nil, false
-		}
-		return m, true
-	}
-	/*
-		// do we have an empty array?
-		a, ok := in.([]interface{})
-		if ok && len(a) == 0 {
-			// if so, return an empty map
-			return &yaml.Node{
-				Kind:    yaml.MappingNode,
-				Content: make([]*yaml.Node, 0),
-			}, true
-		}
-	*/
-	return nil, false
+	return in, true
 }
 
 // SortedKeysForMap returns the sorted keys of a yamlv2.MapSlice.
@@ -320,35 +302,6 @@ func NewScalarNodeForInt(i int64) *yaml.Node {
 		Tag:   "!!int",
 		Value: fmt.Sprintf("%d", i),
 	}
-}
-
-// DescribeMap describes a map (for debugging purposes).
-func DescribeMap(in interface{}, indent string) string {
-	description := ""
-	m, ok := in.(map[string]interface{})
-	if ok {
-		keys := make([]string, 0)
-		for k := range m {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			v := m[k]
-			description += fmt.Sprintf("%s%s:\n", indent, k)
-			description += DescribeMap(v, indent+"  ")
-		}
-		return description
-	}
-	a, ok := in.([]interface{})
-	if ok {
-		for i, v := range a {
-			description += fmt.Sprintf("%s%d:\n", indent, i)
-			description += DescribeMap(v, indent+"  ")
-		}
-		return description
-	}
-	description += fmt.Sprintf("%s%+v\n", indent, in)
-	return description
 }
 
 // PluralProperties returns the string "properties" pluralized.

@@ -30,7 +30,7 @@ func Version() string {
 }
 
 // NewAdditionalPropertiesItem creates an object of type AdditionalPropertiesItem if possible, returning an error if not.
-func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*AdditionalPropertiesItem, error) {
+func NewAdditionalPropertiesItem(in *yaml.Node, context *compiler.Context) (*AdditionalPropertiesItem, error) {
 	errors := make([]error, 0)
 	x := &AdditionalPropertiesItem{}
 	matched := false
@@ -49,7 +49,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 		}
 	}
 	// bool boolean = 2;
-	boolValue, ok := in.(bool)
+	boolValue, ok := compiler.BoolForScalarNode(in)
 	if ok {
 		x.Oneof = &AdditionalPropertiesItem_Boolean{Boolean: boolValue}
 		matched = true
@@ -62,16 +62,16 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 }
 
 // NewAny creates an object of type Any if possible, returning an error if not.
-func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
+func NewAny(in *yaml.Node, context *compiler.Context) (*Any, error) {
 	errors := make([]error, 0)
 	x := &Any{}
-	bytes := compiler.Marshal(in.(*yaml.Node))
+	bytes := compiler.Marshal(in)
 	x.Yaml = string(bytes)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 // NewAnyOrExpression creates an object of type AnyOrExpression if possible, returning an error if not.
-func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpression, error) {
+func NewAnyOrExpression(in *yaml.Node, context *compiler.Context) (*AnyOrExpression, error) {
 	errors := make([]error, 0)
 	x := &AnyOrExpression{}
 	matched := false
@@ -111,7 +111,7 @@ func NewAnyOrExpression(in interface{}, context *compiler.Context) (*AnyOrExpres
 }
 
 // NewCallback creates an object of type Callback if possible, returning an error if not.
-func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
+func NewCallback(in *yaml.Node, context *compiler.Context) (*Callback, error) {
 	errors := make([]error, 0)
 	x := &Callback{}
 	m, ok := compiler.UnpackMap(in)
@@ -181,7 +181,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 }
 
 // NewCallbackOrReference creates an object of type CallbackOrReference if possible, returning an error if not.
-func NewCallbackOrReference(in interface{}, context *compiler.Context) (*CallbackOrReference, error) {
+func NewCallbackOrReference(in *yaml.Node, context *compiler.Context) (*CallbackOrReference, error) {
 	errors := make([]error, 0)
 	x := &CallbackOrReference{}
 	matched := false
@@ -221,7 +221,7 @@ func NewCallbackOrReference(in interface{}, context *compiler.Context) (*Callbac
 }
 
 // NewCallbacksOrReferences creates an object of type CallbacksOrReferences if possible, returning an error if not.
-func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*CallbacksOrReferences, error) {
+func NewCallbacksOrReferences(in *yaml.Node, context *compiler.Context) (*CallbacksOrReferences, error) {
 	errors := make([]error, 0)
 	x := &CallbacksOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -251,7 +251,7 @@ func NewCallbacksOrReferences(in interface{}, context *compiler.Context) (*Callb
 }
 
 // NewComponents creates an object of type Components if possible, returning an error if not.
-func NewComponents(in interface{}, context *compiler.Context) (*Components, error) {
+func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error) {
 	errors := make([]error, 0)
 	x := &Components{}
 	m, ok := compiler.UnpackMap(in)
@@ -383,7 +383,7 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 }
 
 // NewContact creates an object of type Contact if possible, returning an error if not.
-func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
+func NewContact(in *yaml.Node, context *compiler.Context) (*Contact, error) {
 	errors := make([]error, 0)
 	x := &Contact{}
 	m, ok := compiler.UnpackMap(in)
@@ -461,32 +461,27 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 }
 
 // NewDefaultType creates an object of type DefaultType if possible, returning an error if not.
-func NewDefaultType(in interface{}, context *compiler.Context) (*DefaultType, error) {
+func NewDefaultType(in *yaml.Node, context *compiler.Context) (*DefaultType, error) {
 	errors := make([]error, 0)
 	x := &DefaultType{}
 	matched := false
-	switch in := in.(type) {
-	case bool:
-		x.Oneof = &DefaultType_Boolean{Boolean: in}
-		matched = true
-	case string:
-		x.Oneof = &DefaultType_String_{String_: in}
-		matched = true
-	case int64:
-		x.Oneof = &DefaultType_Number{Number: float64(in)}
-		matched = true
-	case int32:
-		x.Oneof = &DefaultType_Number{Number: float64(in)}
-		matched = true
-	case int:
-		x.Oneof = &DefaultType_Number{Number: float64(in)}
-		matched = true
-	case float64:
-		x.Oneof = &DefaultType_Number{Number: in}
-		matched = true
-	case float32:
-		x.Oneof = &DefaultType_Number{Number: float64(in)}
-		matched = true
+	switch in.Tag {
+	case "!!bool":
+		var v bool
+		v, matched = compiler.BoolForScalarNode(in)
+		x.Oneof = &DefaultType_Boolean{Boolean: v}
+	case "!!str":
+		var v string
+		v, matched = compiler.StringForScalarNode(in)
+		x.Oneof = &DefaultType_String_{String_: v}
+	case "!!float":
+		var v float64
+		v, matched = compiler.FloatForScalarNode(in)
+		x.Oneof = &DefaultType_Number{Number: v}
+	case "!!int":
+		var v int64
+		v, matched = compiler.IntForScalarNode(in)
+		x.Oneof = &DefaultType_Number{Number: float64(v)}
 	}
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
@@ -496,7 +491,7 @@ func NewDefaultType(in interface{}, context *compiler.Context) (*DefaultType, er
 }
 
 // NewDiscriminator creates an object of type Discriminator if possible, returning an error if not.
-func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator, error) {
+func NewDiscriminator(in *yaml.Node, context *compiler.Context) (*Discriminator, error) {
 	errors := make([]error, 0)
 	x := &Discriminator{}
 	m, ok := compiler.UnpackMap(in)
@@ -571,7 +566,7 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 }
 
 // NewDocument creates an object of type Document if possible, returning an error if not.
-func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
+func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 	errors := make([]error, 0)
 	x := &Document{}
 	m, ok := compiler.UnpackMap(in)
@@ -721,7 +716,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 }
 
 // NewEncoding creates an object of type Encoding if possible, returning an error if not.
-func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
+func NewEncoding(in *yaml.Node, context *compiler.Context) (*Encoding, error) {
 	errors := make([]error, 0)
 	x := &Encoding{}
 	m, ok := compiler.UnpackMap(in)
@@ -817,7 +812,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 }
 
 // NewEncodings creates an object of type Encodings if possible, returning an error if not.
-func NewEncodings(in interface{}, context *compiler.Context) (*Encodings, error) {
+func NewEncodings(in *yaml.Node, context *compiler.Context) (*Encodings, error) {
 	errors := make([]error, 0)
 	x := &Encodings{}
 	m, ok := compiler.UnpackMap(in)
@@ -847,7 +842,7 @@ func NewEncodings(in interface{}, context *compiler.Context) (*Encodings, error)
 }
 
 // NewExample creates an object of type Example if possible, returning an error if not.
-func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
+func NewExample(in *yaml.Node, context *compiler.Context) (*Example, error) {
 	errors := make([]error, 0)
 	x := &Example{}
 	m, ok := compiler.UnpackMap(in)
@@ -934,7 +929,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 }
 
 // NewExampleOrReference creates an object of type ExampleOrReference if possible, returning an error if not.
-func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleOrReference, error) {
+func NewExampleOrReference(in *yaml.Node, context *compiler.Context) (*ExampleOrReference, error) {
 	errors := make([]error, 0)
 	x := &ExampleOrReference{}
 	matched := false
@@ -974,7 +969,7 @@ func NewExampleOrReference(in interface{}, context *compiler.Context) (*ExampleO
 }
 
 // NewExamplesOrReferences creates an object of type ExamplesOrReferences if possible, returning an error if not.
-func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*ExamplesOrReferences, error) {
+func NewExamplesOrReferences(in *yaml.Node, context *compiler.Context) (*ExamplesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &ExamplesOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -1004,7 +999,7 @@ func NewExamplesOrReferences(in interface{}, context *compiler.Context) (*Exampl
 }
 
 // NewExpression creates an object of type Expression if possible, returning an error if not.
-func NewExpression(in interface{}, context *compiler.Context) (*Expression, error) {
+func NewExpression(in *yaml.Node, context *compiler.Context) (*Expression, error) {
 	errors := make([]error, 0)
 	x := &Expression{}
 	m, ok := compiler.UnpackMap(in)
@@ -1046,7 +1041,7 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 }
 
 // NewExternalDocs creates an object of type ExternalDocs if possible, returning an error if not.
-func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, error) {
+func NewExternalDocs(in *yaml.Node, context *compiler.Context) (*ExternalDocs, error) {
 	errors := make([]error, 0)
 	x := &ExternalDocs{}
 	m, ok := compiler.UnpackMap(in)
@@ -1121,7 +1116,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 }
 
 // NewHeader creates an object of type Header if possible, returning an error if not.
-func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
+func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 	errors := make([]error, 0)
 	x := &Header{}
 	m, ok := compiler.UnpackMap(in)
@@ -1271,7 +1266,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 }
 
 // NewHeaderOrReference creates an object of type HeaderOrReference if possible, returning an error if not.
-func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrReference, error) {
+func NewHeaderOrReference(in *yaml.Node, context *compiler.Context) (*HeaderOrReference, error) {
 	errors := make([]error, 0)
 	x := &HeaderOrReference{}
 	matched := false
@@ -1311,7 +1306,7 @@ func NewHeaderOrReference(in interface{}, context *compiler.Context) (*HeaderOrR
 }
 
 // NewHeadersOrReferences creates an object of type HeadersOrReferences if possible, returning an error if not.
-func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*HeadersOrReferences, error) {
+func NewHeadersOrReferences(in *yaml.Node, context *compiler.Context) (*HeadersOrReferences, error) {
 	errors := make([]error, 0)
 	x := &HeadersOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -1341,7 +1336,7 @@ func NewHeadersOrReferences(in interface{}, context *compiler.Context) (*Headers
 }
 
 // NewInfo creates an object of type Info if possible, returning an error if not.
-func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
+func NewInfo(in *yaml.Node, context *compiler.Context) (*Info, error) {
 	errors := make([]error, 0)
 	x := &Info{}
 	m, ok := compiler.UnpackMap(in)
@@ -1461,7 +1456,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 }
 
 // NewItemsItem creates an object of type ItemsItem if possible, returning an error if not.
-func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
+func NewItemsItem(in *yaml.Node, context *compiler.Context) (*ItemsItem, error) {
 	errors := make([]error, 0)
 	x := &ItemsItem{}
 	m, ok := compiler.UnpackMap(in)
@@ -1480,7 +1475,7 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 }
 
 // NewLicense creates an object of type License if possible, returning an error if not.
-func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
+func NewLicense(in *yaml.Node, context *compiler.Context) (*License, error) {
 	errors := make([]error, 0)
 	x := &License{}
 	m, ok := compiler.UnpackMap(in)
@@ -1555,7 +1550,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 }
 
 // NewLink creates an object of type Link if possible, returning an error if not.
-func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
+func NewLink(in *yaml.Node, context *compiler.Context) (*Link, error) {
 	errors := make([]error, 0)
 	x := &Link{}
 	m, ok := compiler.UnpackMap(in)
@@ -1660,7 +1655,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 }
 
 // NewLinkOrReference creates an object of type LinkOrReference if possible, returning an error if not.
-func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrReference, error) {
+func NewLinkOrReference(in *yaml.Node, context *compiler.Context) (*LinkOrReference, error) {
 	errors := make([]error, 0)
 	x := &LinkOrReference{}
 	matched := false
@@ -1700,7 +1695,7 @@ func NewLinkOrReference(in interface{}, context *compiler.Context) (*LinkOrRefer
 }
 
 // NewLinksOrReferences creates an object of type LinksOrReferences if possible, returning an error if not.
-func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrReferences, error) {
+func NewLinksOrReferences(in *yaml.Node, context *compiler.Context) (*LinksOrReferences, error) {
 	errors := make([]error, 0)
 	x := &LinksOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -1730,7 +1725,7 @@ func NewLinksOrReferences(in interface{}, context *compiler.Context) (*LinksOrRe
 }
 
 // NewMediaType creates an object of type MediaType if possible, returning an error if not.
-func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error) {
+func NewMediaType(in *yaml.Node, context *compiler.Context) (*MediaType, error) {
 	errors := make([]error, 0)
 	x := &MediaType{}
 	m, ok := compiler.UnpackMap(in)
@@ -1817,7 +1812,7 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 }
 
 // NewMediaTypes creates an object of type MediaTypes if possible, returning an error if not.
-func NewMediaTypes(in interface{}, context *compiler.Context) (*MediaTypes, error) {
+func NewMediaTypes(in *yaml.Node, context *compiler.Context) (*MediaTypes, error) {
 	errors := make([]error, 0)
 	x := &MediaTypes{}
 	m, ok := compiler.UnpackMap(in)
@@ -1847,7 +1842,7 @@ func NewMediaTypes(in interface{}, context *compiler.Context) (*MediaTypes, erro
 }
 
 // NewNamedAny creates an object of type NamedAny if possible, returning an error if not.
-func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
+func NewNamedAny(in *yaml.Node, context *compiler.Context) (*NamedAny, error) {
 	errors := make([]error, 0)
 	x := &NamedAny{}
 	m, ok := compiler.UnpackMap(in)
@@ -1885,7 +1880,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 }
 
 // NewNamedCallbackOrReference creates an object of type NamedCallbackOrReference if possible, returning an error if not.
-func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*NamedCallbackOrReference, error) {
+func NewNamedCallbackOrReference(in *yaml.Node, context *compiler.Context) (*NamedCallbackOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedCallbackOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -1923,7 +1918,7 @@ func NewNamedCallbackOrReference(in interface{}, context *compiler.Context) (*Na
 }
 
 // NewNamedEncoding creates an object of type NamedEncoding if possible, returning an error if not.
-func NewNamedEncoding(in interface{}, context *compiler.Context) (*NamedEncoding, error) {
+func NewNamedEncoding(in *yaml.Node, context *compiler.Context) (*NamedEncoding, error) {
 	errors := make([]error, 0)
 	x := &NamedEncoding{}
 	m, ok := compiler.UnpackMap(in)
@@ -1961,7 +1956,7 @@ func NewNamedEncoding(in interface{}, context *compiler.Context) (*NamedEncoding
 }
 
 // NewNamedExampleOrReference creates an object of type NamedExampleOrReference if possible, returning an error if not.
-func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*NamedExampleOrReference, error) {
+func NewNamedExampleOrReference(in *yaml.Node, context *compiler.Context) (*NamedExampleOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedExampleOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -1999,7 +1994,7 @@ func NewNamedExampleOrReference(in interface{}, context *compiler.Context) (*Nam
 }
 
 // NewNamedHeaderOrReference creates an object of type NamedHeaderOrReference if possible, returning an error if not.
-func NewNamedHeaderOrReference(in interface{}, context *compiler.Context) (*NamedHeaderOrReference, error) {
+func NewNamedHeaderOrReference(in *yaml.Node, context *compiler.Context) (*NamedHeaderOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedHeaderOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2037,7 +2032,7 @@ func NewNamedHeaderOrReference(in interface{}, context *compiler.Context) (*Name
 }
 
 // NewNamedLinkOrReference creates an object of type NamedLinkOrReference if possible, returning an error if not.
-func NewNamedLinkOrReference(in interface{}, context *compiler.Context) (*NamedLinkOrReference, error) {
+func NewNamedLinkOrReference(in *yaml.Node, context *compiler.Context) (*NamedLinkOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedLinkOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2075,7 +2070,7 @@ func NewNamedLinkOrReference(in interface{}, context *compiler.Context) (*NamedL
 }
 
 // NewNamedMediaType creates an object of type NamedMediaType if possible, returning an error if not.
-func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaType, error) {
+func NewNamedMediaType(in *yaml.Node, context *compiler.Context) (*NamedMediaType, error) {
 	errors := make([]error, 0)
 	x := &NamedMediaType{}
 	m, ok := compiler.UnpackMap(in)
@@ -2113,7 +2108,7 @@ func NewNamedMediaType(in interface{}, context *compiler.Context) (*NamedMediaTy
 }
 
 // NewNamedParameterOrReference creates an object of type NamedParameterOrReference if possible, returning an error if not.
-func NewNamedParameterOrReference(in interface{}, context *compiler.Context) (*NamedParameterOrReference, error) {
+func NewNamedParameterOrReference(in *yaml.Node, context *compiler.Context) (*NamedParameterOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedParameterOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2151,7 +2146,7 @@ func NewNamedParameterOrReference(in interface{}, context *compiler.Context) (*N
 }
 
 // NewNamedPathItem creates an object of type NamedPathItem if possible, returning an error if not.
-func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem, error) {
+func NewNamedPathItem(in *yaml.Node, context *compiler.Context) (*NamedPathItem, error) {
 	errors := make([]error, 0)
 	x := &NamedPathItem{}
 	m, ok := compiler.UnpackMap(in)
@@ -2189,7 +2184,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 }
 
 // NewNamedRequestBodyOrReference creates an object of type NamedRequestBodyOrReference if possible, returning an error if not.
-func NewNamedRequestBodyOrReference(in interface{}, context *compiler.Context) (*NamedRequestBodyOrReference, error) {
+func NewNamedRequestBodyOrReference(in *yaml.Node, context *compiler.Context) (*NamedRequestBodyOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedRequestBodyOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2227,7 +2222,7 @@ func NewNamedRequestBodyOrReference(in interface{}, context *compiler.Context) (
 }
 
 // NewNamedResponseOrReference creates an object of type NamedResponseOrReference if possible, returning an error if not.
-func NewNamedResponseOrReference(in interface{}, context *compiler.Context) (*NamedResponseOrReference, error) {
+func NewNamedResponseOrReference(in *yaml.Node, context *compiler.Context) (*NamedResponseOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedResponseOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2265,7 +2260,7 @@ func NewNamedResponseOrReference(in interface{}, context *compiler.Context) (*Na
 }
 
 // NewNamedSchemaOrReference creates an object of type NamedSchemaOrReference if possible, returning an error if not.
-func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*NamedSchemaOrReference, error) {
+func NewNamedSchemaOrReference(in *yaml.Node, context *compiler.Context) (*NamedSchemaOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedSchemaOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2303,7 +2298,7 @@ func NewNamedSchemaOrReference(in interface{}, context *compiler.Context) (*Name
 }
 
 // NewNamedSecuritySchemeOrReference creates an object of type NamedSecuritySchemeOrReference if possible, returning an error if not.
-func NewNamedSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*NamedSecuritySchemeOrReference, error) {
+func NewNamedSecuritySchemeOrReference(in *yaml.Node, context *compiler.Context) (*NamedSecuritySchemeOrReference, error) {
 	errors := make([]error, 0)
 	x := &NamedSecuritySchemeOrReference{}
 	m, ok := compiler.UnpackMap(in)
@@ -2341,7 +2336,7 @@ func NewNamedSecuritySchemeOrReference(in interface{}, context *compiler.Context
 }
 
 // NewNamedServerVariable creates an object of type NamedServerVariable if possible, returning an error if not.
-func NewNamedServerVariable(in interface{}, context *compiler.Context) (*NamedServerVariable, error) {
+func NewNamedServerVariable(in *yaml.Node, context *compiler.Context) (*NamedServerVariable, error) {
 	errors := make([]error, 0)
 	x := &NamedServerVariable{}
 	m, ok := compiler.UnpackMap(in)
@@ -2379,7 +2374,7 @@ func NewNamedServerVariable(in interface{}, context *compiler.Context) (*NamedSe
 }
 
 // NewNamedString creates an object of type NamedString if possible, returning an error if not.
-func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, error) {
+func NewNamedString(in *yaml.Node, context *compiler.Context) (*NamedString, error) {
 	errors := make([]error, 0)
 	x := &NamedString{}
 	m, ok := compiler.UnpackMap(in)
@@ -2417,7 +2412,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 }
 
 // NewNamedStringArray creates an object of type NamedStringArray if possible, returning an error if not.
-func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStringArray, error) {
+func NewNamedStringArray(in *yaml.Node, context *compiler.Context) (*NamedStringArray, error) {
 	errors := make([]error, 0)
 	x := &NamedStringArray{}
 	m, ok := compiler.UnpackMap(in)
@@ -2455,7 +2450,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 }
 
 // NewOauthFlow creates an object of type OauthFlow if possible, returning an error if not.
-func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error) {
+func NewOauthFlow(in *yaml.Node, context *compiler.Context) (*OauthFlow, error) {
 	errors := make([]error, 0)
 	x := &OauthFlow{}
 	m, ok := compiler.UnpackMap(in)
@@ -2542,7 +2537,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 }
 
 // NewOauthFlows creates an object of type OauthFlows if possible, returning an error if not.
-func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, error) {
+func NewOauthFlows(in *yaml.Node, context *compiler.Context) (*OauthFlows, error) {
 	errors := make([]error, 0)
 	x := &OauthFlows{}
 	m, ok := compiler.UnpackMap(in)
@@ -2629,7 +2624,7 @@ func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, erro
 }
 
 // NewObject creates an object of type Object if possible, returning an error if not.
-func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
+func NewObject(in *yaml.Node, context *compiler.Context) (*Object, error) {
 	errors := make([]error, 0)
 	x := &Object{}
 	m, ok := compiler.UnpackMap(in)
@@ -2671,7 +2666,7 @@ func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 }
 
 // NewOperation creates an object of type Operation if possible, returning an error if not.
-func NewOperation(in interface{}, context *compiler.Context) (*Operation, error) {
+func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) {
 	errors := make([]error, 0)
 	x := &Operation{}
 	m, ok := compiler.UnpackMap(in)
@@ -2859,7 +2854,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 }
 
 // NewParameter creates an object of type Parameter if possible, returning an error if not.
-func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error) {
+func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) {
 	errors := make([]error, 0)
 	x := &Parameter{}
 	m, ok := compiler.UnpackMap(in)
@@ -3033,7 +3028,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 }
 
 // NewParameterOrReference creates an object of type ParameterOrReference if possible, returning an error if not.
-func NewParameterOrReference(in interface{}, context *compiler.Context) (*ParameterOrReference, error) {
+func NewParameterOrReference(in *yaml.Node, context *compiler.Context) (*ParameterOrReference, error) {
 	errors := make([]error, 0)
 	x := &ParameterOrReference{}
 	matched := false
@@ -3073,7 +3068,7 @@ func NewParameterOrReference(in interface{}, context *compiler.Context) (*Parame
 }
 
 // NewParametersOrReferences creates an object of type ParametersOrReferences if possible, returning an error if not.
-func NewParametersOrReferences(in interface{}, context *compiler.Context) (*ParametersOrReferences, error) {
+func NewParametersOrReferences(in *yaml.Node, context *compiler.Context) (*ParametersOrReferences, error) {
 	errors := make([]error, 0)
 	x := &ParametersOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -3103,7 +3098,7 @@ func NewParametersOrReferences(in interface{}, context *compiler.Context) (*Para
 }
 
 // NewPathItem creates an object of type PathItem if possible, returning an error if not.
-func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
+func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 	errors := make([]error, 0)
 	x := &PathItem{}
 	m, ok := compiler.UnpackMap(in)
@@ -3285,7 +3280,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 }
 
 // NewPaths creates an object of type Paths if possible, returning an error if not.
-func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
+func NewPaths(in *yaml.Node, context *compiler.Context) (*Paths, error) {
 	errors := make([]error, 0)
 	x := &Paths{}
 	m, ok := compiler.UnpackMap(in)
@@ -3355,7 +3350,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 }
 
 // NewProperties creates an object of type Properties if possible, returning an error if not.
-func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
+func NewProperties(in *yaml.Node, context *compiler.Context) (*Properties, error) {
 	errors := make([]error, 0)
 	x := &Properties{}
 	m, ok := compiler.UnpackMap(in)
@@ -3385,7 +3380,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 }
 
 // NewReference creates an object of type Reference if possible, returning an error if not.
-func NewReference(in interface{}, context *compiler.Context) (*Reference, error) {
+func NewReference(in *yaml.Node, context *compiler.Context) (*Reference, error) {
 	errors := make([]error, 0)
 	x := &Reference{}
 	m, ok := compiler.UnpackMap(in)
@@ -3413,7 +3408,7 @@ func NewReference(in interface{}, context *compiler.Context) (*Reference, error)
 }
 
 // NewRequestBodiesOrReferences creates an object of type RequestBodiesOrReferences if possible, returning an error if not.
-func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*RequestBodiesOrReferences, error) {
+func NewRequestBodiesOrReferences(in *yaml.Node, context *compiler.Context) (*RequestBodiesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &RequestBodiesOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -3443,7 +3438,7 @@ func NewRequestBodiesOrReferences(in interface{}, context *compiler.Context) (*R
 }
 
 // NewRequestBody creates an object of type RequestBody if possible, returning an error if not.
-func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, error) {
+func NewRequestBody(in *yaml.Node, context *compiler.Context) (*RequestBody, error) {
 	errors := make([]error, 0)
 	x := &RequestBody{}
 	m, ok := compiler.UnpackMap(in)
@@ -3527,7 +3522,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 }
 
 // NewRequestBodyOrReference creates an object of type RequestBodyOrReference if possible, returning an error if not.
-func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*RequestBodyOrReference, error) {
+func NewRequestBodyOrReference(in *yaml.Node, context *compiler.Context) (*RequestBodyOrReference, error) {
 	errors := make([]error, 0)
 	x := &RequestBodyOrReference{}
 	matched := false
@@ -3567,7 +3562,7 @@ func NewRequestBodyOrReference(in interface{}, context *compiler.Context) (*Requ
 }
 
 // NewResponse creates an object of type Response if possible, returning an error if not.
-func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
+func NewResponse(in *yaml.Node, context *compiler.Context) (*Response, error) {
 	errors := make([]error, 0)
 	x := &Response{}
 	m, ok := compiler.UnpackMap(in)
@@ -3660,7 +3655,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 }
 
 // NewResponseOrReference creates an object of type ResponseOrReference if possible, returning an error if not.
-func NewResponseOrReference(in interface{}, context *compiler.Context) (*ResponseOrReference, error) {
+func NewResponseOrReference(in *yaml.Node, context *compiler.Context) (*ResponseOrReference, error) {
 	errors := make([]error, 0)
 	x := &ResponseOrReference{}
 	matched := false
@@ -3700,7 +3695,7 @@ func NewResponseOrReference(in interface{}, context *compiler.Context) (*Respons
 }
 
 // NewResponses creates an object of type Responses if possible, returning an error if not.
-func NewResponses(in interface{}, context *compiler.Context) (*Responses, error) {
+func NewResponses(in *yaml.Node, context *compiler.Context) (*Responses, error) {
 	errors := make([]error, 0)
 	x := &Responses{}
 	m, ok := compiler.UnpackMap(in)
@@ -3779,7 +3774,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 }
 
 // NewResponsesOrReferences creates an object of type ResponsesOrReferences if possible, returning an error if not.
-func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*ResponsesOrReferences, error) {
+func NewResponsesOrReferences(in *yaml.Node, context *compiler.Context) (*ResponsesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &ResponsesOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -3809,7 +3804,7 @@ func NewResponsesOrReferences(in interface{}, context *compiler.Context) (*Respo
 }
 
 // NewSchema creates an object of type Schema if possible, returning an error if not.
-func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
+func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 	errors := make([]error, 0)
 	x := &Schema{}
 	m, ok := compiler.UnpackMap(in)
@@ -4223,7 +4218,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 }
 
 // NewSchemaOrReference creates an object of type SchemaOrReference if possible, returning an error if not.
-func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrReference, error) {
+func NewSchemaOrReference(in *yaml.Node, context *compiler.Context) (*SchemaOrReference, error) {
 	errors := make([]error, 0)
 	x := &SchemaOrReference{}
 	matched := false
@@ -4263,7 +4258,7 @@ func NewSchemaOrReference(in interface{}, context *compiler.Context) (*SchemaOrR
 }
 
 // NewSchemasOrReferences creates an object of type SchemasOrReferences if possible, returning an error if not.
-func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*SchemasOrReferences, error) {
+func NewSchemasOrReferences(in *yaml.Node, context *compiler.Context) (*SchemasOrReferences, error) {
 	errors := make([]error, 0)
 	x := &SchemasOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -4293,7 +4288,7 @@ func NewSchemasOrReferences(in interface{}, context *compiler.Context) (*Schemas
 }
 
 // NewSecurityRequirement creates an object of type SecurityRequirement if possible, returning an error if not.
-func NewSecurityRequirement(in interface{}, context *compiler.Context) (*SecurityRequirement, error) {
+func NewSecurityRequirement(in *yaml.Node, context *compiler.Context) (*SecurityRequirement, error) {
 	errors := make([]error, 0)
 	x := &SecurityRequirement{}
 	m, ok := compiler.UnpackMap(in)
@@ -4323,7 +4318,7 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 }
 
 // NewSecurityScheme creates an object of type SecurityScheme if possible, returning an error if not.
-func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecurityScheme, error) {
+func NewSecurityScheme(in *yaml.Node, context *compiler.Context) (*SecurityScheme, error) {
 	errors := make([]error, 0)
 	x := &SecurityScheme{}
 	m, ok := compiler.UnpackMap(in)
@@ -4452,7 +4447,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 }
 
 // NewSecuritySchemeOrReference creates an object of type SecuritySchemeOrReference if possible, returning an error if not.
-func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*SecuritySchemeOrReference, error) {
+func NewSecuritySchemeOrReference(in *yaml.Node, context *compiler.Context) (*SecuritySchemeOrReference, error) {
 	errors := make([]error, 0)
 	x := &SecuritySchemeOrReference{}
 	matched := false
@@ -4492,7 +4487,7 @@ func NewSecuritySchemeOrReference(in interface{}, context *compiler.Context) (*S
 }
 
 // NewSecuritySchemesOrReferences creates an object of type SecuritySchemesOrReferences if possible, returning an error if not.
-func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (*SecuritySchemesOrReferences, error) {
+func NewSecuritySchemesOrReferences(in *yaml.Node, context *compiler.Context) (*SecuritySchemesOrReferences, error) {
 	errors := make([]error, 0)
 	x := &SecuritySchemesOrReferences{}
 	m, ok := compiler.UnpackMap(in)
@@ -4522,7 +4517,7 @@ func NewSecuritySchemesOrReferences(in interface{}, context *compiler.Context) (
 }
 
 // NewServer creates an object of type Server if possible, returning an error if not.
-func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
+func NewServer(in *yaml.Node, context *compiler.Context) (*Server, error) {
 	errors := make([]error, 0)
 	x := &Server{}
 	m, ok := compiler.UnpackMap(in)
@@ -4606,7 +4601,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 }
 
 // NewServerVariable creates an object of type ServerVariable if possible, returning an error if not.
-func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariable, error) {
+func NewServerVariable(in *yaml.Node, context *compiler.Context) (*ServerVariable, error) {
 	errors := make([]error, 0)
 	x := &ServerVariable{}
 	m, ok := compiler.UnpackMap(in)
@@ -4692,7 +4687,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 }
 
 // NewServerVariables creates an object of type ServerVariables if possible, returning an error if not.
-func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVariables, error) {
+func NewServerVariables(in *yaml.Node, context *compiler.Context) (*ServerVariables, error) {
 	errors := make([]error, 0)
 	x := &ServerVariables{}
 	m, ok := compiler.UnpackMap(in)
@@ -4722,32 +4717,27 @@ func NewServerVariables(in interface{}, context *compiler.Context) (*ServerVaria
 }
 
 // NewSpecificationExtension creates an object of type SpecificationExtension if possible, returning an error if not.
-func NewSpecificationExtension(in interface{}, context *compiler.Context) (*SpecificationExtension, error) {
+func NewSpecificationExtension(in *yaml.Node, context *compiler.Context) (*SpecificationExtension, error) {
 	errors := make([]error, 0)
 	x := &SpecificationExtension{}
 	matched := false
-	switch in := in.(type) {
-	case bool:
-		x.Oneof = &SpecificationExtension_Boolean{Boolean: in}
-		matched = true
-	case string:
-		x.Oneof = &SpecificationExtension_String_{String_: in}
-		matched = true
-	case int64:
-		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
-		matched = true
-	case int32:
-		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
-		matched = true
-	case int:
-		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
-		matched = true
-	case float64:
-		x.Oneof = &SpecificationExtension_Number{Number: in}
-		matched = true
-	case float32:
-		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}
-		matched = true
+	switch in.Tag {
+	case "!!bool":
+		var v bool
+		v, matched = compiler.BoolForScalarNode(in)
+		x.Oneof = &SpecificationExtension_Boolean{Boolean: v}
+	case "!!str":
+		var v string
+		v, matched = compiler.StringForScalarNode(in)
+		x.Oneof = &SpecificationExtension_String_{String_: v}
+	case "!!float":
+		var v float64
+		v, matched = compiler.FloatForScalarNode(in)
+		x.Oneof = &SpecificationExtension_Number{Number: v}
+	case "!!int":
+		var v int64
+		v, matched = compiler.IntForScalarNode(in)
+		x.Oneof = &SpecificationExtension_Number{Number: float64(v)}
 	}
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
@@ -4757,24 +4747,19 @@ func NewSpecificationExtension(in interface{}, context *compiler.Context) (*Spec
 }
 
 // NewStringArray creates an object of type StringArray if possible, returning an error if not.
-func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, error) {
+func NewStringArray(in *yaml.Node, context *compiler.Context) (*StringArray, error) {
 	errors := make([]error, 0)
 	x := &StringArray{}
-	a, ok := in.([]interface{})
-	if !ok {
-		message := fmt.Sprintf("has unexpected value for StringArray: %+v (%T)", in, in)
-		errors = append(errors, compiler.NewError(context, message))
-	} else {
-		x.Value = make([]string, 0)
-		for _, s := range a {
-			x.Value = append(x.Value, s.(string))
-		}
+	x.Value = make([]string, 0)
+	for _, node := range in.Content {
+		s, _ := compiler.StringForScalarNode(node)
+		x.Value = append(x.Value, s)
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
 // NewStrings creates an object of type Strings if possible, returning an error if not.
-func NewStrings(in interface{}, context *compiler.Context) (*Strings, error) {
+func NewStrings(in *yaml.Node, context *compiler.Context) (*Strings, error) {
 	errors := make([]error, 0)
 	x := &Strings{}
 	m, ok := compiler.UnpackMap(in)
@@ -4800,7 +4785,7 @@ func NewStrings(in interface{}, context *compiler.Context) (*Strings, error) {
 }
 
 // NewTag creates an object of type Tag if possible, returning an error if not.
-func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
+func NewTag(in *yaml.Node, context *compiler.Context) (*Tag, error) {
 	errors := make([]error, 0)
 	x := &Tag{}
 	m, ok := compiler.UnpackMap(in)
@@ -4884,7 +4869,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 }
 
 // NewXml creates an object of type Xml if possible, returning an error if not.
-func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
+func NewXml(in *yaml.Node, context *compiler.Context) (*Xml, error) {
 	errors := make([]error, 0)
 	x := &Xml{}
 	m, ok := compiler.UnpackMap(in)
@@ -4980,7 +4965,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 }
 
 // ResolveReferences resolves references found inside AdditionalPropertiesItem objects.
-func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
+func (m *AdditionalPropertiesItem) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*AdditionalPropertiesItem_SchemaOrReference)
@@ -4995,13 +4980,13 @@ func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, 
 }
 
 // ResolveReferences resolves references found inside Any objects.
-func (m *Any) ResolveReferences(root string) (interface{}, error) {
+func (m *Any) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 // ResolveReferences resolves references found inside AnyOrExpression objects.
-func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
+func (m *AnyOrExpression) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*AnyOrExpression_Any)
@@ -5025,7 +5010,7 @@ func (m *AnyOrExpression) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Callback objects.
-func (m *Callback) ResolveReferences(root string) (interface{}, error) {
+func (m *Callback) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Path {
 		if item != nil {
@@ -5047,7 +5032,7 @@ func (m *Callback) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside CallbackOrReference objects.
-func (m *CallbackOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *CallbackOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*CallbackOrReference_Callback)
@@ -5071,7 +5056,7 @@ func (m *CallbackOrReference) ResolveReferences(root string) (interface{}, error
 }
 
 // ResolveReferences resolves references found inside CallbacksOrReferences objects.
-func (m *CallbacksOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *CallbacksOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5085,7 +5070,7 @@ func (m *CallbacksOrReferences) ResolveReferences(root string) (interface{}, err
 }
 
 // ResolveReferences resolves references found inside Components objects.
-func (m *Components) ResolveReferences(root string) (interface{}, error) {
+func (m *Components) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Schemas != nil {
 		_, err := m.Schemas.ResolveReferences(root)
@@ -5153,7 +5138,7 @@ func (m *Components) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Contact objects.
-func (m *Contact) ResolveReferences(root string) (interface{}, error) {
+func (m *Contact) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
@@ -5167,13 +5152,13 @@ func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside DefaultType objects.
-func (m *DefaultType) ResolveReferences(root string) (interface{}, error) {
+func (m *DefaultType) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 // ResolveReferences resolves references found inside Discriminator objects.
-func (m *Discriminator) ResolveReferences(root string) (interface{}, error) {
+func (m *Discriminator) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Mapping != nil {
 		_, err := m.Mapping.ResolveReferences(root)
@@ -5193,7 +5178,7 @@ func (m *Discriminator) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Document objects.
-func (m *Document) ResolveReferences(root string) (interface{}, error) {
+func (m *Document) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Info != nil {
 		_, err := m.Info.ResolveReferences(root)
@@ -5255,7 +5240,7 @@ func (m *Document) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Encoding objects.
-func (m *Encoding) ResolveReferences(root string) (interface{}, error) {
+func (m *Encoding) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Headers != nil {
 		_, err := m.Headers.ResolveReferences(root)
@@ -5275,7 +5260,7 @@ func (m *Encoding) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Encodings objects.
-func (m *Encodings) ResolveReferences(root string) (interface{}, error) {
+func (m *Encodings) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5289,7 +5274,7 @@ func (m *Encodings) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Example objects.
-func (m *Example) ResolveReferences(root string) (interface{}, error) {
+func (m *Example) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5309,7 +5294,7 @@ func (m *Example) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ExampleOrReference objects.
-func (m *ExampleOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *ExampleOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*ExampleOrReference_Example)
@@ -5333,7 +5318,7 @@ func (m *ExampleOrReference) ResolveReferences(root string) (interface{}, error)
 }
 
 // ResolveReferences resolves references found inside ExamplesOrReferences objects.
-func (m *ExamplesOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *ExamplesOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5347,7 +5332,7 @@ func (m *ExamplesOrReferences) ResolveReferences(root string) (interface{}, erro
 }
 
 // ResolveReferences resolves references found inside Expression objects.
-func (m *Expression) ResolveReferences(root string) (interface{}, error) {
+func (m *Expression) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5361,7 +5346,7 @@ func (m *Expression) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ExternalDocs objects.
-func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
+func (m *ExternalDocs) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
@@ -5375,7 +5360,7 @@ func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Header objects.
-func (m *Header) ResolveReferences(root string) (interface{}, error) {
+func (m *Header) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
 		_, err := m.Schema.ResolveReferences(root)
@@ -5413,7 +5398,7 @@ func (m *Header) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside HeaderOrReference objects.
-func (m *HeaderOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *HeaderOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*HeaderOrReference_Header)
@@ -5437,7 +5422,7 @@ func (m *HeaderOrReference) ResolveReferences(root string) (interface{}, error) 
 }
 
 // ResolveReferences resolves references found inside HeadersOrReferences objects.
-func (m *HeadersOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *HeadersOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5451,7 +5436,7 @@ func (m *HeadersOrReferences) ResolveReferences(root string) (interface{}, error
 }
 
 // ResolveReferences resolves references found inside Info objects.
-func (m *Info) ResolveReferences(root string) (interface{}, error) {
+func (m *Info) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Contact != nil {
 		_, err := m.Contact.ResolveReferences(root)
@@ -5477,7 +5462,7 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ItemsItem objects.
-func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
+func (m *ItemsItem) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SchemaOrReference {
 		if item != nil {
@@ -5491,7 +5476,7 @@ func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside License objects.
-func (m *License) ResolveReferences(root string) (interface{}, error) {
+func (m *License) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
@@ -5505,7 +5490,7 @@ func (m *License) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Link objects.
-func (m *Link) ResolveReferences(root string) (interface{}, error) {
+func (m *Link) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Parameters != nil {
 		_, err := m.Parameters.ResolveReferences(root)
@@ -5537,7 +5522,7 @@ func (m *Link) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside LinkOrReference objects.
-func (m *LinkOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *LinkOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*LinkOrReference_Link)
@@ -5561,7 +5546,7 @@ func (m *LinkOrReference) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside LinksOrReferences objects.
-func (m *LinksOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *LinksOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5575,7 +5560,7 @@ func (m *LinksOrReferences) ResolveReferences(root string) (interface{}, error) 
 }
 
 // ResolveReferences resolves references found inside MediaType objects.
-func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
+func (m *MediaType) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
 		_, err := m.Schema.ResolveReferences(root)
@@ -5613,7 +5598,7 @@ func (m *MediaType) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside MediaTypes objects.
-func (m *MediaTypes) ResolveReferences(root string) (interface{}, error) {
+func (m *MediaTypes) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5627,7 +5612,7 @@ func (m *MediaTypes) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside NamedAny objects.
-func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedAny) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5639,7 +5624,7 @@ func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside NamedCallbackOrReference objects.
-func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedCallbackOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5651,7 +5636,7 @@ func (m *NamedCallbackOrReference) ResolveReferences(root string) (interface{}, 
 }
 
 // ResolveReferences resolves references found inside NamedEncoding objects.
-func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedEncoding) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5663,7 +5648,7 @@ func (m *NamedEncoding) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside NamedExampleOrReference objects.
-func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedExampleOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5675,7 +5660,7 @@ func (m *NamedExampleOrReference) ResolveReferences(root string) (interface{}, e
 }
 
 // ResolveReferences resolves references found inside NamedHeaderOrReference objects.
-func (m *NamedHeaderOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedHeaderOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5687,7 +5672,7 @@ func (m *NamedHeaderOrReference) ResolveReferences(root string) (interface{}, er
 }
 
 // ResolveReferences resolves references found inside NamedLinkOrReference objects.
-func (m *NamedLinkOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedLinkOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5699,7 +5684,7 @@ func (m *NamedLinkOrReference) ResolveReferences(root string) (interface{}, erro
 }
 
 // ResolveReferences resolves references found inside NamedMediaType objects.
-func (m *NamedMediaType) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedMediaType) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5711,7 +5696,7 @@ func (m *NamedMediaType) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside NamedParameterOrReference objects.
-func (m *NamedParameterOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedParameterOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5723,7 +5708,7 @@ func (m *NamedParameterOrReference) ResolveReferences(root string) (interface{},
 }
 
 // ResolveReferences resolves references found inside NamedPathItem objects.
-func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedPathItem) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5735,7 +5720,7 @@ func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside NamedRequestBodyOrReference objects.
-func (m *NamedRequestBodyOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedRequestBodyOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5747,7 +5732,7 @@ func (m *NamedRequestBodyOrReference) ResolveReferences(root string) (interface{
 }
 
 // ResolveReferences resolves references found inside NamedResponseOrReference objects.
-func (m *NamedResponseOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedResponseOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5759,7 +5744,7 @@ func (m *NamedResponseOrReference) ResolveReferences(root string) (interface{}, 
 }
 
 // ResolveReferences resolves references found inside NamedSchemaOrReference objects.
-func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedSchemaOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5771,7 +5756,7 @@ func (m *NamedSchemaOrReference) ResolveReferences(root string) (interface{}, er
 }
 
 // ResolveReferences resolves references found inside NamedSecuritySchemeOrReference objects.
-func (m *NamedSecuritySchemeOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedSecuritySchemeOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5783,7 +5768,7 @@ func (m *NamedSecuritySchemeOrReference) ResolveReferences(root string) (interfa
 }
 
 // ResolveReferences resolves references found inside NamedServerVariable objects.
-func (m *NamedServerVariable) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedServerVariable) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5795,13 +5780,13 @@ func (m *NamedServerVariable) ResolveReferences(root string) (interface{}, error
 }
 
 // ResolveReferences resolves references found inside NamedString objects.
-func (m *NamedString) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedString) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 // ResolveReferences resolves references found inside NamedStringArray objects.
-func (m *NamedStringArray) ResolveReferences(root string) (interface{}, error) {
+func (m *NamedStringArray) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
 		_, err := m.Value.ResolveReferences(root)
@@ -5813,7 +5798,7 @@ func (m *NamedStringArray) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside OauthFlow objects.
-func (m *OauthFlow) ResolveReferences(root string) (interface{}, error) {
+func (m *OauthFlow) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
 		_, err := m.Scopes.ResolveReferences(root)
@@ -5833,7 +5818,7 @@ func (m *OauthFlow) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside OauthFlows objects.
-func (m *OauthFlows) ResolveReferences(root string) (interface{}, error) {
+func (m *OauthFlows) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Implicit != nil {
 		_, err := m.Implicit.ResolveReferences(root)
@@ -5871,7 +5856,7 @@ func (m *OauthFlows) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Object objects.
-func (m *Object) ResolveReferences(root string) (interface{}, error) {
+func (m *Object) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -5885,7 +5870,7 @@ func (m *Object) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Operation objects.
-func (m *Operation) ResolveReferences(root string) (interface{}, error) {
+func (m *Operation) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
 		_, err := m.ExternalDocs.ResolveReferences(root)
@@ -5947,7 +5932,7 @@ func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Parameter objects.
-func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
+func (m *Parameter) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
 		_, err := m.Schema.ResolveReferences(root)
@@ -5985,7 +5970,7 @@ func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ParameterOrReference objects.
-func (m *ParameterOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *ParameterOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*ParameterOrReference_Parameter)
@@ -6009,7 +5994,7 @@ func (m *ParameterOrReference) ResolveReferences(root string) (interface{}, erro
 }
 
 // ResolveReferences resolves references found inside ParametersOrReferences objects.
-func (m *ParametersOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *ParametersOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6023,7 +6008,7 @@ func (m *ParametersOrReferences) ResolveReferences(root string) (interface{}, er
 }
 
 // ResolveReferences resolves references found inside PathItem objects.
-func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
+func (m *PathItem) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
 		info, err := compiler.ReadInfoForRef(root, m.XRef)
@@ -6115,7 +6100,7 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Paths objects.
-func (m *Paths) ResolveReferences(root string) (interface{}, error) {
+func (m *Paths) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Path {
 		if item != nil {
@@ -6137,7 +6122,7 @@ func (m *Paths) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Properties objects.
-func (m *Properties) ResolveReferences(root string) (interface{}, error) {
+func (m *Properties) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6151,7 +6136,7 @@ func (m *Properties) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Reference objects.
-func (m *Reference) ResolveReferences(root string) (interface{}, error) {
+func (m *Reference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
 		info, err := compiler.ReadInfoForRef(root, m.XRef)
@@ -6164,7 +6149,7 @@ func (m *Reference) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside RequestBodiesOrReferences objects.
-func (m *RequestBodiesOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *RequestBodiesOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6178,7 +6163,7 @@ func (m *RequestBodiesOrReferences) ResolveReferences(root string) (interface{},
 }
 
 // ResolveReferences resolves references found inside RequestBody objects.
-func (m *RequestBody) ResolveReferences(root string) (interface{}, error) {
+func (m *RequestBody) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Content != nil {
 		_, err := m.Content.ResolveReferences(root)
@@ -6198,7 +6183,7 @@ func (m *RequestBody) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside RequestBodyOrReference objects.
-func (m *RequestBodyOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *RequestBodyOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*RequestBodyOrReference_RequestBody)
@@ -6222,7 +6207,7 @@ func (m *RequestBodyOrReference) ResolveReferences(root string) (interface{}, er
 }
 
 // ResolveReferences resolves references found inside Response objects.
-func (m *Response) ResolveReferences(root string) (interface{}, error) {
+func (m *Response) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Headers != nil {
 		_, err := m.Headers.ResolveReferences(root)
@@ -6254,7 +6239,7 @@ func (m *Response) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ResponseOrReference objects.
-func (m *ResponseOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *ResponseOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*ResponseOrReference_Response)
@@ -6278,7 +6263,7 @@ func (m *ResponseOrReference) ResolveReferences(root string) (interface{}, error
 }
 
 // ResolveReferences resolves references found inside Responses objects.
-func (m *Responses) ResolveReferences(root string) (interface{}, error) {
+func (m *Responses) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Default != nil {
 		_, err := m.Default.ResolveReferences(root)
@@ -6306,7 +6291,7 @@ func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ResponsesOrReferences objects.
-func (m *ResponsesOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *ResponsesOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6320,7 +6305,7 @@ func (m *ResponsesOrReferences) ResolveReferences(root string) (interface{}, err
 }
 
 // ResolveReferences resolves references found inside Schema objects.
-func (m *Schema) ResolveReferences(root string) (interface{}, error) {
+func (m *Schema) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Discriminator != nil {
 		_, err := m.Discriminator.ResolveReferences(root)
@@ -6420,7 +6405,7 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside SchemaOrReference objects.
-func (m *SchemaOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *SchemaOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*SchemaOrReference_Schema)
@@ -6444,7 +6429,7 @@ func (m *SchemaOrReference) ResolveReferences(root string) (interface{}, error) 
 }
 
 // ResolveReferences resolves references found inside SchemasOrReferences objects.
-func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *SchemasOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6458,7 +6443,7 @@ func (m *SchemasOrReferences) ResolveReferences(root string) (interface{}, error
 }
 
 // ResolveReferences resolves references found inside SecurityRequirement objects.
-func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error) {
+func (m *SecurityRequirement) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6472,7 +6457,7 @@ func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error
 }
 
 // ResolveReferences resolves references found inside SecurityScheme objects.
-func (m *SecurityScheme) ResolveReferences(root string) (interface{}, error) {
+func (m *SecurityScheme) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Flows != nil {
 		_, err := m.Flows.ResolveReferences(root)
@@ -6492,7 +6477,7 @@ func (m *SecurityScheme) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside SecuritySchemeOrReference objects.
-func (m *SecuritySchemeOrReference) ResolveReferences(root string) (interface{}, error) {
+func (m *SecuritySchemeOrReference) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	{
 		p, ok := m.Oneof.(*SecuritySchemeOrReference_SecurityScheme)
@@ -6516,7 +6501,7 @@ func (m *SecuritySchemeOrReference) ResolveReferences(root string) (interface{},
 }
 
 // ResolveReferences resolves references found inside SecuritySchemesOrReferences objects.
-func (m *SecuritySchemesOrReferences) ResolveReferences(root string) (interface{}, error) {
+func (m *SecuritySchemesOrReferences) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6530,7 +6515,7 @@ func (m *SecuritySchemesOrReferences) ResolveReferences(root string) (interface{
 }
 
 // ResolveReferences resolves references found inside Server objects.
-func (m *Server) ResolveReferences(root string) (interface{}, error) {
+func (m *Server) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.Variables != nil {
 		_, err := m.Variables.ResolveReferences(root)
@@ -6550,7 +6535,7 @@ func (m *Server) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ServerVariable objects.
-func (m *ServerVariable) ResolveReferences(root string) (interface{}, error) {
+func (m *ServerVariable) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
 		if item != nil {
@@ -6564,7 +6549,7 @@ func (m *ServerVariable) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside ServerVariables objects.
-func (m *ServerVariables) ResolveReferences(root string) (interface{}, error) {
+func (m *ServerVariables) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6578,19 +6563,19 @@ func (m *ServerVariables) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside SpecificationExtension objects.
-func (m *SpecificationExtension) ResolveReferences(root string) (interface{}, error) {
+func (m *SpecificationExtension) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 // ResolveReferences resolves references found inside StringArray objects.
-func (m *StringArray) ResolveReferences(root string) (interface{}, error) {
+func (m *StringArray) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
 // ResolveReferences resolves references found inside Strings objects.
-func (m *Strings) ResolveReferences(root string) (interface{}, error) {
+func (m *Strings) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
 		if item != nil {
@@ -6604,7 +6589,7 @@ func (m *Strings) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Tag objects.
-func (m *Tag) ResolveReferences(root string) (interface{}, error) {
+func (m *Tag) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
 		_, err := m.ExternalDocs.ResolveReferences(root)
@@ -6624,7 +6609,7 @@ func (m *Tag) ResolveReferences(root string) (interface{}, error) {
 }
 
 // ResolveReferences resolves references found inside Xml objects.
-func (m *Xml) ResolveReferences(root string) (interface{}, error) {
+func (m *Xml) ResolveReferences(root string) (*yaml.Node, error) {
 	errors := make([]error, 0)
 	for _, item := range m.SpecificationExtension {
 		if item != nil {

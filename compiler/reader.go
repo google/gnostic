@@ -234,7 +234,7 @@ func readInfoFromBytes(filename string, bytes []byte) (*yaml.Node, error) {
 }
 
 // ReadInfoForRef reads a file and return the fragment needed to resolve a $ref.
-func ReadInfoForRef(basefile string, ref string) (interface{}, error) {
+func ReadInfoForRef(basefile string, ref string) (*yaml.Node, error) {
 	fileCacheMutex.Lock()
 	defer fileCacheMutex.Unlock()
 	infoCacheMutex.Lock()

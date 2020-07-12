@@ -66,7 +66,7 @@ const (
 )
 
 // Determine the version of an OpenAPI description read from JSON or YAML.
-func getOpenAPIVersionFromInfo(info interface{}) int {
+func getOpenAPIVersionFromInfo(info *yaml.Node) int {
 	m, ok := compiler.UnpackMap(info)
 	if !ok {
 		return SourceFormatUnknown
