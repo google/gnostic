@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"os/exec"
 
 	"strings"
@@ -51,7 +50,6 @@ func HandleExtension(context *Context, in *yaml.Node, extensionName string) (boo
 			}
 		}
 	}
-	log.Printf("%s %t %+v", extensionName, handled, outFromPlugin)
 	return handled, outFromPlugin, errFromPlugin
 }
 
@@ -75,11 +73,8 @@ func (extensionHandlers *ExtensionHandler) handle(in *yaml.Node, extensionName s
 
 		requestBytes, _ := proto.Marshal(request)
 		cmd := exec.Command(extensionHandlers.Name)
-		log.Printf("calling %s", extensionHandlers.Name)
-		log.Printf("with request %+v", request)
 		cmd.Stdin = bytes.NewReader(requestBytes)
 		output, err := cmd.Output()
-		log.Printf("output %+v", output)
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)
 			return nil, err
@@ -91,7 +86,6 @@ func (extensionHandlers *ExtensionHandler) handle(in *yaml.Node, extensionName s
 			fmt.Printf("%s\n", string(output))
 			return nil, err
 		}
-		log.Printf("response %+v", response)
 		if !response.Handled {
 			return nil, nil
 		}
