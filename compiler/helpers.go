@@ -118,6 +118,12 @@ func SequenceNodeForNode(node *yaml.Node) (*yaml.Node, bool) {
 
 // BoolForScalarNode returns the bool value of a node.
 func BoolForScalarNode(node *yaml.Node) (bool, bool) {
+	if node == nil {
+		return false, false
+	}
+	if node.Kind == yaml.DocumentNode {
+		return BoolForScalarNode(node.Content[0])
+	}
 	if node.Kind != yaml.ScalarNode {
 		return false, false
 	}
@@ -133,6 +139,12 @@ func BoolForScalarNode(node *yaml.Node) (bool, bool) {
 
 // IntForScalarNode returns the integer value of a node.
 func IntForScalarNode(node *yaml.Node) (int64, bool) {
+	if node == nil {
+		return 0, false
+	}
+	if node.Kind == yaml.DocumentNode {
+		return IntForScalarNode(node.Content[0])
+	}
 	if node.Kind != yaml.ScalarNode {
 		return 0, false
 	}
@@ -148,6 +160,12 @@ func IntForScalarNode(node *yaml.Node) (int64, bool) {
 
 // FloatForScalarNode returns the float value of a node.
 func FloatForScalarNode(node *yaml.Node) (float64, bool) {
+	if node == nil {
+		return 0.0, false
+	}
+	if node.Kind == yaml.DocumentNode {
+		return FloatForScalarNode(node.Content[0])
+	}
 	if node.Kind != yaml.ScalarNode {
 		return 0.0, false
 	}
@@ -166,13 +184,22 @@ func StringForScalarNode(node *yaml.Node) (string, bool) {
 	if node == nil {
 		return "", false
 	}
-	if node.Kind != yaml.ScalarNode {
+	if node.Kind == yaml.DocumentNode {
+		return StringForScalarNode(node.Content[0])
+	}
+	switch node.Kind {
+	case yaml.ScalarNode:
+		switch node.Tag {
+		case "!!str":
+			return node.Value, true
+		case "!!null":
+			return "", true
+		default:
+			return "", false
+		}
+	default:
 		return "", false
 	}
-	if node.Tag != "!!str" {
-		return "", false
-	}
-	return node.Value, true
 }
 
 // StringArrayForSequenceNode converts a sequence node to an array of strings, if possible.
@@ -384,4 +411,20 @@ func Display(node *yaml.Node) string {
 		}
 	}
 	return fmt.Sprintf("%+v (%T)", node, node)
+}
+
+// Marshal creates a yaml version of a structure in our preferred style
+func Marshal(in *yaml.Node) []byte {
+	clearStyle(in)
+	//bytes, _ := yaml.Marshal(&yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{in}})
+	bytes, _ := yaml.Marshal(in)
+
+	return bytes
+}
+
+func clearStyle(node *yaml.Node) {
+	node.Style = 0
+	for _, c := range node.Content {
+		clearStyle(c)
+	}
 }

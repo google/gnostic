@@ -32,6 +32,14 @@ func usage() {
 	os.Exit(0)
 }
 
+func dump(node *yaml.Node, indent string) {
+	node.Style = 0
+	fmt.Printf("%s%s: %+v\n", indent, node.Value, node)
+	for _, c := range node.Content {
+		dump(c, indent+"  ")
+	}
+}
+
 func main() {
 	if len(os.Args) != 3 {
 		usage()
@@ -44,6 +52,8 @@ func main() {
 	}
 	var node yaml.Node
 	err = yaml.Unmarshal(file, &node)
+
+	dump(&node, "")
 
 	switch os.Args[2] {
 	case "--json":

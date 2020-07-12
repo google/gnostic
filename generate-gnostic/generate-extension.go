@@ -66,17 +66,17 @@ const additionalCompilerCodeWithMain = "" +
 
 const caseStringForObjectTypes = "\n" +
 	"case \"%s\":\n" +
-	"var info yaml.MapSlice\n" +
+	"var info yaml.Node\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
-	"newObject, err := %s.New%s(info, compiler.NewContext(\"$root\", nil))\n" +
+	"newObject, err := %s.New%s(&info, compiler.NewContext(\"$root\", nil))\n" +
 	"return true, newObject, err"
 
 const caseStringForWrapperTypes = "\n" +
 	"case \"%s\":\n" +
-	"var info %s\n" +
+	"var info yaml.Node\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
@@ -294,10 +294,16 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	var cases string
 	for _, extensionName := range extensionNameKeys {
 		if extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo == nil {
-			cases += fmt.Sprintf(caseStringForObjectTypes, extensionName, goPackageName, extensionNameToMessageName[extensionName].schemaName)
+			cases += fmt.Sprintf(caseStringForObjectTypes,
+				extensionName,
+				goPackageName,
+				extensionNameToMessageName[extensionName].schemaName)
 		} else {
 			wrapperTypeIncluded = true
-			cases += fmt.Sprintf(caseStringForWrapperTypes, extensionName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
+			cases += fmt.Sprintf(caseStringForWrapperTypes,
+				extensionName,
+				//	extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName,
+				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
 		}
 
 	}
@@ -306,7 +312,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"github.com/golang/protobuf/proto",
 		"github.com/googleapis/gnostic/extensions",
 		"github.com/googleapis/gnostic/compiler",
-		"gopkg.in/yaml.v2",
+		"gopkg.in/yaml.v3",
 		outDirRelativeToPackageRoot + "/" + "proto",
 	}
 	if wrapperTypeIncluded {

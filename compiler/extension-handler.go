@@ -16,17 +16,17 @@ package compiler
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"log"
 	"os/exec"
 
 	"strings"
 
-	"errors"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/any"
 	ext_plugin "github.com/googleapis/gnostic/extensions"
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // ExtensionHandler describes a binary that is called by the compiler to handle specification extensions.
@@ -35,7 +35,7 @@ type ExtensionHandler struct {
 }
 
 // HandleExtension calls a binary extension handler.
-func HandleExtension(context *Context, in interface{}, extensionName string) (bool, *any.Any, error) {
+func HandleExtension(context *Context, in *yaml.Node, extensionName string) (bool, *any.Any, error) {
 	handled := false
 	var errFromPlugin error
 	var outFromPlugin *any.Any
@@ -51,10 +51,11 @@ func HandleExtension(context *Context, in interface{}, extensionName string) (bo
 			}
 		}
 	}
+	log.Printf("%s %t %+v", extensionName, handled, outFromPlugin)
 	return handled, outFromPlugin, errFromPlugin
 }
 
-func (extensionHandlers *ExtensionHandler) handle(in interface{}, extensionName string) (*any.Any, error) {
+func (extensionHandlers *ExtensionHandler) handle(in *yaml.Node, extensionName string) (*any.Any, error) {
 	if extensionHandlers.Name != "" {
 		binary, _ := yaml.Marshal(in)
 
@@ -74,9 +75,11 @@ func (extensionHandlers *ExtensionHandler) handle(in interface{}, extensionName 
 
 		requestBytes, _ := proto.Marshal(request)
 		cmd := exec.Command(extensionHandlers.Name)
+		log.Printf("calling %s", extensionHandlers.Name)
+		log.Printf("with request %+v", request)
 		cmd.Stdin = bytes.NewReader(requestBytes)
 		output, err := cmd.Output()
-
+		log.Printf("output %+v", output)
 		if err != nil {
 			fmt.Printf("Error: %+v\n", err)
 			return nil, err
@@ -88,6 +91,7 @@ func (extensionHandlers *ExtensionHandler) handle(in interface{}, extensionName 
 			fmt.Printf("%s\n", string(output))
 			return nil, err
 		}
+		log.Printf("response %+v", response)
 		if !response.Handled {
 			return nil, nil
 		}

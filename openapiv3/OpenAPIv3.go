@@ -65,7 +65,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	errors := make([]error, 0)
 	x := &Any{}
-	bytes, _ := yaml.Marshal(in)
+	bytes := compiler.Marshal(in.(*yaml.Node))
 	x.Yaml = string(bytes)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -161,7 +161,7 @@ func NewCallback(in interface{}, context *compiler.Context) (*Callback, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -363,7 +363,7 @@ func NewComponents(in interface{}, context *compiler.Context) (*Components, erro
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -441,7 +441,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -551,7 +551,7 @@ func NewDiscriminator(in interface{}, context *compiler.Context) (*Discriminator
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -701,7 +701,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -797,7 +797,7 @@ func NewEncoding(in interface{}, context *compiler.Context) (*Encoding, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -914,7 +914,7 @@ func NewExample(in interface{}, context *compiler.Context) (*Example, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -1027,7 +1027,7 @@ func NewExpression(in interface{}, context *compiler.Context) (*Expression, erro
 					if err != nil {
 						errors = append(errors, err)
 					} else {
-						bytes, _ := yaml.Marshal(v)
+						bytes := compiler.Marshal(v)
 						result.Yaml = string(bytes)
 						result.Value = resultFromExt
 						pair.Value = result
@@ -1101,7 +1101,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -1251,7 +1251,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -1441,7 +1441,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -1535,7 +1535,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -1640,7 +1640,7 @@ func NewLink(in interface{}, context *compiler.Context) (*Link, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -1797,7 +1797,7 @@ func NewMediaType(in interface{}, context *compiler.Context) (*MediaType, error)
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -2522,7 +2522,7 @@ func NewOauthFlow(in interface{}, context *compiler.Context) (*OauthFlow, error)
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -2609,7 +2609,7 @@ func NewOauthFlows(in interface{}, context *compiler.Context) (*OauthFlows, erro
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -2652,7 +2652,7 @@ func NewObject(in interface{}, context *compiler.Context) (*Object, error) {
 					if err != nil {
 						errors = append(errors, err)
 					} else {
-						bytes, _ := yaml.Marshal(v)
+						bytes := compiler.Marshal(v)
 						result.Yaml = string(bytes)
 						result.Value = resultFromExt
 						pair.Value = result
@@ -2839,7 +2839,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -3013,7 +3013,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -3265,7 +3265,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -3335,7 +3335,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -3507,7 +3507,7 @@ func NewRequestBody(in interface{}, context *compiler.Context) (*RequestBody, er
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -3640,7 +3640,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -3759,7 +3759,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -4203,7 +4203,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -4432,7 +4432,7 @@ func NewSecurityScheme(in interface{}, context *compiler.Context) (*SecuritySche
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -4586,7 +4586,7 @@ func NewServer(in interface{}, context *compiler.Context) (*Server, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -4672,7 +4672,7 @@ func NewServerVariable(in interface{}, context *compiler.Context) (*ServerVariab
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -4864,7 +4864,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -4960,7 +4960,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 						if err != nil {
 							errors = append(errors, err)
 						} else {
-							bytes, _ := yaml.Marshal(v)
+							bytes := compiler.Marshal(v)
 							result.Yaml = string(bytes)
 							result.Value = resultFromExt
 							pair.Value = result
@@ -6659,7 +6659,12 @@ func (m *Any) ToRawInfo() *yaml.Node {
 	var node yaml.Node
 	err = yaml.Unmarshal([]byte(m.Yaml), &node)
 	if err == nil {
+		if node.Kind == yaml.DocumentNode {
+			return node.Content[0]
+		}
 		return &node
+	} else {
+		return nil
 	}
 	return nil
 }

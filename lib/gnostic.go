@@ -521,6 +521,12 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 		document := message.(*discovery_v1.Document)
 		rawInfo = document.ToRawInfo()
 	}
+	if rawInfo.Kind != yaml.DocumentNode {
+		rawInfo = &yaml.Node{
+			Kind:    yaml.DocumentNode,
+			Content: []*yaml.Node{rawInfo},
+		}
+	}
 	// Optionally write description in yaml format.
 	if g.yamlOutputPath != "" {
 		var bytes []byte
@@ -528,6 +534,7 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 			bytes, err = yaml.Marshal(rawInfo)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating yaml output %s\n", err.Error())
+				fmt.Fprintf(os.Stderr, "info %+v", rawInfo)
 			}
 			writeFile(g.yamlOutputPath, bytes, g.sourceName, "yaml")
 		} else {

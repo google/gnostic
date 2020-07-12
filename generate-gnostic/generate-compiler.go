@@ -195,7 +195,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		}
 	} else if typeModel.IsBlob {
 		code.Print("x := &Any{}")
-		code.Print("bytes, _ := yaml.Marshal(in)")
+		code.Print("bytes := compiler.Marshal(in.(*yaml.Node))")
 		code.Print("x.Yaml = string(bytes)")
 	} else if typeModel.Name == "StringArray" {
 		code.Print("x := &StringArray{}")
@@ -588,7 +588,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("	if err != nil {")
 						code.Print("		errors = append(errors, err)")
 						code.Print("	} else {")
-						code.Print("		bytes, _ := yaml.Marshal(v)")
+						code.Print("		bytes := compiler.Marshal(v)")
 						code.Print("		result.Yaml = string(bytes)")
 						code.Print("		result.Value = resultFromExt")
 						code.Print("		pair.Value = result")
@@ -759,7 +759,14 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 		code.Print("var err error")
 		code.Print("var node yaml.Node")
 		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &node)")
-		code.Print("if err == nil {return &node}")
+		code.Print("if err == nil {")
+		code.Print("	if node.Kind == yaml.DocumentNode {")
+		code.Print("		return node.Content[0]")
+		code.Print("	}")
+		code.Print("	return &node")
+		code.Print("} else {")
+		code.Print("	return nil")
+		code.Print("}")
 		code.Print("return nil")
 	} else if typeName == "StringArray" {
 		code.Print("return compiler.NewSequenceNodeForStringArray(m.Value)")

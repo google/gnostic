@@ -45,6 +45,10 @@ func (w *writer) writeString(s string) {
 }
 
 func (w *writer) writeMap(node *yaml.Node, indent string) {
+	if node.Kind == yaml.DocumentNode {
+		w.writeMap(node.Content[0], indent)
+		return
+	}
 	if node.Kind != yaml.MappingNode {
 		w.writeString(fmt.Sprintf("invalid node for map: %+v", node))
 		return
