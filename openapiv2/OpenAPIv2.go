@@ -151,7 +151,7 @@ func NewApiKeySecurity(in *yaml.Node, context *compiler.Context) (*ApiKeySecurit
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -232,7 +232,7 @@ func NewBasicAuthenticationSecurity(in *yaml.Node, context *compiler.Context) (*
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -340,7 +340,7 @@ func NewBodyParameter(in *yaml.Node, context *compiler.Context) (*BodyParameter,
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -418,7 +418,7 @@ func NewContact(in *yaml.Node, context *compiler.Context) (*Contact, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -461,7 +461,7 @@ func NewDefault(in *yaml.Node, context *compiler.Context) (*Default, error) {
 				pair := &NamedAny{}
 				pair.Name = k
 				result := &Any{}
-				handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+				handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 				if handled {
 					if err != nil {
 						errors = append(errors, err)
@@ -714,7 +714,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -757,7 +757,7 @@ func NewExamples(in *yaml.Node, context *compiler.Context) (*Examples, error) {
 				pair := &NamedAny{}
 				pair.Name = k
 				result := &Any{}
-				handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+				handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 				if handled {
 					if err != nil {
 						errors = append(errors, err)
@@ -831,7 +831,7 @@ func NewExternalDocs(in *yaml.Node, context *compiler.Context) (*ExternalDocs, e
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -977,7 +977,7 @@ func NewFileSchema(in *yaml.Node, context *compiler.Context) (*FileSchema, error
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -1265,7 +1265,7 @@ func NewFormDataParameterSubSchema(in *yaml.Node, context *compiler.Context) (*F
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -1517,7 +1517,7 @@ func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -1796,7 +1796,7 @@ func NewHeaderParameterSubSchema(in *yaml.Node, context *compiler.Context) (*Hea
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -1937,7 +1937,7 @@ func NewInfo(in *yaml.Node, context *compiler.Context) (*Info, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -2068,7 +2068,7 @@ func NewLicense(in *yaml.Node, context *compiler.Context) (*License, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -2639,7 +2639,7 @@ func NewOauth2AccessCodeSecurity(in *yaml.Node, context *compiler.Context) (*Oau
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -2753,7 +2753,7 @@ func NewOauth2ApplicationSecurity(in *yaml.Node, context *compiler.Context) (*Oa
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -2867,7 +2867,7 @@ func NewOauth2ImplicitSecurity(in *yaml.Node, context *compiler.Context) (*Oauth
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -2981,7 +2981,7 @@ func NewOauth2PasswordSecurity(in *yaml.Node, context *compiler.Context) (*Oauth
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -3200,7 +3200,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -3449,7 +3449,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -3734,7 +3734,7 @@ func NewPathParameterSubSchema(in *yaml.Node, context *compiler.Context) (*PathP
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -3785,7 +3785,7 @@ func NewPaths(in *yaml.Node, context *compiler.Context) (*Paths, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -4041,7 +4041,7 @@ func NewPrimitivesItems(in *yaml.Node, context *compiler.Context) (*PrimitivesIt
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -4359,7 +4359,7 @@ func NewQueryParameterSubSchema(in *yaml.Node, context *compiler.Context) (*Quer
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -4452,7 +4452,7 @@ func NewResponse(in *yaml.Node, context *compiler.Context) (*Response, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -4592,7 +4592,7 @@ func NewResponses(in *yaml.Node, context *compiler.Context) (*Responses, error) 
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -4947,7 +4947,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -5239,7 +5239,7 @@ func NewTag(in *yaml.Node, context *compiler.Context) (*Tag, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)
@@ -5310,7 +5310,7 @@ func NewVendorExtension(in *yaml.Node, context *compiler.Context) (*VendorExtens
 				pair := &NamedAny{}
 				pair.Name = k
 				result := &Any{}
-				handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+				handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 				if handled {
 					if err != nil {
 						errors = append(errors, err)
@@ -5405,7 +5405,7 @@ func NewXml(in *yaml.Node, context *compiler.Context) (*Xml, error) {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
-					handled, resultFromExt, err := compiler.HandleExtension(context, v, k)
+					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
 						if err != nil {
 							errors = append(errors, err)

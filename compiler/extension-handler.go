@@ -33,8 +33,8 @@ type ExtensionHandler struct {
 	Name string
 }
 
-// HandleExtension calls a binary extension handler.
-func HandleExtension(context *Context, in *yaml.Node, extensionName string) (bool, *any.Any, error) {
+// CallExtension calls a binary extension handler.
+func CallExtension(context *Context, in *yaml.Node, extensionName string) (bool, *any.Any, error) {
 	handled := false
 	var errFromPlugin error
 	var outFromPlugin *any.Any

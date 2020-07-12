@@ -568,7 +568,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("pair.Value, _ = compiler.StringForScalarNode(v)")
 					} else if mapTypeName == "Any" {
 						code.Print("result := &Any{}")
-						code.Print("handled, resultFromExt, err := compiler.HandleExtension(context, v, k)")
+						code.Print("handled, resultFromExt, err := compiler.CallExtension(context, v, k)")
 						code.Print("if handled {")
 						code.Print("	if err != nil {")
 						code.Print("		errors = append(errors, err)")
@@ -584,7 +584,6 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("		errors = append(errors, err)")
 						code.Print("	}")
 						code.Print("}")
-
 					} else {
 						code.Print("var err error")
 						code.Print("pair.Value, err = New%s(v, compiler.NewContext(k, context))", mapTypeName)
