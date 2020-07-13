@@ -18,11 +18,10 @@ package openapi_v2
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
-
 	"github.com/googleapis/gnostic/compiler"
 	"gopkg.in/yaml.v3"
+	"regexp"
+	"strings"
 )
 
 // Version returns the package name (and OpenAPI version).
@@ -418,7 +417,6 @@ func NewContact(in *yaml.Node, context *compiler.Context) (*Contact, error) {
 				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
-					pair.Value = compiler.HandleExtension()
 					result := &Any{}
 					handled, resultFromExt, err := compiler.CallExtension(context, v, k)
 					if handled {
