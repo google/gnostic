@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,22 +66,27 @@ const additionalCompilerCodeWithMain = "" +
 
 const caseStringForObjectTypes = "\n" +
 	"case \"%s\":\n" +
-	"var info yaml.MapSlice\n" +
+	"var info yaml.Node\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
-	"newObject, err := %s.New%s(info, compiler.NewContext(\"$root\", nil))\n" +
+	"info = *info.Content[0]\n" +
+	"newObject, err := %s.New%s(&info, compiler.NewContext(\"$root\", nil))\n" +
 	"return true, newObject, err"
 
 const caseStringForWrapperTypes = "\n" +
 	"case \"%s\":\n" +
-	"var info %s\n" +
+	"var info yaml.Node\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
-	"newObject := &wrappers.%s{Value: info}\n" +
+	"v, ok := compiler.%sForScalarNode(&info)\n" +
+	"if !ok {\n" +
+	"	return true, nil, nil\n" +
+	"}\n" +
+	"newObject := &wrappers.%s{Value: v}\n" +
 	"return true, newObject, nil"
 
 // generateMainFile generates the main program for an extension.
@@ -132,10 +137,10 @@ type primitiveTypeInfo struct {
 }
 
 var supportedPrimitiveTypeInfos = map[string]primitiveTypeInfo{
-	"string":  primitiveTypeInfo{goTypeName: "string", wrapperProtoName: "StringValue"},
-	"number":  primitiveTypeInfo{goTypeName: "float64", wrapperProtoName: "DoubleValue"},
-	"integer": primitiveTypeInfo{goTypeName: "int64", wrapperProtoName: "Int64Value"},
-	"boolean": primitiveTypeInfo{goTypeName: "bool", wrapperProtoName: "BoolValue"},
+	"string":  primitiveTypeInfo{goTypeName: "String", wrapperProtoName: "StringValue"},
+	"number":  primitiveTypeInfo{goTypeName: "Float", wrapperProtoName: "DoubleValue"},
+	"integer": primitiveTypeInfo{goTypeName: "Int", wrapperProtoName: "Int64Value"},
+	"boolean": primitiveTypeInfo{goTypeName: "Bool", wrapperProtoName: "BoolValue"},
 	// TODO: Investigate how to support arrays. For now users will not be allowed to
 	// create extension handlers for arrays and they will have to use the
 	// plane yaml string as is.
@@ -268,7 +273,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"regexp",
 		"strings",
 		"github.com/googleapis/gnostic/compiler",
-		"gopkg.in/yaml.v2",
+		"gopkg.in/yaml.v3",
 	})
 	goFilename := path.Join(protoOutDirectory, outFileBaseName+".go")
 	err = ioutil.WriteFile(goFilename, []byte(compiler), 0644)
@@ -294,10 +299,16 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	var cases string
 	for _, extensionName := range extensionNameKeys {
 		if extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo == nil {
-			cases += fmt.Sprintf(caseStringForObjectTypes, extensionName, goPackageName, extensionNameToMessageName[extensionName].schemaName)
+			cases += fmt.Sprintf(caseStringForObjectTypes,
+				extensionName,
+				goPackageName,
+				extensionNameToMessageName[extensionName].schemaName)
 		} else {
 			wrapperTypeIncluded = true
-			cases += fmt.Sprintf(caseStringForWrapperTypes, extensionName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
+			cases += fmt.Sprintf(caseStringForWrapperTypes,
+				extensionName,
+				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName,
+				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
 		}
 
 	}
@@ -306,7 +317,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"github.com/golang/protobuf/proto",
 		"github.com/googleapis/gnostic/extensions",
 		"github.com/googleapis/gnostic/compiler",
-		"gopkg.in/yaml.v2",
+		"gopkg.in/yaml.v3",
 		outDirRelativeToPackageRoot + "/" + "proto",
 	}
 	if wrapperTypeIncluded {

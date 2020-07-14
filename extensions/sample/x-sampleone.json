@@ -47,7 +47,7 @@
                     "id": "x-sampleone-mysimpleboolean"
                 },
                 "PrimitiveInt64": {
-                    "type": "string",
+                    "type": "integer",
                     "id": "x-sampleone-mysimpleint64"
                 }
 

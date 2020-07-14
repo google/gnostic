@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import (
 
 // License is the software license applied to generated code.
 const License = "" +
-	"// Copyright 2017 Google Inc. All Rights Reserved.\n" +
+	"// Copyright 2020 Google LLC. All Rights Reserved.\n" +
 	"//\n" +
 	"// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
 	"// you may not use this file except in compliance with the License.\n" +
@@ -190,7 +190,7 @@ func generateOpenAPIModel(version string) error {
 
 	packageImports := []string{
 		"fmt",
-		"gopkg.in/yaml.v2",
+		"gopkg.in/yaml.v3",
 		"strings",
 		"regexp",
 		"github.com/googleapis/gnostic/compiler",

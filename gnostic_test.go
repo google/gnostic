@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ func TestJSONOutput(t *testing.T) {
 	// Verify that both models have the same internal representation.
 	err = exec.Command("diff", textFile, textFile2).Run()
 	if err != nil {
-		t.Logf("Diff failed: %+v", err)
+		t.Logf("Diff failed (%s vs %s): %+v", textFile, textFile2, err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up

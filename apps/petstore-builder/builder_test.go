@@ -57,7 +57,7 @@ func testBuilder(version string, t *testing.T) {
 	// Verify that the generated text matches our reference.
 	err = exec.Command("diff", textFile, textReference).Run()
 	if err != nil {
-		t.Logf("Diff failed: %+v", err)
+		t.Logf("Diff %s vs %s failed: %+v", textFile, textReference, err)
 		t.FailNow()
 	}
 
