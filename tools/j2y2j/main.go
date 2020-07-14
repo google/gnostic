@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/googleapis/gnostic/jsonschema"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/googleapis/gnostic/jsonschema"
+	"gopkg.in/yaml.v3"
 )
 
 func usage() {
@@ -29,6 +30,14 @@ func usage() {
 	fmt.Printf("where [filename] is a path to a JSON or YAML file to convert\n")
 	fmt.Printf("and --json or --yaml indicates conversion to the corresponding format.\n")
 	os.Exit(0)
+}
+
+func dump(node *yaml.Node, indent string) {
+	node.Style = 0
+	fmt.Printf("%s%s: %+v\n", indent, node.Value, node)
+	for _, c := range node.Content {
+		dump(c, indent+"  ")
+	}
 }
 
 func main() {
@@ -41,15 +50,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var info yaml.MapSlice
-	err = yaml.Unmarshal(file, &info)
+	var node yaml.Node
+	err = yaml.Unmarshal(file, &node)
+
+	dump(&node, "")
 
 	switch os.Args[2] {
 	case "--json":
-		result := jsonschema.Render(info)
+		result := jsonschema.Render(&node)
 		fmt.Printf("%s", result)
 	case "--yaml":
-		result, err := yaml.Marshal(info)
+		result, err := yaml.Marshal(&node)
 		if err != nil {
 			panic(err)
 		}
