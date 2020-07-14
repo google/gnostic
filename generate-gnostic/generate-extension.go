@@ -61,7 +61,7 @@ const additionalCompilerCodeWithMain = "" +
 	"}\n" +
 	"\n" +
 	"func main() {\n" +
-	"	openapiextension_v1.ProcessExtension(handleExtension)\n" +
+	"	gnostic_extension_v1.Main(handleExtension)\n" +
 	"}\n"
 
 const caseStringForObjectTypes = "\n" +
@@ -334,7 +334,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", mainFileName).Run()
 }
 
-func processExtensionGenCommandline(usage string) error {
+func MainGenCommandline(usage string) error {
 
 	outDir := ""
 	schameFile := ""

@@ -14,8 +14,9 @@
 
 syntax = "proto3";
 
+package gnostic.extension.v1;
+
 import "google/protobuf/any.proto";
-package openapiextension.v1;
 
 // This option lets the proto compiler generate Java code inside the package
 // name (see below) instead of inside an outer class. It creates a simpler
@@ -40,7 +41,7 @@ option java_package = "org.gnostic.v1";
 option objc_class_prefix = "OAE"; // "OpenAPI Extension"
 
 // The Go package name.
-option go_package = "extensions;openapiextension_v1";
+option go_package = "extensions;gnostic_extension_v1";
 
 // The version number of OpenAPI compiler.
 message Version {
@@ -69,7 +70,7 @@ message ExtensionHandlerResponse {
   // true if the extension is handled by the extension handler; false otherwise
   bool handled = 1;
 
-  // Error message.  If non-empty, the extension handling failed.
+  // Error message(s).  If non-empty, the extension handling failed.
   // The extension handler process should exit with status code zero
   // even if it reports an error in this way.
   //
@@ -78,7 +79,7 @@ message ExtensionHandlerResponse {
   // itself -- such as the input Document being unparseable -- should be
   // reported by writing a message to stderr and exiting with a non-zero
   // status code.
-  repeated string error = 2;
+  repeated string errors = 2;
 
   // text output
   google.protobuf.Any value = 3;

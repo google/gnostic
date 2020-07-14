@@ -258,7 +258,7 @@ func main() {
 			fmt.Printf("%+v\n", err)
 		}
 	} else if generateExtensions {
-		err := processExtensionGenCommandline(usage())
+		err := MainGenCommandline(usage())
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
