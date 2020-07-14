@@ -139,7 +139,6 @@ func fillMessageProtoStructureIBM(lint IBMLint) []*Message {
 		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
-
 	return messages
 }
 
