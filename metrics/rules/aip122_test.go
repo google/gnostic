@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+package rules
 
-syntax = "proto3";
+import (
+	"testing"
+)
 
-package linter;
+func TestNameSuffix(t *testing.T) {
+	if pass, suggestion := checkNameSuffix("author_name"); !pass {
+		t.Error("Given \"author_name\", checkNameSuffix() returned false, expected true")
+	} else if suggestion != "author" {
+		t.Errorf("Expected suggestion \"author\", received %s instead", suggestion)
+	}
 
-// The Go package name.
-option go_package = ".;linter";
+	if pass, suggestion := checkNameSuffix("author"); pass {
+		t.Error("Given \"author\", checkNameSuffix() returned true, expected false")
+	} else if suggestion != "author" {
+		t.Errorf("Expected suggestion \"author\", received %s instead", suggestion)
+	}
 
-message Message{
-    string type = 1;
-    string message = 2;
-    string suggestion = 3;
-    repeated string keys = 4;
-    int32 line = 5;
-}
-
-message Linter{
-    repeated Message messages = 1;
 }

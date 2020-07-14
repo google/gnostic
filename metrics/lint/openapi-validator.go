@@ -1,4 +1,4 @@
-package lint
+package linter
 
 import (
 	"encoding/json"
@@ -10,7 +10,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type Lint struct {
+//The Lint struct is used to parse the structured json data from the IBM linter output.
+//Documentation for IBM's openapi-validator results: https://github.com/IBM/openapi-validator#validation-results
+type IBMLint struct {
 	LinterErrors   ErrorResult   `json:"errors"`
 	LinterWarnings WarningResult `json:"warnings"`
 }
@@ -61,87 +63,86 @@ func writePb(v *Linter) {
 	}
 }
 
-func addToMessages(mtype string, message string, path string, line int) *Message {
+func addToMessages(mtype string, message string, path []string, line int) *Message {
 	temp := &Message{
 		Type:    mtype,
 		Message: message,
-		Path:    path,
+		Keys:    path,
 		Line:    int32(line),
 	}
 	return temp
 }
 
-func fillMessageProtoStructureIBM(lint Lint) []*Message {
+func fillMessageProtoStructureIBM(lint IBMLint) []*Message {
 	messages := make([]*Message, 0)
 	for _, v := range lint.LinterErrors.Parameters {
-		temp := addToMessages("Error", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Error", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterErrors.PathsIBM {
-		temp := addToMessages("Error", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Error", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterErrors.Paths {
-		temp := addToMessages("Error", v.Message, v.Path, v.Line)
+		temp := addToMessages("Error", v.Message, strings.Split(v.Path, "."), v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterErrors.Schemas {
-		temp := addToMessages("Error", v.Message, strings.Join(v.Path, "."), v.Line)
-		messages = append(messages, temp)
-	}
-	for _, v := range lint.LinterErrors.FormData {
 		temp := addToMessages("Error", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
+	for _, v := range lint.LinterErrors.FormData {
+		temp := addToMessages("Error", v.Message, strings.Split(v.Path, "."), v.Line)
+		messages = append(messages, temp)
+	}
 	for _, v := range lint.LinterErrors.WalkerIBM {
-		temp := addToMessages("Error", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Error", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.OperationID {
-		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
+		temp := addToMessages("Warning", v.Message, strings.Split(v.Path, "."), v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.OperationsShared {
-		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
+		temp := addToMessages("Warning", v.Message, strings.Split(v.Path, "."), v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.Refs {
-		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
+		temp := addToMessages("Warning", v.Message, strings.Split(v.Path, "."), v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.Schemas {
-		temp := addToMessages("Warning", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.PathsIBM {
-		temp := addToMessages("Warning", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.WalkerIBM {
-		temp := addToMessages("Warning", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.CircularIBM {
-		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
+		temp := addToMessages("Warning", v.Message, strings.Split(v.Path, "."), v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.Operations {
-		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
+		temp := addToMessages("Warning", v.Message, strings.Split(v.Path, "."), v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.Responses {
-		temp := addToMessages("Warning", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
 	for _, v := range lint.LinterWarnings.ParametersIBM {
-		temp := addToMessages("Warning", v.Message, strings.Join(v.Path, "."), v.Line)
+		temp := addToMessages("Warning", v.Message, v.Path, v.Line)
 		messages = append(messages, temp)
 	}
-
 	return messages
 }
 
-func openAndReadJSON(filename string) Lint {
+func openAndReadJSON(filename string) IBMLint {
 	jsonFile, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
@@ -149,7 +150,7 @@ func openAndReadJSON(filename string) Lint {
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var lint Lint
+	var lint IBMLint
 
 	json.Unmarshal(byteValue, &lint)
 
@@ -161,7 +162,7 @@ func LintIBM(filename string) {
 	messages := fillMessageProtoStructureIBM(lint)
 
 	linterResult := &Linter{
-		LinterResults: messages,
+		Messages: messages,
 	}
 
 	writePb(linterResult)
