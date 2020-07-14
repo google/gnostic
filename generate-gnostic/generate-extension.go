@@ -152,8 +152,8 @@ type generatedTypeInfo struct {
 	optionalPrimitiveTypeInfo *primitiveTypeInfo
 }
 
-// GenerateExtension generates the implementation of an extension.
-func GenerateExtension(schemaFile string, outDir string) error {
+// generateExtension generates the implementation of an extension.
+func generateExtension(schemaFile string, outDir string) error {
 	outFileBaseName := getBaseFileNameWithoutExt(schemaFile)
 	extensionNameWithoutXDashPrefix := outFileBaseName[len("x-"):]
 	outDir = path.Join(outDir, "gnostic-x-"+extensionNameWithoutXDashPrefix)
@@ -334,10 +334,10 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", mainFileName).Run()
 }
 
-func MainGenCommandline(usage string) error {
+func generateExtensions() error {
 
 	outDir := ""
-	schameFile := ""
+	schemaFile := ""
 
 	extParamRegex, _ := regexp.Compile("--(.+)=(.+)")
 
@@ -353,31 +353,31 @@ func MainGenCommandline(usage string) error {
 			case "out_dir":
 				outDir = flagValue
 			default:
-				fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+				fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 				os.Exit(-1)
 			}
 		} else if arg == "--extension" {
 			continue
 		} else if arg[0] == '-' {
-			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 			os.Exit(-1)
 		} else {
-			schameFile = arg
+			schemaFile = arg
 		}
 	}
 
-	if schameFile == "" {
-		fmt.Printf("No input json schema specified.\n%s\n", usage)
+	if schemaFile == "" {
+		fmt.Printf("No input json schema specified.\n%s\n", usage())
 		os.Exit(-1)
 	}
 	if outDir == "" {
-		fmt.Printf("Missing output directive.\n%s\n", usage)
+		fmt.Printf("Missing output directive.\n%s\n", usage())
 		os.Exit(-1)
 	}
-	if !strings.HasPrefix(getBaseFileNameWithoutExt(schameFile), "x-") {
-		fmt.Printf("Schema file name has to start with 'x-'.\n%s\n", usage)
+	if !strings.HasPrefix(getBaseFileNameWithoutExt(schemaFile), "x-") {
+		fmt.Printf("Schema file name has to start with 'x-'.\n%s\n", usage())
 		os.Exit(-1)
 	}
 
-	return GenerateExtension(schameFile, outDir)
+	return generateExtension(schemaFile, outDir)
 }

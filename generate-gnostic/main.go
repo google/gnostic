@@ -231,7 +231,7 @@ Options:
 
 func main() {
 	var openapiVersion = ""
-	var generateExtensions = false
+	var shouldGenerateExtensions = false
 
 	for i, arg := range os.Args {
 		if i == 0 {
@@ -244,7 +244,7 @@ func main() {
 		} else if arg == "--discovery" {
 			openapiVersion = "discovery"
 		} else if arg == "--extension" {
-			generateExtensions = true
+			shouldGenerateExtensions = true
 			break
 		} else {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
@@ -257,8 +257,8 @@ func main() {
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
-	} else if generateExtensions {
-		err := MainGenCommandline(usage())
+	} else if shouldGenerateExtensions {
+		err := generateExtensions()
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
