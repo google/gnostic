@@ -1,4 +1,4 @@
-package lint
+package linter
 
 import (
 	"bufio"
@@ -47,7 +47,7 @@ func LintSpectral(filename string) {
 	output := openAndReadTxt(filename)
 	messages := parseOutput(output)
 	linterResult := &Linter{
-		LinterResults: messages,
+		Messages: messages,
 	}
 	writePb(linterResult)
 }
