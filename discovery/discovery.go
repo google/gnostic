@@ -2163,7 +2163,6 @@ func (m *Auth) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("oauth2"))
 		info.Content = append(info.Content, m.Oauth2.ToRawInfo())
 	}
-	// &{Name:oauth2 Type:Oauth2 StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -2207,7 +2206,6 @@ func (m *Document) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("icons"))
 		info.Content = append(info.Content, m.Icons.ToRawInfo())
 	}
-	// &{Name:icons Type:Icons StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.DocumentationLink != "" {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("documentationLink"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.DocumentationLink))
@@ -2244,12 +2242,10 @@ func (m *Document) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameters"))
 		info.Content = append(info.Content, m.Parameters.ToRawInfo())
 	}
-	// &{Name:parameters Type:Parameters StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Auth != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("auth"))
 		info.Content = append(info.Content, m.Auth.ToRawInfo())
 	}
-	// &{Name:auth Type:Auth StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if len(m.Features) != 0 {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("features"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Features))
@@ -2258,17 +2254,14 @@ func (m *Document) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("schemas"))
 		info.Content = append(info.Content, m.Schemas.ToRawInfo())
 	}
-	// &{Name:schemas Type:Schemas StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Methods != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("methods"))
 		info.Content = append(info.Content, m.Methods.ToRawInfo())
 	}
-	// &{Name:methods Type:Methods StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Resources != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("resources"))
 		info.Content = append(info.Content, m.Resources.ToRawInfo())
 	}
-	// &{Name:resources Type:Resources StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Etag != "" {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("etag"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Etag))
@@ -2337,7 +2330,6 @@ func (m *MediaUpload) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("protocols"))
 		info.Content = append(info.Content, m.Protocols.ToRawInfo())
 	}
-	// &{Name:protocols Type:Protocols StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.SupportsSubscription != false {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsSubscription"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsSubscription))
@@ -2371,7 +2363,6 @@ func (m *Method) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameters"))
 		info.Content = append(info.Content, m.Parameters.ToRawInfo())
 	}
-	// &{Name:parameters Type:Parameters StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if len(m.ParameterOrder) != 0 {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("parameterOrder"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.ParameterOrder))
@@ -2380,12 +2371,10 @@ func (m *Method) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("request"))
 		info.Content = append(info.Content, m.Request.ToRawInfo())
 	}
-	// &{Name:request Type:Request StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Response != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("response"))
 		info.Content = append(info.Content, m.Response.ToRawInfo())
 	}
-	// &{Name:response Type:Response StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if len(m.Scopes) != 0 {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("scopes"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Scopes))
@@ -2406,7 +2395,6 @@ func (m *Method) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("mediaUpload"))
 		info.Content = append(info.Content, m.MediaUpload.ToRawInfo())
 	}
-	// &{Name:mediaUpload Type:MediaUpload StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.SupportsSubscription != false {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsSubscription"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsSubscription))
@@ -2434,7 +2422,6 @@ func (m *Methods) ToRawInfo() *yaml.Node {
 			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
-	// &{Name:additionalProperties Type:NamedMethod StringEnumValues:[] MapType:Method Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
@@ -2518,7 +2505,6 @@ func (m *Oauth2) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("scopes"))
 		info.Content = append(info.Content, m.Scopes.ToRawInfo())
 	}
-	// &{Name:scopes Type:Scopes StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -2588,22 +2574,18 @@ func (m *Parameter) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("properties"))
 		info.Content = append(info.Content, m.Properties.ToRawInfo())
 	}
-	// &{Name:properties Type:Schemas StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.AdditionalProperties != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("additionalProperties"))
 		info.Content = append(info.Content, m.AdditionalProperties.ToRawInfo())
 	}
-	// &{Name:additionalProperties Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("items"))
 		info.Content = append(info.Content, m.Items.ToRawInfo())
 	}
-	// &{Name:items Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Annotations != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("annotations"))
 		info.Content = append(info.Content, m.Annotations.ToRawInfo())
 	}
-	// &{Name:annotations Type:Annotations StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -2619,7 +2601,6 @@ func (m *Parameters) ToRawInfo() *yaml.Node {
 			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
-	// &{Name:additionalProperties Type:NamedParameter StringEnumValues:[] MapType:Parameter Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
@@ -2633,12 +2614,10 @@ func (m *Protocols) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("simple"))
 		info.Content = append(info.Content, m.Simple.ToRawInfo())
 	}
-	// &{Name:simple Type:Simple StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Resumable != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("resumable"))
 		info.Content = append(info.Content, m.Resumable.ToRawInfo())
 	}
-	// &{Name:resumable Type:Resumable StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -2669,12 +2648,10 @@ func (m *Resource) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("methods"))
 		info.Content = append(info.Content, m.Methods.ToRawInfo())
 	}
-	// &{Name:methods Type:Methods StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Resources != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("resources"))
 		info.Content = append(info.Content, m.Resources.ToRawInfo())
 	}
-	// &{Name:resources Type:Resources StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	return info
 }
 
@@ -2690,7 +2667,6 @@ func (m *Resources) ToRawInfo() *yaml.Node {
 			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
-	// &{Name:additionalProperties Type:NamedResource StringEnumValues:[] MapType:Resource Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
@@ -2786,17 +2762,14 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("properties"))
 		info.Content = append(info.Content, m.Properties.ToRawInfo())
 	}
-	// &{Name:properties Type:Schemas StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.AdditionalProperties != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("additionalProperties"))
 		info.Content = append(info.Content, m.AdditionalProperties.ToRawInfo())
 	}
-	// &{Name:additionalProperties Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.Items != nil {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("items"))
 		info.Content = append(info.Content, m.Items.ToRawInfo())
 	}
-	// &{Name:items Type:Schema StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.XRef != "" {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("$ref"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.XRef))
@@ -2805,7 +2778,6 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("annotations"))
 		info.Content = append(info.Content, m.Annotations.ToRawInfo())
 	}
-	// &{Name:annotations Type:Annotations StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.ReadOnly != false {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("readOnly"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ReadOnly))
@@ -2825,7 +2797,6 @@ func (m *Schemas) ToRawInfo() *yaml.Node {
 			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
-	// &{Name:additionalProperties Type:NamedSchema StringEnumValues:[] MapType:Schema Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
@@ -2854,7 +2825,6 @@ func (m *Scopes) ToRawInfo() *yaml.Node {
 			info.Content = append(info.Content, item.Value.ToRawInfo())
 		}
 	}
-	// &{Name:additionalProperties Type:NamedScope StringEnumValues:[] MapType:Scope Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
