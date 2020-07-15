@@ -111,6 +111,7 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateToRawInfoMethodForType(code, typeName)
 	}
 
+	// generate precompiled regexps for use during parsing
 	domain.generateConstantVariables(code, regexPatterns)
 
 	return code.String()
@@ -204,36 +205,6 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		code.Print("  s, _ := compiler.StringForScalarNode(node)")
 		code.Print("  x.Value = append(x.Value, s)")
 		code.Print("}")
-	} else if typeModel.Name == "Primitive" {
-		code.Print("	x := &Primitive{}")
-		code.Print("	matched := false")
-		code.Print("	switch in.Tag {")
-		code.Print("	case \"!!bool\":")
-		code.Print("        v, matched := compiler.BoolForScalarNode(in)")
-		code.Print("		x.Oneof = &Primitive_Boolean{Boolean: v}")
-		code.Print("	case string:")
-		code.Print("		x.Oneof = &Primitive_String_{String_: in}")
-		code.Print("		matched = true")
-		code.Print("	case int64:")
-		code.Print("		x.Oneof = &Primitive_Integer{Integer: in}")
-		code.Print("		matched = true")
-		code.Print("	case int32:")
-		code.Print("		x.Oneof = &Primitive_Integer{Integer: int64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case int:")
-		code.Print("		x.Oneof = &Primitive_Integer{Integer: int64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case float64:")
-		code.Print("		x.Oneof = &Primitive_Number{Number: in}")
-		code.Print("		matched = true")
-		code.Print("	case float32:")
-		code.Print("		x.Oneof = &Primitive_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	}")
-		code.Print("	if matched {")
-		code.Print("		// since the oneof matched one of its possibilities, discard any matching errors")
-		code.Print("		errors = make([]error, 0)")
-		code.Print("	}")
 	} else if typeModel.Name == "SpecificationExtension" {
 		code.Print("	x := &SpecificationExtension{}")
 		code.Print("	matched := false")
@@ -809,7 +780,8 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForBoolArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			case "int":
@@ -822,7 +794,8 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForIntArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			case "float":
@@ -835,7 +808,8 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForFloatArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			default:
@@ -862,9 +836,7 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 						}
 						code.Print("	items.Content = append(items.Content, item.ToRawInfo())")
 						code.Print("}")
-
 						code.Print("if len(items.Content) == 1 {items = items.Content[0]}")
-
 						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"items\"))")
 						code.Print("info.Content = append(info.Content, items)")
 					} else {
@@ -872,7 +844,6 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 						code.Print("info.Content = append(info.Content, m.%s.ToRawInfo())", propertyModel.FieldName())
 					}
 					code.PrintIf(!isRequired, "}")
-					code.Print("// %+v", propertyModel)
 				} else if propertyModel.MapType == "string" {
 					code.Print("// %+v", propertyModel)
 				} else if propertyModel.MapType != "" {
@@ -882,7 +853,6 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 					code.Print("info.Content = append(info.Content, item.Value.ToRawInfo())")
 					code.Print("}")
 					code.Print("}")
-					code.Print("// %+v", propertyModel)
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
 					code.Print("items := compiler.NewSequenceNode()")
@@ -892,7 +862,6 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
 					code.Print("info.Content = append(info.Content, items)")
 					code.Print("}")
-					code.Print("// %+v", propertyModel)
 				}
 			}
 		}
@@ -907,7 +876,7 @@ func (domain *Domain) generateConstantVariables(code *printer.Code, regexPattern
 		return
 	}
 	var sortedNames []string
-	for name, _ := range names {
+	for name := range names {
 		sortedNames = append(sortedNames, name)
 	}
 	sort.Strings(sortedNames)
