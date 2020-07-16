@@ -17,8 +17,6 @@ package openapi_v2
 import (
 	"io/ioutil"
 	"testing"
-
-	"github.com/googleapis/gnostic/compiler"
 )
 
 func TestParseDocument(t *testing.T) {
@@ -28,12 +26,7 @@ func TestParseDocument(t *testing.T) {
 		t.Logf("unable to read file %s", filename)
 		t.FailNow()
 	}
-	info, err := compiler.ReadInfoFromBytes("", b)
-	if err != nil {
-		t.Logf("unable to parse file %s", filename)
-		t.FailNow()
-	}
-	d, err := NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, nil))
+	d, err := ParseDocument(b)
 	if err != nil {
 		t.Logf("%s", err.Error())
 		t.FailNow()
