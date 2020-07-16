@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openapi_v3
+package discovery_v1
 
 import (
 	"io/ioutil"
@@ -20,7 +20,7 @@ import (
 )
 
 func TestParseDocument(t *testing.T) {
-	filename := "../examples/v3.0/yaml/petstore.yaml"
+	filename := "../examples/discovery/discovery-v1.json"
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		t.Logf("unable to read file %s", filename)
@@ -31,8 +31,18 @@ func TestParseDocument(t *testing.T) {
 		t.Logf("%s", err.Error())
 		t.FailNow()
 	}
-	title := "OpenAPI Petstore"
-	if d.Info.Title != title {
-		t.Errorf("unexpected value for Title: %s (expected %s)", d.Info.Title, title)
+	// expected values
+	name := "discovery"
+	version := "v1"
+	title := "API Discovery Service"
+	// check actual values
+	if d.Name != name {
+		t.Errorf("unexpected value for Name: %s (expected %s)", d.Name, name)
+	}
+	if d.Version != version {
+		t.Errorf("unexpected value for Version: %s (expected %s)", d.Version, version)
+	}
+	if d.Title != title {
+		t.Errorf("unexpected value for Title: %s (expected %s)", d.Title, title)
 	}
 }
