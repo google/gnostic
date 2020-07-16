@@ -172,6 +172,8 @@ func StringForScalarNode(node *yaml.Node) (string, bool) {
 	switch node.Kind {
 	case yaml.ScalarNode:
 		switch node.Tag {
+		case "!!int":
+			return node.Value, true
 		case "!!str":
 			return node.Value, true
 		case "!!null":
