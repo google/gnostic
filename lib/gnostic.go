@@ -454,7 +454,7 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 		}
 		message = document
 	} else {
-		document, err := discovery_v1.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		document, err := discovery_v1.NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
