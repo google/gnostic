@@ -288,3 +288,9 @@ func TestEmptyRequiredFields_v3(t *testing.T) {
 		"examples/v3.0/yaml/empty-v3.yaml",
 		"testdata/v3.0/json/empty-v3.json")
 }
+
+func TestDiscoveryJSON(t *testing.T) {
+	testNormal(t,
+		"examples/discovery/discovery-v1.json",
+		"testdata/discovery/discovery-v1.text")
+}
