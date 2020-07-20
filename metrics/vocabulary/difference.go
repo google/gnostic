@@ -20,32 +20,32 @@ import (
 
 // mapDifference finds the difference between two Vocabularies.
 // This function takes a Vocabulary and checks if the words within
-// the current Vocabulary already exist within the global Vocabulary.
+// the current Vocabulary already exist within the first Vocabulary.
 // If the word exists in both structures it is removed from the
 // Vocabulary structure.
-func mapDifference(v *metrics.Vocabulary) {
+func (vocab *Vocabulary) mapDifference(v *metrics.Vocabulary) {
 	for _, s := range v.Schemas {
-		_, ok := schemas[s.Word]
+		_, ok := vocab.schemas[s.Word]
 		if ok {
-			delete(schemas, s.Word)
+			delete(vocab.schemas, s.Word)
 		}
 	}
 	for _, op := range v.Operations {
-		_, ok := operationID[op.Word]
+		_, ok := vocab.operationID[op.Word]
 		if ok {
-			delete(operationID, op.Word)
+			delete(vocab.operationID, op.Word)
 		}
 	}
 	for _, param := range v.Parameters {
-		_, ok := parameters[param.Word]
+		_, ok := vocab.parameters[param.Word]
 		if ok {
-			delete(parameters, param.Word)
+			delete(vocab.parameters, param.Word)
 		}
 	}
 	for _, prop := range v.Properties {
-		_, ok := properties[prop.Word]
+		_, ok := vocab.properties[prop.Word]
 		if ok {
-			delete(properties, prop.Word)
+			delete(vocab.properties, prop.Word)
 		}
 	}
 }
@@ -53,22 +53,23 @@ func mapDifference(v *metrics.Vocabulary) {
 // Difference implements the difference operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
 // struct which that contains words that were unique to the first Vocabulary in the slice.
-func Difference(vocab []*metrics.Vocabulary) *metrics.Vocabulary {
-	schemas = make(map[string]int)
-	operationID = make(map[string]int)
-	parameters = make(map[string]int)
-	properties = make(map[string]int)
+func Difference(vocabularies []*metrics.Vocabulary) *metrics.Vocabulary {
+	var vocab Vocabulary
+	vocab.schemas = make(map[string]int)
+	vocab.operationID = make(map[string]int)
+	vocab.parameters = make(map[string]int)
+	vocab.properties = make(map[string]int)
 
-	unpackageVocabulary(vocab[0])
-	for i := 1; i < len(vocab); i++ {
-		mapDifference(vocab[i])
+	vocab.unpackageVocabulary(vocabularies[0])
+	for i := 1; i < len(vocabularies); i++ {
+		vocab.mapDifference(vocabularies[i])
 	}
 
 	v := &metrics.Vocabulary{
-		Properties: fillProtoStructure(properties),
-		Schemas:    fillProtoStructure(schemas),
-		Operations: fillProtoStructure(operationID),
-		Parameters: fillProtoStructure(parameters),
+		Schemas:    fillProtoStructures(vocab.schemas),
+		Operations: fillProtoStructures(vocab.operationID),
+		Parameters: fillProtoStructures(vocab.parameters),
+		Properties: fillProtoStructures(vocab.properties),
 	}
 	return v
 }
