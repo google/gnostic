@@ -463,6 +463,10 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	return message, err
 }
 
+func (g *Gnostic) ReadOpenAPIText(bytes []byte) (message proto.Message, err error) {
+	return g.readOpenAPIText(bytes)
+}
+
 // Read an OpenAPI binary file.
 func (g *Gnostic) readOpenAPIBinary(data []byte) (message proto.Message, err error) {
 	// try to read an OpenAPI v3 document
