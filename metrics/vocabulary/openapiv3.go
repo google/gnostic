@@ -1,3 +1,17 @@
+// Copyright 2020 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package vocabulary
 
 import (
@@ -25,47 +39,47 @@ func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func processOperationV3(operation *openapi_v3.Operation, operationID, parameters map[string]int) {
+func (vocab *Vocabulary) processOperationV3(operation *openapi_v3.Operation) {
 	if operation.OperationId != "" {
-		operationID[operation.OperationId]++
+		vocab.operationID[operation.OperationId]++
 	}
 	for _, item := range operation.Parameters {
 		switch t := item.Oneof.(type) {
 		case *openapi_v3.ParameterOrReference_Parameter:
-			parameters[t.Parameter.Name]++
+			vocab.parameters[t.Parameter.Name]++
 		}
 	}
 }
 
-func processComponentsV3(components *openapi_v3.Components, schemas, parameters, properties map[string]int) {
-	processParametersV3(components, schemas, parameters)
-	processSchemasV3(components, schemas, properties)
-	processResponsesV3(components, schemas)
+func (vocab *Vocabulary) processComponentsV3(components *openapi_v3.Components) {
+	vocab.processParametersV3(components)
+	vocab.processSchemasV3(components)
+	vocab.processResponsesV3(components)
 }
 
-func processParametersV3(components *openapi_v3.Components, schemas, parameters map[string]int) {
+func (vocab *Vocabulary) processParametersV3(components *openapi_v3.Components) {
 	if components.Parameters == nil {
 		return
 	}
 	for _, pair := range components.Parameters.AdditionalProperties {
 		switch t := pair.Value.Oneof.(type) {
 		case *openapi_v3.ParameterOrReference_Parameter:
-			parameters[t.Parameter.Name]++
+			vocab.parameters[t.Parameter.Name]++
 		}
 	}
 }
 
-func processSchemasV3(components *openapi_v3.Components, schemas, properties map[string]int) {
+func (vocab *Vocabulary) processSchemasV3(components *openapi_v3.Components) {
 	if components.Schemas == nil {
 		return
 	}
 	for _, pair := range components.Schemas.AdditionalProperties {
-		schemas[pair.Name]++
-		processSchemaV3(pair.Value, properties)
+		vocab.schemas[pair.Name]++
+		vocab.processSchemaV3(pair.Value)
 	}
 }
 
-func processSchemaV3(schema *openapi_v3.SchemaOrReference, properties map[string]int) {
+func (vocab *Vocabulary) processSchemaV3(schema *openapi_v3.SchemaOrReference) {
 	if schema == nil {
 		return
 	}
@@ -75,55 +89,56 @@ func processSchemaV3(schema *openapi_v3.SchemaOrReference, properties map[string
 	case *openapi_v3.SchemaOrReference_Schema:
 		if t.Schema.Properties != nil {
 			for _, pair := range t.Schema.Properties.AdditionalProperties {
-				properties[pair.Name]++
+				vocab.properties[pair.Name]++
 			}
 		}
 	}
 }
 
-func processResponsesV3(components *openapi_v3.Components, schemas map[string]int) {
+func (vocab *Vocabulary) processResponsesV3(components *openapi_v3.Components) {
 	if components.Responses == nil {
 		return
 	}
 	for _, pair := range components.Responses.AdditionalProperties {
-		schemas[pair.Name]++
+		vocab.schemas[pair.Name]++
 	}
 }
 
 func NewVocabularyFromOpenAPIv3(document *openapi_v3.Document) *metrics.Vocabulary {
-	schemas := make(map[string]int)
-	operationID := make(map[string]int)
-	parameters := make(map[string]int)
-	properties := make(map[string]int)
+	var vocab Vocabulary
+	vocab.schemas = make(map[string]int)
+	vocab.operationID = make(map[string]int)
+	vocab.parameters = make(map[string]int)
+	vocab.properties = make(map[string]int)
 
 	if document.Components != nil {
-		processComponentsV3(document.Components, schemas, parameters, properties)
+		vocab.processComponentsV3(document.Components)
 
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperationV3(v.Get, operationID, parameters)
+			vocab.processOperationV3(v.Get)
 		}
 		if v.Post != nil {
-			processOperationV3(v.Post, operationID, parameters)
+			vocab.processOperationV3(v.Post)
 		}
 		if v.Put != nil {
-			processOperationV3(v.Put, operationID, parameters)
+			vocab.processOperationV3(v.Put)
 		}
 		if v.Patch != nil {
-			processOperationV3(v.Patch, operationID, parameters)
+			vocab.processOperationV3(v.Patch)
 		}
 		if v.Delete != nil {
-			processOperationV3(v.Delete, operationID, parameters)
+			vocab.processOperationV3(v.Delete)
 		}
 	}
 
-	vocab := &metrics.Vocabulary{
-		Properties: fillProtoStructures(properties),
-		Schemas:    fillProtoStructures(schemas),
-		Operations: fillProtoStructures(operationID),
-		Parameters: fillProtoStructures(parameters),
+	v := &metrics.Vocabulary{
+		Schemas:    fillProtoStructures(vocab.schemas),
+		Operations: fillProtoStructures(vocab.operationID),
+		Parameters: fillProtoStructures(vocab.parameters),
+		Properties: fillProtoStructures(vocab.properties),
 	}
-	return vocab
+	return v
 }
