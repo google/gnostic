@@ -1,4 +1,4 @@
-package linenumbers
+package sourceinfo
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func recursiveFindLine(node *yaml.Node, keyIndex int, maxDepth int, keys []string) (*yaml.Node, error) {
+func findNode(node *yaml.Node, keyIndex int, maxDepth int, keys []string) (*yaml.Node, error) {
 	for i := 0; i < len(node.Content); i += 2 {
 		key := node.Content[i]
 		val := node.Content[i+1]
@@ -22,9 +22,9 @@ func recursiveFindLine(node *yaml.Node, keyIndex int, maxDepth int, keys []strin
 				if err != nil {
 					return nil, err
 				}
-				return recursiveFindLine(val.Content[nextKeyIndex], keyIndex+2, maxDepth, keys)
+				return findNode(val.Content[nextKeyIndex], keyIndex+2, maxDepth, keys)
 			default:
-				return recursiveFindLine(val, keyIndex+1, maxDepth, keys)
+				return findNode(val, keyIndex+1, maxDepth, keys)
 			}
 		} else {
 			continue
@@ -34,8 +34,8 @@ func recursiveFindLine(node *yaml.Node, keyIndex int, maxDepth int, keys []strin
 	return &yaml.Node{}, nil
 }
 
-// FindYamlLine returns a line number for a field within a yaml file given the path and yaml file.
-func FindYamlLine(filename string, keys []string, token string) (*yaml.Node, error) {
+// FindNode returns a line number for a field within a yaml file given the path and yaml file.
+func FindNode(filename string, keys []string, token string) (*yaml.Node, error) {
 	data, _ := ioutil.ReadFile(filename)
 
 	var node yaml.Node
@@ -44,5 +44,5 @@ func FindYamlLine(filename string, keys []string, token string) (*yaml.Node, err
 		fmt.Printf("%+v", err)
 	}
 	keys = append(keys, token)
-	return recursiveFindLine(node.Content[0], 0, len(keys)-1, keys)
+	return findNode(node.Content[0], 0, len(keys)-1, keys)
 }
