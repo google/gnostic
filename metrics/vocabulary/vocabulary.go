@@ -30,10 +30,12 @@ import (
 These variables were made globally because multiple
 functions will be accessing and mutating them.
 */
-var schemas map[string]int
-var operationID map[string]int
-var parameters map[string]int
-var properties map[string]int
+type Vocabulary struct {
+	schemas     map[string]int
+	operationID map[string]int
+	parameters  map[string]int
+	properties  map[string]int
+}
 
 // WriteCSV converts a Vocabulary pb file to a user-friendly readable CSV file.
 // The format of the CSV file is as follows: "group","word","frequency"
@@ -101,18 +103,18 @@ func fillProtoStructure(m map[string]int) []*metrics.WordCount {
 
 // unpackageVocabulary unravels the Vocabulary struct by converting their
 // fields to maps in order to perform operations on the data.
-func unpackageVocabulary(v *metrics.Vocabulary) {
+func unpackageVocabulary(v *metrics.Vocabulary, vocab *Vocabulary) {
 	for _, s := range v.Schemas {
-		schemas[s.Word] += int(s.Count)
+		vocab.schemas[s.Word] += int(s.Count)
 	}
 	for _, op := range v.Operations {
-		operationID[op.Word] += int(op.Count)
+		vocab.operationID[op.Word] += int(op.Count)
 	}
 	for _, param := range v.Parameters {
-		parameters[param.Word] += int(param.Count)
+		vocab.parameters[param.Word] += int(param.Count)
 	}
 	for _, prop := range v.Properties {
-		properties[prop.Word] += int(prop.Count)
+		vocab.properties[prop.Word] += int(prop.Count)
 	}
 }
 
@@ -120,18 +122,18 @@ func unpackageVocabulary(v *metrics.Vocabulary) {
 // The structures are then combined into one large Vocabulary.
 // This function utilizes the readVocabularyFromFileWithName() function to
 // open the Vocabulary protocol buffers.
-func combineVocabularies() *metrics.Vocabulary {
+func combineVocabularies(vocab *Vocabulary) *metrics.Vocabulary {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
-		readVocabularyFromFileWithName(scanner.Text())
+		readVocabularyFromFileWithName(scanner.Text(), vocab)
 	}
 
 	v := &metrics.Vocabulary{
-		Properties: fillProtoStructure(properties),
-		Schemas:    fillProtoStructure(schemas),
-		Operations: fillProtoStructure(operationID),
-		Parameters: fillProtoStructure(parameters),
+		Properties: fillProtoStructure(vocab.properties),
+		Schemas:    fillProtoStructure(vocab.schemas),
+		Operations: fillProtoStructure(vocab.operationID),
+		Parameters: fillProtoStructure(vocab.parameters),
 	}
 	return v
 
@@ -139,7 +141,7 @@ func combineVocabularies() *metrics.Vocabulary {
 
 // readVocabularyFromFileWithNametakes the filename of a Vocabulary protocol
 // buffer file and parses the wire-format message into a Vocabulary struct.
-func readVocabularyFromFileWithName(filename string) {
+func readVocabularyFromFileWithName(filename string, vocab *Vocabulary) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
@@ -151,7 +153,7 @@ func readVocabularyFromFileWithName(filename string) {
 	if err != nil {
 		panic(err)
 	}
-	unpackageVocabulary(v)
+	unpackageVocabulary(v, vocab)
 }
 
 func isEmpty(v *metrics.Vocabulary) bool {

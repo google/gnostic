@@ -23,60 +23,61 @@ import (
 // the current Vocabulary already exist within the global Vocabulary.
 // If the word exists in both structures it is added to a temp Vocabulary
 // which replaces the old Vocabulary.
-func mapIntersection(v *metrics.Vocabulary) {
+func mapIntersection(v *metrics.Vocabulary, vocab *Vocabulary) {
 	schemastemp := make(map[string]int)
 	operationIDTemp := make(map[string]int)
 	parametersTemp := make(map[string]int)
 	propertiesTemp := make(map[string]int)
 	for _, s := range v.Schemas {
-		value, ok := schemas[s.Word]
+		value, ok := vocab.schemas[s.Word]
 		if ok {
 			schemastemp[s.Word] += (value + int(s.Count))
 		}
 	}
 	for _, op := range v.Operations {
-		value, ok := operationID[op.Word]
+		value, ok := vocab.operationID[op.Word]
 		if ok {
 			operationIDTemp[op.Word] += (value + int(op.Count))
 		}
 	}
 	for _, param := range v.Parameters {
-		value, ok := parameters[param.Word]
+		value, ok := vocab.parameters[param.Word]
 		if ok {
 			parametersTemp[param.Word] += (value + int(param.Count))
 		}
 	}
 	for _, prop := range v.Properties {
-		value, ok := properties[prop.Word]
+		value, ok := vocab.properties[prop.Word]
 		if ok {
 			propertiesTemp[prop.Word] += (value + int(prop.Count))
 		}
 	}
-	schemas = schemastemp
-	operationID = operationIDTemp
-	parameters = parametersTemp
-	properties = propertiesTemp
+	vocab.schemas = schemastemp
+	vocab.operationID = operationIDTemp
+	vocab.parameters = parametersTemp
+	vocab.properties = propertiesTemp
 }
 
 // Intersection implements the intersection operation between multiple Vocabularies.
 // The function accepts a slice of Vocabularies and returns a single Vocabulary
 // struct which that contains words that were found in all of the Vocabularies.
 func Intersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabulary {
-	schemas = make(map[string]int)
-	operationID = make(map[string]int)
-	parameters = make(map[string]int)
-	properties = make(map[string]int)
+	var vocab Vocabulary
+	vocab.schemas = make(map[string]int)
+	vocab.operationID = make(map[string]int)
+	vocab.parameters = make(map[string]int)
+	vocab.properties = make(map[string]int)
 
-	unpackageVocabulary(vocabSlices[0])
+	unpackageVocabulary(vocabSlices[0], &vocab)
 	for i := 1; i < len(vocabSlices); i++ {
-		mapIntersection(vocabSlices[i])
+		mapIntersection(vocabSlices[i], &vocab)
 	}
 
 	v := &metrics.Vocabulary{
-		Properties: fillProtoStructure(properties),
-		Schemas:    fillProtoStructure(schemas),
-		Operations: fillProtoStructure(operationID),
-		Parameters: fillProtoStructure(parameters),
+		Schemas:    fillProtoStructures(vocab.schemas),
+		Operations: fillProtoStructures(vocab.operationID),
+		Parameters: fillProtoStructures(vocab.parameters),
+		Properties: fillProtoStructures(vocab.properties),
 	}
 	return v
 }
