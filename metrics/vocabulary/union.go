@@ -29,7 +29,7 @@ func Union(vocabularies []*metrics.Vocabulary) *metrics.Vocabulary {
 	vocab.properties = make(map[string]int)
 
 	for _, v := range vocabularies {
-		unpackageVocabulary(v, &vocab)
+		vocab.unpackageVocabulary(v)
 	}
 
 	combinedVocab := &metrics.Vocabulary{

@@ -23,7 +23,7 @@ import (
 // the current Vocabulary already exist within the global Vocabulary.
 // If the word exists in both structures it is added to a temp Vocabulary
 // which replaces the old Vocabulary.
-func mapIntersection(v *metrics.Vocabulary, vocab *Vocabulary) {
+func (vocab *Vocabulary) mapIntersection(v *metrics.Vocabulary) {
 	schemastemp := make(map[string]int)
 	operationIDTemp := make(map[string]int)
 	parametersTemp := make(map[string]int)
@@ -68,9 +68,9 @@ func Intersection(vocabSlices []*metrics.Vocabulary) *metrics.Vocabulary {
 	vocab.parameters = make(map[string]int)
 	vocab.properties = make(map[string]int)
 
-	unpackageVocabulary(vocabSlices[0], &vocab)
+	vocab.unpackageVocabulary(vocabSlices[0])
 	for i := 1; i < len(vocabSlices); i++ {
-		mapIntersection(vocabSlices[i], &vocab)
+		vocab.mapIntersection(vocabSlices[i])
 	}
 
 	v := &metrics.Vocabulary{

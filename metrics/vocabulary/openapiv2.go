@@ -19,7 +19,7 @@ import (
 	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 )
 
-func processOperationV2(operation *openapi_v2.Operation, vocab *Vocabulary) {
+func (vocab *Vocabulary) processOperationV2(operation *openapi_v2.Operation) {
 	if operation.OperationId != "" {
 		vocab.operationID[operation.OperationId]++
 	}
@@ -31,13 +31,13 @@ func processOperationV2(operation *openapi_v2.Operation, vocab *Vocabulary) {
 				vocab.parameters[t2.BodyParameter.Name]++
 			case *openapi_v2.Parameter_NonBodyParameter:
 				nonBodyParam := t2.NonBodyParameter
-				processOperationParametersV2(operation, vocab, nonBodyParam)
+				vocab.processOperationParametersV2(operation, nonBodyParam)
 			}
 		}
 	}
 }
 
-func processOperationParametersV2(operation *openapi_v2.Operation, vocab *Vocabulary, nonBodyParam *openapi_v2.NonBodyParameter) {
+func (vocab *Vocabulary) processOperationParametersV2(operation *openapi_v2.Operation, nonBodyParam *openapi_v2.NonBodyParameter) {
 	switch t3 := nonBodyParam.Oneof.(type) {
 	case *openapi_v2.NonBodyParameter_FormDataParameterSubSchema:
 		vocab.parameters[t3.FormDataParameterSubSchema.Name]++
@@ -50,7 +50,7 @@ func processOperationParametersV2(operation *openapi_v2.Operation, vocab *Vocabu
 	}
 }
 
-func processSchemaV2(schema *openapi_v2.Schema, vocab *Vocabulary) {
+func (vocab *Vocabulary) processSchemaV2(schema *openapi_v2.Schema) {
 	if schema.Properties == nil {
 		return
 	}
@@ -59,7 +59,6 @@ func processSchemaV2(schema *openapi_v2.Schema, vocab *Vocabulary) {
 	}
 }
 
-//NewVocabularyFromOpenAPIv2 does
 func NewVocabularyFromOpenAPIv2(document *openapi_v2.Document) *metrics.Vocabulary {
 	var vocab Vocabulary
 	vocab.schemas = make(map[string]int)
@@ -70,26 +69,26 @@ func NewVocabularyFromOpenAPIv2(document *openapi_v2.Document) *metrics.Vocabula
 	if document.Definitions != nil {
 		for _, pair := range document.Definitions.AdditionalProperties {
 			vocab.schemas[pair.Name]++
-			processSchemaV2(pair.Value, &vocab)
+			vocab.processSchemaV2(pair.Value)
 		}
 	}
 	if document.Paths != nil {
 		for _, pair := range document.Paths.Path {
 			v := pair.Value
 			if v.Get != nil {
-				processOperationV2(v.Get, &vocab)
+				vocab.processOperationV2(v.Get)
 			}
 			if v.Post != nil {
-				processOperationV2(v.Post, &vocab)
+				vocab.processOperationV2(v.Post)
 			}
 			if v.Put != nil {
-				processOperationV2(v.Put, &vocab)
+				vocab.processOperationV2(v.Put)
 			}
 			if v.Patch != nil {
-				processOperationV2(v.Patch, &vocab)
+				vocab.processOperationV2(v.Patch)
 			}
 			if v.Delete != nil {
-				processOperationV2(v.Delete, &vocab)
+				vocab.processOperationV2(v.Delete)
 			}
 		}
 	}

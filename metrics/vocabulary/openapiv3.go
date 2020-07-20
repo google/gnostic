@@ -39,7 +39,7 @@ func fillProtoStructures(m map[string]int) []*metrics.WordCount {
 	return counts
 }
 
-func processOperationV3(operation *openapi_v3.Operation, vocab *Vocabulary) {
+func (vocab *Vocabulary) processOperationV3(operation *openapi_v3.Operation) {
 	if operation.OperationId != "" {
 		vocab.operationID[operation.OperationId]++
 	}
@@ -51,13 +51,13 @@ func processOperationV3(operation *openapi_v3.Operation, vocab *Vocabulary) {
 	}
 }
 
-func processComponentsV3(components *openapi_v3.Components, vocab *Vocabulary) {
-	processParametersV3(components, vocab)
-	processSchemasV3(components, vocab)
-	processResponsesV3(components, vocab)
+func (vocab *Vocabulary) processComponentsV3(components *openapi_v3.Components) {
+	vocab.processParametersV3(components)
+	vocab.processSchemasV3(components)
+	vocab.processResponsesV3(components)
 }
 
-func processParametersV3(components *openapi_v3.Components, vocab *Vocabulary) {
+func (vocab *Vocabulary) processParametersV3(components *openapi_v3.Components) {
 	if components.Parameters == nil {
 		return
 	}
@@ -69,17 +69,17 @@ func processParametersV3(components *openapi_v3.Components, vocab *Vocabulary) {
 	}
 }
 
-func processSchemasV3(components *openapi_v3.Components, vocab *Vocabulary) {
+func (vocab *Vocabulary) processSchemasV3(components *openapi_v3.Components) {
 	if components.Schemas == nil {
 		return
 	}
 	for _, pair := range components.Schemas.AdditionalProperties {
 		vocab.schemas[pair.Name]++
-		processSchemaV3(pair.Value, vocab)
+		vocab.processSchemaV3(pair.Value)
 	}
 }
 
-func processSchemaV3(schema *openapi_v3.SchemaOrReference, vocab *Vocabulary) {
+func (vocab *Vocabulary) processSchemaV3(schema *openapi_v3.SchemaOrReference) {
 	if schema == nil {
 		return
 	}
@@ -95,7 +95,7 @@ func processSchemaV3(schema *openapi_v3.SchemaOrReference, vocab *Vocabulary) {
 	}
 }
 
-func processResponsesV3(components *openapi_v3.Components, vocab *Vocabulary) {
+func (vocab *Vocabulary) processResponsesV3(components *openapi_v3.Components) {
 	if components.Responses == nil {
 		return
 	}
@@ -112,25 +112,25 @@ func NewVocabularyFromOpenAPIv3(document *openapi_v3.Document) *metrics.Vocabula
 	vocab.properties = make(map[string]int)
 
 	if document.Components != nil {
-		processComponentsV3(document.Components, &vocab)
+		vocab.processComponentsV3(document.Components)
 
 	}
 	for _, pair := range document.Paths.Path {
 		v := pair.Value
 		if v.Get != nil {
-			processOperationV3(v.Get, &vocab)
+			vocab.processOperationV3(v.Get)
 		}
 		if v.Post != nil {
-			processOperationV3(v.Post, &vocab)
+			vocab.processOperationV3(v.Post)
 		}
 		if v.Put != nil {
-			processOperationV3(v.Put, &vocab)
+			vocab.processOperationV3(v.Put)
 		}
 		if v.Patch != nil {
-			processOperationV3(v.Patch, &vocab)
+			vocab.processOperationV3(v.Patch)
 		}
 		if v.Delete != nil {
-			processOperationV3(v.Delete, &vocab)
+			vocab.processOperationV3(v.Delete)
 		}
 	}
 

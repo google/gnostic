@@ -23,7 +23,7 @@ import (
 // the current Vocabulary already exist within the global Vocabulary.
 // If the word exists in both structures it is removed from the
 // Vocabulary structure.
-func mapDifference(v *metrics.Vocabulary, vocab *Vocabulary) {
+func (vocab *Vocabulary) mapDifference(v *metrics.Vocabulary) {
 	for _, s := range v.Schemas {
 		_, ok := vocab.schemas[s.Word]
 		if ok {
@@ -60,9 +60,9 @@ func Difference(vocabularies []*metrics.Vocabulary) *metrics.Vocabulary {
 	vocab.parameters = make(map[string]int)
 	vocab.properties = make(map[string]int)
 
-	unpackageVocabulary(vocabularies[0], &vocab)
+	vocab.unpackageVocabulary(vocabularies[0])
 	for i := 1; i < len(vocabularies); i++ {
-		mapDifference(vocabularies[i], &vocab)
+		vocab.mapDifference(vocabularies[i])
 	}
 
 	v := &metrics.Vocabulary{

@@ -103,7 +103,7 @@ func fillProtoStructure(m map[string]int) []*metrics.WordCount {
 
 // unpackageVocabulary unravels the Vocabulary struct by converting their
 // fields to maps in order to perform operations on the data.
-func unpackageVocabulary(v *metrics.Vocabulary, vocab *Vocabulary) {
+func (vocab *Vocabulary) unpackageVocabulary(v *metrics.Vocabulary) {
 	for _, s := range v.Schemas {
 		vocab.schemas[s.Word] += int(s.Count)
 	}
@@ -126,7 +126,7 @@ func combineVocabularies(vocab *Vocabulary) *metrics.Vocabulary {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
-		readVocabularyFromFileWithName(scanner.Text(), vocab)
+		vocab.readVocabularyFromFileWithName(scanner.Text())
 	}
 
 	v := &metrics.Vocabulary{
@@ -141,7 +141,7 @@ func combineVocabularies(vocab *Vocabulary) *metrics.Vocabulary {
 
 // readVocabularyFromFileWithNametakes the filename of a Vocabulary protocol
 // buffer file and parses the wire-format message into a Vocabulary struct.
-func readVocabularyFromFileWithName(filename string, vocab *Vocabulary) {
+func (vocab *Vocabulary) readVocabularyFromFileWithName(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
@@ -153,7 +153,7 @@ func readVocabularyFromFileWithName(filename string, vocab *Vocabulary) {
 	if err != nil {
 		panic(err)
 	}
-	unpackageVocabulary(v, vocab)
+	vocab.unpackageVocabulary(v)
 }
 
 func isEmpty(v *metrics.Vocabulary) bool {
