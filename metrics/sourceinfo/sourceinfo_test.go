@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-//TestFindLineNumbers runs unit tests on the linenumbers package
+//TestFindLineNumbers runs unit tests on the sourceinfo package
 func TestFindLineNumbersV2(t *testing.T) {
 	keys := []string{"paths", "/pets", "get", "parameters", "0", "name"}
 	token := "limit"
@@ -14,7 +14,7 @@ func TestFindLineNumbersV2(t *testing.T) {
 		t.Errorf("%+v\n", err)
 	}
 	if result.Line != 23 {
-		t.Errorf("Given token \"latSour\", FindYamlLine() returned %d, expected 23", result.Line)
+		t.Errorf("Given token \"limit\", FindYamlLine() returned %d, expected 23", result.Line)
 	}
 
 	keys = []string{"paths", "/pets/{petId}", "get", "parameters", "0", "name"}
@@ -25,7 +25,7 @@ func TestFindLineNumbersV2(t *testing.T) {
 		t.Errorf("%+v\n", err)
 	}
 	if result.Line != 61 {
-		t.Errorf("Given token \"latSour\", FindYamlLine() returned %d, expected 61", result.Line)
+		t.Errorf("Given token \"petId\", FindYamlLine() returned %d, expected 61", result.Line)
 	}
 }
 
@@ -38,7 +38,7 @@ func TestFindLineNumbersV3(t *testing.T) {
 		t.Errorf("%+v\n", err)
 	}
 	if result.Line != 18 {
-		t.Errorf("Given token \"latSour\", FindYamlLine() returned %d, expected 18", result.Line)
+		t.Errorf("Given token \"limit\", FindYamlLine() returned %d, expected 18", result.Line)
 	}
 
 	keys = []string{"paths", "/pets/{petId}", "get", "parameters", "0", "name"}
@@ -49,6 +49,6 @@ func TestFindLineNumbersV3(t *testing.T) {
 		t.Errorf("%+v\n", err)
 	}
 	if result.Line != 64 {
-		t.Errorf("Given token \"latSour\", FindYamlLine() returned %d, expected 64", result.Line)
+		t.Errorf("Given token \"petId\", FindYamlLine() returned %d, expected 64", result.Line)
 	}
 }
