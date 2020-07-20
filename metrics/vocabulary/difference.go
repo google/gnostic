@@ -20,7 +20,7 @@ import (
 
 // mapDifference finds the difference between two Vocabularies.
 // This function takes a Vocabulary and checks if the words within
-// the current Vocabulary already exist within the global Vocabulary.
+// the current Vocabulary already exist within the first Vocabulary.
 // If the word exists in both structures it is removed from the
 // Vocabulary structure.
 func (vocab *Vocabulary) mapDifference(v *metrics.Vocabulary) {

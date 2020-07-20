@@ -26,10 +26,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-/*
-These variables were made globally because multiple
-functions will be accessing and mutating them.
-*/
 type Vocabulary struct {
 	schemas     map[string]int
 	operationID map[string]int

@@ -20,7 +20,7 @@ import (
 
 // mapIntersection finds the intersection between two Vocabularies.
 // This function takes a Vocabulary and checks if the words within
-// the current Vocabulary already exist within the global Vocabulary.
+// the current Vocabulary already exist within the first Vocabulary.
 // If the word exists in both structures it is added to a temp Vocabulary
 // which replaces the old Vocabulary.
 func (vocab *Vocabulary) mapIntersection(v *metrics.Vocabulary) {
