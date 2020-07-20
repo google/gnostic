@@ -15,8 +15,9 @@
 package linter
 
 import (
+	"fmt"
 	"io/ioutil"
-	"strings"
+	"os"
 
 	"github.com/golang/protobuf/proto"
 
@@ -42,7 +43,7 @@ func processParametersV3(components *openapi_v3.Components, path []string) []rul
 		for _, pair := range components.Parameters.AdditionalProperties {
 			switch t := pair.Value.Oneof.(type) {
 			case *openapi_v3.ParameterOrReference_Parameter:
-				parameters = append(parameters, rules.Field{Name: t.Parameter.Name, Path: path})
+				parameters = append(parameters, rules.Field{Name: t.Parameter.Name, Path: append(path, pair.Name, "name")})
 
 			}
 		}
@@ -53,6 +54,7 @@ func processParametersV3(components *openapi_v3.Components, path []string) []rul
 func processOperationV3(operation *openapi_v3.Operation, path []string) []rules.Field {
 	parameters := make([]rules.Field, 0)
 	for _, item := range operation.Parameters {
+		fmt.Fprintf(os.Stderr, "%+v\n", item)
 		switch t := item.Oneof.(type) {
 		case *openapi_v3.ParameterOrReference_Parameter:
 			parameters = append(parameters, rules.Field{Name: t.Parameter.Name, Path: path})
@@ -72,22 +74,23 @@ func gatherParameters(document *openapi_v3.Document) []rules.Field {
 
 	if document.Paths != nil {
 		for _, pair := range document.Paths.Path {
+			fmt.Fprintf(os.Stderr, "%+v\n", pair)
 			v := pair.Value
-			path := strings.Split("paths"+pair.Name, "/")
+			path := []string{"paths", pair.Name}
 			if v.Get != nil {
-				p = append(p, processOperationV3(v.Get, path)...)
+				p = append(p, processOperationV3(v.Get, append(path, "get", "parameters", "name"))...)
 			}
 			if v.Post != nil {
-				p = append(p, processOperationV3(v.Post, path)...)
+				p = append(p, processOperationV3(v.Post, append(path, "post", "parameters", "name"))...)
 			}
 			if v.Put != nil {
-				p = append(p, processOperationV3(v.Put, path)...)
+				p = append(p, processOperationV3(v.Put, append(path, "put", "parameters", "name"))...)
 			}
 			if v.Patch != nil {
-				p = append(p, processOperationV3(v.Patch, path)...)
+				p = append(p, processOperationV3(v.Patch, append(path, "patch", "parameters", "name"))...)
 			}
 			if v.Delete != nil {
-				p = append(p, processOperationV3(v.Delete, path)...)
+				p = append(p, processOperationV3(v.Delete, append(path, "delete", "parameters", "name"))...)
 			}
 		}
 	}
