@@ -31,3 +31,16 @@ message Vocabulary{
     repeated WordCount parameters = 4;
     
 }
+
+message Version{
+    Vocabulary newTerms = 1;
+    Vocabulary deletedTerms = 2;
+    string name = 3; 
+    int32 newTermCount = 4;
+    int32 deletedTermCount = 5;
+}
+
+message VersionHistory{
+    repeated Version versions = 1;
+    string name = 2;
+}

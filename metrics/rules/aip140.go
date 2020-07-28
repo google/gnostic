@@ -23,6 +23,9 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
+// checkSnakeCase ensures that the field is in lower snake case.
+// If not, the function returns false and the suggested reformat
+// of the field.
 func checkSnakeCase(field string) (bool, string) {
 	snake := strcase.SnakeCase(field)
 	snake = strings.ToLower(snake)
@@ -30,6 +33,8 @@ func checkSnakeCase(field string) (bool, string) {
 	return snake == field, snake
 }
 
+// checkAbbreviation checks if the field name is a common abbreviation.
+// If true, the functions returns true and the suggested abbreviation.
 func checkAbbreviation(field string) (bool, string) {
 	var expectedAbbreviations = map[string]string{
 		"configuration": "config",
@@ -45,6 +50,8 @@ func checkAbbreviation(field string) (bool, string) {
 	return false, field
 }
 
+// checkNumbers ensures that no word within the field name begins with a number.
+// If it starts with a number, the function returns true. False if not.
 func checkNumbers(field string) bool {
 	var numberStart = regexp.MustCompile("^[0-9]")
 	for _, segment := range strings.Split(field, "_") {
@@ -55,6 +62,8 @@ func checkNumbers(field string) bool {
 	return false
 }
 
+// checkReservedWords ensures that no word within the field is a reserved word.
+// If it is a reserved word, the function returns true. False if not.
 func checkReservedWords(field string) bool {
 	reservedWordsSet := []string{"abstract", "and", "arguments", "as", "assert", "async", "await", "boolean", "break", "byte",
 		"case", "catch", "char", "class", "const", "continue", "debugger", "def", "default", "del", "delete", "do", "double", "elif",
@@ -73,6 +82,8 @@ func checkReservedWords(field string) bool {
 	return false
 }
 
+// checkPreposition ensures that no word within the field name is a preposition.
+// If it is a preposition, the function returns true. False if not.
 func checkPrepositions(field string) bool {
 	preps := []string{"after", "at", "before", "between", "but", "by", "except",
 		"for", "from", "in", "including", "into", "of", "over", "since", "to",

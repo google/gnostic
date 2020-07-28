@@ -29,6 +29,8 @@ type MessageType struct {
 	Path    []string
 }
 
+// checkNameSuffix ensures that the name of the field does not
+// end in "_name"
 func checkNameSuffix(name string) (bool, string) {
 	if strings.HasSuffix(name, "_name") {
 		return true, name[:len(name)-5]

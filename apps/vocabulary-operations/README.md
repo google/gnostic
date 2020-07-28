@@ -1,11 +1,11 @@
 # Vocabulary Operations
 
 This directory contains a command-line tool that provides operations for Vocabulary structures, 
-including intersection, difference, union, and export.
+including intersection, difference, union, version, filterCommon and export.
 
 ## Usage:
 
-The vocabulary-operations tool accepts a command that specifies which operation (union, intersection, difference, export) to run, and accepts at least one vocabulary file as an argument. Files can be provided using either command line arguments:
+The vocabulary-operations tool accepts a command that specifies which operation (union, intersection, difference, version, filterCommon, export) to run, and accepts at least one vocabulary file as an argument. Files can be provided using either command line arguments:
 
         vocabulary-operations -[command] [<file1.pb>] [<file2.pb>] ... [<filen.pb>]
 
@@ -29,7 +29,15 @@ The `-intersection` options creates a new Vocabulary pb that contains vocabulary
 
 The `-difference` options creates a new Vocabulary pb that contains vocabulary that is present in the first provided file but not the other provided files. The new Vocabulary pb is saved in the current working directory as "vocabulary-operations.pb"
 
-         vocabulary-operations -export [<file1.pb>]
+        vocabulary-operations -version ["directory path"]
+
+The `-version` option creates a new VersionHistory pb that contains the history of an API's lifecycle. The operator takes a directory which contains numerous versions of the same API's vocabulary, and creates a VersionHistory pb which contains the new and deleted terms from each update. The VersionHistory is saved in the current working directory as "(directory-name)-version-history.pb"
+
+        vocabulary-operations -filter-common <[files.txt]>
+
+The `-filter-common` option takes numerousvocabularies and will return a slice of Vocabulary pbs that contain the unique term for each API among the other. he new Vocabulary pb is saved in the current working directory as "vocabulary-operations.pb"
+
+        vocabulary-operations -export [<file1.pb>]
 
 The `-export` option accepts *one* Vocabulary file and converts it into a user-friendly readable CSV file. The CSV file is saved in the current working directory as "vocabulary-operations.csv".                    
 **Note:** While the other options accept both command line arguments and standard input, the export function only supports command line arguments.

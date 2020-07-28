@@ -8,6 +8,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// findNode recursively iterates through the yaml file using the node feature. The function
+// will continue until the token is found at the max depth. If the token is not found, an
+// empty node is returned.
 func findNode(node *yaml.Node, keyIndex int, maxDepth int, keys []string) (*yaml.Node, error) {
 	for i := 0; i < len(node.Content); i += 2 {
 		key := node.Content[i]
@@ -34,7 +37,8 @@ func findNode(node *yaml.Node, keyIndex int, maxDepth int, keys []string) (*yaml
 	return &yaml.Node{}, nil
 }
 
-// FindNode returns a line number for a field within a yaml file given the path and yaml file.
+// FindNode returns a node object pointing to the given token in a yaml file. The node contains
+//information such as the string value, line number, bordering commments, etc.
 func FindNode(filename string, keys []string, token string) (*yaml.Node, error) {
 	data, _ := ioutil.ReadFile(filename)
 

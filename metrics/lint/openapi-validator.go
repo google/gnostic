@@ -51,6 +51,8 @@ type WMessage struct {
 	Line    int    `json:"line"`
 }
 
+// writePb takes a Linter proto structure, marshals the data and saves it to
+// the "linterResults.pb" file in the current working directory.
 func writePb(v *Linter) {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
@@ -63,6 +65,8 @@ func writePb(v *Linter) {
 	}
 }
 
+// addToMessages creates a new Message struct given a message type, message, path
+// and line. The new struct is then returned.
 func addToMessages(mtype string, message string, path []string, line int) *Message {
 	temp := &Message{
 		Type:    mtype,
@@ -73,6 +77,8 @@ func addToMessages(mtype string, message string, path []string, line int) *Messa
 	return temp
 }
 
+// fillMessageProtoStructureIBM is used to create a slice of messages
+// from the results of IBM's openapi-validator output.
 func fillMessageProtoStructureIBM(lint IBMLint) []*Message {
 	messages := make([]*Message, 0)
 	for _, v := range lint.LinterErrors.Parameters {
@@ -142,6 +148,8 @@ func fillMessageProtoStructureIBM(lint IBMLint) []*Message {
 	return messages
 }
 
+// openAndReadJSON takes the name of the filename that contains the linter results
+// from the openapi-validator and parses it into the linter struct
 func openAndReadJSON(filename string) IBMLint {
 	jsonFile, err := os.Open(filename)
 	if err != nil {
@@ -157,7 +165,10 @@ func openAndReadJSON(filename string) IBMLint {
 	return lint
 }
 
-func LintIBM(filename string) {
+// LintOpenapiValidator functions serves as a linter results translater. The function takes the filename
+// which contains the json results of IBM's openapi-validator and creates a new instance of
+// the linter struct using the JSON data.
+func LintOpenapiValidator(filename string) {
 	lint := openAndReadJSON(filename)
 	messages := fillMessageProtoStructureIBM(lint)
 
