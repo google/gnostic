@@ -27,7 +27,7 @@ func fillVersionProto(oldVersion, newVersion *metrics.Vocabulary, oldName, newNa
 	version := &metrics.Version{
 		NewTerms:         newTerms,
 		DeletedTerms:     deletedTerms,
-		Name:             newName + ", " + oldName,
+		Name:             newName,
 		NewTermCount:     int32(length(newTerms)),
 		DeletedTermCount: int32(length(deletedTerms)),
 	}
