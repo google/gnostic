@@ -16,27 +16,14 @@ package linter
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-
-	"github.com/golang/protobuf/proto"
 
 	rules "github.com/googleapis/gnostic/metrics/rules"
 	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
 )
 
-func readDocumentFromFileWithName(filename string) (*openapi_v3.Document, error) {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	document := &openapi_v3.Document{}
-	err = proto.Unmarshal(data, document)
-	if err != nil {
-		return nil, err
-	}
-	return document, nil
-}
+// processParametersV2 loops over the parameters of component and creates a
+// Field struct slice which will be used for the linter.
 func processParametersV3(components *openapi_v3.Components, path []string) []rules.Field {
 	parameters := make([]rules.Field, 0)
 	if components.Parameters != nil {
@@ -51,6 +38,8 @@ func processParametersV3(components *openapi_v3.Components, path []string) []rul
 	return parameters
 }
 
+// processParametersV2 loops over the parameters of an operation and creates a
+// Field struct slice which will be used for the linter.
 func processOperationV3(operation *openapi_v3.Operation, path []string) []rules.Field {
 	parameters := make([]rules.Field, 0)
 	for _, item := range operation.Parameters {
@@ -64,6 +53,9 @@ func processOperationV3(operation *openapi_v3.Operation, path []string) []rules.
 	return parameters
 }
 
+// gatherParametersV2 takes a Document struct as a parameter and calls the
+// processParamater function on components and each HTTP request in order
+// to gather the parameters.
 func gatherParameters(document *openapi_v3.Document) []rules.Field {
 	p := make([]rules.Field, 0)
 

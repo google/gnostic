@@ -29,5 +29,17 @@ message Vocabulary{
     repeated WordCount properties = 2;
     repeated WordCount operations = 3;
     repeated WordCount parameters = 4;
-    
+}
+
+message Version{
+    string name = 3; 
+    Vocabulary newTerms = 1;
+    Vocabulary deletedTerms = 2;
+    int32 newTermCount = 4;
+    int32 deletedTermCount = 5;
+}
+
+message VersionHistory{
+    repeated Version versions = 1;
+    string name = 2;
 }
