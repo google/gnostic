@@ -82,7 +82,7 @@ func checkReservedWords(field string) bool {
 	return false
 }
 
-// checkPreposition ensures that no word within the field name is a preposition.
+// checkPrepositions ensures that no word within the field name is a preposition.
 // If it is a preposition, the function returns true. False if not.
 func checkPrepositions(field string) bool {
 	preps := []string{"after", "at", "before", "between", "but", "by", "except",

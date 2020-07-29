@@ -28,7 +28,7 @@ func main() {
 	}
 
 	if *ibmPtr {
-		lint.LintOpenapiValidator(args[0])
+		lint.LintOpenAPIValidator(args[0])
 	}
 
 	if *spectralPtr {

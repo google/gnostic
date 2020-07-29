@@ -29,13 +29,12 @@ message Vocabulary{
     repeated WordCount properties = 2;
     repeated WordCount operations = 3;
     repeated WordCount parameters = 4;
-    
 }
 
 message Version{
+    string name = 3; 
     Vocabulary newTerms = 1;
     Vocabulary deletedTerms = 2;
-    string name = 3; 
     int32 newTermCount = 4;
     int32 deletedTermCount = 5;
 }

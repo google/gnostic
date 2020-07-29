@@ -35,7 +35,7 @@ The `-version` option creates a new VersionHistory pb that contains the history 
 
         vocabulary-operations -filter-common <[files.txt]>
 
-The `-filter-common` option takes numerousvocabularies and will return a slice of Vocabulary pbs that contain the unique term for each API among the other. he new Vocabulary pb is saved in the current working directory as "vocabulary-operations.pb"
+The `-filter-common` option takes numerous vocabularies and will return a slice of Vocabulary pbs that contain the unique term for each API among the other. The new Vocabulary pb is saved in the current working directory as "vocabulary-operations.pb"
 
         vocabulary-operations -export [<file1.pb>]
 

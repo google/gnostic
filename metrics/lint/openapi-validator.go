@@ -168,7 +168,7 @@ func openAndReadJSON(filename string) IBMLint {
 // LintOpenapiValidator functions serves as a linter results translater. The function takes the filename
 // which contains the json results of IBM's openapi-validator and creates a new instance of
 // the linter struct using the JSON data.
-func LintOpenapiValidator(filename string) {
+func LintOpenAPIValidator(filename string) {
 	lint := openAndReadJSON(filename)
 	messages := fillMessageProtoStructureIBM(lint)
 

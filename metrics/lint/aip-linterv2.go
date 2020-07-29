@@ -21,7 +21,7 @@ import (
 	pb "github.com/googleapis/gnostic/openapiv2"
 )
 
-// Fill Porot takes a slice of rules and coverts them to a slice of
+// fillProtoStructure takes a slice of rules and coverts them to a slice of
 // Message structs.
 func fillProtoStructure(m []rules.MessageType) []*Message {
 	messages := make([]*Message, 0)

@@ -134,8 +134,6 @@ func main() {
 			os.Exit(1)
 		}
 		return
-		// file, _ := json.MarshalIndent(versionHistory, "", " ")
-		// _ = ioutil.WriteFile("versionHistory.json", file, 0644)
 
 	}
 	vocabularies := make([]*metrics.Vocabulary, 0)
