@@ -18,12 +18,8 @@ import (
 	metrics "github.com/googleapis/gnostic/metrics"
 )
 
-// Difference implements the difference operation between multiple Vocabularies.
-// The function accepts a slice of Vocabularies and returns a single Vocabulary
-// struct which that contains words that were unique to the first Vocabulary in the slice.
-
-// FilterCommon implements the difference operation among a slice of Vocabularies.
-// The function returns a slice of Vocabrularies that contains the unique terms
+// FilterCommon implements the difference operation amongst a slice of Vocabularies.
+// The function returns a slice of Vocabularies that contains the unique terms
 // for each pb file.
 func FilterCommon(v []*metrics.Vocabulary) []*metrics.Vocabulary {
 	uniqueVocabularies := make([]*metrics.Vocabulary, 0)

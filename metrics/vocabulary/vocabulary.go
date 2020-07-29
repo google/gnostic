@@ -20,7 +20,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"sort"
+	"strings"
 
 	metrics "github.com/googleapis/gnostic/metrics"
 	"google.golang.org/protobuf/proto"
@@ -63,7 +65,8 @@ func WriteCSV(v *metrics.Vocabulary, filename string) error {
 	return nil
 }
 
-// WritePb create a protocol buffer file that contains the wire-format encoding of a Vocabulary struct.
+// WritePb create a protocol buffer file that contains the wire-format
+// encoding of a Vocabulary struct.
 func WritePb(v *metrics.Vocabulary) error {
 	bytes, err := proto.Marshal(v)
 	if err != nil {
@@ -75,6 +78,34 @@ func WritePb(v *metrics.Vocabulary) error {
 		return err
 	}
 	return nil
+}
+
+// WriteVersionHistory create a protocol buffer file that contains the wire-format
+// encoding of a VersionHistory struct.
+func WriteVersionHistory(v *metrics.VersionHistory, directory string) error {
+	bytes, err := proto.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(directory+"-version-history.pb", bytes, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// length returns the numbers of terms in a vocabulary
+func length(v *metrics.Vocabulary) int {
+	var vocab Vocabulary
+	vocab.schemas = make(map[string]int)
+	vocab.operationID = make(map[string]int)
+	vocab.parameters = make(map[string]int)
+	vocab.properties = make(map[string]int)
+
+	vocab.unpackageVocabulary(v)
+
+	return len(vocab.schemas) + len(vocab.operationID) + len(vocab.parameters) + len(vocab.properties)
 }
 
 // fillProtoStructure adds data to the Word Count structure.
@@ -133,6 +164,24 @@ func combineVocabularies(vocab *Vocabulary) *metrics.Vocabulary {
 	}
 	return v
 
+}
+
+// GatherFilesFromDirectory takes a directory path as input and
+// returns all of the file paths within the directory that contain
+// the "vocabulary.pb" file.
+func GatherFilesFromDirectory(directory string) ([]string, error) {
+	paths := make([]string, 0)
+	err := filepath.Walk(directory,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if strings.Contains(path, "vocabulary.pb") {
+				paths = append(paths, path)
+			}
+			return nil
+		})
+	return paths, err
 }
 
 // readVocabularyFromFileWithNametakes the filename of a Vocabulary protocol

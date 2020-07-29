@@ -21,6 +21,8 @@ import (
 	pb "github.com/googleapis/gnostic/openapiv2"
 )
 
+// fillProtoStructure takes a slice of rules and coverts them to a slice of
+// Message structs.
 func fillProtoStructure(m []rules.MessageType) []*Message {
 	messages := make([]*Message, 0)
 	for _, message := range m {
@@ -37,6 +39,8 @@ func fillProtoStructure(m []rules.MessageType) []*Message {
 	return messages
 }
 
+// gatherParametersV2 takes a Document struct as a parameter and calls the
+// processParamater function on each HTTP request in order to gather the parameters.
 func gatherParametersV2(document *pb.Document) []rules.Field {
 	p := make([]rules.Field, 0)
 	if document.Paths != nil {
@@ -63,6 +67,8 @@ func gatherParametersV2(document *pb.Document) []rules.Field {
 	return p
 }
 
+// processParametersV2 loops over the parameters of an operation and creates a
+// Field struct slice which will be used for the linter.
 func processParametersV2(operation *pb.Operation, path []string) []rules.Field {
 	parameters := make([]rules.Field, 0)
 	for i, item := range operation.Parameters {
