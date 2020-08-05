@@ -25,21 +25,27 @@ message WordCount{
 }
 
 message Vocabulary{
-    repeated WordCount schemas = 1;
-    repeated WordCount properties = 2;
-    repeated WordCount operations = 3;
-    repeated WordCount parameters = 4;
+    string name = 1;
+    repeated WordCount schemas = 2;
+    repeated WordCount properties = 3;
+    repeated WordCount operations = 4;
+    repeated WordCount parameters = 5;
+}
+
+message VocabularyList{
+    repeated Vocabulary vocabularies = 1;
 }
 
 message Version{
-    string name = 3; 
-    Vocabulary newTerms = 1;
-    Vocabulary deletedTerms = 2;
-    int32 newTermCount = 4;
-    int32 deletedTermCount = 5;
+    string name = 1; 
+    int32 new_term_count = 2;
+    Vocabulary new_terms = 3;
+    int32 deleted_term_count = 4;
+    Vocabulary deleted_terms = 5;
 }
 
 message VersionHistory{
-    repeated Version versions = 1;
-    string name = 2;
+    string name = 1;
+    repeated Version versions = 2;
+    
 }

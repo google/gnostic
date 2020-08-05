@@ -80,6 +80,21 @@ func WritePb(v *metrics.Vocabulary) error {
 	return nil
 }
 
+// WriteVocabularyList create a protocol buffer file that contains the wire-format
+// encoding of a VocabularyList struct.
+func WriteVocabularyList(v *metrics.VocabularyList) error {
+	bytes, err := proto.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("vocabulary-list.pb", bytes, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // WriteVersionHistory create a protocol buffer file that contains the wire-format
 // encoding of a VersionHistory struct.
 func WriteVersionHistory(v *metrics.VersionHistory, directory string) error {
@@ -88,7 +103,7 @@ func WriteVersionHistory(v *metrics.VersionHistory, directory string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(directory+"-version-history.pb", bytes, 0644)
+	err = ioutil.WriteFile("version-history.pb", bytes, 0644)
 	if err != nil {
 		return err
 	}

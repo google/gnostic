@@ -163,7 +163,8 @@ func main() {
 	}
 	if *filterCommonPtr {
 		vocab := vocabulary.FilterCommon(vocabularies)
-		err = vocabulary.WritePb(vocab[0])
+		err = vocabulary.WriteVocabularyList(vocab)
+
 	}
 
 	if err != nil {
