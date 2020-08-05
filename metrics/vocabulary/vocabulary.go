@@ -103,7 +103,7 @@ func WriteVersionHistory(v *metrics.VersionHistory, directory string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile("version-history.pb", bytes, 0644)
+	err = ioutil.WriteFile(directory+"-version-history.pb", bytes, 0644)
 	if err != nil {
 		return err
 	}
