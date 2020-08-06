@@ -66,21 +66,18 @@
 
 
 ../../examples/v3.0/yaml/vocabulary.pb -------------------- 
+	
+Error
+Pet
+Pets
+code
+id
+message
+name
+tag"
 
-	
-Error
-
-Pet
-
-Pets
-code
-id
-message
-name
-tag
-
-createPets
-listPets
-showPetById"	
-limit"	
+createPets"
+listPets"
+showPetById*	
+limit*	
 petId
