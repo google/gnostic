@@ -192,15 +192,14 @@ func TestSampleVocabularyFilterCommon(t *testing.T) {
 	differenceResult := FilterCommon(vocabularies)
 
 	testVocabulary(t,
-		differenceResult[0],
+		differenceResult.Vocabularies[0],
 		&reference,
 	)
 
 	testVocabulary(t,
-		differenceResult[1],
+		differenceResult.Vocabularies[1],
 		&reference2,
 	)
-
 }
 
 func TestSampleVocabularyCSV(t *testing.T) {
