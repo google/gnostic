@@ -21,7 +21,7 @@ import (
 // FilterCommon implements the difference operation amongst a slice of Vocabularies.
 // The function returns a slice of Vocabularies that contains the unique terms
 // for each pb file.
-func FilterCommon(v []*metrics.Vocabulary) []*metrics.Vocabulary {
+func FilterCommon(v []*metrics.Vocabulary) *metrics.VocabularyList {
 	uniqueVocabularies := make([]*metrics.Vocabulary, 0)
 	n := len(v)
 	for x := 0; x < n; x++ {
@@ -36,5 +36,9 @@ func FilterCommon(v []*metrics.Vocabulary) []*metrics.Vocabulary {
 		vocab := Difference(temp)
 		uniqueVocabularies = append(uniqueVocabularies, vocab)
 	}
-	return uniqueVocabularies
+
+	unique := &metrics.VocabularyList{
+		Vocabularies: uniqueVocabularies,
+	}
+	return unique
 }
