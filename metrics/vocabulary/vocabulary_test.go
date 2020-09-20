@@ -20,7 +20,8 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb"
+	discovery "github.com/googleapis/gnostic/discovery"
 	metrics "github.com/googleapis/gnostic/metrics"
 	openapiv2 "github.com/googleapis/gnostic/openapiv2"
 	openapiv3 "github.com/googleapis/gnostic/openapiv3"
@@ -219,16 +220,28 @@ func TestSampleVocabularyCSV(t *testing.T) {
 }
 
 func TestSampleVocabularyV2(t *testing.T) {
-	data, _ := ioutil.ReadFile("../../examples/v2.0/pb/petstore.pb")
-	documentv2 := &openapiv2.Document{}
-	proto.Unmarshal(data, documentv2)
-	v1 := NewVocabularyFromOpenAPIv2(documentv2)
-	reference := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructure([]string{"Error", "Pet", "Pets"}, []int{1, 1, 1}),
-		Properties: fillTestProtoStructure([]string{"code", "id", "message", "name", "tag"}, []int{1, 1, 1, 1, 1}),
-		Operations: fillTestProtoStructure([]string{"createPets", "listPets", "showPetById"}, []int{1, 1, 1}),
-		Parameters: fillTestProtoStructure([]string{"limit", "petId"}, []int{1, 1}),
+	inputFile := "../../examples/v2.0/json/petstore.json"
+	referenceFile := "../../testdata/metrics/vocabulary/petstore-v2.json"
+	data, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		t.Logf("ReadFile failed: %+v", err)
+		t.FailNow()
 	}
+	document, err := openapiv2.ParseDocument(data)
+	if err != nil {
+		t.Logf("Parse failed: %+v", err)
+		t.FailNow()
+	}
+	v1 := NewVocabularyFromOpenAPIv2(document)
+	// uncomment the following line to write reference data
+	//err = ioutil.WriteFile(referenceFile, []byte(protojson.Format(v1)), 0644)
+	referenceData, err := ioutil.ReadFile(referenceFile)
+	if err != nil {
+		t.Logf("ReadFile failed: %+v", err)
+		t.FailNow()
+	}
+	reference := metrics.Vocabulary{}
+	jsonpb.UnmarshalString(string(referenceData), &reference)
 	testVocabulary(t,
 		v1,
 		&reference,
@@ -236,16 +249,57 @@ func TestSampleVocabularyV2(t *testing.T) {
 }
 
 func TestSampleVocabularyV3(t *testing.T) {
-	data, _ := ioutil.ReadFile("../../examples/v3.0/pb/petstore.pb")
-	documentv3 := &openapiv3.Document{}
-	proto.Unmarshal(data, documentv3)
-	v1 := NewVocabularyFromOpenAPIv3(documentv3)
-	reference := metrics.Vocabulary{
-		Schemas:    fillTestProtoStructure([]string{"Error", "Pet", "Pets"}, []int{1, 1, 1}),
-		Properties: fillTestProtoStructure([]string{"code", "id", "message", "name", "tag"}, []int{1, 1, 1, 1, 1}),
-		Operations: fillTestProtoStructure([]string{"createPets", "listPets", "showPetById"}, []int{1, 1, 1}),
-		Parameters: fillTestProtoStructure([]string{"limit", "petId"}, []int{1, 1}),
+	inputFile := "../../examples/v3.0/json/petstore.json"
+	referenceFile := "../../testdata/metrics/vocabulary/petstore-v3.json"
+	data, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		t.Logf("ReadFile failed: %+v", err)
+		t.FailNow()
 	}
+	document, err := openapiv3.ParseDocument(data)
+	if err != nil {
+		t.Logf("Parse failed: %+v", err)
+		t.FailNow()
+	}
+	v1 := NewVocabularyFromOpenAPIv3(document)
+	// uncomment the following line to write reference data
+	//err = ioutil.WriteFile(referenceFile, []byte(protojson.Format(v1)), 0644)
+	referenceData, err := ioutil.ReadFile(referenceFile)
+	if err != nil {
+		t.Logf("ReadFile failed: %+v", err)
+		t.FailNow()
+	}
+	reference := metrics.Vocabulary{}
+	jsonpb.UnmarshalString(string(referenceData), &reference)
+	testVocabulary(t,
+		v1,
+		&reference,
+	)
+}
+
+func TestSampleVocabularyDiscovery(t *testing.T) {
+	inputFile := "../../examples/discovery/discovery-v1.json"
+	referenceFile := "../../testdata/metrics/vocabulary/discovery.json"
+	data, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		t.Logf("ReadFile failed: %+v", err)
+		t.FailNow()
+	}
+	document, err := discovery.ParseDocument(data)
+	if err != nil {
+		t.Logf("Parse failed: %+v", err)
+		t.FailNow()
+	}
+	v1 := NewVocabularyFromDiscovery(document)
+	// uncomment the following line to write reference data
+	//err = ioutil.WriteFile(referenceFile, []byte(protojson.Format(v1)), 0644)
+	referenceData, err := ioutil.ReadFile(referenceFile)
+	if err != nil {
+		t.Logf("ReadFile failed: %+v", err)
+		t.FailNow()
+	}
+	reference := metrics.Vocabulary{}
+	jsonpb.UnmarshalString(string(referenceData), &reference)
 	testVocabulary(t,
 		v1,
 		&reference,
