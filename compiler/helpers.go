@@ -176,6 +176,8 @@ func StringForScalarNode(node *yaml.Node) (string, bool) {
 			return node.Value, true
 		case "!!str":
 			return node.Value, true
+		case "!!timestamp":
+			return node.Value, true
 		case "!!null":
 			return "", true
 		default:
