@@ -23,9 +23,11 @@ func (vocab *Vocabulary) processMethodDiscovery(operation *discovery_v1.Method) 
 	if operation.Id != "" {
 		vocab.operationID[operation.Id]++
 	}
-	for _, pair := range operation.Parameters.AdditionalProperties {
-		vocab.parameters[pair.Name]++
-		vocab.processParameterDiscovery(pair.Value)
+	if operation.Parameters != nil {
+		for _, pair := range operation.Parameters.AdditionalProperties {
+			vocab.parameters[pair.Name]++
+			vocab.processParameterDiscovery(pair.Value)
+		}
 	}
 }
 
