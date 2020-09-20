@@ -15,10 +15,12 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/golang/protobuf/proto"
+	discovery_v1 "github.com/googleapis/gnostic/discovery"
 	metrics "github.com/googleapis/gnostic/metrics"
 	vocabulary "github.com/googleapis/gnostic/metrics/vocabulary"
 	openapiv2 "github.com/googleapis/gnostic/openapiv2"
@@ -64,6 +66,15 @@ func main() {
 				// Analyze the API document.
 				vocab = vocabulary.NewVocabularyFromOpenAPIv3(documentv3)
 			}
+		case "discovery.v1.Document":
+			discoveryDocument := &discovery_v1.Document{}
+			err = proto.Unmarshal(model.Value, discoveryDocument)
+			if err == nil {
+				// Analyze the API document.
+				vocab = vocabulary.NewVocabularyFromDiscovery(discoveryDocument)
+			}
+		default:
+			log.Printf("unsupported document type %s", model.TypeUrl)
 		}
 	}
 
