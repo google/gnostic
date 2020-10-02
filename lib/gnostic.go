@@ -514,7 +514,6 @@ func (g *Gnostic) writeTextOutput(message proto.Message) {
 func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	// Convert the OpenAPI document into an exportable MapSlice.
 	var rawInfo *yaml.Node
-	var err error
 	if g.sourceFormat == SourceFormatOpenAPI2 {
 		document := message.(*openapi_v2.Document)
 		rawInfo = document.ToRawInfo()
@@ -533,9 +532,8 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	}
 	// Optionally write description in yaml format.
 	if g.yamlOutputPath != "" {
-		var bytes []byte
 		if rawInfo != nil {
-			bytes, err = yaml.Marshal(rawInfo)
+			bytes, err := yaml.Marshal(rawInfo)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating yaml output %s\n", err.Error())
 				fmt.Fprintf(os.Stderr, "info %+v", rawInfo)
@@ -547,13 +545,12 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	}
 	// Optionally write description in json format.
 	if g.jsonOutputPath != "" {
-		var bytes []byte
 		if rawInfo != nil {
 			rawInfo := &yaml.Node{
 				Kind:    yaml.DocumentNode,
 				Content: []*yaml.Node{rawInfo},
 			}
-			bytes, _ = jsonwriter.Marshal(rawInfo)
+			bytes, err := jsonwriter.Marshal(rawInfo)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating json output %s\n", err.Error())
 			}
