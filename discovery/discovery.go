@@ -2147,10 +2147,8 @@ func (m *Any) ToRawInfo() *yaml.Node {
 			return node.Content[0]
 		}
 		return &node
-	} else {
-		return nil
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Auth suitable for JSON or YAML export.

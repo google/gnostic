@@ -6817,7 +6817,7 @@ func (m *AdditionalPropertiesItem) ToRawInfo() *yaml.Node {
 	if v1, ok := m.GetOneof().(*AdditionalPropertiesItem_Boolean); ok {
 		return compiler.NewScalarNodeForBool(v1.Boolean)
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Any suitable for JSON or YAML export.
@@ -6830,10 +6830,8 @@ func (m *Any) ToRawInfo() *yaml.Node {
 			return node.Content[0]
 		}
 		return &node
-	} else {
-		return nil
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of ApiKeySecurity suitable for JSON or YAML export.
@@ -7716,7 +7714,7 @@ func (m *NonBodyParameter) ToRawInfo() *yaml.Node {
 	if v3 != nil {
 		return v3.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Oauth2AccessCodeSecurity suitable for JSON or YAML export.
@@ -7944,7 +7942,7 @@ func (m *Parameter) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of ParameterDefinitions suitable for JSON or YAML export.
@@ -7976,7 +7974,7 @@ func (m *ParametersItem) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of PathItem suitable for JSON or YAML export.
@@ -8425,7 +8423,7 @@ func (m *ResponseValue) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Responses suitable for JSON or YAML export.
@@ -8618,7 +8616,7 @@ func (m *SchemaItem) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of SecurityDefinitions suitable for JSON or YAML export.
@@ -8670,7 +8668,7 @@ func (m *SecurityDefinitionsItem) ToRawInfo() *yaml.Node {
 	if v5 != nil {
 		return v5.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of SecurityRequirement suitable for JSON or YAML export.

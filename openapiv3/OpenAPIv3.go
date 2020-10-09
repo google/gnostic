@@ -6635,7 +6635,7 @@ func (m *AdditionalPropertiesItem) ToRawInfo() *yaml.Node {
 	if v1, ok := m.GetOneof().(*AdditionalPropertiesItem_Boolean); ok {
 		return compiler.NewScalarNodeForBool(v1.Boolean)
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Any suitable for JSON or YAML export.
@@ -6648,10 +6648,8 @@ func (m *Any) ToRawInfo() *yaml.Node {
 			return node.Content[0]
 		}
 		return &node
-	} else {
-		return nil
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of AnyOrExpression suitable for JSON or YAML export.
@@ -6668,7 +6666,7 @@ func (m *AnyOrExpression) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Callback suitable for JSON or YAML export.
@@ -6706,7 +6704,7 @@ func (m *CallbackOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of CallbacksOrReferences suitable for JSON or YAML export.
@@ -6818,7 +6816,7 @@ func (m *DefaultType) ToRawInfo() *yaml.Node {
 	if v2, ok := m.GetOneof().(*DefaultType_String_); ok {
 		return compiler.NewScalarNodeForString(v2.String_)
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Discriminator suitable for JSON or YAML export.
@@ -6991,7 +6989,7 @@ func (m *ExampleOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of ExamplesOrReferences suitable for JSON or YAML export.
@@ -7119,7 +7117,7 @@ func (m *HeaderOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of HeadersOrReferences suitable for JSON or YAML export.
@@ -7270,7 +7268,7 @@ func (m *LinkOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of LinksOrReferences suitable for JSON or YAML export.
@@ -7791,7 +7789,7 @@ func (m *ParameterOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of ParametersOrReferences suitable for JSON or YAML export.
@@ -7987,7 +7985,7 @@ func (m *RequestBodyOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Response suitable for JSON or YAML export.
@@ -8034,7 +8032,7 @@ func (m *ResponseOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of Responses suitable for JSON or YAML export.
@@ -8269,7 +8267,7 @@ func (m *SchemaOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of SchemasOrReferences suitable for JSON or YAML export.
@@ -8362,7 +8360,7 @@ func (m *SecuritySchemeOrReference) ToRawInfo() *yaml.Node {
 	if v1 != nil {
 		return v1.ToRawInfo()
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of SecuritySchemesOrReferences suitable for JSON or YAML export.
@@ -8463,7 +8461,7 @@ func (m *SpecificationExtension) ToRawInfo() *yaml.Node {
 	if v2, ok := m.GetOneof().(*SpecificationExtension_String_); ok {
 		return compiler.NewScalarNodeForString(v2.String_)
 	}
-	return nil
+	return compiler.NewNullNode()
 }
 
 // ToRawInfo returns a description of StringArray suitable for JSON or YAML export.
