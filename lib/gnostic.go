@@ -442,19 +442,22 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	}
 	// Compile to the proto model.
 	if g.sourceFormat == SourceFormatOpenAPI2 {
-		document, err := openapi_v2.NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		root := info.Content[0]
+		document, err := openapi_v2.NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
 	} else if g.sourceFormat == SourceFormatOpenAPI3 {
-		document, err := openapi_v3.NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		root := info.Content[0]
+		document, err := openapi_v3.NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
 	} else {
-		document, err := discovery_v1.NewDocument(info.Content[0], compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		root := info.Content[0]
+		document, err := discovery_v1.NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}

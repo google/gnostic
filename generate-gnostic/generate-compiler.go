@@ -173,7 +173,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("  errors = append(errors, compiler.NewError(context, message))")
 			code.Print("} else {")
 			code.Print("  x.Schema = make([]*Schema, 0)")
-			code.Print("  y, err := NewSchema(m, compiler.NewContext(\"<array>\", context))")
+			code.Print("  y, err := NewSchema(m, compiler.NewContext(\"<array>\", m, context))")
 			code.Print("  if err != nil {")
 			code.Print("    return nil, err")
 			code.Print("  }")
@@ -187,7 +187,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("  errors = append(errors, compiler.NewError(context, message))")
 			code.Print("} else {")
 			code.Print("  x.SchemaOrReference = make([]*SchemaOrReference, 0)")
-			code.Print("  y, err := NewSchemaOrReference(m, compiler.NewContext(\"<array>\", context))")
+			code.Print("  y, err := NewSchemaOrReference(m, compiler.NewContext(\"<array>\", m, context))")
 			code.Print("  if err != nil {")
 			code.Print("    return nil, err")
 			code.Print("  }")
@@ -372,7 +372,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("  a, ok := compiler.SequenceNodeForNode(v%d)", fieldNumber)
 					code.Print("  if ok {")
 					code.Print("    for _, item := range a.Content {")
-					code.Print("      y, err := New%s(item, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
+					code.Print("      y, err := New%s(item, compiler.NewContext(\"%s\", item, context))", typeModel.Name, propertyName)
 					code.Print("      if err != nil {")
 					code.Print("        errors = append(errors, err)")
 					code.Print("      }")
@@ -388,7 +388,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 							code.Print("  if ok {")
 						}
 						code.Print("    // errors might be ok here, they mean we just don't have the right subtype")
-						code.Print("    t, matchingError := New%s(m, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
+						code.Print("    t, matchingError := New%s(m, compiler.NewContext(\"%s\", m, context))", typeModel.Name, propertyName)
 						code.Print("    if matchingError == nil {")
 						code.Print("      x.Oneof = &%s_%s{%s: t}", parentTypeName, typeModel.Name, typeModel.Name)
 						code.Print("      matched = true")
@@ -403,8 +403,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("  var err error")
-						code.Print("  x.%s, err = New%s(v%d, compiler.NewContext(\"%s\", context))",
-							fieldName, typeModel.Name, fieldNumber, propertyName)
+						code.Print("  x.%s, err = New%s(v%d, compiler.NewContext(\"%s\", v%d, context))",
+							fieldName, typeModel.Name, fieldNumber, propertyName, fieldNumber)
 						code.Print("  if err != nil {")
 						code.Print("    errors = append(errors, err)")
 						code.Print("  }")
@@ -550,14 +550,14 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("		pair.Value = result")
 						code.Print("	}")
 						code.Print("} else {")
-						code.Print("	pair.Value, err = NewAny(v, compiler.NewContext(k, context))")
+						code.Print("	pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))")
 						code.Print("	if err != nil {")
 						code.Print("		errors = append(errors, err)")
 						code.Print("	}")
 						code.Print("}")
 					} else {
 						code.Print("var err error")
-						code.Print("pair.Value, err = New%s(v, compiler.NewContext(k, context))", mapTypeName)
+						code.Print("pair.Value, err = New%s(v, compiler.NewContext(k, v, context))", mapTypeName)
 						code.Print("if err != nil {")
 						code.Print("  errors = append(errors, err)")
 						code.Print("}")
@@ -580,12 +580,12 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("if matched {")
 			code.Print("    // since the oneof matched one of its possibilities, discard any matching errors")
 			code.Print("	errors = make([]error, 0)")
-			generateMatchErrors := false // TODO: enable this and update tests for new error messages
+			generateMatchErrors := true // TODO: enable this and update tests for new error messages
 			if generateMatchErrors {
 				code.Print("} else {")
-				code.Print("    message := fmt.Sprintf(\"failed to match %s with %%+v\", compiler.Description(in))", typeName)
+				code.Print("    message := fmt.Sprintf(\"contains an invalid %s\")", typeName)
 				code.Print("    err := compiler.NewError(context, message)")
-				code.Print("    errors = append(errors, err)")
+				code.Print("    errors = []error{err}")
 			}
 			code.Print("}")
 		}
