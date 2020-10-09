@@ -719,10 +719,8 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 		code.Print("		return node.Content[0]")
 		code.Print("	}")
 		code.Print("	return &node")
-		code.Print("} else {")
-		code.Print("	return nil")
 		code.Print("}")
-		code.Print("return nil")
+		code.Print("return compiler.NewNullNode()")
 	} else if typeName == "StringArray" {
 		code.Print("return compiler.NewSequenceNodeForStringArray(m.Value)")
 	} else if typeModel.OneOfWrapper {
@@ -749,7 +747,7 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				code.Print("}")
 			}
 		}
-		code.Print("return nil")
+		code.Print("return compiler.NewNullNode()")
 	} else {
 		code.Print("info := compiler.NewMappingNode()")
 		code.Print("if m == nil {return info}")

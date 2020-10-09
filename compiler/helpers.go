@@ -243,6 +243,15 @@ func InvalidKeysInMap(m *yaml.Node, allowedKeys []string, allowedPatterns []*reg
 	return invalidKeys
 }
 
+// NewNullNode creates a new Null node.
+func NewNullNode() *yaml.Node {
+	node := &yaml.Node{
+		Kind: yaml.ScalarNode,
+		Tag:  "!!null",
+	}
+	return node
+}
+
 // NewMappingNode creates a new Mapping node.
 func NewMappingNode() *yaml.Node {
 	return &yaml.Node{
