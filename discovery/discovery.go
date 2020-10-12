@@ -89,7 +89,7 @@ func NewAuth(in *yaml.Node, context *compiler.Context) (*Auth, error) {
 		v1 := compiler.MapValueForKey(m, "oauth2")
 		if v1 != nil {
 			var err error
-			x.Oauth2, err = NewOauth2(v1, compiler.NewContext("oauth2", context))
+			x.Oauth2, err = NewOauth2(v1, compiler.NewContext("oauth2", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -196,7 +196,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v9 := compiler.MapValueForKey(m, "icons")
 		if v9 != nil {
 			var err error
-			x.Icons, err = NewIcons(v9, compiler.NewContext("icons", context))
+			x.Icons, err = NewIcons(v9, compiler.NewContext("icons", v9, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -279,7 +279,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v18 := compiler.MapValueForKey(m, "parameters")
 		if v18 != nil {
 			var err error
-			x.Parameters, err = NewParameters(v18, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewParameters(v18, compiler.NewContext("parameters", v18, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -288,7 +288,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v19 := compiler.MapValueForKey(m, "auth")
 		if v19 != nil {
 			var err error
-			x.Auth, err = NewAuth(v19, compiler.NewContext("auth", context))
+			x.Auth, err = NewAuth(v19, compiler.NewContext("auth", v19, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -308,7 +308,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v21 := compiler.MapValueForKey(m, "schemas")
 		if v21 != nil {
 			var err error
-			x.Schemas, err = NewSchemas(v21, compiler.NewContext("schemas", context))
+			x.Schemas, err = NewSchemas(v21, compiler.NewContext("schemas", v21, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -317,7 +317,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v22 := compiler.MapValueForKey(m, "methods")
 		if v22 != nil {
 			var err error
-			x.Methods, err = NewMethods(v22, compiler.NewContext("methods", context))
+			x.Methods, err = NewMethods(v22, compiler.NewContext("methods", v22, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -326,7 +326,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v23 := compiler.MapValueForKey(m, "resources")
 		if v23 != nil {
 			var err error
-			x.Resources, err = NewResources(v23, compiler.NewContext("resources", context))
+			x.Resources, err = NewResources(v23, compiler.NewContext("resources", v23, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -491,7 +491,7 @@ func NewMediaUpload(in *yaml.Node, context *compiler.Context) (*MediaUpload, err
 		v3 := compiler.MapValueForKey(m, "protocols")
 		if v3 != nil {
 			var err error
-			x.Protocols, err = NewProtocols(v3, compiler.NewContext("protocols", context))
+			x.Protocols, err = NewProtocols(v3, compiler.NewContext("protocols", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -565,7 +565,7 @@ func NewMethod(in *yaml.Node, context *compiler.Context) (*Method, error) {
 		v5 := compiler.MapValueForKey(m, "parameters")
 		if v5 != nil {
 			var err error
-			x.Parameters, err = NewParameters(v5, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewParameters(v5, compiler.NewContext("parameters", v5, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -585,7 +585,7 @@ func NewMethod(in *yaml.Node, context *compiler.Context) (*Method, error) {
 		v7 := compiler.MapValueForKey(m, "request")
 		if v7 != nil {
 			var err error
-			x.Request, err = NewRequest(v7, compiler.NewContext("request", context))
+			x.Request, err = NewRequest(v7, compiler.NewContext("request", v7, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -594,7 +594,7 @@ func NewMethod(in *yaml.Node, context *compiler.Context) (*Method, error) {
 		v8 := compiler.MapValueForKey(m, "response")
 		if v8 != nil {
 			var err error
-			x.Response, err = NewResponse(v8, compiler.NewContext("response", context))
+			x.Response, err = NewResponse(v8, compiler.NewContext("response", v8, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -641,7 +641,7 @@ func NewMethod(in *yaml.Node, context *compiler.Context) (*Method, error) {
 		v13 := compiler.MapValueForKey(m, "mediaUpload")
 		if v13 != nil {
 			var err error
-			x.MediaUpload, err = NewMediaUpload(v13, compiler.NewContext("mediaUpload", context))
+			x.MediaUpload, err = NewMediaUpload(v13, compiler.NewContext("mediaUpload", v13, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -696,7 +696,7 @@ func NewMethods(in *yaml.Node, context *compiler.Context) (*Methods, error) {
 				pair := &NamedMethod{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewMethod(v, compiler.NewContext(k, context))
+				pair.Value, err = NewMethod(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -736,7 +736,7 @@ func NewNamedMethod(in *yaml.Node, context *compiler.Context) (*NamedMethod, err
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewMethod(v2, compiler.NewContext("value", context))
+			x.Value, err = NewMethod(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -774,7 +774,7 @@ func NewNamedParameter(in *yaml.Node, context *compiler.Context) (*NamedParamete
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewParameter(v2, compiler.NewContext("value", context))
+			x.Value, err = NewParameter(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -812,7 +812,7 @@ func NewNamedResource(in *yaml.Node, context *compiler.Context) (*NamedResource,
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewResource(v2, compiler.NewContext("value", context))
+			x.Value, err = NewResource(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -850,7 +850,7 @@ func NewNamedSchema(in *yaml.Node, context *compiler.Context) (*NamedSchema, err
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewSchema(v2, compiler.NewContext("value", context))
+			x.Value, err = NewSchema(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -888,7 +888,7 @@ func NewNamedScope(in *yaml.Node, context *compiler.Context) (*NamedScope, error
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewScope(v2, compiler.NewContext("value", context))
+			x.Value, err = NewScope(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -917,7 +917,7 @@ func NewOauth2(in *yaml.Node, context *compiler.Context) (*Oauth2, error) {
 		v1 := compiler.MapValueForKey(m, "scopes")
 		if v1 != nil {
 			var err error
-			x.Scopes, err = NewScopes(v1, compiler.NewContext("scopes", context))
+			x.Scopes, err = NewScopes(v1, compiler.NewContext("scopes", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1076,7 +1076,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v15 := compiler.MapValueForKey(m, "properties")
 		if v15 != nil {
 			var err error
-			x.Properties, err = NewSchemas(v15, compiler.NewContext("properties", context))
+			x.Properties, err = NewSchemas(v15, compiler.NewContext("properties", v15, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1085,7 +1085,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v16 := compiler.MapValueForKey(m, "additionalProperties")
 		if v16 != nil {
 			var err error
-			x.AdditionalProperties, err = NewSchema(v16, compiler.NewContext("additionalProperties", context))
+			x.AdditionalProperties, err = NewSchema(v16, compiler.NewContext("additionalProperties", v16, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1094,7 +1094,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v17 := compiler.MapValueForKey(m, "items")
 		if v17 != nil {
 			var err error
-			x.Items, err = NewSchema(v17, compiler.NewContext("items", context))
+			x.Items, err = NewSchema(v17, compiler.NewContext("items", v17, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1103,7 +1103,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v18 := compiler.MapValueForKey(m, "annotations")
 		if v18 != nil {
 			var err error
-			x.Annotations, err = NewAnnotations(v18, compiler.NewContext("annotations", context))
+			x.Annotations, err = NewAnnotations(v18, compiler.NewContext("annotations", v18, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1131,7 +1131,7 @@ func NewParameters(in *yaml.Node, context *compiler.Context) (*Parameters, error
 				pair := &NamedParameter{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewParameter(v, compiler.NewContext(k, context))
+				pair.Value, err = NewParameter(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1162,7 +1162,7 @@ func NewProtocols(in *yaml.Node, context *compiler.Context) (*Protocols, error) 
 		v1 := compiler.MapValueForKey(m, "simple")
 		if v1 != nil {
 			var err error
-			x.Simple, err = NewSimple(v1, compiler.NewContext("simple", context))
+			x.Simple, err = NewSimple(v1, compiler.NewContext("simple", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1171,7 +1171,7 @@ func NewProtocols(in *yaml.Node, context *compiler.Context) (*Protocols, error) 
 		v2 := compiler.MapValueForKey(m, "resumable")
 		if v2 != nil {
 			var err error
-			x.Resumable, err = NewResumable(v2, compiler.NewContext("resumable", context))
+			x.Resumable, err = NewResumable(v2, compiler.NewContext("resumable", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1238,7 +1238,7 @@ func NewResource(in *yaml.Node, context *compiler.Context) (*Resource, error) {
 		v1 := compiler.MapValueForKey(m, "methods")
 		if v1 != nil {
 			var err error
-			x.Methods, err = NewMethods(v1, compiler.NewContext("methods", context))
+			x.Methods, err = NewMethods(v1, compiler.NewContext("methods", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1247,7 +1247,7 @@ func NewResource(in *yaml.Node, context *compiler.Context) (*Resource, error) {
 		v2 := compiler.MapValueForKey(m, "resources")
 		if v2 != nil {
 			var err error
-			x.Resources, err = NewResources(v2, compiler.NewContext("resources", context))
+			x.Resources, err = NewResources(v2, compiler.NewContext("resources", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1275,7 +1275,7 @@ func NewResources(in *yaml.Node, context *compiler.Context) (*Resources, error) 
 				pair := &NamedResource{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewResource(v, compiler.NewContext(k, context))
+				pair.Value, err = NewResource(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1494,7 +1494,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v14 := compiler.MapValueForKey(m, "properties")
 		if v14 != nil {
 			var err error
-			x.Properties, err = NewSchemas(v14, compiler.NewContext("properties", context))
+			x.Properties, err = NewSchemas(v14, compiler.NewContext("properties", v14, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1503,7 +1503,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v15 := compiler.MapValueForKey(m, "additionalProperties")
 		if v15 != nil {
 			var err error
-			x.AdditionalProperties, err = NewSchema(v15, compiler.NewContext("additionalProperties", context))
+			x.AdditionalProperties, err = NewSchema(v15, compiler.NewContext("additionalProperties", v15, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1512,7 +1512,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v16 := compiler.MapValueForKey(m, "items")
 		if v16 != nil {
 			var err error
-			x.Items, err = NewSchema(v16, compiler.NewContext("items", context))
+			x.Items, err = NewSchema(v16, compiler.NewContext("items", v16, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1530,7 +1530,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v18 := compiler.MapValueForKey(m, "annotations")
 		if v18 != nil {
 			var err error
-			x.Annotations, err = NewAnnotations(v18, compiler.NewContext("annotations", context))
+			x.Annotations, err = NewAnnotations(v18, compiler.NewContext("annotations", v18, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1567,7 +1567,7 @@ func NewSchemas(in *yaml.Node, context *compiler.Context) (*Schemas, error) {
 				pair := &NamedSchema{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSchema(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSchema(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1626,7 +1626,7 @@ func NewScopes(in *yaml.Node, context *compiler.Context) (*Scopes, error) {
 				pair := &NamedScope{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewScope(v, compiler.NewContext(k, context))
+				pair.Value, err = NewScope(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
