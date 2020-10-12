@@ -39,7 +39,7 @@ func NewAdditionalPropertiesItem(in *yaml.Node, context *compiler.Context) (*Add
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewSchemaOrReference(m, compiler.NewContext("schemaOrReference", context))
+			t, matchingError := NewSchemaOrReference(m, compiler.NewContext("schemaOrReference", m, context))
 			if matchingError == nil {
 				x.Oneof = &AdditionalPropertiesItem_SchemaOrReference{SchemaOrReference: t}
 				matched = true
@@ -57,6 +57,10 @@ func NewAdditionalPropertiesItem(in *yaml.Node, context *compiler.Context) (*Add
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid AdditionalPropertiesItem")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -80,7 +84,7 @@ func NewAnyOrExpression(in *yaml.Node, context *compiler.Context) (*AnyOrExpress
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewAny(m, compiler.NewContext("any", context))
+			t, matchingError := NewAny(m, compiler.NewContext("any", m, context))
 			if matchingError == nil {
 				x.Oneof = &AnyOrExpression_Any{Any: t}
 				matched = true
@@ -94,7 +98,7 @@ func NewAnyOrExpression(in *yaml.Node, context *compiler.Context) (*AnyOrExpress
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewExpression(m, compiler.NewContext("expression", context))
+			t, matchingError := NewExpression(m, compiler.NewContext("expression", m, context))
 			if matchingError == nil {
 				x.Oneof = &AnyOrExpression_Expression{Expression: t}
 				matched = true
@@ -106,6 +110,10 @@ func NewAnyOrExpression(in *yaml.Node, context *compiler.Context) (*AnyOrExpress
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid AnyOrExpression")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -137,7 +145,7 @@ func NewCallback(in *yaml.Node, context *compiler.Context) (*Callback, error) {
 					pair := &NamedPathItem{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
+					pair.Value, err = NewPathItem(v, compiler.NewContext(k, v, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -167,7 +175,7 @@ func NewCallback(in *yaml.Node, context *compiler.Context) (*Callback, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -190,7 +198,7 @@ func NewCallbackOrReference(in *yaml.Node, context *compiler.Context) (*Callback
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewCallback(m, compiler.NewContext("callback", context))
+			t, matchingError := NewCallback(m, compiler.NewContext("callback", m, context))
 			if matchingError == nil {
 				x.Oneof = &CallbackOrReference_Callback{Callback: t}
 				matched = true
@@ -204,7 +212,7 @@ func NewCallbackOrReference(in *yaml.Node, context *compiler.Context) (*Callback
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &CallbackOrReference_Reference{Reference: t}
 				matched = true
@@ -216,6 +224,10 @@ func NewCallbackOrReference(in *yaml.Node, context *compiler.Context) (*Callback
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid CallbackOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -239,7 +251,7 @@ func NewCallbacksOrReferences(in *yaml.Node, context *compiler.Context) (*Callba
 				pair := &NamedCallbackOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewCallbackOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewCallbackOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -270,7 +282,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v1 := compiler.MapValueForKey(m, "schemas")
 		if v1 != nil {
 			var err error
-			x.Schemas, err = NewSchemasOrReferences(v1, compiler.NewContext("schemas", context))
+			x.Schemas, err = NewSchemasOrReferences(v1, compiler.NewContext("schemas", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -279,7 +291,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v2 := compiler.MapValueForKey(m, "responses")
 		if v2 != nil {
 			var err error
-			x.Responses, err = NewResponsesOrReferences(v2, compiler.NewContext("responses", context))
+			x.Responses, err = NewResponsesOrReferences(v2, compiler.NewContext("responses", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -288,7 +300,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v3 := compiler.MapValueForKey(m, "parameters")
 		if v3 != nil {
 			var err error
-			x.Parameters, err = NewParametersOrReferences(v3, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewParametersOrReferences(v3, compiler.NewContext("parameters", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -297,7 +309,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v4 := compiler.MapValueForKey(m, "examples")
 		if v4 != nil {
 			var err error
-			x.Examples, err = NewExamplesOrReferences(v4, compiler.NewContext("examples", context))
+			x.Examples, err = NewExamplesOrReferences(v4, compiler.NewContext("examples", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -306,7 +318,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v5 := compiler.MapValueForKey(m, "requestBodies")
 		if v5 != nil {
 			var err error
-			x.RequestBodies, err = NewRequestBodiesOrReferences(v5, compiler.NewContext("requestBodies", context))
+			x.RequestBodies, err = NewRequestBodiesOrReferences(v5, compiler.NewContext("requestBodies", v5, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -315,7 +327,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v6 := compiler.MapValueForKey(m, "headers")
 		if v6 != nil {
 			var err error
-			x.Headers, err = NewHeadersOrReferences(v6, compiler.NewContext("headers", context))
+			x.Headers, err = NewHeadersOrReferences(v6, compiler.NewContext("headers", v6, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -324,7 +336,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v7 := compiler.MapValueForKey(m, "securitySchemes")
 		if v7 != nil {
 			var err error
-			x.SecuritySchemes, err = NewSecuritySchemesOrReferences(v7, compiler.NewContext("securitySchemes", context))
+			x.SecuritySchemes, err = NewSecuritySchemesOrReferences(v7, compiler.NewContext("securitySchemes", v7, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -333,7 +345,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v8 := compiler.MapValueForKey(m, "links")
 		if v8 != nil {
 			var err error
-			x.Links, err = NewLinksOrReferences(v8, compiler.NewContext("links", context))
+			x.Links, err = NewLinksOrReferences(v8, compiler.NewContext("links", v8, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -342,7 +354,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 		v9 := compiler.MapValueForKey(m, "callbacks")
 		if v9 != nil {
 			var err error
-			x.Callbacks, err = NewCallbacksOrReferences(v9, compiler.NewContext("callbacks", context))
+			x.Callbacks, err = NewCallbacksOrReferences(v9, compiler.NewContext("callbacks", v9, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -369,7 +381,7 @@ func NewComponents(in *yaml.Node, context *compiler.Context) (*Components, error
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -447,7 +459,7 @@ func NewContact(in *yaml.Node, context *compiler.Context) (*Contact, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -525,7 +537,7 @@ func NewDiscriminator(in *yaml.Node, context *compiler.Context) (*Discriminator,
 		v2 := compiler.MapValueForKey(m, "mapping")
 		if v2 != nil {
 			var err error
-			x.Mapping, err = NewStrings(v2, compiler.NewContext("mapping", context))
+			x.Mapping, err = NewStrings(v2, compiler.NewContext("mapping", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -552,7 +564,7 @@ func NewDiscriminator(in *yaml.Node, context *compiler.Context) (*Discriminator,
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -600,7 +612,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v2 := compiler.MapValueForKey(m, "info")
 		if v2 != nil {
 			var err error
-			x.Info, err = NewInfo(v2, compiler.NewContext("info", context))
+			x.Info, err = NewInfo(v2, compiler.NewContext("info", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -613,7 +625,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 			a, ok := compiler.SequenceNodeForNode(v3)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewServer(item, compiler.NewContext("servers", context))
+					y, err := NewServer(item, compiler.NewContext("servers", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -625,7 +637,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v4 := compiler.MapValueForKey(m, "paths")
 		if v4 != nil {
 			var err error
-			x.Paths, err = NewPaths(v4, compiler.NewContext("paths", context))
+			x.Paths, err = NewPaths(v4, compiler.NewContext("paths", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -634,7 +646,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v5 := compiler.MapValueForKey(m, "components")
 		if v5 != nil {
 			var err error
-			x.Components, err = NewComponents(v5, compiler.NewContext("components", context))
+			x.Components, err = NewComponents(v5, compiler.NewContext("components", v5, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -647,7 +659,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 			a, ok := compiler.SequenceNodeForNode(v6)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewSecurityRequirement(item, compiler.NewContext("security", context))
+					y, err := NewSecurityRequirement(item, compiler.NewContext("security", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -663,7 +675,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 			a, ok := compiler.SequenceNodeForNode(v7)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewTag(item, compiler.NewContext("tags", context))
+					y, err := NewTag(item, compiler.NewContext("tags", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -675,7 +687,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 		v8 := compiler.MapValueForKey(m, "externalDocs")
 		if v8 != nil {
 			var err error
-			x.ExternalDocs, err = NewExternalDocs(v8, compiler.NewContext("externalDocs", context))
+			x.ExternalDocs, err = NewExternalDocs(v8, compiler.NewContext("externalDocs", v8, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -702,7 +714,7 @@ func NewDocument(in *yaml.Node, context *compiler.Context) (*Document, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -744,7 +756,7 @@ func NewEncoding(in *yaml.Node, context *compiler.Context) (*Encoding, error) {
 		v2 := compiler.MapValueForKey(m, "headers")
 		if v2 != nil {
 			var err error
-			x.Headers, err = NewHeadersOrReferences(v2, compiler.NewContext("headers", context))
+			x.Headers, err = NewHeadersOrReferences(v2, compiler.NewContext("headers", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -798,7 +810,7 @@ func NewEncoding(in *yaml.Node, context *compiler.Context) (*Encoding, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -830,7 +842,7 @@ func NewEncodings(in *yaml.Node, context *compiler.Context) (*Encodings, error) 
 				pair := &NamedEncoding{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewEncoding(v, compiler.NewContext(k, context))
+				pair.Value, err = NewEncoding(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -879,7 +891,7 @@ func NewExample(in *yaml.Node, context *compiler.Context) (*Example, error) {
 		v3 := compiler.MapValueForKey(m, "value")
 		if v3 != nil {
 			var err error
-			x.Value, err = NewAny(v3, compiler.NewContext("value", context))
+			x.Value, err = NewAny(v3, compiler.NewContext("value", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -915,7 +927,7 @@ func NewExample(in *yaml.Node, context *compiler.Context) (*Example, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -938,7 +950,7 @@ func NewExampleOrReference(in *yaml.Node, context *compiler.Context) (*ExampleOr
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewExample(m, compiler.NewContext("example", context))
+			t, matchingError := NewExample(m, compiler.NewContext("example", m, context))
 			if matchingError == nil {
 				x.Oneof = &ExampleOrReference_Example{Example: t}
 				matched = true
@@ -952,7 +964,7 @@ func NewExampleOrReference(in *yaml.Node, context *compiler.Context) (*ExampleOr
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &ExampleOrReference_Reference{Reference: t}
 				matched = true
@@ -964,6 +976,10 @@ func NewExampleOrReference(in *yaml.Node, context *compiler.Context) (*ExampleOr
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid ExampleOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -987,7 +1003,7 @@ func NewExamplesOrReferences(in *yaml.Node, context *compiler.Context) (*Example
 				pair := &NamedExampleOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewExampleOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewExampleOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1028,7 +1044,7 @@ func NewExpression(in *yaml.Node, context *compiler.Context) (*Expression, error
 						pair.Value = result
 					}
 				} else {
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -1102,7 +1118,7 @@ func NewExternalDocs(in *yaml.Node, context *compiler.Context) (*ExternalDocs, e
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -1198,7 +1214,7 @@ func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 		v8 := compiler.MapValueForKey(m, "schema")
 		if v8 != nil {
 			var err error
-			x.Schema, err = NewSchemaOrReference(v8, compiler.NewContext("schema", context))
+			x.Schema, err = NewSchemaOrReference(v8, compiler.NewContext("schema", v8, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1207,7 +1223,7 @@ func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 		v9 := compiler.MapValueForKey(m, "example")
 		if v9 != nil {
 			var err error
-			x.Example, err = NewAny(v9, compiler.NewContext("example", context))
+			x.Example, err = NewAny(v9, compiler.NewContext("example", v9, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1216,7 +1232,7 @@ func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 		v10 := compiler.MapValueForKey(m, "examples")
 		if v10 != nil {
 			var err error
-			x.Examples, err = NewExamplesOrReferences(v10, compiler.NewContext("examples", context))
+			x.Examples, err = NewExamplesOrReferences(v10, compiler.NewContext("examples", v10, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1225,7 +1241,7 @@ func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 		v11 := compiler.MapValueForKey(m, "content")
 		if v11 != nil {
 			var err error
-			x.Content, err = NewMediaTypes(v11, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v11, compiler.NewContext("content", v11, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1252,7 +1268,7 @@ func NewHeader(in *yaml.Node, context *compiler.Context) (*Header, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -1275,7 +1291,7 @@ func NewHeaderOrReference(in *yaml.Node, context *compiler.Context) (*HeaderOrRe
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewHeader(m, compiler.NewContext("header", context))
+			t, matchingError := NewHeader(m, compiler.NewContext("header", m, context))
 			if matchingError == nil {
 				x.Oneof = &HeaderOrReference_Header{Header: t}
 				matched = true
@@ -1289,7 +1305,7 @@ func NewHeaderOrReference(in *yaml.Node, context *compiler.Context) (*HeaderOrRe
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &HeaderOrReference_Reference{Reference: t}
 				matched = true
@@ -1301,6 +1317,10 @@ func NewHeaderOrReference(in *yaml.Node, context *compiler.Context) (*HeaderOrRe
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid HeaderOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -1324,7 +1344,7 @@ func NewHeadersOrReferences(in *yaml.Node, context *compiler.Context) (*HeadersO
 				pair := &NamedHeaderOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewHeaderOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewHeaderOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1388,7 +1408,7 @@ func NewInfo(in *yaml.Node, context *compiler.Context) (*Info, error) {
 		v4 := compiler.MapValueForKey(m, "contact")
 		if v4 != nil {
 			var err error
-			x.Contact, err = NewContact(v4, compiler.NewContext("contact", context))
+			x.Contact, err = NewContact(v4, compiler.NewContext("contact", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1397,7 +1417,7 @@ func NewInfo(in *yaml.Node, context *compiler.Context) (*Info, error) {
 		v5 := compiler.MapValueForKey(m, "license")
 		if v5 != nil {
 			var err error
-			x.License, err = NewLicense(v5, compiler.NewContext("license", context))
+			x.License, err = NewLicense(v5, compiler.NewContext("license", v5, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1442,7 +1462,7 @@ func NewInfo(in *yaml.Node, context *compiler.Context) (*Info, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -1465,7 +1485,7 @@ func NewItemsItem(in *yaml.Node, context *compiler.Context) (*ItemsItem, error) 
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		x.SchemaOrReference = make([]*SchemaOrReference, 0)
-		y, err := NewSchemaOrReference(m, compiler.NewContext("<array>", context))
+		y, err := NewSchemaOrReference(m, compiler.NewContext("<array>", m, context))
 		if err != nil {
 			return nil, err
 		}
@@ -1536,7 +1556,7 @@ func NewLicense(in *yaml.Node, context *compiler.Context) (*License, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -1587,7 +1607,7 @@ func NewLink(in *yaml.Node, context *compiler.Context) (*Link, error) {
 		v3 := compiler.MapValueForKey(m, "parameters")
 		if v3 != nil {
 			var err error
-			x.Parameters, err = NewAnyOrExpression(v3, compiler.NewContext("parameters", context))
+			x.Parameters, err = NewAnyOrExpression(v3, compiler.NewContext("parameters", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1596,7 +1616,7 @@ func NewLink(in *yaml.Node, context *compiler.Context) (*Link, error) {
 		v4 := compiler.MapValueForKey(m, "requestBody")
 		if v4 != nil {
 			var err error
-			x.RequestBody, err = NewAnyOrExpression(v4, compiler.NewContext("requestBody", context))
+			x.RequestBody, err = NewAnyOrExpression(v4, compiler.NewContext("requestBody", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1614,7 +1634,7 @@ func NewLink(in *yaml.Node, context *compiler.Context) (*Link, error) {
 		v6 := compiler.MapValueForKey(m, "server")
 		if v6 != nil {
 			var err error
-			x.Server, err = NewServer(v6, compiler.NewContext("server", context))
+			x.Server, err = NewServer(v6, compiler.NewContext("server", v6, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1641,7 +1661,7 @@ func NewLink(in *yaml.Node, context *compiler.Context) (*Link, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -1664,7 +1684,7 @@ func NewLinkOrReference(in *yaml.Node, context *compiler.Context) (*LinkOrRefere
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewLink(m, compiler.NewContext("link", context))
+			t, matchingError := NewLink(m, compiler.NewContext("link", m, context))
 			if matchingError == nil {
 				x.Oneof = &LinkOrReference_Link{Link: t}
 				matched = true
@@ -1678,7 +1698,7 @@ func NewLinkOrReference(in *yaml.Node, context *compiler.Context) (*LinkOrRefere
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &LinkOrReference_Reference{Reference: t}
 				matched = true
@@ -1690,6 +1710,10 @@ func NewLinkOrReference(in *yaml.Node, context *compiler.Context) (*LinkOrRefere
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid LinkOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -1713,7 +1737,7 @@ func NewLinksOrReferences(in *yaml.Node, context *compiler.Context) (*LinksOrRef
 				pair := &NamedLinkOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewLinkOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewLinkOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1744,7 +1768,7 @@ func NewMediaType(in *yaml.Node, context *compiler.Context) (*MediaType, error) 
 		v1 := compiler.MapValueForKey(m, "schema")
 		if v1 != nil {
 			var err error
-			x.Schema, err = NewSchemaOrReference(v1, compiler.NewContext("schema", context))
+			x.Schema, err = NewSchemaOrReference(v1, compiler.NewContext("schema", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1753,7 +1777,7 @@ func NewMediaType(in *yaml.Node, context *compiler.Context) (*MediaType, error) 
 		v2 := compiler.MapValueForKey(m, "example")
 		if v2 != nil {
 			var err error
-			x.Example, err = NewAny(v2, compiler.NewContext("example", context))
+			x.Example, err = NewAny(v2, compiler.NewContext("example", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1762,7 +1786,7 @@ func NewMediaType(in *yaml.Node, context *compiler.Context) (*MediaType, error) 
 		v3 := compiler.MapValueForKey(m, "examples")
 		if v3 != nil {
 			var err error
-			x.Examples, err = NewExamplesOrReferences(v3, compiler.NewContext("examples", context))
+			x.Examples, err = NewExamplesOrReferences(v3, compiler.NewContext("examples", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1771,7 +1795,7 @@ func NewMediaType(in *yaml.Node, context *compiler.Context) (*MediaType, error) 
 		v4 := compiler.MapValueForKey(m, "encoding")
 		if v4 != nil {
 			var err error
-			x.Encoding, err = NewEncodings(v4, compiler.NewContext("encoding", context))
+			x.Encoding, err = NewEncodings(v4, compiler.NewContext("encoding", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1798,7 +1822,7 @@ func NewMediaType(in *yaml.Node, context *compiler.Context) (*MediaType, error) 
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -1830,7 +1854,7 @@ func NewMediaTypes(in *yaml.Node, context *compiler.Context) (*MediaTypes, error
 				pair := &NamedMediaType{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewMediaType(v, compiler.NewContext(k, context))
+				pair.Value, err = NewMediaType(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -1870,7 +1894,7 @@ func NewNamedAny(in *yaml.Node, context *compiler.Context) (*NamedAny, error) {
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewAny(v2, compiler.NewContext("value", context))
+			x.Value, err = NewAny(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1908,7 +1932,7 @@ func NewNamedCallbackOrReference(in *yaml.Node, context *compiler.Context) (*Nam
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewCallbackOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewCallbackOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1946,7 +1970,7 @@ func NewNamedEncoding(in *yaml.Node, context *compiler.Context) (*NamedEncoding,
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewEncoding(v2, compiler.NewContext("value", context))
+			x.Value, err = NewEncoding(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -1984,7 +2008,7 @@ func NewNamedExampleOrReference(in *yaml.Node, context *compiler.Context) (*Name
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewExampleOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewExampleOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2022,7 +2046,7 @@ func NewNamedHeaderOrReference(in *yaml.Node, context *compiler.Context) (*Named
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewHeaderOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewHeaderOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2060,7 +2084,7 @@ func NewNamedLinkOrReference(in *yaml.Node, context *compiler.Context) (*NamedLi
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewLinkOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewLinkOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2098,7 +2122,7 @@ func NewNamedMediaType(in *yaml.Node, context *compiler.Context) (*NamedMediaTyp
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewMediaType(v2, compiler.NewContext("value", context))
+			x.Value, err = NewMediaType(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2136,7 +2160,7 @@ func NewNamedParameterOrReference(in *yaml.Node, context *compiler.Context) (*Na
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewParameterOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewParameterOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2174,7 +2198,7 @@ func NewNamedPathItem(in *yaml.Node, context *compiler.Context) (*NamedPathItem,
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewPathItem(v2, compiler.NewContext("value", context))
+			x.Value, err = NewPathItem(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2212,7 +2236,7 @@ func NewNamedRequestBodyOrReference(in *yaml.Node, context *compiler.Context) (*
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewRequestBodyOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewRequestBodyOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2250,7 +2274,7 @@ func NewNamedResponseOrReference(in *yaml.Node, context *compiler.Context) (*Nam
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewResponseOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewResponseOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2288,7 +2312,7 @@ func NewNamedSchemaOrReference(in *yaml.Node, context *compiler.Context) (*Named
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewSchemaOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewSchemaOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2326,7 +2350,7 @@ func NewNamedSecuritySchemeOrReference(in *yaml.Node, context *compiler.Context)
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewSecuritySchemeOrReference(v2, compiler.NewContext("value", context))
+			x.Value, err = NewSecuritySchemeOrReference(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2364,7 +2388,7 @@ func NewNamedServerVariable(in *yaml.Node, context *compiler.Context) (*NamedSer
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewServerVariable(v2, compiler.NewContext("value", context))
+			x.Value, err = NewServerVariable(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2440,7 +2464,7 @@ func NewNamedStringArray(in *yaml.Node, context *compiler.Context) (*NamedString
 		v2 := compiler.MapValueForKey(m, "value")
 		if v2 != nil {
 			var err error
-			x.Value, err = NewStringArray(v2, compiler.NewContext("value", context))
+			x.Value, err = NewStringArray(v2, compiler.NewContext("value", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2496,7 +2520,7 @@ func NewOauthFlow(in *yaml.Node, context *compiler.Context) (*OauthFlow, error) 
 		v4 := compiler.MapValueForKey(m, "scopes")
 		if v4 != nil {
 			var err error
-			x.Scopes, err = NewStrings(v4, compiler.NewContext("scopes", context))
+			x.Scopes, err = NewStrings(v4, compiler.NewContext("scopes", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2523,7 +2547,7 @@ func NewOauthFlow(in *yaml.Node, context *compiler.Context) (*OauthFlow, error) 
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -2556,7 +2580,7 @@ func NewOauthFlows(in *yaml.Node, context *compiler.Context) (*OauthFlows, error
 		v1 := compiler.MapValueForKey(m, "implicit")
 		if v1 != nil {
 			var err error
-			x.Implicit, err = NewOauthFlow(v1, compiler.NewContext("implicit", context))
+			x.Implicit, err = NewOauthFlow(v1, compiler.NewContext("implicit", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2565,7 +2589,7 @@ func NewOauthFlows(in *yaml.Node, context *compiler.Context) (*OauthFlows, error
 		v2 := compiler.MapValueForKey(m, "password")
 		if v2 != nil {
 			var err error
-			x.Password, err = NewOauthFlow(v2, compiler.NewContext("password", context))
+			x.Password, err = NewOauthFlow(v2, compiler.NewContext("password", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2574,7 +2598,7 @@ func NewOauthFlows(in *yaml.Node, context *compiler.Context) (*OauthFlows, error
 		v3 := compiler.MapValueForKey(m, "clientCredentials")
 		if v3 != nil {
 			var err error
-			x.ClientCredentials, err = NewOauthFlow(v3, compiler.NewContext("clientCredentials", context))
+			x.ClientCredentials, err = NewOauthFlow(v3, compiler.NewContext("clientCredentials", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2583,7 +2607,7 @@ func NewOauthFlows(in *yaml.Node, context *compiler.Context) (*OauthFlows, error
 		v4 := compiler.MapValueForKey(m, "authorizationCode")
 		if v4 != nil {
 			var err error
-			x.AuthorizationCode, err = NewOauthFlow(v4, compiler.NewContext("authorizationCode", context))
+			x.AuthorizationCode, err = NewOauthFlow(v4, compiler.NewContext("authorizationCode", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2610,7 +2634,7 @@ func NewOauthFlows(in *yaml.Node, context *compiler.Context) (*OauthFlows, error
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -2653,7 +2677,7 @@ func NewObject(in *yaml.Node, context *compiler.Context) (*Object, error) {
 						pair.Value = result
 					}
 				} else {
-					pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+					pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -2720,7 +2744,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 		v4 := compiler.MapValueForKey(m, "externalDocs")
 		if v4 != nil {
 			var err error
-			x.ExternalDocs, err = NewExternalDocs(v4, compiler.NewContext("externalDocs", context))
+			x.ExternalDocs, err = NewExternalDocs(v4, compiler.NewContext("externalDocs", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2742,7 +2766,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 			a, ok := compiler.SequenceNodeForNode(v6)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewParameterOrReference(item, compiler.NewContext("parameters", context))
+					y, err := NewParameterOrReference(item, compiler.NewContext("parameters", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -2754,7 +2778,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 		v7 := compiler.MapValueForKey(m, "requestBody")
 		if v7 != nil {
 			var err error
-			x.RequestBody, err = NewRequestBodyOrReference(v7, compiler.NewContext("requestBody", context))
+			x.RequestBody, err = NewRequestBodyOrReference(v7, compiler.NewContext("requestBody", v7, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2763,7 +2787,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 		v8 := compiler.MapValueForKey(m, "responses")
 		if v8 != nil {
 			var err error
-			x.Responses, err = NewResponses(v8, compiler.NewContext("responses", context))
+			x.Responses, err = NewResponses(v8, compiler.NewContext("responses", v8, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2772,7 +2796,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 		v9 := compiler.MapValueForKey(m, "callbacks")
 		if v9 != nil {
 			var err error
-			x.Callbacks, err = NewCallbacksOrReferences(v9, compiler.NewContext("callbacks", context))
+			x.Callbacks, err = NewCallbacksOrReferences(v9, compiler.NewContext("callbacks", v9, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2794,7 +2818,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 			a, ok := compiler.SequenceNodeForNode(v11)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewSecurityRequirement(item, compiler.NewContext("security", context))
+					y, err := NewSecurityRequirement(item, compiler.NewContext("security", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -2810,7 +2834,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 			a, ok := compiler.SequenceNodeForNode(v12)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewServer(item, compiler.NewContext("servers", context))
+					y, err := NewServer(item, compiler.NewContext("servers", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -2840,7 +2864,7 @@ func NewOperation(in *yaml.Node, context *compiler.Context) (*Operation, error) 
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -2960,7 +2984,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v10 := compiler.MapValueForKey(m, "schema")
 		if v10 != nil {
 			var err error
-			x.Schema, err = NewSchemaOrReference(v10, compiler.NewContext("schema", context))
+			x.Schema, err = NewSchemaOrReference(v10, compiler.NewContext("schema", v10, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2969,7 +2993,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v11 := compiler.MapValueForKey(m, "example")
 		if v11 != nil {
 			var err error
-			x.Example, err = NewAny(v11, compiler.NewContext("example", context))
+			x.Example, err = NewAny(v11, compiler.NewContext("example", v11, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2978,7 +3002,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v12 := compiler.MapValueForKey(m, "examples")
 		if v12 != nil {
 			var err error
-			x.Examples, err = NewExamplesOrReferences(v12, compiler.NewContext("examples", context))
+			x.Examples, err = NewExamplesOrReferences(v12, compiler.NewContext("examples", v12, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -2987,7 +3011,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 		v13 := compiler.MapValueForKey(m, "content")
 		if v13 != nil {
 			var err error
-			x.Content, err = NewMediaTypes(v13, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v13, compiler.NewContext("content", v13, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3014,7 +3038,7 @@ func NewParameter(in *yaml.Node, context *compiler.Context) (*Parameter, error) 
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -3037,7 +3061,7 @@ func NewParameterOrReference(in *yaml.Node, context *compiler.Context) (*Paramet
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewParameter(m, compiler.NewContext("parameter", context))
+			t, matchingError := NewParameter(m, compiler.NewContext("parameter", m, context))
 			if matchingError == nil {
 				x.Oneof = &ParameterOrReference_Parameter{Parameter: t}
 				matched = true
@@ -3051,7 +3075,7 @@ func NewParameterOrReference(in *yaml.Node, context *compiler.Context) (*Paramet
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &ParameterOrReference_Reference{Reference: t}
 				matched = true
@@ -3063,6 +3087,10 @@ func NewParameterOrReference(in *yaml.Node, context *compiler.Context) (*Paramet
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid ParameterOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3086,7 +3114,7 @@ func NewParametersOrReferences(in *yaml.Node, context *compiler.Context) (*Param
 				pair := &NamedParameterOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewParameterOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewParameterOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3144,7 +3172,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v4 := compiler.MapValueForKey(m, "get")
 		if v4 != nil {
 			var err error
-			x.Get, err = NewOperation(v4, compiler.NewContext("get", context))
+			x.Get, err = NewOperation(v4, compiler.NewContext("get", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3153,7 +3181,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v5 := compiler.MapValueForKey(m, "put")
 		if v5 != nil {
 			var err error
-			x.Put, err = NewOperation(v5, compiler.NewContext("put", context))
+			x.Put, err = NewOperation(v5, compiler.NewContext("put", v5, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3162,7 +3190,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v6 := compiler.MapValueForKey(m, "post")
 		if v6 != nil {
 			var err error
-			x.Post, err = NewOperation(v6, compiler.NewContext("post", context))
+			x.Post, err = NewOperation(v6, compiler.NewContext("post", v6, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3171,7 +3199,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v7 := compiler.MapValueForKey(m, "delete")
 		if v7 != nil {
 			var err error
-			x.Delete, err = NewOperation(v7, compiler.NewContext("delete", context))
+			x.Delete, err = NewOperation(v7, compiler.NewContext("delete", v7, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3180,7 +3208,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v8 := compiler.MapValueForKey(m, "options")
 		if v8 != nil {
 			var err error
-			x.Options, err = NewOperation(v8, compiler.NewContext("options", context))
+			x.Options, err = NewOperation(v8, compiler.NewContext("options", v8, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3189,7 +3217,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v9 := compiler.MapValueForKey(m, "head")
 		if v9 != nil {
 			var err error
-			x.Head, err = NewOperation(v9, compiler.NewContext("head", context))
+			x.Head, err = NewOperation(v9, compiler.NewContext("head", v9, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3198,7 +3226,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v10 := compiler.MapValueForKey(m, "patch")
 		if v10 != nil {
 			var err error
-			x.Patch, err = NewOperation(v10, compiler.NewContext("patch", context))
+			x.Patch, err = NewOperation(v10, compiler.NewContext("patch", v10, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3207,7 +3235,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 		v11 := compiler.MapValueForKey(m, "trace")
 		if v11 != nil {
 			var err error
-			x.Trace, err = NewOperation(v11, compiler.NewContext("trace", context))
+			x.Trace, err = NewOperation(v11, compiler.NewContext("trace", v11, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3220,7 +3248,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 			a, ok := compiler.SequenceNodeForNode(v12)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewServer(item, compiler.NewContext("servers", context))
+					y, err := NewServer(item, compiler.NewContext("servers", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -3236,7 +3264,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 			a, ok := compiler.SequenceNodeForNode(v13)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewParameterOrReference(item, compiler.NewContext("parameters", context))
+					y, err := NewParameterOrReference(item, compiler.NewContext("parameters", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -3266,7 +3294,7 @@ func NewPathItem(in *yaml.Node, context *compiler.Context) (*PathItem, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -3306,7 +3334,7 @@ func NewPaths(in *yaml.Node, context *compiler.Context) (*Paths, error) {
 					pair := &NamedPathItem{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewPathItem(v, compiler.NewContext(k, context))
+					pair.Value, err = NewPathItem(v, compiler.NewContext(k, v, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -3336,7 +3364,7 @@ func NewPaths(in *yaml.Node, context *compiler.Context) (*Paths, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -3368,7 +3396,7 @@ func NewProperties(in *yaml.Node, context *compiler.Context) (*Properties, error
 				pair := &NamedSchemaOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSchemaOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSchemaOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3426,7 +3454,7 @@ func NewRequestBodiesOrReferences(in *yaml.Node, context *compiler.Context) (*Re
 				pair := &NamedRequestBodyOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewRequestBodyOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewRequestBodyOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3472,7 +3500,7 @@ func NewRequestBody(in *yaml.Node, context *compiler.Context) (*RequestBody, err
 		v2 := compiler.MapValueForKey(m, "content")
 		if v2 != nil {
 			var err error
-			x.Content, err = NewMediaTypes(v2, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v2, compiler.NewContext("content", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3508,7 +3536,7 @@ func NewRequestBody(in *yaml.Node, context *compiler.Context) (*RequestBody, err
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -3531,7 +3559,7 @@ func NewRequestBodyOrReference(in *yaml.Node, context *compiler.Context) (*Reque
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewRequestBody(m, compiler.NewContext("requestBody", context))
+			t, matchingError := NewRequestBody(m, compiler.NewContext("requestBody", m, context))
 			if matchingError == nil {
 				x.Oneof = &RequestBodyOrReference_RequestBody{RequestBody: t}
 				matched = true
@@ -3545,7 +3573,7 @@ func NewRequestBodyOrReference(in *yaml.Node, context *compiler.Context) (*Reque
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &RequestBodyOrReference_Reference{Reference: t}
 				matched = true
@@ -3557,6 +3585,10 @@ func NewRequestBodyOrReference(in *yaml.Node, context *compiler.Context) (*Reque
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid RequestBodyOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3596,7 +3628,7 @@ func NewResponse(in *yaml.Node, context *compiler.Context) (*Response, error) {
 		v2 := compiler.MapValueForKey(m, "headers")
 		if v2 != nil {
 			var err error
-			x.Headers, err = NewHeadersOrReferences(v2, compiler.NewContext("headers", context))
+			x.Headers, err = NewHeadersOrReferences(v2, compiler.NewContext("headers", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3605,7 +3637,7 @@ func NewResponse(in *yaml.Node, context *compiler.Context) (*Response, error) {
 		v3 := compiler.MapValueForKey(m, "content")
 		if v3 != nil {
 			var err error
-			x.Content, err = NewMediaTypes(v3, compiler.NewContext("content", context))
+			x.Content, err = NewMediaTypes(v3, compiler.NewContext("content", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3614,7 +3646,7 @@ func NewResponse(in *yaml.Node, context *compiler.Context) (*Response, error) {
 		v4 := compiler.MapValueForKey(m, "links")
 		if v4 != nil {
 			var err error
-			x.Links, err = NewLinksOrReferences(v4, compiler.NewContext("links", context))
+			x.Links, err = NewLinksOrReferences(v4, compiler.NewContext("links", v4, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3641,7 +3673,7 @@ func NewResponse(in *yaml.Node, context *compiler.Context) (*Response, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -3664,7 +3696,7 @@ func NewResponseOrReference(in *yaml.Node, context *compiler.Context) (*Response
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewResponse(m, compiler.NewContext("response", context))
+			t, matchingError := NewResponse(m, compiler.NewContext("response", m, context))
 			if matchingError == nil {
 				x.Oneof = &ResponseOrReference_Response{Response: t}
 				matched = true
@@ -3678,7 +3710,7 @@ func NewResponseOrReference(in *yaml.Node, context *compiler.Context) (*Response
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &ResponseOrReference_Reference{Reference: t}
 				matched = true
@@ -3690,6 +3722,10 @@ func NewResponseOrReference(in *yaml.Node, context *compiler.Context) (*Response
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid ResponseOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -3714,7 +3750,7 @@ func NewResponses(in *yaml.Node, context *compiler.Context) (*Responses, error) 
 		v1 := compiler.MapValueForKey(m, "default")
 		if v1 != nil {
 			var err error
-			x.Default, err = NewResponseOrReference(v1, compiler.NewContext("default", context))
+			x.Default, err = NewResponseOrReference(v1, compiler.NewContext("default", v1, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3730,7 +3766,7 @@ func NewResponses(in *yaml.Node, context *compiler.Context) (*Responses, error) 
 					pair := &NamedResponseOrReference{}
 					pair.Name = k
 					var err error
-					pair.Value, err = NewResponseOrReference(v, compiler.NewContext(k, context))
+					pair.Value, err = NewResponseOrReference(v, compiler.NewContext(k, v, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -3760,7 +3796,7 @@ func NewResponses(in *yaml.Node, context *compiler.Context) (*Responses, error) 
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -3792,7 +3828,7 @@ func NewResponsesOrReferences(in *yaml.Node, context *compiler.Context) (*Respon
 				pair := &NamedResponseOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewResponseOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewResponseOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -3832,7 +3868,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v2 := compiler.MapValueForKey(m, "discriminator")
 		if v2 != nil {
 			var err error
-			x.Discriminator, err = NewDiscriminator(v2, compiler.NewContext("discriminator", context))
+			x.Discriminator, err = NewDiscriminator(v2, compiler.NewContext("discriminator", v2, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3859,7 +3895,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v5 := compiler.MapValueForKey(m, "xml")
 		if v5 != nil {
 			var err error
-			x.Xml, err = NewXml(v5, compiler.NewContext("xml", context))
+			x.Xml, err = NewXml(v5, compiler.NewContext("xml", v5, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3868,7 +3904,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v6 := compiler.MapValueForKey(m, "externalDocs")
 		if v6 != nil {
 			var err error
-			x.ExternalDocs, err = NewExternalDocs(v6, compiler.NewContext("externalDocs", context))
+			x.ExternalDocs, err = NewExternalDocs(v6, compiler.NewContext("externalDocs", v6, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -3877,7 +3913,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v7 := compiler.MapValueForKey(m, "example")
 		if v7 != nil {
 			var err error
-			x.Example, err = NewAny(v7, compiler.NewContext("example", context))
+			x.Example, err = NewAny(v7, compiler.NewContext("example", v7, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4054,7 +4090,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 			a, ok := compiler.SequenceNodeForNode(v24)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewAny(item, compiler.NewContext("enum", context))
+					y, err := NewAny(item, compiler.NewContext("enum", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -4079,7 +4115,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 			a, ok := compiler.SequenceNodeForNode(v26)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewSchemaOrReference(item, compiler.NewContext("allOf", context))
+					y, err := NewSchemaOrReference(item, compiler.NewContext("allOf", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -4095,7 +4131,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 			a, ok := compiler.SequenceNodeForNode(v27)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewSchemaOrReference(item, compiler.NewContext("oneOf", context))
+					y, err := NewSchemaOrReference(item, compiler.NewContext("oneOf", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -4111,7 +4147,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 			a, ok := compiler.SequenceNodeForNode(v28)
 			if ok {
 				for _, item := range a.Content {
-					y, err := NewSchemaOrReference(item, compiler.NewContext("anyOf", context))
+					y, err := NewSchemaOrReference(item, compiler.NewContext("anyOf", item, context))
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -4123,7 +4159,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v29 := compiler.MapValueForKey(m, "not")
 		if v29 != nil {
 			var err error
-			x.Not, err = NewSchema(v29, compiler.NewContext("not", context))
+			x.Not, err = NewSchema(v29, compiler.NewContext("not", v29, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4132,7 +4168,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v30 := compiler.MapValueForKey(m, "items")
 		if v30 != nil {
 			var err error
-			x.Items, err = NewItemsItem(v30, compiler.NewContext("items", context))
+			x.Items, err = NewItemsItem(v30, compiler.NewContext("items", v30, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4141,7 +4177,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v31 := compiler.MapValueForKey(m, "properties")
 		if v31 != nil {
 			var err error
-			x.Properties, err = NewProperties(v31, compiler.NewContext("properties", context))
+			x.Properties, err = NewProperties(v31, compiler.NewContext("properties", v31, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4150,7 +4186,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v32 := compiler.MapValueForKey(m, "additionalProperties")
 		if v32 != nil {
 			var err error
-			x.AdditionalProperties, err = NewAdditionalPropertiesItem(v32, compiler.NewContext("additionalProperties", context))
+			x.AdditionalProperties, err = NewAdditionalPropertiesItem(v32, compiler.NewContext("additionalProperties", v32, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4159,7 +4195,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 		v33 := compiler.MapValueForKey(m, "default")
 		if v33 != nil {
 			var err error
-			x.Default, err = NewDefaultType(v33, compiler.NewContext("default", context))
+			x.Default, err = NewDefaultType(v33, compiler.NewContext("default", v33, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4204,7 +4240,7 @@ func NewSchema(in *yaml.Node, context *compiler.Context) (*Schema, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -4227,7 +4263,7 @@ func NewSchemaOrReference(in *yaml.Node, context *compiler.Context) (*SchemaOrRe
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewSchema(m, compiler.NewContext("schema", context))
+			t, matchingError := NewSchema(m, compiler.NewContext("schema", m, context))
 			if matchingError == nil {
 				x.Oneof = &SchemaOrReference_Schema{Schema: t}
 				matched = true
@@ -4241,7 +4277,7 @@ func NewSchemaOrReference(in *yaml.Node, context *compiler.Context) (*SchemaOrRe
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &SchemaOrReference_Reference{Reference: t}
 				matched = true
@@ -4253,6 +4289,10 @@ func NewSchemaOrReference(in *yaml.Node, context *compiler.Context) (*SchemaOrRe
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid SchemaOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4276,7 +4316,7 @@ func NewSchemasOrReferences(in *yaml.Node, context *compiler.Context) (*SchemasO
 				pair := &NamedSchemaOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSchemaOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSchemaOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -4306,7 +4346,7 @@ func NewSecurityRequirement(in *yaml.Node, context *compiler.Context) (*Security
 				pair := &NamedStringArray{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewStringArray(v, compiler.NewContext(k, context))
+				pair.Value, err = NewStringArray(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -4397,7 +4437,7 @@ func NewSecurityScheme(in *yaml.Node, context *compiler.Context) (*SecuritySchem
 		v7 := compiler.MapValueForKey(m, "flows")
 		if v7 != nil {
 			var err error
-			x.Flows, err = NewOauthFlows(v7, compiler.NewContext("flows", context))
+			x.Flows, err = NewOauthFlows(v7, compiler.NewContext("flows", v7, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4433,7 +4473,7 @@ func NewSecurityScheme(in *yaml.Node, context *compiler.Context) (*SecuritySchem
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -4456,7 +4496,7 @@ func NewSecuritySchemeOrReference(in *yaml.Node, context *compiler.Context) (*Se
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewSecurityScheme(m, compiler.NewContext("securityScheme", context))
+			t, matchingError := NewSecurityScheme(m, compiler.NewContext("securityScheme", m, context))
 			if matchingError == nil {
 				x.Oneof = &SecuritySchemeOrReference_SecurityScheme{SecurityScheme: t}
 				matched = true
@@ -4470,7 +4510,7 @@ func NewSecuritySchemeOrReference(in *yaml.Node, context *compiler.Context) (*Se
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matchingError := NewReference(m, compiler.NewContext("reference", context))
+			t, matchingError := NewReference(m, compiler.NewContext("reference", m, context))
 			if matchingError == nil {
 				x.Oneof = &SecuritySchemeOrReference_Reference{Reference: t}
 				matched = true
@@ -4482,6 +4522,10 @@ func NewSecuritySchemeOrReference(in *yaml.Node, context *compiler.Context) (*Se
 	if matched {
 		// since the oneof matched one of its possibilities, discard any matching errors
 		errors = make([]error, 0)
+	} else {
+		message := fmt.Sprintf("contains an invalid SecuritySchemeOrReference")
+		err := compiler.NewError(context, message)
+		errors = []error{err}
 	}
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
@@ -4505,7 +4549,7 @@ func NewSecuritySchemesOrReferences(in *yaml.Node, context *compiler.Context) (*
 				pair := &NamedSecuritySchemeOrReference{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewSecuritySchemeOrReference(v, compiler.NewContext(k, context))
+				pair.Value, err = NewSecuritySchemeOrReference(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -4560,7 +4604,7 @@ func NewServer(in *yaml.Node, context *compiler.Context) (*Server, error) {
 		v3 := compiler.MapValueForKey(m, "variables")
 		if v3 != nil {
 			var err error
-			x.Variables, err = NewServerVariables(v3, compiler.NewContext("variables", context))
+			x.Variables, err = NewServerVariables(v3, compiler.NewContext("variables", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4587,7 +4631,7 @@ func NewServer(in *yaml.Node, context *compiler.Context) (*Server, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -4673,7 +4717,7 @@ func NewServerVariable(in *yaml.Node, context *compiler.Context) (*ServerVariabl
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -4705,7 +4749,7 @@ func NewServerVariables(in *yaml.Node, context *compiler.Context) (*ServerVariab
 				pair := &NamedServerVariable{}
 				pair.Name = k
 				var err error
-				pair.Value, err = NewServerVariable(v, compiler.NewContext(k, context))
+				pair.Value, err = NewServerVariable(v, compiler.NewContext(k, v, context))
 				if err != nil {
 					errors = append(errors, err)
 				}
@@ -4828,7 +4872,7 @@ func NewTag(in *yaml.Node, context *compiler.Context) (*Tag, error) {
 		v3 := compiler.MapValueForKey(m, "externalDocs")
 		if v3 != nil {
 			var err error
-			x.ExternalDocs, err = NewExternalDocs(v3, compiler.NewContext("externalDocs", context))
+			x.ExternalDocs, err = NewExternalDocs(v3, compiler.NewContext("externalDocs", v3, context))
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -4855,7 +4899,7 @@ func NewTag(in *yaml.Node, context *compiler.Context) (*Tag, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}
@@ -4951,7 +4995,7 @@ func NewXml(in *yaml.Node, context *compiler.Context) (*Xml, error) {
 							pair.Value = result
 						}
 					} else {
-						pair.Value, err = NewAny(v, compiler.NewContext(k, context))
+						pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))
 						if err != nil {
 							errors = append(errors, err)
 						}

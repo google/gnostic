@@ -72,7 +72,7 @@ const caseStringForObjectTypes = "\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
 	"info = *info.Content[0]\n" +
-	"newObject, err := %s.New%s(&info, compiler.NewContext(\"$root\", nil))\n" +
+	"newObject, err := %s.New%s(&info, compiler.NewContext(\"$root\", &info, nil))\n" +
 	"return true, newObject, err"
 
 const caseStringForWrapperTypes = "\n" +
