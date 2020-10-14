@@ -123,7 +123,7 @@ func (w *writer) writeSequence(node *yaml.Node, indent string) {
 	w.writeString("]")
 }
 
-// Marshal writes a yaml.MapSlice as JSON
+// Marshal writes a yaml.Node as JSON
 func Marshal(in *yaml.Node) (out []byte, err error) {
 	var w writer
 
@@ -133,6 +133,12 @@ func Marshal(in *yaml.Node) (out []byte, err error) {
 		w.writeString("\n")
 	case yaml.MappingNode:
 		w.writeMap(in, "")
+		w.writeString("\n")
+	case yaml.SequenceNode:
+		w.writeSequence(in, "")
+		w.writeString("\n")
+	case yaml.ScalarNode:
+		w.writeScalar(in, "")
 		w.writeString("\n")
 	default:
 		return nil, errors.New("invalid type passed to Marshal")
