@@ -47,7 +47,6 @@ package generator
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -527,11 +526,7 @@ func (g *Generator) GenerateAllFiles() {
 		}
 
 		document := g.BuildDocumentV2(file)
-		rawInfo, ok := document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			message := "failed to generate OpenAPI"
-			g.Error(errors.New(message), message)
-		}
+		rawInfo := document.ToRawInfo()
 		bytes, err := yaml.Marshal(rawInfo)
 		if err != nil {
 			g.Error(err, "failed to marshal yaml")

@@ -18,9 +18,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	v2 "github.com/googleapis/gnostic/OpenAPIv2"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	v2 "github.com/googleapis/gnostic/openapiv2"
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
@@ -48,7 +48,7 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 			log.Printf(" INPUT %s", *method.InputType)
 			log.Printf(" OUTPUT %s", *method.OutputType)
 			log.Printf(" OPTIONS %+v", *method.Options)
-			log.Printf(" EXTENSIONS %+v", method.Options.XXX_InternalExtensions)
+			//log.Printf(" EXTENSIONS %+v", method.Options.XXX_InternalExtensions)
 
 			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
 			log.Printf(" extensions: %T %+v (%+v)", extension, extension, err)
@@ -108,11 +108,11 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 		for _, field := range desc.Field {
 			fieldSchema := &v2.Schema{}
 			if *field.Label == descriptor.FieldDescriptorProto_LABEL_REPEATED {
-				fieldSchema.Type = &v2.TypeItem{[]string{"array"}}
+				fieldSchema.Type = &v2.TypeItem{Value: []string{"array"}}
 				switch *field.Type {
 				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
 					fieldSchema.Items =
-						&v2.ItemsItem{[]*v2.Schema{&v2.Schema{
+						&v2.ItemsItem{Schema: []*v2.Schema{&v2.Schema{
 							XRef: g.definitionReferenceForTypeName(*field.TypeName)}}}
 				default:
 					log.Printf("(TODO) Unsupported array type: %+v", field.Type)
@@ -120,9 +120,9 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 			} else {
 				switch *field.Type {
 				case descriptor.FieldDescriptorProto_TYPE_STRING:
-					fieldSchema.Type = &v2.TypeItem{[]string{"string"}}
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"string"}}
 				case descriptor.FieldDescriptorProto_TYPE_INT64:
-					fieldSchema.Type = &v2.TypeItem{[]string{"integer"}}
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"integer"}}
 					fieldSchema.Format = "int64"
 				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
 					fieldSchema.XRef = g.definitionReferenceForTypeName(*field.TypeName)
@@ -152,7 +152,6 @@ func (g *Generator) definitionReferenceForTypeName(typeName string) string {
 	lastPart := parts[len(parts)-1]
 	return "#/definitions/" + lastPart
 }
-
 
 func (g *Generator) BuildOperation() *v2.Operation {
 	return &v2.Operation{
@@ -201,7 +200,7 @@ func (g *Generator) AddOperation(d *v2.Document, op *v2.Operation, path string, 
 		}
 	}
 	// if we get here, we need to create a path item
-	namedPathItem := &v2.NamedPathItem{Name:path, Value:&v2.PathItem{}}
+	namedPathItem := &v2.NamedPathItem{Name: path, Value: &v2.PathItem{}}
 	switch methodName {
 	case "GET":
 		namedPathItem.Value.Get = op

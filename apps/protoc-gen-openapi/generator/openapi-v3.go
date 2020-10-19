@@ -15,7 +15,7 @@
 package generator
 
 import (
-	v3 "github.com/googleapis/gnostic/OpenAPIv3"
+	v3 "github.com/googleapis/gnostic/openapiv3"
 )
 
 func (g *Generator) BuildDocumentV3() *v3.Document {
