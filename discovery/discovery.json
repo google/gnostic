@@ -105,6 +105,9 @@
     },
     "packagePath": {
       "type": "string"
+    },
+    "mtlsRootUrl": {
+        "type": "string"
     }
   },
   "definitions": {

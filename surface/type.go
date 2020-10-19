@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,11 +26,20 @@ func (s *Type) FieldWithName(name string) *Field {
 	if s == nil || s.Fields == nil || name == "" {
 		return nil
 	}
+	// Compares Go specific field names.
 	for _, f := range s.Fields {
 		if f.FieldName == name {
 			return f
 		}
 	}
+
+	// Compares names as specified in the OpenAPI description.
+	for _, f := range s.Fields {
+		if f.Name == name {
+			return f
+		}
+	}
+
 	return nil
 }
 

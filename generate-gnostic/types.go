@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,4 +129,13 @@ func NewTypeModel() *TypeModel {
 	typeModel := &TypeModel{}
 	typeModel.Properties = make([]*TypeProperty, 0)
 	return typeModel
+}
+
+func (typeModel *TypeModel) IsRequired(propertyName string) bool {
+	for _, requiredName := range typeModel.Required {
+		if requiredName == propertyName {
+			return true
+		}
+	}
+	return false
 }

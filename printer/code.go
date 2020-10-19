@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,20 @@ type Code struct {
 
 // Print adds a line of code using the current indentation. Accepts printf-style format strings and arguments.
 func (c *Code) Print(args ...interface{}) {
+	if len(args) > 0 {
+		for i := 0; i < c.indent; i++ {
+			c.text += indentation
+		}
+		c.text += fmt.Sprintf(args[0].(string), args[1:]...)
+	}
+	c.text += "\n"
+}
+
+// PrintIf adds a line of code using the current indentation if a condition is true. Accepts printf-style format strings and arguments.
+func (c *Code) PrintIf(condition bool, args ...interface{}) {
+	if !condition {
+		return
+	}
 	if len(args) > 0 {
 		for i := 0; i < c.indent; i++ {
 			c.text += indentation

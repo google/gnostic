@@ -2,101 +2,125 @@
 
 # ⨁ gnostic
 
-This repository contains a Go command line tool which converts
-JSON and YAML [OpenAPI](https://github.com/OAI/OpenAPI-Specification)
-descriptions to and from equivalent Protocol Buffer representations.
+This repository contains a Go command line tool which converts JSON and YAML
+[OpenAPI](https://github.com/OAI/OpenAPI-Specification) descriptions to and
+from equivalent Protocol Buffer representations.
 
-[Protocol Buffers](https://developers.google.com/protocol-buffers/)
-provide a language-neutral, platform-neutral, extensible mechanism
-for serializing structured data.
-**gnostic**'s Protocol Buffer models for the OpenAPI Specification
-can be used to generate code that includes data structures with 
-explicit fields for the elements of an OpenAPI description.
-This makes it possible for developers to work with OpenAPI
-descriptions in type-safe ways, which is particularly useful
-in strongly-typed languages like Go and Swift.
+[Protocol Buffers](https://developers.google.com/protocol-buffers/) provide a
+language-neutral, platform-neutral, extensible mechanism for serializing
+structured data. **gnostic**'s Protocol Buffer models for the OpenAPI
+Specification can be used to generate code that includes data structures with
+explicit fields for the elements of an OpenAPI description. This makes it
+possible for developers to work with OpenAPI descriptions in type-safe ways,
+which is particularly useful in strongly-typed languages like Go and
+[Dart](https://dart.dev/).
 
-**gnostic** reads OpenAPI descriptions into
-these generated data structures, reports errors,
-resolves internal dependencies, and writes the results
-in a binary form that can be used in any language that is
-supported by the Protocol Buffer tools.
-A plugin interface simplifies integration with API
-tools written in a variety of different languages,
-and when necessary, Protocol Buffer OpenAPI descriptions
-can be reexported as JSON or YAML.
+**gnostic** reads OpenAPI descriptions into these generated data structures,
+reports errors, resolves internal dependencies, and writes the results in a
+binary form that can be used in any language that is supported by the Protocol
+Buffer tools. A plugin interface simplifies integration with API tools written
+in a variety of different languages, and when necessary, Protocol Buffer
+OpenAPI descriptions can be reexported as JSON or YAML.
 
-**gnostic** compilation code and OpenAPI Protocol Buffer
-models are automatically generated from an
+**gnostic** compilation code and OpenAPI Protocol Buffer models are
+automatically generated from an
 [OpenAPI JSON Schema](https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v2.0/schema.json).
-Source code for the generator is in the [generate-gnostic](generate-gnostic) directory.
+Source code for the generator is in the [generate-gnostic](generate-gnostic)
+directory.
 
 ## Disclaimer
 
-This is prerelease software and work in progress. Feedback and
-contributions are welcome, but we currently make no guarantees of
-function or stability.
+Feedback and contributions are welcome! Until there is a 1.0 release, please
+consider this prerelease software and work in progress. To ensure stable
+builds, we request that dependent projects always refer to tagged releases of
+**gnostic**.
 
 ## Requirements
 
 **gnostic** can be run in any environment that supports [Go](http://golang.org)
-and the [Google Protocol Buffer Compiler](https://github.com/google/protobuf).
+and the
+[Protocol Buffer Compiler](https://github.com/protocolbuffers/protobuf).
 
-## Installation
+## Installation and Getting Started
 
-1. Get this package by downloading it with `go get`.
+The following instructions are for installing **gnostic** using
+[Go modules](https://blog.golang.org/using-go-modules), supported by Go 1.11
+and later.
 
-        go get github.com/googleapis/gnostic
-  
-2. [Optional] Build and run the compiler generator. 
-This uses the OpenAPI JSON schema to generate a Protocol Buffer language file 
-that describes the OpenAPI specification and a Go-language file of code that 
-will read a JSON or YAML OpenAPI representation into the generated protocol 
-buffers. Pre-generated versions of these files are in the OpenAPIv2 directory.
+1.  Get this package by downloading it with `git clone`.
 
-        cd $GOPATH/src/github.com/googleapis/gnostic/generate-gnostic
-        go install
-        cd ..
-        generate-gnostic --v2
+        git clone https://github.com/googleapis/gnostic
+        cd gnostic
 
-3. [Optional] Generate Protocol Buffer support code. 
-A pre-generated version of this file is checked into the OpenAPIv2 directory.
-This step requires a local installation of protoc, the Protocol Buffer Compiler.
-You can get protoc [here](https://github.com/google/protobuf).
+2.  Verify that you have a local installation of `protoc`. You can get protoc
+    [here](https://github.com/protocolbuffers/protobuf).
 
-        ./COMPILE-PROTOS.sh
+3.  Build **gnostic** with `make`. This uses
+    [go generate](https://blog.golang.org/generate) to build support code
+    including code generated by `protoc` and the Go protoc plugin, which is
+    automatically downloaded from
+    [github.com/golang/protobuf](https://github.com/golang/protobuf) by the
+    [COMPILE-PROTOS.sh](COMPILE-PROTOS.sh) script. This also builds all plugins
+    and associated tools in this repo.
 
-4. [Optional] Rebuild **gnostic**. This is only necessary if you've performed steps
-2 or 3 above.
+4.  Verify **gnostic** with `make test`. These tests are run by **gnostic**'s
+    continuous integration, so you should expect them to pass for all release
+    versions.
 
-        go install github.com/googleapis/gnostic
+5.  Run **gnostic**. This sample invocation creates a file in the current
+    directory named `petstore.pb` that contains a binary Protocol Buffer
+    description of a sample API.
 
-5. Run **gnostic**. This will create a file in the current directory named "petstore.pb" that contains a binary
-Protocol Buffer description of a sample API.
+            gnostic --pb-out=. examples/v2.0/json/petstore.json
 
-        gnostic --pb-out=. examples/petstore.json
+6.  You can also compile files that you specify with a URL. Here's another way
+    to compile the previous example. This time we're creating `petstore.text`,
+    which contains a textual representation of the Protocol Buffer description.
+    This is mainly for use in testing and debugging.
 
-6. You can also compile files that you specify with a URL. Here's another way to compile the previous 
-example. This time we're creating "petstore.text", which contains a textual representation of the
-Protocol Buffer description. This is mainly for use in testing and debugging.
+            gnostic --text-out=petstore.text https://raw.githubusercontent.com/googleapis/gnostic/master/examples/v2.0/json/petstore.json
 
-        gnostic --text-out=petstore.text https://raw.githubusercontent.com/googleapis/gnostic/master/examples/petstore.json
+7.  For a sample application, see apps/report. This reads a binary Protocol
+    Buffer encoding created by **gnostic**.
 
-7. For a sample application, see apps/report.
-
-        go install github.com/googleapis/gnostic/apps/report
+        go install ./apps/report ## automatically installed by the top-level Makefile
         report petstore.pb
 
-8. **gnostic** supports plugins. This builds and runs a sample plugin
-that reports some basic information about an API. The "-" causes the plugin to 
-write its output to stdout.
+8.  **gnostic** also supports plugins. **gnostic**'s plugin interface is
+    modeled on `protoc`'s
+    [plugin.proto](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/compiler/plugin.proto)
+    and is described in [plugins/plugin.proto](plugins/plugin.proto). Several
+    plugins are implemented in the `plugins` directory. Others, like
+    [gnostic-grpc](https://github.com/googleapis/gnostic-grpc) and
+    [gnostic-go-generator](https://github.com/googleapis/gnostic-go-generator),
+    are published in their own repositories. One such plugin is
+    [gnostic-vocabulary](plugins/gnostic-vocabulary), which produces a summary
+    of the word usage in an APIs interfaces. You can run `gnostic-vocabulary`
+    with the following:
 
-        go install github.com/googleapis/gnostic/plugins/gnostic-go-sample
-        gnostic examples/petstore.json --go-sample-out=-
+            gnostic examples/v2.0/json/petstore.json --vocabulary_out=.
+
+    This will produce files named `vocabulary.pb` and `vocabulary.json` in
+    `examples/v2.0/json`. For the format of `vocabulary.pb`, see
+    [metrics/vocabulary.proto](metrics/vocabulary.proto).
+
+9.  [Optional] A large part of **gnostic** is automatically-generated by the
+    [generate-gnostic](generate-gnostic) tool. This uses JSON schemas to
+    generate Protocol Buffer language files that describe supported API
+    specification formats and Go-language files of code that will read JSON or
+    YAML API descriptions into the generated protocol buffer models.
+    Pre-generated versions of these files are checked into the
+    [openapiv2](openapiv2), [openapiv3](openapiv3), and [discovery](discovery)
+    directories. You can regenerate this code with the following:
+
+        go install ./generate-gnostic
+        generate-gnostic --v2
+        generate-gnostic --v3
+        generate-gnostic --discovery
 
 ## Copyright
 
-Copyright 2017, Google Inc.
+Copyright 2017-2020, Google LLC.
 
 ## License
 

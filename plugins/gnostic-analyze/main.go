@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,9 +30,12 @@ import (
 	"path"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
-	plugins "github.com/googleapis/gnostic/plugins"
 	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
+
+	"github.com/golang/protobuf/proto"
+	openapiv2 "github.com/googleapis/gnostic/openapiv2"
+	openapiv3 "github.com/googleapis/gnostic/openapiv3"
+	plugins "github.com/googleapis/gnostic/plugins"
 )
 
 // Record an error, then serialize and return a response.
@@ -56,14 +59,24 @@ func main() {
 	env.RespondAndExitIfError(err)
 
 	var stats *statistics.DocumentStatistics
-	if env.Request.Openapi2 != nil {
-		// Analyze the API document.
-		stats = statistics.NewDocumentStatistics(env.Request.SourceName, env.Request.Openapi2)
-	}
 
-	if env.Request.Openapi3 != nil {
-		// Analyze the API document.
-		stats = statistics.NewDocumentStatisticsV3(env.Request.SourceName, env.Request.Openapi3)
+	for _, model := range env.Request.Models {
+		switch model.TypeUrl {
+		case "openapi.v2.Document":
+			documentv2 := &openapiv2.Document{}
+			err = proto.Unmarshal(model.Value, documentv2)
+			if err == nil {
+				// Analyze the API document.
+				stats = statistics.NewDocumentStatistics(env.Request.SourceName, documentv2)
+			}
+		case "openapi.v3.Document":
+			documentv3 := &openapiv3.Document{}
+			err = proto.Unmarshal(model.Value, documentv3)
+			if err == nil {
+				// Analyze the API document.
+				stats = statistics.NewDocumentStatisticsV3(env.Request.SourceName, documentv3)
+			}
+		}
 	}
 
 	if stats != nil {

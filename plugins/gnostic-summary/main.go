@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,18 @@
 package main
 
 import (
-	openapi2 "github.com/googleapis/gnostic/OpenAPIv2"
-	openapi3 "github.com/googleapis/gnostic/OpenAPIv3"
+	"log"
+	"path/filepath"
+
+	"github.com/golang/protobuf/proto"
+	openapiv2 "github.com/googleapis/gnostic/openapiv2"
+	openapiv3 "github.com/googleapis/gnostic/openapiv3"
 	plugins "github.com/googleapis/gnostic/plugins"
 	"github.com/googleapis/gnostic/printer"
 )
 
 // generate a simple report of an OpenAPI document's contents
-func printDocumentV2(code *printer.Code, document *openapi2.Document) {
+func printDocumentV2(code *printer.Code, document *openapiv2.Document) {
 	code.Print("Swagger: %+v", document.Swagger)
 	code.Print("Host: %+v", document.Host)
 	code.Print("BasePath: %+v", document.BasePath)
@@ -57,7 +61,7 @@ func printDocumentV2(code *printer.Code, document *openapi2.Document) {
 }
 
 // generate a simple report of an OpenAPI document's contents
-func printDocumentV3(code *printer.Code, document *openapi3.Document) {
+func printDocumentV3(code *printer.Code, document *openapiv3.Document) {
 	code.Print("OpenAPI: %+v", document.Openapi)
 	code.Print("Servers: %+v", document.Servers)
 	if document.Info != nil {
@@ -92,20 +96,30 @@ func printDocumentV3(code *printer.Code, document *openapi3.Document) {
 func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
-
 	code := &printer.Code{}
-	switch {
-	case env.Request.Openapi2 != nil:
-		printDocumentV2(code, env.Request.Openapi2)
-	case env.Request.Openapi3 != nil:
-		printDocumentV3(code, env.Request.Openapi3)
-	default:
+	for _, model := range env.Request.Models {
+		switch model.TypeUrl {
+		case "openapi.v2.Document":
+			documentv2 := &openapiv2.Document{}
+			err = proto.Unmarshal(model.Value, documentv2)
+			if err == nil {
+				printDocumentV2(code, documentv2)
+			}
+		case "openapi.v3.Document":
+			documentv3 := &openapiv3.Document{}
+			err = proto.Unmarshal(model.Value, documentv3)
+			if err == nil {
+				printDocumentV3(code, documentv3)
+			}
+		}
 	}
-	file := &plugins.File{
-		Name: "summary.txt",
+	outputName := filepath.Join(
+		filepath.Dir(env.Request.SourceName), "summary.txt")
+	log.Printf("generating %+v", outputName)
+	f := &plugins.File{
+		Name: outputName,
 		Data: []byte(code.String()),
 	}
-	env.Response.Files = append(env.Response.Files, file)
-
+	env.Response.Files = append(env.Response.Files, f)
 	env.RespondAndExit()
 }

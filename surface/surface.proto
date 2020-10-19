@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,15 @@ syntax = "proto3";
 
 package surface.v1;
 
+// The Go package name.
+option go_package = "surface;surface_v1";
+
 enum FieldKind {
     SCALAR = 0;
     MAP = 1;
     ARRAY = 2;
     REFERENCE = 3;
+    ANY = 4;
 }
 
 enum TypeKind {
@@ -47,11 +51,13 @@ message Field {
     string format = 4; // the specified format of the field
     Position position = 5; // "body", "header", "formdata", "query", or "path"
 
-    string nativeType = 6; // the programming-language native type of the field
-    string fieldName = 7; // the name to use for a data structure field
-    string parameterName = 8; // the name to use for a function parameter
+    string native_type = 6; // the programming-language native type of the field
+    string field_name = 7; // the name to use for a data structure field
+    string parameter_name = 8; // the name to use for a function parameter
 
     bool serialize = 9; // true if this field should be serialized (to JSON, etc)
+
+    repeated string enum_values = 10; // enum values as specified in the API description
 }
 
 // Type typically corresponds to a definition, parameter, or response
@@ -60,10 +66,10 @@ message Type {
     string name = 1; // the name to use for the type
     TypeKind kind = 2; // a meta-description of the type (struct, map, etc)
     string description = 3; // a comment describing the type
-    string contentType = 4; // if the type is a map, this is its content type
+    string content_type = 4; // if the type is a map, this is its content type
     repeated Field fields = 5; // the fields of the type
 
-    string typeName = 6; // language-specific type name
+    string type_name = 6; // language-specific type name
 }
 
 // Method is an operation of an API and typically has associated client and server code.
@@ -74,12 +80,12 @@ message Method {
     string description = 4; // description of method
 
     string name = 5; // Operation name, possibly generated from method and path
-    string handlerName = 6; // name of the generated handler
-    string processorName = 7; // name of the processing function in the service interface
-    string clientName = 8; // name of client
+    string handler_name = 6; // name of the generated handler
+    string processor_name = 7; // name of the processing function in the service interface
+    string client_name = 8; // name of client
 
-    string parametersTypeName = 9; // parameters (input), with fields corresponding to input parameters
-    string responsesTypeName = 10; // responses (output), with fields corresponding to possible response values
+    string parameters_type_name = 9; // parameters (input), with fields corresponding to input parameters
+    string responses_type_name = 10; // responses (output), with fields corresponding to possible response values
 }
 
 // Model represents an API for code generation.
@@ -87,4 +93,5 @@ message Model {
     string name = 1; // a free-form title for the API
     repeated Type types = 2; // the types used by the API
     repeated Method methods = 3; // the methods (functions) of the API
+    repeated string symbolic_references = 4; // references to other OpenAPI files. Currently only supported for OpenAPI v3.
 }
