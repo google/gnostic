@@ -57,7 +57,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-	"gopkg.in/yaml.v2"
 )
 
 // Each type we import as a protocol buffer (other than FileDescriptorProto) needs
@@ -510,34 +509,18 @@ func extractComments(file *FileDescriptor) {
 
 // GenerateAllFiles generates the output for all the files we're outputting.
 func (g *Generator) GenerateAllFiles() {
-	// Generate the output. The generator runs for every file, even the files
-	// that we don't generate output for, so that we can collate the full list
-	// of exported symbols to support public imports.
-	genFileMap := make(map[*FileDescriptor]bool, len(g.genFiles))
-	for _, file := range g.genFiles {
-		genFileMap[file] = true
-	}
+	d := g.NewDocumentV2()
 	for _, file := range g.allFiles {
-		g.Reset()
-		g.writeOutput = genFileMap[file]
-
-		if !g.writeOutput {
-			continue
-		}
-
-		document := g.BuildDocumentV2(file)
-		rawInfo := document.ToRawInfo()
-		bytes, err := yaml.Marshal(rawInfo)
-		if err != nil {
-			g.Error(err, "failed to marshal yaml")
-		}
-
-		g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
-			Name:    proto.String(file.openapiFileName()),
-			Content: proto.String(string(bytes)),
-		})
-
+		g.AddToDocumentV2(d, file)
 	}
+	bytes, err := d.YAMLValue()
+	if err != nil {
+		g.Error(err, "failed to marshal yaml")
+	}
+	g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
+		Name:    proto.String("swagger.yaml"),
+		Content: proto.String(string(bytes)),
+	})
 }
 
 func (g *Generator) fileByName(filename string) *FileDescriptor {

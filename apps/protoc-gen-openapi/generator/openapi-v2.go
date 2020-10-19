@@ -24,10 +24,18 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
+func (g *Generator) NewDocumentV2() *v2.Document {
+	d := &v2.Document{}
+	d.Swagger = "2.0"
+	d.Paths = &v2.Paths{}
+	d.Definitions = &v2.Definitions{}
+	return d
+}
+
+// AddToDocumentV2 constructs an OpenAPIv2 document for a file descriptor
+func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 	g.file = file
 
-	d := &v2.Document{}
 	d.Swagger = "2.0"
 	d.Info = &v2.Info{
 		Title:   "Swagger Petstore",
@@ -39,7 +47,6 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 	d.Schemes = []string{"http"}
 	d.Consumes = []string{"application/json"}
 	d.Produces = []string{"application/json"}
-	d.Paths = &v2.Paths{}
 
 	for _, service := range file.FileDescriptorProto.Service {
 		log.Printf("SERVICE %s", *service.Name)
@@ -49,6 +56,8 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 			log.Printf(" OUTPUT %s", *method.OutputType)
 			log.Printf(" OPTIONS %+v", *method.Options)
 			//log.Printf(" EXTENSIONS %+v", method.Options.XXX_InternalExtensions)
+
+			operationID := *service.Name + "_" + *method.Name
 
 			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
 			log.Printf(" extensions: %T %+v (%+v)", extension, extension, err)
@@ -95,14 +104,13 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 			}
 			log.Printf("%s", methodName)
 
-			op := g.BuildOperation()
+			op := g.BuildOperation(operationID)
 
 			g.AddOperation(d, op, path, methodName)
 		}
 	}
 
 	// for each message, generate a definition
-	d.Definitions = &v2.Definitions{}
 	for _, desc := range g.file.desc {
 		definitionProperties := &v2.Properties{}
 		for _, field := range desc.Field {
@@ -144,7 +152,6 @@ func (g *Generator) BuildDocumentV2(file *FileDescriptor) *v2.Document {
 				Value: &v2.Schema{Properties: definitionProperties},
 			})
 	}
-	return d
 }
 
 func (g *Generator) definitionReferenceForTypeName(typeName string) string {
@@ -153,10 +160,10 @@ func (g *Generator) definitionReferenceForTypeName(typeName string) string {
 	return "#/definitions/" + lastPart
 }
 
-func (g *Generator) BuildOperation() *v2.Operation {
+func (g *Generator) BuildOperation(operationID string) *v2.Operation {
 	return &v2.Operation{
 		Summary:     "Summary",
-		OperationId: "OperationId",
+		OperationId: operationID,
 		Tags:        []string{"tag"},
 		Parameters: []*v2.ParametersItem{
 			&v2.ParametersItem{
