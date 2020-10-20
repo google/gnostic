@@ -27,6 +27,16 @@ import (
 func (g *Generator) NewDocumentV2() *v2.Document {
 	d := &v2.Document{}
 	d.Swagger = "2.0"
+	d.Info = &v2.Info{
+		Title:   "",
+		Version: "1.0.0",
+		License: &v2.License{Name: "Unknown"},
+	}
+	d.Host = "example.com"
+	d.BasePath = ""
+	d.Schemes = []string{"http"}
+	d.Consumes = []string{"application/json"}
+	d.Produces = []string{"application/json"}
 	d.Paths = &v2.Paths{}
 	d.Definitions = &v2.Definitions{}
 	return d
@@ -35,18 +45,6 @@ func (g *Generator) NewDocumentV2() *v2.Document {
 // AddToDocumentV2 constructs an OpenAPIv2 document for a file descriptor
 func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 	g.file = file
-
-	d.Swagger = "2.0"
-	d.Info = &v2.Info{
-		Title:   "Swagger Petstore",
-		Version: "1.0.0",
-		License: &v2.License{Name: "MIT"},
-	}
-	d.Host = "petstore.swagger.io"
-	d.BasePath = "/v1"
-	d.Schemes = []string{"http"}
-	d.Consumes = []string{"application/json"}
-	d.Produces = []string{"application/json"}
 
 	for _, service := range file.FileDescriptorProto.Service {
 		log.Printf("SERVICE %s", *service.Name)
@@ -62,6 +60,7 @@ func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
 			log.Printf(" extensions: %T %+v (%+v)", extension, extension, err)
 			var path string
+			var methodName string
 			if extension != nil {
 				rule := extension.(*annotations.HttpRule)
 				log.Printf("  PATTERN %T %v", rule.Pattern, rule.Pattern)
@@ -72,14 +71,19 @@ func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 				switch pattern := rule.Pattern.(type) {
 				case *annotations.HttpRule_Get:
 					path = pattern.Get
+					methodName = "GET"
 				case *annotations.HttpRule_Post:
 					path = pattern.Post
+					methodName = "POST"
 				case *annotations.HttpRule_Put:
 					path = pattern.Put
+					methodName = "PUT"
 				case *annotations.HttpRule_Delete:
 					path = pattern.Delete
+					methodName = "DELETE"
 				case *annotations.HttpRule_Patch:
 					path = pattern.Patch
+					methodName = "PATCH"
 				case *annotations.HttpRule_Custom:
 					path = "custom-unsupported"
 				default:
@@ -87,26 +91,11 @@ func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 				}
 				log.Printf("  PATH %s", path)
 			}
-
-			var methodName string
-			name := *method.Name
-			switch {
-			case strings.HasPrefix(name, "Get"):
-				methodName = "GET"
-			case strings.HasPrefix(name, "List"):
-				methodName = "GET"
-			case strings.HasPrefix(name, "Create"):
-				methodName = "POST"
-			case strings.HasPrefix(name, "Delete"):
-				methodName = "DELETE"
-			default:
-				methodName = "UNKNOWN"
-			}
 			log.Printf("%s", methodName)
-
 			op := g.BuildOperation(operationID)
-
-			g.AddOperation(d, op, path, methodName)
+			if methodName != "" {
+				g.AddOperation(d, op, path, methodName)
+			}
 		}
 	}
 
@@ -122,6 +111,27 @@ func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 					fieldSchema.Items =
 						&v2.ItemsItem{Schema: []*v2.Schema{&v2.Schema{
 							XRef: g.definitionReferenceForTypeName(*field.TypeName)}}}
+
+				case descriptor.FieldDescriptorProto_TYPE_STRING:
+					fieldSchema.Items =
+						&v2.ItemsItem{Schema: []*v2.Schema{&v2.Schema{
+							Type: &v2.TypeItem{Value: []string{"string"}}}}}
+
+				case descriptor.FieldDescriptorProto_TYPE_INT32:
+					fieldSchema.Items =
+						&v2.ItemsItem{Schema: []*v2.Schema{&v2.Schema{
+							Type: &v2.TypeItem{Value: []string{"integer"}}}}}
+
+				case descriptor.FieldDescriptorProto_TYPE_UINT64:
+					fieldSchema.Items =
+						&v2.ItemsItem{Schema: []*v2.Schema{&v2.Schema{
+							Type: &v2.TypeItem{Value: []string{"integer"}}}}}
+
+				case descriptor.FieldDescriptorProto_TYPE_ENUM:
+					fieldSchema.Items =
+						&v2.ItemsItem{Schema: []*v2.Schema{&v2.Schema{
+							Type: &v2.TypeItem{Value: []string{"integer"}}}}}
+
 				default:
 					log.Printf("(TODO) Unsupported array type: %+v", field.Type)
 				}
@@ -132,6 +142,21 @@ func (g *Generator) AddToDocumentV2(d *v2.Document, file *FileDescriptor) {
 				case descriptor.FieldDescriptorProto_TYPE_INT64:
 					fieldSchema.Type = &v2.TypeItem{Value: []string{"integer"}}
 					fieldSchema.Format = "int64"
+				case descriptor.FieldDescriptorProto_TYPE_UINT64:
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"integer"}}
+					fieldSchema.Format = "uint64"
+				case descriptor.FieldDescriptorProto_TYPE_INT32:
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"integer"}}
+					fieldSchema.Format = "int32"
+				case descriptor.FieldDescriptorProto_TYPE_ENUM:
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"integer"}}
+					fieldSchema.Format = "enum"
+				case descriptor.FieldDescriptorProto_TYPE_BOOL:
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"boolean"}}
+				case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"double"}}
+				case descriptor.FieldDescriptorProto_TYPE_BYTES:
+					fieldSchema.Type = &v2.TypeItem{Value: []string{"byte"}}
 				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
 					fieldSchema.XRef = g.definitionReferenceForTypeName(*field.TypeName)
 				default:
@@ -202,6 +227,8 @@ func (g *Generator) AddOperation(d *v2.Document, op *v2.Operation, path string, 
 				namedPathItem.Value.Put = op
 			case "DELETE":
 				namedPathItem.Value.Delete = op
+			case "PATCH":
+				namedPathItem.Value.Patch = op
 			}
 			return
 		}
@@ -217,6 +244,8 @@ func (g *Generator) AddOperation(d *v2.Document, op *v2.Operation, path string, 
 		namedPathItem.Value.Put = op
 	case "DELETE":
 		namedPathItem.Value.Delete = op
+	case "PATCH":
+		namedPathItem.Value.Patch = op
 	}
 	d.Paths.Path = append(d.Paths.Path, namedPathItem)
 }
