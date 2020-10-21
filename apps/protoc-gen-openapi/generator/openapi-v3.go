@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,24 +31,23 @@ func (g *Generator) definitionReferenceForTypeName(typeName string) string {
 	return "#/definitions/" + lastPart
 }
 
-// NewDocumentV3 creates a new OpenAPIv3 document
-func (g *Generator) NewDocumentV3() *v3.Document {
+// GenerateOpenAPIv3 creates a new OpenAPIv3 document
+func (g *Generator) GenerateOpenAPIv3() *v3.Document {
 	d := &v3.Document{}
 	d.Openapi = "3.0"
 	d.Info = &v3.Info{
-		Title:   "OpenAPI Petstore",
-		Version: "1.0.0",
-		License: &v3.License{Name: "MIT"},
+		Title:       "",
+		Version:     "0.0.1",
+		Description: "",
 	}
-	d.Servers = append(d.Servers, &v3.Server{
-		Url:         "https://petstore.openapis.org/v1",
-		Description: "Development server",
-	})
 	d.Paths = &v3.Paths{}
 	d.Components = &v3.Components{
 		Schemas: &v3.SchemasOrReferences{
 			AdditionalProperties: []*v3.NamedSchemaOrReference{},
 		},
+	}
+	for _, file := range g.allFiles {
+		g.AddToDocumentV3(d, file)
 	}
 	return d
 }
@@ -71,61 +70,56 @@ func itemsItemForReference(xref string) *v3.ItemsItem {
 func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 	g.file = file
 	sourceCodeInfo := file.SourceCodeInfo
-	if false {
-		for _, location := range sourceCodeInfo.Location {
-			log.Printf("%+v", location)
-		}
-	}
+
 	linterRulePattern := regexp.MustCompile(`\(-- .* --\)`)
 
-	for _, service := range file.FileDescriptorProto.Service {
-		log.Printf("SERVICE %s", *service.Name)
-		for i, method := range service.Method {
-			log.Printf("METHOD %d: %s", i, *method.Name)
+	for s, service := range file.FileDescriptorProto.Service {
+		var comment string
+		for _, location := range sourceCodeInfo.Location {
+			paths := location.GetPath()
+			if len(paths) == 2 &&
+				paths[0] == servicePath &&
+				paths[1] == int32(s) {
+				comment = location.GetLeadingComments()
+				comment = strings.Replace(comment, "\n", "", -1)
+				comment = linterRulePattern.ReplaceAllString(comment, "")
+				comment = strings.TrimSpace(comment)
+			}
 
+			d.Info.Title = *service.Name
+			d.Info.Description = comment
+		}
+
+		for m, method := range service.Method {
 			// search source info for leading comments
 			var comment string
 			for _, location := range sourceCodeInfo.Location {
 				paths := location.GetPath()
 				if len(paths) == 4 &&
-					paths[0] == 6 &&
-					paths[1] == 0 &&
-					paths[2] == 2 &&
-					paths[3] == int32(i) {
+					paths[0] == servicePath &&
+					paths[1] == int32(s) &&
+					paths[2] == messageFieldPath &&
+					paths[3] == int32(m) {
 					comment = location.GetLeadingComments()
 					comment = strings.Replace(comment, "\n", "", -1)
 					comment = linterRulePattern.ReplaceAllString(comment, "")
 					comment = strings.TrimSpace(comment)
 				}
 			}
-
 			inputType := *method.InputType
-			log.Printf(" INPUT %s", inputType)
-
 			inputMessage := g.FindMessage(inputType)
-			log.Printf(" INPUT MESSAGE %+v", inputMessage)
-
 			outputType := *method.OutputType
-			log.Printf(" OUTPUT %s", outputType)
-
 			outputMessage := g.FindMessage(outputType)
-			log.Printf(" OUTPUT MESSAGE %+v", outputMessage)
-
-			log.Printf(" OPTIONS %+v", *method.Options)
-
 			operationID := *service.Name + "_" + *method.Name
-
 			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
-			log.Printf(" extensions: %T %+v (%+v)", extension, extension, err)
+			if err != nil {
+				log.Printf("%s", err.Error())
+			}
 			var path string
 			var methodName string
 			var body string
 			if extension != nil {
 				rule := extension.(*annotations.HttpRule)
-				log.Printf("  PATTERN %T %v", rule.Pattern, rule.Pattern)
-				log.Printf("  SELECTOR %s", rule.Selector)
-				log.Printf("  BODY %s", rule.Body)
-				log.Printf("  BINDINGS %s", rule.AdditionalBindings)
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
 				case *annotations.HttpRule_Get:
@@ -148,9 +142,7 @@ func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				default:
 					path = "unknown-unsupported"
 				}
-				log.Printf("  PATH %s", path)
 			}
-			log.Printf("%s", methodName)
 			if methodName != "" {
 				op, path2 := g.buildOperationV3(operationID, comment, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
@@ -283,12 +275,10 @@ func (g *Generator) buildOperationV3(
 	pathParameters := make([]string, 0)
 
 	if matches := namePattern.FindStringSubmatch(path); matches != nil {
-		log.Printf("MATCHES %+v", matches)
 		coveredParameters = append(coveredParameters, matches[1])
 		starredPath := matches[2]
 
 		parts := strings.Split(starredPath, "/")
-		log.Printf("parts: %+v", parts)
 
 		for i := 0; i < len(parts); i += 2 {
 			section := parts[i]
@@ -298,10 +288,8 @@ func (g *Generator) buildOperationV3(
 		}
 
 		newPath := strings.Join(parts, "/")
-		log.Printf("new: %s", newPath)
 
 		path = strings.Replace(path, matches[0], newPath, 1)
-		log.Printf("path %s", path)
 	}
 
 	parameters := []*v3.ParameterOrReference{}
@@ -424,37 +412,33 @@ func (g *Generator) buildOperationV3(
 	return op, path
 }
 
+func addOpToPathForMethod(
+	op *v3.Operation,
+	pathItem *v3.PathItem,
+	methodName string) {
+	switch methodName {
+	case "GET":
+		pathItem.Get = op
+	case "POST":
+		pathItem.Post = op
+	case "PUT":
+		pathItem.Put = op
+	case "DELETE":
+		pathItem.Delete = op
+	case "PATCH":
+		pathItem.Patch = op
+	}
+}
+
 func (g *Generator) addOperationV3(d *v3.Document, op *v3.Operation, path string, methodName string) {
 	for _, namedPathItem := range d.Paths.Path {
 		if namedPathItem.Name == path {
-			switch methodName {
-			case "GET":
-				namedPathItem.Value.Get = op
-			case "POST":
-				namedPathItem.Value.Post = op
-			case "PUT":
-				namedPathItem.Value.Put = op
-			case "DELETE":
-				namedPathItem.Value.Delete = op
-			case "PATCH":
-				namedPathItem.Value.Patch = op
-			}
+			addOpToPathForMethod(op, namedPathItem.Value, methodName)
 			return
 		}
 	}
 	// if we get here, we need to create a path item
 	namedPathItem := &v3.NamedPathItem{Name: path, Value: &v3.PathItem{}}
-	switch methodName {
-	case "GET":
-		namedPathItem.Value.Get = op
-	case "POST":
-		namedPathItem.Value.Post = op
-	case "PUT":
-		namedPathItem.Value.Put = op
-	case "DELETE":
-		namedPathItem.Value.Delete = op
-	case "PATCH":
-		namedPathItem.Value.Patch = op
-	}
+	addOpToPathForMethod(op, namedPathItem.Value, methodName)
 	d.Paths.Path = append(d.Paths.Path, namedPathItem)
 }

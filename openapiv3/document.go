@@ -30,11 +30,12 @@ func ParseDocument(b []byte) (*Document, error) {
 }
 
 // YAMLValue produces a serialized YAML representation of the document.
-func (d *Document) YAMLValue() ([]byte, error) {
+func (d *Document) YAMLValue(comment string) ([]byte, error) {
 	rawInfo := d.ToRawInfo()
 	rawInfo = &yaml.Node{
-		Kind:    yaml.DocumentNode,
-		Content: []*yaml.Node{rawInfo},
+		Kind:        yaml.DocumentNode,
+		Content:     []*yaml.Node{rawInfo},
+		HeadComment: comment,
 	}
 	return yaml.Marshal(rawInfo)
 }

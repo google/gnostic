@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,6 +37,9 @@ func main() {
 		g.Error(err, "parsing input proto")
 	}
 
+	// Uncomment this to log the request as JSON.
+	// log.Println(protojson.Format(g.Request))
+
 	if len(g.Request.FileToGenerate) == 0 {
 		g.Fail("no files to generate")
 	}
@@ -46,6 +49,7 @@ func main() {
 	// Create a wrapped version of the Descriptors and EnumDescriptors that
 	// point to the file that defines them.
 	g.WrapTypes()
+
 	g.GenerateAllFiles()
 
 	// Send back the results.

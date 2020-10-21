@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -510,11 +510,8 @@ func extractComments(file *FileDescriptor) {
 
 // GenerateAllFiles generates the output for all the files we're outputting.
 func (g *Generator) GenerateAllFiles() {
-	d := g.NewDocumentV3()
-	for _, file := range g.allFiles {
-		g.AddToDocumentV3(d, file)
-	}
-	bytes, err := d.YAMLValue()
+	d := g.GenerateOpenAPIv3()
+	bytes, err := d.YAMLValue("Generated with protoc-gen-openapi (https://github.com/googleapis/gnostic/tree/protoc-gen-openapi/apps/protoc-gen-openapi")
 	if err != nil {
 		g.Error(err, "failed to marshal yaml")
 	}
@@ -600,6 +597,7 @@ const (
 	packagePath = 2 // package
 	messagePath = 4 // message_type
 	enumPath    = 5 // enum_type
+	servicePath = 6 // service type
 	// tag numbers in DescriptorProto
 	messageFieldPath   = 2 // field
 	messageMessagePath = 3 // nested_type
