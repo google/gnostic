@@ -168,6 +168,7 @@ type ImportedDescriptor struct {
 	o Object
 }
 
+// TypeName returns the name of an imported type.
 func (id *ImportedDescriptor) TypeName() []string { return id.o.TypeName() }
 
 // FileDescriptor describes an protocol buffer descriptor file (.proto).
@@ -509,16 +510,16 @@ func extractComments(file *FileDescriptor) {
 
 // GenerateAllFiles generates the output for all the files we're outputting.
 func (g *Generator) GenerateAllFiles() {
-	d := g.NewDocumentV2()
+	d := g.NewDocumentV3()
 	for _, file := range g.allFiles {
-		g.AddToDocumentV2(d, file)
+		g.AddToDocumentV3(d, file)
 	}
 	bytes, err := d.YAMLValue()
 	if err != nil {
 		g.Error(err, "failed to marshal yaml")
 	}
 	g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
-		Name:    proto.String("swagger.yaml"),
+		Name:    proto.String("openapi.yaml"),
 		Content: proto.String(string(bytes)),
 	})
 }
@@ -607,3 +608,24 @@ const (
 	// tag numbers in EnumDescriptorProto
 	enumValuePath = 2 // value
 )
+
+///
+
+// FindMessage gets a message descriptor by name
+func (g *Generator) FindMessage(name string) *Descriptor {
+	for _, file := range g.allFiles {
+		packageName := *file.Package
+		var innerName string
+		if strings.HasPrefix(name, "."+packageName+".") {
+			innerName = strings.TrimPrefix(name, "."+packageName+".")
+		} else {
+			continue
+		}
+		for _, desc := range file.desc {
+			if *desc.Name == innerName {
+				return desc
+			}
+		}
+	}
+	return nil
+}
