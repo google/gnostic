@@ -26,6 +26,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
+var linterRulePattern *regexp.Regexp
+
 // schemaReferenceForTypeName returns an OpenAPI JSON Reference to the schema that represents a type.
 func (g *Generator) schemaReferenceForTypeName(typeName string) string {
 	if !contains(g.requiredSchemas, typeName) {
@@ -40,6 +42,8 @@ func (g *Generator) schemaReferenceForTypeName(typeName string) string {
 func (g *Generator) GenerateOpenAPIv3() *v3.Document {
 	g.requiredSchemas = make([]string, 0)
 	g.generatedSchemas = make([]string, 0)
+
+	linterRulePattern = regexp.MustCompile(`\(-- .* --\)`)
 
 	d := &v3.Document{}
 	d.Openapi = "3.0"
@@ -104,8 +108,6 @@ func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
 	g.file = file
 	sourceCodeInfo := file.SourceCodeInfo
 
-	linterRulePattern := regexp.MustCompile(`\(-- .* --\)`)
-
 	for s, service := range file.FileDescriptorProto.Service {
 		var comment string
 		for _, location := range sourceCodeInfo.Location {
@@ -140,9 +142,9 @@ func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				}
 			}
 			inputType := *method.InputType
-			inputMessage := g.FindMessage(inputType)
+			inputIndex, inputMessage := g.FindMessage(inputType)
 			outputType := *method.OutputType
-			outputMessage := g.FindMessage(outputType)
+			outputIndex, outputMessage := g.FindMessage(outputType)
 			operationID := *service.Name + "_" + *method.Name
 			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
 			if err != nil {
@@ -177,7 +179,10 @@ func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				}
 			}
 			if methodName != "" {
-				op, path2 := g.buildOperationV3(operationID, comment, path, body, inputType, inputMessage, outputType, outputMessage)
+				op, path2 := g.buildOperationV3(
+					operationID, comment, path, body,
+					inputType, inputIndex, inputMessage,
+					outputType, outputIndex, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
@@ -188,7 +193,22 @@ func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
 func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor) {
 	g.file = file
 	// for each message, generate a definition
-	for _, desc := range g.file.desc {
+	for i, desc := range g.file.desc {
+
+		var messageDescription string
+		for _, location := range file.SourceCodeInfo.Location {
+			paths := location.GetPath()
+			if len(paths) == 2 &&
+				paths[0] == messagePath &&
+				paths[1] == int32(i) {
+				comment := location.GetLeadingComments()
+				comment = strings.Replace(comment, "\n", "", -1)
+				comment = linterRulePattern.ReplaceAllString(comment, "")
+				comment = strings.TrimSpace(comment)
+				messageDescription = comment
+			}
+		}
+
 		typeName := "." + *g.file.Package + "." + *desc.Name
 		if !contains(g.requiredSchemas, typeName) ||
 			contains(g.generatedSchemas, typeName) {
@@ -198,9 +218,27 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
-		for _, field := range desc.Field {
+		for j, field := range desc.Field {
+
+			var fieldDescription string
+			for _, location := range file.SourceCodeInfo.Location {
+				paths := location.GetPath()
+				if len(paths) == 4 &&
+					paths[0] == messagePath &&
+					paths[1] == int32(i) &&
+					paths[2] == messageFieldPath &&
+					paths[3] == int32(j) {
+					comment := location.GetLeadingComments()
+					comment = strings.Replace(comment, "\n", "", -1)
+					comment = linterRulePattern.ReplaceAllString(comment, "")
+					comment = strings.TrimSpace(comment)
+					fieldDescription = comment
+				}
+			}
+
 			XRef := ""
 			fieldSchema := &v3.Schema{}
+			fieldSchema.Description = fieldDescription
 			if *field.Label == descriptor.FieldDescriptorProto_LABEL_REPEATED {
 				fieldSchema.Type = "array"
 				switch *field.Type {
@@ -254,7 +292,8 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 						Name: *field.Name,
 						Value: &v3.SchemaOrReference{
 							Oneof: &v3.SchemaOrReference_Reference{
-								Reference: &v3.Reference{XRef: XRef},
+								Reference: &v3.Reference{
+									XRef: XRef},
 							},
 						},
 					},
@@ -279,8 +318,8 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 				Value: &v3.SchemaOrReference{
 					Oneof: &v3.SchemaOrReference_Schema{
 						Schema: &v3.Schema{
-							// Description: *desc.Name,
-							Properties: definitionProperties},
+							Description: messageDescription,
+							Properties:  definitionProperties},
 					},
 				},
 			})
@@ -312,16 +351,22 @@ func (g *Generator) buildOperationV3(
 	path string,
 	bodyField string,
 	inputType string,
+	inputIndex int,
 	inputMessage *Descriptor,
 	outputType string,
+	outputIndex int,
 	outputMessage *Descriptor,
 ) (*v3.Operation, string) {
 
 	namePattern := regexp.MustCompile("{(.*)=(.*)}")
+
+	// track the parameters that are covered in the body or path
 	coveredParameters := make([]string, 0)
 	if bodyField != "" {
 		coveredParameters = append(coveredParameters, bodyField)
 	}
+
+	parameters := []*v3.ParameterOrReference{}
 
 	// build a list of path parameters
 	pathParameters := make([]string, 0)
@@ -338,9 +383,7 @@ func (g *Generator) buildOperationV3(
 		newPath := strings.Join(parts, "/")
 		path = strings.Replace(path, matches[0], newPath, 1)
 	}
-
-	// build all parameters
-	parameters := []*v3.ParameterOrReference{}
+	// add the path parameters
 	for _, pathParameter := range pathParameters {
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
@@ -362,18 +405,35 @@ func (g *Generator) buildOperationV3(
 			})
 	}
 
+	// add any unhandled parameters as query parameters
 	if bodyField != "*" {
-		for _, field := range inputMessage.Field {
+		for fieldIndex, field := range inputMessage.Field {
 			fieldName := *field.Name
-
 			if !contains(coveredParameters, fieldName) {
+
+				var fieldDescription string
+				for _, location := range g.file.SourceCodeInfo.Location {
+					paths := location.GetPath()
+					if len(paths) == 4 &&
+						paths[0] == messagePath &&
+						paths[1] == int32(inputIndex) &&
+						paths[2] == messageFieldPath &&
+						paths[3] == int32(fieldIndex) {
+						comment := location.GetLeadingComments()
+						comment = strings.Replace(comment, "\n", "", -1)
+						comment = linterRulePattern.ReplaceAllString(comment, "")
+						comment = strings.TrimSpace(comment)
+						fieldDescription = comment
+					}
+				}
+
 				parameters = append(parameters,
 					&v3.ParameterOrReference{
 						Oneof: &v3.ParameterOrReference_Parameter{
 							Parameter: &v3.Parameter{
 								Name:        fieldName,
 								In:          "query",
-								Description: "",
+								Description: fieldDescription,
 								Required:    false,
 								Schema: &v3.SchemaOrReference{
 									Oneof: &v3.SchemaOrReference_Schema{

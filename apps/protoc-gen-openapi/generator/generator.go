@@ -613,7 +613,7 @@ const (
 ///
 
 // FindMessage gets a message descriptor by name
-func (g *Generator) FindMessage(name string) *Descriptor {
+func (g *Generator) FindMessage(name string) (int, *Descriptor) {
 	for _, file := range g.allFiles {
 		packageName := *file.Package
 		var innerName string
@@ -622,11 +622,11 @@ func (g *Generator) FindMessage(name string) *Descriptor {
 		} else {
 			continue
 		}
-		for _, desc := range file.desc {
+		for i, desc := range file.desc {
 			if *desc.Name == innerName {
-				return desc
+				return i, desc
 			}
 		}
 	}
-	return nil
+	return -1, nil
 }
