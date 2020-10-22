@@ -241,6 +241,9 @@ type Generator struct {
 	init             []string                   // Lines to emit in the init function.
 	indent           string
 	writeOutput      bool
+
+	requiredSchemas  []string // Names of schemas that should be generated.
+	generatedSchemas []string // Names of schemas that have already been generated.
 }
 
 // New creates a new generator and allocates the request and response protobufs.
@@ -255,14 +258,14 @@ func New() *Generator {
 // Error reports a problem, including an error, and exits the program.
 func (g *Generator) Error(err error, msgs ...string) {
 	s := strings.Join(msgs, " ") + ":" + err.Error()
-	log.Print("protoc-gen-go: error:", s)
+	log.Print("protoc-gen-openapi: error:", s)
 	os.Exit(1)
 }
 
 // Fail reports a problem and exits the program.
 func (g *Generator) Fail(msgs ...string) {
 	s := strings.Join(msgs, " ")
-	log.Print("protoc-gen-go: error:", s)
+	log.Print("protoc-gen-openapi: error:", s)
 	os.Exit(1)
 }
 

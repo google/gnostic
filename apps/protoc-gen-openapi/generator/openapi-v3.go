@@ -17,6 +17,7 @@ package generator
 import (
 	"log"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -25,14 +26,21 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-func (g *Generator) definitionReferenceForTypeName(typeName string) string {
+// schemaReferenceForTypeName returns an OpenAPI JSON Reference to the schema that represents a type.
+func (g *Generator) schemaReferenceForTypeName(typeName string) string {
+	if !contains(g.requiredSchemas, typeName) {
+		g.requiredSchemas = append(g.requiredSchemas, typeName)
+	}
 	parts := strings.Split(typeName, ".")
 	lastPart := parts[len(parts)-1]
-	return "#/definitions/" + lastPart
+	return "#/components/schemas/" + lastPart
 }
 
 // GenerateOpenAPIv3 creates a new OpenAPIv3 document
 func (g *Generator) GenerateOpenAPIv3() *v3.Document {
+	g.requiredSchemas = make([]string, 0)
+	g.generatedSchemas = make([]string, 0)
+
 	d := &v3.Document{}
 	d.Openapi = "3.0"
 	d.Info = &v3.Info{
@@ -47,7 +55,32 @@ func (g *Generator) GenerateOpenAPIv3() *v3.Document {
 		},
 	}
 	for _, file := range g.allFiles {
-		g.AddToDocumentV3(d, file)
+		g.addPathsToDocumentV3(d, file)
+	}
+
+	for len(g.requiredSchemas) > 0 {
+		count := len(g.requiredSchemas)
+		for _, file := range g.allFiles {
+			g.addSchemasToDocumentV3(d, file)
+		}
+		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
+	}
+
+	// sort the paths
+	if true {
+		pairs := d.Paths.Path
+		sort.Slice(pairs, func(i, j int) bool {
+			return pairs[i].Name < pairs[j].Name
+		})
+		d.Paths.Path = pairs
+	}
+	// sort the schemas
+	if true {
+		pairs := d.Components.Schemas.AdditionalProperties
+		sort.Slice(pairs, func(i, j int) bool {
+			return pairs[i].Name < pairs[j].Name
+		})
+		d.Components.Schemas.AdditionalProperties = pairs
 	}
 	return d
 }
@@ -66,8 +99,8 @@ func itemsItemForReference(xref string) *v3.ItemsItem {
 				XRef: xref}}}}}
 }
 
-// AddToDocumentV3 adds info from one file descriptor
-func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
+// addPathsToDocumentV3 adds info from one file descriptor
+func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
 	g.file = file
 	sourceCodeInfo := file.SourceCodeInfo
 
@@ -144,14 +177,24 @@ func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				}
 			}
 			if methodName != "" {
-				op, path2 := g.buildOperationV3(operationID, comment, path, body, inputMessage, outputMessage)
+				op, path2 := g.buildOperationV3(operationID, comment, path, body, inputType, inputMessage, outputType, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
 	}
+}
 
+// addSchemasToDocumentV3 adds info from one file descriptor
+func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor) {
+	g.file = file
 	// for each message, generate a definition
 	for _, desc := range g.file.desc {
+		typeName := "." + *g.file.Package + "." + *desc.Name
+		if !contains(g.requiredSchemas, typeName) ||
+			contains(g.generatedSchemas, typeName) {
+			continue
+		}
+		g.generatedSchemas = append(g.generatedSchemas, typeName)
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
@@ -162,7 +205,7 @@ func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				fieldSchema.Type = "array"
 				switch *field.Type {
 				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-					fieldSchema.Items = itemsItemForReference(g.definitionReferenceForTypeName(*field.TypeName))
+					fieldSchema.Items = itemsItemForReference(g.schemaReferenceForTypeName(*field.TypeName))
 				case descriptor.FieldDescriptorProto_TYPE_STRING:
 					fieldSchema.Items = itemsItemForType("string")
 				case descriptor.FieldDescriptorProto_TYPE_INT32:
@@ -177,7 +220,7 @@ func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 			} else {
 				switch *field.Type {
 				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-					XRef = g.definitionReferenceForTypeName(*field.TypeName)
+					XRef = g.schemaReferenceForTypeName(*field.TypeName)
 				case descriptor.FieldDescriptorProto_TYPE_STRING:
 					fieldSchema.Type = "string"
 				case descriptor.FieldDescriptorProto_TYPE_INT64:
@@ -195,9 +238,11 @@ func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				case descriptor.FieldDescriptorProto_TYPE_BOOL:
 					fieldSchema.Type = "boolean"
 				case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
-					fieldSchema.Type = "double"
+					fieldSchema.Type = "number"
+					fieldSchema.Format = "double"
 				case descriptor.FieldDescriptorProto_TYPE_BYTES:
-					fieldSchema.Type = "byte"
+					fieldSchema.Type = "string"
+					fieldSchema.Format = "bytes"
 				default:
 					log.Printf("(TODO) Unsupported field type: %+v", field.Type)
 				}
@@ -233,7 +278,9 @@ func (g *Generator) AddToDocumentV3(d *v3.Document, file *FileDescriptor) {
 				Name: *desc.Name,
 				Value: &v3.SchemaOrReference{
 					Oneof: &v3.SchemaOrReference_Schema{
-						Schema: &v3.Schema{Properties: definitionProperties},
+						Schema: &v3.Schema{
+							// Description: *desc.Name,
+							Properties: definitionProperties},
 					},
 				},
 			})
@@ -250,6 +297,9 @@ func contains(s []string, e string) bool {
 }
 
 func singular(plural string) string {
+	if strings.HasSuffix(plural, "ies") {
+		return strings.TrimSuffix(plural, "ies") + "y"
+	}
 	if strings.HasSuffix(plural, "s") {
 		return strings.TrimSuffix(plural, "s")
 	}
@@ -261,39 +311,36 @@ func (g *Generator) buildOperationV3(
 	description string,
 	path string,
 	bodyField string,
+	inputType string,
 	inputMessage *Descriptor,
+	outputType string,
 	outputMessage *Descriptor,
 ) (*v3.Operation, string) {
 
 	namePattern := regexp.MustCompile("{(.*)=(.*)}")
-
 	coveredParameters := make([]string, 0)
 	if bodyField != "" {
 		coveredParameters = append(coveredParameters, bodyField)
 	}
 
+	// build a list of path parameters
 	pathParameters := make([]string, 0)
-
 	if matches := namePattern.FindStringSubmatch(path); matches != nil {
 		coveredParameters = append(coveredParameters, matches[1])
 		starredPath := matches[2]
-
 		parts := strings.Split(starredPath, "/")
-
 		for i := 0; i < len(parts); i += 2 {
 			section := parts[i]
 			parameter := singular(section)
 			parts[i+1] = "{" + parameter + "}"
 			pathParameters = append(pathParameters, parameter)
 		}
-
 		newPath := strings.Join(parts, "/")
-
 		path = strings.Replace(path, matches[0], newPath, 1)
 	}
 
+	// build all parameters
 	parameters := []*v3.ParameterOrReference{}
-
 	for _, pathParameter := range pathParameters {
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
@@ -315,28 +362,30 @@ func (g *Generator) buildOperationV3(
 			})
 	}
 
-	for _, field := range inputMessage.Field {
-		fieldName := *field.Name
+	if bodyField != "*" {
+		for _, field := range inputMessage.Field {
+			fieldName := *field.Name
 
-		if !contains(coveredParameters, fieldName) {
-			parameters = append(parameters,
-				&v3.ParameterOrReference{
-					Oneof: &v3.ParameterOrReference_Parameter{
-						Parameter: &v3.Parameter{
-							Name:        fieldName,
-							In:          "query",
-							Description: "",
-							Required:    false,
-							Schema: &v3.SchemaOrReference{
-								Oneof: &v3.SchemaOrReference_Schema{
-									Schema: &v3.Schema{
-										Type: "string",
+			if !contains(coveredParameters, fieldName) {
+				parameters = append(parameters,
+					&v3.ParameterOrReference{
+						Oneof: &v3.ParameterOrReference_Parameter{
+							Parameter: &v3.Parameter{
+								Name:        fieldName,
+								In:          "query",
+								Description: "",
+								Required:    false,
+								Schema: &v3.SchemaOrReference{
+									Oneof: &v3.SchemaOrReference_Schema{
+										Schema: &v3.Schema{
+											Type: "string",
+										},
 									},
 								},
 							},
 						},
-					},
-				})
+					})
+			}
 		}
 	}
 
@@ -360,7 +409,7 @@ func (g *Generator) buildOperationV3(
 												Schema: &v3.SchemaOrReference{
 													Oneof: &v3.SchemaOrReference_Reference{
 														Reference: &v3.Reference{
-															XRef: "#/components/schemas/" + *outputMessage.Name,
+															XRef: g.schemaReferenceForTypeName(outputType),
 														},
 													},
 												},
@@ -378,10 +427,14 @@ func (g *Generator) buildOperationV3(
 
 	if bodyField != "" {
 		bodyFieldTypeName := ""
-		for _, field := range inputMessage.Field {
-			if *field.Name == bodyField {
-				bodyFieldTypeName = *field.TypeName
-				break
+		if bodyField == "*" {
+			bodyFieldTypeName = inputType
+		} else {
+			for _, field := range inputMessage.Field {
+				if *field.Name == bodyField {
+					bodyFieldTypeName = *field.TypeName
+					break
+				}
 			}
 		}
 		op.RequestBody = &v3.RequestBodyOrReference{
@@ -396,7 +449,7 @@ func (g *Generator) buildOperationV3(
 									Schema: &v3.SchemaOrReference{
 										Oneof: &v3.SchemaOrReference_Reference{
 											Reference: &v3.Reference{
-												XRef: g.definitionReferenceForTypeName(bodyFieldTypeName),
+												XRef: g.schemaReferenceForTypeName(bodyFieldTypeName),
 											},
 										},
 									},

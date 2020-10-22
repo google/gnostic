@@ -38,7 +38,7 @@ func main() {
 	}
 
 	// Uncomment this to log the request as JSON.
-	// log.Println(protojson.Format(g.Request))
+	//log.Println(protojson.Format(g.Request))
 
 	if len(g.Request.FileToGenerate) == 0 {
 		g.Fail("no files to generate")
