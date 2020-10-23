@@ -219,7 +219,20 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
 		for j, field := range desc.Field {
-
+			outputOnly := false
+			extension, err := proto.GetExtension(field.Options, annotations.E_FieldBehavior)
+			if err == nil {
+				switch v := extension.(type) {
+				case []annotations.FieldBehavior:
+					for _, vv := range v {
+						if vv == annotations.FieldBehavior_OUTPUT_ONLY {
+							outputOnly = true
+						}
+					}
+				default:
+					log.Printf("unsupported extension type %T", extension)
+				}
+			}
 			var fieldDescription string
 			for _, location := range file.SourceCodeInfo.Location {
 				paths := location.GetPath()
@@ -239,6 +252,9 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 			XRef := ""
 			fieldSchema := &v3.Schema{}
 			fieldSchema.Description = fieldDescription
+			if outputOnly {
+				fieldSchema.ReadOnly = true
+			}
 			if *field.Label == descriptor.FieldDescriptorProto_LABEL_REPEATED {
 				fieldSchema.Type = "array"
 				switch *field.Type {
