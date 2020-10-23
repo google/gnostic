@@ -51,6 +51,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -244,6 +245,9 @@ type Generator struct {
 
 	requiredSchemas  []string // Names of schemas that should be generated.
 	generatedSchemas []string // Names of schemas that have already been generated.
+
+	linterRulePattern *regexp.Regexp
+	namePattern       *regexp.Regexp
 }
 
 // New creates a new generator and allocates the request and response protobufs.
