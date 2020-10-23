@@ -1,4 +1,5 @@
-# Generated with protoc-gen-openapi (https://github.com/googleapis/gnostic/tree/protoc-gen-openapi/apps/protoc-gen-openapi
+# Generated with protoc-gen-openapi
+# https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi
 
 openapi: "3.0"
 info:

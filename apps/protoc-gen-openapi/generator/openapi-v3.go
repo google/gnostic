@@ -11,86 +11,61 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
 package generator
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	v3 "github.com/googleapis/gnostic/openapiv3"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
+const infoURL = "https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi"
+
+// OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
+type OpenAPIv3Generator struct {
+	plugin *protogen.Plugin
+
+	requiredSchemas   []string // Names of schemas that need to be generated.
+	generatedSchemas  []string // Names of schemas that have already been generated.
+	linterRulePattern *regexp.Regexp
+	namePattern       *regexp.Regexp
 }
 
-func singular(plural string) string {
-	if strings.HasSuffix(plural, "ves") {
-		return strings.TrimSuffix(plural, "ves") + "f"
+// NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
+func NewOpenAPIv3Generator(plugin *protogen.Plugin) *OpenAPIv3Generator {
+	return &OpenAPIv3Generator{
+		plugin:            plugin,
+		requiredSchemas:   make([]string, 0),
+		generatedSchemas:  make([]string, 0),
+		linterRulePattern: regexp.MustCompile(`\(-- .* --\)`),
+		namePattern:       regexp.MustCompile("{(.*)=(.*)}"),
 	}
-	if strings.HasSuffix(plural, "ies") {
-		return strings.TrimSuffix(plural, "ies") + "y"
-	}
-	if strings.HasSuffix(plural, "s") {
-		return strings.TrimSuffix(plural, "s")
-	}
-	return plural
 }
 
-func (g *Generator) filterCommentString(comment string) string {
-	comment = strings.Replace(comment, "\n", "", -1)
-	comment = g.linterRulePattern.ReplaceAllString(comment, "")
-	return strings.TrimSpace(comment)
-}
-
-func (g *Generator) commentForPath2(file *FileDescriptor, servicePath, s int) string {
-	path := []string{
-		strconv.Itoa(servicePath),
-		strconv.Itoa(s),
+// Run runs the generator.
+func (g *OpenAPIv3Generator) Run() error {
+	d := g.buildDocumentV3()
+	bytes, err := d.YAMLValue("Generated with protoc-gen-openapi\n" + infoURL)
+	if err != nil {
+		return fmt.Errorf("failed to marshal yaml: %s", err.Error())
 	}
-	return g.filterCommentString(file.comments[strings.Join(path, ",")].GetLeadingComments())
+	outputFile := g.plugin.NewGeneratedFile("openapi.yaml", "")
+	outputFile.Write(bytes)
+	return nil
 }
 
-func (g *Generator) commentForPath4(file *FileDescriptor, servicePath, s, messageFieldPath, m int) string {
-	path := []string{
-		strconv.Itoa(servicePath),
-		strconv.Itoa(s),
-		strconv.Itoa(messageFieldPath),
-		strconv.Itoa(m),
-	}
-	return g.filterCommentString(file.comments[strings.Join(path, ",")].GetLeadingComments())
-}
-
-// schemaReferenceForTypeName returns an OpenAPI JSON Reference to the schema that represents a type.
-func (g *Generator) schemaReferenceForTypeName(typeName string) string {
-	if !contains(g.requiredSchemas, typeName) {
-		g.requiredSchemas = append(g.requiredSchemas, typeName)
-	}
-	parts := strings.Split(typeName, ".")
-	lastPart := parts[len(parts)-1]
-	return "#/components/schemas/" + lastPart
-}
-
-// GenerateOpenAPIv3 creates a new OpenAPIv3 document
-func (g *Generator) GenerateOpenAPIv3() *v3.Document {
-	g.requiredSchemas = make([]string, 0)
-	g.generatedSchemas = make([]string, 0)
-
-	g.linterRulePattern = regexp.MustCompile(`\(-- .* --\)`)
-	g.namePattern = regexp.MustCompile("{(.*)=(.*)}")
-
+// buildDocumentV3 builds an OpenAPIv3 document for a plugin request.
+func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	d := &v3.Document{}
 	d.Openapi = "3.0"
 	d.Info = &v3.Info{
@@ -104,17 +79,18 @@ func (g *Generator) GenerateOpenAPIv3() *v3.Document {
 			AdditionalProperties: []*v3.NamedSchemaOrReference{},
 		},
 	}
-	for _, file := range g.allFiles {
+	for _, file := range g.plugin.Files {
 		g.addPathsToDocumentV3(d, file)
 	}
 	for len(g.requiredSchemas) > 0 {
+		log.Printf("REQUIRED SCHEMAS %+v", g.requiredSchemas)
 		count := len(g.requiredSchemas)
-		for _, file := range g.allFiles {
+		for _, file := range g.plugin.Files {
 			g.addSchemasToDocumentV3(d, file)
 		}
 		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
 	}
-	// sort the paths
+	// Sort the paths.
 	{
 		pairs := d.Paths.Path
 		sort.Slice(pairs, func(i, j int) bool {
@@ -122,7 +98,7 @@ func (g *Generator) GenerateOpenAPIv3() *v3.Document {
 		})
 		d.Paths.Path = pairs
 	}
-	// sort the schemas
+	// Sort the schemas.
 	{
 		pairs := d.Components.Schemas.AdditionalProperties
 		sort.Slice(pairs, func(i, j int) bool {
@@ -133,24 +109,32 @@ func (g *Generator) GenerateOpenAPIv3() *v3.Document {
 	return d
 }
 
-// addPathsToDocumentV3 adds paths from a specified file descriptor
-func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
-	for s, service := range file.FileDescriptorProto.Service {
-		comment := g.commentForPath2(file, servicePath, s)
-		d.Info.Title = *service.Name
+// filterCommentString removes line breaks and linter rules from comments.
+func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
+	comment := string(c)
+	comment = strings.Replace(comment, "\n", "", -1)
+	comment = g.linterRulePattern.ReplaceAllString(comment, "")
+	return strings.TrimSpace(comment)
+}
+
+// addPathsToDocumentV3 adds paths from a specified file descriptor.
+func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
+	for _, service := range file.Services {
+		comment := g.filterCommentString(service.Comments.Leading)
+		d.Info.Title = service.GoName
 		d.Info.Description = comment
 
-		for m, method := range service.Method {
-			comment := g.commentForPath4(file, servicePath, s, messageFieldPath, m)
-			inputType := *method.InputType
-			inputIndex, inputMessage := g.FindMessage(inputType)
-			outputType := *method.OutputType
-			outputIndex, outputMessage := g.FindMessage(outputType)
-			operationID := *service.Name + "_" + *method.Name
-			extension, err := proto.GetExtension(method.Options, annotations.E_Http)
-			if err != nil {
-				log.Printf("%s", err.Error())
-			}
+		for _, method := range service.Methods {
+			comment := g.filterCommentString(method.Comments.Leading)
+
+			inputMessage := method.Input
+			outputMessage := method.Output
+
+			inputType := fullMessageTypeName(inputMessage)
+			outputType := fullMessageTypeName(outputMessage)
+
+			operationID := service.GoName + "_" + method.GoName
+			extension := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
 			var path string
 			var methodName string
 			var body string
@@ -182,59 +166,54 @@ func (g *Generator) addPathsToDocumentV3(d *v3.Document, file *FileDescriptor) {
 			if methodName != "" {
 				op, path2 := g.buildOperationV3(
 					file, operationID, comment, path, body,
-					inputType, inputIndex, inputMessage,
-					outputType, outputIndex, outputMessage)
+					inputType, inputMessage,
+					outputType, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
 	}
 }
 
-// buildOperationV3 constructs an operation for a set of values
-func (g *Generator) buildOperationV3(
-	file *FileDescriptor,
+// buildOperationV3 constructs an operation for a set of values.
+func (g *OpenAPIv3Generator) buildOperationV3(
+	file *protogen.File,
 	operationID string,
 	description string,
 	path string,
 	bodyField string,
 	inputType string,
-	inputIndex int,
-	inputMessage *Descriptor,
+	inputMessage *protogen.Message,
 	outputType string,
-	outputIndex int,
-	outputMessage *Descriptor,
+	outputMessage *protogen.Message,
 ) (*v3.Operation, string) {
-
-	// coveredParameters tracks the parameters that have been used in the body or path
+	// coveredParameters tracks the parameters that have been used in the body or path.
 	coveredParameters := make([]string, 0)
 	if bodyField != "" {
 		coveredParameters = append(coveredParameters, bodyField)
 	}
-
-	// initialize the list of operation parameters
+	// Initialize the list of operation parameters.
 	parameters := []*v3.ParameterOrReference{}
-
-	// build a list of path parameters
+	// Build a list of path parameters.
 	pathParameters := make([]string, 0)
 	if matches := g.namePattern.FindStringSubmatch(path); matches != nil {
-		// add the "name=" "name" value to the list of covered parameters
+		// Add the "name=" "name" value to the list of covered parameters.
 		coveredParameters = append(coveredParameters, matches[1])
-		// convert the path from the starred form to use named path parameters
+		// Convert the path from the starred form to use named path parameters.
 		starredPath := matches[2]
 		parts := strings.Split(starredPath, "/")
-		// the starred path is assumed to be in the form "things/*/otherthings/*"
-		// we want to convert it to "things/{thing}/otherthings/{otherthing}"
+		// The starred path is assumed to be in the form "things/*/otherthings/*".
+		// We want to convert it to "things/{thing}/otherthings/{otherthing}".
 		for i := 0; i < len(parts); i += 2 {
 			section := parts[i]
 			parameter := singular(section)
 			parts[i+1] = "{" + parameter + "}"
 			pathParameters = append(pathParameters, parameter)
 		}
-		// rewrite the path to use the path parameters
+		// Rewrite the path to use the path parameters.
 		newPath := strings.Join(parts, "/")
 		path = strings.Replace(path, matches[0], newPath, 1)
 	}
-	// add the path parameters to the operation parameters
+	// Add the path parameters to the operation parameters.
 	for _, pathParameter := range pathParameters {
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
@@ -255,14 +234,13 @@ func (g *Generator) buildOperationV3(
 				},
 			})
 	}
-
-	// add any unhandled fields in the request message as query parameters
+	// Add any unhandled fields in the request message as query parameters.
 	if bodyField != "*" {
-		for fieldIndex, field := range inputMessage.Field {
-			fieldName := *field.Name
+		for _, field := range inputMessage.Fields {
+			fieldName := string(field.Desc.Name())
 			if !contains(coveredParameters, fieldName) {
-				// get the field description from the comments
-				fieldDescription := g.commentForPath4(file, messagePath, inputIndex, messageFieldPath, fieldIndex)
+				// Get the field description from the comments.
+				fieldDescription := g.filterCommentString(field.Comments.Leading)
 				parameters = append(parameters,
 					&v3.ParameterOrReference{
 						Oneof: &v3.ParameterOrReference_Parameter{
@@ -284,8 +262,7 @@ func (g *Generator) buildOperationV3(
 			}
 		}
 	}
-
-	// create the response
+	// Create the response.
 	responses := &v3.Responses{
 		ResponseOrReference: []*v3.NamedResponseOrReference{
 			&v3.NamedResponseOrReference{
@@ -316,26 +293,24 @@ func (g *Generator) buildOperationV3(
 			},
 		},
 	}
-
-	// create the operation
+	// Create the operation.
 	op := &v3.Operation{
 		Summary:     description,
 		OperationId: operationID,
 		Parameters:  parameters,
 		Responses:   responses,
 	}
-
-	// if a body field is specified, we need to pass a message as the request body
+	// If a body field is specified, we need to pass a message as the request body.
 	if bodyField != "" {
 		var bodyFieldTypeName string
 		if bodyField == "*" {
-			// pass the entire request message as the request body
+			// Pass the entire request message as the request body.
 			bodyFieldTypeName = inputType
 		} else {
-			// if body refers to a message field, use that type
-			for _, field := range inputMessage.Field {
-				if *field.Name == bodyField {
-					bodyFieldTypeName = *field.TypeName
+			// If body refers to a message field, use that type.
+			for _, field := range inputMessage.Fields {
+				if string(field.Desc.Name()) == bodyField {
+					bodyFieldTypeName = fullMessageTypeName(field.Message)
 					break
 				}
 			}
@@ -364,12 +339,11 @@ func (g *Generator) buildOperationV3(
 			},
 		}
 	}
-
 	return op, path
 }
 
-// addOperationV3 adds an operation to the specified path/method
-func (g *Generator) addOperationV3(d *v3.Document, op *v3.Operation, path string, methodName string) {
+// addOperationV3 adds an operation to the specified path/method.
+func (g *OpenAPIv3Generator) addOperationV3(d *v3.Document, op *v3.Operation, path string, methodName string) {
 	var selectedPathItem *v3.NamedPathItem
 	for _, namedPathItem := range d.Paths.Path {
 		if namedPathItem.Name == path {
@@ -377,12 +351,12 @@ func (g *Generator) addOperationV3(d *v3.Document, op *v3.Operation, path string
 			break
 		}
 	}
-	// if we get here, we need to create a path item
+	// If we get here, we need to create a path item.
 	if selectedPathItem == nil {
 		selectedPathItem = &v3.NamedPathItem{Name: path, Value: &v3.PathItem{}}
 		d.Paths.Path = append(d.Paths.Path, selectedPathItem)
 	}
-	// set the operation on the specified method
+	// Set the operation on the specified method.
 	switch methodName {
 	case "GET":
 		selectedPathItem.Value.Get = op
@@ -397,6 +371,17 @@ func (g *Generator) addOperationV3(d *v3.Document, op *v3.Operation, path string
 	}
 }
 
+// schemaReferenceForTypeName returns an OpenAPI JSON Reference to the schema that represents a type.
+func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string {
+	if !contains(g.requiredSchemas, typeName) {
+		g.requiredSchemas = append(g.requiredSchemas, typeName)
+	}
+	parts := strings.Split(typeName, ".")
+	lastPart := parts[len(parts)-1]
+	return "#/components/schemas/" + lastPart
+}
+
+// itemsItemForTypeName is a helper constructor.
 func itemsItemForTypeName(typeName string) *v3.ItemsItem {
 	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{&v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
@@ -404,6 +389,7 @@ func itemsItemForTypeName(typeName string) *v3.ItemsItem {
 				Type: typeName}}}}}
 }
 
+// itemsItemForReference is a helper constructor.
 func itemsItemForReference(xref string) *v3.ItemsItem {
 	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{&v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Reference{
@@ -411,28 +397,34 @@ func itemsItemForReference(xref string) *v3.ItemsItem {
 				XRef: xref}}}}}
 }
 
-// addSchemasToDocumentV3 adds info from one file descriptor
-func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor) {
-	// for each message, generate a definition
-	for i, desc := range file.desc {
-		typeName := "." + *file.Package + "." + *desc.Name
-		// only generate this if we need it and haven't already generated it
+// fullMessageTypeName builds the full type name of a message.
+func fullMessageTypeName(message *protogen.Message) string {
+	return "." + string(message.Desc.ParentFile().Package()) + "." + string(message.Desc.Name())
+}
+
+// addSchemasToDocumentV3 adds info from one file descriptor.
+func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protogen.File) {
+	// For each message, generate a definition.
+	for _, message := range file.Messages {
+		typeName := fullMessageTypeName(message)
+		// Only generate this if we need it and haven't already generated it.
 		if !contains(g.requiredSchemas, typeName) ||
 			contains(g.generatedSchemas, typeName) {
 			continue
 		}
 		g.generatedSchemas = append(g.generatedSchemas, typeName)
-		// get the message description from the comments
-		messageDescription := g.commentForPath2(file, messagePath, i)
-		// build an array holding the fields of the message
+		// Get the message description from the comments.
+		messageDescription := g.filterCommentString(message.Comments.Leading)
+
+		// Build an array holding the fields of the message.
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
-		for j, field := range desc.Field {
-			// check the field annotations to see if this is a readonly field
+		for _, field := range message.Fields {
+			// Check the field annotations to see if this is a readonly field.
 			outputOnly := false
-			extension, err := proto.GetExtension(field.Options, annotations.E_FieldBehavior)
-			if err == nil {
+			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
+			if extension != nil {
 				switch v := extension.(type) {
 				case []annotations.FieldBehavior:
 					for _, vv := range v {
@@ -444,9 +436,10 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 					log.Printf("unsupported extension type %T", extension)
 				}
 			}
-			// get the field description from the comments
-			fieldDescription := g.commentForPath4(file, messagePath, i, messageFieldPath, j)
-			// the field is either described by a reference or a schema
+			// Get the field description from the comments.
+			fieldDescription := g.filterCommentString(field.Comments.Leading)
+
+			// The field is either described by a reference or a schema.
 			XRef := ""
 			fieldSchema := &v3.Schema{
 				Description: fieldDescription,
@@ -454,61 +447,70 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 			if outputOnly {
 				fieldSchema.ReadOnly = true
 			}
-			if *field.Label == descriptor.FieldDescriptorProto_LABEL_REPEATED {
+			if field.Desc.IsList() {
 				fieldSchema.Type = "array"
-				switch *field.Type {
-				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-					fieldSchema.Items = itemsItemForReference(g.schemaReferenceForTypeName(*field.TypeName))
-				case descriptor.FieldDescriptorProto_TYPE_STRING:
+				switch field.Desc.Kind() {
+				case protoreflect.MessageKind:
+					fieldSchema.Items = itemsItemForReference(
+						g.schemaReferenceForTypeName(
+							fullMessageTypeName(field.Message)))
+				case protoreflect.StringKind:
 					fieldSchema.Items = itemsItemForTypeName("string")
-				case descriptor.FieldDescriptorProto_TYPE_INT32,
-					descriptor.FieldDescriptorProto_TYPE_UINT32,
-					descriptor.FieldDescriptorProto_TYPE_INT64,
-					descriptor.FieldDescriptorProto_TYPE_UINT64:
+				case protoreflect.Int32Kind,
+					protoreflect.Sint32Kind,
+					protoreflect.Uint32Kind,
+					protoreflect.Int64Kind,
+					protoreflect.Sint64Kind,
+					protoreflect.Uint64Kind,
+					protoreflect.Sfixed32Kind,
+					protoreflect.Fixed32Kind,
+					protoreflect.Sfixed64Kind,
+					protoreflect.Fixed64Kind:
 					fieldSchema.Items = itemsItemForTypeName("integer")
-				case descriptor.FieldDescriptorProto_TYPE_ENUM:
+				case protoreflect.EnumKind:
 					fieldSchema.Items = itemsItemForTypeName("integer")
-				case descriptor.FieldDescriptorProto_TYPE_BOOL:
+				case protoreflect.BoolKind:
 					fieldSchema.Items = itemsItemForTypeName("boolean")
-				case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
+				case protoreflect.FloatKind, protoreflect.DoubleKind:
 					fieldSchema.Items = itemsItemForTypeName("number")
-				case descriptor.FieldDescriptorProto_TYPE_BYTES:
+				case protoreflect.BytesKind:
 					fieldSchema.Items = itemsItemForTypeName("string")
 				default:
-					log.Printf("(TODO) Unsupported array type: %+v", field.Type)
+					log.Printf("(TODO) Unsupported array type: %+v", fullMessageTypeName(field.Message))
 				}
 			} else {
-				switch *field.Type {
-				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-					// the field is described by a reference
-					XRef = g.schemaReferenceForTypeName(*field.TypeName)
-				case descriptor.FieldDescriptorProto_TYPE_STRING:
+				k := field.Desc.Kind()
+				switch k {
+				case protoreflect.MessageKind:
+					// The field is described by a reference.
+					XRef = g.schemaReferenceForTypeName(fullMessageTypeName(field.Message))
+				case protoreflect.StringKind:
 					fieldSchema.Type = "string"
-				case descriptor.FieldDescriptorProto_TYPE_INT32:
+				case protoreflect.Int32Kind,
+					protoreflect.Sint32Kind,
+					protoreflect.Uint32Kind,
+					protoreflect.Int64Kind,
+					protoreflect.Sint64Kind,
+					protoreflect.Uint64Kind,
+					protoreflect.Sfixed32Kind,
+					protoreflect.Fixed32Kind,
+					protoreflect.Sfixed64Kind,
+					protoreflect.Fixed64Kind:
 					fieldSchema.Type = "integer"
-					fieldSchema.Format = "int32"
-				case descriptor.FieldDescriptorProto_TYPE_UINT32:
-					fieldSchema.Type = "integer"
-					fieldSchema.Format = "uint32"
-				case descriptor.FieldDescriptorProto_TYPE_INT64:
-					fieldSchema.Type = "integer"
-					fieldSchema.Format = "int64"
-				case descriptor.FieldDescriptorProto_TYPE_UINT64:
-					fieldSchema.Type = "integer"
-					fieldSchema.Format = "uint64"
-				case descriptor.FieldDescriptorProto_TYPE_ENUM:
+					fieldSchema.Format = k.String()
+				case protoreflect.EnumKind:
 					fieldSchema.Type = "integer"
 					fieldSchema.Format = "enum"
-				case descriptor.FieldDescriptorProto_TYPE_BOOL:
+				case protoreflect.BoolKind:
 					fieldSchema.Type = "boolean"
-				case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
+				case protoreflect.FloatKind, protoreflect.DoubleKind:
 					fieldSchema.Type = "number"
-					fieldSchema.Format = "double"
-				case descriptor.FieldDescriptorProto_TYPE_BYTES:
+					fieldSchema.Format = k.String()
+				case protoreflect.BytesKind:
 					fieldSchema.Type = "string"
 					fieldSchema.Format = "bytes"
 				default:
-					log.Printf("(TODO) Unsupported field type: %+v", field.Type)
+					log.Printf("(TODO) Unsupported field type: %+v", fullMessageTypeName(field.Message))
 				}
 			}
 			var value *v3.SchemaOrReference
@@ -530,15 +532,15 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 			definitionProperties.AdditionalProperties = append(
 				definitionProperties.AdditionalProperties,
 				&v3.NamedSchemaOrReference{
-					Name:  *field.Name,
+					Name:  string(field.Desc.Name()),
 					Value: value,
 				},
 			)
 		}
-		// add the schema to the components.schema list
+		// Add the schema to the components.schema list.
 		d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
 			&v3.NamedSchemaOrReference{
-				Name: *desc.Name,
+				Name: string(message.Desc.Name()),
 				Value: &v3.SchemaOrReference{
 					Oneof: &v3.SchemaOrReference_Schema{
 						Schema: &v3.Schema{
@@ -547,6 +549,31 @@ func (g *Generator) addSchemasToDocumentV3(d *v3.Document, file *FileDescriptor)
 						},
 					},
 				},
-			})
+			},
+		)
 	}
+}
+
+// contains returns true if an array contains a specified string.
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+// singular produces the singular form of a collection name.
+func singular(plural string) string {
+	if strings.HasSuffix(plural, "ves") {
+		return strings.TrimSuffix(plural, "ves") + "f"
+	}
+	if strings.HasSuffix(plural, "ies") {
+		return strings.TrimSuffix(plural, "ies") + "y"
+	}
+	if strings.HasSuffix(plural, "s") {
+		return strings.TrimSuffix(plural, "s")
+	}
+	return plural
 }
