@@ -123,7 +123,6 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 		comment := g.filterCommentString(service.Comments.Leading)
 		d.Info.Title = service.GoName
 		d.Info.Description = comment
-
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
@@ -406,7 +405,6 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 		g.generatedSchemas = append(g.generatedSchemas, typeName)
 		// Get the message description from the comments.
 		messageDescription := g.filterCommentString(message.Comments.Leading)
-
 		// Build an array holding the fields of the message.
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
@@ -429,7 +427,6 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 			}
 			// Get the field description from the comments.
 			fieldDescription := g.filterCommentString(field.Comments.Leading)
-
 			// The field is either described by a reference or a schema.
 			XRef := ""
 			fieldSchema := &v3.Schema{
