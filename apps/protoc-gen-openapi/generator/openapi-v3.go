@@ -126,13 +126,8 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
-
 			inputMessage := method.Input
 			outputMessage := method.Output
-
-			inputType := fullMessageTypeName(inputMessage)
-			outputType := fullMessageTypeName(outputMessage)
-
 			operationID := service.GoName + "_" + method.GoName
 			extension := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
 			var path string
@@ -165,9 +160,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			}
 			if methodName != "" {
 				op, path2 := g.buildOperationV3(
-					file, operationID, comment, path, body,
-					inputType, inputMessage,
-					outputType, outputMessage)
+					file, operationID, comment, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
@@ -181,9 +174,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	description string,
 	path string,
 	bodyField string,
-	inputType string,
 	inputMessage *protogen.Message,
-	outputType string,
 	outputMessage *protogen.Message,
 ) (*v3.Operation, string) {
 	// coveredParameters tracks the parameters that have been used in the body or path.
@@ -279,7 +270,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 											Schema: &v3.SchemaOrReference{
 												Oneof: &v3.SchemaOrReference_Reference{
 													Reference: &v3.Reference{
-														XRef: g.schemaReferenceForTypeName(outputType),
+														XRef: g.schemaReferenceForTypeName(fullMessageTypeName(outputMessage)),
 													},
 												},
 											},
@@ -305,7 +296,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		var bodyFieldTypeName string
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
-			bodyFieldTypeName = inputType
+			bodyFieldTypeName = fullMessageTypeName(inputMessage)
 		} else {
 			// If body refers to a message field, use that type.
 			for _, field := range inputMessage.Fields {
