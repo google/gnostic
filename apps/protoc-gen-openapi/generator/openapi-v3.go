@@ -37,6 +37,9 @@ func contains(s []string, e string) bool {
 }
 
 func singular(plural string) string {
+	if strings.HasSuffix(plural, "ves") {
+		return strings.TrimSuffix(plural, "ves") + "f"
+	}
 	if strings.HasSuffix(plural, "ies") {
 		return strings.TrimSuffix(plural, "ies") + "y"
 	}
