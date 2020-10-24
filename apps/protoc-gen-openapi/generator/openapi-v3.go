@@ -67,7 +67,7 @@ func (g *OpenAPIv3Generator) Run() error {
 // buildDocumentV3 builds an OpenAPIv3 document for a plugin request.
 func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	d := &v3.Document{}
-	d.Openapi = "3.0"
+	d.Openapi = "3.0.3"
 	d.Info = &v3.Info{
 		Title:       "",
 		Version:     "0.0.1",

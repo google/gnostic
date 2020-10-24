@@ -1,7 +1,7 @@
 # Generated with protoc-gen-openapi
 # https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi
 
-openapi: "3.0"
+openapi: 3.0.3
 info:
     title: LibraryService
     description: 'This API represents a simple digital library.  It lets you manage Shelf resources and Book resources in the library. It defines the following resource model: - The API has a collection of [Shelf][google.example.library.v1.Shelf]   resources, named `shelves/*` - Each Shelf has a collection of [Book][google.example.library.v1.Book]   resources, named `shelves/*/books/*`'
