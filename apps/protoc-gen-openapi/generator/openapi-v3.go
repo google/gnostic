@@ -83,7 +83,6 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		g.addPathsToDocumentV3(d, file)
 	}
 	for len(g.requiredSchemas) > 0 {
-		log.Printf("REQUIRED SCHEMAS %+v", g.requiredSchemas)
 		count := len(g.requiredSchemas)
 		for _, file := range g.plugin.Files {
 			g.addSchemasToDocumentV3(d, file)
