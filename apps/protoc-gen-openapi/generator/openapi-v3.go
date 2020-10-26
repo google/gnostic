@@ -67,7 +67,7 @@ func (g *OpenAPIv3Generator) Run() error {
 // buildDocumentV3 builds an OpenAPIv3 document for a plugin request.
 func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	d := &v3.Document{}
-	d.Openapi = "3.0"
+	d.Openapi = "3.0.3"
 	d.Info = &v3.Info{
 		Title:       "",
 		Version:     "0.0.1",
@@ -83,7 +83,6 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		g.addPathsToDocumentV3(d, file)
 	}
 	for len(g.requiredSchemas) > 0 {
-		log.Printf("REQUIRED SCHEMAS %+v", g.requiredSchemas)
 		count := len(g.requiredSchemas)
 		for _, file := range g.plugin.Files {
 			g.addSchemasToDocumentV3(d, file)
