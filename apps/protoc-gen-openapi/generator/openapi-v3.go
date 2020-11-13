@@ -469,8 +469,15 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 				k := field.Desc.Kind()
 				switch k {
 				case protoreflect.MessageKind:
-					// The field is described by a reference.
-					XRef = g.schemaReferenceForTypeName(fullMessageTypeName(field.Message))
+					typeName := fullMessageTypeName(field.Message)
+					if typeName == ".google.protobuf.Timestamp" {
+						// Timestamps are serialized as strings
+						fieldSchema.Type = "string"
+						fieldSchema.Format = "RFC3339"
+					} else {
+						// The field is described by a reference.
+						XRef = g.schemaReferenceForTypeName(typeName)
+					}
 				case protoreflect.StringKind:
 					fieldSchema.Type = "string"
 				case protoreflect.Int32Kind,

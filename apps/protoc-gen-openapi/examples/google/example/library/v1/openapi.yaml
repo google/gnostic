@@ -282,6 +282,16 @@ components:
                 read:
                     type: boolean
                     description: Value indicating whether the book has been read.
+                create_time:
+                    readOnly: true
+                    type: string
+                    description: Creation timestamp.
+                    format: RFC3339
+                update_time:
+                    readOnly: true
+                    type: string
+                    description: Last update timestamp.
+                    format: RFC3339
             description: A single book in the library.
         Empty:
             properties: {}
@@ -334,4 +344,14 @@ components:
                 theme:
                     type: string
                     description: The theme of the shelf
+                create_time:
+                    readOnly: true
+                    type: string
+                    description: Creation timestamp.
+                    format: RFC3339
+                update_time:
+                    readOnly: true
+                    type: string
+                    description: Last update timestamp.
+                    format: RFC3339
             description: A Shelf contains a collection of books with a theme.
