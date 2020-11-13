@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/google/gnostic.svg?branch=master)](https://travis-ci.org/google/gnostic)
+
 # ⨁ gnostic
 
 This repository contains a Go command line tool which converts JSON and YAML
