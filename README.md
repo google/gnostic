@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/googleapis/gnostic.svg?branch=master)](https://travis-ci.org/googleapis/gnostic)
+[![Build Status](https://travis-ci.org/google/gnostic.svg?branch=master)](https://travis-ci.org/google/gnostic)
 
 # ⨁ gnostic
 
