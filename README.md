@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/google/gnostic.svg?branch=master)](https://travis-ci.org/google/gnostic)
-
 # ⨁ gnostic
+
+[![Build Status](https://travis-ci.org/google/gnostic.svg?branch=master)](https://travis-ci.org/google/gnostic)
+[![GitHub license](https://img.shields.io/github/license/google/gnostic?color=yellow)](https://github.com/google/gnostic/blob/master/LICENSE)
 
 This repository contains a Go command line tool which converts JSON and YAML
 [OpenAPI](https://github.com/OAI/OpenAPI-Specification) descriptions to and
