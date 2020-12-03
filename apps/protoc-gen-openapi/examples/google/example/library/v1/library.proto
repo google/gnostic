@@ -22,6 +22,7 @@ import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/example/library/v1;library";
 option java_multiple_files = true;
@@ -165,6 +166,14 @@ message Book {
 
   // Value indicating whether the book has been read.
   bool read = 4;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp create_time = 5
+   [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Last update timestamp.
+  google.protobuf.Timestamp update_time = 6
+   [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // A Shelf contains a collection of books with a theme.
@@ -183,6 +192,15 @@ message Shelf {
 
   // The theme of the shelf
   string theme = 2;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp create_time = 3
+    [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Last update timestamp.
+  google.protobuf.Timestamp update_time = 4
+    [(google.api.field_behavior) = OUTPUT_ONLY];
+
 }
 
 // Request message for LibraryService.CreateShelf.
