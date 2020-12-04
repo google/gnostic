@@ -10,7 +10,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
 
     - name: Set up Go 1.x
@@ -30,5 +30,8 @@ jobs:
     - name: Get dependencies
       run: go get -v -t -d ./...
              
-    - name: Build and test
+    - name: Build
+      run: make all
+      
+    - name: Test
       run: make test
