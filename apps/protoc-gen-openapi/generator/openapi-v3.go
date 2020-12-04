@@ -291,17 +291,42 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	}
 	// If a body field is specified, we need to pass a message as the request body.
 	if bodyField != "" {
-		var bodyFieldTypeName string
+		var bodyFieldScalarTypeName string
+		var bodyFieldMessageTypeName string
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
-			bodyFieldTypeName = fullMessageTypeName(inputMessage)
+			bodyFieldMessageTypeName = fullMessageTypeName(inputMessage)
 		} else {
 			// If body refers to a message field, use that type.
 			for _, field := range inputMessage.Fields {
 				if string(field.Desc.Name()) == bodyField {
-					bodyFieldTypeName = fullMessageTypeName(field.Message)
+					switch field.Desc.Kind() {
+					case protoreflect.StringKind:
+						bodyFieldScalarTypeName = "string"
+					case protoreflect.MessageKind:
+						bodyFieldMessageTypeName = fullMessageTypeName(field.Message)
+					default:
+						log.Printf("unsupported field type %+v", field.Desc)
+					}
 					break
 				}
+			}
+		}
+		var requestSchema *v3.SchemaOrReference
+		if bodyFieldScalarTypeName != "" {
+			requestSchema = &v3.SchemaOrReference{
+				Oneof: &v3.SchemaOrReference_Schema{
+					Schema: &v3.Schema{
+						Type: bodyFieldScalarTypeName,
+					},
+				},
+			}
+		} else if bodyFieldMessageTypeName != "" {
+			requestSchema = &v3.SchemaOrReference{
+				Oneof: &v3.SchemaOrReference_Reference{
+					Reference: &v3.Reference{
+						XRef: g.schemaReferenceForTypeName(bodyFieldMessageTypeName),
+					}},
 			}
 		}
 		op.RequestBody = &v3.RequestBodyOrReference{
@@ -313,13 +338,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 							&v3.NamedMediaType{
 								Name: "application/json",
 								Value: &v3.MediaType{
-									Schema: &v3.SchemaOrReference{
-										Oneof: &v3.SchemaOrReference_Reference{
-											Reference: &v3.Reference{
-												XRef: g.schemaReferenceForTypeName(bodyFieldTypeName),
-											},
-										},
-									},
+									Schema: requestSchema,
 								},
 							},
 						},
