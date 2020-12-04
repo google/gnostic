@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/google/gnostic.svg?branch=master)](https://travis-ci.org/google/gnostic)
+[![Go Actions Status](https://github.com/google/gnostic/workflows/Go/badge.svg)](https://github.com/google/gnostic/actions)
 
 # ⨁ gnostic
 
