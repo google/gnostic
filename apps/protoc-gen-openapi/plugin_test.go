@@ -40,3 +40,24 @@ func TestLibraryOpenAPI(t *testing.T) {
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
 }
+
+func TestBodyMappingOpenAPI(t *testing.T) {
+	var err error
+	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
+	err = exec.Command("protoc",
+		"-I", "examples",
+		"examples/tests/bodymapping/message.proto",
+		"--openapi_out=.").Run()
+	if err != nil {
+		t.Logf("protoc failed: %+v", err)
+		t.FailNow()
+	}
+	// Verify that the generated spec matches our expected version.
+	err = exec.Command("diff", "openapi.yaml", "examples/tests/bodymapping/openapi.yaml").Run()
+	if err != nil {
+		t.Logf("Diff failed: %+v", err)
+		t.FailNow()
+	}
+	// if the test succeeded, clean up
+	os.Remove("openapi.yaml")
+}
