@@ -282,16 +282,21 @@ components:
                 read:
                     type: boolean
                     description: Value indicating whether the book has been read.
-                create_time:
+                borrow_time:
                     readOnly: true
                     type: string
-                    description: Creation timestamp.
+                    description: The previous borrowing timestamp.
                     format: RFC3339
-                update_time:
+                created_at:
                     readOnly: true
                     type: string
-                    description: Last update timestamp.
-                    format: RFC3339
+                    description: The creation date and time.
+                    format: date-time
+                updated_at:
+                    readOnly: true
+                    type: string
+                    description: The last update date and time.
+                    format: date-time
             description: A single book in the library.
         Empty:
             properties: {}
@@ -344,14 +349,19 @@ components:
                 theme:
                     type: string
                     description: The theme of the shelf
-                create_time:
+                next_sort_at:
                     readOnly: true
                     type: string
-                    description: Creation timestamp.
-                    format: RFC3339
-                update_time:
+                    description: The next sorting date.
+                    format: date
+                created_at:
                     readOnly: true
                     type: string
-                    description: Last update timestamp.
-                    format: RFC3339
+                    description: The creation date and time.
+                    format: date-time
+                updated_at:
+                    readOnly: true
+                    type: string
+                    description: The last update date and time.
+                    format: date-time
             description: A Shelf contains a collection of books with a theme.
