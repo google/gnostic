@@ -254,7 +254,7 @@ func generateExtension(schemaFile string, outDir string) error {
 		},
 		ProtoOption{
 			Name:    "go_package",
-			Value:   ".;" + strings.ToLower(protoPackage),
+			Value:   "./;" + strings.ToLower(protoPackage),
 			Comment: "// The Go package path.",
 		},
 	)

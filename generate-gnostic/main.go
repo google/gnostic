@@ -84,7 +84,7 @@ func protoOptions(directoryName string, packageName string) []ProtoOption {
 
 		ProtoOption{
 			Name:    "go_package",
-			Value:   directoryName + ";" + packageName,
+			Value:   path.Clean("./"+directoryName) + ";" + packageName,
 			Comment: "// The Go package name.",
 		},
 	}

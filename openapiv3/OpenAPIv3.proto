@@ -42,7 +42,7 @@ option java_package = "org.openapi_v3";
 option objc_class_prefix = "OAS";
 
 // The Go package name.
-option go_package = "openapiv3;openapi_v3";
+option go_package = "./openapiv3;openapi_v3";
 
 message AdditionalPropertiesItem {
   oneof oneof {
@@ -63,7 +63,11 @@ message AnyOrExpression {
   }
 }
 
-// A map of possible out-of band callbacks related to the parent operation. Each value in the map is a Path Item Object that describes a set of requests that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
+// A map of possible out-of band callbacks related to the parent operation. Each
+// value in the map is a Path Item Object that describes a set of requests that
+// may be initiated by the API provider and the expected responses. The key
+// value used to identify the callback object is an expression, evaluated at
+// runtime, that identifies a URL to use for the callback operation.
 message Callback {
   repeated NamedPathItem path = 1;
   repeated NamedAny specification_extension = 2;
@@ -80,7 +84,9 @@ message CallbacksOrReferences {
   repeated NamedCallbackOrReference additional_properties = 1;
 }
 
-// Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.
+// Holds a set of reusable objects for different aspects of the OAS. All objects
+// defined within the components object will have no effect on the API unless
+// they are explicitly referenced from properties outside the components object.
 message Components {
   SchemasOrReferences schemas = 1;
   ResponsesOrReferences responses = 2;
@@ -110,7 +116,12 @@ message DefaultType {
   }
 }
 
-// When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  When using the discriminator, _inline_ schemas will not be considered.
+// When request bodies or response payloads may be one of a number of different
+// schemas, a `discriminator` object can be used to aid in serialization,
+// deserialization, and validation.  The discriminator is a specific object in a
+// schema which is used to inform the consumer of the specification of an
+// alternative schema based on the value associated with it.  When using the
+// discriminator, _inline_ schemas will not be considered.
 message Discriminator {
   string property_name = 1;
   Strings mapping = 2;
@@ -139,9 +150,7 @@ message Encoding {
   repeated NamedAny specification_extension = 6;
 }
 
-message Encodings {
-  repeated NamedEncoding additional_properties = 1;
-}
+message Encodings { repeated NamedEncoding additional_properties = 1; }
 
 message Example {
   string summary = 1;
@@ -162,9 +171,7 @@ message ExamplesOrReferences {
   repeated NamedExampleOrReference additional_properties = 1;
 }
 
-message Expression {
-  repeated NamedAny additional_properties = 1;
-}
+message Expression { repeated NamedAny additional_properties = 1; }
 
 // Allows referencing an external resource for extended documentation.
 message ExternalDocs {
@@ -173,7 +180,11 @@ message ExternalDocs {
   repeated NamedAny specification_extension = 3;
 }
 
-// The Header Object follows the structure of the Parameter Object with the following changes:  1. `name` MUST NOT be specified, it is given in the corresponding `headers` map. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).
+// The Header Object follows the structure of the Parameter Object with the
+// following changes:  1. `name` MUST NOT be specified, it is given in the
+// corresponding `headers` map. 1. `in` MUST NOT be specified, it is implicitly
+// in `header`. 1. All traits that are affected by the location MUST be
+// applicable to a location of `header` (for example, `style`).
 message Header {
   string description = 1;
   bool required = 2;
@@ -200,7 +211,9 @@ message HeadersOrReferences {
   repeated NamedHeaderOrReference additional_properties = 1;
 }
 
-// The object provides metadata about the API. The metadata MAY be used by the clients if needed, and MAY be presented in editing or documentation generation tools for convenience.
+// The object provides metadata about the API. The metadata MAY be used by the
+// clients if needed, and MAY be presented in editing or documentation
+// generation tools for convenience.
 message Info {
   string title = 1;
   string description = 2;
@@ -212,9 +225,7 @@ message Info {
   string summary = 8;
 }
 
-message ItemsItem {
-  repeated SchemaOrReference schema_or_reference = 1;
-}
+message ItemsItem { repeated SchemaOrReference schema_or_reference = 1; }
 
 // License information for the exposed API.
 message License {
@@ -223,7 +234,15 @@ message License {
   repeated NamedAny specification_extension = 3;
 }
 
-// The `Link object` represents a possible design-time link for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.  Unlike _dynamic_ links (i.e. links provided **in** the response payload), the OAS linking mechanism does not require link information in the runtime response.  For computing links, and providing instructions to execute them, a runtime expression is used for accessing values in an operation and using them as parameters while invoking the linked operation.
+// The `Link object` represents a possible design-time link for a response. The
+// presence of a link does not guarantee the caller's ability to successfully
+// invoke it, rather it provides a known relationship and traversal mechanism
+// between responses and other operations.  Unlike _dynamic_ links (i.e. links
+// provided **in** the response payload), the OAS linking mechanism does not
+// require link information in the runtime response.  For computing links, and
+// providing instructions to execute them, a runtime expression is used for
+// accessing values in an operation and using them as parameters while invoking
+// the linked operation.
 message Link {
   string operation_ref = 1;
   string operation_id = 2;
@@ -245,7 +264,8 @@ message LinksOrReferences {
   repeated NamedLinkOrReference additional_properties = 1;
 }
 
-// Each Media Type Object provides schema and examples for the media type identified by its key.
+// Each Media Type Object provides schema and examples for the media type
+// identified by its key.
 message MediaType {
   SchemaOrReference schema = 1;
   Any example = 2;
@@ -254,11 +274,10 @@ message MediaType {
   repeated NamedAny specification_extension = 5;
 }
 
-message MediaTypes {
-  repeated NamedMediaType additional_properties = 1;
-}
+message MediaTypes { repeated NamedMediaType additional_properties = 1; }
 
-// Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of Any as ordered
+// (name,value) pairs.
 message NamedAny {
   // Map key
   string name = 1;
@@ -266,7 +285,8 @@ message NamedAny {
   Any value = 2;
 }
 
-// Automatically-generated message used to represent maps of CallbackOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of CallbackOrReference
+// as ordered (name,value) pairs.
 message NamedCallbackOrReference {
   // Map key
   string name = 1;
@@ -274,7 +294,8 @@ message NamedCallbackOrReference {
   CallbackOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of Encoding as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of Encoding as ordered
+// (name,value) pairs.
 message NamedEncoding {
   // Map key
   string name = 1;
@@ -282,7 +303,8 @@ message NamedEncoding {
   Encoding value = 2;
 }
 
-// Automatically-generated message used to represent maps of ExampleOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of ExampleOrReference
+// as ordered (name,value) pairs.
 message NamedExampleOrReference {
   // Map key
   string name = 1;
@@ -290,7 +312,8 @@ message NamedExampleOrReference {
   ExampleOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of HeaderOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of HeaderOrReference
+// as ordered (name,value) pairs.
 message NamedHeaderOrReference {
   // Map key
   string name = 1;
@@ -298,7 +321,8 @@ message NamedHeaderOrReference {
   HeaderOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of LinkOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of LinkOrReference as
+// ordered (name,value) pairs.
 message NamedLinkOrReference {
   // Map key
   string name = 1;
@@ -306,7 +330,8 @@ message NamedLinkOrReference {
   LinkOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of MediaType as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of MediaType as
+// ordered (name,value) pairs.
 message NamedMediaType {
   // Map key
   string name = 1;
@@ -314,7 +339,8 @@ message NamedMediaType {
   MediaType value = 2;
 }
 
-// Automatically-generated message used to represent maps of ParameterOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of
+// ParameterOrReference as ordered (name,value) pairs.
 message NamedParameterOrReference {
   // Map key
   string name = 1;
@@ -322,7 +348,8 @@ message NamedParameterOrReference {
   ParameterOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of PathItem as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of PathItem as ordered
+// (name,value) pairs.
 message NamedPathItem {
   // Map key
   string name = 1;
@@ -330,7 +357,8 @@ message NamedPathItem {
   PathItem value = 2;
 }
 
-// Automatically-generated message used to represent maps of RequestBodyOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of
+// RequestBodyOrReference as ordered (name,value) pairs.
 message NamedRequestBodyOrReference {
   // Map key
   string name = 1;
@@ -338,7 +366,8 @@ message NamedRequestBodyOrReference {
   RequestBodyOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of ResponseOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of ResponseOrReference
+// as ordered (name,value) pairs.
 message NamedResponseOrReference {
   // Map key
   string name = 1;
@@ -346,7 +375,8 @@ message NamedResponseOrReference {
   ResponseOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of SchemaOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of SchemaOrReference
+// as ordered (name,value) pairs.
 message NamedSchemaOrReference {
   // Map key
   string name = 1;
@@ -354,7 +384,8 @@ message NamedSchemaOrReference {
   SchemaOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of SecuritySchemeOrReference as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of
+// SecuritySchemeOrReference as ordered (name,value) pairs.
 message NamedSecuritySchemeOrReference {
   // Map key
   string name = 1;
@@ -362,7 +393,8 @@ message NamedSecuritySchemeOrReference {
   SecuritySchemeOrReference value = 2;
 }
 
-// Automatically-generated message used to represent maps of ServerVariable as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of ServerVariable as
+// ordered (name,value) pairs.
 message NamedServerVariable {
   // Map key
   string name = 1;
@@ -370,7 +402,8 @@ message NamedServerVariable {
   ServerVariable value = 2;
 }
 
-// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of string as ordered
+// (name,value) pairs.
 message NamedString {
   // Map key
   string name = 1;
@@ -378,7 +411,8 @@ message NamedString {
   string value = 2;
 }
 
-// Automatically-generated message used to represent maps of StringArray as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of StringArray as
+// ordered (name,value) pairs.
 message NamedStringArray {
   // Map key
   string name = 1;
@@ -404,9 +438,7 @@ message OauthFlows {
   repeated NamedAny specification_extension = 5;
 }
 
-message Object {
-  repeated NamedAny additional_properties = 1;
-}
+message Object { repeated NamedAny additional_properties = 1; }
 
 // Describes a single API operation on a path.
 message Operation {
@@ -425,7 +457,8 @@ message Operation {
   repeated NamedAny specification_extension = 13;
 }
 
-// Describes a single operation parameter.  A unique parameter is defined by a combination of a name and location.
+// Describes a single operation parameter.  A unique parameter is defined by a
+// combination of a name and location.
 message Parameter {
   string name = 1;
   string in = 2;
@@ -454,7 +487,10 @@ message ParametersOrReferences {
   repeated NamedParameterOrReference additional_properties = 1;
 }
 
-// Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.
+// Describes the operations available on a single path. A Path Item MAY be
+// empty, due to ACL constraints. The path itself is still exposed to the
+// documentation viewer but they will not know which operations and parameters
+// are available.
 message PathItem {
   string _ref = 1;
   string summary = 2;
@@ -472,7 +508,9 @@ message PathItem {
   repeated NamedAny specification_extension = 14;
 }
 
-// Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the `Server Object` in order to construct the full URL.  The Paths MAY be empty, due to ACL constraints.
+// Holds the relative paths to the individual endpoints and their operations.
+// The path is appended to the URL from the `Server Object` in order to
+// construct the full URL.  The Paths MAY be empty, due to ACL constraints.
 message Paths {
   repeated NamedPathItem path = 1;
   repeated NamedAny specification_extension = 2;
@@ -482,10 +520,12 @@ message Properties {
   repeated NamedSchemaOrReference additional_properties = 1;
 }
 
-// A simple object to allow referencing other components in the specification, internally and externally.  The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.   For this specification, reference resolution is accomplished as defined by the JSON Reference specification and not by the JSON Schema specification.
-message Reference {
-  string _ref = 1;
-}
+// A simple object to allow referencing other components in the specification,
+// internally and externally.  The Reference Object is defined by JSON Reference
+// and follows the same structure, behavior and rules.   For this specification,
+// reference resolution is accomplished as defined by the JSON Reference
+// specification and not by the JSON Schema specification.
+message Reference { string _ref = 1; }
 
 message RequestBodiesOrReferences {
   repeated NamedRequestBodyOrReference additional_properties = 1;
@@ -506,7 +546,8 @@ message RequestBodyOrReference {
   }
 }
 
-// Describes a single response from an API Operation, including design-time, static  `links` to operations based on the response.
+// Describes a single response from an API Operation, including design-time,
+// static  `links` to operations based on the response.
 message Response {
   string description = 1;
   HeadersOrReferences headers = 2;
@@ -522,7 +563,15 @@ message ResponseOrReference {
   }
 }
 
-// A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  The documentation is not necessarily expected to cover all possible HTTP response codes because they may not be known in advance. However, documentation is expected to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.
+// A container for the expected responses of an operation. The container maps a
+// HTTP response code to the expected response.  The documentation is not
+// necessarily expected to cover all possible HTTP response codes because they
+// may not be known in advance. However, documentation is expected to cover a
+// successful operation response and any known errors.  The `default` MAY be
+// used as a default response object for all HTTP codes  that are not covered
+// individually by the specification.  The `Responses Object` MUST contain at
+// least one response code, and it  SHOULD be the response for a successful
+// operation call.
 message Responses {
   ResponseOrReference default = 1;
   repeated NamedResponseOrReference response_or_reference = 2;
@@ -533,7 +582,12 @@ message ResponsesOrReferences {
   repeated NamedResponseOrReference additional_properties = 1;
 }
 
-// The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  For more information about the properties, see JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema.
+// The Schema Object allows the definition of input and output data types. These
+// types can be objects, but also primitives and arrays. This object is an
+// extended subset of the JSON Schema Specification Wright Draft 00.  For more
+// information about the properties, see JSON Schema Core and JSON Schema
+// Validation. Unless stated otherwise, the property definitions follow the JSON
+// Schema.
 message Schema {
   bool nullable = 1;
   Discriminator discriminator = 2;
@@ -558,7 +612,8 @@ message Schema {
   int64 max_properties = 21;
   int64 min_properties = 22;
   repeated string required = 23;
-  repeated Any enum = 24;
+  repeated Any enum
+  = 24;
   string type = 25;
   repeated SchemaOrReference all_of = 26;
   repeated SchemaOrReference one_of = 27;
@@ -584,12 +639,27 @@ message SchemasOrReferences {
   repeated NamedSchemaOrReference additional_properties = 1;
 }
 
-// Lists the required security schemes to execute this operation. The name used for each property MUST correspond to a security scheme declared in the Security Schemes under the Components Object.  Security Requirement Objects that contain multiple schemes require that all schemes MUST be satisfied for a request to be authorized. This enables support for scenarios where multiple query parameters or HTTP headers are required to convey security information.  When a list of Security Requirement Objects is defined on the OpenAPI Object or Operation Object, only one of the Security Requirement Objects in the list needs to be satisfied to authorize the request.
+// Lists the required security schemes to execute this operation. The name used
+// for each property MUST correspond to a security scheme declared in the
+// Security Schemes under the Components Object.  Security Requirement Objects
+// that contain multiple schemes require that all schemes MUST be satisfied for
+// a request to be authorized. This enables support for scenarios where multiple
+// query parameters or HTTP headers are required to convey security information.
+// When a list of Security Requirement Objects is defined on the OpenAPI Object
+// or Operation Object, only one of the Security Requirement Objects in the list
+// needs to be satisfied to authorize the request.
 message SecurityRequirement {
   repeated NamedStringArray additional_properties = 1;
 }
 
-// Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header, a cookie parameter or as a query parameter), mutual TLS (use of a client certificate), OAuth2's common flows (implicit, password, application and access code) as defined in RFC6749, and OpenID Connect.   Please note that currently (2019) the implicit flow is about to be deprecated OAuth 2.0 Security Best Current Practice. Recommended for most use case is Authorization Code Grant flow with PKCE.
+// Defines a security scheme that can be used by the operations. Supported
+// schemes are HTTP authentication, an API key (either as a header, a cookie
+// parameter or as a query parameter), mutual TLS (use of a client certificate),
+// OAuth2's common flows (implicit, password, application and access code) as
+// defined in RFC6749, and OpenID Connect.   Please note that currently (2019)
+// the implicit flow is about to be deprecated OAuth 2.0 Security Best Current
+// Practice. Recommended for most use case is Authorization Code Grant flow with
+// PKCE.
 message SecurityScheme {
   string type = 1;
   string description = 2;
@@ -621,9 +691,11 @@ message Server {
   repeated NamedAny specification_extension = 4;
 }
 
-// An object representing a Server Variable for server URL template substitution.
+// An object representing a Server Variable for server URL template
+// substitution.
 message ServerVariable {
-  repeated string enum = 1;
+  repeated string enum
+  = 1;
   string default = 2;
   string description = 3;
   repeated NamedAny specification_extension = 4;
@@ -642,15 +714,13 @@ message SpecificationExtension {
   }
 }
 
-message StringArray {
-  repeated string value = 1;
-}
+message StringArray { repeated string value = 1; }
 
-message Strings {
-  repeated NamedString additional_properties = 1;
-}
+message Strings { repeated NamedString additional_properties = 1; }
 
-// Adds metadata to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
+// Adds metadata to a single tag that is used by the Operation Object. It is not
+// mandatory to have a Tag Object per tag defined in the Operation Object
+// instances.
 message Tag {
   string name = 1;
   string description = 2;
@@ -658,7 +728,10 @@ message Tag {
   repeated NamedAny specification_extension = 4;
 }
 
-// A metadata object that allows for more fine-tuned XML model definitions.  When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information. See examples for expected behavior.
+// A metadata object that allows for more fine-tuned XML model definitions. When
+// using arrays, XML element names are *not* inferred (for singular/plural
+// forms) and the `name` property SHOULD be used to add that information. See
+// examples for expected behavior.
 message Xml {
   string name = 1;
   string namespace = 2;
@@ -667,4 +740,3 @@ message Xml {
   bool wrapped = 5;
   repeated NamedAny specification_extension = 6;
 }
-
