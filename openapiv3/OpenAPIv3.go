@@ -7005,6 +7005,10 @@ func (m *Example) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("description"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Description))
 	}
+	if m.Value != nil {
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("value"))
+		info.Content = append(info.Content, m.Value.ToRawInfo())
+	}
 	// &{Name:value Type:Any StringEnumValues:[] MapType: Repeated:false Pattern: Implicit:false Description:}
 	if m.ExternalValue != "" {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("externalValue"))
