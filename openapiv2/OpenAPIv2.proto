@@ -71,8 +71,7 @@ message BasicAuthenticationSecurity {
 }
 
 message BodyParameter {
-  // A brief description of the parameter. This could contain examples of use.
-  // GitHub Flavored Markdown is allowed.
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 1;
   // The name of the parameter.
   string name = 2;
@@ -95,11 +94,14 @@ message Contact {
   repeated NamedAny vendor_extension = 4;
 }
 
-message Default { repeated NamedAny additional_properties = 1; }
+message Default {
+  repeated NamedAny additional_properties = 1;
+}
 
-// One or more JSON objects describing the schemas being consumed and produced
-// by the API.
-message Definitions { repeated NamedSchema additional_properties = 1; }
+// One or more JSON objects describing the schemas being consumed and produced by the API.
+message Definitions {
+  repeated NamedSchema additional_properties = 1;
+}
 
 message Document {
   // The Swagger version of this document.
@@ -126,7 +128,9 @@ message Document {
   repeated NamedAny vendor_extension = 16;
 }
 
-message Examples { repeated NamedAny additional_properties = 1; }
+message Examples {
+  repeated NamedAny additional_properties = 1;
+}
 
 // information about external documentation
 message ExternalDocs {
@@ -154,8 +158,7 @@ message FormDataParameterSubSchema {
   bool required = 1;
   // Determines the location of the parameter.
   string in = 2;
-  // A brief description of the parameter. This could contain examples of use.
-  // GitHub Flavored Markdown is allowed.
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
   // The name of the parameter.
   string name = 4;
@@ -176,8 +179,7 @@ message FormDataParameterSubSchema {
   int64 max_items = 18;
   int64 min_items = 19;
   bool unique_items = 20;
-  repeated Any enum
-  = 21;
+  repeated Any enum = 21;
   double multiple_of = 22;
   repeated NamedAny vendor_extension = 23;
 }
@@ -198,8 +200,7 @@ message Header {
   int64 max_items = 13;
   int64 min_items = 14;
   bool unique_items = 15;
-  repeated Any enum
-  = 16;
+  repeated Any enum = 16;
   double multiple_of = 17;
   string description = 18;
   repeated NamedAny vendor_extension = 19;
@@ -210,8 +211,7 @@ message HeaderParameterSubSchema {
   bool required = 1;
   // Determines the location of the parameter.
   string in = 2;
-  // A brief description of the parameter. This could contain examples of use.
-  // GitHub Flavored Markdown is allowed.
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
   // The name of the parameter.
   string name = 4;
@@ -230,13 +230,14 @@ message HeaderParameterSubSchema {
   int64 max_items = 17;
   int64 min_items = 18;
   bool unique_items = 19;
-  repeated Any enum
-  = 20;
+  repeated Any enum = 20;
   double multiple_of = 21;
   repeated NamedAny vendor_extension = 22;
 }
 
-message Headers { repeated NamedHeader additional_properties = 1; }
+message Headers {
+  repeated NamedHeader additional_properties = 1;
+}
 
 // General information about the API.
 message Info {
@@ -244,8 +245,7 @@ message Info {
   string title = 1;
   // A semantic version number of the API.
   string version = 2;
-  // A longer description of the API. Should be different from the title. GitHub
-  // Flavored Markdown is allowed.
+  // A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.
   string description = 3;
   // The terms of service for the API.
   string terms_of_service = 4;
@@ -254,7 +254,9 @@ message Info {
   repeated NamedAny vendor_extension = 7;
 }
 
-message ItemsItem { repeated Schema schema = 1; }
+message ItemsItem {
+  repeated Schema schema = 1;
+}
 
 message JsonReference {
   string _ref = 1;
@@ -262,16 +264,14 @@ message JsonReference {
 }
 
 message License {
-  // The name of the license type. It's encouraged to use an OSI compatible
-  // license.
+  // The name of the license type. It's encouraged to use an OSI compatible license.
   string name = 1;
   // The URL pointing to the license.
   string url = 2;
   repeated NamedAny vendor_extension = 3;
 }
 
-// Automatically-generated message used to represent maps of Any as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
 message NamedAny {
   // Map key
   string name = 1;
@@ -279,8 +279,7 @@ message NamedAny {
   Any value = 2;
 }
 
-// Automatically-generated message used to represent maps of Header as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
 message NamedHeader {
   // Map key
   string name = 1;
@@ -288,8 +287,7 @@ message NamedHeader {
   Header value = 2;
 }
 
-// Automatically-generated message used to represent maps of Parameter as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
 message NamedParameter {
   // Map key
   string name = 1;
@@ -297,8 +295,7 @@ message NamedParameter {
   Parameter value = 2;
 }
 
-// Automatically-generated message used to represent maps of PathItem as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of PathItem as ordered (name,value) pairs.
 message NamedPathItem {
   // Map key
   string name = 1;
@@ -306,8 +303,7 @@ message NamedPathItem {
   PathItem value = 2;
 }
 
-// Automatically-generated message used to represent maps of Response as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Response as ordered (name,value) pairs.
 message NamedResponse {
   // Map key
   string name = 1;
@@ -315,8 +311,7 @@ message NamedResponse {
   Response value = 2;
 }
 
-// Automatically-generated message used to represent maps of ResponseValue as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of ResponseValue as ordered (name,value) pairs.
 message NamedResponseValue {
   // Map key
   string name = 1;
@@ -324,8 +319,7 @@ message NamedResponseValue {
   ResponseValue value = 2;
 }
 
-// Automatically-generated message used to represent maps of Schema as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
 message NamedSchema {
   // Map key
   string name = 1;
@@ -333,8 +327,7 @@ message NamedSchema {
   Schema value = 2;
 }
 
-// Automatically-generated message used to represent maps of
-// SecurityDefinitionsItem as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of SecurityDefinitionsItem as ordered (name,value) pairs.
 message NamedSecurityDefinitionsItem {
   // Map key
   string name = 1;
@@ -342,8 +335,7 @@ message NamedSecurityDefinitionsItem {
   SecurityDefinitionsItem value = 2;
 }
 
-// Automatically-generated message used to represent maps of string as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
 message NamedString {
   // Map key
   string name = 1;
@@ -351,8 +343,7 @@ message NamedString {
   string value = 2;
 }
 
-// Automatically-generated message used to represent maps of StringArray as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of StringArray as ordered (name,value) pairs.
 message NamedStringArray {
   // Map key
   string name = 1;
@@ -406,7 +397,9 @@ message Oauth2PasswordSecurity {
   repeated NamedAny vendor_extension = 6;
 }
 
-message Oauth2Scopes { repeated NamedString additional_properties = 1; }
+message Oauth2Scopes {
+  repeated NamedString additional_properties = 1;
+}
 
 message Operation {
   repeated string tags = 1;
@@ -469,8 +462,7 @@ message PathParameterSubSchema {
   bool required = 1;
   // Determines the location of the parameter.
   string in = 2;
-  // A brief description of the parameter. This could contain examples of use.
-  // GitHub Flavored Markdown is allowed.
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
   // The name of the parameter.
   string name = 4;
@@ -489,14 +481,12 @@ message PathParameterSubSchema {
   int64 max_items = 17;
   int64 min_items = 18;
   bool unique_items = 19;
-  repeated Any enum
-  = 20;
+  repeated Any enum = 20;
   double multiple_of = 21;
   repeated NamedAny vendor_extension = 22;
 }
 
-// Relative paths to the individual endpoints. They must be relative to the
-// 'basePath'.
+// Relative paths to the individual endpoints. They must be relative to the 'basePath'.
 message Paths {
   repeated NamedAny vendor_extension = 1;
   repeated NamedPathItem path = 2;
@@ -518,21 +508,21 @@ message PrimitivesItems {
   int64 max_items = 13;
   int64 min_items = 14;
   bool unique_items = 15;
-  repeated Any enum
-  = 16;
+  repeated Any enum = 16;
   double multiple_of = 17;
   repeated NamedAny vendor_extension = 18;
 }
 
-message Properties { repeated NamedSchema additional_properties = 1; }
+message Properties {
+  repeated NamedSchema additional_properties = 1;
+}
 
 message QueryParameterSubSchema {
   // Determines whether or not this parameter is required or optional.
   bool required = 1;
   // Determines the location of the parameter.
   string in = 2;
-  // A brief description of the parameter. This could contain examples of use.
-  // GitHub Flavored Markdown is allowed.
+  // A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
   string description = 3;
   // The name of the parameter.
   string name = 4;
@@ -553,8 +543,7 @@ message QueryParameterSubSchema {
   int64 max_items = 18;
   int64 min_items = 19;
   bool unique_items = 20;
-  repeated Any enum
-  = 21;
+  repeated Any enum = 21;
   double multiple_of = 22;
   repeated NamedAny vendor_extension = 23;
 }
@@ -606,8 +595,7 @@ message Schema {
   int64 max_properties = 17;
   int64 min_properties = 18;
   repeated string required = 19;
-  repeated Any enum
-  = 20;
+  repeated Any enum = 20;
   AdditionalPropertiesItem additional_properties = 21;
   TypeItem type = 22;
   ItemsItem items = 23;
@@ -647,7 +635,9 @@ message SecurityRequirement {
   repeated NamedStringArray additional_properties = 1;
 }
 
-message StringArray { repeated string value = 1; }
+message StringArray {
+  repeated string value = 1;
+}
 
 message Tag {
   string name = 1;
@@ -656,10 +646,14 @@ message Tag {
   repeated NamedAny vendor_extension = 4;
 }
 
-message TypeItem { repeated string value = 1; }
+message TypeItem {
+  repeated string value = 1;
+}
 
 // Any property starting with x- is valid.
-message VendorExtension { repeated NamedAny additional_properties = 1; }
+message VendorExtension {
+  repeated NamedAny additional_properties = 1;
+}
 
 message Xml {
   string name = 1;
@@ -669,3 +663,4 @@ message Xml {
   bool wrapped = 5;
   repeated NamedAny vendor_extension = 6;
 }
+

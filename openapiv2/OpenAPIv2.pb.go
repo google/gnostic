@@ -319,8 +319,7 @@ type BodyParameter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// A brief description of the parameter. This could contain examples of use.
-	// GitHub Flavored Markdown is allowed.
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
 	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
 	// The name of the parameter.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -528,8 +527,7 @@ func (x *Default) GetAdditionalProperties() []*NamedAny {
 	return nil
 }
 
-// One or more JSON objects describing the schemas being consumed and produced
-// by the API.
+// One or more JSON objects describing the schemas being consumed and produced by the API.
 type Definitions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -990,8 +988,7 @@ type FormDataParameterSubSchema struct {
 	Required bool `protobuf:"varint,1,opt,name=required,proto3" json:"required,omitempty"`
 	// Determines the location of the parameter.
 	In string `protobuf:"bytes,2,opt,name=in,proto3" json:"in,omitempty"`
-	// A brief description of the parameter. This could contain examples of use.
-	// GitHub Flavored Markdown is allowed.
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The name of the parameter.
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
@@ -1410,8 +1407,7 @@ type HeaderParameterSubSchema struct {
 	Required bool `protobuf:"varint,1,opt,name=required,proto3" json:"required,omitempty"`
 	// Determines the location of the parameter.
 	In string `protobuf:"bytes,2,opt,name=in,proto3" json:"in,omitempty"`
-	// A brief description of the parameter. This could contain examples of use.
-	// GitHub Flavored Markdown is allowed.
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The name of the parameter.
 	Name             string           `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
@@ -1678,8 +1674,7 @@ type Info struct {
 	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	// A semantic version number of the API.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	// A longer description of the API. Should be different from the title. GitHub
-	// Flavored Markdown is allowed.
+	// A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The terms of service for the API.
 	TermsOfService  string      `protobuf:"bytes,4,opt,name=terms_of_service,json=termsOfService,proto3" json:"terms_of_service,omitempty"`
@@ -1876,8 +1871,7 @@ type License struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the license type. It's encouraged to use an OSI compatible
-	// license.
+	// The name of the license type. It's encouraged to use an OSI compatible license.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The URL pointing to the license.
 	Url             string      `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
@@ -1937,8 +1931,7 @@ func (x *License) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Any as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Any as ordered (name,value) pairs.
 type NamedAny struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1996,8 +1989,7 @@ func (x *NamedAny) GetValue() *Any {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Header as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Header as ordered (name,value) pairs.
 type NamedHeader struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2055,8 +2047,7 @@ func (x *NamedHeader) GetValue() *Header {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Parameter as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
 type NamedParameter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2114,8 +2105,7 @@ func (x *NamedParameter) GetValue() *Parameter {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of PathItem as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of PathItem as ordered (name,value) pairs.
 type NamedPathItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2173,8 +2163,7 @@ func (x *NamedPathItem) GetValue() *PathItem {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Response as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Response as ordered (name,value) pairs.
 type NamedResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2232,8 +2221,7 @@ func (x *NamedResponse) GetValue() *Response {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of ResponseValue as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of ResponseValue as ordered (name,value) pairs.
 type NamedResponseValue struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2291,8 +2279,7 @@ func (x *NamedResponseValue) GetValue() *ResponseValue {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Schema as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
 type NamedSchema struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2350,8 +2337,7 @@ func (x *NamedSchema) GetValue() *Schema {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of
-// SecurityDefinitionsItem as ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of SecurityDefinitionsItem as ordered (name,value) pairs.
 type NamedSecurityDefinitionsItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2409,8 +2395,7 @@ func (x *NamedSecurityDefinitionsItem) GetValue() *SecurityDefinitionsItem {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of string as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of string as ordered (name,value) pairs.
 type NamedString struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2468,8 +2453,7 @@ func (x *NamedString) GetValue() string {
 	return ""
 }
 
-// Automatically-generated message used to represent maps of StringArray as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of StringArray as ordered (name,value) pairs.
 type NamedStringArray struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3525,8 +3509,7 @@ type PathParameterSubSchema struct {
 	Required bool `protobuf:"varint,1,opt,name=required,proto3" json:"required,omitempty"`
 	// Determines the location of the parameter.
 	In string `protobuf:"bytes,2,opt,name=in,proto3" json:"in,omitempty"`
-	// A brief description of the parameter. This could contain examples of use.
-	// GitHub Flavored Markdown is allowed.
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The name of the parameter.
 	Name             string           `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
@@ -3736,8 +3719,7 @@ func (x *PathParameterSubSchema) GetVendorExtension() []*NamedAny {
 	return nil
 }
 
-// Relative paths to the individual endpoints. They must be relative to the
-// 'basePath'.
+// Relative paths to the individual endpoints. They must be relative to the 'basePath'.
 type Paths struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4032,8 +4014,7 @@ type QueryParameterSubSchema struct {
 	Required bool `protobuf:"varint,1,opt,name=required,proto3" json:"required,omitempty"`
 	// Determines the location of the parameter.
 	In string `protobuf:"bytes,2,opt,name=in,proto3" json:"in,omitempty"`
-	// A brief description of the parameter. This could contain examples of use.
-	// GitHub Flavored Markdown is allowed.
+	// A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The name of the parameter.
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`

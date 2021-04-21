@@ -44,14 +44,18 @@ option objc_class_prefix = "OAS";
 // The Go package name.
 option go_package = "./discovery;discovery_v1";
 
-message Annotations { repeated string required = 1; }
+message Annotations {
+  repeated string required = 1;
+}
 
 message Any {
   google.protobuf.Any value = 1;
   string yaml = 2;
 }
 
-message Auth { Oauth2 oauth2 = 1; }
+message Auth {
+  Oauth2 oauth2 = 1;
+}
 
 message Document {
   string kind = 1;
@@ -119,10 +123,11 @@ message Method {
   bool etag_required = 16;
 }
 
-message Methods { repeated NamedMethod additional_properties = 1; }
+message Methods {
+  repeated NamedMethod additional_properties = 1;
+}
 
-// Automatically-generated message used to represent maps of Method as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Method as ordered (name,value) pairs.
 message NamedMethod {
   // Map key
   string name = 1;
@@ -130,8 +135,7 @@ message NamedMethod {
   Method value = 2;
 }
 
-// Automatically-generated message used to represent maps of Parameter as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
 message NamedParameter {
   // Map key
   string name = 1;
@@ -139,8 +143,7 @@ message NamedParameter {
   Parameter value = 2;
 }
 
-// Automatically-generated message used to represent maps of Resource as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Resource as ordered (name,value) pairs.
 message NamedResource {
   // Map key
   string name = 1;
@@ -148,8 +151,7 @@ message NamedResource {
   Resource value = 2;
 }
 
-// Automatically-generated message used to represent maps of Schema as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
 message NamedSchema {
   // Map key
   string name = 1;
@@ -157,8 +159,7 @@ message NamedSchema {
   Schema value = 2;
 }
 
-// Automatically-generated message used to represent maps of Scope as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Scope as ordered (name,value) pairs.
 message NamedScope {
   // Map key
   string name = 1;
@@ -166,7 +167,9 @@ message NamedScope {
   Scope value = 2;
 }
 
-message Oauth2 { Scopes scopes = 1; }
+message Oauth2 {
+  Scopes scopes = 1;
+}
 
 message Parameter {
   string id = 1;
@@ -179,8 +182,7 @@ message Parameter {
   string pattern = 8;
   string minimum = 9;
   string maximum = 10;
-  repeated string enum
-  = 11;
+  repeated string enum = 11;
   repeated string enum_descriptions = 12;
   bool repeated = 13;
   string location = 14;
@@ -190,7 +192,9 @@ message Parameter {
   Annotations annotations = 18;
 }
 
-message Parameters { repeated NamedParameter additional_properties = 1; }
+message Parameters {
+  repeated NamedParameter additional_properties = 1;
+}
 
 message Protocols {
   Simple simple = 1;
@@ -207,9 +211,13 @@ message Resource {
   Resources resources = 2;
 }
 
-message Resources { repeated NamedResource additional_properties = 1; }
+message Resources {
+  repeated NamedResource additional_properties = 1;
+}
 
-message Response { string _ref = 1; }
+message Response {
+  string _ref = 1;
+}
 
 message Resumable {
   bool multipart = 1;
@@ -226,8 +234,7 @@ message Schema {
   string pattern = 7;
   string minimum = 8;
   string maximum = 9;
-  repeated string enum
-  = 10;
+  repeated string enum = 10;
   repeated string enum_descriptions = 11;
   bool repeated = 12;
   string location = 13;
@@ -239,15 +246,24 @@ message Schema {
   bool read_only = 19;
 }
 
-message Schemas { repeated NamedSchema additional_properties = 1; }
+message Schemas {
+  repeated NamedSchema additional_properties = 1;
+}
 
-message Scope { string description = 1; }
+message Scope {
+  string description = 1;
+}
 
-message Scopes { repeated NamedScope additional_properties = 1; }
+message Scopes {
+  repeated NamedScope additional_properties = 1;
+}
 
 message Simple {
   bool multipart = 1;
   string path = 2;
 }
 
-message StringArray { repeated string value = 1; }
+message StringArray {
+  repeated string value = 1;
+}
+

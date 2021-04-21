@@ -814,8 +814,7 @@ func (x *Methods) GetAdditionalProperties() []*NamedMethod {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Method as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Method as ordered (name,value) pairs.
 type NamedMethod struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -873,8 +872,7 @@ func (x *NamedMethod) GetValue() *Method {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Parameter as
-// ordered (name,value) pairs.
+// Automatically-generated message used to represent maps of Parameter as ordered (name,value) pairs.
 type NamedParameter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -932,8 +930,7 @@ func (x *NamedParameter) GetValue() *Parameter {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Resource as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Resource as ordered (name,value) pairs.
 type NamedResource struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -991,8 +988,7 @@ func (x *NamedResource) GetValue() *Resource {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Schema as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Schema as ordered (name,value) pairs.
 type NamedSchema struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1050,8 +1046,7 @@ func (x *NamedSchema) GetValue() *Schema {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of Scope as ordered
-// (name,value) pairs.
+// Automatically-generated message used to represent maps of Scope as ordered (name,value) pairs.
 type NamedScope struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
