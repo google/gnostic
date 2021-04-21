@@ -25,6 +25,7 @@ func TestLibraryOpenAPI(t *testing.T) {
 	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
 	err = exec.Command("protoc",
 		"-I", "../../",
+		"-I", "../../third_party",
 		"-I", "examples",
 		"examples/google/example/library/v1/library.proto",
 		"--openapi_out=.").Run()
@@ -47,6 +48,7 @@ func TestBodyMappingOpenAPI(t *testing.T) {
 	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
 	err = exec.Command("protoc",
 		"-I", "../../",
+		"-I", "../../third_party",
 		"-I", "examples",
 		"examples/tests/bodymapping/message.proto",
 		"--openapi_out=.").Run()
