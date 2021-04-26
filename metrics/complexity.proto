@@ -17,7 +17,7 @@ syntax = "proto3";
 package gnostic.metrics.v1;
 
 // The Go package name.
-option go_package = "metrics;gnostic_metrics_v1";
+option go_package = "./metrics;gnostic_metrics_v1";
 
 // The complexity metric includes measurements of the complexity of an API.
 message Complexity {
