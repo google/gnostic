@@ -812,7 +812,7 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				}
 			default:
 				propertyName := propertyModel.Name
-				if propertyName == "value" {
+				if propertyName == "value" && propertyModel.Type != "Any" {
 					code.Print("// %+v", propertyModel)
 				} else if !propertyModel.Repeated {
 					code.PrintIf(isRequired, "// always include this required field.")

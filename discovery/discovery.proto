@@ -42,7 +42,7 @@ option java_package = "org.discovery_v1";
 option objc_class_prefix = "OAS";
 
 // The Go package name.
-option go_package = "discovery;discovery_v1";
+option go_package = "./discovery;discovery_v1";
 
 message Annotations {
   repeated string required = 1;
