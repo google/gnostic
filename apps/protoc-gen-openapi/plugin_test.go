@@ -30,14 +30,12 @@ func TestLibraryOpenAPI(t *testing.T) {
 		"examples/google/example/library/v1/library.proto",
 		"--openapi_out=.").Run()
 	if err != nil {
-		t.Logf("protoc failed: %+v", err)
-		t.FailNow()
+		t.Fatalf("protoc failed: %+v", err)
 	}
 	// Verify that the generated spec matches our expected version.
 	err = exec.Command("diff", "openapi.yaml", "examples/google/example/library/v1/openapi.yaml").Run()
 	if err != nil {
-		t.Logf("Diff failed: %+v", err)
-		t.FailNow()
+		t.Fatalf("Diff failed: %+v", err)
 	}
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
@@ -53,14 +51,12 @@ func TestBodyMappingOpenAPI(t *testing.T) {
 		"examples/tests/bodymapping/message.proto",
 		"--openapi_out=.").Run()
 	if err != nil {
-		t.Logf("protoc failed: %+v", err)
-		t.FailNow()
+		t.Fatalf("protoc failed: %+v", err)
 	}
 	// Verify that the generated spec matches our expected version.
 	err = exec.Command("diff", "openapi.yaml", "examples/tests/bodymapping/openapi.yaml").Run()
 	if err != nil {
-		t.Logf("Diff failed: %+v", err)
-		t.FailNow()
+		t.Fatalf("Diff failed: %+v", err)
 	}
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
@@ -76,14 +72,12 @@ func TestMapFieldsOpenAPI(t *testing.T) {
 		"examples/tests/mapfields/message.proto",
 		"--openapi_out=.").Run()
 	if err != nil {
-		t.Logf("protoc failed: %+v", err)
-		t.FailNow()
+		t.Fatalf("protoc failed: %+v", err)
 	}
 	// Verify that the generated spec matches our expected version.
 	err = exec.Command("diff", "openapi.yaml", "examples/tests/mapfields/openapi.yaml").Run()
 	if err != nil {
-		t.Logf("Diff failed: %+v", err)
-		t.FailNow()
+		t.Fatalf("Diff failed: %+v", err)
 	}
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
