@@ -484,6 +484,10 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 				default:
 					log.Printf("(TODO) Unsupported array type: %+v", fullMessageTypeName(field.Message))
 				}
+			} else if field.Desc.IsMap() &&
+				field.Desc.MapKey().Kind() == protoreflect.StringKind &&
+				field.Desc.MapValue().Kind() == protoreflect.StringKind {
+				fieldSchema.Type = "object"
 			} else {
 				k := field.Desc.Kind()
 				switch k {
