@@ -493,11 +493,20 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 				switch k {
 				case protoreflect.MessageKind:
 					typeName := fullMessageTypeName(field.Message)
-					if typeName == ".google.protobuf.Timestamp" {
+					switch typeName {
+					case ".google.protobuf.Timestamp":
 						// Timestamps are serialized as strings
 						fieldSchema.Type = "string"
 						fieldSchema.Format = "RFC3339"
-					} else {
+					case ".google.type.Date":
+						// Dates are serialized as strings
+						fieldSchema.Type = "string"
+						fieldSchema.Format = "date"
+					case ".google.type.DateTime":
+						// DateTimes are serialized as strings
+						fieldSchema.Type = "string"
+						fieldSchema.Format = "date-time"
+					default:
 						// The field is described by a reference.
 						XRef = g.schemaReferenceForTypeName(typeName)
 					}
