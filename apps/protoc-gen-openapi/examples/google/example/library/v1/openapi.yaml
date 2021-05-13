@@ -76,10 +76,7 @@ paths:
             responses:
                 "200":
                     description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Empty'
+                    content: {}
     /v1/shelves/{shelf}/books:
         get:
             summary: Lists books in a shelf. The order is unspecified but deterministic. Newly created books will not necessarily be added to the end of this list. Returns NOT_FOUND if the shelf does not exist.
@@ -208,10 +205,7 @@ paths:
             responses:
                 "200":
                     description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Empty'
+                    content: {}
     /v1/shelves/{shelf}/books/{book}:move:
         post:
             summary: Moves a book to another shelf, and returns the new book. The book id of the new book may not be the same as the original book.
@@ -298,9 +292,6 @@ components:
                     description: The last update date and time.
                     format: date-time
             description: A single book in the library.
-        Empty:
-            properties: {}
-            description: 'A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance:     service Foo {       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);     } The JSON representation for `Empty` is empty JSON object `{}`.'
         ListBooksResponse:
             properties:
                 books:
