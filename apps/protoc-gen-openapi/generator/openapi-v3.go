@@ -192,7 +192,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		parts := strings.Split(starredPath, "/")
 		// The starred path is assumed to be in the form "things/*/otherthings/*".
 		// We want to convert it to "things/{thing}/otherthings/{otherthing}".
-		for i := 0; i < len(parts); i += 2 {
+		for i := 0; i < len(parts)-1; i += 2 {
 			section := parts[i]
 			parameter := singular(section)
 			parts[i+1] = "{" + parameter + "}"
@@ -260,22 +260,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					Oneof: &v3.ResponseOrReference_Response{
 						Response: &v3.Response{
 							Description: "OK",
-							Content: &v3.MediaTypes{
-								AdditionalProperties: []*v3.NamedMediaType{
-									&v3.NamedMediaType{
-										Name: "application/json",
-										Value: &v3.MediaType{
-											Schema: &v3.SchemaOrReference{
-												Oneof: &v3.SchemaOrReference_Reference{
-													Reference: &v3.Reference{
-														XRef: g.schemaReferenceForTypeName(fullMessageTypeName(outputMessage)),
-													},
-												},
-											},
-										},
-									},
-								},
-							},
+							Content:     g.responseContentForMessage(outputMessage),
 						},
 					},
 				},
@@ -408,6 +393,42 @@ func itemsItemForReference(xref string) *v3.ItemsItem {
 // fullMessageTypeName builds the full type name of a message.
 func fullMessageTypeName(message *protogen.Message) string {
 	return "." + string(message.Desc.ParentFile().Package()) + "." + string(message.Desc.Name())
+}
+
+func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.Message) *v3.MediaTypes {
+	typeName := fullMessageTypeName(outputMessage)
+
+	if typeName == ".google.protobuf.Empty" {
+		return &v3.MediaTypes{}
+	}
+
+	if typeName == ".google.api.HttpBody" {
+		return &v3.MediaTypes{
+			AdditionalProperties: []*v3.NamedMediaType{
+				&v3.NamedMediaType{
+					Name:  "application/octet-stream",
+					Value: &v3.MediaType{},
+				},
+			},
+		}
+	}
+
+	return &v3.MediaTypes{
+		AdditionalProperties: []*v3.NamedMediaType{
+			&v3.NamedMediaType{
+				Name: "application/json",
+				Value: &v3.MediaType{
+					Schema: &v3.SchemaOrReference{
+						Oneof: &v3.SchemaOrReference_Reference{
+							Reference: &v3.Reference{
+								XRef: g.schemaReferenceForTypeName(fullMessageTypeName(outputMessage)),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 // addSchemasToDocumentV3 adds info from one file descriptor.
