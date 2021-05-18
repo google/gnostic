@@ -127,11 +127,12 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
-			extension := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
+			xt := annotations.E_Http
+			extension := proto.GetExtension(method.Desc.Options(), xt)
 			var path string
 			var methodName string
 			var body string
-			if extension != nil {
+			if extension != nil && extension != xt.InterfaceOf(xt.Zero()) {
 				rule := extension.(*annotations.HttpRule)
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
