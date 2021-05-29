@@ -313,7 +313,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	// read object names and their details
 	specification := document.Children[4] // fragile! the section title is "Specification"
-	schema := specification.Children[7]   // fragile! the section title is "Schema"
+	schema := specification.Children[8]   // fragile! the section title is "Schema"
 	anchor := regexp.MustCompile("^#### <a name=\"(.*)Object\"")
 	schemaObjects := make([]SchemaObject, 0)
 	for _, section := range schema.Children {
