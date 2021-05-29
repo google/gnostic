@@ -302,7 +302,6 @@ func (m *SchemaModel) objectWithID(id string) *SchemaObject {
 
 // NewSchemaModel returns a new SchemaModel.
 func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
-
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -842,11 +841,11 @@ func main() {
 	if contactObject != nil {
 		emailProperty := contactObject.PropertyWithName("email")
 		if emailProperty != nil {
-			emailProperty.Format = stringptr("email");
+			emailProperty.Format = stringptr("email")
 		}
 		urlProperty := contactObject.PropertyWithName("url")
 		if urlProperty != nil {
-			urlProperty.Format = stringptr("uri");
+			urlProperty.Format = stringptr("uri")
 		}
 	}
 
