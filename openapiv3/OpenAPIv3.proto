@@ -208,8 +208,8 @@ message Info {
   Contact contact = 4;
   License license = 5;
   string version = 6;
-  repeated NamedAny specification_extension = 7;
-  string summary = 8;
+  string summary = 7;
+  repeated NamedAny specification_extension = 8;
 }
 
 message ItemsItem {
