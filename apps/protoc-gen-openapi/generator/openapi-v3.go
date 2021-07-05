@@ -162,10 +162,11 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
 func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
+	d.Info.Title = "Definition for following service(s):"
 	for _, service := range file.Services {
+		d.Info.Title += " " + service.GoName
 		comment := g.filterCommentString(service.Comments.Leading)
-		d.Info.Title = service.GoName
-		d.Info.Description = comment
+		d.Info.Description += fmt.Sprintf("%s: %s\n", service.GoName, comment)
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
