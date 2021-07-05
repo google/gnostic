@@ -110,7 +110,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() (*v3.Document, error) {
 		version = parameters.Version
 	}
 	d.Info = &v3.Info{
-		Title:       "",
+		Title:       "Definition for following service(s):",
 		Version:     version,
 		Description: "",
 	}
@@ -162,7 +162,6 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
 func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
-	d.Info.Title = "Definition for following service(s):"
 	for _, service := range file.Services {
 		d.Info.Title += " " + service.GoName
 		comment := g.filterCommentString(service.Comments.Leading)
