@@ -18,6 +18,7 @@ package generator
 import (
 	"fmt"
 	"log"
+	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -31,6 +32,10 @@ import (
 
 const infoURL = "https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi"
 
+type parameterKeys struct {
+	Version string
+}
+
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
 	plugin *protogen.Plugin
@@ -39,6 +44,29 @@ type OpenAPIv3Generator struct {
 	generatedSchemas  []string // Names of schemas that have already been generated.
 	linterRulePattern *regexp.Regexp
 	namePattern       *regexp.Regexp
+}
+
+// getParameters returns a mapping of parameter key on parameter value
+func (g *OpenAPIv3Generator) getParameters() (*parameterKeys, error) {
+	parameter := g.plugin.Request.Parameter
+	if parameter == nil {
+		return &parameterKeys{}, nil
+	}
+	result := parameterKeys{}
+	params := strings.Split(*parameter, ",")
+	for _, param := range params {
+		keyValuePair := strings.Split(param, "=")
+		if len(keyValuePair) != 2 {
+			return nil, fmt.Errorf("the keys and values of your parameters have to be separated by a '='")
+		}
+		v := reflect.ValueOf(&result).Elem()
+		field := v.FieldByName(strings.ToUpper(keyValuePair[0][:1]) + keyValuePair[0][1:])
+		if !field.IsValid() {
+			return nil, fmt.Errorf("the parameter key %s is not known", keyValuePair[0])
+		}
+		field.SetString(keyValuePair[1])
+	}
+	return &result, nil
 }
 
 // NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
@@ -54,7 +82,10 @@ func NewOpenAPIv3Generator(plugin *protogen.Plugin) *OpenAPIv3Generator {
 
 // Run runs the generator.
 func (g *OpenAPIv3Generator) Run() error {
-	d := g.buildDocumentV3()
+	d, err := g.buildDocumentV3()
+	if err != nil {
+		return err
+	}
 	bytes, err := d.YAMLValue("Generated with protoc-gen-openapi\n" + infoURL)
 	if err != nil {
 		return fmt.Errorf("failed to marshal yaml: %s", err.Error())
@@ -65,12 +96,22 @@ func (g *OpenAPIv3Generator) Run() error {
 }
 
 // buildDocumentV3 builds an OpenAPIv3 document for a plugin request.
-func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
+func (g *OpenAPIv3Generator) buildDocumentV3() (*v3.Document, error) {
 	d := &v3.Document{}
 	d.Openapi = "3.0.3"
+	parameters, err := g.getParameters()
+	if err != nil {
+		return nil, err
+	}
+	var version string
+	if parameters.Version == "" {
+		version = "0.0.1"
+	} else {
+		version = parameters.Version
+	}
 	d.Info = &v3.Info{
 		Title:       "",
-		Version:     "0.0.1",
+		Version:     version,
 		Description: "",
 	}
 	d.Paths = &v3.Paths{}
@@ -108,7 +149,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		})
 		d.Components.Schemas.AdditionalProperties = pairs
 	}
-	return d
+	return d, nil
 }
 
 // filterCommentString removes line breaks and linter rules from comments.
