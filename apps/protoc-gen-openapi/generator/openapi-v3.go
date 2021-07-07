@@ -319,13 +319,38 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					schemaFormat = field.Desc.Kind().String()
 				}
 				if isSpecial {
+					// get full field name
+					fieldName := string(field.Desc.Name())
+					{
+						containingMessage := field.Desc.ContainingMessage()
+						parentMessage := containingMessage.Parent()
+						for parentMessage != nil {
+						ParentMessageType:
+							switch parentMessage.(type) {
+							case protoreflect.MessageDescriptor:
+								parentMsgFields := parentMessage.(protoreflect.MessageDescriptor).Fields()
+								for j := 0; j < parentMsgFields.Len(); j++ {
+									parentMsgField := parentMsgFields.Get(j)
+									if containingMessage == parentMsgField.Message() {
+										fieldName = fmt.Sprintf("%s.%s", parentMsgField.Name(), fieldName)
+										containingMessage = parentMessage.(protoreflect.MessageDescriptor)
+										parentMessage = containingMessage.Parent()
+										break ParentMessageType
+									}
+								}
+								parentMessage = nil
+							default:
+								parentMessage = nil
+							}
+						}
+					}
 					// Get the field description from the comments.
 					fieldDescription := g.filterCommentString(field.Comments.Leading)
 					parameters = append(parameters,
 						&v3.ParameterOrReference{
 							Oneof: &v3.ParameterOrReference_Parameter{
 								Parameter: &v3.Parameter{
-									Name:        string(field.Desc.Name()),
+									Name:        fieldName,
 									In:          "query",
 									Description: fieldDescription,
 									Required:    false,
