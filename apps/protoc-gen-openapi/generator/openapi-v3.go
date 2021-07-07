@@ -361,31 +361,55 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			if !containsField(coveredFields, &fld) {
 				var schemaType string
 				var schemaFormat string
-				isSpecial := true
+				var toBeAddedAsParameter bool
 				if fld.fld.Desc.Kind() == protoreflect.MessageKind {
-					typeName := fullMessageTypeName(fld.fld.Message)
-					isSpecial = false
-					for _, specType := range specialTypes {
-						if specType.Name == typeName {
-							schemaType = specType.Type
-							schemaFormat = specType.Format
-							isSpecial = true
-							break
-						}
-					}
-					if !isSpecial {
-						for _, f := range fld.fld.Message.Fields {
-							fields = append(fields, protoField{
-								fld:     f,
-								fldPath: append(fields[i].fldPath, string(f.Desc.Name())),
+					toBeAddedAsParameter = false
+					// prevent recursive self reference of messages being parsed by adding a reference parameter
+					if referencesAnyParentMessage(inputMessage, &fld) {
+						fieldDescription := g.filterCommentString(fld.fld.Comments.Leading)
+						parameters = append(parameters,
+							&v3.ParameterOrReference{
+								Oneof: &v3.ParameterOrReference_Parameter{
+									Parameter: &v3.Parameter{
+										Name:        fields[i].getWholePath(),
+										In:          "query",
+										Description: fieldDescription,
+										Required:    false,
+										Schema: &v3.SchemaOrReference{
+											Oneof: &v3.SchemaOrReference_Reference{
+												Reference: &v3.Reference{
+													XRef: g.schemaReferenceForTypeName(fullMessageTypeName(fld.fld.Message)),
+												},
+											},
+										},
+									},
+								},
 							})
+					} else {
+						typeName := fullMessageTypeName(fld.fld.Message)
+						for _, specType := range specialTypes {
+							if specType.Name == typeName {
+								schemaType = specType.Type
+								schemaFormat = specType.Format
+								toBeAddedAsParameter = true
+								break
+							}
+						}
+						if !toBeAddedAsParameter {
+							for _, f := range fld.fld.Message.Fields {
+								fields = append(fields, protoField{
+									fld:     f,
+									fldPath: append(fields[i].fldPath, string(f.Desc.Name())),
+								})
+							}
 						}
 					}
 				} else {
+					toBeAddedAsParameter = true
 					schemaType = "string"
 					schemaFormat = fld.fld.Desc.Kind().String()
 				}
-				if isSpecial {
+				if toBeAddedAsParameter {
 					// Get the field description from the comments.
 					fieldDescription := g.filterCommentString(fld.fld.Comments.Leading)
 					parameters = append(parameters,
@@ -494,6 +518,18 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		}
 	}
 	return op, path, nil
+}
+
+// referencesAnyParentMessage returns if a field references one of its parent Messages
+func referencesAnyParentMessage(sourceMessage *protogen.Message, field *protoField) bool {
+	tmpMsg := sourceMessage.Desc
+	for j := 0; j < len(field.fldPath)-1; j++ {
+		tmpMsg = tmpMsg.Fields().ByTextName(field.fldPath[j]).Message()
+		if tmpMsg.FullName() == field.fld.Message.Desc.FullName() {
+			return true
+		}
+	}
+	return false
 }
 
 // getFieldForParameter gets a field related to the passed parameter string using sourceMessage as root
