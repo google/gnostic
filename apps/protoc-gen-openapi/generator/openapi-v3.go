@@ -276,9 +276,6 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			pathParameter := match[1]
 			field, err := getFieldForParameter(inputMessage, pathParameter)
 			if err != nil {
-				log.Println("2" + path)
-				log.Println(inputMessage.Desc.Name())
-				log.Println(err)
 				return nil, "", err
 			}
 			// create a parameter based on the field
