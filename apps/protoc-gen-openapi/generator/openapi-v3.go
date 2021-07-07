@@ -144,11 +144,15 @@ func (g *OpenAPIv3Generator) buildDocumentV3() (*v3.Document, error) {
 			AdditionalProperties: []*v3.NamedSchemaOrReference{},
 		},
 	}
+	var serviceNames []string
+	var serviceComments []string
 	for _, file := range g.plugin.Files {
-		if err := g.addPathsToDocumentV3(d, file); err != nil {
+		if err := g.addPathsToDocumentV3(d, file, &serviceNames, &serviceComments); err != nil {
 			return nil, err
 		}
 	}
+	d.Info.Title += " " + strings.Join(serviceNames, ", ")
+	d.Info.Description += strings.Join(serviceComments, "\n")
 	for len(g.requiredSchemas) > 0 {
 		count := len(g.requiredSchemas)
 		for _, file := range g.plugin.Files {
@@ -187,11 +191,14 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
 }
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
-func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) error {
+func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File, serviceNames *[]string, serviceComments *[]string) error {
 	for _, service := range file.Services {
-		d.Info.Title += " " + service.GoName
-		comment := g.filterCommentString(service.Comments.Leading)
-		d.Info.Description += fmt.Sprintf("%s - %s\n", service.GoName, comment)
+		{
+			serviceName := string(service.Desc.Name())
+			*serviceNames = append(*serviceNames, serviceName)
+			serviceComment := g.filterCommentString(service.Comments.Leading)
+			*serviceComments = append(*serviceComments, fmt.Sprintf("%s - %s", serviceName, serviceComment))
+		}
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
