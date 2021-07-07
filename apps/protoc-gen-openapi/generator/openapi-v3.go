@@ -293,15 +293,25 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 				coveredFields = append(coveredFields, field)
 			}
 		}
-		fields := inputMessage.Fields
+		type field struct {
+			fld     *protogen.Field
+			fldPath []string
+		}
+		var fields []field
+		for _, fld := range inputMessage.Fields {
+			fields = append(fields, field{
+				fld:     fld,
+				fldPath: []string{string(fld.Desc.Name())},
+			})
+		}
 		for i := 0; i < len(fields); i++ {
-			field := fields[i]
-			if !contains(coveredFields, field) {
+			fld := fields[i].fld
+			if !contains(coveredFields, fld) {
 				var schemaType string
 				var schemaFormat string
 				isSpecial := true
-				if field.Desc.Kind() == protoreflect.MessageKind {
-					typeName := fullMessageTypeName(field.Message)
+				if fld.Desc.Kind() == protoreflect.MessageKind {
+					typeName := fullMessageTypeName(fld.Message)
 					isSpecial = false
 					for _, specType := range specialTypes {
 						if specType.Name == typeName {
@@ -312,45 +322,25 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 						}
 					}
 					if !isSpecial {
-						fields = append(fields, field.Message.Fields...)
+						for _, f := range fld.Message.Fields {
+							fields = append(fields, field{
+								fld:     f,
+								fldPath: append(fields[i].fldPath, string(f.Desc.Name())),
+							})
+						}
 					}
 				} else {
 					schemaType = "string"
-					schemaFormat = field.Desc.Kind().String()
+					schemaFormat = fld.Desc.Kind().String()
 				}
 				if isSpecial {
-					// get full field name
-					fieldName := string(field.Desc.Name())
-					{
-						containingMessage := field.Desc.ContainingMessage()
-						parentMessage := containingMessage.Parent()
-						for parentMessage != nil {
-						ParentMessageType:
-							switch parentMessage.(type) {
-							case protoreflect.MessageDescriptor:
-								parentMsgFields := parentMessage.(protoreflect.MessageDescriptor).Fields()
-								for j := 0; j < parentMsgFields.Len(); j++ {
-									parentMsgField := parentMsgFields.Get(j)
-									if containingMessage == parentMsgField.Message() {
-										fieldName = fmt.Sprintf("%s.%s", parentMsgField.Name(), fieldName)
-										containingMessage = parentMessage.(protoreflect.MessageDescriptor)
-										parentMessage = containingMessage.Parent()
-										break ParentMessageType
-									}
-								}
-								parentMessage = nil
-							default:
-								parentMessage = nil
-							}
-						}
-					}
 					// Get the field description from the comments.
-					fieldDescription := g.filterCommentString(field.Comments.Leading)
+					fieldDescription := g.filterCommentString(fld.Comments.Leading)
 					parameters = append(parameters,
 						&v3.ParameterOrReference{
 							Oneof: &v3.ParameterOrReference_Parameter{
 								Parameter: &v3.Parameter{
-									Name:        fieldName,
+									Name:        strings.Join(fields[i].fldPath, "."),
 									In:          "query",
 									Description: fieldDescription,
 									Required:    false,
@@ -366,7 +356,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 							},
 						})
 				}
-				coveredFields = append(coveredFields, field)
+				coveredFields = append(coveredFields, fld)
 			}
 		}
 	}
