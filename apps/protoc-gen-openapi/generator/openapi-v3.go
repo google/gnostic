@@ -60,6 +60,15 @@ var specialTypes = []specialType{
 	},
 }
 
+type protoField struct {
+	fld     *protogen.Field
+	fldPath []string
+}
+
+func (f *protoField) getWholePath() string {
+	return strings.Join(f.fldPath, ".")
+}
+
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
 	plugin *protogen.Plugin
@@ -258,38 +267,81 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	outputMessage *protogen.Message,
 ) (*v3.Operation, string, error) {
 	// coveredFields tracks the fields that have been used in the body or path.
-	coveredFields := make([]*protogen.Field, 0)
+	var coveredFields []protoField
 	// Initialize the list of operation parameters.
-	parameters := []*v3.ParameterOrReference{}
+	var parameters []*v3.ParameterOrReference
 	// Add the path parameters to the operation parameters.
 	for _, match := range g.namePattern.FindAllStringSubmatch(path, -1) {
-		pathParameter := match[1]
-		field, err := getFieldForParameter(inputMessage, pathParameter)
-		if err != nil {
-			return nil, "", err
-		}
-		// create a parameter based on the field
-		parameters = append(parameters,
-			&v3.ParameterOrReference{
-				Oneof: &v3.ParameterOrReference_Parameter{
-					Parameter: &v3.Parameter{
-						Name:        pathParameter,
-						In:          "path",
-						Required:    true,
-						Description: g.filterCommentString(field.Comments.Leading),
-						Schema: &v3.SchemaOrReference{
-							Oneof: &v3.SchemaOrReference_Schema{
-								Schema: &v3.Schema{
-									Type:   "string",
-									Format: field.Desc.Kind().String(),
+		if matches := regexp.MustCompile(`^([^=]+)=(.+)$`).FindStringSubmatch(match[1]); matches == nil {
+			pathParameter := match[1]
+			field, err := getFieldForParameter(inputMessage, pathParameter)
+			if err != nil {
+				log.Println("2" + path)
+				log.Println(inputMessage.Desc.Name())
+				log.Println(err)
+				return nil, "", err
+			}
+			// create a parameter based on the field
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        pathParameter,
+							In:          "path",
+							Required:    true,
+							Description: g.filterCommentString(field.fld.Comments.Leading),
+							Schema: &v3.SchemaOrReference{
+								Oneof: &v3.SchemaOrReference_Schema{
+									Schema: &v3.Schema{
+										Type:   "string",
+										Format: field.fld.Desc.Kind().String(),
+									},
 								},
 							},
 						},
 					},
-				},
-			})
-		// add the path parameter to the covered parameters
-		coveredFields = append(coveredFields, field)
+				})
+			// add the path parameter to the covered parameters
+			coveredFields = append(coveredFields, *field)
+		} else {
+			if coveredField, err := getFieldForParameter(inputMessage, matches[1]); err == nil {
+				// Add the "name=" "name" value to the list of covered fields.
+				coveredFields = append(coveredFields, *coveredField)
+			} else {
+				return nil, "", err
+			}
+			// Convert the path from the starred form to use named path parameters.
+			starredPath := matches[2]
+			parts := strings.Split(starredPath, "/")
+			// The starred path is assumed to be in the form "things/*/otherthings/*".
+			// We want to convert it to "things/{thing}/otherthings/{otherthing}".
+			for i := 0; i < len(parts)-1; i += 2 {
+				section := parts[i]
+				pathParameter := singular(section)
+				parts[i+1] = "{" + pathParameter + "}"
+				parameters = append(parameters,
+					&v3.ParameterOrReference{
+						Oneof: &v3.ParameterOrReference_Parameter{
+							Parameter: &v3.Parameter{
+								Name:        pathParameter,
+								In:          "path",
+								Required:    true,
+								Description: "The " + pathParameter + " id.",
+								Schema: &v3.SchemaOrReference{
+									Oneof: &v3.SchemaOrReference_Schema{
+										Schema: &v3.Schema{
+											Type: "string",
+										},
+									},
+								},
+							},
+						},
+					})
+			}
+			// Rewrite the path to use the path parameters.
+			newPath := strings.Join(parts, "/")
+			path = strings.Replace(path, match[0], newPath, 1)
+		}
 	}
 	// Add any unhandled fields in the request message as query parameters.
 	if bodyField != "*" {
@@ -297,28 +349,24 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			if field, err := getFieldForParameter(inputMessage, bodyField); err != nil {
 				return nil, "", err
 			} else {
-				coveredFields = append(coveredFields, field)
+				coveredFields = append(coveredFields, *field)
 			}
 		}
-		type field struct {
-			fld     *protogen.Field
-			fldPath []string
-		}
-		var fields []field
+		var fields []protoField
 		for _, fld := range inputMessage.Fields {
-			fields = append(fields, field{
+			fields = append(fields, protoField{
 				fld:     fld,
 				fldPath: []string{string(fld.Desc.Name())},
 			})
 		}
 		for i := 0; i < len(fields); i++ {
-			fld := fields[i].fld
-			if !contains(coveredFields, fld) {
+			fld := fields[i]
+			if !containsField(coveredFields, &fld) {
 				var schemaType string
 				var schemaFormat string
 				isSpecial := true
-				if fld.Desc.Kind() == protoreflect.MessageKind {
-					typeName := fullMessageTypeName(fld.Message)
+				if fld.fld.Desc.Kind() == protoreflect.MessageKind {
+					typeName := fullMessageTypeName(fld.fld.Message)
 					isSpecial = false
 					for _, specType := range specialTypes {
 						if specType.Name == typeName {
@@ -329,8 +377,8 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 						}
 					}
 					if !isSpecial {
-						for _, f := range fld.Message.Fields {
-							fields = append(fields, field{
+						for _, f := range fld.fld.Message.Fields {
+							fields = append(fields, protoField{
 								fld:     f,
 								fldPath: append(fields[i].fldPath, string(f.Desc.Name())),
 							})
@@ -338,16 +386,16 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					}
 				} else {
 					schemaType = "string"
-					schemaFormat = fld.Desc.Kind().String()
+					schemaFormat = fld.fld.Desc.Kind().String()
 				}
 				if isSpecial {
 					// Get the field description from the comments.
-					fieldDescription := g.filterCommentString(fld.Comments.Leading)
+					fieldDescription := g.filterCommentString(fld.fld.Comments.Leading)
 					parameters = append(parameters,
 						&v3.ParameterOrReference{
 							Oneof: &v3.ParameterOrReference_Parameter{
 								Parameter: &v3.Parameter{
-									Name:        strings.Join(fields[i].fldPath, "."),
+									Name:        fields[i].getWholePath(),
 									In:          "query",
 									Description: fieldDescription,
 									Required:    false,
@@ -452,16 +500,16 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 }
 
 // getFieldForParameter gets a field related to the passed parameter string using sourceMessage as root
-func getFieldForParameter(sourceMessage *protogen.Message, parameter string) (*protogen.Field, error) {
+func getFieldForParameter(sourceMessage *protogen.Message, parameter string) (*protoField, error) {
 	subParameters := strings.Split(parameter, ".")
 	// get the field the path parameter points to
-	var field *protogen.Field
+	var pField protoField
 	for _, subParameter := range subParameters {
 		var message *protogen.Message
-		if field == nil {
+		if pField.fld == nil {
 			message = sourceMessage
-		} else if field.Desc.Kind() == protoreflect.MessageKind {
-			message = field.Message
+		} else if pField.fld.Desc.Kind() == protoreflect.MessageKind {
+			message = pField.fld.Message
 		} else {
 			return nil, fmt.Errorf("only the last subparameter of a parameter is allowed to point to a non message type (%s does not fulfil this criterium)", subParameter)
 		}
@@ -469,15 +517,16 @@ func getFieldForParameter(sourceMessage *protogen.Message, parameter string) (*p
 		if fieldDesc == nil {
 			return nil, fmt.Errorf("the subparameter %s of parameter %s does not exist", subParameter, parameter)
 		}
-		field = message.Fields[fieldDesc.Index()]
-		if field == nil {
+		pField.fld = message.Fields[fieldDesc.Index()]
+		if pField.fld == nil {
 			return nil, fmt.Errorf("the parameter %s has a subparameter %s that does not exist", parameter, subParameter)
 		}
+		pField.fldPath = append(pField.fldPath, string(pField.fld.Desc.Name()))
 	}
-	if field == nil {
+	if pField.fld == nil {
 		return nil, fmt.Errorf("could not resolve field for %s", parameter)
 	}
-	return field, nil
+	return &pField, nil
 }
 
 // addOperationV3 adds an operation to the specified path/method.
@@ -738,6 +787,16 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, message *pro
 			},
 		},
 	)
+}
+
+// containsField checks if a slice of protofields contains a value with the same whole path as the passed val parameter
+func containsField(store []protoField, val *protoField) bool {
+	for _, field := range store {
+		if field.getWholePath() == val.getWholePath() {
+			return true
+		}
+	}
+	return false
 }
 
 // contains returns true if a store (slice or array) contains a specified value.
