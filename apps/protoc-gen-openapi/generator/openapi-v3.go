@@ -522,14 +522,15 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	return op, path, nil
 }
 
-// referencesAnyParentMessage returns if a field references one of its parent Messages
+// referencesAnyParentMessage returns if a field references one of its parent Messages. Requires the passed
+//  field to be of type message
 func referencesAnyParentMessage(sourceMessage *protogen.Message, field *protoField) bool {
 	tmpMsg := sourceMessage.Desc
-	for j := 0; j < len(field.fldPath)-1; j++ {
-		tmpMsg = tmpMsg.Fields().ByTextName(field.fldPath[j]).Message()
+	for _, fldPath := range field.fldPath {
 		if tmpMsg.FullName() == field.fld.Message.Desc.FullName() {
 			return true
 		}
+		tmpMsg = tmpMsg.Fields().ByTextName(fldPath).Message()
 	}
 	return false
 }
