@@ -73,10 +73,10 @@ func (f *protoField) getWholePath() string {
 type OpenAPIv3Generator struct {
 	plugin *protogen.Plugin
 
-	requiredSchemas   []string // Names of schemas that need to be generated.
-	generatedSchemas  []string // Names of schemas that have already been generated.
-	linterRulePattern *regexp.Regexp
-	namePattern       *regexp.Regexp
+	requiredSchemas      []string // Names of schemas that need to be generated.
+	generatedSchemas     []string // Names of schemas that have already been generated.
+	linterRulePattern    *regexp.Regexp
+	pathParameterPattern *regexp.Regexp
 }
 
 // getParameters returns a mapping of parameter key on parameter value
@@ -105,11 +105,11 @@ func (g *OpenAPIv3Generator) getParameters() (*parameterKeys, error) {
 // NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
 func NewOpenAPIv3Generator(plugin *protogen.Plugin) *OpenAPIv3Generator {
 	return &OpenAPIv3Generator{
-		plugin:            plugin,
-		requiredSchemas:   make([]string, 0),
-		generatedSchemas:  make([]string, 0),
-		linterRulePattern: regexp.MustCompile(`\(-- .* --\)`),
-		namePattern:       regexp.MustCompile(`{([^}]+)}`),
+		plugin:               plugin,
+		requiredSchemas:      make([]string, 0),
+		generatedSchemas:     make([]string, 0),
+		linterRulePattern:    regexp.MustCompile(`\(-- .* --\)`),
+		pathParameterPattern: regexp.MustCompile(`{([^}]+)}`),
 	}
 }
 
@@ -273,7 +273,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Initialize the list of operation parameters.
 	var parameters []*v3.ParameterOrReference
 	// Add the path parameters to the operation parameters.
-	for _, match := range g.namePattern.FindAllStringSubmatch(path, -1) {
+	for _, match := range g.pathParameterPattern.FindAllStringSubmatch(path, -1) {
 		if matches := regexp.MustCompile(`^([^=]+)=(.+)$`).FindStringSubmatch(match[1]); matches == nil {
 			pathParameter := match[1]
 			field, err := getFieldForParameter(inputMessage, pathParameter)
