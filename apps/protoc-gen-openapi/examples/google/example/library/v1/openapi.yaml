@@ -3,25 +3,27 @@
 
 openapi: 3.0.3
 info:
-    title: LibraryService
-    description: 'This API represents a simple digital library.  It lets you manage Shelf resources and Book resources in the library. It defines the following resource model: - The API has a collection of [Shelf][google.example.library.v1.Shelf]   resources, named `shelves/*` - Each Shelf has a collection of [Book][google.example.library.v1.Book]   resources, named `shelves/*/books/*`'
-    version: 0.0.1
+    title: 'Definition for following service(s): LibraryService'
+    description: "LibraryService - This API represents a simple digital library.  It lets you manage Shelf\r resources and Book resources in the library. It defines the following\r resource model:\r\r - The API has a collection of [Shelf][google.example.library.v1.Shelf]\r   resources, named `shelves/*`\r\r - Each Shelf has a collection of [Book][google.example.library.v1.Book]\r   resources, named `shelves/*/books/*`"
+    version: 1.2.3
 paths:
     /v1/shelves:
         get:
-            summary: Lists shelves. The order is unspecified but deterministic. Newly created shelves will not necessarily be added to the end of this list.
+            summary: "Lists shelves. The order is unspecified but deterministic. Newly created\r shelves will not necessarily be added to the end of this list."
             operationId: LibraryService_ListShelves
             parameters:
                 - name: page_size
                   in: query
-                  description: Requested page size. Server may return fewer shelves than requested. If unspecified, server will pick an appropriate default.
+                  description: "Requested page size. Server may return fewer shelves than requested.\r If unspecified, server will pick an appropriate default."
                   schema:
                     type: string
+                    format: int32
                 - name: page_token
                   in: query
-                  description: A token identifying a page of results the server should return. Typically, this is the value of [ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token] returned from the previous call to `ListShelves` method.
+                  description: "A token identifying a page of results the server should return.\r Typically, this is the value of\r [ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token]\r returned from the previous call to `ListShelves` method."
                   schema:
                     type: string
+                    format: string
             responses:
                 "200":
                     description: OK
@@ -79,7 +81,7 @@ paths:
                     content: {}
     /v1/shelves/{shelf}/books:
         get:
-            summary: Lists books in a shelf. The order is unspecified but deterministic. Newly created books will not necessarily be added to the end of this list. Returns NOT_FOUND if the shelf does not exist.
+            summary: "Lists books in a shelf. The order is unspecified but deterministic. Newly\r created books will not necessarily be added to the end of this list.\r Returns NOT_FOUND if the shelf does not exist."
             operationId: LibraryService_ListBooks
             parameters:
                 - name: shelf
@@ -90,14 +92,16 @@ paths:
                     type: string
                 - name: page_size
                   in: query
-                  description: Requested page size. Server may return fewer books than requested. If unspecified, server will pick an appropriate default.
+                  description: "Requested page size. Server may return fewer books than requested.\r If unspecified, server will pick an appropriate default."
                   schema:
                     type: string
+                    format: int32
                 - name: page_token
                   in: query
-                  description: A token identifying a page of results the server should return. Typically, this is the value of [ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token]. returned from the previous call to `ListBooks` method.
+                  description: "A token identifying a page of results the server should return.\r Typically, this is the value of\r [ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token].\r returned from the previous call to `ListBooks` method."
                   schema:
                     type: string
+                    format: string
             responses:
                 "200":
                     description: OK
@@ -153,7 +157,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
         put:
-            summary: Updates a book. Returns INVALID_ARGUMENT if the name of the book is non-empty and does not equal the existing name.
+            summary: "Updates a book. Returns INVALID_ARGUMENT if the name of the book\r is non-empty and does not equal the existing name."
             operationId: LibraryService_UpdateBook
             parameters:
                 - name: shelf
@@ -173,6 +177,7 @@ paths:
                   description: The name of the book to update.
                   schema:
                     type: string
+                    format: string
             requestBody:
                 content:
                     application/json:
@@ -208,7 +213,7 @@ paths:
                     content: {}
     /v1/shelves/{shelf}/books/{book}:move:
         post:
-            summary: Moves a book to another shelf, and returns the new book. The book id of the new book may not be the same as the original book.
+            summary: "Moves a book to another shelf, and returns the new book. The book\r id of the new book may not be the same as the original book."
             operationId: LibraryService_MoveBook
             parameters:
                 - name: shelf
@@ -238,7 +243,7 @@ paths:
                                 $ref: '#/components/schemas/Book'
     /v1/shelves/{shelf}:merge:
         post:
-            summary: Merges two shelves by adding all books from the shelf named `other_shelf_name` to shelf `name`, and deletes `other_shelf_name`. Returns the updated shelf. The book ids of the moved books may not be the same as the original books. Returns NOT_FOUND if either shelf does not exist. This call is a no-op if the specified shelves are the same.
+            summary: "Merges two shelves by adding all books from the shelf named\r `other_shelf_name` to shelf `name`, and deletes\r `other_shelf_name`. Returns the updated shelf.\r The book ids of the moved books may not be the same as the original books.\r\r Returns NOT_FOUND if either shelf does not exist.\r This call is a no-op if the specified shelves are the same."
             operationId: LibraryService_MergeShelves
             parameters:
                 - name: shelf
@@ -266,7 +271,7 @@ components:
             properties:
                 name:
                     type: string
-                    description: The resource name of the book. Book names have the form `shelves/{shelf_id}/books/{book_id}`. The name is ignored when creating a book.
+                    description: "The resource name of the book.\r Book names have the form `shelves/{shelf_id}/books/{book_id}`.\r The name is ignored when creating a book."
                 author:
                     type: string
                     description: The name of the book author.
@@ -301,7 +306,7 @@ components:
                     description: The list of books.
                 next_page_token:
                     type: string
-                    description: A token to retrieve next page of results. Pass this value in the [ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token] field in the subsequent call to `ListBooks` method to retrieve the next page of results.
+                    description: "A token to retrieve next page of results.\r Pass this value in the\r [ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token]\r field in the subsequent call to `ListBooks` method to retrieve the next\r page of results."
             description: Response message for LibraryService.ListBooks.
         ListShelvesResponse:
             properties:
@@ -312,7 +317,7 @@ components:
                     description: The list of shelves.
                 next_page_token:
                     type: string
-                    description: A token to retrieve next page of results. Pass this value in the [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token] field in the subsequent call to `ListShelves` method to retrieve the next page of results.
+                    description: "A token to retrieve next page of results.\r Pass this value in the\r [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token]\r field in the subsequent call to `ListShelves` method to retrieve the next\r page of results."
             description: Response message for LibraryService.ListShelves.
         MergeShelvesRequest:
             properties:
@@ -322,7 +327,7 @@ components:
                 other_shelf_name:
                     type: string
                     description: The name of the shelf we're removing books from and deleting.
-            description: Describes the shelf being removed (other_shelf_name) and updated (name) in this merge.
+            description: "Describes the shelf being removed (other_shelf_name) and updated\r (name) in this merge."
         MoveBookRequest:
             properties:
                 name:
@@ -331,12 +336,12 @@ components:
                 other_shelf_name:
                     type: string
                     description: The name of the destination shelf.
-            description: Describes what book to move (name) and what shelf we're moving it to (other_shelf_name).
+            description: "Describes what book to move (name) and what shelf we're moving it\r to (other_shelf_name)."
         Shelf:
             properties:
                 name:
                     type: string
-                    description: The resource name of the shelf. Shelf names have the form `shelves/{shelf_id}`. The name is ignored when creating a shelf.
+                    description: "The resource name of the shelf.\r Shelf names have the form `shelves/{shelf_id}`.\r The name is ignored when creating a shelf."
                 theme:
                     type: string
                     description: The theme of the shelf

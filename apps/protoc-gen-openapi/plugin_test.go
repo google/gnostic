@@ -22,12 +22,21 @@ import (
 
 func TestLibraryOpenAPI(t *testing.T) {
 	var err error
+	// Compile the protoc plugin
+	err = exec.Command("go",
+		"build",
+		".").Run()
+	if err != nil {
+		t.Fatalf("go failed compiling the protoc plugin: %+v", err)
+	}
 	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
 	err = exec.Command("protoc",
+		"--plugin", "./protoc-gen-openapi",
 		"-I", "../../",
 		"-I", "../../third_party",
 		"-I", "examples",
 		"examples/google/example/library/v1/library.proto",
+		"--openapi_opt=version=1.2.3",
 		"--openapi_out=.").Run()
 	if err != nil {
 		t.Fatalf("protoc failed: %+v", err)
@@ -39,16 +48,26 @@ func TestLibraryOpenAPI(t *testing.T) {
 	}
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
+	os.Remove("protoc-gen-openapi")
 }
 
 func TestBodyMappingOpenAPI(t *testing.T) {
 	var err error
+	// Compile the protoc plugin
+	err = exec.Command("go",
+		"build",
+		".").Run()
+	if err != nil {
+		t.Fatalf("go failed compiling the protoc plugin: %+v", err)
+	}
 	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
 	err = exec.Command("protoc",
+		"--plugin", "./protoc-gen-openapi",
 		"-I", "../../",
 		"-I", "../../third_party",
 		"-I", "examples",
 		"examples/tests/bodymapping/message.proto",
+		"--openapi_opt=version=3.2.1",
 		"--openapi_out=.").Run()
 	if err != nil {
 		t.Fatalf("protoc failed: %+v", err)
@@ -60,16 +79,26 @@ func TestBodyMappingOpenAPI(t *testing.T) {
 	}
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
+	os.Remove("protoc-gen-openapi")
 }
 
 func TestMapFieldsOpenAPI(t *testing.T) {
 	var err error
+	// Compile the protoc plugin
+	err = exec.Command("go",
+		"build",
+		".").Run()
+	if err != nil {
+		t.Fatalf("go failed compiling the protoc plugin: %+v", err)
+	}
 	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
 	err = exec.Command("protoc",
+		"--plugin", "./protoc-gen-openapi",
 		"-I", "../../",
 		"-I", "../../third_party",
 		"-I", "examples",
 		"examples/tests/mapfields/message.proto",
+		"--openapi_opt=version=47",
 		"--openapi_out=.").Run()
 	if err != nil {
 		t.Fatalf("protoc failed: %+v", err)
@@ -81,4 +110,5 @@ func TestMapFieldsOpenAPI(t *testing.T) {
 	}
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
+	os.Remove("protoc-gen-openapi")
 }
