@@ -206,7 +206,9 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			serviceName := string(service.Desc.Name())
 			*serviceNames = append(*serviceNames, serviceName)
 			serviceComment := g.filterCommentString(service.Comments.Leading)
-			*serviceComments = append(*serviceComments, fmt.Sprintf("%s - %s", serviceName, serviceComment))
+			if serviceComment != "" {
+				*serviceComments = append(*serviceComments, fmt.Sprintf("%s - %s", serviceName, serviceComment))
+			}
 		}
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
