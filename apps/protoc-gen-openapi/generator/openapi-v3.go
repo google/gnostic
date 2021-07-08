@@ -368,14 +368,18 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					toBeAddedAsParameter = false
 					// prevent recursive self reference of messages being parsed by adding a reference parameter
 					if referencesAnyParentMessage(inputMessage, &fld) {
+						descriptionComponents := []string{"You can extend the parameter's name by any parameter in the referenced schema using a '.' for separation"}
 						fieldDescription := g.filterCommentString(fld.fld.Comments.Leading)
+						if fieldDescription != "" {
+							descriptionComponents = append(descriptionComponents, fieldDescription)
+						}
 						parameters = append(parameters,
 							&v3.ParameterOrReference{
 								Oneof: &v3.ParameterOrReference_Parameter{
 									Parameter: &v3.Parameter{
 										Name:        fields[i].getWholePath(),
 										In:          "query",
-										Description: fieldDescription,
+										Description: strings.Join(descriptionComponents, ". "),
 										Required:    false,
 										Schema: &v3.SchemaOrReference{
 											Oneof: &v3.SchemaOrReference_Reference{
