@@ -71,7 +71,8 @@ func (f *protoField) getWholePath() string {
 	return strings.Join(f.fldPath, ".")
 }
 
-// OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
+// OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a
+//  transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
 	plugin *protogen.Plugin
 
@@ -225,7 +226,12 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
 }
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
-func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File, serviceNames *[]string, serviceComments *[]string) error {
+func (g *OpenAPIv3Generator) addPathsToDocumentV3(
+	d *v3.Document,
+	file *protogen.File,
+	serviceNames *[]string,
+	serviceComments *[]string,
+) error {
 	for _, service := range file.Services {
 		{
 			serviceName := string(service.Desc.Name())
@@ -393,7 +399,8 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					toBeAddedAsParameter = false
 					// prevent recursive self reference of messages being parsed by adding a reference parameter
 					if referencesAnyParentMessage(inputMessage, &fld) {
-						descriptionComponents := []string{"You can extend the parameter's name by any parameter in the referenced schema using a '.' for separation"}
+						descriptionComponents := []string{"You can extend the parameter's name by any parameter" +
+							" in the referenced schema using a '.' for separation"}
 						fieldDescription := g.filterCommentString(fld.fld.Comments.Leading)
 						if fieldDescription != "" {
 							descriptionComponents = append(descriptionComponents, fieldDescription)
@@ -409,7 +416,8 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 										Schema: &v3.SchemaOrReference{
 											Oneof: &v3.SchemaOrReference_Reference{
 												Reference: &v3.Reference{
-													XRef: g.schemaReferenceForTypeName(fullMessageTypeName(fld.fld.Message)),
+													XRef: g.schemaReferenceForTypeName(
+														fullMessageTypeName(fld.fld.Message)),
 												},
 											},
 										},
@@ -576,15 +584,24 @@ func getFieldForParameter(sourceMessage *protogen.Message, parameter string) (*p
 		} else if pField.fld.Desc.Kind() == protoreflect.MessageKind {
 			message = pField.fld.Message
 		} else {
-			return nil, fmt.Errorf("only the last subparameter of a parameter is allowed to point to a non message type (%s does not fulfil this criterium)", subParameter)
+			return nil, fmt.Errorf(
+				"only the last subparameter of a parameter is allowed to point"+
+					" to a non message type (%s does not fulfil this criterium)",
+				subParameter)
 		}
 		fieldDesc := message.Desc.Fields().ByTextName(subParameter)
 		if fieldDesc == nil {
-			return nil, fmt.Errorf("the subparameter %s of parameter %s does not exist", subParameter, parameter)
+			return nil, fmt.Errorf(
+				"the subparameter %s of parameter %s does not exist",
+				subParameter,
+				parameter)
 		}
 		pField.fld = message.Fields[fieldDesc.Index()]
 		if pField.fld == nil {
-			return nil, fmt.Errorf("the parameter %s has a subparameter %s that does not exist", parameter, subParameter)
+			return nil, fmt.Errorf(
+				"the parameter %s has a subparameter %s that does not exist",
+				parameter,
+				subParameter)
 		}
 		pField.fldPath = append(pField.fldPath, string(pField.fld.Desc.Name()))
 	}
@@ -855,7 +872,8 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, message *pro
 	)
 }
 
-// containsField checks if a slice of protofields contains a value with the same whole path as the passed val parameter
+// containsField checks if a slice of protofields contains a value with the same whole path as the
+//  passed val parameter
 func containsField(store []protoField, val *protoField) bool {
 	for _, field := range store {
 		if field.getWholePath() == val.getWholePath() {
