@@ -713,6 +713,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, message *pro
 				fieldSchema.Items = itemsItemForReference(
 					g.schemaReferenceForTypeName(
 						fullMessageTypeName(field.Message)))
+				g.addSchemasToDocumentV3(d, field.Message)
 			case protoreflect.StringKind:
 				fieldSchema.Items = itemsItemForTypeName("string")
 			case protoreflect.Int32Kind,
