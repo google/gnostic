@@ -278,7 +278,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(
 			}
 			if methodName != "" {
 				op, path2, err := g.buildOperationV3(
-					file, operationID, comment, path, body, inputMessage, outputMessage)
+					operationID, comment, path, body, inputMessage, outputMessage)
 				if err != nil {
 					return err
 				}
@@ -291,7 +291,6 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(
 
 // buildOperationV3 constructs an operation for a set of values.
 func (g *OpenAPIv3Generator) buildOperationV3(
-	file *protogen.File,
 	operationID string,
 	description string,
 	path string,
