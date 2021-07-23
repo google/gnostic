@@ -33,7 +33,9 @@ import (
 const infoURL = "https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi"
 
 type parameterKeys struct {
-	Version string
+	Version            string
+	Serverurls         string // separated by &
+	Serverdescriptions string // separated by &
 }
 
 type specialType struct {
@@ -141,6 +143,29 @@ func (g *OpenAPIv3Generator) buildDocumentV3() (*v3.Document, error) {
 		version = "0.0.1"
 	} else {
 		version = parameters.Version
+	}
+	if parameters.Serverurls != "" {
+		serverUrls := strings.Split(parameters.Serverurls, "&")
+		var serverDescriptions []string
+		if parameters.Serverdescriptions == "" {
+			serverDescriptions = make([]string, len(serverUrls))
+		} else {
+			serverDescriptions = strings.Split(parameters.Serverdescriptions, "&")
+			if len(serverUrls) != len(serverDescriptions) {
+				return nil, fmt.Errorf("the server description count must match the server" +
+					" url count or be empty. If you only want some endpoints to have descriptions you" +
+					" can place an '&' without description at the index you do not want a description to appear")
+			}
+		}
+		d.Servers = []*v3.Server{}
+		for i, serverUrl := range serverUrls {
+			d.Servers = append(d.Servers, &v3.Server{
+				Url:         serverUrl,
+				Description: serverDescriptions[i],
+			})
+		}
+	} else if parameters.Serverdescriptions != "" {
+		return nil, fmt.Errorf("you need to also pass server urls if you pass server descriptions")
 	}
 	d.Info = &v3.Info{
 		Title:       "Definition for following service(s):",
