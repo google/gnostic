@@ -283,9 +283,6 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = file
 	}
 	writer.Write(bytes)
-	if name == "-" || name == "=" {
-		writer.Write([]byte("\n"))
-	}
 }
 
 // The Gnostic structure holds global state information for gnostic.
