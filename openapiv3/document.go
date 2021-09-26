@@ -15,7 +15,7 @@
 package openapi_v3
 
 import (
-	"github.com/googleapis/gnostic/compiler"
+	"github.com/google/gnostic/compiler"
 	"gopkg.in/yaml.v3"
 )
 

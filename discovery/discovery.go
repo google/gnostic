@@ -18,7 +18,7 @@ package discovery_v1
 
 import (
 	"fmt"
-	"github.com/googleapis/gnostic/compiler"
+	"github.com/google/gnostic/compiler"
 	"gopkg.in/yaml.v3"
 	"regexp"
 	"strings"

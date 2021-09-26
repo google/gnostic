@@ -17,7 +17,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/googleapis/gnostic/jsonschema"
+	"github.com/google/gnostic/jsonschema"
 	"os"
 	"path"
 )

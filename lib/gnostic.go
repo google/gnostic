@@ -29,13 +29,13 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/compiler"
-	discovery_v1 "github.com/googleapis/gnostic/discovery"
-	"github.com/googleapis/gnostic/jsonwriter"
-	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
-	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
-	plugins "github.com/googleapis/gnostic/plugins"
-	surface "github.com/googleapis/gnostic/surface"
+	"github.com/google/gnostic/compiler"
+	discovery_v1 "github.com/google/gnostic/discovery"
+	"github.com/google/gnostic/jsonwriter"
+	openapi_v2 "github.com/google/gnostic/openapiv2"
+	openapi_v3 "github.com/google/gnostic/openapiv3"
+	plugins "github.com/google/gnostic/plugins"
+	surface "github.com/google/gnostic/surface"
 	"gopkg.in/yaml.v3"
 )
 

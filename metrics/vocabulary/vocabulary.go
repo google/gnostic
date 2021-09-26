@@ -24,7 +24,7 @@ import (
 	"sort"
 	"strings"
 
-	metrics "github.com/googleapis/gnostic/metrics"
+	metrics "github.com/google/gnostic/metrics"
 	"google.golang.org/protobuf/proto"
 )
 

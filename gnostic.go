@@ -35,7 +35,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/googleapis/gnostic/lib"
+	"github.com/google/gnostic/lib"
 )
 
 func main() {

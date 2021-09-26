@@ -22,7 +22,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/any"
-	extensions "github.com/googleapis/gnostic/extensions"
+	extensions "github.com/google/gnostic/extensions"
 	yaml "gopkg.in/yaml.v3"
 )
 

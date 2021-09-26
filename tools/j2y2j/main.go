@@ -21,7 +21,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/googleapis/gnostic/jsonschema"
+	"github.com/google/gnostic/jsonschema"
 	"gopkg.in/yaml.v3"
 )
 

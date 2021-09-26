@@ -22,7 +22,7 @@ import (
 	"sort"
 	"strings"
 
-	v3 "github.com/googleapis/gnostic/openapiv3"
+	v3 "github.com/google/gnostic/openapiv3"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"

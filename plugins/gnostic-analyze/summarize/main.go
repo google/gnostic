@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
+	"github.com/google/gnostic/plugins/gnostic-analyze/statistics"
 )
 
 // Results are collected in this global slice.

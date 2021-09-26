@@ -23,8 +23,8 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	metrics "github.com/googleapis/gnostic/metrics"
-	vocabulary "github.com/googleapis/gnostic/metrics/vocabulary"
+	metrics "github.com/google/gnostic/metrics"
+	vocabulary "github.com/google/gnostic/metrics/vocabulary"
 )
 
 // openVocabularyFiles uses standard input to create a slice of
