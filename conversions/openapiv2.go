@@ -18,8 +18,8 @@ import (
 	"log"
 	"net/url"
 
-	openapi2 "github.com/google/gnostic/openapiv2"
 	discovery "github.com/google/gnostic/discovery"
+	openapi2 "github.com/google/gnostic/openapiv2"
 )
 
 func addOpenAPI2SchemaForSchema(d *openapi2.Document, name string, schema *discovery.Schema) {

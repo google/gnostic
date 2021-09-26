@@ -16,8 +16,9 @@
 package main
 
 import (
-	"github.com/google/gnostic/apps/protoc-gen-openapi/generator"
 	"google.golang.org/protobuf/compiler/protogen"
+
+	"github.com/google/gnostic/apps/protoc-gen-openapi/generator"
 )
 
 func main() {

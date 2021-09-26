@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/proto"
+
 	discovery_v1 "github.com/google/gnostic/discovery"
 	metrics "github.com/google/gnostic/metrics"
 	vocabulary "github.com/google/gnostic/metrics/vocabulary"

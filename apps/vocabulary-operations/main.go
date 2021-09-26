@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+
 	metrics "github.com/google/gnostic/metrics"
 	vocabulary "github.com/google/gnostic/metrics/vocabulary"
 )

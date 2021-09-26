@@ -22,6 +22,7 @@ package main
 
 import (
 	"github.com/golang/protobuf/proto"
+
 	openapiv2 "github.com/google/gnostic/openapiv2"
 	openapiv3 "github.com/google/gnostic/openapiv3"
 	plugins "github.com/google/gnostic/plugins"

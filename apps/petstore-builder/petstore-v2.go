@@ -252,7 +252,7 @@ func buildDocumentV2() *v2.Document {
 						&v2.NamedSchema{Name: "code", Value: &v2.Schema{
 							Type:   &v2.TypeItem{Value: []string{"integer"}},
 							Format: "int32"}},
-						&v2.NamedSchema{Name: "message", Value: &v2.Schema{Type: &v2.TypeItem{Value:[]string{"string"}}}},
+						&v2.NamedSchema{Name: "message", Value: &v2.Schema{Type: &v2.TypeItem{Value: []string{"string"}}}},
 					},
 				},
 			}})

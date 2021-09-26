@@ -29,6 +29,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"gopkg.in/yaml.v3"
+
 	"github.com/google/gnostic/compiler"
 	discovery_v1 "github.com/google/gnostic/discovery"
 	"github.com/google/gnostic/jsonwriter"
@@ -36,7 +38,6 @@ import (
 	openapi_v3 "github.com/google/gnostic/openapiv3"
 	plugins "github.com/google/gnostic/plugins"
 	surface "github.com/google/gnostic/surface"
-	"gopkg.in/yaml.v3"
 )
 
 // UsageError is a response to invalid command-line inputs

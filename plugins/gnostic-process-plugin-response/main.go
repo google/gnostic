@@ -24,6 +24,7 @@ import (
 	"os"
 
 	"github.com/golang/protobuf/proto"
+
 	plugins "github.com/google/gnostic/plugins"
 )
 

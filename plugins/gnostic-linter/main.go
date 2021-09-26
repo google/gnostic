@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/proto"
+
 	lint "github.com/google/gnostic/metrics/lint"
 	openapiv2 "github.com/google/gnostic/openapiv2"
 	openapiv3 "github.com/google/gnostic/openapiv3"

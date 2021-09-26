@@ -22,11 +22,12 @@ import (
 	"sort"
 	"strings"
 
-	v3 "github.com/google/gnostic/openapiv3"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+
+	v3 "github.com/google/gnostic/openapiv3"
 )
 
 const infoURL = "https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi"
