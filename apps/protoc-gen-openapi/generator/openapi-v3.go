@@ -565,6 +565,12 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 						// DateTimes are serialized as strings
 						fieldSchema.Type = "string"
 						fieldSchema.Format = "date-time"
+					case ".google.protobuf.Struct":
+						// Struct is equivalent to a JSON object
+						fieldSchema.Type = "object"
+					case ".google.protobuf.Empty":
+						// Struct is close to JSON null, so ignore this field
+						continue
 					default:
 						// The field is described by a reference.
 						XRef = g.schemaReferenceForTypeName(typeName)
