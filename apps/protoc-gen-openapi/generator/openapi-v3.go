@@ -439,6 +439,9 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 	if typeName == ".google.protobuf.Empty" {
 		return &v3.MediaTypes{}
 	}
+	if typeName == ".google.protobuf.Struct" {
+		return &v3.MediaTypes{}
+	}
 
 	if typeName == ".google.api.HttpBody" {
 		return &v3.MediaTypes{

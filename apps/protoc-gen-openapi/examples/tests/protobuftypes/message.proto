@@ -24,7 +24,7 @@ import "google/protobuf/empty.proto";
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
 
 service Messaging {
-  rpc UpdateMessage(Message) returns (Message) {
+  rpc UpdateMessage(Message) returns (google.protobuf.Struct) {
     option (google.api.http) = {
       patch : "/v1/messages/{message_id}"
       body : "*"
