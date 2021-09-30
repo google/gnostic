@@ -23,12 +23,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path"
-	"runtime"
 	"strings"
 
-	"github.com/googleapis/gnostic/jsonschema"
+	"golang.org/x/tools/imports"
+
+	"github.com/google/gnostic/jsonschema"
 )
 
 // License is the software license applied to generated code.
@@ -193,19 +193,27 @@ func generateOpenAPIModel(version string) error {
 		"gopkg.in/yaml.v3",
 		"strings",
 		"regexp",
-		"github.com/googleapis/gnostic/compiler",
+		"github.com/google/gnostic/compiler",
 	}
 	// generate the compiler
 	log.Printf("Generating compiler support code")
 	compiler := cc.GenerateCompiler(goPackageName, License, packageImports)
 	goFileName := projectRoot + directoryName + "/" + filename + ".go"
-	err = ioutil.WriteFile(goFileName, []byte(compiler), 0644)
+
+	// format the compiler
+	log.Printf("Formatting compiler support code")
+	imports.LocalPrefix = "github.com/google/gnostic"
+	data, err := imports.Process(goFileName, []byte(compiler), &imports.Options{
+		TabWidth:  8,
+		TabIndent: true,
+		Comments:  true,
+		Fragment:  true,
+	})
 	if err != nil {
 		return err
 	}
-	// format the compiler
-	log.Printf("Formatting compiler support code")
-	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", goFileName).Run()
+
+	return ioutil.WriteFile(goFileName, []byte(data), 0644)
 }
 
 func usage() string {

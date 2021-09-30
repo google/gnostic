@@ -15,7 +15,7 @@
 package statistics
 
 import (
-	openapi "github.com/googleapis/gnostic/openapiv3"
+	openapi "github.com/google/gnostic/openapiv3"
 )
 
 // NewDocumentStatistics builds a new DocumentStatistics object.

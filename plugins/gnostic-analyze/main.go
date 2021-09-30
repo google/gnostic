@@ -30,12 +30,13 @@ import (
 	"path"
 	"strings"
 
-	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
+	"github.com/google/gnostic/plugins/gnostic-analyze/statistics"
 
 	"github.com/golang/protobuf/proto"
-	openapiv2 "github.com/googleapis/gnostic/openapiv2"
-	openapiv3 "github.com/googleapis/gnostic/openapiv3"
-	plugins "github.com/googleapis/gnostic/plugins"
+
+	openapiv2 "github.com/google/gnostic/openapiv2"
+	openapiv3 "github.com/google/gnostic/openapiv3"
+	plugins "github.com/google/gnostic/plugins"
 )
 
 // Record an error, then serialize and return a response.

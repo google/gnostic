@@ -29,7 +29,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/googleapis/gnostic/jsonschema"
+	"github.com/google/gnostic/jsonschema"
 )
 
 // convert the first character of a string to lower case
@@ -302,7 +302,6 @@ func (m *SchemaModel) objectWithID(id string) *SchemaObject {
 
 // NewSchemaModel returns a new SchemaModel.
 func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
-
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -314,7 +313,7 @@ func NewSchemaModel(filename string) (schemaModel *SchemaModel, err error) {
 
 	// read object names and their details
 	specification := document.Children[4] // fragile! the section title is "Specification"
-	schema := specification.Children[7]   // fragile! the section title is "Schema"
+	schema := specification.Children[8]   // fragile! the section title is "Schema"
 	anchor := regexp.MustCompile("^#### <a name=\"(.*)Object\"")
 	schemaObjects := make([]SchemaObject, 0)
 	for _, section := range schema.Children {
@@ -842,11 +841,11 @@ func main() {
 	if contactObject != nil {
 		emailProperty := contactObject.PropertyWithName("email")
 		if emailProperty != nil {
-			emailProperty.Format = stringptr("email");
+			emailProperty.Format = stringptr("email")
 		}
 		urlProperty := contactObject.PropertyWithName("url")
 		if urlProperty != nil {
-			urlProperty.Format = stringptr("uri");
+			urlProperty.Format = stringptr("uri")
 		}
 	}
 
