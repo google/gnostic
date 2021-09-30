@@ -15,7 +15,7 @@
 package vocabulary
 
 import (
-	metrics "github.com/googleapis/gnostic/metrics"
+	metrics "github.com/google/gnostic/metrics"
 )
 
 // FilterCommon implements the difference operation amongst a slice of Vocabularies.

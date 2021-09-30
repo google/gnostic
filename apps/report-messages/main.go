@@ -22,9 +22,10 @@ import (
 	"os"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/printer"
 
-	plugins "github.com/googleapis/gnostic/plugins"
+	"github.com/google/gnostic/printer"
+
+	plugins "github.com/google/gnostic/plugins"
 )
 
 func readMessagesFromFileWithName(filename string) *plugins.Messages {
@@ -43,13 +44,13 @@ func readMessagesFromFileWithName(filename string) *plugins.Messages {
 
 func printMessages(code *printer.Code, messages *plugins.Messages) {
 	for _, message := range messages.Messages {
-		line := fmt.Sprintf("%-7s %-14s %s %+v", 
-				message.Level,
-				message.Code,
-				message.Text,
-				message.Keys)
+		line := fmt.Sprintf("%-7s %-14s %s %+v",
+			message.Level,
+			message.Code,
+			message.Text,
+			message.Keys)
 		code.Print(line)
-        }
+	}
 }
 
 func main() {

@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"os"
 
-	rules "github.com/googleapis/gnostic/metrics/rules"
-	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
+	rules "github.com/google/gnostic/metrics/rules"
+	openapi_v3 "github.com/google/gnostic/openapiv3"
 )
 
 // processParametersV2 loops over the parameters of component and creates a
