@@ -345,11 +345,24 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 				},
 			}
 		} else if bodyFieldMessageTypeName != "" {
-			requestSchema = &v3.SchemaOrReference{
-				Oneof: &v3.SchemaOrReference_Reference{
-					Reference: &v3.Reference{
-						XRef: g.schemaReferenceForTypeName(bodyFieldMessageTypeName),
-					}},
+			switch bodyFieldMessageTypeName {
+			case ".google.protobuf.Empty":
+				fallthrough
+			case ".google.protobuf.Struct":
+				requestSchema = &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{
+							Type: "object",
+						},
+					},
+				}
+			default:
+				requestSchema = &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Reference{
+						Reference: &v3.Reference{
+							XRef: g.schemaReferenceForTypeName(bodyFieldMessageTypeName),
+						}},
+				}
 			}
 		}
 		op.RequestBody = &v3.RequestBodyOrReference{
@@ -519,9 +532,28 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 				fieldSchema.Type = "array"
 				switch field.Desc.Kind() {
 				case protoreflect.MessageKind:
-					fieldSchema.Items = itemsItemForReference(
-						g.schemaReferenceForTypeName(
-							fullMessageTypeName(field.Message)))
+					typeName := fullMessageTypeName(field.Message)
+					switch typeName {
+					case ".google.protobuf.Timestamp":
+						// Timestamps are serialized as strings
+						fieldSchema.Items = itemsItemForTypeName("string")
+					case ".google.type.Date":
+						// Dates are serialized as strings
+						fieldSchema.Items = itemsItemForTypeName("string")
+					case ".google.type.DateTime":
+						// DateTimes are serialized as strings
+						fieldSchema.Items = itemsItemForTypeName("string")
+					case ".google.protobuf.Struct":
+						// Struct is equivalent to a JSON object
+						fieldSchema.Items = itemsItemForTypeName("object")
+					case ".google.protobuf.Empty":
+						// Struct is close to JSON null, so ignore this field
+						continue
+					default:
+						// The field is described by a reference.
+						fieldSchema.Items = itemsItemForReference(
+							g.schemaReferenceForTypeName(typeName))
+					}
 				case protoreflect.StringKind:
 					fieldSchema.Items = itemsItemForTypeName("string")
 				case protoreflect.Int32Kind,

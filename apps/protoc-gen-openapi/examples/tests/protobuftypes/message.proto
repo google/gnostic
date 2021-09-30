@@ -24,15 +24,27 @@ import "google/protobuf/empty.proto";
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
 
 service Messaging {
+  rpc CreateMessage(Message) returns (Message) {
+    option (google.api.http) = {
+      post : "/v1/messages/{message_id}"
+      body : "*"
+    };
+  }
+  rpc GetMessage(Message) returns (Message) {
+    option (google.api.http) = {
+      get : "/v1/messages/{message_id}"
+    };
+  }
   rpc UpdateMessage(Message) returns (google.protobuf.Struct) {
     option (google.api.http) = {
       patch : "/v1/messages/{message_id}"
-      body : "*"
+      body : "body"
     };
   }
 }
 message Message {
   string message_id = 1;
-  google.protobuf.Struct media = 2;
-  google.protobuf.Empty no_such_value = 3;
+  google.protobuf.Struct body = 2;
+  repeated google.protobuf.Struct media = 3;
+  google.protobuf.Empty no_such_value = 4;
 }
