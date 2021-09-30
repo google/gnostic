@@ -26,9 +26,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/googleapis/gnostic/compiler"
-	"github.com/googleapis/gnostic/jsonschema"
-	"github.com/googleapis/gnostic/printer"
+	"github.com/google/gnostic/compiler"
+	"github.com/google/gnostic/jsonschema"
+	"github.com/google/gnostic/printer"
 )
 
 var protoOptionsForExtensions = []ProtoOption{
@@ -272,7 +272,7 @@ func generateExtension(schemaFile string, outDir string) error {
 		"fmt",
 		"regexp",
 		"strings",
-		"github.com/googleapis/gnostic/compiler",
+		"github.com/google/gnostic/compiler",
 		"gopkg.in/yaml.v3",
 	})
 	goFilename := path.Join(protoOutDirectory, outFileBaseName+".go")
@@ -287,7 +287,7 @@ func generateExtension(schemaFile string, outDir string) error {
 	// TODO: This path is currently fixed to the location of the samples.
 	//       Can we make it relative, perhaps with an option or by generating
 	//       a go.mod file for the generated extension handler?
-	outDirRelativeToPackageRoot := "github.com/googleapis/gnostic/extensions/sample/" + outDir
+	outDirRelativeToPackageRoot := "github.com/google/gnostic/extensions/sample/" + outDir
 
 	var extensionNameKeys []string
 	for k := range extensionNameToMessageName {
@@ -315,8 +315,8 @@ func generateExtension(schemaFile string, outDir string) error {
 	extMainCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
 	imports := []string{
 		"github.com/golang/protobuf/proto",
-		"github.com/googleapis/gnostic/extensions",
-		"github.com/googleapis/gnostic/compiler",
+		"github.com/google/gnostic/extensions",
+		"github.com/google/gnostic/compiler",
 		"gopkg.in/yaml.v3",
 		outDirRelativeToPackageRoot + "/" + "proto",
 	}

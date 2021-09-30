@@ -21,10 +21,11 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	openapiv2 "github.com/googleapis/gnostic/openapiv2"
-	openapiv3 "github.com/googleapis/gnostic/openapiv3"
-	plugins "github.com/googleapis/gnostic/plugins"
-	surface "github.com/googleapis/gnostic/surface"
+
+	openapiv2 "github.com/google/gnostic/openapiv2"
+	openapiv3 "github.com/google/gnostic/openapiv3"
+	plugins "github.com/google/gnostic/plugins"
+	surface "github.com/google/gnostic/surface"
 )
 
 func main() {

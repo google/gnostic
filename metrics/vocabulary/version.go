@@ -15,7 +15,7 @@
 package vocabulary
 
 import (
-	metrics "github.com/googleapis/gnostic/metrics"
+	metrics "github.com/google/gnostic/metrics"
 )
 
 // fillVersionProto takes a newer and older version of a vocabularies and utilizes the

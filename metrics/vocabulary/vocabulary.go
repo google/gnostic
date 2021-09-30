@@ -24,8 +24,9 @@ import (
 	"sort"
 	"strings"
 
-	metrics "github.com/googleapis/gnostic/metrics"
 	"google.golang.org/protobuf/proto"
+
+	metrics "github.com/google/gnostic/metrics"
 )
 
 type Vocabulary struct {
