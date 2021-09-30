@@ -82,3 +82,24 @@ func TestMapFieldsOpenAPI(t *testing.T) {
 	// if the test succeeded, clean up
 	os.Remove("openapi.yaml")
 }
+
+func TestPathParamsOpenAPI(t *testing.T) {
+	var err error
+	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
+	err = exec.Command("protoc",
+		"-I", "../../",
+		"-I", "../../third_party",
+		"-I", "examples",
+		"examples/tests/pathparams/message.proto",
+		"--openapi_out=.").Run()
+	if err != nil {
+		t.Fatalf("protoc failed: %+v", err)
+	}
+	// Verify that the generated spec matches our expected version.
+	err = exec.Command("diff", "openapi.yaml", "examples/tests/pathparams/openapi.yaml").Run()
+	if err != nil {
+		t.Fatalf("Diff failed: %+v", err)
+	}
+	// if the test succeeded, clean up
+	os.Remove("openapi.yaml")
+}

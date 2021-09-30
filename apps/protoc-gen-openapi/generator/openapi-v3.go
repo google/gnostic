@@ -38,7 +38,8 @@ type OpenAPIv3Generator struct {
 	requiredSchemas   []string // Names of schemas that need to be generated.
 	generatedSchemas  []string // Names of schemas that have already been generated.
 	linterRulePattern *regexp.Regexp
-	namePattern       *regexp.Regexp
+	pathPattern       *regexp.Regexp
+	namedPathPattern  *regexp.Regexp
 }
 
 // NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
@@ -48,7 +49,8 @@ func NewOpenAPIv3Generator(plugin *protogen.Plugin) *OpenAPIv3Generator {
 		requiredSchemas:   make([]string, 0),
 		generatedSchemas:  make([]string, 0),
 		linterRulePattern: regexp.MustCompile(`\(-- .* --\)`),
-		namePattern:       regexp.MustCompile("{(.*)=(.*)}"),
+		pathPattern:       regexp.MustCompile("{([^=}]+)}"),
+		namedPathPattern:  regexp.MustCompile("{(.+)=(.+)}"),
 	}
 }
 
@@ -183,9 +185,43 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	}
 	// Initialize the list of operation parameters.
 	parameters := []*v3.ParameterOrReference{}
+
 	// Build a list of path parameters.
 	pathParameters := make([]string, 0)
-	if matches := g.namePattern.FindStringSubmatch(path); matches != nil {
+	// Find simple path parameters like {id}
+	if allMatches := g.pathPattern.FindAllStringSubmatch(path, -1); allMatches != nil {
+		for _, matches := range allMatches {
+			// Add the value to the list of covered parameters.
+			coveredParameters = append(coveredParameters, matches[1])
+			pathParameters = append(pathParameters, matches[1])
+		}
+	}
+
+	// Add the path parameters to the operation parameters.
+	for _, pathParameter := range pathParameters {
+		parameters = append(parameters,
+			&v3.ParameterOrReference{
+				Oneof: &v3.ParameterOrReference_Parameter{
+					Parameter: &v3.Parameter{
+						Name:     pathParameter,
+						In:       "path",
+						Required: true,
+						Schema: &v3.SchemaOrReference{
+							Oneof: &v3.SchemaOrReference_Schema{
+								Schema: &v3.Schema{
+									Type: "string",
+								},
+							},
+						},
+					},
+				},
+			})
+	}
+
+	// Build a list of named path parameters.
+	namedPathParameters := make([]string, 0)
+	// Find named path parameters like {name=shelves/*}
+	if matches := g.namedPathPattern.FindStringSubmatch(path); matches != nil {
 		// Add the "name=" "name" value to the list of covered parameters.
 		coveredParameters = append(coveredParameters, matches[1])
 		// Convert the path from the starred form to use named path parameters.
@@ -197,22 +233,23 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			section := parts[i]
 			parameter := singular(section)
 			parts[i+1] = "{" + parameter + "}"
-			pathParameters = append(pathParameters, parameter)
+			namedPathParameters = append(namedPathParameters, parameter)
 		}
 		// Rewrite the path to use the path parameters.
 		newPath := strings.Join(parts, "/")
 		path = strings.Replace(path, matches[0], newPath, 1)
 	}
-	// Add the path parameters to the operation parameters.
-	for _, pathParameter := range pathParameters {
+
+	// Add the named path parameters to the operation parameters.
+	for _, namedPathParameter := range namedPathParameters {
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
 				Oneof: &v3.ParameterOrReference_Parameter{
 					Parameter: &v3.Parameter{
-						Name:        pathParameter,
+						Name:        namedPathParameter,
 						In:          "path",
 						Required:    true,
-						Description: "The " + pathParameter + " id.",
+						Description: "The " + namedPathParameter + " id.",
 						Schema: &v3.SchemaOrReference{
 							Oneof: &v3.SchemaOrReference_Schema{
 								Schema: &v3.Schema{
