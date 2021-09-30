@@ -15,7 +15,7 @@
 package discovery_v1
 
 import (
-	"github.com/googleapis/gnostic/compiler"
+	"github.com/google/gnostic/compiler"
 )
 
 // FetchDocumentBytes downloads the bytes of a discovery document from a URL.
