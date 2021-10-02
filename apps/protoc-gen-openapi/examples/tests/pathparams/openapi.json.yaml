@@ -4,26 +4,18 @@
 openapi: 3.0.3
 info:
     title: Messaging
-    version: 0.0.1
+    version: 1.2.3
 paths:
-    /v1/messages/{message_id}:
+    /v1/messages/{messageId}:
         get:
             operationId: Messaging_GetMessage
             parameters:
-                - name: message_id
+                - name: messageId
                   in: path
                   required: true
                   schema:
                     type: string
-                - name: body
-                  in: query
-                  schema:
-                    type: string
-                - name: media
-                  in: query
-                  schema:
-                    type: string
-                - name: not_used
+                - name: userId
                   in: query
                   schema:
                     type: string
@@ -33,11 +25,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Message'
+                                $ref: '#/components/schemas/message'
         post:
             operationId: Messaging_CreateMessage
             parameters:
-                - name: message_id
+                - name: messageId
                   in: path
                   required: true
                   schema:
@@ -46,7 +38,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Message'
+                            $ref: '#/components/schemas/message'
                 required: true
             responses:
                 "200":
@@ -54,42 +46,35 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Message'
-        patch:
-            operationId: Messaging_UpdateMessage
+                                $ref: '#/components/schemas/message'
+    /v1/users/{userId}/messages/{messageId}:
+        get:
+            operationId: Messaging_GetUserMessage
             parameters:
-                - name: message_id
+                - name: userId
                   in: path
                   required: true
                   schema:
                     type: string
-                - name: media
-                  in: query
+                - name: messageId
+                  in: path
+                  required: true
                   schema:
                     type: string
-                - name: not_used
-                  in: query
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                required: true
             responses:
                 "200":
                     description: OK
-                    content: {}
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/message'
 components:
     schemas:
-        Message:
+        message:
             properties:
-                message_id:
+                messageId:
                     type: string
-                body:
-                    type: object
-                media:
-                    type: array
-                    items:
-                        type: object
+                userId:
+                    type: string
+                content:
+                    type: string

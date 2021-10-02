@@ -4,49 +4,27 @@
 openapi: 3.0.3
 info:
     title: Messaging
-    version: 0.0.1
+    description: Messaging service
+    version: 1.2.3
 paths:
-    /v1/messages/{message_id}:
-        get:
-            operationId: Messaging_GetMessage
-            parameters:
-                - name: message_id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: body
-                  in: query
-                  schema:
-                    type: string
-                - name: media
-                  in: query
-                  schema:
-                    type: string
-                - name: not_used
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Message'
+    /v1/messages/{messageId}:
         post:
             operationId: Messaging_CreateMessage
             parameters:
-                - name: message_id
+                - name: messageId
                   in: path
                   required: true
+                  schema:
+                    type: string
+                - name: notUsed
+                  in: query
                   schema:
                     type: string
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Message'
+                            type: string
                 required: true
             responses:
                 "200":
@@ -54,7 +32,8 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Message'
+                                $ref: '#/components/schemas/message'
+    /v1/messages/{message_id}:
         patch:
             operationId: Messaging_UpdateMessage
             parameters:
@@ -63,10 +42,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: media
-                  in: query
-                  schema:
-                    type: string
                 - name: not_used
                   in: query
                   schema:
@@ -75,21 +50,30 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
+                            type: string
                 required: true
             responses:
                 "200":
                     description: OK
-                    content: {}
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/message2'
 components:
     schemas:
-        Message:
+        message:
+            properties:
+                messageId:
+                    type: string
+                bodyText:
+                    type: string
+                notUsed:
+                    type: string
+        message2:
             properties:
                 message_id:
                     type: string
-                body:
-                    type: object
-                media:
-                    type: array
-                    items:
-                        type: object
+                body_text:
+                    type: string
+                not_used:
+                    type: string

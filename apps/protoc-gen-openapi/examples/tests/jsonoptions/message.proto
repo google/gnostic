@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC.
+// Copyright 2020 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,36 +15,34 @@
 
 syntax = "proto3";
 
-package tests.protobuftypes.message.v1;
+package tests.jsonnames.message.v1;
 
 import "google/api/annotations.proto";
-import "google/protobuf/struct.proto";
-import "google/protobuf/empty.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
+option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/jsonnames/message/v1;message";
 
+// Messaging service
 service Messaging {
   rpc CreateMessage(Message) returns (Message) {
     option (google.api.http) = {
       post : "/v1/messages/{message_id}"
-      body : "*"
+      body : "body_text"
     };
   }
-  rpc GetMessage(Message) returns (Message) {
-    option (google.api.http) = {
-      get : "/v1/messages/{message_id}"
-    };
-  }
-  rpc UpdateMessage(Message) returns (google.protobuf.Struct) {
+  rpc UpdateMessage(Message2) returns (Message2) {
     option (google.api.http) = {
       patch : "/v1/messages/{message_id}"
-      body : "body"
+      body : "body_text"
     };
   }
 }
 message Message {
   string message_id = 1;
-  google.protobuf.Struct body = 2;
-  repeated google.protobuf.Struct media = 3;
-  google.protobuf.Empty not_used = 4;
+  string body_text = 2;
+  string not_used = 3;
+}
+message Message2 {
+  string message_id = 1 [ json_name = "message_id" ];
+  string body_text = 2 [ json_name = "body_text" ];
+  string not_used = 3 [ json_name = "not_used" ];
 }

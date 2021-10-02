@@ -34,7 +34,9 @@ const infoURL = "https://github.com/googleapis/gnostic/tree/master/apps/protoc-g
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
-	plugin *protogen.Plugin
+	plugin     *protogen.Plugin
+	apiVersion *string
+	jsonNames  *bool
 
 	requiredSchemas   []string // Names of schemas that need to be generated.
 	generatedSchemas  []string // Names of schemas that have already been generated.
@@ -44,9 +46,12 @@ type OpenAPIv3Generator struct {
 }
 
 // NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
-func NewOpenAPIv3Generator(plugin *protogen.Plugin) *OpenAPIv3Generator {
+func NewOpenAPIv3Generator(plugin *protogen.Plugin, version *string, jsonNames *bool) *OpenAPIv3Generator {
 	return &OpenAPIv3Generator{
-		plugin:            plugin,
+		plugin:     plugin,
+		apiVersion: version,
+		jsonNames:  jsonNames,
+
 		requiredSchemas:   make([]string, 0),
 		generatedSchemas:  make([]string, 0),
 		linterRulePattern: regexp.MustCompile(`\(-- .* --\)`),
@@ -73,7 +78,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	d.Openapi = "3.0.3"
 	d.Info = &v3.Info{
 		Title:       "",
-		Version:     "0.0.1",
+		Version:     *g.apiVersion,
 		Description: "",
 	}
 	d.Paths = &v3.Paths{}
@@ -169,6 +174,53 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 	}
 }
 
+func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
+	if !*g.jsonNames {
+		return name
+	}
+
+	if len(name) > 1 {
+		return strings.ToLower(name[0:1]) + name[1:]
+	}
+
+	if len(name) == 1 {
+		return strings.ToLower(name)
+	}
+
+	return name
+}
+
+func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
+	if !*g.jsonNames {
+		return string(message.Desc.Name())
+	}
+
+	name := string(message.Desc.Name())
+	if len(name) > 0 {
+		return strings.ToLower(name[0:1]) + name[1:]
+	}
+
+	return name
+}
+
+func (g *OpenAPIv3Generator) formatFieldName(field *protogen.Field) string {
+	if !*g.jsonNames {
+		return string(field.Desc.Name())
+	}
+
+	return field.Desc.JSONName()
+}
+
+func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *protogen.Message) string {
+	for _, field := range inMessage.Fields {
+		if string(field.Desc.Name()) == name {
+			return g.formatFieldName(field)
+		}
+	}
+
+	return name
+}
+
 // buildOperationV3 constructs an operation for a set of values.
 func (g *OpenAPIv3Generator) buildOperationV3(
 	file *protogen.File,
@@ -194,7 +246,9 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		for _, matches := range allMatches {
 			// Add the value to the list of covered parameters.
 			coveredParameters = append(coveredParameters, matches[1])
-			pathParameters = append(pathParameters, matches[1])
+			pathParameter := g.findAndFormatFieldName(matches[1], inputMessage)
+			path = strings.Replace(path, matches[1], pathParameter, 1)
+			pathParameters = append(pathParameters, pathParameter)
 		}
 	}
 
@@ -229,12 +283,13 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		starredPath := matches[2]
 		parts := strings.Split(starredPath, "/")
 		// The starred path is assumed to be in the form "things/*/otherthings/*".
-		// We want to convert it to "things/{thing}/otherthings/{otherthing}".
+		// We want to convert it to "things/{thingsId}/otherthings/{otherthingsId}".
 		for i := 0; i < len(parts)-1; i += 2 {
 			section := parts[i]
-			parameter := singular(section)
-			parts[i+1] = "{" + parameter + "}"
-			namedPathParameters = append(namedPathParameters, parameter)
+			namedPathParameter := g.findAndFormatFieldName(section, inputMessage)
+			namedPathParameter = singular(namedPathParameter)
+			parts[i+1] = "{" + namedPathParameter + "}"
+			namedPathParameters = append(namedPathParameters, namedPathParameter)
 		}
 		// Rewrite the path to use the path parameters.
 		newPath := strings.Join(parts, "/")
@@ -267,13 +322,14 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		for _, field := range inputMessage.Fields {
 			fieldName := string(field.Desc.Name())
 			if !contains(coveredParameters, fieldName) {
+				bodyFieldName := g.formatFieldName(field)
 				// Get the field description from the comments.
 				fieldDescription := g.filterCommentString(field.Comments.Leading)
 				parameters = append(parameters,
 					&v3.ParameterOrReference{
 						Oneof: &v3.ParameterOrReference_Parameter{
 							Parameter: &v3.Parameter{
-								Name:        fieldName,
+								Name:        bodyFieldName,
 								In:          "query",
 								Description: fieldDescription,
 								Required:    false,
@@ -293,7 +349,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Create the response.
 	responses := &v3.Responses{
 		ResponseOrReference: []*v3.NamedResponseOrReference{
-			&v3.NamedResponseOrReference{
+			{
 				Name: "200",
 				Value: &v3.ResponseOrReference{
 					Oneof: &v3.ResponseOrReference_Response{
@@ -372,7 +428,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					Required: true,
 					Content: &v3.MediaTypes{
 						AdditionalProperties: []*v3.NamedMediaType{
-							&v3.NamedMediaType{
+							{
 								Name: "application/json",
 								Value: &v3.MediaType{
 									Schema: requestSchema,
@@ -423,12 +479,12 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 	}
 	parts := strings.Split(typeName, ".")
 	lastPart := parts[len(parts)-1]
-	return "#/components/schemas/" + lastPart
+	return "#/components/schemas/" + g.formatMessageRef(lastPart)
 }
 
 // itemsItemForTypeName is a helper constructor.
 func itemsItemForTypeName(typeName string) *v3.ItemsItem {
-	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{&v3.SchemaOrReference{
+	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{{
 		Oneof: &v3.SchemaOrReference_Schema{
 			Schema: &v3.Schema{
 				Type: typeName}}}}}
@@ -436,7 +492,7 @@ func itemsItemForTypeName(typeName string) *v3.ItemsItem {
 
 // itemsItemForReference is a helper constructor.
 func itemsItemForReference(xref string) *v3.ItemsItem {
-	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{&v3.SchemaOrReference{
+	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{{
 		Oneof: &v3.SchemaOrReference_Reference{
 			Reference: &v3.Reference{
 				XRef: xref}}}}}
@@ -460,7 +516,7 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 	if typeName == ".google.api.HttpBody" {
 		return &v3.MediaTypes{
 			AdditionalProperties: []*v3.NamedMediaType{
-				&v3.NamedMediaType{
+				{
 					Name:  "application/octet-stream",
 					Value: &v3.MediaType{},
 				},
@@ -470,7 +526,7 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 
 	return &v3.MediaTypes{
 		AdditionalProperties: []*v3.NamedMediaType{
-			&v3.NamedMediaType{
+			{
 				Name: "application/json",
 				Value: &v3.MediaType{
 					Schema: &v3.SchemaOrReference{
@@ -659,7 +715,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 			definitionProperties.AdditionalProperties = append(
 				definitionProperties.AdditionalProperties,
 				&v3.NamedSchemaOrReference{
-					Name:  string(field.Desc.Name()),
+					Name:  g.formatFieldName(field),
 					Value: value,
 				},
 			)
@@ -667,7 +723,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 		// Add the schema to the components.schema list.
 		d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
 			&v3.NamedSchemaOrReference{
-				Name: string(message.Desc.Name()),
+				Name: g.formatMessageName(message),
 				Value: &v3.SchemaOrReference{
 					Oneof: &v3.SchemaOrReference_Schema{
 						Schema: &v3.Schema{

@@ -16,13 +16,23 @@
 package main
 
 import (
-	"google.golang.org/protobuf/compiler/protogen"
+	"flag"
 
 	"github.com/google/gnostic/apps/protoc-gen-openapi/generator"
+	"google.golang.org/protobuf/compiler/protogen"
 )
 
+var flags flag.FlagSet
+
 func main() {
-	protogen.Options{}.Run(func(plugin *protogen.Plugin) error {
-		return generator.NewOpenAPIv3Generator(plugin).Run()
+	version := flags.String("version", "0.0.1", "version number text, e.g. 1.2.3")
+	jsonNames := flags.Bool("json", false, "use JSON naming convention (camelCase)")
+
+	opts := protogen.Options{
+		ParamFunc: flags.Set,
+	}
+
+	opts.Run(func(plugin *protogen.Plugin) error {
+		return generator.NewOpenAPIv3Generator(plugin, version, jsonNames).Run()
 	})
 }

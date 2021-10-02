@@ -1,0 +1,38 @@
+# Generated with protoc-gen-openapi
+# https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Messaging
+    version: 1.2.3
+paths:
+    /v1/messages/{messageId}:
+        patch:
+            operationId: Messaging_UpdateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/message'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/message'
+components:
+    schemas:
+        message:
+            properties:
+                messageId:
+                    type: string
+                labels:
+                    type: object
