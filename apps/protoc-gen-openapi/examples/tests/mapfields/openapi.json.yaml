@@ -3,11 +3,13 @@
 
 openapi: 3.0.3
 info:
-    title: Messaging
+    title: Messaging API
     version: 1.2.3
 paths:
     /v1/messages/{messageId}:
         patch:
+            tags:
+                - Messaging
             operationId: Messaging_UpdateMessage
             parameters:
                 - name: messageId
@@ -36,3 +38,5 @@ components:
                     type: string
                 labels:
                     type: object
+tags:
+    - name: Messaging

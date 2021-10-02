@@ -3,11 +3,13 @@
 
 openapi: 3.0.3
 info:
-    title: Messaging
+    title: Messaging API
     version: 1.2.3
 paths:
     /v1/messages/{messageId}:
         get:
+            tags:
+                - Messaging
             operationId: Messaging_GetMessage
             parameters:
                 - name: messageId
@@ -35,6 +37,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/message'
         post:
+            tags:
+                - Messaging
             operationId: Messaging_CreateMessage
             parameters:
                 - name: messageId
@@ -56,6 +60,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/message'
         patch:
+            tags:
+                - Messaging
             operationId: Messaging_UpdateMessage
             parameters:
                 - name: messageId
@@ -93,3 +99,5 @@ components:
                     type: array
                     items:
                         type: object
+tags:
+    - name: Messaging

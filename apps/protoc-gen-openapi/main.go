@@ -25,14 +25,18 @@ import (
 var flags flag.FlagSet
 
 func main() {
-	version := flags.String("version", "0.0.1", "version number text, e.g. 1.2.3")
-	jsonNames := flags.Bool("json", false, "use JSON naming convention (camelCase)")
+	conf := generator.Configuration{
+		Version:     flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
+		Title:       flags.String("title", "", "name of the API"),
+		Description: flags.String("description", "", "description of the API"),
+		JSONNames:   flags.Bool("json", false, "use JSON naming convention (camelCase)"),
+	}
 
 	opts := protogen.Options{
 		ParamFunc: flags.Set,
 	}
 
 	opts.Run(func(plugin *protogen.Plugin) error {
-		return generator.NewOpenAPIv3Generator(plugin, version, jsonNames).Run()
+		return generator.NewOpenAPIv3Generator(plugin, conf).Run()
 	})
 }

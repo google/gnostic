@@ -30,14 +30,21 @@ import (
 	v3 "github.com/google/gnostic/openapiv3"
 )
 
+type Configuration struct {
+	Version     *string
+	Title       *string
+	Description *string
+	JSONNames   *bool
+}
+
 const infoURL = "https://github.com/googleapis/gnostic/tree/master/apps/protoc-gen-openapi"
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
-	plugin     *protogen.Plugin
-	apiVersion *string
-	jsonNames  *bool
+	conf   Configuration
+	plugin *protogen.Plugin
 
+	singleService     bool     // 1 file with 1 service
 	requiredSchemas   []string // Names of schemas that need to be generated.
 	generatedSchemas  []string // Names of schemas that have already been generated.
 	linterRulePattern *regexp.Regexp
@@ -46,11 +53,10 @@ type OpenAPIv3Generator struct {
 }
 
 // NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
-func NewOpenAPIv3Generator(plugin *protogen.Plugin, version *string, jsonNames *bool) *OpenAPIv3Generator {
+func NewOpenAPIv3Generator(plugin *protogen.Plugin, conf Configuration) *OpenAPIv3Generator {
 	return &OpenAPIv3Generator{
-		plugin:     plugin,
-		apiVersion: version,
-		jsonNames:  jsonNames,
+		conf:   conf,
+		plugin: plugin,
 
 		requiredSchemas:   make([]string, 0),
 		generatedSchemas:  make([]string, 0),
@@ -75,21 +81,39 @@ func (g *OpenAPIv3Generator) Run() error {
 // buildDocumentV3 builds an OpenAPIv3 document for a plugin request.
 func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	d := &v3.Document{}
+
 	d.Openapi = "3.0.3"
 	d.Info = &v3.Info{
-		Title:       "",
-		Version:     *g.apiVersion,
-		Description: "",
+		Version:     *g.conf.Version,
+		Title:       *g.conf.Title,
+		Description: *g.conf.Description,
 	}
+
 	d.Paths = &v3.Paths{}
 	d.Components = &v3.Components{
 		Schemas: &v3.SchemasOrReferences{
 			AdditionalProperties: []*v3.NamedSchemaOrReference{},
 		},
 	}
+
 	for _, file := range g.plugin.Files {
-		g.addPathsToDocumentV3(d, file)
+		if file.Generate {
+			g.addPathsToDocumentV3(d, file)
+		}
 	}
+
+	// If there is only 1 service, then use it's title for the document,
+	//  if the document is missing it.
+	if len(d.Tags) == 1 {
+		if d.Info.Title == "" && d.Tags[0].Name != "" {
+			d.Info.Title = d.Tags[0].Name + " API"
+		}
+		if d.Info.Description == "" {
+			d.Info.Description = d.Tags[0].Description
+		}
+		d.Tags[0].Description = ""
+	}
+
 	for len(g.requiredSchemas) > 0 {
 		count := len(g.requiredSchemas)
 		for _, file := range g.plugin.Files {
@@ -117,9 +141,11 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 }
 
 // filterCommentString removes line breaks and linter rules from comments.
-func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
+func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewLines bool) string {
 	comment := string(c)
-	comment = strings.Replace(comment, "\n", "", -1)
+	if removeNewLines {
+		comment = strings.Replace(comment, "\n", "", -1)
+	}
 	comment = g.linterRulePattern.ReplaceAllString(comment, "")
 	return strings.TrimSpace(comment)
 }
@@ -127,11 +153,11 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
 func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
 	for _, service := range file.Services {
-		comment := g.filterCommentString(service.Comments.Leading)
-		d.Info.Title = service.GoName
-		d.Info.Description = comment
+		comment := g.filterCommentString(service.Comments.Leading, false)
+		d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+
 		for _, method := range service.Methods {
-			comment := g.filterCommentString(method.Comments.Leading)
+			comment := g.filterCommentString(method.Comments.Leading, false)
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
@@ -167,7 +193,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			}
 			if methodName != "" {
 				op, path2 := g.buildOperationV3(
-					file, operationID, comment, path, body, inputMessage, outputMessage)
+					file, operationID, service.GoName, comment, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
@@ -175,7 +201,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 }
 
 func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
-	if !*g.jsonNames {
+	if !*g.conf.JSONNames {
 		return name
 	}
 
@@ -191,7 +217,7 @@ func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
 }
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-	if !*g.jsonNames {
+	if !*g.conf.JSONNames {
 		return string(message.Desc.Name())
 	}
 
@@ -204,7 +230,7 @@ func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string
 }
 
 func (g *OpenAPIv3Generator) formatFieldName(field *protogen.Field) string {
-	if !*g.jsonNames {
+	if !*g.conf.JSONNames {
 		return string(field.Desc.Name())
 	}
 
@@ -225,6 +251,7 @@ func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *prot
 func (g *OpenAPIv3Generator) buildOperationV3(
 	file *protogen.File,
 	operationID string,
+	tagName string,
 	description string,
 	path string,
 	bodyField string,
@@ -324,7 +351,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			if !contains(coveredParameters, fieldName) {
 				bodyFieldName := g.formatFieldName(field)
 				// Get the field description from the comments.
-				fieldDescription := g.filterCommentString(field.Comments.Leading)
+				fieldDescription := g.filterCommentString(field.Comments.Leading, true)
 				parameters = append(parameters,
 					&v3.ParameterOrReference{
 						Oneof: &v3.ParameterOrReference_Parameter{
@@ -364,7 +391,8 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	}
 	// Create the operation.
 	op := &v3.Operation{
-		Summary:     description,
+		Tags:        []string{tagName},
+		Description: description,
 		OperationId: operationID,
 		Parameters:  parameters,
 		Responses:   responses,
@@ -554,7 +582,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 		}
 		g.generatedSchemas = append(g.generatedSchemas, typeName)
 		// Get the message description from the comments.
-		messageDescription := g.filterCommentString(message.Comments.Leading)
+		messageDescription := g.filterCommentString(message.Comments.Leading, true)
 		// Build an array holding the fields of the message.
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
@@ -576,7 +604,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 				}
 			}
 			// Get the field description from the comments.
-			fieldDescription := g.filterCommentString(field.Comments.Leading)
+			fieldDescription := g.filterCommentString(field.Comments.Leading, true)
 			// The field is either described by a reference or a schema.
 			XRef := ""
 			fieldSchema := &v3.Schema{

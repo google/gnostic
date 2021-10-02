@@ -3,13 +3,26 @@
 
 openapi: 3.0.3
 info:
-    title: LibraryService
-    description: 'This API represents a simple digital library.  It lets you manage Shelf resources and Book resources in the library. It defines the following resource model: - The API has a collection of [Shelf][google.example.library.v1.Shelf]   resources, named `shelves/*` - Each Shelf has a collection of [Book][google.example.library.v1.Book]   resources, named `shelves/*/books/*`'
+    title: LibraryService API
+    description: |-
+        This API represents a simple digital library.  It lets you manage Shelf
+         resources and Book resources in the library. It defines the following
+         resource model:
+
+         - The API has a collection of [Shelf][google.example.library.v1.Shelf]
+           resources, named `shelves/*`
+
+         - Each Shelf has a collection of [Book][google.example.library.v1.Book]
+           resources, named `shelves/*/books/*`
     version: 1.2.3
 paths:
     /v1/shelves:
         get:
-            summary: Lists shelves. The order is unspecified but deterministic. Newly created shelves will not necessarily be added to the end of this list.
+            tags:
+                - LibraryService
+            description: |-
+                Lists shelves. The order is unspecified but deterministic. Newly created
+                 shelves will not necessarily be added to the end of this list.
             operationId: LibraryService_ListShelves
             parameters:
                 - name: pageSize
@@ -30,7 +43,9 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/listShelvesResponse'
         post:
-            summary: Creates a shelf, and returns the new Shelf.
+            tags:
+                - LibraryService
+            description: Creates a shelf, and returns the new Shelf.
             operationId: LibraryService_CreateShelf
             requestBody:
                 content:
@@ -47,7 +62,9 @@ paths:
                                 $ref: '#/components/schemas/shelf'
     /v1/shelves/{shelf}:
         get:
-            summary: Gets a shelf. Returns NOT_FOUND if the shelf does not exist.
+            tags:
+                - LibraryService
+            description: Gets a shelf. Returns NOT_FOUND if the shelf does not exist.
             operationId: LibraryService_GetShelf
             parameters:
                 - name: shelf
@@ -64,7 +81,9 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/shelf'
         delete:
-            summary: Deletes a shelf. Returns NOT_FOUND if the shelf does not exist.
+            tags:
+                - LibraryService
+            description: Deletes a shelf. Returns NOT_FOUND if the shelf does not exist.
             operationId: LibraryService_DeleteShelf
             parameters:
                 - name: shelf
@@ -79,7 +98,12 @@ paths:
                     content: {}
     /v1/shelves/{shelf}/books:
         get:
-            summary: Lists books in a shelf. The order is unspecified but deterministic. Newly created books will not necessarily be added to the end of this list. Returns NOT_FOUND if the shelf does not exist.
+            tags:
+                - LibraryService
+            description: |-
+                Lists books in a shelf. The order is unspecified but deterministic. Newly
+                 created books will not necessarily be added to the end of this list.
+                 Returns NOT_FOUND if the shelf does not exist.
             operationId: LibraryService_ListBooks
             parameters:
                 - name: shelf
@@ -106,7 +130,9 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/listBooksResponse'
         post:
-            summary: Creates a book, and returns the new Book.
+            tags:
+                - LibraryService
+            description: Creates a book, and returns the new Book.
             operationId: LibraryService_CreateBook
             parameters:
                 - name: shelf
@@ -130,7 +156,9 @@ paths:
                                 $ref: '#/components/schemas/book'
     /v1/shelves/{shelf}/books/{book}:
         get:
-            summary: Gets a book. Returns NOT_FOUND if the book does not exist.
+            tags:
+                - LibraryService
+            description: Gets a book. Returns NOT_FOUND if the book does not exist.
             operationId: LibraryService_GetBook
             parameters:
                 - name: shelf
@@ -153,7 +181,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/book'
         put:
-            summary: Updates a book. Returns INVALID_ARGUMENT if the name of the book is non-empty and does not equal the existing name.
+            tags:
+                - LibraryService
+            description: |-
+                Updates a book. Returns INVALID_ARGUMENT if the name of the book
+                 is non-empty and does not equal the existing name.
             operationId: LibraryService_UpdateBook
             parameters:
                 - name: shelf
@@ -187,7 +219,9 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/book'
         delete:
-            summary: Deletes a book. Returns NOT_FOUND if the book does not exist.
+            tags:
+                - LibraryService
+            description: Deletes a book. Returns NOT_FOUND if the book does not exist.
             operationId: LibraryService_DeleteBook
             parameters:
                 - name: shelf
@@ -208,7 +242,11 @@ paths:
                     content: {}
     /v1/shelves/{shelf}/books/{book}:move:
         post:
-            summary: Moves a book to another shelf, and returns the new book. The book id of the new book may not be the same as the original book.
+            tags:
+                - LibraryService
+            description: |-
+                Moves a book to another shelf, and returns the new book. The book
+                 id of the new book may not be the same as the original book.
             operationId: LibraryService_MoveBook
             parameters:
                 - name: shelf
@@ -238,7 +276,16 @@ paths:
                                 $ref: '#/components/schemas/book'
     /v1/shelves/{shelf}:merge:
         post:
-            summary: Merges two shelves by adding all books from the shelf named `other_shelf_name` to shelf `name`, and deletes `other_shelf_name`. Returns the updated shelf. The book ids of the moved books may not be the same as the original books. Returns NOT_FOUND if either shelf does not exist. This call is a no-op if the specified shelves are the same.
+            tags:
+                - LibraryService
+            description: |-
+                Merges two shelves by adding all books from the shelf named
+                 `other_shelf_name` to shelf `name`, and deletes
+                 `other_shelf_name`. Returns the updated shelf.
+                 The book ids of the moved books may not be the same as the original books.
+
+                 Returns NOT_FOUND if either shelf does not exist.
+                 This call is a no-op if the specified shelves are the same.
             operationId: LibraryService_MergeShelves
             parameters:
                 - name: shelf
@@ -356,3 +403,5 @@ components:
                     description: The last update date and time.
                     format: date-time
             description: A Shelf contains a collection of books with a theme.
+tags:
+    - name: LibraryService
