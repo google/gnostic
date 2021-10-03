@@ -121,6 +121,14 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		}
 		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
 	}
+	// Sort the tags.
+	{
+		pairs := d.Tags
+		sort.Slice(pairs, func(i, j int) bool {
+			return pairs[i].Name < pairs[j].Name
+		})
+		d.Tags = pairs
+	}
 	// Sort the paths.
 	{
 		pairs := d.Paths.Path
