@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Gnostic linter plugin to check responses",
   "main": "gnostic-lint-responses.js",
-  "repository": "git@github.com:googleapis/gnostic.git",
+  "repository": "git@github.com:google/gnostic.git",
   "author": "Mike Kistler",
   "license": "Apache-2.0",
   "dependencies": {
