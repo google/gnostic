@@ -28,6 +28,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	v3 "github.com/google/gnostic/openapiv3"
+
+	"github.com/iancoleman/strcase"
 )
 
 const infoURL = "https://github.com/google/gnostic/tree/master/apps/protoc-gen-openapi"
@@ -236,7 +238,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					&v3.ParameterOrReference{
 						Oneof: &v3.ParameterOrReference_Parameter{
 							Parameter: &v3.Parameter{
-								Name:        fieldName,
+								Name:        strcase.ToLowerCamel(fieldName),
 								In:          "query",
 								Description: fieldDescription,
 								Required:    false,
