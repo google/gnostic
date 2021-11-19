@@ -121,6 +121,7 @@ message Method {
   bool supports_subscription = 14;
   string flat_path = 15;
   bool etag_required = 16;
+  string streaming_type = 17;
 }
 
 message Methods {
