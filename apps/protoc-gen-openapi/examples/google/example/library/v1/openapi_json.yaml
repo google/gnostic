@@ -41,7 +41,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/listShelvesResponse'
+                                $ref: '#/components/schemas/ListShelvesResponse'
         post:
             tags:
                 - LibraryService
@@ -51,7 +51,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/shelf'
+                            $ref: '#/components/schemas/Shelf'
                 required: true
             responses:
                 "200":
@@ -59,7 +59,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/shelf'
+                                $ref: '#/components/schemas/Shelf'
     /v1/shelves/{shelf}:
         get:
             tags:
@@ -79,7 +79,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/shelf'
+                                $ref: '#/components/schemas/Shelf'
         delete:
             tags:
                 - LibraryService
@@ -128,7 +128,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/listBooksResponse'
+                                $ref: '#/components/schemas/ListBooksResponse'
         post:
             tags:
                 - LibraryService
@@ -145,7 +145,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/book'
+                            $ref: '#/components/schemas/Book'
                 required: true
             responses:
                 "200":
@@ -153,7 +153,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/book'
+                                $ref: '#/components/schemas/Book'
     /v1/shelves/{shelf}/books/{book}:
         get:
             tags:
@@ -179,7 +179,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/book'
+                                $ref: '#/components/schemas/Book'
         put:
             tags:
                 - LibraryService
@@ -209,7 +209,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/book'
+                            $ref: '#/components/schemas/Book'
                 required: true
             responses:
                 "200":
@@ -217,7 +217,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/book'
+                                $ref: '#/components/schemas/Book'
         delete:
             tags:
                 - LibraryService
@@ -265,7 +265,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/moveBookRequest'
+                            $ref: '#/components/schemas/MoveBookRequest'
                 required: true
             responses:
                 "200":
@@ -273,7 +273,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/book'
+                                $ref: '#/components/schemas/Book'
     /v1/shelves/{shelf}:merge:
         post:
             tags:
@@ -298,7 +298,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/mergeShelvesRequest'
+                            $ref: '#/components/schemas/MergeShelvesRequest'
                 required: true
             responses:
                 "200":
@@ -306,10 +306,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/shelf'
+                                $ref: '#/components/schemas/Shelf'
 components:
     schemas:
-        book:
+        Book:
             properties:
                 name:
                     type: string
@@ -339,29 +339,29 @@ components:
                     description: The last update date and time.
                     format: date-time
             description: A single book in the library.
-        listBooksResponse:
+        ListBooksResponse:
             properties:
                 books:
                     type: array
                     items:
-                        $ref: '#/components/schemas/book'
+                        $ref: '#/components/schemas/Book'
                     description: The list of books.
                 nextPageToken:
                     type: string
                     description: A token to retrieve next page of results. Pass this value in the [ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token] field in the subsequent call to `ListBooks` method to retrieve the next page of results.
             description: Response message for LibraryService.ListBooks.
-        listShelvesResponse:
+        ListShelvesResponse:
             properties:
                 shelves:
                     type: array
                     items:
-                        $ref: '#/components/schemas/shelf'
+                        $ref: '#/components/schemas/Shelf'
                     description: The list of shelves.
                 nextPageToken:
                     type: string
                     description: A token to retrieve next page of results. Pass this value in the [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token] field in the subsequent call to `ListShelves` method to retrieve the next page of results.
             description: Response message for LibraryService.ListShelves.
-        mergeShelvesRequest:
+        MergeShelvesRequest:
             properties:
                 name:
                     type: string
@@ -370,7 +370,7 @@ components:
                     type: string
                     description: The name of the shelf we're removing books from and deleting.
             description: Describes the shelf being removed (other_shelf_name) and updated (name) in this merge.
-        moveBookRequest:
+        MoveBookRequest:
             properties:
                 name:
                     type: string
@@ -379,7 +379,7 @@ components:
                     type: string
                     description: The name of the destination shelf.
             description: Describes what book to move (name) and what shelf we're moving it to (other_shelf_name).
-        shelf:
+        Shelf:
             properties:
                 name:
                     type: string
