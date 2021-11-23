@@ -17,68 +17,67 @@ package main
 import (
 	"os"
 	"os/exec"
+	"path"
 	"testing"
 )
 
-func TestLibraryOpenAPI(t *testing.T) {
-	var err error
-	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
-	err = exec.Command("protoc",
-		"-I", "../../",
-		"-I", "../../third_party",
-		"-I", "examples",
-		"examples/google/example/library/v1/library.proto",
-		"--openapi_out=.").Run()
-	if err != nil {
-		t.Fatalf("protoc failed: %+v", err)
-	}
-	// Verify that the generated spec matches our expected version.
-	err = exec.Command("diff", "openapi.yaml", "examples/google/example/library/v1/openapi.yaml").Run()
-	if err != nil {
-		t.Fatalf("Diff failed: %+v", err)
-	}
-	// if the test succeeded, clean up
-	os.Remove("openapi.yaml")
+var openapiTests = []struct {
+	name      string
+	path      string
+	protofile string
+}{
+	{name: "Google Library example", path: "examples/google/example/library/v1/", protofile: "library.proto"},
+	{name: "Body mapping", path: "examples/tests/bodymapping/", protofile: "message.proto"},
+	{name: "Map fields", path: "examples/tests/mapfields/", protofile: "message.proto"},
+	{name: "Path params", path: "examples/tests/pathparams/", protofile: "message.proto"},
+	{name: "Protobuf types", path: "examples/tests/protobuftypes/", protofile: "message.proto"},
+	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
 }
 
-func TestBodyMappingOpenAPI(t *testing.T) {
-	var err error
-	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
-	err = exec.Command("protoc",
-		"-I", "../../",
-		"-I", "../../third_party",
-		"-I", "examples",
-		"examples/tests/bodymapping/message.proto",
-		"--openapi_out=.").Run()
-	if err != nil {
-		t.Fatalf("protoc failed: %+v", err)
+func TestOpenAPIProtobufNaming(t *testing.T) {
+	for _, tt := range openapiTests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--openapi_out=naming=proto:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			// Verify that the generated spec matches our expected version.
+			err = exec.Command("diff", "openapi.yaml", path.Join(tt.path, "openapi.yaml")).Run()
+			if err != nil {
+				t.Fatalf("Diff failed: %+v", err)
+			}
+			// if the test succeeded, clean up
+			os.Remove("openapi.yaml")
+		})
 	}
-	// Verify that the generated spec matches our expected version.
-	err = exec.Command("diff", "openapi.yaml", "examples/tests/bodymapping/openapi.yaml").Run()
-	if err != nil {
-		t.Fatalf("Diff failed: %+v", err)
-	}
-	// if the test succeeded, clean up
-	os.Remove("openapi.yaml")
 }
 
-func TestMapFieldsOpenAPI(t *testing.T) {
-	var err error
-	// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
-	err = exec.Command("protoc",
-		"-I", "../../",
-		"-I", "../../third_party",
-		"-I", "examples",
-		"examples/tests/mapfields/message.proto",
-		"--openapi_out=.").Run()
-	if err != nil {
-		t.Fatalf("protoc failed: %+v", err)
+func TestOpenAPIJSONNaming(t *testing.T) {
+	for _, tt := range openapiTests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec with JSON naming.
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--openapi_out=version=1.2.3:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			// Verify that the generated spec matches our expected version.
+			err = exec.Command("diff", "openapi.yaml", path.Join(tt.path, "openapi_json.yaml")).Run()
+			if err != nil {
+				t.Fatalf("Diff failed: %+v", err)
+			}
+			// if the test succeeded, clean up
+			os.Remove("openapi.yaml")
+		})
 	}
-	// Verify that the generated spec matches our expected version.
-	err = exec.Command("diff", "openapi.yaml", "examples/tests/mapfields/openapi.yaml").Run()
-	if err != nil {
-		t.Fatalf("Diff failed: %+v", err)
-	}
-	// if the test succeeded, clean up
-	os.Remove("openapi.yaml")
 }

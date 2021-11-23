@@ -14,7 +14,7 @@ info:
 
          - Each Shelf has a collection of [Book][google.example.library.v1.Book]
            resources, named `shelves/*/books/*`
-    version: 0.0.1
+    version: 1.2.3
 paths:
     /v1/shelves:
         get:
@@ -25,12 +25,12 @@ paths:
                  shelves will not necessarily be added to the end of this list.
             operationId: LibraryService_ListShelves
             parameters:
-                - name: page_size
+                - name: pageSize
                   in: query
                   description: Requested page size. Server may return fewer shelves than requested. If unspecified, server will pick an appropriate default.
                   schema:
                     type: string
-                - name: page_token
+                - name: pageToken
                   in: query
                   description: A token identifying a page of results the server should return. Typically, this is the value of [ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token] returned from the previous call to `ListShelves` method.
                   schema:
@@ -112,12 +112,12 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: page_size
+                - name: pageSize
                   in: query
                   description: Requested page size. Server may return fewer books than requested. If unspecified, server will pick an appropriate default.
                   schema:
                     type: string
-                - name: page_token
+                - name: pageToken
                   in: query
                   description: A token identifying a page of results the server should return. Typically, this is the value of [ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token]. returned from the previous call to `ListBooks` method.
                   schema:
@@ -323,17 +323,17 @@ components:
                 read:
                     type: boolean
                     description: Value indicating whether the book has been read.
-                borrow_time:
+                borrowTime:
                     readOnly: true
                     type: string
                     description: The previous borrowing timestamp.
                     format: RFC3339
-                created_at:
+                createdAt:
                     readOnly: true
                     type: string
                     description: The creation date and time.
                     format: date-time
-                updated_at:
+                updatedAt:
                     readOnly: true
                     type: string
                     description: The last update date and time.
@@ -346,7 +346,7 @@ components:
                     items:
                         $ref: '#/components/schemas/Book'
                     description: The list of books.
-                next_page_token:
+                nextPageToken:
                     type: string
                     description: A token to retrieve next page of results. Pass this value in the [ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token] field in the subsequent call to `ListBooks` method to retrieve the next page of results.
             description: Response message for LibraryService.ListBooks.
@@ -357,7 +357,7 @@ components:
                     items:
                         $ref: '#/components/schemas/Shelf'
                     description: The list of shelves.
-                next_page_token:
+                nextPageToken:
                     type: string
                     description: A token to retrieve next page of results. Pass this value in the [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token] field in the subsequent call to `ListShelves` method to retrieve the next page of results.
             description: Response message for LibraryService.ListShelves.
@@ -366,7 +366,7 @@ components:
                 name:
                     type: string
                     description: The name of the shelf we're adding books to.
-                other_shelf_name:
+                otherShelfName:
                     type: string
                     description: The name of the shelf we're removing books from and deleting.
             description: Describes the shelf being removed (other_shelf_name) and updated (name) in this merge.
@@ -375,7 +375,7 @@ components:
                 name:
                     type: string
                     description: The name of the book to move.
-                other_shelf_name:
+                otherShelfName:
                     type: string
                     description: The name of the destination shelf.
             description: Describes what book to move (name) and what shelf we're moving it to (other_shelf_name).
@@ -387,17 +387,17 @@ components:
                 theme:
                     type: string
                     description: The theme of the shelf
-                next_sort_at:
+                nextSortAt:
                     readOnly: true
                     type: string
                     description: The next sorting date.
                     format: date
-                created_at:
+                createdAt:
                     readOnly: true
                     type: string
                     description: The creation date and time.
                     format: date-time
-                updated_at:
+                updatedAt:
                     readOnly: true
                     type: string
                     description: The last update date and time.
