@@ -29,7 +29,7 @@ func main() {
 		Version:     flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
 		Title:       flags.String("title", "", "name of the API"),
 		Description: flags.String("description", "", "description of the API"),
-		JSONNames:   flags.Bool("json", false, "use JSON naming convention (camelCase)"),
+		Naming:      flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
 	}
 
 	opts := protogen.Options{

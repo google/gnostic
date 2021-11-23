@@ -43,7 +43,7 @@ func TestOpenAPIProtobufNaming(t *testing.T) {
 				"-I", "../../third_party",
 				"-I", "examples",
 				path.Join(tt.path, tt.protofile),
-				"--openapi_out=.").Run()
+				"--openapi_out=naming=proto:.").Run()
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
@@ -67,7 +67,7 @@ func TestOpenAPIJSONNaming(t *testing.T) {
 				"-I", "../../third_party",
 				"-I", "examples",
 				path.Join(tt.path, tt.protofile),
-				"--openapi_out=json=true,version=1.2.3:.").Run()
+				"--openapi_out=version=1.2.3:.").Run()
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}

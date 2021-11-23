@@ -34,7 +34,7 @@ type Configuration struct {
 	Version     *string
 	Title       *string
 	Description *string
-	JSONNames   *bool
+	Naming      *string
 }
 
 const infoURL = "https://github.com/google/gnostic/tree/master/apps/protoc-gen-openapi"
@@ -209,7 +209,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 }
 
 func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
-	if !*g.conf.JSONNames {
+	if *g.conf.Naming == "proto" {
 		return name
 	}
 
@@ -225,7 +225,7 @@ func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
 }
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-	if !*g.conf.JSONNames {
+	if *g.conf.Naming == "proto" {
 		return string(message.Desc.Name())
 	}
 
@@ -238,7 +238,7 @@ func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string
 }
 
 func (g *OpenAPIv3Generator) formatFieldName(field *protogen.Field) string {
-	if !*g.conf.JSONNames {
+	if *g.conf.Naming == "proto" {
 		return string(field.Desc.Name())
 	}
 
