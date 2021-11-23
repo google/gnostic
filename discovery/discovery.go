@@ -520,7 +520,7 @@ func NewMethod(in *yaml.Node, context *compiler.Context) (*Method, error) {
 		message := fmt.Sprintf("has unexpected value: %+v (%T)", in, in)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
-		allowedKeys := []string{"description", "etagRequired", "flatPath", "httpMethod", "id", "mediaUpload", "parameterOrder", "parameters", "path", "request", "response", "scopes", "supportsMediaDownload", "supportsMediaUpload", "supportsSubscription", "useMediaDownloadService"}
+		allowedKeys := []string{"description", "etagRequired", "flatPath", "httpMethod", "id", "mediaUpload", "parameterOrder", "parameters", "path", "request", "response", "scopes", "streamingType", "supportsMediaDownload", "supportsMediaUpload", "supportsSubscription", "useMediaDownloadService"}
 		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
@@ -672,6 +672,15 @@ func NewMethod(in *yaml.Node, context *compiler.Context) (*Method, error) {
 			x.EtagRequired, ok = compiler.BoolForScalarNode(v16)
 			if !ok {
 				message := fmt.Sprintf("has unexpected value for etagRequired: %s", compiler.Display(v16))
+				errors = append(errors, compiler.NewError(context, message))
+			}
+		}
+		// string streaming_type = 17;
+		v17 := compiler.MapValueForKey(m, "streamingType")
+		if v17 != nil {
+			x.StreamingType, ok = compiler.StringForScalarNode(v17)
+			if !ok {
+				message := fmt.Sprintf("has unexpected value for streamingType: %s", compiler.Display(v17))
 				errors = append(errors, compiler.NewError(context, message))
 			}
 		}
@@ -2406,6 +2415,10 @@ func (m *Method) ToRawInfo() *yaml.Node {
 	if m.EtagRequired != false {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("etagRequired"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.EtagRequired))
+	}
+	if m.StreamingType != "" {
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("streamingType"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.StreamingType))
 	}
 	return info
 }

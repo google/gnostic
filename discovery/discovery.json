@@ -361,6 +361,9 @@
         },
         "etagRequired": {
           "type": "boolean"
+        },
+        "streamingType": {
+          "type": "string"
         }
       }
     },
