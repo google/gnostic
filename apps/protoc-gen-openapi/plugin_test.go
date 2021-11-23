@@ -72,7 +72,7 @@ func TestOpenAPIJSONNaming(t *testing.T) {
 				t.Fatalf("protoc failed: %+v", err)
 			}
 			// Verify that the generated spec matches our expected version.
-			err = exec.Command("diff", "openapi.yaml", path.Join(tt.path, "openapi.json.yaml")).Run()
+			err = exec.Command("diff", "openapi.yaml", path.Join(tt.path, "openapi_json.yaml")).Run()
 			if err != nil {
 				t.Fatalf("Diff failed: %+v", err)
 			}
