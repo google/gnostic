@@ -29,10 +29,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/message'
+                                $ref: '#/components/schemas/Message'
 components:
     schemas:
-        message:
+        Message:
             properties:
                 messageId:
                     type: string

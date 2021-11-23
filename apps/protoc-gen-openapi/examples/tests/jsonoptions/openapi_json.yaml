@@ -34,7 +34,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/message'
+                                $ref: '#/components/schemas/Message'
     /v1/messages/{message_id}:
         patch:
             tags:
@@ -62,10 +62,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/message2'
+                                $ref: '#/components/schemas/Message2'
 components:
     schemas:
-        message:
+        Message:
             properties:
                 messageId:
                     type: string
@@ -73,7 +73,7 @@ components:
                     type: string
                 notUsed:
                     type: string
-        message2:
+        Message2:
             properties:
                 message_id:
                     type: string

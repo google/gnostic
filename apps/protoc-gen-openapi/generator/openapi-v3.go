@@ -214,7 +214,7 @@ func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
 	}
 
 	if len(name) > 1 {
-		return strings.ToLower(name[0:1]) + name[1:]
+		return strings.ToUpper(name[0:1]) + name[1:]
 	}
 
 	if len(name) == 1 {
@@ -231,7 +231,7 @@ func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string
 
 	name := string(message.Desc.Name())
 	if len(name) > 0 {
-		return strings.ToLower(name[0:1]) + name[1:]
+		return strings.ToUpper(name[0:1]) + name[1:]
 	}
 
 	return name

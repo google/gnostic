@@ -35,7 +35,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/message'
+                                $ref: '#/components/schemas/Message'
         post:
             tags:
                 - Messaging
@@ -50,7 +50,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/message'
+                            $ref: '#/components/schemas/Message'
                 required: true
             responses:
                 "200":
@@ -58,7 +58,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/message'
+                                $ref: '#/components/schemas/Message'
         patch:
             tags:
                 - Messaging
@@ -89,7 +89,7 @@ paths:
                     content: {}
 components:
     schemas:
-        message:
+        Message:
             properties:
                 messageId:
                     type: string
