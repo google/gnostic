@@ -44,7 +44,6 @@ type OpenAPIv3Generator struct {
 	conf   Configuration
 	plugin *protogen.Plugin
 
-	singleService     bool     // 1 file with 1 service
 	requiredSchemas   []string // Names of schemas that need to be generated.
 	generatedSchemas  []string // Names of schemas that have already been generated.
 	linterRulePattern *regexp.Regexp
@@ -121,6 +120,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		}
 		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
 	}
+
 	// Sort the tags.
 	{
 		pairs := d.Tags
@@ -411,7 +411,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		var bodyFieldMessageTypeName string
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
-			bodyFieldMessageTypeName = fullMessageTypeName(inputMessage)
+			bodyFieldMessageTypeName = fullMessageTypeName(inputMessage.Desc)
 		} else {
 			// If body refers to a message field, use that type.
 			for _, field := range inputMessage.Fields {
@@ -420,7 +420,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 					case protoreflect.StringKind:
 						bodyFieldScalarTypeName = "string"
 					case protoreflect.MessageKind:
-						bodyFieldMessageTypeName = fullMessageTypeName(field.Message)
+						bodyFieldMessageTypeName = fullMessageTypeName(field.Message.Desc)
 					default:
 						log.Printf("unsupported field type %+v", field.Desc)
 					}
@@ -518,29 +518,13 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 	return "#/components/schemas/" + g.formatMessageRef(lastPart)
 }
 
-// itemsItemForTypeName is a helper constructor.
-func itemsItemForTypeName(typeName string) *v3.ItemsItem {
-	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{{
-		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{
-				Type: typeName}}}}}
-}
-
-// itemsItemForReference is a helper constructor.
-func itemsItemForReference(xref string) *v3.ItemsItem {
-	return &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{{
-		Oneof: &v3.SchemaOrReference_Reference{
-			Reference: &v3.Reference{
-				XRef: xref}}}}}
-}
-
 // fullMessageTypeName builds the full type name of a message.
-func fullMessageTypeName(message *protogen.Message) string {
-	return "." + string(message.Desc.ParentFile().Package()) + "." + string(message.Desc.Name())
+func fullMessageTypeName(message protoreflect.MessageDescriptor) string {
+	return "." + string(message.ParentFile().Package()) + "." + string(message.Name())
 }
 
 func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.Message) *v3.MediaTypes {
-	typeName := fullMessageTypeName(outputMessage)
+	typeName := fullMessageTypeName(outputMessage.Desc)
 
 	if typeName == ".google.protobuf.Empty" {
 		return &v3.MediaTypes{}
@@ -568,7 +552,7 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 					Schema: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Reference{
 							Reference: &v3.Reference{
-								XRef: g.schemaReferenceForTypeName(fullMessageTypeName(outputMessage)),
+								XRef: g.schemaReferenceForTypeName(fullMessageTypeName(outputMessage.Desc)),
 							},
 						},
 					},
@@ -578,11 +562,120 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 	}
 }
 
+func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.SchemaOrReference {
+	switch typeName {
+
+	case ".google.protobuf.Timestamp":
+		// Timestamps are serialized as strings
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string", Format: "RFC3339"}}}
+
+	case ".google.type.Date":
+		// Dates are serialized as strings
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string", Format: "date"}}}
+
+	case ".google.type.DateTime":
+		// DateTimes are serialized as strings
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
+
+	case ".google.protobuf.Struct":
+		// Struct is equivalent to a JSON object
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "object"}}}
+
+	case ".google.protobuf.Empty":
+		// Empty is close to JSON undefined than null, so ignore this field
+		return nil //&v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{Type: "null"}}}
+
+	default:
+		ref := g.schemaReferenceForTypeName(typeName)
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Reference{
+				Reference: &v3.Reference{XRef: ref}}}
+	}
+}
+
+func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
+	if field.IsMap() {
+		return g.schemaOrReferenceForField(field.MapValue())
+	}
+
+	var kindSchema *v3.SchemaOrReference
+
+	kind := field.Kind()
+
+	switch kind {
+
+	case protoreflect.MessageKind:
+		typeName := fullMessageTypeName(field.Message())
+		kindSchema = g.schemaOrReferenceForType(typeName)
+		if kindSchema == nil {
+			return nil
+		}
+
+	case protoreflect.StringKind:
+		kindSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string"}}}
+
+	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
+		protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
+		protoreflect.Sfixed32Kind, protoreflect.Fixed32Kind, protoreflect.Sfixed64Kind,
+		protoreflect.Fixed64Kind:
+		kindSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "integer", Format: kind.String()}}}
+
+	case protoreflect.EnumKind:
+		kindSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "integer", Format: "enum"}}}
+
+	case protoreflect.BoolKind:
+		kindSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "boolean"}}}
+
+	case protoreflect.FloatKind, protoreflect.DoubleKind:
+		kindSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "number", Format: kind.String()}}}
+
+	case protoreflect.BytesKind:
+		kindSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string", Format: "bytes"}}}
+
+	default:
+		log.Printf("(TODO) Unsupported field type: %+v", fullMessageTypeName(field.Message()))
+	}
+
+	if field.IsList() {
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{
+					Type:  "array",
+					Items: &v3.ItemsItem{SchemaOrReference: []*v3.SchemaOrReference{kindSchema}},
+				},
+			},
+		}
+	}
+
+	return kindSchema
+}
+
 // addSchemasToDocumentV3 adds info from one file descriptor.
 func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protogen.File) {
 	// For each message, generate a definition.
 	for _, message := range file.Messages {
-		typeName := fullMessageTypeName(message)
+		typeName := fullMessageTypeName(message.Desc)
+
 		// Only generate this if we need it and haven't already generated it.
 		if !contains(g.requiredSchemas, typeName) ||
 			contains(g.generatedSchemas, typeName) {
@@ -611,148 +704,26 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protog
 					log.Printf("unsupported extension type %T", extension)
 				}
 			}
-			// Get the field description from the comments.
-			fieldDescription := g.filterCommentString(field.Comments.Leading, true)
+
 			// The field is either described by a reference or a schema.
-			XRef := ""
-			fieldSchema := &v3.Schema{
-				Description: fieldDescription,
+			fieldSchema := g.schemaOrReferenceForField(field.Desc)
+			if fieldSchema == nil {
+				continue
 			}
-			if outputOnly {
-				fieldSchema.ReadOnly = true
-			}
-			if field.Desc.IsList() {
-				fieldSchema.Type = "array"
-				switch field.Desc.Kind() {
-				case protoreflect.MessageKind:
-					typeName := fullMessageTypeName(field.Message)
-					switch typeName {
-					case ".google.protobuf.Timestamp":
-						// Timestamps are serialized as strings
-						fieldSchema.Items = itemsItemForTypeName("string")
-					case ".google.type.Date":
-						// Dates are serialized as strings
-						fieldSchema.Items = itemsItemForTypeName("string")
-					case ".google.type.DateTime":
-						// DateTimes are serialized as strings
-						fieldSchema.Items = itemsItemForTypeName("string")
-					case ".google.protobuf.Struct":
-						// Struct is equivalent to a JSON object
-						fieldSchema.Items = itemsItemForTypeName("object")
-					case ".google.protobuf.Empty":
-						// Struct is close to JSON null, so ignore this field
-						continue
-					default:
-						// The field is described by a reference.
-						fieldSchema.Items = itemsItemForReference(
-							g.schemaReferenceForTypeName(typeName))
-					}
-				case protoreflect.StringKind:
-					fieldSchema.Items = itemsItemForTypeName("string")
-				case protoreflect.Int32Kind,
-					protoreflect.Sint32Kind,
-					protoreflect.Uint32Kind,
-					protoreflect.Int64Kind,
-					protoreflect.Sint64Kind,
-					protoreflect.Uint64Kind,
-					protoreflect.Sfixed32Kind,
-					protoreflect.Fixed32Kind,
-					protoreflect.Sfixed64Kind,
-					protoreflect.Fixed64Kind:
-					fieldSchema.Items = itemsItemForTypeName("integer")
-				case protoreflect.EnumKind:
-					fieldSchema.Items = itemsItemForTypeName("integer")
-				case protoreflect.BoolKind:
-					fieldSchema.Items = itemsItemForTypeName("boolean")
-				case protoreflect.FloatKind, protoreflect.DoubleKind:
-					fieldSchema.Items = itemsItemForTypeName("number")
-				case protoreflect.BytesKind:
-					fieldSchema.Items = itemsItemForTypeName("string")
-				default:
-					log.Printf("(TODO) Unsupported array type: %+v", fullMessageTypeName(field.Message))
-				}
-			} else if field.Desc.IsMap() &&
-				field.Desc.MapKey().Kind() == protoreflect.StringKind &&
-				field.Desc.MapValue().Kind() == protoreflect.StringKind {
-				fieldSchema.Type = "object"
-			} else {
-				k := field.Desc.Kind()
-				switch k {
-				case protoreflect.MessageKind:
-					typeName := fullMessageTypeName(field.Message)
-					switch typeName {
-					case ".google.protobuf.Timestamp":
-						// Timestamps are serialized as strings
-						fieldSchema.Type = "string"
-						fieldSchema.Format = "RFC3339"
-					case ".google.type.Date":
-						// Dates are serialized as strings
-						fieldSchema.Type = "string"
-						fieldSchema.Format = "date"
-					case ".google.type.DateTime":
-						// DateTimes are serialized as strings
-						fieldSchema.Type = "string"
-						fieldSchema.Format = "date-time"
-					case ".google.protobuf.Struct":
-						// Struct is equivalent to a JSON object
-						fieldSchema.Type = "object"
-					case ".google.protobuf.Empty":
-						// Struct is close to JSON null, so ignore this field
-						continue
-					default:
-						// The field is described by a reference.
-						XRef = g.schemaReferenceForTypeName(typeName)
-					}
-				case protoreflect.StringKind:
-					fieldSchema.Type = "string"
-				case protoreflect.Int32Kind,
-					protoreflect.Sint32Kind,
-					protoreflect.Uint32Kind,
-					protoreflect.Int64Kind,
-					protoreflect.Sint64Kind,
-					protoreflect.Uint64Kind,
-					protoreflect.Sfixed32Kind,
-					protoreflect.Fixed32Kind,
-					protoreflect.Sfixed64Kind,
-					protoreflect.Fixed64Kind:
-					fieldSchema.Type = "integer"
-					fieldSchema.Format = k.String()
-				case protoreflect.EnumKind:
-					fieldSchema.Type = "integer"
-					fieldSchema.Format = "enum"
-				case protoreflect.BoolKind:
-					fieldSchema.Type = "boolean"
-				case protoreflect.FloatKind, protoreflect.DoubleKind:
-					fieldSchema.Type = "number"
-					fieldSchema.Format = k.String()
-				case protoreflect.BytesKind:
-					fieldSchema.Type = "string"
-					fieldSchema.Format = "bytes"
-				default:
-					log.Printf("(TODO) Unsupported field type: %+v", fullMessageTypeName(field.Message))
+
+			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
+				// Get the field description from the comments.
+				schema.Schema.Description = g.filterCommentString(field.Comments.Leading, true)
+				if outputOnly {
+					schema.Schema.ReadOnly = true
 				}
 			}
-			var value *v3.SchemaOrReference
-			if XRef != "" {
-				value = &v3.SchemaOrReference{
-					Oneof: &v3.SchemaOrReference_Reference{
-						Reference: &v3.Reference{
-							XRef: XRef,
-						},
-					},
-				}
-			} else {
-				value = &v3.SchemaOrReference{
-					Oneof: &v3.SchemaOrReference_Schema{
-						Schema: fieldSchema,
-					},
-				}
-			}
+
 			definitionProperties.AdditionalProperties = append(
 				definitionProperties.AdditionalProperties,
 				&v3.NamedSchemaOrReference{
 					Name:  g.formatFieldName(field),
-					Value: value,
+					Value: fieldSchema,
 				},
 			)
 		}

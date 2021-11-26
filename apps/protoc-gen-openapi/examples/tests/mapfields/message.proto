@@ -18,6 +18,7 @@ syntax = "proto3";
 package tests.mapfields.message.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/mapfields/message/v1;message";
 
@@ -29,7 +30,18 @@ service Messaging {
         };
     }
 }
+
+message SubMessage {
+    int64 id = 1;
+    string label = 2;
+}
+
 message Message {
     string message_id = 1;
-    map<string, string> labels = 2;
+    repeated string string_list = 2;
+    repeated SubMessage sub_message_list = 3;
+    repeated google.protobuf.Struct object_list = 4;
+    map<string, string> strings_map = 5;
+    map<string, SubMessage> sub_messages_map = 6;
+    map<string, google.protobuf.Struct> objects_map = 7;
 }
