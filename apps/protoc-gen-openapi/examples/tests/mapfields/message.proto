@@ -31,12 +31,11 @@ service Messaging {
     }
 }
 
-message SubMessage {
-    int64 id = 1;
-    string label = 2;
-}
-
 message Message {
+    message SubMessage {
+        int64 id = 1;
+        string label = 2;
+    }
     string message_id = 1;
     SubMessage sub_message = 2;
     repeated string string_list = 3;
