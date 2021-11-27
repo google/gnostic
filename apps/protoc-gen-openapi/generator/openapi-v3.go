@@ -603,7 +603,12 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 
 func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
 	if field.IsMap() {
-		return g.schemaOrReferenceForField(field.MapValue())
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "object",
+					AdditionalProperties: &v3.AdditionalPropertiesItem{
+						Oneof: &v3.AdditionalPropertiesItem_SchemaOrReference{
+							SchemaOrReference: g.schemaOrReferenceForField(field.MapValue())}}}}}
 	}
 
 	var kindSchema *v3.SchemaOrReference

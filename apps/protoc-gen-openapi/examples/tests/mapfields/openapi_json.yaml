@@ -36,6 +36,8 @@ components:
             properties:
                 messageId:
                     type: string
+                subMessage:
+                    $ref: '#/components/schemas/SubMessage'
                 stringList:
                     type: array
                     items:
@@ -49,11 +51,17 @@ components:
                     items:
                         type: object
                 stringsMap:
-                    type: string
+                    type: object
+                    additionalProperties:
+                        type: string
                 subMessagesMap:
-                    $ref: '#/components/schemas/SubMessage'
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/SubMessage'
                 objectsMap:
                     type: object
+                    additionalProperties:
+                        type: object
         SubMessage:
             properties:
                 id:

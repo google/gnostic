@@ -38,10 +38,11 @@ message SubMessage {
 
 message Message {
     string message_id = 1;
-    repeated string string_list = 2;
-    repeated SubMessage sub_message_list = 3;
-    repeated google.protobuf.Struct object_list = 4;
-    map<string, string> strings_map = 5;
-    map<string, SubMessage> sub_messages_map = 6;
-    map<string, google.protobuf.Struct> objects_map = 7;
+    SubMessage sub_message = 2;
+    repeated string string_list = 3;
+    repeated SubMessage sub_message_list = 4;
+    repeated google.protobuf.Struct object_list = 5;
+    map<string, string> strings_map = 6;
+    map<string, SubMessage> sub_messages_map = 7;
+    map<string, google.protobuf.Struct> objects_map = 8;
 }
