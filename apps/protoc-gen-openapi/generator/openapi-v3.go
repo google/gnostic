@@ -161,8 +161,7 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewL
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
 func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
 	for _, service := range file.Services {
-		comment := g.filterCommentString(service.Comments.Leading, false)
-		d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+		annotationsCount := 0
 
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading, false)
@@ -175,6 +174,8 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			var methodName string
 			var body string
 			if extension != nil && extension != xt.InterfaceOf(xt.Zero()) {
+				annotationsCount++
+
 				rule := extension.(*annotations.HttpRule)
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
@@ -204,6 +205,11 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 					file, operationID, service.GoName, comment, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
+		}
+
+		if annotationsCount > 0 {
+			comment := g.filterCommentString(service.Comments.Leading, false)
+			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
 		}
 	}
 }
