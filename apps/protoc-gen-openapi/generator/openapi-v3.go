@@ -116,7 +116,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	for len(g.requiredSchemas) > 0 {
 		count := len(g.requiredSchemas)
 		for _, file := range g.plugin.Files {
-			g.addSchemasToDocumentV3(d, file)
+			g.addSchemasToDocumentV3(d, file.Messages)
 		}
 		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
 	}
@@ -676,9 +676,14 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldD
 }
 
 // addSchemasToDocumentV3 adds info from one file descriptor.
-func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, file *protogen.File) {
+func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*protogen.Message) {
 	// For each message, generate a definition.
-	for _, message := range file.Messages {
+	for _, message := range messages {
+		// Add any messages that are defined inside this message.
+		if message.Messages != nil {
+			g.addSchemasToDocumentV3(d, message.Messages)
+		}
+
 		typeName := fullMessageTypeName(message.Desc)
 
 		// Only generate this if we need it and haven't already generated it.
