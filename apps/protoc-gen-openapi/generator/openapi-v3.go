@@ -225,11 +225,25 @@ func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
 }
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-	if *g.conf.Naming == "proto" {
-		return string(message.Desc.Name())
+
+	prefix := ""
+	parent := message.Desc.Parent()
+	if parent != nil {
+		_, ok := parent.(protoreflect.MessageDescriptor)
+		if ok {
+			prefix = string(parent.Name()) + "_" + prefix
+			parent = parent.Parent()
+		} else {
+			parent = nil
+		}
 	}
 
-	name := string(message.Desc.Name())
+	name := prefix + string(message.Desc.Name())
+
+	if *g.conf.Naming == "proto" {
+		return name
+	}
+
 	if len(name) > 0 {
 		return strings.ToUpper(name[0:1]) + name[1:]
 	}
@@ -520,7 +534,18 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 
 // fullMessageTypeName builds the full type name of a message.
 func fullMessageTypeName(message protoreflect.MessageDescriptor) string {
-	return "." + string(message.ParentFile().Package()) + "." + string(message.Name())
+	prefix := ""
+	parent := message.Parent()
+	if parent != nil {
+		_, ok := parent.(protoreflect.MessageDescriptor)
+		if ok {
+			prefix = string(parent.Name()) + "_" + prefix
+			parent = parent.Parent()
+		} else {
+			parent = nil
+		}
+	}
+	return "." + string(message.ParentFile().Package()) + "." + prefix + string(message.Name())
 }
 
 func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.Message) *v3.MediaTypes {
@@ -679,12 +704,13 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldD
 func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*protogen.Message) {
 	// For each message, generate a definition.
 	for _, message := range messages {
-		// Add any messages that are defined inside this message.
+
 		if message.Messages != nil {
 			g.addSchemasToDocumentV3(d, message.Messages)
 		}
 
 		typeName := fullMessageTypeName(message.Desc)
+		log.Printf("Adding %s", typeName)
 
 		// Only generate this if we need it and haven't already generated it.
 		if !contains(g.requiredSchemas, typeName) ||
