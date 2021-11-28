@@ -36,7 +36,38 @@ components:
             properties:
                 message_id:
                     type: string
-                labels:
+                sub_message:
+                    $ref: '#/components/schemas/SubMessage'
+                string_list:
+                    type: array
+                    items:
+                        type: string
+                sub_message_list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SubMessage'
+                object_list:
+                    type: array
+                    items:
+                        type: object
+                strings_map:
                     type: object
+                    additionalProperties:
+                        type: string
+                sub_messages_map:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/SubMessage'
+                objects_map:
+                    type: object
+                    additionalProperties:
+                        type: object
+        SubMessage:
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                label:
+                    type: string
 tags:
     - name: Messaging
