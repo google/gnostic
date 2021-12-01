@@ -32,12 +32,21 @@ paths:
                                 $ref: '#/components/schemas/Message'
 components:
     schemas:
+        AnotherMessage:
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                label:
+                    type: string
         Message:
             properties:
                 messageId:
                     type: string
+                anotherMessage:
+                    $ref: '#/components/schemas/AnotherMessage'
                 subMessage:
-                    $ref: '#/components/schemas/SubMessage'
+                    $ref: '#/components/schemas/Message_SubMessage'
                 stringList:
                     type: array
                     items:
@@ -45,7 +54,7 @@ components:
                 subMessageList:
                     type: array
                     items:
-                        $ref: '#/components/schemas/SubMessage'
+                        $ref: '#/components/schemas/Message_SubMessage'
                 objectList:
                     type: array
                     items:
@@ -57,12 +66,12 @@ components:
                 subMessagesMap:
                     type: object
                     additionalProperties:
-                        $ref: '#/components/schemas/SubMessage'
+                        $ref: '#/components/schemas/Message_SubMessage'
                 objectsMap:
                     type: object
                     additionalProperties:
                         type: object
-        SubMessage:
+        Message_SubMessage:
             properties:
                 id:
                     type: integer
