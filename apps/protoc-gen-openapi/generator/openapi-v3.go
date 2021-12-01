@@ -161,8 +161,7 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewL
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
 func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
 	for _, service := range file.Services {
-		comment := g.filterCommentString(service.Comments.Leading, false)
-		d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+		annotationsCount := 0
 
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading, false)
@@ -175,6 +174,8 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			var methodName string
 			var body string
 			if extension != nil && extension != xt.InterfaceOf(xt.Zero()) {
+				annotationsCount++
+
 				rule := extension.(*annotations.HttpRule)
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
@@ -205,6 +206,11 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
+
+		if annotationsCount > 0 {
+			comment := g.filterCommentString(service.Comments.Leading, false)
+			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+		}
 	}
 }
 
@@ -224,12 +230,25 @@ func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
 	return name
 }
 
-func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-	if *g.conf.Naming == "proto" {
-		return string(message.Desc.Name())
+func getMessageName(message protoreflect.MessageDescriptor) string {
+	prefix := ""
+	parent := message.Parent()
+	if message != nil {
+		if _, ok := parent.(protoreflect.MessageDescriptor); ok {
+			prefix = string(parent.Name()) + "_" + prefix
+		}
 	}
 
-	name := string(message.Desc.Name())
+	return prefix + string(message.Name())
+}
+
+func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
+	name := getMessageName(message.Desc)
+
+	if *g.conf.Naming == "proto" {
+		return name
+	}
+
 	if len(name) > 0 {
 		return strings.ToUpper(name[0:1]) + name[1:]
 	}
@@ -520,7 +539,8 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 
 // fullMessageTypeName builds the full type name of a message.
 func fullMessageTypeName(message protoreflect.MessageDescriptor) string {
-	return "." + string(message.ParentFile().Package()) + "." + string(message.Name())
+	name := getMessageName(message)
+	return "." + string(message.ParentFile().Package()) + "." + name
 }
 
 func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.Message) *v3.MediaTypes {
@@ -679,12 +699,13 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldD
 func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*protogen.Message) {
 	// For each message, generate a definition.
 	for _, message := range messages {
-		// Add any messages that are defined inside this message.
+
 		if message.Messages != nil {
 			g.addSchemasToDocumentV3(d, message.Messages)
 		}
 
 		typeName := fullMessageTypeName(message.Desc)
+		log.Printf("Adding %s", typeName)
 
 		// Only generate this if we need it and haven't already generated it.
 		if !contains(g.requiredSchemas, typeName) ||

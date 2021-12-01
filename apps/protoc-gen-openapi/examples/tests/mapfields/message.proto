@@ -31,17 +31,23 @@ service Messaging {
     }
 }
 
+message AnotherMessage {
+    int64 id = 1;
+    string label = 2;
+}
+
 message Message {
     message SubMessage {
         int64 id = 1;
         string label = 2;
     }
     string message_id = 1;
-    SubMessage sub_message = 2;
-    repeated string string_list = 3;
-    repeated SubMessage sub_message_list = 4;
-    repeated google.protobuf.Struct object_list = 5;
-    map<string, string> strings_map = 6;
-    map<string, SubMessage> sub_messages_map = 7;
-    map<string, google.protobuf.Struct> objects_map = 8;
+    AnotherMessage another_message = 2;
+    SubMessage sub_message = 3;
+    repeated string string_list = 4;
+    repeated SubMessage sub_message_list = 5;
+    repeated google.protobuf.Struct object_list = 6;
+    map<string, string> strings_map = 7;
+    map<string, SubMessage> sub_messages_map = 8;
+    map<string, google.protobuf.Struct> objects_map = 9;
 }
