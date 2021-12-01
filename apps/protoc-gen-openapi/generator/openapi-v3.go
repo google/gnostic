@@ -230,21 +230,20 @@ func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
 	return name
 }
 
-func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-
+func getMessageName(message protoreflect.MessageDescriptor) string {
 	prefix := ""
-	parent := message.Desc.Parent()
-	if parent != nil {
-		_, ok := parent.(protoreflect.MessageDescriptor)
-		if ok {
+	parent := message.Parent()
+	if message != nil {
+		if _, ok := parent.(protoreflect.MessageDescriptor); ok {
 			prefix = string(parent.Name()) + "_" + prefix
-			parent = parent.Parent()
-		} else {
-			parent = nil
 		}
 	}
 
-	name := prefix + string(message.Desc.Name())
+	return prefix + string(message.Name())
+}
+
+func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
+	name := getMessageName(message.Desc)
 
 	if *g.conf.Naming == "proto" {
 		return name
@@ -540,18 +539,8 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 
 // fullMessageTypeName builds the full type name of a message.
 func fullMessageTypeName(message protoreflect.MessageDescriptor) string {
-	prefix := ""
-	parent := message.Parent()
-	if parent != nil {
-		_, ok := parent.(protoreflect.MessageDescriptor)
-		if ok {
-			prefix = string(parent.Name()) + "_" + prefix
-			parent = parent.Parent()
-		} else {
-			parent = nil
-		}
-	}
-	return "." + string(message.ParentFile().Package()) + "." + prefix + string(message.Name())
+	name := getMessageName(message)
+	return "." + string(message.ParentFile().Package()) + "." + name
 }
 
 func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.Message) *v3.MediaTypes {
