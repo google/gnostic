@@ -1,0 +1,22 @@
+{
+  "title": "ListBooksResponse",
+  "$id": "http://example.com/schemas/ListBooksResponse.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Response message for LibraryService.ListBooks.",
+  "properties": {
+    "books": {
+      "title": "books",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/Book.json"
+      },
+      "description": "The list of books."
+    },
+    "next_page_token": {
+      "title": "next_page_token",
+      "type": "string",
+      "description": "A token to retrieve next page of results. Pass this value in the [ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token] field in the subsequent call to `ListBooks` method to retrieve the next page of results."
+    }
+  }
+}

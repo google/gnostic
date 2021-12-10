@@ -1,0 +1,20 @@
+{
+  "title": "Message",
+  "$id": "http://example.com/schemas/Message.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "message_id": {
+      "title": "message_id",
+      "type": "string"
+    },
+    "body_text": {
+      "title": "body_text",
+      "type": "string"
+    },
+    "not_used": {
+      "title": "not_used",
+      "type": "string"
+    }
+  }
+}

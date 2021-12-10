@@ -1,0 +1,19 @@
+{
+  "shelves": [
+    {
+      "name": "Best Sci-Fi ever",
+      "theme": "Science Fiction",
+      "nextSortAt": "2021-12-24",
+      "createdAt": "2019-07-26T00:00:00Z",
+      "updatedAt": "2021-09-22T00:45:00Z"
+    },
+    {
+      "name": "Worst Sci-Fi ever",
+      "theme": "Science Fiction",
+      "nextSortAt": "2021-12-24",
+      "createdAt": "2019-07-26T00:00:00Z",
+      "updatedAt": "2021-09-22T00:45:00Z"
+    }
+  ],
+  "nextPageToken": "abc-123"
+}
