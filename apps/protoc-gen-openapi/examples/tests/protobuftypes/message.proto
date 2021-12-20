@@ -42,9 +42,38 @@ service Messaging {
     };
   }
 }
-message Message {
+
+message RecursiveParent {
+  int32 parent_id = 1;
+  RecursiveChild child = 2;
+}
+message RecursiveChild {
+  int32 child_id = 1;
+  RecursiveParent parent = 2;
+}
+
+message SubMessage {
   string message_id = 1;
-  google.protobuf.Struct body = 2;
-  repeated google.protobuf.Struct media = 3;
-  google.protobuf.Empty not_used = 4;
+  SubSubMessage sub_sub_message = 2;
+}
+
+message SubSubMessage {
+  string message_id = 1;
+  repeated int32 integers = 2;
+}
+
+message Message {
+  message EmbMessage { string message_id = 1; }
+  string message_id = 1;
+  string string_type = 2;
+  RecursiveParent recursive_type = 3;
+  EmbMessage embedded_type = 4;
+  SubMessage sub_type = 5;
+  repeated string repeated_type = 6;
+  repeated SubMessage repeated_sub_type = 7;
+  repeated RecursiveParent repeated_recursive_type = 8;
+  map<string, string> map_type = 9;
+  google.protobuf.Struct body = 10;
+  repeated google.protobuf.Struct media = 11;
+  google.protobuf.Empty not_used = 12;
 }

@@ -31,10 +31,11 @@ import (
 )
 
 type Configuration struct {
-	Version     *string
-	Title       *string
-	Description *string
-	Naming      *string
+	Version       *string
+	Title         *string
+	Description   *string
+	Naming        *string
+	CircularDepth *int
 }
 
 const infoURL = "https://github.com/google/gnostic/tree/master/apps/protoc-gen-openapi"
@@ -264,14 +265,97 @@ func (g *OpenAPIv3Generator) formatFieldName(field *protogen.Field) string {
 	return field.Desc.JSONName()
 }
 
-func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *protogen.Message) string {
+func (g *OpenAPIv3Generator) findField(name string, inMessage *protogen.Message) *protogen.Field {
 	for _, field := range inMessage.Fields {
-		if string(field.Desc.Name()) == name {
-			return g.formatFieldName(field)
+		if string(field.Desc.Name()) == name || string(field.Desc.JSONName()) == name {
+			return field
 		}
 	}
 
+	return nil
+}
+
+func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *protogen.Message) string {
+	field := g.findField(name, inMessage)
+	if field != nil {
+		return g.formatFieldName(field)
+	}
+
 	return name
+}
+
+// Note that fields which are mapped to URL query parameters must have a primitive type
+// or a repeated primitive type or a non-repeated message type.
+// In the case of a repeated type, the parameter can be repeated in the URL as ...?param=A&param=B.
+// In the case of a message type, each field of the message is mapped to a separate parameter,
+// such as ...?foo.a=A&foo.b=B&foo.c=C.
+//
+// maps, Struct and Empty can NOT be used
+// messages can have any number of sub messages - including circular (e.g. sub.subsub.sub.subsub.id)
+
+// buildQueryParamsV3 extracts any valid query params, including sub and recursive messages
+func (g *OpenAPIv3Generator) buildQueryParamsV3(field *protogen.Field) []*v3.ParameterOrReference {
+	depths := map[string]int{}
+	return g._buildQueryParamsV3(field, depths)
+}
+
+// depths are used to keep track of how many times a message's fields has been seen
+func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths map[string]int) []*v3.ParameterOrReference {
+	parameters := []*v3.ParameterOrReference{}
+
+	queryFieldName := g.formatFieldName(field)
+	fieldDescription := g.filterCommentString(field.Comments.Leading, true)
+
+	if field.Desc.IsMap() {
+		// Map types are not allowed in query parameteres
+		return parameters
+
+	} else if field.Desc.Kind() == protoreflect.MessageKind {
+		if field.Desc.IsList() {
+			// Only non-repeated message types are valid
+			return parameters
+		}
+
+		// Sub messages are allowed, even circular, as long as the final type is a primitive.
+		// Go through each of the sub message fields
+		for _, subField := range field.Message.Fields {
+			subFieldFullName := string(subField.Desc.FullName())
+			seen, ok := depths[subFieldFullName]
+			if !ok {
+				depths[subFieldFullName] = 0
+			}
+
+			if seen < *g.conf.CircularDepth {
+				depths[subFieldFullName]++
+				subParams := g._buildQueryParamsV3(subField, depths)
+				for _, subParam := range subParams {
+					if param, ok := subParam.Oneof.(*v3.ParameterOrReference_Parameter); ok {
+						param.Parameter.Name = queryFieldName + "." + param.Parameter.Name
+						parameters = append(parameters, subParam)
+					}
+				}
+			}
+		}
+
+	} else if field.Desc.Kind() != protoreflect.GroupKind {
+		// schemaOrReferenceForField also handles array types
+		fieldSchema := g.schemaOrReferenceForField(field.Desc)
+
+		parameters = append(parameters,
+			&v3.ParameterOrReference{
+				Oneof: &v3.ParameterOrReference_Parameter{
+					Parameter: &v3.Parameter{
+						Name:        queryFieldName,
+						In:          "query",
+						Description: fieldDescription,
+						Required:    false,
+						Schema:      fieldSchema,
+					},
+				},
+			})
+	}
+
+	return parameters
 }
 
 // buildOperationV3 constructs an operation for a set of values.
@@ -293,8 +377,6 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Initialize the list of operation parameters.
 	parameters := []*v3.ParameterOrReference{}
 
-	// Build a list of path parameters.
-	pathParameters := make([]string, 0)
 	// Find simple path parameters like {id}
 	if allMatches := g.pathPattern.FindAllStringSubmatch(path, -1); allMatches != nil {
 		for _, matches := range allMatches {
@@ -302,35 +384,46 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			coveredParameters = append(coveredParameters, matches[1])
 			pathParameter := g.findAndFormatFieldName(matches[1], inputMessage)
 			path = strings.Replace(path, matches[1], pathParameter, 1)
-			pathParameters = append(pathParameters, pathParameter)
+
+			// Add the path parameters to the operation parameters.
+			var fieldSchema *v3.SchemaOrReference
+
+			var fieldDescription string
+			field := g.findField(pathParameter, inputMessage)
+			if field != nil {
+				fieldSchema = g.schemaOrReferenceForField(field.Desc)
+				fieldDescription = g.filterCommentString(field.Comments.Leading, true)
+			} else {
+				// If field dooes not exist, it is safe to set it to string, as it is ignored downstream
+				fieldSchema = &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{
+							Type: "string",
+						},
+					},
+				}
+			}
+
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        pathParameter,
+							In:          "path",
+							Description: fieldDescription,
+							Required:    true,
+							Schema:      fieldSchema,
+						},
+					},
+				})
 		}
 	}
 
-	// Add the path parameters to the operation parameters.
-	for _, pathParameter := range pathParameters {
-		parameters = append(parameters,
-			&v3.ParameterOrReference{
-				Oneof: &v3.ParameterOrReference_Parameter{
-					Parameter: &v3.Parameter{
-						Name:     pathParameter,
-						In:       "path",
-						Required: true,
-						Schema: &v3.SchemaOrReference{
-							Oneof: &v3.SchemaOrReference_Schema{
-								Schema: &v3.Schema{
-									Type: "string",
-								},
-							},
-						},
-					},
-				},
-			})
-	}
-
-	// Build a list of named path parameters.
-	namedPathParameters := make([]string, 0)
 	// Find named path parameters like {name=shelves/*}
 	if matches := g.namedPathPattern.FindStringSubmatch(path); matches != nil {
+		// Build a list of named path parameters.
+		namedPathParameters := make([]string, 0)
+
 		// Add the "name=" "name" value to the list of covered parameters.
 		coveredParameters = append(coveredParameters, matches[1])
 		// Convert the path from the starred form to use named path parameters.
@@ -348,58 +441,41 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		// Rewrite the path to use the path parameters.
 		newPath := strings.Join(parts, "/")
 		path = strings.Replace(path, matches[0], newPath, 1)
-	}
 
-	// Add the named path parameters to the operation parameters.
-	for _, namedPathParameter := range namedPathParameters {
-		parameters = append(parameters,
-			&v3.ParameterOrReference{
-				Oneof: &v3.ParameterOrReference_Parameter{
-					Parameter: &v3.Parameter{
-						Name:        namedPathParameter,
-						In:          "path",
-						Required:    true,
-						Description: "The " + namedPathParameter + " id.",
-						Schema: &v3.SchemaOrReference{
-							Oneof: &v3.SchemaOrReference_Schema{
-								Schema: &v3.Schema{
-									Type: "string",
-								},
-							},
-						},
-					},
-				},
-			})
-	}
-	// Add any unhandled fields in the request message as query parameters.
-	if bodyField != "*" {
-		for _, field := range inputMessage.Fields {
-			fieldName := string(field.Desc.Name())
-			if !contains(coveredParameters, fieldName) {
-				bodyFieldName := g.formatFieldName(field)
-				// Get the field description from the comments.
-				fieldDescription := g.filterCommentString(field.Comments.Leading, true)
-				parameters = append(parameters,
-					&v3.ParameterOrReference{
-						Oneof: &v3.ParameterOrReference_Parameter{
-							Parameter: &v3.Parameter{
-								Name:        bodyFieldName,
-								In:          "query",
-								Description: fieldDescription,
-								Required:    false,
-								Schema: &v3.SchemaOrReference{
-									Oneof: &v3.SchemaOrReference_Schema{
-										Schema: &v3.Schema{
-											Type: "string",
-										},
+		// Add the named path parameters to the operation parameters.
+		for _, namedPathParameter := range namedPathParameters {
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        namedPathParameter,
+							In:          "path",
+							Required:    true,
+							Description: "The " + namedPathParameter + " id.",
+							Schema: &v3.SchemaOrReference{
+								Oneof: &v3.SchemaOrReference_Schema{
+									Schema: &v3.Schema{
+										Type: "string",
 									},
 								},
 							},
 						},
-					})
+					},
+				})
+		}
+	}
+
+	// Add any unhandled fields in the request message as query parameters.
+	if bodyField != "*" {
+		for _, field := range inputMessage.Fields {
+			fieldName := string(field.Desc.Name())
+			if !contains(coveredParameters, fieldName) && fieldName != bodyField {
+				fieldParams := g.buildQueryParamsV3(field)
+				parameters = append(parameters, fieldParams...)
 			}
 		}
 	}
+
 	// Create the response.
 	responses := &v3.Responses{
 		ResponseOrReference: []*v3.NamedResponseOrReference{
@@ -416,6 +492,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			},
 		},
 	}
+
 	// Create the operation.
 	op := &v3.Operation{
 		Tags:        []string{tagName},
@@ -424,6 +501,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		Parameters:  parameters,
 		Responses:   responses,
 	}
+
 	// If a body field is specified, we need to pass a message as the request body.
 	if bodyField != "" {
 		var bodyFieldScalarTypeName string
@@ -705,7 +783,6 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		}
 
 		typeName := fullMessageTypeName(message.Desc)
-		log.Printf("Adding %s", typeName)
 
 		// Only generate this if we need it and haven't already generated it.
 		if !contains(g.requiredSchemas, typeName) ||
