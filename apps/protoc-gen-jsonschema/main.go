@@ -20,6 +20,7 @@ import (
 
 	"github.com/google/gnostic/apps/protoc-gen-jsonschema/generator"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 var flags flag.FlagSet
@@ -36,6 +37,9 @@ func main() {
 	}
 
 	opts.Run(func(plugin *protogen.Plugin) error {
+		// Enable "optional" keyword in front of type (e.g. optional string labe = 1;)
+		plugin.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+
 		return generator.NewJSONSchemaGenerator(plugin, conf).Run()
 	})
 }
