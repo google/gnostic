@@ -18,6 +18,7 @@ package generator
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 	"sort"
 	"strings"
@@ -122,6 +123,70 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
 	}
 
+	allServers := []string{}
+
+	// If paths methods has servers, but they're all the same, then move servers to path level
+	for _, path := range d.Paths.Path {
+		servers := []string{}
+		// Only 1 server will ever be set, per method, by the generator
+
+		if path.Value.Get != nil && len(path.Value.Get.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Get.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Get.Servers[0].Url)
+		}
+		if path.Value.Post != nil && len(path.Value.Post.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Post.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Post.Servers[0].Url)
+		}
+		if path.Value.Put != nil && len(path.Value.Put.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Put.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Put.Servers[0].Url)
+		}
+		if path.Value.Delete != nil && len(path.Value.Delete.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Delete.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Delete.Servers[0].Url)
+		}
+		if path.Value.Patch != nil && len(path.Value.Patch.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Patch.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Patch.Servers[0].Url)
+		}
+
+		if len(servers) == 1 {
+			path.Value.Servers = []*v3.Server{{Url: servers[0]}}
+
+			if path.Value.Get != nil {
+				path.Value.Get.Servers = nil
+			}
+			if path.Value.Post != nil {
+				path.Value.Post.Servers = nil
+			}
+			if path.Value.Put != nil {
+				path.Value.Put.Servers = nil
+			}
+			if path.Value.Delete != nil {
+				path.Value.Delete.Servers = nil
+			}
+			if path.Value.Patch != nil {
+				path.Value.Patch.Servers = nil
+			}
+		}
+	}
+
+	// Set all servers on API level
+	if len(allServers) > 0 {
+		d.Servers = []*v3.Server{}
+		for _, server := range allServers {
+			d.Servers = append(d.Servers, &v3.Server{Url: server})
+		}
+	}
+
+	// If there is only 1 server, we can safely remove all path level servers
+	if len(allServers) == 1 {
+		for _, path := range d.Paths.Path {
+			path.Value.Servers = nil
+		}
+	}
+
 	// Sort the tags.
 	{
 		pairs := d.Tags
@@ -169,15 +234,16 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
-			xt := annotations.E_Http
-			extension := proto.GetExtension(method.Desc.Options(), xt)
+
 			var path string
 			var methodName string
 			var body string
-			if extension != nil && extension != xt.InterfaceOf(xt.Zero()) {
+
+			extHTTP := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
+			if extHTTP != nil && extHTTP != annotations.E_Http.InterfaceOf(annotations.E_Http.Zero()) {
 				annotationsCount++
 
-				rule := extension.(*annotations.HttpRule)
+				rule := extHTTP.(*annotations.HttpRule)
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
 				case *annotations.HttpRule_Get:
@@ -201,9 +267,12 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 					path = "unknown-unsupported"
 				}
 			}
+
 			if methodName != "" {
+				defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
+
 				op, path2 := g.buildOperationV3(
-					file, operationID, service.GoName, comment, path, body, inputMessage, outputMessage)
+					file, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
@@ -364,6 +433,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	operationID string,
 	tagName string,
 	description string,
+	defaultHost string,
 	path string,
 	bodyField string,
 	inputMessage *protogen.Message,
@@ -500,6 +570,14 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		OperationId: operationID,
 		Parameters:  parameters,
 		Responses:   responses,
+	}
+
+	if defaultHost != "" {
+		hostURL, err := url.Parse(defaultHost)
+		if err == nil {
+			hostURL.Scheme = "https"
+			op.Servers = append(op.Servers, &v3.Server{Url: hostURL.String()})
+		}
 	}
 
 	// If a body field is specified, we need to pass a message as the request body.
@@ -860,6 +938,14 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+// appendUniuqe appends a string, to a string slice, if the string is not already in the slice
+func appendUniuqe(s []string, e string) []string {
+	if !contains(s, e) {
+		return append(s, e)
+	}
+	return s
 }
 
 // singular produces the singular form of a collection name.

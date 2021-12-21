@@ -17,6 +17,7 @@ syntax = "proto3";
 
 package tests.protobuftypes.message.v1;
 
+import "google/api/client.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
@@ -24,6 +25,7 @@ import "google/protobuf/empty.proto";
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
 
 service Messaging {
+  option (google.api.default_host) = "foo.googleapi.com";
   rpc CreateMessage(Message) returns (Message) {
     option (google.api.http) = {
       post : "/v1/messages/{message_id}"

@@ -5,6 +5,8 @@ openapi: 3.0.3
 info:
     title: Messaging API
     version: 0.0.1
+servers:
+    - url: https://foo.googleapi.com
 paths:
     /v1/messages/{message_id}:
         get:
