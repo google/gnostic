@@ -1,0 +1,14 @@
+{
+  "title": "DeleteShelfRequest",
+  "$id": "http://example.com/schemas/DeleteShelfRequest.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Request message for LibraryService.DeleteShelf.",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The name of the shelf to delete."
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Book title",
+  "author": "James B. Ookwriter",
+  "title": "Book title",
+  "read": true,
+  "borrowTime": "2021-09-22T00:45:00Z",
+  "createdAt": "2019-07-26T00:00:00Z",
+  "updatedAt": "2021-09-22T00:45:00Z"
+}
