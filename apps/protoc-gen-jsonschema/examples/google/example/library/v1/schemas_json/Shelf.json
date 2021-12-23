@@ -1,0 +1,40 @@
+{
+  "title": "Shelf",
+  "$id": "http://example.com/schemas/Shelf.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "A Shelf contains a collection of books with a theme.",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The resource name of the shelf. Shelf names have the form `shelves/{shelf_id}`. The name is ignored when creating a shelf."
+    },
+    "theme": {
+      "title": "theme",
+      "type": "string",
+      "description": "The theme of the shelf"
+    },
+    "nextSortAt": {
+      "title": "nextSortAt",
+      "readOnly": true,
+      "type": "string",
+      "description": "The next sorting date.",
+      "format": "date"
+    },
+    "createdAt": {
+      "title": "createdAt",
+      "readOnly": true,
+      "type": "string",
+      "description": "The creation date and time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "title": "updatedAt",
+      "readOnly": true,
+      "type": "string",
+      "description": "The last update date and time.",
+      "format": "date-time"
+    }
+  }
+}

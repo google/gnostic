@@ -1,0 +1,22 @@
+{
+  "title": "ListShelvesResponse",
+  "$id": "http://example.com/schemas/ListShelvesResponse.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Response message for LibraryService.ListShelves.",
+  "properties": {
+    "shelves": {
+      "title": "shelves",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/Shelf.json"
+      },
+      "description": "The list of shelves."
+    },
+    "next_page_token": {
+      "title": "next_page_token",
+      "type": "string",
+      "description": "A token to retrieve next page of results. Pass this value in the [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token] field in the subsequent call to `ListShelves` method to retrieve the next page of results."
+    }
+  }
+}
