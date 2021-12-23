@@ -1,0 +1,19 @@
+{
+  "title": "AnotherMessage",
+  "$id": "http://example.com/schemas/AnotherMessage.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "id",
+      "readOnly": true,
+      "type": "integer",
+      "format": "int64"
+    },
+    "label": {
+      "title": "label",
+      "writeOnly": true,
+      "type": "string"
+    }
+  }
+}

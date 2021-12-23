@@ -1,0 +1,19 @@
+{
+  "title": "MoveBookRequest",
+  "$id": "http://example.com/schemas/MoveBookRequest.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Describes what book to move (name) and what shelf we're moving it to (other_shelf_name).",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The name of the book to move."
+    },
+    "otherShelfName": {
+      "title": "otherShelfName",
+      "type": "string",
+      "description": "The name of the destination shelf."
+    }
+  }
+}

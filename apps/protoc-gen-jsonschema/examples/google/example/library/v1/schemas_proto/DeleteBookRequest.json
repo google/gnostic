@@ -1,0 +1,14 @@
+{
+  "title": "DeleteBookRequest",
+  "$id": "http://example.com/schemas/DeleteBookRequest.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Request message for LibraryService.DeleteBook.",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The name of the book to delete."
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "messageId": "123abc",
+  "anotherMessage": {
+    "id": 1234,
+    "label": "The label"
+  },
+  "subMessage": {
+    "id": 1234,
+    "label": "The label"
+  },
+  "stringList": ["123", "abc"],
+  "subMessageList": [
+    {
+      "id": 1234,
+      "label": "The label"
+    },
+    {
+      "id": 4321,
+      "label": "Another label"
+    }
+  ],
+  "anotherMessageList": [
+    {
+      "id": 1234,
+      "label": "The label"
+    },
+    {
+      "id": 4321,
+      "label": "Another label"
+    }
+  ],
+  "objectList": [
+    {
+      "any": "props",
+      "should": "work"
+    }
+  ],
+  "stringsMap": {
+    "any": "props",
+    "should": "work"
+  },
+  "subMessagesMap": {
+    "sub1": {
+      "id": 1234,
+      "label": "The label"
+    },
+    "sub2": {
+      "id": 4321,
+      "label": "Another label"
+    }
+  },
+  "anotherMessagesMap": {
+    "another1": {
+      "id": 1234,
+      "label": "The label"
+    },
+    "another2": {
+      "id": 4321,
+      "label": "Another label"
+    }
+  },
+  "objectsMap": {
+    "object1": {
+      "any": "props",
+      "should": "work"
+    },
+    "object2": {
+      "any": "props",
+      "should": "work"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "title": "ListBooksRequest",
+  "$id": "http://example.com/schemas/ListBooksRequest.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Request message for LibraryService.ListBooks.",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The name of the shelf whose books we'd like to list."
+    },
+    "page_size": {
+      "title": "page_size",
+      "type": "integer",
+      "description": "Requested page size. Server may return fewer books than requested. If unspecified, server will pick an appropriate default.",
+      "format": "int32"
+    },
+    "page_token": {
+      "title": "page_token",
+      "type": "string",
+      "description": "A token identifying a page of results the server should return. Typically, this is the value of [ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token]. returned from the previous call to `ListBooks` method."
+    }
+  }
+}
