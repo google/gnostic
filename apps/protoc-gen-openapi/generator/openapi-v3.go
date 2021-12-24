@@ -719,6 +719,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
+		var required []string
 		for _, field := range message.Fields {
 			// Check the field annotations to see if this is a readonly field.
 			outputOnly := false
@@ -727,8 +728,11 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 				switch v := extension.(type) {
 				case []annotations.FieldBehavior:
 					for _, vv := range v {
-						if vv == annotations.FieldBehavior_OUTPUT_ONLY {
+						switch vv {
+						case annotations.FieldBehavior_OUTPUT_ONLY:
 							outputOnly = true
+						case annotations.FieldBehavior_REQUIRED:
+							required = append(required, g.formatFieldName(field))
 						}
 					}
 				default:
@@ -767,6 +771,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 						Schema: &v3.Schema{
 							Description: messageDescription,
 							Properties:  definitionProperties,
+							Required:    required,
 						},
 					},
 				},
