@@ -778,7 +778,7 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 				Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
 
 	case ".google.protobuf.FieldMask":
-		// Field masks are serializied as strings
+		// Field masks are serialized as strings
 		return &v3.SchemaOrReference{
 			Oneof: &v3.SchemaOrReference_Schema{
 				Schema: &v3.Schema{Type: "string", Format: "field-mask"}}}
