@@ -5,6 +5,8 @@ openapi: 3.0.3
 info:
     title: Messaging API
     version: 1.2.3
+servers:
+    - url: https://foo.googleapi.com
 paths:
     /v1/messages/{messageId}:
         get:
@@ -17,18 +19,55 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: body
+                - name: stringType
                   in: query
                   schema:
                     type: string
-                - name: media
+                - name: recursiveType.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: embeddedType.messageId
                   in: query
                   schema:
                     type: string
-                - name: notUsed
+                - name: subType.messageId
                   in: query
                   schema:
                     type: string
+                - name: subType.subSubMessage.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.integers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                - name: repeatedType
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
             responses:
                 "200":
                     description: OK
@@ -69,14 +108,55 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: media
+                - name: stringType
                   in: query
                   schema:
                     type: string
-                - name: notUsed
+                - name: recursiveType.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: embeddedType.messageId
                   in: query
                   schema:
                     type: string
+                - name: subType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.integers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                - name: repeatedType
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
             requestBody:
                 content:
                     application/json:
@@ -93,11 +173,68 @@ components:
             properties:
                 messageId:
                     type: string
+                stringType:
+                    type: string
+                recursiveType:
+                    $ref: '#/components/schemas/RecursiveParent'
+                embeddedType:
+                    $ref: '#/components/schemas/Message_EmbMessage'
+                subType:
+                    $ref: '#/components/schemas/SubMessage'
+                repeatedType:
+                    type: array
+                    items:
+                        type: string
+                repeatedSubType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SubMessage'
+                repeatedRecursiveType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RecursiveParent'
+                mapType:
+                    type: object
+                    additionalProperties:
+                        type: string
                 body:
                     type: object
                 media:
                     type: array
                     items:
                         type: object
+        Message_EmbMessage:
+            properties:
+                messageId:
+                    type: string
+        RecursiveChild:
+            properties:
+                childId:
+                    type: integer
+                    format: int32
+                parent:
+                    $ref: '#/components/schemas/RecursiveParent'
+        RecursiveParent:
+            properties:
+                parentId:
+                    type: integer
+                    format: int32
+                child:
+                    $ref: '#/components/schemas/RecursiveChild'
+        SubMessage:
+            properties:
+                messageId:
+                    type: string
+                subSubMessage:
+                    $ref: '#/components/schemas/SubSubMessage'
+        SubSubMessage:
+            properties:
+                messageId:
+                    type: string
+                integers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
 tags:
     - name: Messaging

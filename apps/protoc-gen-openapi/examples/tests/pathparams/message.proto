@@ -41,13 +41,27 @@ service Messaging {
     };
   }
 }
+
 message GetMessageRequest {
   string message_id = 1;
-  string user_id = 2;
+  uint64 user_id = 2;
+}
+
+message Meta {
+  string message_id = 1;
+  uint64 user_id = 2;
+  string content = 3;
 }
 
 message Message {
   string message_id = 1;
-  string user_id = 2;
+  uint64 user_id = 2;
+  string content = 3;
+  optional string maybe = 4;
+}
+
+message Comment {
+  string comment_id = 1;
+  uint64 user_id = 2;
   string content = 3;
 }
