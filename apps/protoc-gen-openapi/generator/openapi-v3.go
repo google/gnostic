@@ -385,6 +385,24 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 			return parameters
 		}
 
+		// Represent field masks directly as strings (don't expand them).
+		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.FieldMask" {
+			fieldSchema := g.schemaOrReferenceForField(field.Desc)
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        queryFieldName,
+							In:          "query",
+							Description: fieldDescription,
+							Required:    false,
+							Schema:      fieldSchema,
+						},
+					},
+				})
+			return parameters
+		}
+
 		// Sub messages are allowed, even circular, as long as the final type is a primitive.
 		// Go through each of the sub message fields
 		for _, subField := range field.Message.Fields {
@@ -758,6 +776,12 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 		return &v3.SchemaOrReference{
 			Oneof: &v3.SchemaOrReference_Schema{
 				Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
+
+	case ".google.protobuf.FieldMask":
+		// Field masks are serialized as strings
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string", Format: "field-mask"}}}
 
 	case ".google.protobuf.Struct":
 		// Struct is equivalent to a JSON object
