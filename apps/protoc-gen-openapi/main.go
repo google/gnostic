@@ -20,16 +20,18 @@ import (
 
 	"github.com/google/gnostic/apps/protoc-gen-openapi/generator"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 var flags flag.FlagSet
 
 func main() {
 	conf := generator.Configuration{
-		Version:     flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
-		Title:       flags.String("title", "", "name of the API"),
-		Description: flags.String("description", "", "description of the API"),
-		Naming:      flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
+		Version:       flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
+		Title:         flags.String("title", "", "name of the API"),
+		Description:   flags.String("description", "", "description of the API"),
+		Naming:        flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
+		CircularDepth: flags.Int("depth", 2, `depth of recursion for circular messages`),
 	}
 
 	opts := protogen.Options{
@@ -37,6 +39,9 @@ func main() {
 	}
 
 	opts.Run(func(plugin *protogen.Plugin) error {
+		// Enable "optional" keyword in front of type (e.g. optional string labe = 1;)
+		plugin.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+
 		return generator.NewOpenAPIv3Generator(plugin, conf).Run()
 	})
 }

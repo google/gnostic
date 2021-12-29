@@ -18,7 +18,6 @@ syntax = "proto3";
 package tests.mapfields.message.v1;
 
 import "google/api/annotations.proto";
-import "google/protobuf/struct.proto";
 
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/noannotations/message/v1;message";
 
