@@ -314,6 +314,8 @@ paths:
 components:
     schemas:
         Book:
+            required:
+                - name
             properties:
                 name:
                     type: string
@@ -366,6 +368,9 @@ components:
                     description: A token to retrieve next page of results. Pass this value in the [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token] field in the subsequent call to `ListShelves` method to retrieve the next page of results.
             description: Response message for LibraryService.ListShelves.
         MergeShelvesRequest:
+            required:
+                - name
+                - other_shelf_name
             properties:
                 name:
                     type: string
@@ -375,6 +380,9 @@ components:
                     description: The name of the shelf we're removing books from and deleting.
             description: Describes the shelf being removed (other_shelf_name) and updated (name) in this merge.
         MoveBookRequest:
+            required:
+                - name
+                - other_shelf_name
             properties:
                 name:
                     type: string
@@ -384,6 +392,8 @@ components:
                     description: The name of the destination shelf.
             description: Describes what book to move (name) and what shelf we're moving it to (other_shelf_name).
         Shelf:
+            required:
+                - name
             properties:
                 name:
                     type: string
