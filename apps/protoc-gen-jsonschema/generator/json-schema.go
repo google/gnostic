@@ -289,7 +289,7 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 			}
 
 			// Handle readonly and writeonly properties, if the schema version can handle it.
-			if strings.TrimSuffix(*schema.Value.Schema, "#") == "http://json-schema.org/draft-07/schema" {
+			if getSchemaVersion(schema.Value) >= "07" {
 				t := true
 				// Check the field annotations to see if this is a readonly field.
 				extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
@@ -336,6 +336,17 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 	}
 
 	return schemas
+}
+
+var reSchemaVersion = regexp.MustCompile(`https*://json-schema.org/draft[/-]([^/]+)/schema`)
+
+func getSchemaVersion(schema *jsonschema.Schema) string {
+	schemaSchema := *schema.Schema
+	matches := reSchemaVersion.FindStringSubmatch(schemaSchema)
+	if len(matches) == 2 {
+		return matches[1]
+	}
+	return ""
 }
 
 func refInDefinitions(ref string, definitions *[]*jsonschema.NamedSchema) bool {
