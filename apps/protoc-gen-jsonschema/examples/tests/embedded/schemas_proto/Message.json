@@ -12,12 +12,12 @@
       "title": "comments",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Comment"
+        "$ref": "#/definitions/Message_Comment"
       }
     }
   },
   "definitions": {
-    "Reply": {
+    "Message_Comment_Reply": {
       "title": "Reply",
       "type": "object",
       "properties": {
@@ -35,7 +35,7 @@
         }
       }
     },
-    "Comment": {
+    "Message_Comment": {
       "title": "Comment",
       "type": "object",
       "properties": {
@@ -51,7 +51,7 @@
           "title": "replies",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Reply"
+            "$ref": "#/definitions/Message_Comment_Reply"
           }
         }
       }

@@ -14,7 +14,7 @@
       "$ref": "http://example.com/schemas/AnotherMessage.json"
     },
     "sub_message": {
-      "$ref": "#/definitions/SubMessage"
+      "$ref": "#/definitions/Message_SubMessage"
     },
     "string_list": {
       "title": "string_list",
@@ -27,7 +27,7 @@
       "title": "sub_message_list",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/SubMessage"
+        "$ref": "#/definitions/Message_SubMessage"
       }
     },
     "another_message_list": {
@@ -55,7 +55,7 @@
       "title": "sub_messages_map",
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/SubMessage"
+        "$ref": "#/definitions/Message_SubMessage"
       }
     },
     "another_messages_map": {
@@ -74,7 +74,7 @@
     }
   },
   "definitions": {
-    "SubMessage": {
+    "Message_SubMessage": {
       "title": "SubMessage",
       "type": "object",
       "properties": {
