@@ -170,6 +170,7 @@ paths:
 components:
     schemas:
         Message:
+            type: object
             properties:
                 messageId:
                     type: string
@@ -204,10 +205,12 @@ components:
                     items:
                         type: object
         Message_EmbMessage:
+            type: object
             properties:
                 messageId:
                     type: string
         RecursiveChild:
+            type: object
             properties:
                 childId:
                     type: integer
@@ -215,6 +218,7 @@ components:
                 parent:
                     $ref: '#/components/schemas/RecursiveParent'
         RecursiveParent:
+            type: object
             properties:
                 parentId:
                     type: integer
@@ -222,12 +226,14 @@ components:
                 child:
                     $ref: '#/components/schemas/RecursiveChild'
         SubMessage:
+            type: object
             properties:
                 messageId:
                     type: string
                 subSubMessage:
                     $ref: '#/components/schemas/SubSubMessage'
         SubSubMessage:
+            type: object
             properties:
                 messageId:
                     type: string
