@@ -76,8 +76,6 @@
   "definitions": {
     "SubMessage": {
       "title": "SubMessage",
-      "$id": "/schemas/SubMessage",
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
       "properties": {
         "id": {

@@ -268,13 +268,28 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 
 		// Any embedded messages will be created as definitions
 		if message.Messages != nil {
+			if schema.Value.Definitions == nil {
+				schema.Value.Definitions = &[]*jsonschema.NamedSchema{}
+			}
+
 			subSchemas := g.buildSchemasFromMessages(message.Messages)
 			for i, subSchema := range subSchemas {
 				idURL, _ := url.Parse(*subSchema.Value.ID)
 				path := strings.TrimSuffix(idURL.Path, ".json")
 				subSchemas[i].Value.ID = &path
+
+				// Extract any defintiions (embedded schemas) in the embedded schema
+				if subSchema.Value.Definitions != nil {
+					*schema.Value.Definitions = append(*schema.Value.Definitions, *subSchema.Value.Definitions...)
+					subSchema.Value.Definitions = nil
+				}
 			}
-			schema.Value.Definitions = &subSchemas
+			// Remove $id and $schema, which is used for self-contained schemas
+			*schema.Value.Definitions = append(*schema.Value.Definitions, subSchemas...)
+			for _, def := range *schema.Value.Definitions {
+				def.Value.ID = nil
+				def.Value.Schema = nil
+			}
 		}
 
 		if message.Desc.IsMapEntry() {
