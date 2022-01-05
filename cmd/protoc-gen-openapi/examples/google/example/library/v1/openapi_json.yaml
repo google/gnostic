@@ -15,6 +15,8 @@ info:
          - Each Shelf has a collection of [Book][google.example.library.v1.Book]
            resources, named `shelves/*/books/*`
     version: 1.2.3
+servers:
+    - url: https://library-example.googleapis.com
 paths:
     /v1/shelves:
         get:
@@ -29,7 +31,8 @@ paths:
                   in: query
                   description: Requested page size. Server may return fewer shelves than requested. If unspecified, server will pick an appropriate default.
                   schema:
-                    type: string
+                    type: integer
+                    format: int32
                 - name: pageToken
                   in: query
                   description: A token identifying a page of results the server should return. Typically, this is the value of [ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token] returned from the previous call to `ListShelves` method.
@@ -116,7 +119,8 @@ paths:
                   in: query
                   description: Requested page size. Server may return fewer books than requested. If unspecified, server will pick an appropriate default.
                   schema:
-                    type: string
+                    type: integer
+                    format: int32
                 - name: pageToken
                   in: query
                   description: A token identifying a page of results the server should return. Typically, this is the value of [ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token]. returned from the previous call to `ListBooks` method.
@@ -310,6 +314,8 @@ paths:
 components:
     schemas:
         Book:
+            required:
+                - name
             properties:
                 name:
                     type: string
@@ -362,6 +368,9 @@ components:
                     description: A token to retrieve next page of results. Pass this value in the [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token] field in the subsequent call to `ListShelves` method to retrieve the next page of results.
             description: Response message for LibraryService.ListShelves.
         MergeShelvesRequest:
+            required:
+                - name
+                - otherShelfName
             properties:
                 name:
                     type: string
@@ -371,6 +380,9 @@ components:
                     description: The name of the shelf we're removing books from and deleting.
             description: Describes the shelf being removed (other_shelf_name) and updated (name) in this merge.
         MoveBookRequest:
+            required:
+                - name
+                - otherShelfName
             properties:
                 name:
                     type: string
@@ -380,6 +392,8 @@ components:
                     description: The name of the destination shelf.
             description: Describes what book to move (name) and what shelf we're moving it to (other_shelf_name).
         Shelf:
+            required:
+                - name
             properties:
                 name:
                     type: string

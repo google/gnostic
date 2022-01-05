@@ -18,6 +18,7 @@ package generator
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 	"sort"
 	"strings"
@@ -31,10 +32,11 @@ import (
 )
 
 type Configuration struct {
-	Version     *string
-	Title       *string
-	Description *string
-	Naming      *string
+	Version       *string
+	Title         *string
+	Description   *string
+	Naming        *string
+	CircularDepth *int
 }
 
 const infoURL = "https://github.com/google/gnostic/tree/master/apps/protoc-gen-openapi"
@@ -121,6 +123,70 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		g.requiredSchemas = g.requiredSchemas[count:len(g.requiredSchemas)]
 	}
 
+	allServers := []string{}
+
+	// If paths methods has servers, but they're all the same, then move servers to path level
+	for _, path := range d.Paths.Path {
+		servers := []string{}
+		// Only 1 server will ever be set, per method, by the generator
+
+		if path.Value.Get != nil && len(path.Value.Get.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Get.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Get.Servers[0].Url)
+		}
+		if path.Value.Post != nil && len(path.Value.Post.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Post.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Post.Servers[0].Url)
+		}
+		if path.Value.Put != nil && len(path.Value.Put.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Put.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Put.Servers[0].Url)
+		}
+		if path.Value.Delete != nil && len(path.Value.Delete.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Delete.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Delete.Servers[0].Url)
+		}
+		if path.Value.Patch != nil && len(path.Value.Patch.Servers) == 1 {
+			servers = appendUniuqe(servers, path.Value.Patch.Servers[0].Url)
+			allServers = appendUniuqe(servers, path.Value.Patch.Servers[0].Url)
+		}
+
+		if len(servers) == 1 {
+			path.Value.Servers = []*v3.Server{{Url: servers[0]}}
+
+			if path.Value.Get != nil {
+				path.Value.Get.Servers = nil
+			}
+			if path.Value.Post != nil {
+				path.Value.Post.Servers = nil
+			}
+			if path.Value.Put != nil {
+				path.Value.Put.Servers = nil
+			}
+			if path.Value.Delete != nil {
+				path.Value.Delete.Servers = nil
+			}
+			if path.Value.Patch != nil {
+				path.Value.Patch.Servers = nil
+			}
+		}
+	}
+
+	// Set all servers on API level
+	if len(allServers) > 0 {
+		d.Servers = []*v3.Server{}
+		for _, server := range allServers {
+			d.Servers = append(d.Servers, &v3.Server{Url: server})
+		}
+	}
+
+	// If there is only 1 server, we can safely remove all path level servers
+	if len(allServers) == 1 {
+		for _, path := range d.Paths.Path {
+			path.Value.Servers = nil
+		}
+	}
+
 	// Sort the tags.
 	{
 		pairs := d.Tags
@@ -168,15 +234,16 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
-			xt := annotations.E_Http
-			extension := proto.GetExtension(method.Desc.Options(), xt)
+
 			var path string
 			var methodName string
 			var body string
-			if extension != nil && extension != xt.InterfaceOf(xt.Zero()) {
+
+			extHTTP := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
+			if extHTTP != nil && extHTTP != annotations.E_Http.InterfaceOf(annotations.E_Http.Zero()) {
 				annotationsCount++
 
-				rule := extension.(*annotations.HttpRule)
+				rule := extHTTP.(*annotations.HttpRule)
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
 				case *annotations.HttpRule_Get:
@@ -200,9 +267,12 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 					path = "unknown-unsupported"
 				}
 			}
+
 			if methodName != "" {
+				defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
+
 				op, path2 := g.buildOperationV3(
-					file, operationID, service.GoName, comment, path, body, inputMessage, outputMessage)
+					file, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
@@ -264,14 +334,115 @@ func (g *OpenAPIv3Generator) formatFieldName(field *protogen.Field) string {
 	return field.Desc.JSONName()
 }
 
-func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *protogen.Message) string {
+func (g *OpenAPIv3Generator) findField(name string, inMessage *protogen.Message) *protogen.Field {
 	for _, field := range inMessage.Fields {
-		if string(field.Desc.Name()) == name {
-			return g.formatFieldName(field)
+		if string(field.Desc.Name()) == name || string(field.Desc.JSONName()) == name {
+			return field
 		}
 	}
 
+	return nil
+}
+
+func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *protogen.Message) string {
+	field := g.findField(name, inMessage)
+	if field != nil {
+		return g.formatFieldName(field)
+	}
+
 	return name
+}
+
+// Note that fields which are mapped to URL query parameters must have a primitive type
+// or a repeated primitive type or a non-repeated message type.
+// In the case of a repeated type, the parameter can be repeated in the URL as ...?param=A&param=B.
+// In the case of a message type, each field of the message is mapped to a separate parameter,
+// such as ...?foo.a=A&foo.b=B&foo.c=C.
+//
+// maps, Struct and Empty can NOT be used
+// messages can have any number of sub messages - including circular (e.g. sub.subsub.sub.subsub.id)
+
+// buildQueryParamsV3 extracts any valid query params, including sub and recursive messages
+func (g *OpenAPIv3Generator) buildQueryParamsV3(field *protogen.Field) []*v3.ParameterOrReference {
+	depths := map[string]int{}
+	return g._buildQueryParamsV3(field, depths)
+}
+
+// depths are used to keep track of how many times a message's fields has been seen
+func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths map[string]int) []*v3.ParameterOrReference {
+	parameters := []*v3.ParameterOrReference{}
+
+	queryFieldName := g.formatFieldName(field)
+	fieldDescription := g.filterCommentString(field.Comments.Leading, true)
+
+	if field.Desc.IsMap() {
+		// Map types are not allowed in query parameteres
+		return parameters
+
+	} else if field.Desc.Kind() == protoreflect.MessageKind {
+		if field.Desc.IsList() {
+			// Only non-repeated message types are valid
+			return parameters
+		}
+
+		// Represent field masks directly as strings (don't expand them).
+		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.FieldMask" {
+			fieldSchema := g.schemaOrReferenceForField(field.Desc)
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        queryFieldName,
+							In:          "query",
+							Description: fieldDescription,
+							Required:    false,
+							Schema:      fieldSchema,
+						},
+					},
+				})
+			return parameters
+		}
+
+		// Sub messages are allowed, even circular, as long as the final type is a primitive.
+		// Go through each of the sub message fields
+		for _, subField := range field.Message.Fields {
+			subFieldFullName := string(subField.Desc.FullName())
+			seen, ok := depths[subFieldFullName]
+			if !ok {
+				depths[subFieldFullName] = 0
+			}
+
+			if seen < *g.conf.CircularDepth {
+				depths[subFieldFullName]++
+				subParams := g._buildQueryParamsV3(subField, depths)
+				for _, subParam := range subParams {
+					if param, ok := subParam.Oneof.(*v3.ParameterOrReference_Parameter); ok {
+						param.Parameter.Name = queryFieldName + "." + param.Parameter.Name
+						parameters = append(parameters, subParam)
+					}
+				}
+			}
+		}
+
+	} else if field.Desc.Kind() != protoreflect.GroupKind {
+		// schemaOrReferenceForField also handles array types
+		fieldSchema := g.schemaOrReferenceForField(field.Desc)
+
+		parameters = append(parameters,
+			&v3.ParameterOrReference{
+				Oneof: &v3.ParameterOrReference_Parameter{
+					Parameter: &v3.Parameter{
+						Name:        queryFieldName,
+						In:          "query",
+						Description: fieldDescription,
+						Required:    false,
+						Schema:      fieldSchema,
+					},
+				},
+			})
+	}
+
+	return parameters
 }
 
 // buildOperationV3 constructs an operation for a set of values.
@@ -280,6 +451,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	operationID string,
 	tagName string,
 	description string,
+	defaultHost string,
 	path string,
 	bodyField string,
 	inputMessage *protogen.Message,
@@ -293,8 +465,6 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Initialize the list of operation parameters.
 	parameters := []*v3.ParameterOrReference{}
 
-	// Build a list of path parameters.
-	pathParameters := make([]string, 0)
 	// Find simple path parameters like {id}
 	if allMatches := g.pathPattern.FindAllStringSubmatch(path, -1); allMatches != nil {
 		for _, matches := range allMatches {
@@ -302,35 +472,46 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			coveredParameters = append(coveredParameters, matches[1])
 			pathParameter := g.findAndFormatFieldName(matches[1], inputMessage)
 			path = strings.Replace(path, matches[1], pathParameter, 1)
-			pathParameters = append(pathParameters, pathParameter)
+
+			// Add the path parameters to the operation parameters.
+			var fieldSchema *v3.SchemaOrReference
+
+			var fieldDescription string
+			field := g.findField(pathParameter, inputMessage)
+			if field != nil {
+				fieldSchema = g.schemaOrReferenceForField(field.Desc)
+				fieldDescription = g.filterCommentString(field.Comments.Leading, true)
+			} else {
+				// If field dooes not exist, it is safe to set it to string, as it is ignored downstream
+				fieldSchema = &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{
+							Type: "string",
+						},
+					},
+				}
+			}
+
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        pathParameter,
+							In:          "path",
+							Description: fieldDescription,
+							Required:    true,
+							Schema:      fieldSchema,
+						},
+					},
+				})
 		}
 	}
 
-	// Add the path parameters to the operation parameters.
-	for _, pathParameter := range pathParameters {
-		parameters = append(parameters,
-			&v3.ParameterOrReference{
-				Oneof: &v3.ParameterOrReference_Parameter{
-					Parameter: &v3.Parameter{
-						Name:     pathParameter,
-						In:       "path",
-						Required: true,
-						Schema: &v3.SchemaOrReference{
-							Oneof: &v3.SchemaOrReference_Schema{
-								Schema: &v3.Schema{
-									Type: "string",
-								},
-							},
-						},
-					},
-				},
-			})
-	}
-
-	// Build a list of named path parameters.
-	namedPathParameters := make([]string, 0)
 	// Find named path parameters like {name=shelves/*}
 	if matches := g.namedPathPattern.FindStringSubmatch(path); matches != nil {
+		// Build a list of named path parameters.
+		namedPathParameters := make([]string, 0)
+
 		// Add the "name=" "name" value to the list of covered parameters.
 		coveredParameters = append(coveredParameters, matches[1])
 		// Convert the path from the starred form to use named path parameters.
@@ -348,58 +529,41 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		// Rewrite the path to use the path parameters.
 		newPath := strings.Join(parts, "/")
 		path = strings.Replace(path, matches[0], newPath, 1)
-	}
 
-	// Add the named path parameters to the operation parameters.
-	for _, namedPathParameter := range namedPathParameters {
-		parameters = append(parameters,
-			&v3.ParameterOrReference{
-				Oneof: &v3.ParameterOrReference_Parameter{
-					Parameter: &v3.Parameter{
-						Name:        namedPathParameter,
-						In:          "path",
-						Required:    true,
-						Description: "The " + namedPathParameter + " id.",
-						Schema: &v3.SchemaOrReference{
-							Oneof: &v3.SchemaOrReference_Schema{
-								Schema: &v3.Schema{
-									Type: "string",
-								},
-							},
-						},
-					},
-				},
-			})
-	}
-	// Add any unhandled fields in the request message as query parameters.
-	if bodyField != "*" {
-		for _, field := range inputMessage.Fields {
-			fieldName := string(field.Desc.Name())
-			if !contains(coveredParameters, fieldName) {
-				bodyFieldName := g.formatFieldName(field)
-				// Get the field description from the comments.
-				fieldDescription := g.filterCommentString(field.Comments.Leading, true)
-				parameters = append(parameters,
-					&v3.ParameterOrReference{
-						Oneof: &v3.ParameterOrReference_Parameter{
-							Parameter: &v3.Parameter{
-								Name:        bodyFieldName,
-								In:          "query",
-								Description: fieldDescription,
-								Required:    false,
-								Schema: &v3.SchemaOrReference{
-									Oneof: &v3.SchemaOrReference_Schema{
-										Schema: &v3.Schema{
-											Type: "string",
-										},
+		// Add the named path parameters to the operation parameters.
+		for _, namedPathParameter := range namedPathParameters {
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        namedPathParameter,
+							In:          "path",
+							Required:    true,
+							Description: "The " + namedPathParameter + " id.",
+							Schema: &v3.SchemaOrReference{
+								Oneof: &v3.SchemaOrReference_Schema{
+									Schema: &v3.Schema{
+										Type: "string",
 									},
 								},
 							},
 						},
-					})
+					},
+				})
+		}
+	}
+
+	// Add any unhandled fields in the request message as query parameters.
+	if bodyField != "*" {
+		for _, field := range inputMessage.Fields {
+			fieldName := string(field.Desc.Name())
+			if !contains(coveredParameters, fieldName) && fieldName != bodyField {
+				fieldParams := g.buildQueryParamsV3(field)
+				parameters = append(parameters, fieldParams...)
 			}
 		}
 	}
+
 	// Create the response.
 	responses := &v3.Responses{
 		ResponseOrReference: []*v3.NamedResponseOrReference{
@@ -416,6 +580,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			},
 		},
 	}
+
 	// Create the operation.
 	op := &v3.Operation{
 		Tags:        []string{tagName},
@@ -424,6 +589,15 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		Parameters:  parameters,
 		Responses:   responses,
 	}
+
+	if defaultHost != "" {
+		hostURL, err := url.Parse(defaultHost)
+		if err == nil {
+			hostURL.Scheme = "https"
+			op.Servers = append(op.Servers, &v3.Server{Url: hostURL.String()})
+		}
+	}
+
 	// If a body field is specified, we need to pass a message as the request body.
 	if bodyField != "" {
 		var bodyFieldScalarTypeName string
@@ -603,6 +777,12 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 			Oneof: &v3.SchemaOrReference_Schema{
 				Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
 
+	case ".google.protobuf.FieldMask":
+		// Field masks are serialized as strings
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string", Format: "field-mask"}}}
+
 	case ".google.protobuf.Struct":
 		// Struct is equivalent to a JSON object
 		return &v3.SchemaOrReference{
@@ -705,7 +885,6 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		}
 
 		typeName := fullMessageTypeName(message.Desc)
-		log.Printf("Adding %s", typeName)
 
 		// Only generate this if we need it and haven't already generated it.
 		if !contains(g.requiredSchemas, typeName) ||
@@ -719,16 +898,23 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
+		var required []string
 		for _, field := range message.Fields {
-			// Check the field annotations to see if this is a readonly field.
+			// Check the field annotations to see if this is a readonly or writeonly field.
+			inputOnly := false
 			outputOnly := false
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
 			if extension != nil {
 				switch v := extension.(type) {
 				case []annotations.FieldBehavior:
 					for _, vv := range v {
-						if vv == annotations.FieldBehavior_OUTPUT_ONLY {
+						switch vv {
+						case annotations.FieldBehavior_OUTPUT_ONLY:
 							outputOnly = true
+						case annotations.FieldBehavior_INPUT_ONLY:
+							inputOnly = true
+						case annotations.FieldBehavior_REQUIRED:
+							required = append(required, g.formatFieldName(field))
 						}
 					}
 				default:
@@ -747,6 +933,9 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 				schema.Schema.Description = g.filterCommentString(field.Comments.Leading, true)
 				if outputOnly {
 					schema.Schema.ReadOnly = true
+				}
+				if inputOnly {
+					schema.Schema.WriteOnly = true
 				}
 			}
 
@@ -767,6 +956,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 						Schema: &v3.Schema{
 							Description: messageDescription,
 							Properties:  definitionProperties,
+							Required:    required,
 						},
 					},
 				},
@@ -783,6 +973,14 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+// appendUniuqe appends a string, to a string slice, if the string is not already in the slice
+func appendUniuqe(s []string, e string) []string {
+	if !contains(s, e) {
+		return append(s, e)
+	}
+	return s
 }
 
 // singular produces the singular form of a collection name.
