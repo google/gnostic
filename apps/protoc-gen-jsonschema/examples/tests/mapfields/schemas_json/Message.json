@@ -14,7 +14,7 @@
       "$ref": "http://example.com/schemas/AnotherMessage.json"
     },
     "subMessage": {
-      "$ref": "#/definitions/SubMessage"
+      "$ref": "#/definitions/Message_SubMessage"
     },
     "stringList": {
       "title": "stringList",
@@ -27,7 +27,7 @@
       "title": "subMessageList",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/SubMessage"
+        "$ref": "#/definitions/Message_SubMessage"
       }
     },
     "anotherMessageList": {
@@ -55,7 +55,7 @@
       "title": "subMessagesMap",
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/SubMessage"
+        "$ref": "#/definitions/Message_SubMessage"
       }
     },
     "anotherMessagesMap": {
@@ -74,10 +74,8 @@
     }
   },
   "definitions": {
-    "SubMessage": {
+    "Message_SubMessage": {
       "title": "SubMessage",
-      "$id": "/schemas/SubMessage",
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
       "properties": {
         "id": {
