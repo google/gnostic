@@ -33,6 +33,7 @@ paths:
 components:
     schemas:
         AnotherMessage:
+            type: object
             properties:
                 id:
                     type: integer
@@ -40,6 +41,7 @@ components:
                 label:
                     type: string
         Message:
+            type: object
             properties:
                 messageId:
                     type: string
@@ -72,6 +74,7 @@ components:
                     additionalProperties:
                         type: object
         Message_SubMessage:
+            type: object
             properties:
                 id:
                     type: integer

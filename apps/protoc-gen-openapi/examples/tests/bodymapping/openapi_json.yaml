@@ -33,6 +33,7 @@ paths:
 components:
     schemas:
         Message:
+            type: object
             properties:
                 messageId:
                     type: string

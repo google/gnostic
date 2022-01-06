@@ -954,6 +954,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 				Value: &v3.SchemaOrReference{
 					Oneof: &v3.SchemaOrReference_Schema{
 						Schema: &v3.Schema{
+							Type:        "object",
 							Description: messageDescription,
 							Properties:  definitionProperties,
 							Required:    required,

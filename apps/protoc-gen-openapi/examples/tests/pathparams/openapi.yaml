@@ -79,6 +79,7 @@ paths:
 components:
     schemas:
         Message:
+            type: object
             properties:
                 message_id:
                     type: string
