@@ -18,7 +18,6 @@ package generator
 import (
 	"fmt"
 	"log"
-	"net/url"
 	"regexp"
 	"strings"
 
@@ -113,20 +112,24 @@ func (g *JSONSchemaGenerator) formatFieldName(field *protogen.Field) string {
 	return field.Desc.JSONName()
 }
 
-// schemaReferenceForTypeName returns a JSON Schema definitions reference.
-func (g *JSONSchemaGenerator) schemaReferenceForTypeName(typeName string) string {
-	parts := strings.Split(typeName, ".")
-	lastPart := parts[len(parts)-1]
-	return "#/definitions/" + g.formatMessageNameString(lastPart)
+// messageDefinitionName builds the full schema definition name of a message.
+func messageDefinitionName(desc protoreflect.MessageDescriptor) string {
+	name := string(desc.Name())
+
+	pkg := string(desc.ParentFile().Package())
+	parentName := desc.Parent().FullName()
+	if len(parentName) > len(pkg) {
+		parentName = parentName[len(pkg)+1:]
+		name = fmt.Sprintf("%s.%s", parentName, name)
+	}
+
+	return strings.Replace(name, ".", "_", -1)
 }
 
-// fullMessageTypeName builds the full type name of a message.
-func fullMessageTypeName(message protoreflect.MessageDescriptor) string {
-	name := string(message.Name())
-	return "." + string(message.ParentFile().Package()) + "." + name
-}
+func (g *JSONSchemaGenerator) schemaOrReferenceForType(desc protoreflect.MessageDescriptor) *jsonschema.Schema {
+	// Create the full typeName
+	typeName := fmt.Sprintf(".%s.%s", desc.ParentFile().Package(), desc.Name())
 
-func (g *JSONSchemaGenerator) schemaOrReferenceForType(typeName string) *jsonschema.Schema {
 	switch typeName {
 
 	case ".google.protobuf.Timestamp":
@@ -157,7 +160,8 @@ func (g *JSONSchemaGenerator) schemaOrReferenceForType(typeName string) *jsonsch
 		return nil
 	}
 
-	ref := g.schemaReferenceForTypeName(typeName)
+	typeName = messageDefinitionName(desc)
+	ref := "#/definitions/" + g.formatMessageNameString(typeName)
 	return &jsonschema.Schema{Ref: &ref}
 }
 
@@ -179,17 +183,17 @@ func (g *JSONSchemaGenerator) schemaOrReferenceForField(field protoreflect.Field
 	switch kind {
 
 	case protoreflect.MessageKind:
-		typeName := fullMessageTypeName(field.Message())
-
-		kindSchema = g.schemaOrReferenceForType(typeName)
+		kindSchema = g.schemaOrReferenceForType(field.Message())
 		if kindSchema == nil {
 			return nil
 		}
 
-		if kindSchema.Ref != nil && !refInDefinitions(*kindSchema.Ref, definitions) {
-			ref := strings.Replace(*kindSchema.Ref, "#/definitions/", *g.conf.BaseURL, 1)
-			ref += ".json"
-			kindSchema.Ref = &ref
+		if kindSchema.Ref != nil {
+			if !refInDefinitions(*kindSchema.Ref, definitions) {
+				ref := strings.Replace(*kindSchema.Ref, "#/definitions/", *g.conf.BaseURL, 1)
+				ref += ".json"
+				kindSchema.Ref = &ref
+			}
 		}
 
 	case protoreflect.StringKind:
@@ -268,13 +272,27 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 
 		// Any embedded messages will be created as definitions
 		if message.Messages != nil {
-			subSchemas := g.buildSchemasFromMessages(message.Messages)
-			for i, subSchema := range subSchemas {
-				idURL, _ := url.Parse(*subSchema.Value.ID)
-				path := strings.TrimSuffix(idURL.Path, ".json")
-				subSchemas[i].Value.ID = &path
+			if schema.Value.Definitions == nil {
+				schema.Value.Definitions = &[]*jsonschema.NamedSchema{}
 			}
-			schema.Value.Definitions = &subSchemas
+
+			for _, subMessage := range message.Messages {
+				subSchemas := g.buildSchemasFromMessages([]*protogen.Message{subMessage})
+				if len(subSchemas) != 1 {
+					continue
+				}
+				subSchema := subSchemas[0]
+				subSchema.Value.ID = nil
+				subSchema.Value.Schema = nil
+				subSchema.Name = messageDefinitionName(subMessage.Desc)
+
+				if subSchema.Value.Definitions != nil {
+					*schema.Value.Definitions = append(*schema.Value.Definitions, *subSchema.Value.Definitions...)
+					subSchema.Value.Definitions = nil
+				}
+
+				*schema.Value.Definitions = append(*schema.Value.Definitions, subSchemas...)
+			}
 		}
 
 		if message.Desc.IsMapEntry() {
@@ -289,7 +307,7 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 			}
 
 			// Handle readonly and writeonly properties, if the schema version can handle it.
-			if strings.TrimSuffix(*schema.Value.Schema, "#") == "http://json-schema.org/draft-07/schema" {
+			if getSchemaVersion(schema.Value) >= "07" {
 				t := true
 				// Check the field annotations to see if this is a readonly field.
 				extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
@@ -313,7 +331,6 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 			// Do not add title for ref values
 			if fieldSchema.Ref == nil {
 				fieldSchema.Title = &fieldName
-
 			}
 
 			// Get the field description from the comments.
@@ -336,6 +353,17 @@ func (g *JSONSchemaGenerator) buildSchemasFromMessages(messages []*protogen.Mess
 	}
 
 	return schemas
+}
+
+var reSchemaVersion = regexp.MustCompile(`https*://json-schema.org/draft[/-]([^/]+)/schema`)
+
+func getSchemaVersion(schema *jsonschema.Schema) string {
+	schemaSchema := *schema.Schema
+	matches := reSchemaVersion.FindStringSubmatch(schemaSchema)
+	if len(matches) == 2 {
+		return matches[1]
+	}
+	return ""
 }
 
 func refInDefinitions(ref string, definitions *[]*jsonschema.NamedSchema) bool {

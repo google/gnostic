@@ -36,6 +36,7 @@ var jsonschemaTests = []struct {
 	{name: "Google Library example", path: "examples/google/example/library/v1/", pkg: "google.example.library.v1", protofile: "library.proto"},
 	{name: "Map fields", path: "examples/tests/mapfields/", pkg: "tests.mapfields.message.v1", protofile: "message.proto"},
 	{name: "JSON options", path: "examples/tests/jsonoptions/", pkg: "", protofile: "message.proto"},
+	{name: "Embedded messages", path: "examples/tests/embedded/", pkg: "", protofile: "message.proto"},
 }
 
 func TestJSONSchemaProtobufNaming(t *testing.T) {
