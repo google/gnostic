@@ -1,0 +1,60 @@
+{
+  "title": "Message",
+  "$id": "http://example.com/schemas/Message.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "messageId": {
+      "title": "messageId",
+      "type": "string"
+    },
+    "comments": {
+      "title": "comments",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Message_Comment"
+      }
+    }
+  },
+  "definitions": {
+    "Message_Comment_Reply": {
+      "title": "Reply",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "id",
+          "type": "string"
+        },
+        "commentId": {
+          "title": "commentId",
+          "type": "string"
+        },
+        "content": {
+          "title": "content",
+          "type": "string"
+        }
+      }
+    },
+    "Message_Comment": {
+      "title": "Comment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "id",
+          "type": "string"
+        },
+        "content": {
+          "title": "content",
+          "type": "string"
+        },
+        "replies": {
+          "title": "replies",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message_Comment_Reply"
+          }
+        }
+      }
+    }
+  }
+}

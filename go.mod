@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
-	github.com/flowstack/go-jsonschema v0.0.0-20211209084258-c17707834089
+	github.com/flowstack/go-jsonschema v0.1.2-0.20220104092834-36c9f7194585
 	github.com/golang/protobuf v1.5.2
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0

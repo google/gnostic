@@ -66,6 +66,7 @@ paths:
 components:
     schemas:
         Message:
+            type: object
             properties:
                 messageId:
                     type: string
@@ -74,6 +75,7 @@ components:
                 notUsed:
                     type: string
         Message2:
+            type: object
             properties:
                 message_id:
                     type: string
