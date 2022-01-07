@@ -5,8 +5,7 @@ JSON Schemas for Protocol Buffer messages.
 
 Installation:
 
-        go get github.com/google/gnostic
-        go install github.com/google/gnostic/apps/protoc-gen-jsonschema
+        go install github.com/google/gnostic/cmd/protoc-gen-jsonschema
   
   
 Usage:

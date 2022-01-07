@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2021 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package main
 import (
 	"flag"
 
-	"github.com/google/gnostic/apps/protoc-gen-openapi/generator"
+    "github.com/google/gnostic/cmd/protoc-gen-jsonschema/generator"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
@@ -27,11 +27,9 @@ var flags flag.FlagSet
 
 func main() {
 	conf := generator.Configuration{
-		Version:       flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
-		Title:         flags.String("title", "", "name of the API"),
-		Description:   flags.String("description", "", "description of the API"),
-		Naming:        flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
-		CircularDepth: flags.Int("depth", 2, `depth of recursion for circular messages`),
+		BaseURL: flags.String("baseurl", "", "the base url to use in schema ids"),
+		Version: flags.String("version", "http://json-schema.org/draft-07/schema#", "schema version URL used in $schema. Currently supported: draft-06, draft-07"),
+		Naming:  flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
 	}
 
 	opts := protogen.Options{
@@ -42,6 +40,6 @@ func main() {
 		// Enable "optional" keyword in front of type (e.g. optional string labe = 1;)
 		plugin.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 
-		return generator.NewOpenAPIv3Generator(plugin, conf).Run()
+		return generator.NewJSONSchemaGenerator(plugin, conf).Run()
 	})
 }
