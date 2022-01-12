@@ -70,8 +70,16 @@ paths:
                         type: string
                 - name: valueType
                   in: query
+                  description: Description of value
                   schema:
                     $ref: '#/components/schemas/AnyJSONValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
             responses:
                 "200":
                     description: OK
@@ -163,8 +171,16 @@ paths:
                         type: string
                 - name: valueType
                   in: query
+                  description: Description of value
                   schema:
                     $ref: '#/components/schemas/AnyJSONValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
             requestBody:
                 content:
                     application/json:
@@ -187,6 +203,7 @@ components:
                 - type: array
                   items:
                     $ref: '#/components/schemas/AnyJSONValue'
+            description: AnyJSONValue is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI
         Message:
             type: object
             properties:
@@ -228,6 +245,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/AnyJSONValue'
+                    description: Description of repeated value
         Message_EmbMessage:
             type: object
             properties:

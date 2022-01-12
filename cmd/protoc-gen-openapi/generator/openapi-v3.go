@@ -383,11 +383,6 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 		return parameters
 
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
-		if field.Desc.IsList() {
-			// Only non-repeated message types are valid
-			return parameters
-		}
-
 		// Represent google.protobuf.Value as reference to the value of const protobufValueName.
 		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.Value" {
 			fieldSchema := g.schemaOrReferenceForField(field.Desc)
@@ -403,6 +398,9 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 						},
 					},
 				})
+			return parameters
+		} else if field.Desc.IsList() {
+			// Only non-repeated message types are valid
 			return parameters
 		}
 
@@ -926,12 +924,15 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		// It's interpreted as a "catch all" JSON value, that can be anything.
 		if message.Desc != nil && message.Desc.FullName() == "google.protobuf.Value" {
 			// Add the schema to the components.schema list.
+			description := protobufValueName + ` is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI`
+
 			d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
 				&v3.NamedSchemaOrReference{
 					Name: protobufValueName,
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
+								Description: description,
 								OneOf: []*v3.SchemaOrReference{
 									// type is not allow to be null in OpenAPI
 									{
@@ -979,6 +980,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 
 		// Get the message description from the comments.
 		messageDescription := g.filterCommentString(message.Comments.Leading, true)
+
 		// Build an array holding the fields of the message.
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),

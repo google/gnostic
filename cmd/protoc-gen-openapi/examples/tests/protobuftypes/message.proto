@@ -78,6 +78,8 @@ message Message {
   google.protobuf.Struct body = 10;
   repeated google.protobuf.Struct media = 11;
   google.protobuf.Empty not_used = 12;
+  // Description of value
   google.protobuf.Value value_type = 13;
+  // Description of repeated value
   repeated google.protobuf.Value repeated_value_type = 14;
 }
