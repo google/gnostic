@@ -619,20 +619,31 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 
 	// If a body field is specified, we need to pass a message as the request body.
 	if bodyField != "" {
-		var bodyFieldScalarTypeName string
-		var bodyFieldMessageTypeName string
+		var requestSchema *v3.SchemaOrReference
+
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
-			bodyFieldMessageTypeName = fullMessageTypeName(inputMessage.Desc)
+			typeName := fullMessageTypeName(inputMessage.Desc)
+			requestSchema = g.schemaOrReferenceForType(typeName)
+
 		} else {
 			// If body refers to a message field, use that type.
 			for _, field := range inputMessage.Fields {
 				if string(field.Desc.Name()) == bodyField {
 					switch field.Desc.Kind() {
 					case protoreflect.StringKind:
-						bodyFieldScalarTypeName = "string"
+						requestSchema = &v3.SchemaOrReference{
+							Oneof: &v3.SchemaOrReference_Schema{
+								Schema: &v3.Schema{
+									Type: "string",
+								},
+							},
+						}
+
 					case protoreflect.MessageKind:
-						bodyFieldMessageTypeName = fullMessageTypeName(field.Message.Desc)
+						typeName := fullMessageTypeName(field.Message.Desc)
+						requestSchema = g.schemaOrReferenceForType(typeName)
+
 					default:
 						log.Printf("unsupported field type %+v", field.Desc)
 					}
@@ -640,36 +651,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 				}
 			}
 		}
-		var requestSchema *v3.SchemaOrReference
-		if bodyFieldScalarTypeName != "" {
-			requestSchema = &v3.SchemaOrReference{
-				Oneof: &v3.SchemaOrReference_Schema{
-					Schema: &v3.Schema{
-						Type: bodyFieldScalarTypeName,
-					},
-				},
-			}
-		} else if bodyFieldMessageTypeName != "" {
-			switch bodyFieldMessageTypeName {
-			case ".google.protobuf.Empty":
-				fallthrough
-			case ".google.protobuf.Struct":
-				requestSchema = &v3.SchemaOrReference{
-					Oneof: &v3.SchemaOrReference_Schema{
-						Schema: &v3.Schema{
-							Type: "object",
-						},
-					},
-				}
-			default:
-				requestSchema = &v3.SchemaOrReference{
-					Oneof: &v3.SchemaOrReference_Reference{
-						Reference: &v3.Reference{
-							XRef: g.schemaReferenceForTypeName(bodyFieldMessageTypeName),
-						}},
-				}
-			}
-		}
+
 		op.RequestBody = &v3.RequestBodyOrReference{
 			Oneof: &v3.RequestBodyOrReference_RequestBody{
 				RequestBody: &v3.RequestBody{
@@ -747,12 +729,6 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 	if typeName == ".google.protobuf.Empty" {
 		return &v3.MediaTypes{}
 	}
-	if typeName == ".google.protobuf.Struct" {
-		return &v3.MediaTypes{}
-	}
-	// if typeName == ".google.protobuf.Value" {
-	// 	return &v3.MediaTypes{}
-	// }
 
 	if typeName == ".google.api.HttpBody" {
 		return &v3.MediaTypes{
@@ -770,13 +746,7 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 			{
 				Name: "application/json",
 				Value: &v3.MediaType{
-					Schema: &v3.SchemaOrReference{
-						Oneof: &v3.SchemaOrReference_Reference{
-							Reference: &v3.Reference{
-								XRef: g.schemaReferenceForTypeName(fullMessageTypeName(outputMessage.Desc)),
-							},
-						},
-					},
+					Schema: g.schemaOrReferenceForType(typeName),
 				},
 			},
 		},

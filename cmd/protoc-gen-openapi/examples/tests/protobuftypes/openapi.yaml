@@ -8,6 +8,18 @@ info:
 servers:
     - url: https://foo.googleapi.com
 paths:
+    /v1/messages:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_ListMessages
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AnyJSONValue'
     /v1/messages/{message_id}:
         get:
             tags:
@@ -190,7 +202,10 @@ paths:
             responses:
                 "200":
                     description: OK
-                    content: {}
+                    content:
+                        application/json:
+                            schema:
+                                type: object
 components:
     schemas:
         AnyJSONValue:

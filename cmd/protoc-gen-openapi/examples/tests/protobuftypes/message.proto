@@ -32,6 +32,11 @@ service Messaging {
       body : "*"
     };
   }
+  rpc ListMessages(google.protobuf.Empty) returns (google.protobuf.Value) {
+    option (google.api.http) = {
+      get : "/v1/messages"
+    };
+  }
   rpc GetMessage(Message) returns (Message) {
     option (google.api.http) = {
       get : "/v1/messages/{message_id}"
