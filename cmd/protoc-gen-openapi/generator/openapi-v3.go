@@ -227,6 +227,22 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewL
 	return strings.TrimSpace(comment)
 }
 
+func (g *OpenAPIv3Generator) getFieldDescription(field *protogen.Field) string {
+	base := g.filterCommentString(field.Comments.Leading, true)
+	if field.Enum != nil {
+		base += "["
+		// if field is enum, add enum description, build from number and comment
+		for _, value := range field.Enum.Values {
+			base += fmt.Sprintf(" %d: %s; ",
+				value.Desc.Number(),
+				g.filterCommentString(value.Comments.Leading, true),
+			)
+		}
+		base += "]"
+	}
+	return base
+}
+
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
 func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen.File) {
 	for _, service := range file.Services {
@@ -376,7 +392,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	parameters := []*v3.ParameterOrReference{}
 
 	queryFieldName := g.formatFieldName(field)
-	fieldDescription := g.filterCommentString(field.Comments.Leading, true)
+	fieldDescription := g.getFieldDescription(field)
 
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
@@ -499,7 +515,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			field := g.findField(pathParameter, inputMessage)
 			if field != nil {
 				fieldSchema = g.schemaOrReferenceForField(field.Desc)
-				fieldDescription = g.filterCommentString(field.Comments.Leading, true)
+				fieldDescription = g.getFieldDescription(field)
 			} else {
 				// If field dooes not exist, it is safe to set it to string, as it is ignored downstream
 				fieldSchema = &v3.SchemaOrReference{
@@ -988,7 +1004,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 
 			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
 				// Get the field description from the comments.
-				schema.Schema.Description = g.filterCommentString(field.Comments.Leading, true)
+				schema.Schema.Description = g.getFieldDescription(field)
 				if outputOnly {
 					schema.Schema.ReadOnly = true
 				}
