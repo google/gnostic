@@ -800,9 +800,16 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 
 	default:
 		ref := g.schemaReferenceForTypeName(typeName)
+
 		return &v3.SchemaOrReference{
-			Oneof: &v3.SchemaOrReference_Reference{
-				Reference: &v3.Reference{XRef: ref}}}
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{
+					AllOf: []*v3.SchemaOrReference{
+						{
+							Oneof: &v3.SchemaOrReference_Reference{
+								Reference: &v3.Reference{XRef: ref}},
+						},
+					}}}}
 	}
 }
 
