@@ -39,7 +39,7 @@ type Configuration struct {
 	CircularDepth *int
 }
 
-const infoURL = "https://github.com/google/gnostic/tree/master/apps/protoc-gen-openapi"
+const infoURL = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
