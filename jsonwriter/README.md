@@ -1,3 +1,3 @@
 # jsonwriter
 
-This directory contains code for writing yaml.MapSlice structures as JSON files.
+This directory contains code for writing yaml.Node structures as JSON.

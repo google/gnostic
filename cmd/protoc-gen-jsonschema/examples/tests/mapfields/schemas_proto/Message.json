@@ -1,0 +1,93 @@
+{
+  "title": "Message",
+  "$id": "http://example.com/schemas/Message.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Message is the main way of communicating",
+  "properties": {
+    "message_id": {
+      "title": "message_id",
+      "type": "string",
+      "description": "Message ID"
+    },
+    "another_message": {
+      "$ref": "http://example.com/schemas/AnotherMessage.json"
+    },
+    "sub_message": {
+      "$ref": "#/definitions/Message_SubMessage"
+    },
+    "string_list": {
+      "title": "string_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sub_message_list": {
+      "title": "sub_message_list",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Message_SubMessage"
+      }
+    },
+    "another_message_list": {
+      "title": "another_message_list",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/AnotherMessage.json"
+      }
+    },
+    "object_list": {
+      "title": "object_list",
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "strings_map": {
+      "title": "strings_map",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "sub_messages_map": {
+      "title": "sub_messages_map",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Message_SubMessage"
+      }
+    },
+    "another_messages_map": {
+      "title": "another_messages_map",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "http://example.com/schemas/AnotherMessage.json"
+      }
+    },
+    "objects_map": {
+      "title": "objects_map",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    }
+  },
+  "definitions": {
+    "Message_SubMessage": {
+      "title": "SubMessage",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "id",
+          "type": "integer",
+          "format": "int64"
+        },
+        "label": {
+          "title": "label",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
 # limitations under the License.
 #
 
-go get github.com/golang/protobuf/protoc-gen-go
+go install github.com/golang/protobuf/protoc-gen-go@latest
 
-protoc --go_out=. openapiv2/OpenAPIv2.proto
-protoc --go_out=. openapiv3/OpenAPIv3.proto
-protoc --go_out=. discovery/discovery.proto
-protoc --go_out=. plugins/plugin.proto
-protoc --go_out=. extensions/extension.proto
-protoc --go_out=. surface/surface.proto
+protoc -I . -I ./third_party --go_out=. openapiv2/OpenAPIv2.proto
+protoc -I . -I ./third_party --go_out=. openapiv3/OpenAPIv3.proto
+protoc -I . -I ./third_party --go_out=. discovery/discovery.proto
+protoc -I . -I ./third_party --go_out=. plugins/plugin.proto
+protoc -I . -I ./third_party --go_out=. extensions/extension.proto
+protoc -I . -I ./third_party --go_out=. surface/surface.proto
+protoc -I . -I ./third_party --go_out=. metrics/vocabulary.proto
+protoc -I . -I ./third_party --go_out=. metrics/complexity.proto

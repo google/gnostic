@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ type FieldInfo struct {
 	// For parameters
 	fieldPosition Position
 	fieldName     string
+	enumValues    []string
 }
 
 func (m *Model) addType(t *Type) {
@@ -89,7 +90,7 @@ func makeFieldAndAppendToType(info *FieldInfo, schemaType *Type, fieldName strin
 		if fieldName != "" {
 			f.Name = fieldName
 		}
-		f.Type, f.Kind, f.Format, f.Position = info.fieldType, info.fieldKind, info.fieldFormat, info.fieldPosition
+		f.Type, f.Kind, f.Format, f.Position, f.EnumValues = info.fieldType, info.fieldKind, info.fieldFormat, info.fieldPosition, info.enumValues
 		schemaType.Fields = append(schemaType.Fields, f)
 	}
 }

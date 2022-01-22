@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All Rights Reserved.
+// Copyright 2019 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import (
 	"net/url"
 	"strings"
 
-	openapi3 "github.com/googleapis/gnostic/openapiv3"
-	discovery "github.com/googleapis/gnostic/discovery"
+	discovery "github.com/google/gnostic/discovery"
+	openapi3 "github.com/google/gnostic/openapiv3"
 )
 
 func pathForMethod(path string) string {

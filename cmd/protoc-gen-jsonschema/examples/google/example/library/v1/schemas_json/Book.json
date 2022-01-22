@@ -1,0 +1,50 @@
+{
+  "title": "Book",
+  "$id": "http://example.com/schemas/Book.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "A single book in the library.",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The resource name of the book. Book names have the form `shelves/{shelf_id}/books/{book_id}`. The name is ignored when creating a book."
+    },
+    "author": {
+      "title": "author",
+      "type": "string",
+      "description": "The name of the book author."
+    },
+    "title": {
+      "title": "title",
+      "type": "string",
+      "description": "The title of the book."
+    },
+    "read": {
+      "title": "read",
+      "type": "boolean",
+      "description": "Value indicating whether the book has been read."
+    },
+    "borrowTime": {
+      "title": "borrowTime",
+      "readOnly": true,
+      "type": "string",
+      "description": "The previous borrowing timestamp.",
+      "format": "date-time"
+    },
+    "createdAt": {
+      "title": "createdAt",
+      "readOnly": true,
+      "type": "string",
+      "description": "The creation date and time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "title": "updatedAt",
+      "readOnly": true,
+      "type": "string",
+      "description": "The last update date and time.",
+      "format": "date-time"
+    }
+  }
+}

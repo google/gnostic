@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,14 +29,15 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/googleapis/gnostic/compiler"
-	discovery_v1 "github.com/googleapis/gnostic/discovery"
-	"github.com/googleapis/gnostic/jsonwriter"
-	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
-	openapi_v3 "github.com/googleapis/gnostic/openapiv3"
-	plugins "github.com/googleapis/gnostic/plugins"
-	surface "github.com/googleapis/gnostic/surface"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
+
+	"github.com/google/gnostic/compiler"
+	discovery_v1 "github.com/google/gnostic/discovery"
+	"github.com/google/gnostic/jsonwriter"
+	openapi_v2 "github.com/google/gnostic/openapiv2"
+	openapi_v3 "github.com/google/gnostic/openapiv3"
+	plugins "github.com/google/gnostic/plugins"
+	surface "github.com/google/gnostic/surface"
 )
 
 // UsageError is a response to invalid command-line inputs
@@ -64,23 +67,31 @@ const (
 )
 
 // Determine the version of an OpenAPI description read from JSON or YAML.
-func getOpenAPIVersionFromInfo(info interface{}) int {
+func getOpenAPIVersionFromInfo(info *yaml.Node) int {
 	m, ok := compiler.UnpackMap(info)
 	if !ok {
 		return SourceFormatUnknown
 	}
-	swagger, ok := compiler.MapValueForKey(m, "swagger").(string)
+
+	if m.Kind == yaml.DocumentNode {
+		return getOpenAPIVersionFromInfo(m.Content[0])
+	}
+
+	swagger, ok := compiler.StringForScalarNode(compiler.MapValueForKey(m, "swagger"))
 	if ok && strings.HasPrefix(swagger, "2.0") {
 		return SourceFormatOpenAPI2
 	}
-	openapi, ok := compiler.MapValueForKey(m, "openapi").(string)
+
+	openapi, ok := compiler.StringForScalarNode(compiler.MapValueForKey(m, "openapi"))
 	if ok && strings.HasPrefix(openapi, "3.0") {
 		return SourceFormatOpenAPI3
 	}
-	kind, ok := compiler.MapValueForKey(m, "kind").(string)
+
+	kind, ok := compiler.StringForScalarNode(compiler.MapValueForKey(m, "kind"))
 	if ok && kind == "discovery#restDescription" {
 		return SourceFormatDiscovery
 	}
+
 	return SourceFormatUnknown
 }
 
@@ -95,7 +106,7 @@ type pluginCall struct {
 }
 
 // Invokes a plugin.
-func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool) ([]*plugins.Message, error) {
+func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceName string, timePlugins bool, excludeSurface bool) ([]*plugins.Message, error) {
 	if p.Name != "" {
 		request := &plugins.Request{}
 
@@ -149,17 +160,21 @@ func (p *pluginCall) perform(document proto.Message, sourceFormat int, sourceNam
 		switch sourceFormat {
 		case SourceFormatOpenAPI2:
 			request.AddModel("openapi.v2.Document", document)
-			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document), sourceName)
-			if err == nil {
-				request.AddModel("surface.v1.Model", surfaceModel)
+			if !excludeSurface {
+				// include experimental API surface model
+				surfaceModel, err := surface.NewModelFromOpenAPI2(document.(*openapi_v2.Document), sourceName)
+				if err == nil {
+					request.AddModel("surface.v1.Model", surfaceModel)
+				}
 			}
 		case SourceFormatOpenAPI3:
 			request.AddModel("openapi.v3.Document", document)
-			// include experimental API surface model
-			surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document), sourceName)
-			if err == nil {
-				request.AddModel("surface.v1.Model", surfaceModel)
+			if !excludeSurface {
+				// include experimental API surface model
+				surfaceModel, err := surface.NewModelFromOpenAPI3(document.(*openapi_v3.Document), sourceName)
+				if err == nil {
+					request.AddModel("surface.v1.Model", surfaceModel)
+				}
 			}
 		case SourceFormatDiscovery:
 			request.AddModel("discovery.v1.Document", document)
@@ -212,6 +227,18 @@ func isDirectory(path string) bool {
 	return fileInfo.IsDir()
 }
 
+func isURL(path string) bool {
+	_, err := url.ParseRequestURI(path)
+	if err != nil {
+		return false
+	}
+	u, err := url.Parse(path)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
+}
+
 // Write bytes to a named file.
 // Certain names have special meaning:
 //   ! writes nothing
@@ -227,6 +254,21 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = os.Stdout
 	} else if name == "=" {
 		writer = os.Stderr
+	} else if isDirectory(name) && !isURL(source) {
+		base := source
+		// Remove the original source extension.
+		base = base[0 : len(base)-len(filepath.Ext(base))]
+		// Build the path that puts the result in the passed-in directory.
+		filename := name + "/" + base + "." + extension
+		// Make sure that the necessary output directory exists
+		err := os.MkdirAll(filepath.Dir(filename), os.ModePerm)
+		if err != nil {
+			log.Printf("error creating %s: %s", filepath.Dir(filename), err.Error())
+		}
+		// Write the file
+		file, _ := os.Create(filename)
+		defer file.Close()
+		writer = file
 	} else if isDirectory(name) {
 		base := filepath.Base(source)
 		// Remove the original source extension.
@@ -242,9 +284,6 @@ func writeFile(name string, bytes []byte, source string, extension string) {
 		writer = file
 	}
 	writer.Write(bytes)
-	if name == "-" || name == "=" {
-		writer.Write([]byte("\n"))
-	}
 }
 
 // The Gnostic structure holds global state information for gnostic.
@@ -263,6 +302,7 @@ type Gnostic struct {
 	extensionHandlers []compiler.ExtensionHandler
 	sourceFormat      int
 	timePlugins       bool
+	excludeSurface    bool
 }
 
 // NewGnostic initializes a structure to store global application state.
@@ -291,6 +331,7 @@ Options:
   --resolve-refs      Explicitly resolve $ref references.
                       This could have problems with recursive definitions.
   --time-plugins      Report plugin runtimes.
+  --no-surface        Exclude surface model from calls to plugins.
   --help              Print usage information and exit.
 `
 	// Initialize internal structures.
@@ -345,7 +386,9 @@ func (g *Gnostic) readOptions() error {
 			g.resolveReferences = true
 		} else if arg == "--time-plugins" {
 			g.timePlugins = true
-		} else if arg[0] == '-' && arg[1] == '-' {
+		} else if arg == "--no-surface" {
+			g.excludeSurface = true
+		} else if len(arg) > 2 && arg[0] == '-' && arg[1] == '-' {
 			// try letting the option specify a plugin with no output files (or unwanted output files)
 			// this is useful for calling plugins like linters that only return messages
 			p := &pluginCall{Name: arg[2:len(arg)], Invocation: "!"}
@@ -397,25 +440,32 @@ func (g *Gnostic) readOpenAPIText(bytes []byte) (message proto.Message, err erro
 	}
 	// Compile to the proto model.
 	if g.sourceFormat == SourceFormatOpenAPI2 {
-		document, err := openapi_v2.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		root := info.Content[0]
+		document, err := openapi_v2.NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
 	} else if g.sourceFormat == SourceFormatOpenAPI3 {
-		document, err := openapi_v3.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		root := info.Content[0]
+		document, err := openapi_v3.NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
 	} else {
-		document, err := discovery_v1.NewDocument(info, compiler.NewContextWithExtensions("$root", nil, &g.extensionHandlers))
+		root := info.Content[0]
+		document, err := discovery_v1.NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, &g.extensionHandlers))
 		if err != nil {
 			return nil, err
 		}
 		message = document
 	}
 	return message, err
+}
+
+func (g *Gnostic) ReadOpenAPIText(bytes []byte) (message proto.Message, err error) {
+	return g.readOpenAPIText(bytes)
 }
 
 // Read an OpenAPI binary file.
@@ -464,35 +514,30 @@ func (g *Gnostic) writeTextOutput(message proto.Message) {
 // Write JSON/YAML OpenAPI representations.
 func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	// Convert the OpenAPI document into an exportable MapSlice.
-	var rawInfo yaml.MapSlice
-	var ok bool
-	var err error
+	var rawInfo *yaml.Node
 	if g.sourceFormat == SourceFormatOpenAPI2 {
 		document := message.(*openapi_v2.Document)
-		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			rawInfo = nil
-		}
+		rawInfo = document.ToRawInfo()
 	} else if g.sourceFormat == SourceFormatOpenAPI3 {
 		document := message.(*openapi_v3.Document)
-		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			rawInfo = nil
-		}
+		rawInfo = document.ToRawInfo()
 	} else if g.sourceFormat == SourceFormatDiscovery {
 		document := message.(*discovery_v1.Document)
-		rawInfo, ok = document.ToRawInfo().(yaml.MapSlice)
-		if !ok {
-			rawInfo = nil
+		rawInfo = document.ToRawInfo()
+	}
+	if rawInfo.Kind != yaml.DocumentNode {
+		rawInfo = &yaml.Node{
+			Kind:    yaml.DocumentNode,
+			Content: []*yaml.Node{rawInfo},
 		}
 	}
 	// Optionally write description in yaml format.
 	if g.yamlOutputPath != "" {
-		var bytes []byte
 		if rawInfo != nil {
-			bytes, err = yaml.Marshal(rawInfo)
+			bytes, err := yaml.Marshal(rawInfo)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating yaml output %s\n", err.Error())
+				fmt.Fprintf(os.Stderr, "info %+v", rawInfo)
 			}
 			writeFile(g.yamlOutputPath, bytes, g.sourceName, "yaml")
 		} else {
@@ -501,9 +546,12 @@ func (g *Gnostic) writeJSONYAMLOutput(message proto.Message) {
 	}
 	// Optionally write description in json format.
 	if g.jsonOutputPath != "" {
-		var bytes []byte
 		if rawInfo != nil {
-			bytes, _ = jsonwriter.Marshal(rawInfo)
+			rawInfo := &yaml.Node{
+				Kind:    yaml.DocumentNode,
+				Content: []*yaml.Node{rawInfo},
+			}
+			bytes, err := jsonwriter.Marshal(rawInfo)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating json output %s\n", err.Error())
 			}
@@ -559,7 +607,7 @@ func (g *Gnostic) performActions(message proto.Message) (err error) {
 	messages := make([]*plugins.Message, 0)
 	errors := make([]error, 0)
 	for _, p := range g.pluginCalls {
-		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins)
+		pluginMessages, err := p.perform(message, g.sourceFormat, g.sourceName, g.timePlugins, g.excludeSurface)
 		if err != nil {
 			// we don't exit or fail here so that we run all plugins even when some have errors
 			errors = append(errors, err)

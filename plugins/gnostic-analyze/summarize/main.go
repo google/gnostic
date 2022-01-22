@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/googleapis/gnostic/plugins/gnostic-analyze/statistics"
+	"github.com/google/gnostic/plugins/gnostic-analyze/statistics"
 )
 
 // Results are collected in this global slice.

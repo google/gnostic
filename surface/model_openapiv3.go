@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,25 @@
 package surface_v1
 
 import (
-	openapiv3 "github.com/googleapis/gnostic/openapiv3"
-	"github.com/googleapis/gnostic/compiler"
 	"log"
-	"strconv"
+	"strings"
+
+	"github.com/google/gnostic/compiler"
+	openapiv3 "github.com/google/gnostic/openapiv3"
 )
 
 type OpenAPI3Builder struct {
-	model *Model
+	model    *Model
+	document *openapiv3.Document
 }
 
 // NewModelFromOpenAPIv3 builds a model of an API service for use in code generation.
 func NewModelFromOpenAPI3(document *openapiv3.Document, sourceName string) (*Model, error) {
-	return newOpenAPI3Builder().buildModel(document, sourceName)
+	return newOpenAPI3Builder(document).buildModel(document, sourceName)
 }
 
-func newOpenAPI3Builder() *OpenAPI3Builder {
-	return &OpenAPI3Builder{model: &Model{}}
+func newOpenAPI3Builder(document *openapiv3.Document) *OpenAPI3Builder {
+	return &OpenAPI3Builder{model: &Model{}, document: document}
 }
 
 // Fills the surface model with information from a parsed OpenAPI description. The surface model provides that information
@@ -39,7 +41,7 @@ func newOpenAPI3Builder() *OpenAPI3Builder {
 // Since OpenAPI schemas can be indefinitely nested, it is a recursive approach to build all Types and Methods.
 // The basic idea is that whenever we have "named OpenAPI object" (e.g.: NamedSchemaOrReference, NamedMediaType) we:
 //	1. Create a Type with that name
-//	2. Recursively execute according methods on child schemas (see buildFromSchema function)
+//	2. Recursively create sub schemas (see buildFromSchema function)
 // 	3. Return a FieldInfo object that describes how the created Type should be represented inside another Type as field.
 func (b *OpenAPI3Builder) buildModel(document *openapiv3.Document, sourceName string) (*Model, error) {
 	b.model.Types = make([]*Type, 0)
@@ -66,57 +68,31 @@ func (b *OpenAPI3Builder) buildFromComponents(components *openapiv3.Components) 
 		return
 	}
 
-	if schemas := components.Schemas; schemas != nil {
-		for _, namedSchema := range schemas.AdditionalProperties {
-			fInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
-			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
-			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
-			if t := findType(b.model.Types, namedSchema.Name); t == nil {
-				t = makeType(namedSchema.Name)
-				makeFieldAndAppendToType(fInfo, t, "value")
-				b.model.addType(t)
-			}
+	for _, namedSchema := range components.GetSchemas().GetAdditionalProperties() {
+		fInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+		b.checkForExistence(namedSchema.Name, fInfo)
+	}
+
+	for _, namedParameter := range components.GetParameters().GetAdditionalProperties() {
+		// Parameters in OpenAPI have a name field. See: https://swagger.io/specification/#parameterObject
+		// The name gets passed up the callstack and is therefore contained inside fInfo. That is why we pass "" as fieldName
+		// A type with that parameter was never created, so we still need to do that.
+		t := makeType(namedParameter.Name)
+		fInfo := b.buildFromParamOrRef(namedParameter.Value)
+		makeFieldAndAppendToType(fInfo, t, "")
+		if len(t.Fields) > 0 {
+			b.model.addType(t)
 		}
 	}
 
-	if parameters := components.Parameters; parameters != nil {
-		for _, namedParameter := range parameters.AdditionalProperties {
-			// Parameters in OpenAPI have a name field. See: https://swagger.io/specification/#parameterObject
-			// The name gets passed up the callstack and is therefore contained inside fInfo. That is why we pass "" as fieldName
-			// A type with that parameter was never created, so we still need to do that.
-			t := makeType(namedParameter.Name)
-			fInfo := b.buildFromParamOrRef(namedParameter.Value)
-			makeFieldAndAppendToType(fInfo, t, "")
-			if len(t.Fields) > 0 {
-				b.model.addType(t)
-			}
-		}
+	for _, namedResponses := range components.GetResponses().GetAdditionalProperties() {
+		fInfo := b.buildFromResponseOrRef(namedResponses.Name, namedResponses.Value)
+		b.checkForExistence(namedResponses.Name, fInfo)
 	}
 
-	if responses := components.Responses; responses != nil {
-		for _, namedResponses := range responses.AdditionalProperties {
-			fInfo := b.buildFromResponseOrRef(namedResponses.Name, namedResponses.Value)
-			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
-			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
-			if t := findType(b.model.Types, namedResponses.Name); t == nil {
-				t = makeType(namedResponses.Name)
-				makeFieldAndAppendToType(fInfo, t, "value")
-				b.model.addType(t)
-			}
-		}
-	}
-
-	if requestBodies := components.RequestBodies; requestBodies != nil {
-		for _, namedRequestBody := range requestBodies.AdditionalProperties {
-			fInfo := b.buildFromRequestBodyOrRef(namedRequestBody.Name, namedRequestBody.Value)
-			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
-			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
-			if t := findType(b.model.Types, namedRequestBody.Name); t == nil {
-				t = makeType(namedRequestBody.Name)
-				makeFieldAndAppendToType(fInfo, t, "value")
-				b.model.addType(t)
-			}
-		}
+	for _, namedRequestBody := range components.GetRequestBodies().GetAdditionalProperties() {
+		fInfo := b.buildFromRequestBodyOrRef(namedRequestBody.Name, namedRequestBody.Value)
+		b.checkForExistence(namedRequestBody.Name, fInfo)
 	}
 }
 
@@ -293,7 +269,7 @@ func (b *OpenAPI3Builder) buildFromRequestBody(name string, reqBody *openapiv3.R
 	if reqBody.Content != nil {
 		schemaType := makeType(name)
 		for _, namedMediaType := range reqBody.Content.AdditionalProperties {
-			fieldInfo := b.buildFromNamedMediaType(name+namedMediaType.Name, namedMediaType.Value)
+			fieldInfo := b.buildFromSchemaOrReference(name+namedMediaType.Name, namedMediaType.GetValue().GetSchema())
 			makeFieldAndAppendToType(fieldInfo, schemaType, namedMediaType.Name)
 		}
 		b.model.addType(schemaType)
@@ -322,7 +298,7 @@ func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Res
 	if response.Content != nil && response.Content.AdditionalProperties != nil {
 		schemaType := makeType(name)
 		for _, namedMediaType := range response.Content.AdditionalProperties {
-			fieldInfo := b.buildFromNamedMediaType(name+namedMediaType.Name, namedMediaType.Value)
+			fieldInfo := b.buildFromSchemaOrReference(name+namedMediaType.Name, namedMediaType.GetValue().GetSchema())
 			makeFieldAndAppendToType(fieldInfo, schemaType, namedMediaType.Name)
 		}
 		b.model.addType(schemaType)
@@ -330,14 +306,6 @@ func (b *OpenAPI3Builder) buildFromResponse(name string, response *openapiv3.Res
 		return fInfo
 	}
 	return nil
-}
-
-// A helper method to keep code organized
-func (b *OpenAPI3Builder) buildFromNamedMediaType(name string, mediaType *openapiv3.MediaType) (fInfo *FieldInfo) {
-	if schemaOrRef := mediaType.Schema; schemaOrRef != nil {
-		fInfo = b.buildFromSchemaOrReference(name, schemaOrRef)
-	}
-	return fInfo
 }
 
 // A helper method to differentiate between references and actual objects
@@ -367,12 +335,12 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 		fallthrough
 	case "object":
 		schemaType := makeType(name)
-		if schema.Properties != nil && schema.Properties.AdditionalProperties != nil {
-			for _, namedSchema := range schema.Properties.AdditionalProperties {
-				fieldInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
-				makeFieldAndAppendToType(fieldInfo, schemaType, namedSchema.Name)
-			}
+
+		for _, namedSchema := range schema.GetProperties().GetAdditionalProperties() {
+			fieldInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+			makeFieldAndAppendToType(fieldInfo, schemaType, namedSchema.Name)
 		}
+
 		if schemaOrRef := schema.AdditionalProperties.GetSchemaOrReference(); schemaOrRef != nil {
 			// AdditionalProperties are represented as map
 			fieldInfo := b.buildFromSchemaOrReference(name+"AdditionalProperties", schemaOrRef)
@@ -383,19 +351,16 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			}
 		}
 
-		for idx, schemaOrRef := range schema.AnyOf {
-			fieldInfo := b.buildFromSchemaOrReference(name+"AnyOf"+strconv.Itoa(idx+1), schemaOrRef)
-			makeFieldAndAppendToType(fieldInfo, schemaType, "any_of_"+strconv.Itoa(idx+1))
+		for _, schemaOrRef := range schema.AnyOf {
+			b.buildFromOneOfAnyOfAndAllOf(schemaOrRef, schemaType)
 		}
 
-		for idx, schemaOrRef := range schema.OneOf {
-			fieldInfo := b.buildFromSchemaOrReference(name+"OneOf"+strconv.Itoa(idx+1), schemaOrRef)
-			makeFieldAndAppendToType(fieldInfo, schemaType, "one_of_"+strconv.Itoa(idx+1))
+		for _, schemaOrRef := range schema.OneOf {
+			b.buildFromOneOfAnyOfAndAllOf(schemaOrRef, schemaType)
 		}
 
-		for idx, schemaOrRef := range schema.AllOf {
-			fieldInfo := b.buildFromSchemaOrReference(name+"AllOf"+strconv.Itoa(idx+1), schemaOrRef)
-			makeFieldAndAppendToType(fieldInfo, schemaType, "all_of_"+strconv.Itoa(idx+1))
+		for _, schemaOrRef := range schema.AllOf {
+			b.buildFromOneOfAnyOfAndAllOf(schemaOrRef, schemaType)
 		}
 
 		if schema.Items != nil {
@@ -405,18 +370,13 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 			}
 		}
 
-		if schema.Enum != nil {
-			// TODO: It is not defined how enums should be represented inside the surface model
-			fieldInfo := &FieldInfo{}
-			fieldInfo.fieldKind, fieldInfo.fieldType, fieldInfo.fieldName = FieldKind_ANY, "string", "enum"
-			makeFieldAndAppendToType(fieldInfo, schemaType, fieldInfo.fieldName)
-		}
-
 		if len(schemaType.Fields) == 0 {
 			schemaType.Kind = TypeKind_OBJECT
 			schemaType.ContentType = "interface{}"
 		}
-		b.model.addType(schemaType)
+		if t := findType(b.model.Types, schemaType.Name); t == nil {
+			b.model.addType(schemaType)
+		}
 		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, schemaType.Name
 		return fInfo
 	case "array":
@@ -427,15 +387,74 @@ func (b *OpenAPI3Builder) buildFromSchema(name string, schema *openapiv3.Schema)
 		for _, schemaOrRef := range schema.Items.SchemaOrReference {
 			arrayFieldInfo := b.buildFromSchemaOrReference(name, schemaOrRef)
 			if arrayFieldInfo != nil {
-				fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat
+				fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat, fInfo.enumValues = FieldKind_ARRAY, arrayFieldInfo.fieldType, arrayFieldInfo.fieldFormat, arrayFieldInfo.enumValues
 				return fInfo
 			}
 		}
 	default:
+		for _, enum := range schema.GetEnum() {
+			fInfo.enumValues = append(fInfo.enumValues, strings.TrimSuffix(enum.Yaml, "\n"))
+		}
 		// We go a scalar value
 		fInfo.fieldKind, fInfo.fieldType, fInfo.fieldFormat = FieldKind_SCALAR, schema.Type, schema.Format
 		return fInfo
 	}
 	log.Printf("Unimplemented: could not find field info for schema: %v", schema)
 	return nil
+}
+
+// buildFromOneOfAnyOfAndAllOf adds appropriate fields to the 'schemaType' given a new 'schemaOrRef'.
+func (b *OpenAPI3Builder) buildFromOneOfAnyOfAndAllOf(schemaOrRef *openapiv3.SchemaOrReference, schemaType *Type) {
+	// Related: https://github.com/google/gnostic-grpc/issues/22
+	if schema := schemaOrRef.GetSchema(); schema != nil {
+		// Build a temporary type that has the required fields; add the fields to the current schema; remove the
+		// temporary type
+		fieldInfo := b.buildFromSchemaOrReference("ATemporaryTypeThatWillBeRemoved", schemaOrRef)
+		t := findType(b.model.Types, "ATemporaryTypeThatWillBeRemoved")
+		if t == nil {
+			// schemaOrRef is some kind of primitive schema (e.g. of type string)
+			makeFieldAndAppendToType(fieldInfo, schemaType, "value")
+			return
+		}
+		schemaType.Fields = append(schemaType.Fields, t.Fields...)
+		b.removeType(t)
+	} else if ref := schemaOrRef.GetReference(); ref != nil {
+		referencedSchemaName := validTypeForRef(ref.XRef)
+		// Make sure that the referenced type exists, before we add the fields to the current schema
+		for _, namedSchema := range b.document.GetComponents().GetSchemas().GetAdditionalProperties() {
+			if referencedSchemaName == namedSchema.Name {
+				fInfo := b.buildFromSchemaOrReference(namedSchema.Name, namedSchema.Value)
+				b.checkForExistence(namedSchema.Name, fInfo)
+				break
+			}
+		}
+		t := findType(b.model.Types, referencedSchemaName)
+		if t == nil {
+			log.Printf("Unable to construct from OneOf, AnyOf, or AllOf schema. Referenced schema not found: %v", ref)
+			return
+		}
+		schemaType.Fields = append(schemaType.Fields, t.Fields...)
+	}
+}
+
+// removeType removes the Type 'toRemove' from the model.
+func (b *OpenAPI3Builder) removeType(toRemove *Type) {
+	res := make([]*Type, 0)
+	for _, t := range b.model.Types {
+		if t != toRemove {
+			res = append(res, t)
+		}
+	}
+	b.model.Types = res
+}
+
+// checkForExistence creates a type (if a type with 'name' does not already exist) and adds a field with the
+// information from 'fInfo'.
+func (b *OpenAPI3Builder) checkForExistence(name string, fInfo *FieldInfo) {
+	// In certain cases no type will be created during the recursion. (e.g.: the schema is a primitive schema)
+	if t := findType(b.model.Types, name); t == nil {
+		t = makeType(name)
+		makeFieldAndAppendToType(fInfo, t, "value")
+		b.model.addType(t)
+	}
 }

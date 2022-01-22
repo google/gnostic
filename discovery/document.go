@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All Rights Reserved.
+// Copyright 2019 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,26 +15,20 @@
 package discovery_v1
 
 import (
-	"errors"
-	"log"
-
-	"github.com/googleapis/gnostic/compiler"
+	"github.com/google/gnostic/compiler"
 )
 
+// FetchDocumentBytes downloads the bytes of a discovery document from a URL.
 func FetchDocumentBytes(documentURL string) ([]byte, error) {
 	return compiler.FetchFile(documentURL)
 }
 
-func ParseDocument(bytes []byte) (*Document, error) {
-	// Unpack the discovery document.
-	info, err := compiler.ReadInfoFromBytes("", bytes)
+// ParseDocument reads a Discovery description from a YAML/JSON representation.
+func ParseDocument(b []byte) (*Document, error) {
+	info, err := compiler.ReadInfoFromBytes("", b)
 	if err != nil {
 		return nil, err
 	}
-	m, ok := compiler.UnpackMap(info)
-	if !ok {
-		log.Printf("%s", string(bytes))
-		return nil, errors.New("Invalid input")
-	}
-	return NewDocument(m, compiler.NewContext("$root", nil))
+	root := info.Content[0]
+	return NewDocument(root, compiler.NewContext("$root", root, nil))
 }

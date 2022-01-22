@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,19 +15,37 @@
 package main
 
 import (
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/googleapis/gnostic/lib"
+	"github.com/google/gnostic/lib"
 )
+
+func isURL(path string) bool {
+	_, err := url.ParseRequestURI(path)
+	if err != nil {
+		return false
+	}
+	u, err := url.Parse(path)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
+}
 
 func testCompiler(t *testing.T, inputFile string, referenceFile string, expectErrors bool) {
 	outputFormat := filepath.Ext(referenceFile)[1:]
-	outputFile := strings.Replace(filepath.Base(inputFile), filepath.Ext(inputFile), "."+outputFormat, 1)
-	errorsFile := strings.Replace(filepath.Base(inputFile), filepath.Ext(inputFile), ".errors", 1)
+	outputFile := strings.Replace(inputFile, filepath.Ext(inputFile), "."+outputFormat, 1)
+	errorsFile := strings.Replace(inputFile, filepath.Ext(inputFile), ".errors", 1)
+	if isURL(inputFile) {
+		// put outputs in the current directory
+		outputFile = filepath.Base(outputFile)
+		errorsFile = filepath.Base(errorsFile)
+	}
 	// remove any preexisting output files
 	os.Remove(outputFile)
 	os.Remove(errorsFile)
@@ -93,25 +111,25 @@ func TestSeparateJSON(t *testing.T) {
 
 func TestRemotePetstoreJSON(t *testing.T) {
 	testNormal(t,
-		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore.json",
+		"https://raw.githubusercontent.com/google/gnostic/master/examples/v2.0/json/petstore.json",
 		"testdata/v2.0/petstore.text")
 }
 
 func TestRemotePetstoreYAML(t *testing.T) {
 	testNormal(t,
-		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore.yaml",
+		"https://raw.githubusercontent.com/google/gnostic/master/examples/v2.0/yaml/petstore.yaml",
 		"testdata/v2.0/petstore.text")
 }
 
 func TestRemoteSeparateYAML(t *testing.T) {
 	testNormal(t,
-		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
+		"https://raw.githubusercontent.com/google/gnostic/master/examples/v2.0/yaml/petstore-separate/spec/swagger.yaml",
 		"testdata/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
 func TestRemoteSeparateJSON(t *testing.T) {
 	testNormal(t,
-		"https://raw.githubusercontent.com/googleapis/openapi-compiler/master/examples/v2.0/json/petstore-separate/spec/swagger.json",
+		"https://raw.githubusercontent.com/google/gnostic/master/examples/v2.0/json/petstore-separate/spec/swagger.json",
 		"testdata/v2.0/yaml/petstore-separate/spec/swagger.text")
 }
 
@@ -177,7 +195,7 @@ func TestJSONOutput(t *testing.T) {
 	// Verify that both models have the same internal representation.
 	err = exec.Command("diff", textFile, textFile2).Run()
 	if err != nil {
-		t.Logf("Diff failed: %+v", err)
+		t.Logf("Diff failed (%s vs %s): %+v", textFile, textFile2, err)
 		t.FailNow()
 	} else {
 		// if the test succeeded, clean up
@@ -269,4 +287,10 @@ func TestEmptyRequiredFields_v3(t *testing.T) {
 	testNormal(t,
 		"examples/v3.0/yaml/empty-v3.yaml",
 		"testdata/v3.0/json/empty-v3.json")
+}
+
+func TestDiscoveryJSON(t *testing.T) {
+	testNormal(t,
+		"examples/discovery/discovery-v1.json",
+		"testdata/discovery/discovery-v1.text")
 }

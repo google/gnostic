@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,8 +46,23 @@ func (schema *Schema) describeSchema(indent string) string {
 	if schema.Schema != nil {
 		result += indent + "$schema: " + *(schema.Schema) + "\n"
 	}
+	if schema.ReadOnly != nil && *schema.ReadOnly {
+		result += indent + fmt.Sprintf("readOnly: %+v\n", *(schema.ReadOnly))
+	}
+	if schema.WriteOnly != nil && *schema.WriteOnly {
+		result += indent + fmt.Sprintf("writeOnly: %+v\n", *(schema.WriteOnly))
+	}
 	if schema.ID != nil {
-		result += indent + "id: " + *(schema.ID) + "\n"
+		switch strings.TrimSuffix(*schema.Schema, "#") {
+		case "http://json-schema.org/draft-04/schema#":
+			fallthrough
+		case "#":
+			fallthrough
+		case "":
+			result += indent + "id: " + *(schema.ID) + "\n"
+		default:
+			result += indent + "$id: " + *(schema.ID) + "\n"
+		}
 	}
 	if schema.MultipleOf != nil {
 		result += indent + fmt.Sprintf("multipleOf: %+v\n", *(schema.MultipleOf))

@@ -1,0 +1,19 @@
+{
+  "title": "MergeShelvesRequest",
+  "$id": "http://example.com/schemas/MergeShelvesRequest.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Describes the shelf being removed (other_shelf_name) and updated (name) in this merge.",
+  "properties": {
+    "name": {
+      "title": "name",
+      "type": "string",
+      "description": "The name of the shelf we're adding books to."
+    },
+    "otherShelfName": {
+      "title": "otherShelfName",
+      "type": "string",
+      "description": "The name of the shelf we're removing books from and deleting."
+    }
+  }
+}

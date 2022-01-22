@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,18 @@
 // of JSON Schemas.
 package jsonschema
 
+import "gopkg.in/yaml.v3"
+
 // The Schema struct models a JSON Schema and, because schemas are
 // defined hierarchically, contains many references to itself.
 // All fields are pointers and are nil if the associated values
 // are not specified.
 type Schema struct {
-	Schema *string // $schema
-	ID     *string // id keyword used for $ref resolution scope
-	Ref    *string // $ref, i.e. JSON Pointers
+	Schema    *string // $schema
+	ID        *string // id keyword used for $ref resolution scope
+	Ref       *string // $ref, i.e. JSON Pointers
+	ReadOnly  *bool
+	WriteOnly *bool
 
 	// http://json-schema.org/latest/json-schema-validation.html
 	// 5.1.  Validation keywords for numeric instances (number and integer)
@@ -66,7 +70,7 @@ type Schema struct {
 	// 6.  Metadata keywords
 	Title       *string
 	Description *string
-	Default     *interface{}
+	Default     *yaml.Node
 
 	// 7.  Semantic validation with "format"
 	Format *string

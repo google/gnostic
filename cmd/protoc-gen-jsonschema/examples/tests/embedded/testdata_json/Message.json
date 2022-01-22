@@ -1,0 +1,27 @@
+{
+  "messageId": "123abc",
+  "comments": [
+    {
+      "id": "abc123",
+      "content": "first comment",
+      "replies": [
+        {
+          "id": "xyz123",
+          "commentId": "abc123",
+          "content": "first reply to first comment"
+        }
+      ]
+    },
+    {
+      "id": "123abc",
+      "content": "second comment",
+      "replies": [
+        {
+          "id": "123xyz",
+          "commentId": "123abc",
+          "content": "first reply to second comment"
+        }
+      ]
+    }
+  ]
+}

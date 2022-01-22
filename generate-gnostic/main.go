@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,17 +23,17 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path"
-	"runtime"
 	"strings"
 
-	"github.com/googleapis/gnostic/jsonschema"
+	"golang.org/x/tools/imports"
+
+	"github.com/google/gnostic/jsonschema"
 )
 
 // License is the software license applied to generated code.
 const License = "" +
-	"// Copyright 2017 Google Inc. All Rights Reserved.\n" +
+	"// Copyright 2020 Google LLC. All Rights Reserved.\n" +
 	"//\n" +
 	"// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
 	"// you may not use this file except in compliance with the License.\n" +
@@ -84,7 +84,7 @@ func protoOptions(directoryName string, packageName string) []ProtoOption {
 
 		ProtoOption{
 			Name:    "go_package",
-			Value:   directoryName + ";" + packageName,
+			Value:   "./" + directoryName + ";" + packageName,
 			Comment: "// The Go package name.",
 		},
 	}
@@ -120,7 +120,7 @@ func generateOpenAPIModel(version string) error {
 
 	projectRoot := "./"
 
-	baseSchema, err := jsonschema.NewSchemaFromFile(projectRoot + "jsonschema/schema.json")
+	baseSchema, err := jsonschema.NewBaseSchema()
 	if err != nil {
 		return err
 	}
@@ -190,22 +190,30 @@ func generateOpenAPIModel(version string) error {
 
 	packageImports := []string{
 		"fmt",
-		"gopkg.in/yaml.v2",
+		"gopkg.in/yaml.v3",
 		"strings",
 		"regexp",
-		"github.com/googleapis/gnostic/compiler",
+		"github.com/google/gnostic/compiler",
 	}
 	// generate the compiler
 	log.Printf("Generating compiler support code")
 	compiler := cc.GenerateCompiler(goPackageName, License, packageImports)
 	goFileName := projectRoot + directoryName + "/" + filename + ".go"
-	err = ioutil.WriteFile(goFileName, []byte(compiler), 0644)
+
+	// format the compiler
+	log.Printf("Formatting compiler support code")
+	imports.LocalPrefix = "github.com/google/gnostic"
+	data, err := imports.Process(goFileName, []byte(compiler), &imports.Options{
+		TabWidth:  8,
+		TabIndent: true,
+		Comments:  true,
+		Fragment:  true,
+	})
 	if err != nil {
 		return err
 	}
-	// format the compiler
-	log.Printf("Formatting compiler support code")
-	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", goFileName).Run()
+
+	return ioutil.WriteFile(goFileName, []byte(data), 0644)
 }
 
 func usage() string {
@@ -231,7 +239,7 @@ Options:
 
 func main() {
 	var openapiVersion = ""
-	var generateExtensions = false
+	var shouldGenerateExtensions = false
 
 	for i, arg := range os.Args {
 		if i == 0 {
@@ -244,7 +252,7 @@ func main() {
 		} else if arg == "--discovery" {
 			openapiVersion = "discovery"
 		} else if arg == "--extension" {
-			generateExtensions = true
+			shouldGenerateExtensions = true
 			break
 		} else {
 			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
@@ -257,8 +265,8 @@ func main() {
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
-	} else if generateExtensions {
-		err := processExtensionGenCommandline(usage())
+	} else if shouldGenerateExtensions {
+		err := generateExtensions()
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}

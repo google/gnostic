@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ option java_package = "org.openapi_v2";
 option objc_class_prefix = "OAS";
 
 // The Go package name.
-option go_package = "openapiv2;openapi_v2";
+option go_package = "./openapiv2;openapi_v2";
 
 message AdditionalPropertiesItem {
   oneof oneof {

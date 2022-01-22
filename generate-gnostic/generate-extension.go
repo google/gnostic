@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/googleapis/gnostic/compiler"
-	"github.com/googleapis/gnostic/jsonschema"
-	"github.com/googleapis/gnostic/printer"
+	"github.com/google/gnostic/compiler"
+	"github.com/google/gnostic/jsonschema"
+	"github.com/google/gnostic/printer"
 )
 
 var protoOptionsForExtensions = []ProtoOption{
@@ -61,27 +61,32 @@ const additionalCompilerCodeWithMain = "" +
 	"}\n" +
 	"\n" +
 	"func main() {\n" +
-	"	openapiextension_v1.ProcessExtension(handleExtension)\n" +
+	"	gnostic_extension_v1.Main(handleExtension)\n" +
 	"}\n"
 
 const caseStringForObjectTypes = "\n" +
 	"case \"%s\":\n" +
-	"var info yaml.MapSlice\n" +
+	"var info yaml.Node\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
-	"newObject, err := %s.New%s(info, compiler.NewContext(\"$root\", nil))\n" +
+	"info = *info.Content[0]\n" +
+	"newObject, err := %s.New%s(&info, compiler.NewContext(\"$root\", &info, nil))\n" +
 	"return true, newObject, err"
 
 const caseStringForWrapperTypes = "\n" +
 	"case \"%s\":\n" +
-	"var info %s\n" +
+	"var info yaml.Node\n" +
 	"err := yaml.Unmarshal([]byte(yamlInput), &info)\n" +
 	"if err != nil {\n" +
 	"  return true, nil, err\n" +
 	"}\n" +
-	"newObject := &wrappers.%s{Value: info}\n" +
+	"v, ok := compiler.%sForScalarNode(&info)\n" +
+	"if !ok {\n" +
+	"	return true, nil, nil\n" +
+	"}\n" +
+	"newObject := &wrappers.%s{Value: v}\n" +
 	"return true, newObject, nil"
 
 // generateMainFile generates the main program for an extension.
@@ -132,10 +137,10 @@ type primitiveTypeInfo struct {
 }
 
 var supportedPrimitiveTypeInfos = map[string]primitiveTypeInfo{
-	"string":  primitiveTypeInfo{goTypeName: "string", wrapperProtoName: "StringValue"},
-	"number":  primitiveTypeInfo{goTypeName: "float64", wrapperProtoName: "DoubleValue"},
-	"integer": primitiveTypeInfo{goTypeName: "int64", wrapperProtoName: "Int64Value"},
-	"boolean": primitiveTypeInfo{goTypeName: "bool", wrapperProtoName: "BoolValue"},
+	"string":  primitiveTypeInfo{goTypeName: "String", wrapperProtoName: "StringValue"},
+	"number":  primitiveTypeInfo{goTypeName: "Float", wrapperProtoName: "DoubleValue"},
+	"integer": primitiveTypeInfo{goTypeName: "Int", wrapperProtoName: "Int64Value"},
+	"boolean": primitiveTypeInfo{goTypeName: "Bool", wrapperProtoName: "BoolValue"},
 	// TODO: Investigate how to support arrays. For now users will not be allowed to
 	// create extension handlers for arrays and they will have to use the
 	// plane yaml string as is.
@@ -147,8 +152,8 @@ type generatedTypeInfo struct {
 	optionalPrimitiveTypeInfo *primitiveTypeInfo
 }
 
-// GenerateExtension generates the implementation of an extension.
-func GenerateExtension(schemaFile string, outDir string) error {
+// generateExtension generates the implementation of an extension.
+func generateExtension(schemaFile string, outDir string) error {
 	outFileBaseName := getBaseFileNameWithoutExt(schemaFile)
 	extensionNameWithoutXDashPrefix := outFileBaseName[len("x-"):]
 	outDir = path.Join(outDir, "gnostic-x-"+extensionNameWithoutXDashPrefix)
@@ -159,8 +164,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	protoOutDirectory := outDir + "/" + "proto"
 	var err error
 
-	projectRoot := os.Getenv("GOPATH") + "/src/github.com/googleapis/gnostic/"
-	baseSchema, err := jsonschema.NewSchemaFromFile(projectRoot + "jsonschema/schema.json")
+	baseSchema, err := jsonschema.NewBaseSchema()
 	if err != nil {
 		return err
 	}
@@ -250,7 +254,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		},
 		ProtoOption{
 			Name:    "go_package",
-			Value:   ".;" + strings.ToLower(protoPackage),
+			Value:   "./;" + strings.ToLower(protoPackage),
 			Comment: "// The Go package path.",
 		},
 	)
@@ -268,8 +272,8 @@ func GenerateExtension(schemaFile string, outDir string) error {
 		"fmt",
 		"regexp",
 		"strings",
-		"github.com/googleapis/gnostic/compiler",
-		"gopkg.in/yaml.v2",
+		"github.com/google/gnostic/compiler",
+		"gopkg.in/yaml.v3",
 	})
 	goFilename := path.Join(protoOutDirectory, outFileBaseName+".go")
 	err = ioutil.WriteFile(goFilename, []byte(compiler), 0644)
@@ -283,7 +287,7 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	// TODO: This path is currently fixed to the location of the samples.
 	//       Can we make it relative, perhaps with an option or by generating
 	//       a go.mod file for the generated extension handler?
-	outDirRelativeToPackageRoot := "github.com/googleapis/gnostic/extensions/sample/" + outDir
+	outDirRelativeToPackageRoot := "github.com/google/gnostic/extensions/sample/" + outDir
 
 	var extensionNameKeys []string
 	for k := range extensionNameToMessageName {
@@ -295,19 +299,25 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	var cases string
 	for _, extensionName := range extensionNameKeys {
 		if extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo == nil {
-			cases += fmt.Sprintf(caseStringForObjectTypes, extensionName, goPackageName, extensionNameToMessageName[extensionName].schemaName)
+			cases += fmt.Sprintf(caseStringForObjectTypes,
+				extensionName,
+				goPackageName,
+				extensionNameToMessageName[extensionName].schemaName)
 		} else {
 			wrapperTypeIncluded = true
-			cases += fmt.Sprintf(caseStringForWrapperTypes, extensionName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName, extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
+			cases += fmt.Sprintf(caseStringForWrapperTypes,
+				extensionName,
+				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName,
+				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
 		}
 
 	}
 	extMainCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
 	imports := []string{
 		"github.com/golang/protobuf/proto",
-		"github.com/googleapis/gnostic/extensions",
-		"github.com/googleapis/gnostic/compiler",
-		"gopkg.in/yaml.v2",
+		"github.com/google/gnostic/extensions",
+		"github.com/google/gnostic/compiler",
+		"gopkg.in/yaml.v3",
 		outDirRelativeToPackageRoot + "/" + "proto",
 	}
 	if wrapperTypeIncluded {
@@ -324,10 +334,10 @@ func GenerateExtension(schemaFile string, outDir string) error {
 	return exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", mainFileName).Run()
 }
 
-func processExtensionGenCommandline(usage string) error {
+func generateExtensions() error {
 
 	outDir := ""
-	schameFile := ""
+	schemaFile := ""
 
 	extParamRegex, _ := regexp.Compile("--(.+)=(.+)")
 
@@ -343,31 +353,31 @@ func processExtensionGenCommandline(usage string) error {
 			case "out_dir":
 				outDir = flagValue
 			default:
-				fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+				fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 				os.Exit(-1)
 			}
 		} else if arg == "--extension" {
 			continue
 		} else if arg[0] == '-' {
-			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage)
+			fmt.Printf("Unknown option: %s.\n%s\n", arg, usage())
 			os.Exit(-1)
 		} else {
-			schameFile = arg
+			schemaFile = arg
 		}
 	}
 
-	if schameFile == "" {
-		fmt.Printf("No input json schema specified.\n%s\n", usage)
+	if schemaFile == "" {
+		fmt.Printf("No input json schema specified.\n%s\n", usage())
 		os.Exit(-1)
 	}
 	if outDir == "" {
-		fmt.Printf("Missing output directive.\n%s\n", usage)
+		fmt.Printf("Missing output directive.\n%s\n", usage())
 		os.Exit(-1)
 	}
-	if !strings.HasPrefix(getBaseFileNameWithoutExt(schameFile), "x-") {
-		fmt.Printf("Schema file name has to start with 'x-'.\n%s\n", usage)
+	if !strings.HasPrefix(getBaseFileNameWithoutExt(schemaFile), "x-") {
+		fmt.Printf("Schema file name has to start with 'x-'.\n%s\n", usage())
 		os.Exit(-1)
 	}
 
-	return GenerateExtension(schameFile, outDir)
+	return generateExtension(schemaFile, outDir)
 }

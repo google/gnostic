@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/googleapis/gnostic/printer"
+	"github.com/google/gnostic/printer"
 )
 
 // patternNames hands out unique names for a given string.
@@ -111,6 +111,7 @@ func (domain *Domain) GenerateCompiler(packageName string, license string, impor
 		domain.generateToRawInfoMethodForType(code, typeName)
 	}
 
+	// generate precompiled regexps for use during parsing
 	domain.generateConstantVariables(code, regexPatterns)
 
 	return code.String()
@@ -134,7 +135,7 @@ func nameForPattern(regexPatterns *patternNames, pattern string) string {
 
 func (domain *Domain) generateConstructorForType(code *printer.Code, typeName string, regexPatterns *patternNames) {
 	code.Print("// New%s creates an object of type %s if possible, returning an error if not.", typeName, typeName)
-	code.Print("func New%s(in interface{}, context *compiler.Context) (*%s, error) {", typeName, typeName)
+	code.Print("func New%s(in *yaml.Node, context *compiler.Context) (*%s, error) {", typeName, typeName)
 	code.Print("errors := make([]error, 0)")
 
 	typeModel := domain.TypeModels[typeName]
@@ -142,14 +143,16 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 
 	if typeModel.IsStringArray {
 		code.Print("x := &TypeItem{}")
-		code.Print("switch in := in.(type) {")
-		code.Print("case string:")
+		code.Print("v1 := in")
+		code.Print("switch v1.Kind {")
+		code.Print("case yaml.ScalarNode:")
 		code.Print("  x.Value = make([]string, 0)")
-		code.Print("  x.Value = append(x.Value, in)")
-		code.Print("case []interface{}:")
+		code.Print("  x.Value = append(x.Value, v1.Value)")
+		code.Print("case yaml.SequenceNode:")
 		code.Print("  x.Value = make([]string, 0)")
-		code.Print("  for _, v := range in {")
-		code.Print("    value, ok := v.(string)")
+		code.Print("  for _, v := range v1.Content {")
+		code.Print("    value := v.Value")
+		code.Print("    ok := v.Kind == yaml.ScalarNode")
 		code.Print("    if ok {")
 		code.Print("      x.Value = append(x.Value, value)")
 		code.Print("    } else {")
@@ -170,7 +173,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("  errors = append(errors, compiler.NewError(context, message))")
 			code.Print("} else {")
 			code.Print("  x.Schema = make([]*Schema, 0)")
-			code.Print("  y, err := NewSchema(m, compiler.NewContext(\"<array>\", context))")
+			code.Print("  y, err := NewSchema(m, compiler.NewContext(\"<array>\", m, context))")
 			code.Print("  if err != nil {")
 			code.Print("    return nil, err")
 			code.Print("  }")
@@ -184,7 +187,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("  errors = append(errors, compiler.NewError(context, message))")
 			code.Print("} else {")
 			code.Print("  x.SchemaOrReference = make([]*SchemaOrReference, 0)")
-			code.Print("  y, err := NewSchemaOrReference(m, compiler.NewContext(\"<array>\", context))")
+			code.Print("  y, err := NewSchemaOrReference(m, compiler.NewContext(\"<array>\", m, context))")
 			code.Print("  if err != nil {")
 			code.Print("    return nil, err")
 			code.Print("  }")
@@ -193,75 +196,35 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 		}
 	} else if typeModel.IsBlob {
 		code.Print("x := &Any{}")
-		code.Print("bytes, _ := yaml.Marshal(in)")
+		code.Print("bytes := compiler.Marshal(in)")
 		code.Print("x.Yaml = string(bytes)")
 	} else if typeModel.Name == "StringArray" {
 		code.Print("x := &StringArray{}")
-		code.Print("a, ok := in.([]interface{})")
-		code.Print("if !ok {")
-		code.Print("  message := fmt.Sprintf(\"has unexpected value for StringArray: %%+v (%%T)\", in, in)")
-		code.Print("  errors = append(errors, compiler.NewError(context, message))")
-		code.Print("} else {")
-		code.Print("  x.Value = make([]string, 0)")
-		code.Print("  for _, s := range a {")
-		code.Print("    x.Value = append(x.Value, s.(string))")
-		code.Print("  }")
+		code.Print("x.Value = make([]string, 0)")
+		code.Print("for _, node := range in.Content {")
+		code.Print("  s, _ := compiler.StringForScalarNode(node)")
+		code.Print("  x.Value = append(x.Value, s)")
 		code.Print("}")
-	} else if typeModel.Name == "Primitive" {
-		code.Print("	x := &Primitive{}")
-		code.Print("	matched := false")
-		code.Print("	switch in := in.(type) {")
-		code.Print("	case bool:")
-		code.Print("		x.Oneof = &Primitive_Boolean{Boolean: in}")
-		code.Print("		matched = true")
-		code.Print("	case string:")
-		code.Print("		x.Oneof = &Primitive_String_{String_: in}")
-		code.Print("		matched = true")
-		code.Print("	case int64:")
-		code.Print("		x.Oneof = &Primitive_Integer{Integer: in}")
-		code.Print("		matched = true")
-		code.Print("	case int32:")
-		code.Print("		x.Oneof = &Primitive_Integer{Integer: int64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case int:")
-		code.Print("		x.Oneof = &Primitive_Integer{Integer: int64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case float64:")
-		code.Print("		x.Oneof = &Primitive_Number{Number: in}")
-		code.Print("		matched = true")
-		code.Print("	case float32:")
-		code.Print("		x.Oneof = &Primitive_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	}")
-		code.Print("	if matched {")
-		code.Print("		// since the oneof matched one of its possibilities, discard any matching errors")
-		code.Print("		errors = make([]error, 0)")
-		code.Print("	}")
 	} else if typeModel.Name == "SpecificationExtension" {
 		code.Print("	x := &SpecificationExtension{}")
 		code.Print("	matched := false")
-		code.Print("	switch in := in.(type) {")
-		code.Print("	case bool:")
-		code.Print("		x.Oneof = &SpecificationExtension_Boolean{Boolean: in}")
-		code.Print("		matched = true")
-		code.Print("	case string:")
-		code.Print("		x.Oneof = &SpecificationExtension_String_{String_: in}")
-		code.Print("		matched = true")
-		code.Print("	case int64:")
-		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case int32:")
-		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case int:")
-		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case float64:")
-		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: in}")
-		code.Print("		matched = true")
-		code.Print("	case float32:")
-		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(in)}")
-		code.Print("		matched = true")
+		code.Print("	switch in.Tag {")
+		code.Print("    case \"!!bool\":")
+		code.Print("        var v bool")
+		code.Print("        v, matched = compiler.BoolForScalarNode(in)")
+		code.Print("		x.Oneof = &SpecificationExtension_Boolean{Boolean: v}")
+		code.Print("    case \"!!str\":")
+		code.Print("        var v string")
+		code.Print("        v, matched = compiler.StringForScalarNode(in)")
+		code.Print("		x.Oneof = &SpecificationExtension_String_{String_: v}")
+		code.Print("    case \"!!float\":")
+		code.Print("        var v float64")
+		code.Print("        v, matched = compiler.FloatForScalarNode(in)")
+		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: v}")
+		code.Print("    case \"!!int\":")
+		code.Print("        var v int64")
+		code.Print("        v, matched = compiler.IntForScalarNode(in)")
+		code.Print("		x.Oneof = &SpecificationExtension_Number{Number: float64(v)}")
 		code.Print("	}")
 		code.Print("	if matched {")
 		code.Print("		// since the oneof matched one of its possibilities, discard any matching errors")
@@ -270,28 +233,23 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 	} else if typeModel.Name == "DefaultType" {
 		code.Print("	x := &DefaultType{}")
 		code.Print("	matched := false")
-		code.Print("	switch in := in.(type) {")
-		code.Print("	case bool:")
-		code.Print("		x.Oneof = &DefaultType_Boolean{Boolean: in}")
-		code.Print("		matched = true")
-		code.Print("	case string:")
-		code.Print("		x.Oneof = &DefaultType_String_{String_: in}")
-		code.Print("		matched = true")
-		code.Print("	case int64:")
-		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case int32:")
-		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case int:")
-		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
-		code.Print("		matched = true")
-		code.Print("	case float64:")
-		code.Print("		x.Oneof = &DefaultType_Number{Number: in}")
-		code.Print("		matched = true")
-		code.Print("	case float32:")
-		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(in)}")
-		code.Print("		matched = true")
+		code.Print("	switch in.Tag {")
+		code.Print("    case \"!!bool\":")
+		code.Print("        var v bool")
+		code.Print("        v, matched = compiler.BoolForScalarNode(in)")
+		code.Print("		x.Oneof = &DefaultType_Boolean{Boolean: v}")
+		code.Print("    case \"!!str\":")
+		code.Print("        var v string")
+		code.Print("        v, matched = compiler.StringForScalarNode(in)")
+		code.Print("		x.Oneof = &DefaultType_String_{String_: v}")
+		code.Print("    case \"!!float\":")
+		code.Print("        var v float64")
+		code.Print("        v, matched = compiler.FloatForScalarNode(in)")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: v}")
+		code.Print("    case \"!!int\":")
+		code.Print("        var v int64")
+		code.Print("        v, matched = compiler.IntForScalarNode(in)")
+		code.Print("		x.Oneof = &DefaultType_Number{Number: float64(v)}")
 		code.Print("	}")
 		code.Print("	if matched {")
 		code.Print("		// since the oneof matched one of its possibilities, discard any matching errors")
@@ -411,10 +369,10 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("if (v%d != nil) {", fieldNumber)
 					code.Print("  // repeated %s", typeModel.Name)
 					code.Print("  x.%s = make([]*%s, 0)", fieldName, typeModel.Name)
-					code.Print("  a, ok := v%d.([]interface{})", fieldNumber)
+					code.Print("  a, ok := compiler.SequenceNodeForNode(v%d)", fieldNumber)
 					code.Print("  if ok {")
-					code.Print("    for _, item := range a {")
-					code.Print("      y, err := New%s(item, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
+					code.Print("    for _, item := range a.Content {")
+					code.Print("      y, err := New%s(item, compiler.NewContext(\"%s\", item, context))", typeModel.Name, propertyName)
 					code.Print("      if err != nil {")
 					code.Print("        errors = append(errors, err)")
 					code.Print("      }")
@@ -430,7 +388,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 							code.Print("  if ok {")
 						}
 						code.Print("    // errors might be ok here, they mean we just don't have the right subtype")
-						code.Print("    t, matchingError := New%s(m, compiler.NewContext(\"%s\", context))", typeModel.Name, propertyName)
+						code.Print("    t, matchingError := New%s(m, compiler.NewContext(\"%s\", m, context))", typeModel.Name, propertyName)
 						code.Print("    if matchingError == nil {")
 						code.Print("      x.Oneof = &%s_%s{%s: t}", parentTypeName, typeModel.Name, typeModel.Name)
 						code.Print("      matched = true")
@@ -445,8 +403,8 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 						code.Print("if (v%d != nil) {", fieldNumber)
 						code.Print("  var err error")
-						code.Print("  x.%s, err = New%s(v%d, compiler.NewContext(\"%s\", context))",
-							fieldName, typeModel.Name, fieldNumber, propertyName)
+						code.Print("  x.%s, err = New%s(v%d, compiler.NewContext(\"%s\", v%d, context))",
+							fieldName, typeModel.Name, fieldNumber, propertyName, fieldNumber)
 						code.Print("  if err != nil {")
 						code.Print("    errors = append(errors, err)")
 						code.Print("  }")
@@ -457,11 +415,11 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				if propertyModel.Repeated {
 					code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 					code.Print("if (v%d != nil) {", fieldNumber)
-					code.Print("  v, ok := v%d.([]interface{})", fieldNumber)
+					code.Print("  v, ok := compiler.SequenceNodeForNode(v%d)", fieldNumber)
 					code.Print("  if ok {")
-					code.Print("    x.%s = compiler.ConvertInterfaceArrayToStringArray(v)", fieldName)
+					code.Print("    x.%s = compiler.StringArrayForSequenceNode(v)", fieldName)
 					code.Print("  } else {")
-					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("}")
 
@@ -478,7 +436,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						}
 						stringArrayLiteral += "}"
 						code.Print("if ok && !compiler.StringArrayContainsValues(%s, x.%s) {", stringArrayLiteral, fieldName)
-						code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v\", v%d)", propertyName, fieldNumber)
+						code.Print("  message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 						code.Print("  errors = append(errors, compiler.NewError(context, message))")
 						code.Print("}")
 					}
@@ -487,9 +445,9 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				} else {
 					code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 					code.Print("if (v%d != nil) {", fieldNumber)
-					code.Print("  x.%s, ok = v%d.(string)", fieldName, fieldNumber)
+					code.Print("  x.%s, ok = compiler.StringForScalarNode(v%d)", fieldName, fieldNumber)
 					code.Print("  if !ok {")
-					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("  }")
 
@@ -507,7 +465,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 						stringArrayLiteral += "}"
 
 						code.Print("if ok && !compiler.StringArrayContainsValue(%s, x.%s) {", stringArrayLiteral, fieldName)
-						code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+						code.Print("  message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 						code.Print("  errors = append(errors, compiler.NewError(context, message))")
 						code.Print("}")
 					}
@@ -516,41 +474,29 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			} else if propertyType == "float" {
 				code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("if (v%d != nil) {", fieldNumber)
-				code.Print("  switch v%d := v%d.(type) {", fieldNumber, fieldNumber)
-				code.Print("  case float64:")
-				code.Print("    x.%s = v%d", fieldName, fieldNumber)
-				code.Print("  case float32:")
-				code.Print("    x.%s = float64(v%d)", fieldName, fieldNumber)
-				code.Print("  case uint64:")
-				code.Print("    x.%s = float64(v%d)", fieldName, fieldNumber)
-				code.Print("  case uint32:")
-				code.Print("    x.%s = float64(v%d)", fieldName, fieldNumber)
-				code.Print("  case int64:")
-				code.Print("    x.%s = float64(v%d)", fieldName, fieldNumber)
-				code.Print("  case int32:")
-				code.Print("    x.%s = float64(v%d)", fieldName, fieldNumber)
-				code.Print("  case int:")
-				code.Print("    x.%s = float64(v%d)", fieldName, fieldNumber)
-				code.Print("  default:")
-				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+				code.Print("  v, ok := compiler.FloatForScalarNode(v%d)", fieldNumber)
+				code.Print("  if ok {")
+				code.Print("    x.%s = v", fieldName)
+				code.Print("  } else {")
+				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 				code.Print("    errors = append(errors, compiler.NewError(context, message))")
 				code.Print("  }")
 				code.Print("}")
 			} else if propertyType == "int64" {
 				code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 				code.Print("if (v%d != nil) {", fieldNumber)
-				code.Print("  t, ok := v%d.(int)", fieldNumber)
+				code.Print("  t, ok := compiler.IntForScalarNode(v%d)", fieldNumber)
 				code.Print("  if ok {")
 				code.Print("    x.%s = int64(t)", fieldName)
 				code.Print("  } else {")
-				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+				code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 				code.Print("    errors = append(errors, compiler.NewError(context, message))")
 				code.Print("  }")
 				code.Print("}")
 			} else if propertyType == "bool" {
 				if oneOfWrapper {
 					propertyName := "Boolean"
-					code.Print("boolValue, ok := in.(bool)")
+					code.Print("boolValue, ok := compiler.BoolForScalarNode(in)")
 					code.Print("if ok {")
 					code.Print("  x.Oneof = &%s_%s{%s: boolValue}", parentTypeName, propertyName, propertyName)
 					code.Print("  matched = true")
@@ -558,9 +504,9 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 				} else {
 					code.Print("v%d := compiler.MapValueForKey(m, \"%s\")", fieldNumber, propertyName)
 					code.Print("if (v%d != nil) {", fieldNumber)
-					code.Print("  x.%s, ok = v%d.(bool)", fieldName, fieldNumber)
+					code.Print("  x.%s, ok = compiler.BoolForScalarNode(v%d)", fieldName, fieldNumber)
 					code.Print("  if !ok {")
-					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%+v (%%T)\", v%d, v%d)", propertyName, fieldNumber, fieldNumber)
+					code.Print("    message := fmt.Sprintf(\"has unexpected value for %s: %%s\", compiler.Display(v%d))", propertyName, fieldNumber)
 					code.Print("    errors = append(errors, compiler.NewError(context, message))")
 					code.Print("  }")
 					code.Print("}")
@@ -574,10 +520,10 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					} else {
 						code.Print("x.%s = make([]*Named%s, 0)", fieldName, mapTypeName)
 					}
-					code.Print("for _, item := range m {")
-					code.Print("k, ok := compiler.StringValue(item.Key)")
+					code.Print("for i := 0; i < len(m.Content); i += 2 {")
+					code.Print("k, ok := compiler.StringForScalarNode(m.Content[i])")
 					code.Print("if ok {")
-					code.Print("v := item.Value")
+					code.Print("v := m.Content[i+1]")
 					if pattern := propertyModel.Pattern; pattern != "" {
 						if inline, ok := regexPatterns.SpecialCaseExpression(pattern, "k"); ok {
 							code.Print("if %s {", inline)
@@ -590,29 +536,28 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 					code.Print("pair.Name = k")
 
 					if mapTypeName == "string" {
-						code.Print("pair.Value = v.(string)")
+						code.Print("pair.Value, _ = compiler.StringForScalarNode(v)")
 					} else if mapTypeName == "Any" {
 						code.Print("result := &Any{}")
-						code.Print("handled, resultFromExt, err := compiler.HandleExtension(context, v, k)")
+						code.Print("handled, resultFromExt, err := compiler.CallExtension(context, v, k)")
 						code.Print("if handled {")
 						code.Print("	if err != nil {")
 						code.Print("		errors = append(errors, err)")
 						code.Print("	} else {")
-						code.Print("		bytes, _ := yaml.Marshal(v)")
+						code.Print("		bytes := compiler.Marshal(v)")
 						code.Print("		result.Yaml = string(bytes)")
 						code.Print("		result.Value = resultFromExt")
 						code.Print("		pair.Value = result")
 						code.Print("	}")
 						code.Print("} else {")
-						code.Print("	pair.Value, err = NewAny(v, compiler.NewContext(k, context))")
+						code.Print("	pair.Value, err = NewAny(v, compiler.NewContext(k, v, context))")
 						code.Print("	if err != nil {")
 						code.Print("		errors = append(errors, err)")
 						code.Print("	}")
 						code.Print("}")
-
 					} else {
 						code.Print("var err error")
-						code.Print("pair.Value, err = New%s(v, compiler.NewContext(k, context))", mapTypeName)
+						code.Print("pair.Value, err = New%s(v, compiler.NewContext(k, v, context))", mapTypeName)
 						code.Print("if err != nil {")
 						code.Print("  errors = append(errors, err)")
 						code.Print("}")
@@ -635,12 +580,12 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 			code.Print("if matched {")
 			code.Print("    // since the oneof matched one of its possibilities, discard any matching errors")
 			code.Print("	errors = make([]error, 0)")
-			generateMatchErrors := false // TODO: enable this and update tests for new error messages
+			generateMatchErrors := true // TODO: enable this and update tests for new error messages
 			if generateMatchErrors {
 				code.Print("} else {")
-				code.Print("    message := fmt.Sprintf(\"failed to match %s with %%+v\", compiler.Description(in))", typeName)
+				code.Print("    message := fmt.Sprintf(\"contains an invalid %s\")", typeName)
 				code.Print("    err := compiler.NewError(context, message)")
-				code.Print("    errors = append(errors, err)")
+				code.Print("    errors = []error{err}")
 			}
 			code.Print("}")
 		}
@@ -654,7 +599,7 @@ func (domain *Domain) generateConstructorForType(code *printer.Code, typeName st
 // ResolveReferences() methods
 func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code, typeName string) {
 	code.Print("// ResolveReferences resolves references found inside %s objects.", typeName)
-	code.Print("func (m *%s) ResolveReferences(root string) (interface{}, error) {", typeName)
+	code.Print("func (m *%s) ResolveReferences(root string) (*yaml.Node, error) {", typeName)
 	code.Print("errors := make([]error, 0)")
 
 	typeModel := domain.TypeModels[typeName]
@@ -763,22 +708,21 @@ func (domain *Domain) generateResolveReferencesMethodsForType(code *printer.Code
 // ToRawInfo() methods
 func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeName string) {
 	code.Print("// ToRawInfo returns a description of %s suitable for JSON or YAML export.", typeName)
-	code.Print("func (m *%s) ToRawInfo() interface{} {", typeName)
+	code.Print("func (m *%s) ToRawInfo() *yaml.Node {", typeName)
 	typeModel := domain.TypeModels[typeName]
 	if typeName == "Any" {
 		code.Print("var err error")
-		code.Print("var info1 []yaml.MapSlice")
-		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info1)")
-		code.Print("if err == nil {return info1}")
-		code.Print("var info2 yaml.MapSlice")
-		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info2)")
-		code.Print("if err == nil {return info2}")
-		code.Print("var info3 interface{}")
-		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &info3)")
-		code.Print("if err == nil {return info3}")
-		code.Print("return nil")
+		code.Print("var node yaml.Node")
+		code.Print("err = yaml.Unmarshal([]byte(m.Yaml), &node)")
+		code.Print("if err == nil {")
+		code.Print("	if node.Kind == yaml.DocumentNode {")
+		code.Print("		return node.Content[0]")
+		code.Print("	}")
+		code.Print("	return &node")
+		code.Print("}")
+		code.Print("return compiler.NewNullNode()")
 	} else if typeName == "StringArray" {
-		code.Print("return m.Value")
+		code.Print("return compiler.NewSequenceNodeForStringArray(m.Value)")
 	} else if typeModel.OneOfWrapper {
 		code.Print("// ONE OF WRAPPER")
 		code.Print("// %s", typeModel.Name)
@@ -786,15 +730,15 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 			code.Print("// %+v", *item)
 			if item.Type == "float" {
 				code.Print("if v%d, ok := m.GetOneof().(*%s_Number); ok {", i, typeName)
-				code.Print("return v%d.Number", i)
+				code.Print("return compiler.NewScalarNodeForFloat(v%d.Number)", i)
 				code.Print("}")
 			} else if item.Type == "bool" {
 				code.Print("if v%d, ok := m.GetOneof().(*%s_Boolean); ok {", i, typeName)
-				code.Print("return v%d.Boolean", i)
+				code.Print("return compiler.NewScalarNodeForBool(v%d.Boolean)", i)
 				code.Print("}")
 			} else if item.Type == "string" {
 				code.Print("if v%d, ok := m.GetOneof().(*%s_String_); ok {", i, typeName)
-				code.Print("return v%d.String_", i)
+				code.Print("return compiler.NewScalarNodeForString(v%d.String_)", i)
 				code.Print("}")
 			} else {
 				code.Print("v%d := m.Get%s()", i, item.Type)
@@ -803,9 +747,9 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				code.Print("}")
 			}
 		}
-		code.Print("return nil")
+		code.Print("return compiler.NewNullNode()")
 	} else {
-		code.Print("info := yaml.MapSlice{}")
+		code.Print("info := compiler.NewMappingNode()")
 		code.Print("if m == nil {return info}")
 		for _, propertyModel := range typeModel.Properties {
 			isRequired := typeModel.IsRequired(propertyModel.Name)
@@ -815,11 +759,13 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				if !propertyModel.Repeated {
 					code.PrintIf(isRequired, "// always include this required field.")
 					code.PrintIf(!isRequired, "if m.%s != \"\" {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(m.%s))", propertyModel.FieldName())
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			case "bool":
@@ -827,11 +773,13 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				if !propertyModel.Repeated {
 					code.PrintIf(isRequired, "// always include this required field.")
 					code.PrintIf(!isRequired, "if m.%s != false {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.%s))", propertyModel.FieldName())
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForBoolArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			case "int":
@@ -839,11 +787,13 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				if !propertyModel.Repeated {
 					code.PrintIf(isRequired, "// always include this required field.")
 					code.PrintIf(!isRequired, "if m.%s != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.%s))", propertyModel.FieldName())
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForIntArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			case "float":
@@ -851,60 +801,65 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 				if !propertyModel.Repeated {
 					code.PrintIf(isRequired, "// always include this required field.")
 					code.PrintIf(!isRequired, "if m.%s != 0.0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.%s))", propertyModel.FieldName())
 					code.PrintIf(!isRequired, "}")
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s})", propertyName, propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForFloatArray(m.%s))", propertyModel.FieldName())
 					code.Print("}")
 				}
 			default:
 				propertyName := propertyModel.Name
-				if propertyName == "value" {
+				if propertyName == "value" && propertyModel.Type != "Any" {
 					code.Print("// %+v", propertyModel)
 				} else if !propertyModel.Repeated {
 					code.PrintIf(isRequired, "// always include this required field.")
 					code.PrintIf(!isRequired, "if m.%s != nil {", propertyModel.FieldName())
 					if propertyModel.Type == "TypeItem" {
 						code.Print("if len(m.Type.Value) == 1 {")
-						code.Print("info = append(info, yaml.MapItem{Key:\"type\", Value:m.Type.Value[0]})")
+						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"type\"))")
+						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Type.Value[0]))")
 						code.Print("} else {")
-						code.Print("info = append(info, yaml.MapItem{Key:\"type\", Value:m.Type.Value})")
+						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"type\"))")
+						code.Print("info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Type.Value))")
 						code.Print("}")
 					} else if propertyModel.Type == "ItemsItem" {
-						code.Print("items := make([]interface{}, 0)")
+						code.Print("items := compiler.NewSequenceNode()")
 						if domain.Version == "v2" {
 							code.Print("for _, item := range m.Items.Schema {")
 						} else {
 							code.Print("for _, item := range m.Items.SchemaOrReference {")
 						}
-						code.Print("	items = append(items, item.ToRawInfo())")
+						code.Print("	items.Content = append(items.Content, item.ToRawInfo())")
 						code.Print("}")
-						code.Print("info = append(info, yaml.MapItem{Key:\"items\", Value:items[0]})")
+						code.Print("if len(items.Content) == 1 {items = items.Content[0]}")
+						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"items\"))")
+						code.Print("info.Content = append(info.Content, items)")
 					} else {
-						code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:m.%s.ToRawInfo()})",
-							propertyName, propertyModel.FieldName())
+						code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+						code.Print("info.Content = append(info.Content, m.%s.ToRawInfo())", propertyModel.FieldName())
 					}
 					code.PrintIf(!isRequired, "}")
-					code.Print("// %+v", propertyModel)
 				} else if propertyModel.MapType == "string" {
 					code.Print("// %+v", propertyModel)
 				} else if propertyModel.MapType != "" {
 					code.Print("if m.%s != nil {", propertyModel.FieldName())
 					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
-					code.Print("info = append(info, yaml.MapItem{Key:item.Name, Value:item.Value.ToRawInfo()})")
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))")
+					code.Print("info.Content = append(info.Content, item.Value.ToRawInfo())")
 					code.Print("}")
 					code.Print("}")
-					code.Print("// %+v", propertyModel)
 				} else {
 					code.Print("if len(m.%s) != 0 {", propertyModel.FieldName())
-					code.Print("items := make([]interface{}, 0)")
+					code.Print("items := compiler.NewSequenceNode()")
 					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
-					code.Print("items = append(items, item.ToRawInfo())")
+					code.Print("items.Content = append(items.Content, item.ToRawInfo())")
 					code.Print("}")
-					code.Print("info = append(info, yaml.MapItem{Key:\"%s\", Value:items})", propertyName)
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(\"%s\"))", propertyName)
+					code.Print("info.Content = append(info.Content, items)")
 					code.Print("}")
-					code.Print("// %+v", propertyModel)
 				}
 			}
 		}
@@ -915,8 +870,11 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 
 func (domain *Domain) generateConstantVariables(code *printer.Code, regexPatterns *patternNames) {
 	names := regexPatterns.Names()
+	if len(names) == 0 {
+		return
+	}
 	var sortedNames []string
-	for name, _ := range names {
+	for name := range names {
 		sortedNames = append(sortedNames, name)
 	}
 	sort.Strings(sortedNames)

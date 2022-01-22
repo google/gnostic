@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ option java_package = "org.discovery_v1";
 option objc_class_prefix = "OAS";
 
 // The Go package name.
-option go_package = "discovery;discovery_v1";
+option go_package = "./discovery;discovery_v1";
 
 message Annotations {
   repeated string required = 1;
@@ -121,6 +121,7 @@ message Method {
   bool supports_subscription = 14;
   string flat_path = 15;
   bool etag_required = 16;
+  string streaming_type = 17;
 }
 
 message Methods {

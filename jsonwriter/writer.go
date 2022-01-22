@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 const indentation = "  "
@@ -44,109 +44,77 @@ func (w *writer) writeString(s string) {
 	w.b.Write([]byte(s))
 }
 
-func (w *writer) writeMap(info interface{}, indent string) {
+func (w *writer) writeMap(node *yaml.Node, indent string) {
+	if node.Kind == yaml.DocumentNode {
+		w.writeMap(node.Content[0], indent)
+		return
+	}
+	if node.Kind != yaml.MappingNode {
+		w.writeString(fmt.Sprintf("invalid node for map: %+v", node))
+		return
+	}
 	w.writeString("{\n")
 	innerIndent := indent + indentation
-	switch pairs := info.(type) {
-	case yaml.MapSlice:
-		for i, pair := range pairs {
-			// first print the key
-			w.writeString(fmt.Sprintf("%s\"%+v\": ", innerIndent, pair.Key))
-			// then the value
-			switch value := pair.Value.(type) {
-			case string:
-				w.writeString("\"")
-				w.writeString(escape(value))
-				w.writeString("\"")
-			case bool:
-				if value {
-					w.writeString("true")
-				} else {
-					w.writeString("false")
-				}
-			case []interface{}:
-				w.writeArray(value, innerIndent)
-			case yaml.MapSlice:
-				w.writeMap(value, innerIndent)
-			case int:
-				w.writeString(fmt.Sprintf("%d", value))
-			case int64:
-				w.writeString(fmt.Sprintf("%d", value))
-			case []string:
-				w.writeStringArray(value, innerIndent)
-			case float64:
-				w.writeString(fmt.Sprintf("%f", value))
-			case []yaml.MapSlice:
-				w.writeMapSliceArray(value, innerIndent)
-			default:
-				w.writeString(fmt.Sprintf("???MapItem(%+v, %T)", value, value))
-			}
-			if i < len(pairs)-1 {
-				w.writeString(",")
-			}
-			w.writeString("\n")
+	for i := 0; i < len(node.Content); i += 2 {
+		// first print the key
+		key := node.Content[i].Value
+		w.writeString(fmt.Sprintf("%s\"%+v\": ", innerIndent, key))
+		// then the value
+		value := node.Content[i+1]
+		switch value.Kind {
+		case yaml.MappingNode:
+			w.writeMap(value, innerIndent)
+		case yaml.SequenceNode:
+			w.writeSequence(value, innerIndent)
+		case yaml.ScalarNode:
+			w.writeScalar(value, innerIndent)
 		}
-	default:
-		// t is some other type that we didn't name.
+		if i < len(node.Content)-2 {
+			w.writeString(",")
+		}
+		w.writeString("\n")
 	}
 	w.writeString(indent)
 	w.writeString("}")
 }
 
-func (w *writer) writeArray(array []interface{}, indent string) {
-	w.writeString("[\n")
-	innerIndent := indent + indentation
-	for i, item := range array {
-		w.writeString(innerIndent)
-		switch item := item.(type) {
-		case string:
-			w.writeString("\"")
-			w.writeString(item)
-			w.writeString("\"")
-		case bool:
-			if item {
-				w.writeString("true")
-			} else {
-				w.writeString("false")
-			}
-		case yaml.MapSlice:
-			w.writeMap(item, innerIndent)
-		default:
-			w.writeString(fmt.Sprintf("???ArrayItem(%+v)", item))
-		}
-		if i < len(array)-1 {
-			w.writeString(",")
-		}
-		w.writeString("\n")
+func (w *writer) writeScalar(node *yaml.Node, indent string) {
+	if node.Kind != yaml.ScalarNode {
+		w.writeString(fmt.Sprintf("invalid node for scalar: %+v", node))
+		return
 	}
-	w.writeString(indent)
-	w.writeString("]")
-}
-
-func (w *writer) writeStringArray(array []string, indent string) {
-	w.writeString("[\n")
-	innerIndent := indent + indentation
-	for i, item := range array {
-		w.writeString(innerIndent)
+	switch node.Tag {
+	case "!!str":
 		w.writeString("\"")
-		w.writeString(escape(item))
+		w.writeString(escape(node.Value))
 		w.writeString("\"")
-		if i < len(array)-1 {
-			w.writeString(",")
-		}
-		w.writeString("\n")
+	case "!!int":
+		w.writeString(node.Value)
+	case "!!float":
+		w.writeString(node.Value)
+	case "!!bool":
+		w.writeString(node.Value)
 	}
-	w.writeString(indent)
-	w.writeString("]")
 }
 
-func (w *writer) writeMapSliceArray(array []yaml.MapSlice, indent string) {
+func (w *writer) writeSequence(node *yaml.Node, indent string) {
+	if node.Kind != yaml.SequenceNode {
+		w.writeString(fmt.Sprintf("invalid node for sequence: %+v", node))
+		return
+	}
 	w.writeString("[\n")
 	innerIndent := indent + indentation
-	for i, item := range array {
+	for i, value := range node.Content {
 		w.writeString(innerIndent)
-		w.writeMap(item, innerIndent)
-		if i < len(array)-1 {
+		switch value.Kind {
+		case yaml.MappingNode:
+			w.writeMap(value, innerIndent)
+		case yaml.SequenceNode:
+			w.writeSequence(value, innerIndent)
+		case yaml.ScalarNode:
+			w.writeScalar(value, innerIndent)
+		}
+		if i < len(node.Content)-1 {
 			w.writeString(",")
 		}
 		w.writeString("\n")
@@ -155,14 +123,26 @@ func (w *writer) writeMapSliceArray(array []yaml.MapSlice, indent string) {
 	w.writeString("]")
 }
 
-// Marshal writes a yaml.MapSlice as JSON
-func Marshal(in interface{}) (out []byte, err error) {
+// Marshal writes a yaml.Node as JSON
+func Marshal(in *yaml.Node) (out []byte, err error) {
 	var w writer
-	m, ok := in.(yaml.MapSlice)
-	if !ok {
+
+	switch in.Kind {
+	case yaml.DocumentNode:
+		w.writeMap(in.Content[0], "")
+		w.writeString("\n")
+	case yaml.MappingNode:
+		w.writeMap(in, "")
+		w.writeString("\n")
+	case yaml.SequenceNode:
+		w.writeSequence(in, "")
+		w.writeString("\n")
+	case yaml.ScalarNode:
+		w.writeScalar(in, "")
+		w.writeString("\n")
+	default:
 		return nil, errors.New("invalid type passed to Marshal")
 	}
-	w.writeMap(m, "")
-	w.writeString("\n")
+
 	return w.bytes(), err
 }
