@@ -8,6 +8,18 @@ info:
 servers:
     - url: https://foo.googleapi.com
 paths:
+    /v1/messages:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_ListMessages
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AnyJSONValue'
     /v1/messages/{messageId}:
         get:
             tags:
@@ -68,6 +80,18 @@ paths:
                     type: array
                     items:
                         type: string
+                - name: valueType
+                  in: query
+                  description: Description of value
+                  schema:
+                    $ref: '#/components/schemas/AnyJSONValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
             responses:
                 "200":
                     description: OK
@@ -157,6 +181,18 @@ paths:
                     type: array
                     items:
                         type: string
+                - name: valueType
+                  in: query
+                  description: Description of value
+                  schema:
+                    $ref: '#/components/schemas/AnyJSONValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
             requestBody:
                 content:
                     application/json:
@@ -166,9 +202,23 @@ paths:
             responses:
                 "200":
                     description: OK
-                    content: {}
+                    content:
+                        application/json:
+                            schema:
+                                type: object
 components:
     schemas:
+        AnyJSONValue:
+            oneOf:
+                - type: string
+                - type: number
+                - type: integer
+                - type: boolean
+                - type: object
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/AnyJSONValue'
+            description: AnyJSONValue is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI
         Message:
             type: object
             properties:
@@ -204,6 +254,13 @@ components:
                     type: array
                     items:
                         type: object
+                valueType:
+                    $ref: '#/components/schemas/AnyJSONValue'
+                repeatedValueType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
+                    description: Description of repeated value
         Message_EmbMessage:
             type: object
             properties:
