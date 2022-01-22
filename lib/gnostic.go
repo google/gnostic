@@ -409,6 +409,7 @@ func (g *Gnostic) validateOptions() error {
 		g.yamlOutputPath == "" &&
 		g.jsonOutputPath == "" &&
 		g.errorOutputPath == "" &&
+		g.messageOutputPath == "" &&
 		len(g.pluginCalls) == 0 {
 		return NewUsageError("missing output directives")
 	}
