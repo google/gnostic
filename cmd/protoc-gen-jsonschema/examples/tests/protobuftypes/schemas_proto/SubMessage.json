@@ -1,0 +1,15 @@
+{
+  "title": "SubMessage",
+  "$id": "http://example.com/schemas/SubMessage.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "message_id": {
+      "title": "message_id",
+      "type": "string"
+    },
+    "sub_sub_message": {
+      "$ref": "http://example.com/schemas/SubSubMessage.json"
+    }
+  }
+}

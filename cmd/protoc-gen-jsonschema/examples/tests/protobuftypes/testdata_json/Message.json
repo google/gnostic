@@ -1,0 +1,107 @@
+{
+  "messageId": "123abc",
+  "stringType": "string",
+  "recursiveType": {
+    "parentId": 123,
+    "child": {
+      "childId": 456,
+      "parent": {
+        "parentId": 124,
+        "child": {
+          "childId": 457
+        }
+      }
+    }
+  },
+  "embeddedType": {
+    "messageId": "abc123"
+  },
+  "subType": {
+    "messageId": "123abc",
+    "subSubMessage": {
+      "messageId": "abc123",
+      "integers": [
+        123,
+        321
+      ]
+    }
+  },
+  "repeatedType": [
+    "string1",
+    "string2"
+  ],
+  "repeatedSubType": [
+    {
+      "messageId": "123abc",
+      "subSubMessage": {
+        "messageId": "abc123",
+        "integers": [
+          123,
+          321
+        ]
+      }
+    },
+    {
+      "messageId": "123abd",
+      "subSubMessage": {
+        "messageId": "abc124",
+        "integers": [
+          123,
+          321
+        ]
+      }
+    }
+  ],
+  "repeatedRecursiveType": [
+    {
+      "parentId": 123,
+      "child": {
+        "childId": 456,
+        "parent": {
+          "parentId": 124,
+          "child": {
+            "childId": 457
+          }
+        }
+      }
+    },
+    {
+      "parentId": 124,
+      "child": {
+        "childId": 457,
+        "parent": {
+          "parentId": 125,
+          "child": {
+            "childId": 458
+          }
+        }
+      }
+    }
+  ],
+  "mapType": {
+    "key1": "val1",
+    "key2": "val2"
+  },
+  "body": {
+    "any": {
+      "object": "here"
+    }
+  },
+  "media": [
+    {
+      "any1": {
+        "object1": "here"
+      }
+    },
+    {
+      "any2": {
+        "object2": "here"
+      }
+    }
+  ],
+  "valueType": 123.321,
+  "repeatedValueType": [
+    123,
+    321
+  ]
+}

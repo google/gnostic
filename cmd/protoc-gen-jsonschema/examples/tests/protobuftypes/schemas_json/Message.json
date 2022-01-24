@@ -1,0 +1,103 @@
+{
+  "title": "Message",
+  "$id": "http://example.com/schemas/Message.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "messageId": {
+      "title": "messageId",
+      "type": "string"
+    },
+    "stringType": {
+      "title": "stringType",
+      "type": "string"
+    },
+    "recursiveType": {
+      "$ref": "http://example.com/schemas/RecursiveParent.json"
+    },
+    "embeddedType": {
+      "$ref": "#/definitions/Message_EmbMessage"
+    },
+    "subType": {
+      "$ref": "http://example.com/schemas/SubMessage.json"
+    },
+    "repeatedType": {
+      "title": "repeatedType",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repeatedSubType": {
+      "title": "repeatedSubType",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/SubMessage.json"
+      }
+    },
+    "repeatedRecursiveType": {
+      "title": "repeatedRecursiveType",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/RecursiveParent.json"
+      }
+    },
+    "mapType": {
+      "title": "mapType",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "body": {
+      "title": "body",
+      "type": "object"
+    },
+    "media": {
+      "title": "media",
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "valueType": {
+      "title": "valueType",
+      "type": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "object",
+        "array"
+      ],
+      "description": "Description of value"
+    },
+    "repeatedValueType": {
+      "title": "repeatedValueType",
+      "type": "array",
+      "items": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "object",
+          "array"
+        ]
+      },
+      "description": "Description of repeated value"
+    }
+  },
+  "definitions": {
+    "Message_EmbMessage": {
+      "title": "EmbMessage",
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "title": "messageId",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

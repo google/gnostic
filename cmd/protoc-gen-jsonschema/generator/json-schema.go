@@ -162,6 +162,14 @@ func (g *JSONSchemaGenerator) schemaOrReferenceForType(desc protoreflect.Message
 		// Struct is equivalent to a JSON object
 		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeObject}}
 
+	case ".google.protobuf.Value":
+		// Value is equivalent to any JSON value except null
+		return &jsonschema.Schema{
+			Type: &jsonschema.StringOrStringArray{
+				StringArray: &[]string{typeString, typeNumber, typeInteger, typeBoolean, typeObject, typeArray},
+			},
+		}
+
 	case ".google.protobuf.Empty":
 		// Empty is close to JSON undefined than null, so ignore this field
 		return nil
