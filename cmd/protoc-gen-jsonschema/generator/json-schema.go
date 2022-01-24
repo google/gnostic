@@ -29,6 +29,20 @@ import (
 	"github.com/google/gnostic/jsonschema"
 )
 
+var (
+	typeString  = "string"
+	typeNumber  = "number"
+	typeInteger = "integer"
+	typeBoolean = "boolean"
+	typeObject  = "object"
+	typeArray   = "array"
+
+	formatDate     = "date"
+	formatDateTime = "date-time"
+	formatEnum     = "enum"
+	formatBytes    = "bytes"
+)
+
 func init() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 }
@@ -134,26 +148,19 @@ func (g *JSONSchemaGenerator) schemaOrReferenceForType(desc protoreflect.Message
 
 	case ".google.protobuf.Timestamp":
 		// Timestamps are serialized as strings
-		typ := "string"
-		format := "date-time"
-		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeString}, Format: &formatDateTime}
 
 	case ".google.type.Date":
 		// Dates are serialized as strings
-		typ := "string"
-		format := "date"
-		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeString}, Format: &formatDate}
 
 	case ".google.type.DateTime":
 		// DateTimes are serialized as strings
-		typ := "string"
-		format := "date-time"
-		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeString}, Format: &formatDateTime}
 
 	case ".google.protobuf.Struct":
 		// Struct is equivalent to a JSON object
-		typ := "object"
-		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}}
+		return &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeObject}}
 
 	case ".google.protobuf.Empty":
 		// Empty is close to JSON undefined than null, so ignore this field
@@ -197,35 +204,27 @@ func (g *JSONSchemaGenerator) schemaOrReferenceForField(field protoreflect.Field
 		}
 
 	case protoreflect.StringKind:
-		typ := "string"
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}}
+		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeString}}
 
 	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
 		protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
 		protoreflect.Sfixed32Kind, protoreflect.Fixed32Kind, protoreflect.Sfixed64Kind,
 		protoreflect.Fixed64Kind:
-		typ := "integer"
 		format := kind.String()
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeInteger}, Format: &format}
 
 	case protoreflect.EnumKind:
-		typ := "integer"
-		format := "enum"
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeInteger}, Format: &formatEnum}
 
 	case protoreflect.BoolKind:
-		typ := "boolean"
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}}
+		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeBoolean}}
 
 	case protoreflect.FloatKind, protoreflect.DoubleKind:
-		typ := "number"
 		format := kind.String()
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeNumber}, Format: &format}
 
 	case protoreflect.BytesKind:
-		typ := "string"
-		format := "bytes"
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typ}, Format: &format}
+		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeString}, Format: &formatBytes}
 
 	default:
 		log.Printf("(TODO) Unsupported field type: %+v", field.Message().FullName())
