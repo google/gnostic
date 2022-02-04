@@ -1,0 +1,12 @@
+{
+  "parentId": 123,
+  "child": {
+    "childId": 456,
+    "parent": {
+      "parentId": 124,
+      "child": {
+        "childId": 457
+      }
+    }
+  }
+}
