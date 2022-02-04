@@ -1,0 +1,16 @@
+{
+  "title": "RecursiveChild",
+  "$id": "http://example.com/schemas/RecursiveChild.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "childId": {
+      "title": "childId",
+      "type": "integer",
+      "format": "int32"
+    },
+    "parent": {
+      "$ref": "http://example.com/schemas/RecursiveParent.json"
+    }
+  }
+}

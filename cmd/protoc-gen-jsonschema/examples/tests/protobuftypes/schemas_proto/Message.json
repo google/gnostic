@@ -1,0 +1,103 @@
+{
+  "title": "Message",
+  "$id": "http://example.com/schemas/Message.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "message_id": {
+      "title": "message_id",
+      "type": "string"
+    },
+    "string_type": {
+      "title": "string_type",
+      "type": "string"
+    },
+    "recursive_type": {
+      "$ref": "http://example.com/schemas/RecursiveParent.json"
+    },
+    "embedded_type": {
+      "$ref": "#/definitions/Message_EmbMessage"
+    },
+    "sub_type": {
+      "$ref": "http://example.com/schemas/SubMessage.json"
+    },
+    "repeated_type": {
+      "title": "repeated_type",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repeated_sub_type": {
+      "title": "repeated_sub_type",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/SubMessage.json"
+      }
+    },
+    "repeated_recursive_type": {
+      "title": "repeated_recursive_type",
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/RecursiveParent.json"
+      }
+    },
+    "map_type": {
+      "title": "map_type",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "body": {
+      "title": "body",
+      "type": "object"
+    },
+    "media": {
+      "title": "media",
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "value_type": {
+      "title": "value_type",
+      "type": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "object",
+        "array"
+      ],
+      "description": "Description of value"
+    },
+    "repeated_value_type": {
+      "title": "repeated_value_type",
+      "type": "array",
+      "items": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "object",
+          "array"
+        ]
+      },
+      "description": "Description of repeated value"
+    }
+  },
+  "definitions": {
+    "Message_EmbMessage": {
+      "title": "EmbMessage",
+      "type": "object",
+      "properties": {
+        "message_id": {
+          "title": "message_id",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

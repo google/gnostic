@@ -40,7 +40,7 @@ type Configuration struct {
 }
 
 const (
-	infoURL           = "https://github.com/google/gnostic/tree/master/apps/protoc-gen-openapi"
+	infoURL           = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
 	protobufValueName = "AnyJSONValue"
 )
 

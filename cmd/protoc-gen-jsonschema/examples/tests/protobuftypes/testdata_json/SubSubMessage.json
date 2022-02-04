@@ -1,0 +1,7 @@
+{
+  "messageId": "abc123",
+  "integers": [
+    123,
+    321
+  ]
+}
