@@ -86,7 +86,7 @@ func (g *OpenAPIv3Generator) Run() error {
 func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	d := &v3.Document{}
 
-	d.Openapi = "3.0.3"
+	d.Openapi = "3.1.0"
 	d.Info = &v3.Info{
 		Version:     *g.conf.Version,
 		Title:       *g.conf.Title,
