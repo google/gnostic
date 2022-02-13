@@ -1,7 +1,7 @@
 # Generated with protoc-gen-openapi
 # https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
 
-openapi: 3.0.3
+openapi: 3.1.0
 info:
     title: LibraryService API
     description: |-
