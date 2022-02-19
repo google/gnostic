@@ -19,6 +19,7 @@ package tests.protobuftypes.message.v1;
 
 import "google/api/client.proto";
 import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 
@@ -32,9 +33,22 @@ service Messaging {
       body : "*"
     };
   }
+  rpc CreateMessagesFromCSV(google.api.HttpBody) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      post : "/v1/messages:csv"
+      body : "*"
+    };
+  }
   rpc ListMessages(google.protobuf.Empty) returns (google.protobuf.Value) {
     option (google.api.http) = {
       get : "/v1/messages"
+    };
+  }
+  // OpenAPI does not allow requestBody in GET operations.
+  // But it should not convert it to query params either.
+  rpc ListMessagesCSV(google.api.HttpBody) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      get : "/v1/messages:csv"
     };
   }
   rpc GetMessage(Message) returns (Message) {
