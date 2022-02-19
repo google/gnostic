@@ -18,7 +18,7 @@ package main
 import (
 	"flag"
 
-    "github.com/google/gnostic/cmd/protoc-gen-openapi/generator"
+	"github.com/google/gnostic/cmd/protoc-gen-openapi/generator"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
