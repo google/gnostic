@@ -48,9 +48,10 @@ func init() {
 }
 
 type Configuration struct {
-	BaseURL *string
-	Version *string
-	Naming  *string
+	BaseURL  *string
+	Version  *string
+	Naming   *string
+	EnumType *string
 }
 
 // JSONSchemaGenerator holds internal state needed to generate the JSON Schema documents for a transcoded Protocol Buffer service.
@@ -222,7 +223,17 @@ func (g *JSONSchemaGenerator) schemaOrReferenceForField(field protoreflect.Field
 		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeInteger}, Format: &format}
 
 	case protoreflect.EnumKind:
-		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeInteger}, Format: &formatEnum}
+		kindSchema = &jsonschema.Schema{Format: &formatEnum}
+		if g.conf.EnumType != nil && *g.conf.EnumType == typeString {
+			kindSchema.Type = &jsonschema.StringOrStringArray{String: &typeString}
+			kindSchema.Enumeration = &[]jsonschema.SchemaEnumValue{}
+			for i := 0; i < field.Enum().Values().Len(); i++ {
+				name := string(field.Enum().Values().Get(i).Name())
+				*kindSchema.Enumeration = append(*kindSchema.Enumeration, jsonschema.SchemaEnumValue{String: &name})
+			}
+		} else {
+			kindSchema.Type = &jsonschema.StringOrStringArray{String: &typeInteger}
+		}
 
 	case protoreflect.BoolKind:
 		kindSchema = &jsonschema.Schema{Type: &jsonschema.StringOrStringArray{String: &typeBoolean}}

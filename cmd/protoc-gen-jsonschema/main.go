@@ -18,7 +18,7 @@ package main
 import (
 	"flag"
 
-    "github.com/google/gnostic/cmd/protoc-gen-jsonschema/generator"
+	"github.com/google/gnostic/cmd/protoc-gen-jsonschema/generator"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
@@ -27,9 +27,10 @@ var flags flag.FlagSet
 
 func main() {
 	conf := generator.Configuration{
-		BaseURL: flags.String("baseurl", "", "the base url to use in schema ids"),
-		Version: flags.String("version", "http://json-schema.org/draft-07/schema#", "schema version URL used in $schema. Currently supported: draft-06, draft-07"),
-		Naming:  flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
+		BaseURL:  flags.String("baseurl", "", "the base url to use in schema ids"),
+		Version:  flags.String("version", "http://json-schema.org/draft-07/schema#", "schema version URL used in $schema. Currently supported: draft-06, draft-07"),
+		Naming:   flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
+		EnumType: flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
 	}
 
 	opts := protogen.Options{
