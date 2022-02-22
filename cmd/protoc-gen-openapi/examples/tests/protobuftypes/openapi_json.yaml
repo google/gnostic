@@ -206,6 +206,34 @@ paths:
                         application/json:
                             schema:
                                 type: object
+    /v1/messages:csv:
+        get:
+            tags:
+                - Messaging
+            description: |-
+                OpenAPI does not allow requestBody in GET operations.
+                 But it should not convert it to query params either.
+            operationId: Messaging_ListMessagesCSV
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessagesFromCSV
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
 components:
     schemas:
         AnyJSONValue:
