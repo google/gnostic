@@ -208,8 +208,8 @@ message Info {
   Contact contact = 4;
   License license = 5;
   string version = 6;
-  repeated NamedAny specification_extension = 7;
-  string summary = 8;
+  string summary = 7;
+  repeated NamedAny specification_extension = 8;
 }
 
 message ItemsItem {
@@ -485,6 +485,8 @@ message Properties {
 // A simple object to allow referencing other components in the specification, internally and externally.  The Reference Object is defined by JSON Reference and follows the same structure, behavior and rules.   For this specification, reference resolution is accomplished as defined by the JSON Reference specification and not by the JSON Schema specification.
 message Reference {
   string _ref = 1;
+  string summary = 2;
+  string description = 3;
 }
 
 message RequestBodiesOrReferences {
