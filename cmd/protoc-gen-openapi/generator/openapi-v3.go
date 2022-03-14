@@ -574,7 +574,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	}
 
 	// Add any unhandled fields in the request message as query parameters.
-	if bodyField != "*" {
+	if bodyField != "*" && string(inputMessage.Desc.FullName()) != "google.api.HttpBody" {
 		for _, field := range inputMessage.Fields {
 			fieldName := string(field.Desc.Name())
 			if !contains(coveredParameters, fieldName) && fieldName != bodyField {
@@ -735,7 +735,7 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 		return &v3.MediaTypes{
 			AdditionalProperties: []*v3.NamedMediaType{
 				{
-					Name:  "application/octet-stream",
+					Name:  "*/*",
 					Value: &v3.MediaType{},
 				},
 			},
@@ -756,6 +756,13 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 
 func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.SchemaOrReference {
 	switch typeName {
+
+	// Even for GET requests, the google.api.HttpBody will contain POST body data
+	// This is based on how Envoy handles google.api.HttpBody
+	case ".google.api.HttpBody":
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{Type: "string"}}}
 
 	case ".google.protobuf.Timestamp":
 		// Timestamps are serialized as strings
