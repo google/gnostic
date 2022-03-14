@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path"
@@ -38,10 +39,15 @@ var jsonschemaTests = []struct {
 	{name: "JSON options", path: "examples/tests/jsonoptions/", pkg: "", protofile: "message.proto"},
 	{name: "Embedded messages", path: "examples/tests/embedded/", pkg: "", protofile: "message.proto"},
 	{name: "Protobuf types", path: "examples/tests/protobuftypes/", pkg: "", protofile: "message.proto"},
+	{name: "Enum Options", path: "examples/tests/enumoptions/", pkg: "", protofile: "message.proto"},
 }
 
 func TestJSONSchemaProtobufNaming(t *testing.T) {
 	for _, tt := range jsonschemaTests {
+		schemasPath := path.Join(tt.path, "schemas_proto")
+		if _, err := os.Stat(schemasPath); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			os.RemoveAll(testSchemasPath)
 			os.MkdirAll(testSchemasPath, 0777)
@@ -59,7 +65,7 @@ func TestJSONSchemaProtobufNaming(t *testing.T) {
 			}
 
 			// Verify that the generated spec matches our expected version.
-			err = exec.Command("diff", testSchemasPath, path.Join(tt.path, "schemas_proto")).Run()
+			err = exec.Command("diff", testSchemasPath, schemasPath).Run()
 			if err != nil {
 				t.Fatalf("Diff failed: %+v", err)
 			}
@@ -72,6 +78,10 @@ func TestJSONSchemaProtobufNaming(t *testing.T) {
 
 func TestJSONSchemaJSONNaming(t *testing.T) {
 	for _, tt := range jsonschemaTests {
+		schemasPath := path.Join(tt.path, "schemas_json")
+		if _, err := os.Stat(schemasPath); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			os.RemoveAll(testSchemasPath)
 			os.MkdirAll(testSchemasPath, 0777)
@@ -88,7 +98,7 @@ func TestJSONSchemaJSONNaming(t *testing.T) {
 			}
 
 			// Verify that the generated spec matches our expected version.
-			err = exec.Command("diff", testSchemasPath, path.Join(tt.path, "schemas_json")).Run()
+			err = exec.Command("diff", testSchemasPath, schemasPath).Run()
 			if err != nil {
 				t.Fatalf("Diff failed: %+v", err)
 			}
@@ -102,8 +112,11 @@ func TestJSONSchemaJSONNaming(t *testing.T) {
 // Meta... Test the tests
 func TestJSONSchemaJSONNamingSchemas(t *testing.T) {
 	for _, tt := range jsonschemaTests {
+		schemasPath := path.Join(tt.path, "schemas_json")
+		if _, err := os.Stat(schemasPath); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
-			schemasPath := path.Join(tt.path, "schemas_json")
 			schemaFiles, err := os.ReadDir(schemasPath)
 			if err != nil {
 				t.Fatal(err)
@@ -152,6 +165,40 @@ func TestJSONSchemaJSONNamingSchemas(t *testing.T) {
 					t.Fatalf("%s: %s", schemaFile.Name(), err.Error())
 				}
 			}
+		})
+	}
+}
+
+func TestJSONSchemaStringEnums(t *testing.T) {
+	for _, tt := range jsonschemaTests {
+		schemasPath := path.Join(tt.path, "schemas_string_enum")
+		if _, err := os.Stat(schemasPath); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			os.RemoveAll(testSchemasPath)
+			os.MkdirAll(testSchemasPath, 0777)
+			// Run protoc and the protoc-gen-jsonschema plugin to generate JSON Schema(s) with JSON naming.
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--jsonschema_opt=baseurl=http://example.com/schemas",
+				"--jsonschema_opt=enum_type=string",
+				"--jsonschema_out="+testSchemasPath).Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+
+			// Verify that the generated spec matches our expected version.
+			err = exec.Command("diff", testSchemasPath, schemasPath).Run()
+			if err != nil {
+				t.Fatalf("Diff failed: %+v", err)
+			}
+
+			// if the test succeeded, clean up
+			os.RemoveAll(testSchemasPath)
 		})
 	}
 }
