@@ -18,7 +18,7 @@ package main
 import (
 	"flag"
 
-    "github.com/google/gnostic/cmd/protoc-gen-openapi/generator"
+	"github.com/google/gnostic/cmd/protoc-gen-openapi/generator"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
@@ -31,7 +31,8 @@ func main() {
 		Title:         flags.String("title", "", "name of the API"),
 		Description:   flags.String("description", "", "description of the API"),
 		Naming:        flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
-		CircularDepth: flags.Int("depth", 2, `depth of recursion for circular messages`),
+		EnumType:      flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
+		CircularDepth: flags.Int("depth", 2, "depth of recursion for circular messages"),
 	}
 
 	opts := protogen.Options{
