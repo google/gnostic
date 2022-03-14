@@ -36,6 +36,7 @@ type Configuration struct {
 	Title         *string
 	Description   *string
 	Naming        *string
+	EnumType      *string
 	CircularDepth *int
 }
 
@@ -842,9 +843,21 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldD
 				Schema: &v3.Schema{Type: "integer", Format: kind.String()}}}
 
 	case protoreflect.EnumKind:
+		s := &v3.Schema{Format: "enum"}
+		if g.conf.EnumType != nil && *g.conf.EnumType == "string" {
+			s.Type = "string"
+			s.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
+			for i := 0; i < field.Enum().Values().Len(); i++ {
+				s.Enum = append(s.Enum, &v3.Any{
+					Yaml: string(field.Enum().Values().Get(i).Name()),
+				})
+			}
+		} else {
+			s.Type = "integer"
+		}
 		kindSchema = &v3.SchemaOrReference{
 			Oneof: &v3.SchemaOrReference_Schema{
-				Schema: &v3.Schema{Type: "integer", Format: "enum"}}}
+				Schema: s}}
 
 	case protoreflect.BoolKind:
 		kindSchema = &v3.SchemaOrReference{

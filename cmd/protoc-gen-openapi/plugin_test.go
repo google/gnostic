@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path"
@@ -32,11 +33,16 @@ var openapiTests = []struct {
 	{name: "Path params", path: "examples/tests/pathparams/", protofile: "message.proto"},
 	{name: "Protobuf types", path: "examples/tests/protobuftypes/", protofile: "message.proto"},
 	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
-	{name: "Ignore services without annotaions", path: "examples/tests/noannotations/", protofile: "message.proto"},
+	{name: "Ignore services without annotations", path: "examples/tests/noannotations/", protofile: "message.proto"},
+	{name: "Enum Options", path: "examples/tests/enumoptions/", protofile: "message.proto"},
 }
 
 func TestOpenAPIProtobufNaming(t *testing.T) {
 	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec.
 			err := exec.Command("protoc",
@@ -49,7 +55,7 @@ func TestOpenAPIProtobufNaming(t *testing.T) {
 				t.Fatalf("protoc failed: %+v", err)
 			}
 			// Verify that the generated spec matches our expected version.
-			err = exec.Command("diff", "openapi.yaml", path.Join(tt.path, "openapi.yaml")).Run()
+			err = exec.Command("diff", "openapi.yaml", fixture).Run()
 			if err != nil {
 				t.Fatalf("Diff failed: %+v", err)
 			}
@@ -61,6 +67,10 @@ func TestOpenAPIProtobufNaming(t *testing.T) {
 
 func TestOpenAPIJSONNaming(t *testing.T) {
 	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi_json.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec with JSON naming.
 			err := exec.Command("protoc",
@@ -73,9 +83,37 @@ func TestOpenAPIJSONNaming(t *testing.T) {
 				t.Fatalf("protoc failed: %+v", err)
 			}
 			// Verify that the generated spec matches our expected version.
-			err = exec.Command("diff", "openapi.yaml", path.Join(tt.path, "openapi_json.yaml")).Run()
+			err = exec.Command("diff", "openapi.yaml", fixture).Run()
 			if err != nil {
 				t.Fatalf("Diff failed: %+v", err)
+			}
+			// if the test succeeded, clean up
+			os.Remove("openapi.yaml")
+		})
+	}
+}
+
+func TestOpenAPIStringEnums(t *testing.T) {
+	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi_string_enum.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec with string Enums.
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--openapi_out=enum_type=string:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			// Verify that the generated spec matches our expected version.
+			err = exec.Command("diff", "openapi.yaml", fixture).Run()
+			if err != nil {
+				t.Fatalf("diff failed: %+v", err)
 			}
 			// if the test succeeded, clean up
 			os.Remove("openapi.yaml")
