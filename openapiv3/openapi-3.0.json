@@ -704,6 +704,12 @@
       "properties": {
         "$ref": {
           "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
