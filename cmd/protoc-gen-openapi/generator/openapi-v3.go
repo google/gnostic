@@ -768,7 +768,7 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 		// Timestamps are serialized as strings
 		return &v3.SchemaOrReference{
 			Oneof: &v3.SchemaOrReference_Schema{
-				Schema: &v3.Schema{Type: "string", Format: "RFC3339"}}}
+				Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
 
 	case ".google.type.Date":
 		// Dates are serialized as strings
