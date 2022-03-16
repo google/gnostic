@@ -317,17 +317,7 @@ func getMessageName(message protoreflect.MessageDescriptor) string {
 }
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-	name := getMessageName(message.Desc)
-
-	if *g.conf.Naming == "proto" {
-		return name
-	}
-
-	if len(name) > 0 {
-		return strings.ToUpper(name[0:1]) + name[1:]
-	}
-
-	return name
+	return fullMessageTypeName(message.Desc)
 }
 
 func (g *OpenAPIv3Generator) formatFieldName(field *protogen.Field) string {
@@ -713,9 +703,7 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 		return "#/components/schemas/" + protobufValueName
 	}
 
-	parts := strings.Split(typeName, ".")
-	lastPart := parts[len(parts)-1]
-	return "#/components/schemas/" + g.formatMessageRef(lastPart)
+	return "#/components/schemas/" + g.formatMessageRef(typeName)
 }
 
 // fullMessageTypeName builds the full type name of a message.
