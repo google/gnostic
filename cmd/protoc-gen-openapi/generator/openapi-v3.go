@@ -104,6 +104,12 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 
 	for _, file := range g.plugin.Files {
 		if file.Generate {
+			// Merge any `Document` annotations with the current
+			extDocument := proto.GetExtension(file.Desc.Options(), v3.E_Document)
+			if extDocument != nil {
+				proto.Merge(d, extDocument.(*v3.Document))
+			}
+
 			g.addPathsToDocumentV3(d, file)
 		}
 	}
@@ -278,6 +284,13 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 
 				op, path2 := g.buildOperationV3(
 					file, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+
+				// Merge any `Operation` annotations with the current
+				extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
+				if extOperation != nil {
+					proto.Merge(op, extOperation.(*v3.Operation))
+				}
+
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}

@@ -36,6 +36,7 @@ var openapiTests = []struct {
 	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
 	{name: "Ignore services without annotations", path: "examples/tests/noannotations/", protofile: "message.proto"},
 	{name: "Enum Options", path: "examples/tests/enumoptions/", protofile: "message.proto"},
+	{name: "OpenAPIv3 Annotations", path: "examples/tests/openapiv3annotations/", protofile: "message.proto"},
 }
 
 // Set this to true to generate/overwrite the fixtures. Make sure you set it back
