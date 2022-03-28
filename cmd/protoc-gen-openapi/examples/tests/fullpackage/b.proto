@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package example.fullpackage.b;
+
+option go_package = "github.com/google/gnostic/cmd/protoc-gen-openapi/examples/tests/fullpackage/b";
+
+import "google/api/annotations.proto";
+
+message Message {
+  string text = 1;
+}
+
+service Service {
+  rpc Method(Message) returns (Message) {
+    option (google.api.http) = {
+      get : "/v1/b/message"
+    };
+  }
+}

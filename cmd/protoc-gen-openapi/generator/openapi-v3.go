@@ -38,6 +38,7 @@ type Configuration struct {
 	Naming        *string
 	EnumType      *string
 	CircularDepth *int
+	FullPackage   *bool
 }
 
 const (
@@ -233,11 +234,16 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 	for _, service := range file.Services {
 		annotationsCount := 0
 
+		serviceName := service.GoName
+		if *g.conf.FullPackage {
+			serviceName = string(file.Desc.FullName()) + "." + serviceName
+		}
+
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading, false)
 			inputMessage := method.Input
 			outputMessage := method.Output
-			operationID := service.GoName + "_" + method.GoName
+			operationID := serviceName + "_" + method.GoName
 
 			var path string
 			var methodName string
@@ -276,14 +282,14 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 				defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
 				op, path2 := g.buildOperationV3(
-					file, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+					file, operationID, serviceName, comment, defaultHost, path, body, inputMessage, outputMessage)
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
 
 		if annotationsCount > 0 {
 			comment := g.filterCommentString(service.Comments.Leading, false)
-			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+			d.Tags = append(d.Tags, &v3.Tag{Name: serviceName, Description: comment})
 		}
 	}
 }
@@ -318,6 +324,10 @@ func getMessageName(message protoreflect.MessageDescriptor) string {
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
 	name := getMessageName(message.Desc)
+
+	if *g.conf.FullPackage {
+		return string(message.Desc.ParentFile().Package()) + "." + name
+	}
 
 	if *g.conf.Naming == "proto" {
 		return name
@@ -713,6 +723,9 @@ func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string 
 		return "#/components/schemas/" + protobufValueName
 	}
 
+	if *g.conf.FullPackage {
+		return "#/components/schemas/" + strings.TrimLeft(typeName, ".")
+	}
 	parts := strings.Split(typeName, ".")
 	lastPart := parts[len(parts)-1]
 	return "#/components/schemas/" + g.formatMessageRef(lastPart)

@@ -33,6 +33,7 @@ func main() {
 		Naming:        flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
 		EnumType:      flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
 		CircularDepth: flags.Int("depth", 2, "depth of recursion for circular messages"),
+		FullPackage:   flags.Bool("full_package", false, `use full package name of message, service and so on, e.g. Foo -> package.Foo`),
 	}
 
 	opts := protogen.Options{

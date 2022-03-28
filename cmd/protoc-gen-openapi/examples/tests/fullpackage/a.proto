@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package example.fullpackage.a;
+
+option go_package = "github.com/google/gnostic/cmd/protoc-gen-openapi/examples/tests/fullpackage/a";
+
+import "google/api/annotations.proto";
+
+enum Enum {
+  ENUM_UNSPECIFIED = 0;
+  ENUM_1 = 1;
+}
+
+message Message {
+  Enum enum = 1;
+}
+
+service Service {
+  rpc Method(Message) returns (Message) {
+    option (google.api.http) = {
+      post : "/v1/a/message"
+      body : "*"
+    };
+  }
+}
