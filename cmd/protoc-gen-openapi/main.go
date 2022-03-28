@@ -27,12 +27,13 @@ var flags flag.FlagSet
 
 func main() {
 	conf := generator.Configuration{
-		Version:       flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
-		Title:         flags.String("title", "", "name of the API"),
-		Description:   flags.String("description", "", "description of the API"),
-		Naming:        flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
-		EnumType:      flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
-		CircularDepth: flags.Int("depth", 2, "depth of recursion for circular messages"),
+		Version:        flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
+		Title:          flags.String("title", "", "name of the API"),
+		Description:    flags.String("description", "", "description of the API"),
+		Naming:         flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
+		FQSchemaNaming: flags.Bool("fq_schema_naming", false, `schema naming convention. If "true" prefixes the schema name with the proto message package name`),
+		EnumType:       flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
+		CircularDepth:  flags.Int("depth", 2, "depth of recursion for circular messages"),
 	}
 
 	opts := protogen.Options{
