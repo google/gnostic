@@ -29,7 +29,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/tests.mapfields.message.v1.Message'
+                            $ref: '#/components/schemas/tests.openapiv3annotations.message.v1.Message'
                 required: true
             responses:
                 "200":
@@ -37,12 +37,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/tests.mapfields.message.v1.Message'
+                                $ref: '#/components/schemas/tests.openapiv3annotations.message.v1.Message'
             security:
                 - BasicAuth: []
 components:
     schemas:
-        tests.mapfields.message.v1.Message:
+        tests.openapiv3annotations.message.v1.Message:
             type: object
             properties:
                 id:

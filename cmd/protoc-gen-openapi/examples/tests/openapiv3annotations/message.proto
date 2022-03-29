@@ -15,12 +15,12 @@
 
 syntax = "proto3";
 
-package tests.mapfields.message.v1;
+package tests.openapiv3annotations.message.v1;
 
 import "google/api/annotations.proto";
 import "openapiv3/annotations.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/noannotations/message/v1;message";
+option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/openapiv3annotations/message/v1;message";
 
 option (openapi.v3.document) = {
   info: {
