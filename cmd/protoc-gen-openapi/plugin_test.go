@@ -23,9 +23,10 @@ import (
 )
 
 var openapiTests = []struct {
-	name      string
-	path      string
-	protofile string
+	name       string
+	path       string
+	protofile  string
+	protofiles []string
 }{
 	{name: "Google Library example", path: "examples/google/example/library/v1/", protofile: "library.proto"},
 	{name: "Body mapping", path: "examples/tests/bodymapping/", protofile: "message.proto"},
@@ -35,6 +36,7 @@ var openapiTests = []struct {
 	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
 	{name: "Ignore services without annotations", path: "examples/tests/noannotations/", protofile: "message.proto"},
 	{name: "Enum Options", path: "examples/tests/enumoptions/", protofile: "message.proto"},
+	{name: "Full Package", path: "examples/tests/fullpackage/", protofiles: []string{"a.proto", "b.proto", "c.proto"}},
 }
 
 func TestOpenAPIProtobufNaming(t *testing.T) {
@@ -107,6 +109,39 @@ func TestOpenAPIStringEnums(t *testing.T) {
 				"-I", "examples",
 				path.Join(tt.path, tt.protofile),
 				"--openapi_out=enum_type=string:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			// Verify that the generated spec matches our expected version.
+			err = exec.Command("diff", "openapi.yaml", fixture).Run()
+			if err != nil {
+				t.Fatalf("diff failed: %+v", err)
+			}
+			// if the test succeeded, clean up
+			os.Remove("openapi.yaml")
+		})
+	}
+}
+
+func TestOpenAPIFullPackage(t *testing.T) {
+	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi_fullpackage.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			// merge all files
+			args := []string{
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				"--openapi_out=full_package=true:.",
+			}
+			for _, protofile := range tt.protofiles {
+				args = append(args, path.Join(tt.path, protofile))
+			}
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec with string Enums.
+			err := exec.Command("protoc", args...).Run()
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
