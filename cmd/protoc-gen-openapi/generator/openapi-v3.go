@@ -44,6 +44,7 @@ type Configuration struct {
 const (
 	infoURL           = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
 	protobufValueName = "AnyJSONValue"
+	protobufAnyName   = "AnySchemaValue"
 )
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
@@ -315,7 +316,16 @@ func getMessageName(message protoreflect.MessageDescriptor) string {
 }
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
+	typeName := fullMessageTypeName(message.Desc)
+
 	name := getMessageName(message.Desc)
+	if !*g.conf.FQSchemaNaming {
+		if typeName == ".google.protobuf.Value" {
+			name = protobufValueName
+		} else if typeName == ".google.protobuf.Any" {
+			name = protobufAnyName
+		}
+	}
 
 	if *g.conf.Naming == "json" {
 		if len(name) > 1 {
@@ -389,8 +399,10 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 		return parameters
 
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
+		typeName := fullMessageTypeName(field.Desc.Message())
+
 		// Represent google.protobuf.Value as reference to the value of const protobufValueName.
-		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.Value" {
+		if typeName == ".google.protobuf.Value" {
 			fieldSchema := g.schemaOrReferenceForField(field)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
@@ -411,7 +423,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 		}
 
 		// Represent field masks directly as strings (don't expand them).
-		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.FieldMask" {
+		if typeName == ".google.protobuf.FieldMask" {
 			fieldSchema := g.schemaOrReferenceForField(field)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
@@ -713,10 +725,6 @@ func (g *OpenAPIv3Generator) schemaReferenceForMessage(message *protogen.Message
 		g.requiredSchemas = append(g.requiredSchemas, typeName)
 	}
 
-	if typeName == ".google.protobuf.Value" {
-		return "#/components/schemas/" + protobufValueName
-	}
-
 	return "#/components/schemas/" + g.formatMessageName(message)
 }
 
@@ -928,20 +936,22 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		}
 
 		g.generatedSchemas = append(g.generatedSchemas, typeName)
+		messageDescription := g.filterCommentString(message.Comments.Leading, true)
 
-		// google.protobuf.Value is handled like a special value when doing transcoding.
-		// It's interpreted as a "catch all" JSON value, that can be anything.
-		if message.Desc != nil && message.Desc.FullName() == "google.protobuf.Value" {
-			// Add the schema to the components.schema list.
-			description := protobufValueName + ` is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI`
-
+		// `google.protobuf.Value` and `google.protobuf.Any` are handled have special JSON transcoding, so
+		// we can't just reflect on the message descriptor.
+		if typeName == ".google.protobuf.Value" {
+			// See here for the details on the JSON mapping:
+			//   https://developers.google.com/protocol-buffers/docs/proto3#json
+			// and here:
+			//   https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
 			d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
 				&v3.NamedSchemaOrReference{
-					Name: protobufValueName,
+					Name: g.formatMessageName(message),
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
-								Description: description,
+								Description: messageDescription,
 								OneOf: []*v3.SchemaOrReference{
 									// type is not allow to be null in OpenAPI
 									{
@@ -971,7 +981,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 												Items: &v3.ItemsItem{
 													SchemaOrReference: []*v3.SchemaOrReference{{
 														Oneof: &v3.SchemaOrReference_Reference{
-															Reference: &v3.Reference{XRef: "#/components/schemas/" + protobufValueName},
+															Reference: &v3.Reference{XRef: "#/components/schemas/" + g.formatMessageName(message)},
 														},
 													}},
 												},
@@ -985,10 +995,43 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 				},
 			)
 			continue
+		} else if typeName == ".google.protobuf.Any" {
+			// See here for the details on the JSON mapping:
+			//   https://developers.google.com/protocol-buffers/docs/proto3#json
+			d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
+				&v3.NamedSchemaOrReference{
+					Name: g.formatMessageName(message),
+					Value: &v3.SchemaOrReference{
+						Oneof: &v3.SchemaOrReference_Schema{
+							Schema: &v3.Schema{
+								Type:        "object",
+								Description: messageDescription,
+								Properties: &v3.Properties{
+									AdditionalProperties: []*v3.NamedSchemaOrReference{
+										{
+											Name: "@type",
+											Value: &v3.SchemaOrReference{
+												Oneof: &v3.SchemaOrReference_Schema{
+													Schema: &v3.Schema{
+														Type: "string",
+													},
+												},
+											},
+										},
+									},
+								},
+								AdditionalProperties: &v3.AdditionalPropertiesItem{
+									Oneof: &v3.AdditionalPropertiesItem_Boolean{
+										Boolean: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			)
+			continue
 		}
-
-		// Get the message description from the comments.
-		messageDescription := g.filterCommentString(message.Comments.Leading, true)
 
 		// Build an array holding the fields of the message.
 		definitionProperties := &v3.Properties{
