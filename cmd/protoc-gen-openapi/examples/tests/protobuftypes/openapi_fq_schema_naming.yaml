@@ -244,6 +244,8 @@ components:
                 - type: integer
                 - type: boolean
                 - type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 - type: array
                   items:
                     $ref: '#/components/schemas/google.protobuf.Value'

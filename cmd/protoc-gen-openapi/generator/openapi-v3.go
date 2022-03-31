@@ -972,7 +972,18 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 										},
 									}, {
 										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "object"},
+											Schema: &v3.Schema{
+												Type: "object",
+												AdditionalProperties: &v3.AdditionalPropertiesItem{
+													Oneof: &v3.AdditionalPropertiesItem_SchemaOrReference{
+														SchemaOrReference: &v3.SchemaOrReference{
+															Oneof: &v3.SchemaOrReference_Reference{
+																Reference: &v3.Reference{XRef: "#/components/schemas/" + g.formatMessageName(message)},
+															},
+														},
+													},
+												},
+											},
 										},
 									}, {
 										Oneof: &v3.SchemaOrReference_Schema{
