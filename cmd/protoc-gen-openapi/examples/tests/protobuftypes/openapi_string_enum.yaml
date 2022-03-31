@@ -19,7 +19,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/AnyJSONValue'
+                                $ref: '#/components/schemas/GoogleProtobufValue'
     /v1/messages/{messageId}:
         get:
             tags:
@@ -84,14 +84,14 @@ paths:
                   in: query
                   description: Description of value
                   schema:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/GoogleProtobufValue'
                 - name: repeatedValueType
                   in: query
                   description: Description of repeated value
                   schema:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/GoogleProtobufValue'
             responses:
                 "200":
                     description: OK
@@ -185,14 +185,14 @@ paths:
                   in: query
                   description: Description of value
                   schema:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/GoogleProtobufValue'
                 - name: repeatedValueType
                   in: query
                   description: Description of repeated value
                   schema:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/GoogleProtobufValue'
             requestBody:
                 content:
                     application/json:
@@ -236,7 +236,8 @@ paths:
                         '*/*': {}
 components:
     schemas:
-        AnyJSONValue:
+        GoogleProtobufValue:
+            nullable: true
             oneOf:
                 - type: string
                 - type: number
@@ -245,8 +246,8 @@ components:
                 - type: object
                 - type: array
                   items:
-                    $ref: '#/components/schemas/AnyJSONValue'
-            description: '`Value` represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values. A producer of value is expected to set one of that variants, absence of any variant indicates an error. The JSON representation for `Value` is JSON value.'
+                    $ref: '#/components/schemas/GoogleProtobufValue'
+            description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
         Message:
             type: object
             properties:
@@ -283,11 +284,11 @@ components:
                     items:
                         type: object
                 valueType:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/GoogleProtobufValue'
                 repeatedValueType:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/GoogleProtobufValue'
                     description: Description of repeated value
         Message_EmbMessage:
             type: object

@@ -43,8 +43,8 @@ type Configuration struct {
 
 const (
 	infoURL           = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
-	protobufValueName = "AnyJSONValue"
-	protobufAnyName   = "AnySchemaValue"
+	protobufValueName = "GoogleProtobufValue"
+	protobufAnyName   = "GoogleProtobufAny"
 )
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
@@ -951,9 +951,9 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
-								Description: messageDescription,
+								Description: "Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.",
+								Nullable:    true, // this only works with OpenAPI 3.0.x
 								OneOf: []*v3.SchemaOrReference{
-									// type is not allow to be null in OpenAPI
 									{
 										Oneof: &v3.SchemaOrReference_Schema{
 											Schema: &v3.Schema{Type: "string"},
@@ -1005,7 +1005,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
 								Type:        "object",
-								Description: messageDescription,
+								Description: "Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.",
 								Properties: &v3.Properties{
 									AdditionalProperties: []*v3.NamedSchemaOrReference{
 										{
