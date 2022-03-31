@@ -43,6 +43,7 @@ type Configuration struct {
 	EnumType        *string
 	CircularDepth   *int
 	DefaultResponse *bool
+	OneofType       *string
 }
 
 const (
@@ -755,12 +756,15 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		definitionProperties := &v3.Properties{
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
+		// Cache wrapped oneof schema
+		oneofSchemaMap := make(map[string]*v3.NamedSchemaOrReference)
 
 		var required []string
 		for _, field := range message.Fields {
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
+			requiredFlag := false
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
 			if extension != nil {
 				switch v := extension.(type) {
@@ -772,7 +776,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 						case annotations.FieldBehavior_INPUT_ONLY:
 							inputOnly = true
 						case annotations.FieldBehavior_REQUIRED:
-							required = append(required, g.reflect.formatFieldName(field.Desc))
+							requiredFlag = true
 						}
 					}
 				default:
@@ -786,6 +790,13 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				continue
 			}
 
+			if requiredFlag {
+				// if oneof wrapped, required should be added to wrapped object
+				if *g.conf.OneofType == "ignore" || field.Oneof == nil {
+					required = append(required, g.reflect.formatFieldName(field.Desc))
+				}
+			}
+
 			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
 				// Get the field description from the comments.
 				schema.Schema.Description = g.filterCommentString(field.Comments.Leading, true)
@@ -797,13 +808,63 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				}
 			}
 
-			definitionProperties.AdditionalProperties = append(
-				definitionProperties.AdditionalProperties,
-				&v3.NamedSchemaOrReference{
-					Name:  g.reflect.formatFieldName(field.Desc),
-					Value: fieldSchema,
-				},
-			)
+			// If OneofType is `wrapped` and this field contained by Oneof
+			if *g.conf.OneofType == "wrapped" && field.Oneof != nil {
+				oneofName := string(field.Oneof.Desc.Name())
+				fieldSchemaObject := &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{
+							Type:        "object",
+							Description: "wrapped in OneOf: " + oneofName,
+							Properties: &v3.Properties{
+								AdditionalProperties: []*v3.NamedSchemaOrReference{
+									{
+										Name:  g.reflect.formatFieldName(field.Desc),
+										Value: fieldSchema,
+									},
+								},
+							},
+							Required: []string{},
+						},
+					},
+				}
+				// fix required, if wrapped into oneof
+				if requiredFlag {
+					fieldSchemaObject.Oneof.(*v3.SchemaOrReference_Schema).Schema.Required = append(
+						fieldSchemaObject.Oneof.(*v3.SchemaOrReference_Schema).Schema.Required, g.reflect.formatFieldName(field.Desc),
+					)
+				}
+				// If oneof has been cached
+				if oneofSchema, ok := oneofSchemaMap[oneofName]; ok {
+					oneofSchema.Value.Oneof.(*v3.SchemaOrReference_Schema).Schema.OneOf = append(
+						oneofSchema.Value.Oneof.(*v3.SchemaOrReference_Schema).Schema.OneOf, fieldSchemaObject,
+					)
+				} else {
+					oneofSchema := &v3.NamedSchemaOrReference{
+						Name: oneofName,
+						Value: &v3.SchemaOrReference{
+							Oneof: &v3.SchemaOrReference_Schema{
+								Schema: &v3.Schema{
+									OneOf: []*v3.SchemaOrReference{fieldSchemaObject},
+								},
+							},
+						},
+					}
+					// cache and add into message
+					oneofSchemaMap[oneofName] = oneofSchema
+					definitionProperties.AdditionalProperties = append(
+						definitionProperties.AdditionalProperties, oneofSchema,
+					)
+				}
+			} else {
+				definitionProperties.AdditionalProperties = append(
+					definitionProperties.AdditionalProperties,
+					&v3.NamedSchemaOrReference{
+						Name:  g.reflect.formatFieldName(field.Desc),
+						Value: fieldSchema,
+					},
+				)
+			}
 		}
 
 		// Add the schema to the components.schema list.
