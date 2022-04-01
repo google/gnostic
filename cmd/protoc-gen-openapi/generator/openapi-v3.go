@@ -952,54 +952,6 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
 								Description: "Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.",
-								Nullable:    true, // this only works with OpenAPI 3.0.x
-								OneOf: []*v3.SchemaOrReference{
-									{
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "string"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "number"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "integer"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "boolean"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{
-												Type: "object",
-												AdditionalProperties: &v3.AdditionalPropertiesItem{
-													Oneof: &v3.AdditionalPropertiesItem_SchemaOrReference{
-														SchemaOrReference: &v3.SchemaOrReference{
-															Oneof: &v3.SchemaOrReference_Reference{
-																Reference: &v3.Reference{XRef: "#/components/schemas/" + g.formatMessageName(message)},
-															},
-														},
-													},
-												},
-											},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{
-												Type: "array",
-												Items: &v3.ItemsItem{
-													SchemaOrReference: []*v3.SchemaOrReference{{
-														Oneof: &v3.SchemaOrReference_Reference{
-															Reference: &v3.Reference{XRef: "#/components/schemas/" + g.formatMessageName(message)},
-														},
-													}},
-												},
-											},
-										},
-									},
-								},
 							},
 						},
 					},

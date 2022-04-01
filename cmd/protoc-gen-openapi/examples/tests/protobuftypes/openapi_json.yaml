@@ -237,18 +237,6 @@ paths:
 components:
     schemas:
         GoogleProtobufValue:
-            nullable: true
-            oneOf:
-                - type: string
-                - type: number
-                - type: integer
-                - type: boolean
-                - type: object
-                  additionalProperties:
-                    $ref: '#/components/schemas/GoogleProtobufValue'
-                - type: array
-                  items:
-                    $ref: '#/components/schemas/GoogleProtobufValue'
             description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
         Message:
             type: object
