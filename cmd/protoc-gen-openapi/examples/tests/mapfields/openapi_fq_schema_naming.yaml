@@ -1,0 +1,85 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Messaging API
+    version: 0.0.1
+paths:
+    /v1/messages/{messageId}:
+        patch:
+            tags:
+                - Messaging
+            operationId: Messaging_UpdateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/tests.mapfields.message.v1.Message'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/tests.mapfields.message.v1.Message'
+components:
+    schemas:
+        tests.mapfields.message.v1.AnotherMessage:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                label:
+                    type: string
+        tests.mapfields.message.v1.Message:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                anotherMessage:
+                    $ref: '#/components/schemas/tests.mapfields.message.v1.AnotherMessage'
+                subMessage:
+                    $ref: '#/components/schemas/tests.mapfields.message.v1.Message_SubMessage'
+                stringList:
+                    type: array
+                    items:
+                        type: string
+                subMessageList:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/tests.mapfields.message.v1.Message_SubMessage'
+                objectList:
+                    type: array
+                    items:
+                        type: object
+                stringsMap:
+                    type: object
+                    additionalProperties:
+                        type: string
+                subMessagesMap:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/tests.mapfields.message.v1.Message_SubMessage'
+                objectsMap:
+                    type: object
+                    additionalProperties:
+                        type: object
+        tests.mapfields.message.v1.Message_SubMessage:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                label:
+                    type: string
+tags:
+    - name: Messaging

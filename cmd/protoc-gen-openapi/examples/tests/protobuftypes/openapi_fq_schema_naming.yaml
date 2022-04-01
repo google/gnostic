@@ -1,0 +1,331 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Messaging API
+    version: 0.0.1
+servers:
+    - url: https://foo.googleapi.com
+paths:
+    /v1/messages:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_ListMessages
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AnyJSONValue'
+    /v1/messages/{messageId}:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_GetMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: stringType
+                  in: query
+                  schema:
+                    type: string
+                - name: recursiveType.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: embeddedType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.integers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                - name: repeatedType
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: valueType
+                  in: query
+                  description: Description of value
+                  schema:
+                    $ref: '#/components/schemas/AnyJSONValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/tests.protobuftypes.message.v1.Message'
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/tests.protobuftypes.message.v1.Message'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/tests.protobuftypes.message.v1.Message'
+        patch:
+            tags:
+                - Messaging
+            operationId: Messaging_UpdateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: stringType
+                  in: query
+                  schema:
+                    type: string
+                - name: recursiveType.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: embeddedType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.integers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                - name: repeatedType
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: valueType
+                  in: query
+                  description: Description of value
+                  schema:
+                    $ref: '#/components/schemas/AnyJSONValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+    /v1/messages:csv:
+        get:
+            tags:
+                - Messaging
+            description: |-
+                OpenAPI does not allow requestBody in GET operations.
+                 But it should not convert it to query params either.
+            operationId: Messaging_ListMessagesCSV
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessagesFromCSV
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+components:
+    schemas:
+        AnyJSONValue:
+            oneOf:
+                - type: string
+                - type: number
+                - type: integer
+                - type: boolean
+                - type: object
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/AnyJSONValue'
+            description: AnyJSONValue is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI
+        tests.protobuftypes.message.v1.Message:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                stringType:
+                    type: string
+                recursiveType:
+                    $ref: '#/components/schemas/tests.protobuftypes.message.v1.RecursiveParent'
+                embeddedType:
+                    $ref: '#/components/schemas/tests.protobuftypes.message.v1.Message_EmbMessage'
+                subType:
+                    $ref: '#/components/schemas/tests.protobuftypes.message.v1.SubMessage'
+                repeatedType:
+                    type: array
+                    items:
+                        type: string
+                repeatedSubType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/tests.protobuftypes.message.v1.SubMessage'
+                repeatedRecursiveType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/tests.protobuftypes.message.v1.RecursiveParent'
+                mapType:
+                    type: object
+                    additionalProperties:
+                        type: string
+                body:
+                    type: object
+                media:
+                    type: array
+                    items:
+                        type: object
+                valueType:
+                    $ref: '#/components/schemas/AnyJSONValue'
+                repeatedValueType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AnyJSONValue'
+                    description: Description of repeated value
+        tests.protobuftypes.message.v1.Message_EmbMessage:
+            type: object
+            properties:
+                messageId:
+                    type: string
+        tests.protobuftypes.message.v1.RecursiveChild:
+            type: object
+            properties:
+                childId:
+                    type: integer
+                    format: int32
+                parent:
+                    $ref: '#/components/schemas/tests.protobuftypes.message.v1.RecursiveParent'
+        tests.protobuftypes.message.v1.RecursiveParent:
+            type: object
+            properties:
+                parentId:
+                    type: integer
+                    format: int32
+                child:
+                    $ref: '#/components/schemas/tests.protobuftypes.message.v1.RecursiveChild'
+        tests.protobuftypes.message.v1.SubMessage:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                subSubMessage:
+                    $ref: '#/components/schemas/tests.protobuftypes.message.v1.SubSubMessage'
+        tests.protobuftypes.message.v1.SubSubMessage:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                integers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+tags:
+    - name: Messaging

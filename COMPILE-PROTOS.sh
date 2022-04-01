@@ -19,6 +19,7 @@ go install github.com/golang/protobuf/protoc-gen-go@latest
 
 protoc -I . -I ./third_party --go_out=. openapiv2/OpenAPIv2.proto
 protoc -I . -I ./third_party --go_out=. openapiv3/OpenAPIv3.proto
+protoc -I . -I ./third_party --go_out=. openapiv3/annotations.proto
 protoc -I . -I ./third_party --go_out=. discovery/discovery.proto
 protoc -I . -I ./third_party --go_out=. plugins/plugin.proto
 protoc -I . -I ./third_party --go_out=. extensions/extension.proto
