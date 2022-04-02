@@ -32,17 +32,19 @@ import (
 )
 
 type Configuration struct {
-	Version       *string
-	Title         *string
-	Description   *string
-	Naming        *string
-	EnumType      *string
-	CircularDepth *int
+	Version        *string
+	Title          *string
+	Description    *string
+	Naming         *string
+	EnumType       *string
+	CircularDepth  *int
+	FQSchemaNaming *bool
 }
 
 const (
 	infoURL           = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
-	protobufValueName = "AnyJSONValue"
+	protobufValueName = "GoogleProtobufValue"
+	protobufAnyName   = "GoogleProtobufAny"
 )
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
@@ -103,6 +105,12 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 
 	for _, file := range g.plugin.Files {
 		if file.Generate {
+			// Merge any `Document` annotations with the current
+			extDocument := proto.GetExtension(file.Desc.Options(), v3.E_Document)
+			if extDocument != nil {
+				proto.Merge(d, extDocument.(*v3.Document))
+			}
+
 			g.addPathsToDocumentV3(d, file)
 		}
 	}
@@ -277,6 +285,13 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 
 				op, path2 := g.buildOperationV3(
 					file, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+
+				// Merge any `Operation` annotations with the current
+				extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
+				if extOperation != nil {
+					proto.Merge(op, extOperation.(*v3.Operation))
+				}
+
 				g.addOperationV3(d, op, path2, methodName)
 			}
 		}
@@ -286,22 +301,6 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, file *protogen
 			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
 		}
 	}
-}
-
-func (g *OpenAPIv3Generator) formatMessageRef(name string) string {
-	if *g.conf.Naming == "proto" {
-		return name
-	}
-
-	if len(name) > 1 {
-		return strings.ToUpper(name[0:1]) + name[1:]
-	}
-
-	if len(name) == 1 {
-		return strings.ToLower(name)
-	}
-
-	return name
 }
 
 func getMessageName(message protoreflect.MessageDescriptor) string {
@@ -317,14 +316,30 @@ func getMessageName(message protoreflect.MessageDescriptor) string {
 }
 
 func (g *OpenAPIv3Generator) formatMessageName(message *protogen.Message) string {
-	name := getMessageName(message.Desc)
+	typeName := fullMessageTypeName(message.Desc)
 
-	if *g.conf.Naming == "proto" {
-		return name
+	name := getMessageName(message.Desc)
+	if !*g.conf.FQSchemaNaming {
+		if typeName == ".google.protobuf.Value" {
+			name = protobufValueName
+		} else if typeName == ".google.protobuf.Any" {
+			name = protobufAnyName
+		}
 	}
 
-	if len(name) > 0 {
-		return strings.ToUpper(name[0:1]) + name[1:]
+	if *g.conf.Naming == "json" {
+		if len(name) > 1 {
+			name = strings.ToUpper(name[0:1]) + name[1:]
+		}
+
+		if len(name) == 1 {
+			name = strings.ToLower(name)
+		}
+	}
+
+	if *g.conf.FQSchemaNaming {
+		package_name := string(message.Desc.ParentFile().Package())
+		name = package_name + "." + name
 	}
 
 	return name
@@ -384,9 +399,11 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 		return parameters
 
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
+		typeName := fullMessageTypeName(field.Desc.Message())
+
 		// Represent google.protobuf.Value as reference to the value of const protobufValueName.
-		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.Value" {
-			fieldSchema := g.schemaOrReferenceForField(field.Desc)
+		if typeName == ".google.protobuf.Value" {
+			fieldSchema := g.schemaOrReferenceForField(field)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
 					Oneof: &v3.ParameterOrReference_Parameter{
@@ -406,8 +423,8 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 		}
 
 		// Represent field masks directly as strings (don't expand them).
-		if fullMessageTypeName(field.Desc.Message()) == ".google.protobuf.FieldMask" {
-			fieldSchema := g.schemaOrReferenceForField(field.Desc)
+		if typeName == ".google.protobuf.FieldMask" {
+			fieldSchema := g.schemaOrReferenceForField(field)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
 					Oneof: &v3.ParameterOrReference_Parameter{
@@ -446,7 +463,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 
 	} else if field.Desc.Kind() != protoreflect.GroupKind {
 		// schemaOrReferenceForField also handles array types
-		fieldSchema := g.schemaOrReferenceForField(field.Desc)
+		fieldSchema := g.schemaOrReferenceForField(field)
 
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
@@ -499,7 +516,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			var fieldDescription string
 			field := g.findField(pathParameter, inputMessage)
 			if field != nil {
-				fieldSchema = g.schemaOrReferenceForField(field.Desc)
+				fieldSchema = g.schemaOrReferenceForField(field)
 				fieldDescription = g.filterCommentString(field.Comments.Leading, true)
 			} else {
 				// If field dooes not exist, it is safe to set it to string, as it is ignored downstream
@@ -624,8 +641,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
-			typeName := fullMessageTypeName(inputMessage.Desc)
-			requestSchema = g.schemaOrReferenceForType(typeName)
+			requestSchema = g.schemaOrReferenceForMessage(inputMessage)
 
 		} else {
 			// If body refers to a message field, use that type.
@@ -642,8 +658,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 						}
 
 					case protoreflect.MessageKind:
-						typeName := fullMessageTypeName(field.Message.Desc)
-						requestSchema = g.schemaOrReferenceForType(typeName)
+						requestSchema = g.schemaOrReferenceForMessage(field.Message)
 
 					default:
 						log.Printf("unsupported field type %+v", field.Desc)
@@ -704,18 +719,13 @@ func (g *OpenAPIv3Generator) addOperationV3(d *v3.Document, op *v3.Operation, pa
 }
 
 // schemaReferenceForTypeName returns an OpenAPI JSON Reference to the schema that represents a type.
-func (g *OpenAPIv3Generator) schemaReferenceForTypeName(typeName string) string {
+func (g *OpenAPIv3Generator) schemaReferenceForMessage(message *protogen.Message) string {
+	typeName := fullMessageTypeName(message.Desc)
 	if !contains(g.requiredSchemas, typeName) {
 		g.requiredSchemas = append(g.requiredSchemas, typeName)
 	}
 
-	if typeName == ".google.protobuf.Value" {
-		return "#/components/schemas/" + protobufValueName
-	}
-
-	parts := strings.Split(typeName, ".")
-	lastPart := parts[len(parts)-1]
-	return "#/components/schemas/" + g.formatMessageRef(lastPart)
+	return "#/components/schemas/" + g.formatMessageName(message)
 }
 
 // fullMessageTypeName builds the full type name of a message.
@@ -747,14 +757,15 @@ func (g *OpenAPIv3Generator) responseContentForMessage(outputMessage *protogen.M
 			{
 				Name: "application/json",
 				Value: &v3.MediaType{
-					Schema: g.schemaOrReferenceForType(typeName),
+					Schema: g.schemaOrReferenceForMessage(outputMessage),
 				},
 			},
 		},
 	}
 }
 
-func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.SchemaOrReference {
+func (g *OpenAPIv3Generator) schemaOrReferenceForMessage(message *protogen.Message) *v3.SchemaOrReference {
+	typeName := fullMessageTypeName(message.Desc)
 	switch typeName {
 
 	// Even for GET requests, the google.api.HttpBody will contain POST body data
@@ -799,32 +810,48 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForType(typeName string) *v3.Schem
 		return nil //&v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{Type: "null"}}}
 
 	default:
-		ref := g.schemaReferenceForTypeName(typeName)
+		ref := g.schemaReferenceForMessage(message)
 		return &v3.SchemaOrReference{
 			Oneof: &v3.SchemaOrReference_Reference{
 				Reference: &v3.Reference{XRef: ref}}}
 	}
 }
 
-func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
-	if field.IsMap() {
-		return &v3.SchemaOrReference{
-			Oneof: &v3.SchemaOrReference_Schema{
-				Schema: &v3.Schema{Type: "object",
-					AdditionalProperties: &v3.AdditionalPropertiesItem{
-						Oneof: &v3.AdditionalPropertiesItem_SchemaOrReference{
-							SchemaOrReference: g.schemaOrReferenceForField(field.MapValue())}}}}}
+func (g *OpenAPIv3Generator) schemaOrReferenceForField(field *protogen.Field) *v3.SchemaOrReference {
+	if field.Desc.IsMap() {
+		// This means the field is a map, for example:
+		//   map<string, value_type> map_field = 1;
+		//
+		// The map ends up getting converted into something like this:
+		//   message MapFieldEntry {
+		//     string key = 1;
+		//     value_type value = 2;
+		//   }
+		//
+		//   repeated MapFieldEntry map_field = N;
+		//
+		// So we need to find the `value` field in the `MapFieldEntry` message
+		map_value_field_desc := field.Desc.MapValue()
+		for _, map_field := range field.Message.Fields {
+			if map_field.Desc == map_value_field_desc {
+				return &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{Type: "object",
+							AdditionalProperties: &v3.AdditionalPropertiesItem{
+								Oneof: &v3.AdditionalPropertiesItem_SchemaOrReference{
+									SchemaOrReference: g.schemaOrReferenceForField(map_field)}}}}}
+			}
+		}
 	}
 
 	var kindSchema *v3.SchemaOrReference
 
-	kind := field.Kind()
+	kind := field.Desc.Kind()
 
 	switch kind {
 
 	case protoreflect.MessageKind:
-		typeName := fullMessageTypeName(field.Message())
-		kindSchema = g.schemaOrReferenceForType(typeName)
+		kindSchema = g.schemaOrReferenceForMessage(field.Message)
 		if kindSchema == nil {
 			return nil
 		}
@@ -846,10 +873,10 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldD
 		s := &v3.Schema{Format: "enum"}
 		if g.conf.EnumType != nil && *g.conf.EnumType == "string" {
 			s.Type = "string"
-			s.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
-			for i := 0; i < field.Enum().Values().Len(); i++ {
+			s.Enum = make([]*v3.Any, 0, field.Desc.Enum().Values().Len())
+			for i := 0; i < field.Desc.Enum().Values().Len(); i++ {
 				s.Enum = append(s.Enum, &v3.Any{
-					Yaml: string(field.Enum().Values().Get(i).Name()),
+					Yaml: string(field.Desc.Enum().Values().Get(i).Name()),
 				})
 			}
 		} else {
@@ -875,10 +902,10 @@ func (g *OpenAPIv3Generator) schemaOrReferenceForField(field protoreflect.FieldD
 				Schema: &v3.Schema{Type: "string", Format: "bytes"}}}
 
 	default:
-		log.Printf("(TODO) Unsupported field type: %+v", fullMessageTypeName(field.Message()))
+		log.Printf("(TODO) Unsupported field type: %+v", fullMessageTypeName(field.Message.Desc))
 	}
 
-	if field.IsList() {
+	if field.Desc.IsList() {
 		return &v3.SchemaOrReference{
 			Oneof: &v3.SchemaOrReference_Schema{
 				Schema: &v3.Schema{
@@ -909,55 +936,56 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 		}
 
 		g.generatedSchemas = append(g.generatedSchemas, typeName)
+		messageDescription := g.filterCommentString(message.Comments.Leading, true)
 
-		// google.protobuf.Value is handled like a special value when doing transcoding.
-		// It's interpreted as a "catch all" JSON value, that can be anything.
-		if message.Desc != nil && message.Desc.FullName() == "google.protobuf.Value" {
-			// Add the schema to the components.schema list.
-			description := protobufValueName + ` is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI`
-
+		// `google.protobuf.Value` and `google.protobuf.Any` are handled have special JSON transcoding, so
+		// we can't just reflect on the message descriptor.
+		if typeName == ".google.protobuf.Value" {
+			// See here for the details on the JSON mapping:
+			//   https://developers.google.com/protocol-buffers/docs/proto3#json
+			// and here:
+			//   https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
 			d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
 				&v3.NamedSchemaOrReference{
-					Name: protobufValueName,
+					Name: g.formatMessageName(message),
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
 							Schema: &v3.Schema{
-								Description: description,
-								OneOf: []*v3.SchemaOrReference{
-									// type is not allow to be null in OpenAPI
-									{
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "string"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "number"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "integer"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "boolean"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{Type: "object"},
-										},
-									}, {
-										Oneof: &v3.SchemaOrReference_Schema{
-											Schema: &v3.Schema{
-												Type: "array",
-												Items: &v3.ItemsItem{
-													SchemaOrReference: []*v3.SchemaOrReference{{
-														Oneof: &v3.SchemaOrReference_Reference{
-															Reference: &v3.Reference{XRef: "#/components/schemas/" + protobufValueName},
-														},
-													}},
+								Description: "Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.",
+							},
+						},
+					},
+				},
+			)
+			continue
+		} else if typeName == ".google.protobuf.Any" {
+			// See here for the details on the JSON mapping:
+			//   https://developers.google.com/protocol-buffers/docs/proto3#json
+			d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties,
+				&v3.NamedSchemaOrReference{
+					Name: g.formatMessageName(message),
+					Value: &v3.SchemaOrReference{
+						Oneof: &v3.SchemaOrReference_Schema{
+							Schema: &v3.Schema{
+								Type:        "object",
+								Description: "Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.",
+								Properties: &v3.Properties{
+									AdditionalProperties: []*v3.NamedSchemaOrReference{
+										{
+											Name: "@type",
+											Value: &v3.SchemaOrReference{
+												Oneof: &v3.SchemaOrReference_Schema{
+													Schema: &v3.Schema{
+														Type: "string",
+													},
 												},
 											},
 										},
+									},
+								},
+								AdditionalProperties: &v3.AdditionalPropertiesItem{
+									Oneof: &v3.AdditionalPropertiesItem_Boolean{
+										Boolean: true,
 									},
 								},
 							},
@@ -967,9 +995,6 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 			)
 			continue
 		}
-
-		// Get the message description from the comments.
-		messageDescription := g.filterCommentString(message.Comments.Leading, true)
 
 		// Build an array holding the fields of the message.
 		definitionProperties := &v3.Properties{
@@ -1001,7 +1026,7 @@ func (g *OpenAPIv3Generator) addSchemasToDocumentV3(d *v3.Document, messages []*
 			}
 
 			// The field is either described by a reference or a schema.
-			fieldSchema := g.schemaOrReferenceForField(field.Desc)
+			fieldSchema := g.schemaOrReferenceForField(field)
 			if fieldSchema == nil {
 				continue
 			}
