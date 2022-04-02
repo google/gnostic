@@ -19,7 +19,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/AnyJSONValue'
+                                $ref: '#/components/schemas/google.protobuf.Value'
     /v1/messages/{messageId}:
         get:
             tags:
@@ -84,14 +84,14 @@ paths:
                   in: query
                   description: Description of value
                   schema:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 - name: repeatedValueType
                   in: query
                   description: Description of repeated value
                   schema:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/google.protobuf.Value'
             responses:
                 "200":
                     description: OK
@@ -185,14 +185,14 @@ paths:
                   in: query
                   description: Description of value
                   schema:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 - name: repeatedValueType
                   in: query
                   description: Description of repeated value
                   schema:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/google.protobuf.Value'
             requestBody:
                 content:
                     application/json:
@@ -236,17 +236,8 @@ paths:
                         '*/*': {}
 components:
     schemas:
-        AnyJSONValue:
-            oneOf:
-                - type: string
-                - type: number
-                - type: integer
-                - type: boolean
-                - type: object
-                - type: array
-                  items:
-                    $ref: '#/components/schemas/AnyJSONValue'
-            description: AnyJSONValue is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI
+        google.protobuf.Value:
+            description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
         tests.protobuftypes.message.v1.Message:
             type: object
             properties:
@@ -283,11 +274,11 @@ components:
                     items:
                         type: object
                 valueType:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 repeatedValueType:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/google.protobuf.Value'
                     description: Description of repeated value
         tests.protobuftypes.message.v1.Message_EmbMessage:
             type: object
