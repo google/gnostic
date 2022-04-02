@@ -33,6 +33,7 @@ var openapiTests = []struct {
 	{name: "Map fields", path: "examples/tests/mapfields/", protofile: "message.proto"},
 	{name: "Path params", path: "examples/tests/pathparams/", protofile: "message.proto"},
 	{name: "Protobuf types", path: "examples/tests/protobuftypes/", protofile: "message.proto"},
+	{name: "RPC types", path: "examples/tests/rpctypes/", protofile: "message.proto"},
 	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
 	{name: "Ignore services without annotations", path: "examples/tests/noannotations/", protofile: "message.proto"},
 	{name: "Enum Options", path: "examples/tests/enumoptions/", protofile: "message.proto"},
