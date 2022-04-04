@@ -14,7 +14,7 @@ info:
 
          - Each Shelf has a collection of [Book][google.example.library.v1.Book]
            resources, named `shelves/*/books/*`
-    version: 1.2.3
+    version: 0.0.1
 servers:
     - url: https://library-example.googleapis.com
 paths:
@@ -400,7 +400,7 @@ components:
                     readOnly: true
                     type: string
                     description: The previous borrowing timestamp.
-                    format: date-time
+                    format: RFC3339
                 createdAt:
                     readOnly: true
                     type: string

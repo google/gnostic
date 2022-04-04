@@ -18,6 +18,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         GoogleProtobufAny:
@@ -25,6 +31,7 @@ components:
             properties:
                 '@type':
                     type: string
+                    description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
         Status:
