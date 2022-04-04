@@ -158,7 +158,8 @@ func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 								Value: &v3.SchemaOrReference{
 									Oneof: &v3.SchemaOrReference_Schema{
 										Schema: &v3.Schema{
-											Type: "string",
+											Type:        "string",
+											Description: "The type of the serialized message.",
 										},
 									},
 								},
@@ -168,6 +169,70 @@ func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 					AdditionalProperties: &v3.AdditionalPropertiesItem{
 						Oneof: &v3.AdditionalPropertiesItem_Boolean{
 							Boolean: true,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+// google.rpc.Status is handled specially
+func NewGoogleRpcStatusSchema(name string, any_name string) *v3.NamedSchemaOrReference {
+	return &v3.NamedSchemaOrReference{
+		Name: name,
+		Value: &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{
+					Type:        "object",
+					Description: "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
+					Properties: &v3.Properties{
+						AdditionalProperties: []*v3.NamedSchemaOrReference{
+							{
+								Name: "code",
+								Value: &v3.SchemaOrReference{
+									Oneof: &v3.SchemaOrReference_Schema{
+										Schema: &v3.Schema{
+											Type:        "integer",
+											Format:      "int32",
+											Description: "The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].",
+										},
+									},
+								},
+							},
+							{
+								Name: "message",
+								Value: &v3.SchemaOrReference{
+									Oneof: &v3.SchemaOrReference_Schema{
+										Schema: &v3.Schema{
+											Type:        "string",
+											Description: "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.",
+										},
+									},
+								},
+							},
+							{
+								Name: "details",
+								Value: &v3.SchemaOrReference{
+									Oneof: &v3.SchemaOrReference_Schema{
+										Schema: &v3.Schema{
+											Type: "array",
+											Items: &v3.ItemsItem{
+												SchemaOrReference: []*v3.SchemaOrReference{
+													{
+														Oneof: &v3.SchemaOrReference_Reference{
+															Reference: &v3.Reference{
+																XRef: "#/components/schemas/" + any_name,
+															},
+														},
+													},
+												},
+											},
+											Description: "A list of messages that carry the error details.  There is a common set of message types for APIs to use.",
+										},
+									},
+								},
+							},
 						},
 					},
 				},

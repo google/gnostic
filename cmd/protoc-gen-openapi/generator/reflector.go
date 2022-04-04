@@ -115,13 +115,15 @@ func (r *OpenAPIv3Reflector) responseContentForMessage(message protoreflect.Mess
 }
 
 func (r *OpenAPIv3Reflector) schemaReferenceForMessage(message protoreflect.MessageDescriptor) string {
-	typeName := r.fullMessageTypeName(message)
-	if !contains(r.requiredSchemas, typeName) {
-		r.requiredSchemas = append(r.requiredSchemas, typeName)
+	schemaName := r.formatMessageName(message)
+	if !contains(r.requiredSchemas, schemaName) {
+		r.requiredSchemas = append(r.requiredSchemas, schemaName)
 	}
-	return "#/components/schemas/" + r.formatMessageName(message)
+	return "#/components/schemas/" + schemaName
 }
 
+// Returns a full schema for simple types, and a schema reference for complex types that reference
+// the definition in `#/components/schemas/`
 func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.MessageDescriptor) *v3.SchemaOrReference {
 	typeName := r.fullMessageTypeName(message)
 	switch typeName {
