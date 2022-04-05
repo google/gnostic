@@ -50,3 +50,11 @@ extend google.protobuf.FileOptions {
 extend google.protobuf.MethodOptions {
   Operation operation = 1042;
 }
+
+extend google.protobuf.MessageOptions {
+  Schema schema = 1042;
+}
+
+extend google.protobuf.FieldOptions {
+  Schema property = 1042;
+}
