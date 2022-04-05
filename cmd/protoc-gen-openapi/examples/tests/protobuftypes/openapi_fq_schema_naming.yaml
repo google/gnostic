@@ -19,7 +19,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/AnyJSONValue'
+                                $ref: '#/components/schemas/google.protobuf.Value'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
     /v1/messages/{messageId}:
         get:
             tags:
@@ -84,14 +90,14 @@ paths:
                   in: query
                   description: Description of value
                   schema:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 - name: repeatedValueType
                   in: query
                   description: Description of repeated value
                   schema:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/google.protobuf.Value'
             responses:
                 "200":
                     description: OK
@@ -99,6 +105,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/tests.protobuftypes.message.v1.Message'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
         post:
             tags:
                 - Messaging
@@ -122,6 +134,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/tests.protobuftypes.message.v1.Message'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
         patch:
             tags:
                 - Messaging
@@ -185,14 +203,14 @@ paths:
                   in: query
                   description: Description of value
                   schema:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 - name: repeatedValueType
                   in: query
                   description: Description of repeated value
                   schema:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/google.protobuf.Value'
             requestBody:
                 content:
                     application/json:
@@ -206,6 +224,12 @@ paths:
                         application/json:
                             schema:
                                 type: object
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
     /v1/messages:csv:
         get:
             tags:
@@ -219,6 +243,12 @@ paths:
                     description: OK
                     content:
                         '*/*': {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
         post:
             tags:
                 - Messaging
@@ -234,19 +264,40 @@ paths:
                     description: OK
                     content:
                         '*/*': {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
 components:
     schemas:
-        AnyJSONValue:
-            oneOf:
-                - type: string
-                - type: number
-                - type: integer
-                - type: boolean
-                - type: object
-                - type: array
-                  items:
-                    $ref: '#/components/schemas/AnyJSONValue'
-            description: AnyJSONValue is a "catch all" type that can hold any JSON value, except null as this is not allowed in OpenAPI
+        google.protobuf.Any:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        google.protobuf.Value:
+            description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
+        google.rpc.Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/google.protobuf.Any'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
         tests.protobuftypes.message.v1.Message:
             type: object
             properties:
@@ -283,11 +334,11 @@ components:
                     items:
                         type: object
                 valueType:
-                    $ref: '#/components/schemas/AnyJSONValue'
+                    $ref: '#/components/schemas/google.protobuf.Value'
                 repeatedValueType:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AnyJSONValue'
+                        $ref: '#/components/schemas/google.protobuf.Value'
                     description: Description of repeated value
         tests.protobuftypes.message.v1.Message_EmbMessage:
             type: object

@@ -45,6 +45,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ListShelvesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
         post:
             tags:
                 - LibraryService
@@ -63,6 +69,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Shelf'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/shelves/{shelf}:
         get:
             tags:
@@ -83,6 +95,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Shelf'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
         delete:
             tags:
                 - LibraryService
@@ -99,6 +117,12 @@ paths:
                 "200":
                     description: OK
                     content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/shelves/{shelf}/books:
         get:
             tags:
@@ -133,6 +157,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ListBooksResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
         post:
             tags:
                 - LibraryService
@@ -158,6 +188,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/shelves/{shelf}/books/{book}:
         get:
             tags:
@@ -184,6 +220,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
         put:
             tags:
                 - LibraryService
@@ -222,6 +264,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
         delete:
             tags:
                 - LibraryService
@@ -244,6 +292,12 @@ paths:
                 "200":
                     description: OK
                     content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/shelves/{shelf}/books/{book}:move:
         post:
             tags:
@@ -278,6 +332,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/shelves/{shelf}:merge:
         post:
             tags:
@@ -311,6 +371,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Shelf'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         Book:
@@ -334,7 +400,7 @@ components:
                     readOnly: true
                     type: string
                     description: The previous borrowing timestamp.
-                    format: RFC3339
+                    format: date-time
                 createdAt:
                     readOnly: true
                     type: string
@@ -346,6 +412,14 @@ components:
                     description: The last update date and time.
                     format: date-time
             description: A single book in the library.
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
         ListBooksResponse:
             type: object
             properties:
@@ -423,5 +497,21 @@ components:
                     description: The last update date and time.
                     format: date-time
             description: A Shelf contains a collection of books with a theme.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
 tags:
     - name: LibraryService

@@ -33,6 +33,7 @@ var openapiTests = []struct {
 	{name: "Map fields", path: "examples/tests/mapfields/", protofile: "message.proto"},
 	{name: "Path params", path: "examples/tests/pathparams/", protofile: "message.proto"},
 	{name: "Protobuf types", path: "examples/tests/protobuftypes/", protofile: "message.proto"},
+	{name: "RPC types", path: "examples/tests/rpctypes/", protofile: "message.proto"},
 	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
 	{name: "Ignore services without annotations", path: "examples/tests/noannotations/", protofile: "message.proto"},
 	{name: "Enum Options", path: "examples/tests/enumoptions/", protofile: "message.proto"},
@@ -200,6 +201,43 @@ func TestOpenAPIStringEnums(t *testing.T) {
 				"-I", "examples",
 				path.Join(tt.path, tt.protofile),
 				"--openapi_out=enum_type=string:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			if GENERATE_FIXTURES {
+				err := CopyFixture(TEMP_FILE, fixture)
+				if err != nil {
+					t.Fatalf("Can't generate fixture: %+v", err)
+				}
+			} else {
+				// Verify that the generated spec matches our expected version.
+				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				if err != nil {
+					t.Fatalf("diff failed: %+v", err)
+				}
+			}
+			// if the test succeeded, clean up
+			os.Remove(TEMP_FILE)
+		})
+	}
+}
+
+func TestOpenAPIDefaultResponse(t *testing.T) {
+	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi_default_response.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			if !GENERATE_FIXTURES {
+				continue
+			}
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec with string Enums.
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--openapi_out=default_response=true:.").Run()
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
