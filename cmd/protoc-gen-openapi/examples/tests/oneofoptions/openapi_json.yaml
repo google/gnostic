@@ -43,19 +43,19 @@ components:
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
         Message:
             required:
-                - plain_text
+                - plainText
             type: object
             properties:
-                message_id:
+                messageId:
                     type: string
                 body:
                     $ref: '#/components/schemas/Message_Body'
-                plain_text:
+                plainText:
                     type: string
         Message_Body:
             type: object
             properties:
-                body_id:
+                bodyId:
                     type: string
         Status:
             type: object
