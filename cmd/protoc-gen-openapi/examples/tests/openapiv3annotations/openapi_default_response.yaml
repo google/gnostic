@@ -57,12 +57,15 @@ components:
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
         Message:
+            title: This is an overridden message schema title
             type: object
             properties:
                 id:
                     type: integer
                     format: int64
                 label:
+                    title: this is an overriden field schema title
+                    maxLength: 255
                     type: string
         Status:
             type: object
