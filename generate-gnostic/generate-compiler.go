@@ -843,7 +843,12 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 					}
 					code.PrintIf(!isRequired, "}")
 				} else if propertyModel.MapType == "string" {
-					code.Print("// %+v", propertyModel)
+					code.Print("if m.%s != nil {", propertyModel.FieldName())
+					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))")
+					code.Print("info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Value))")
+					code.Print("}")
+					code.Print("}")
 				} else if propertyModel.MapType != "" {
 					code.Print("if m.%s != nil {", propertyModel.FieldName())
 					code.Print("for _, item := range m.%s {", propertyModel.FieldName())
