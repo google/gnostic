@@ -795,6 +795,12 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				if inputOnly {
 					schema.Schema.WriteOnly = true
 				}
+
+				// Merge any `Property` annotations with the current
+				extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)
+				if extProperty != nil {
+					proto.Merge(schema.Schema, extProperty.(*v3.Schema))
+				}
 			}
 
 			definitionProperties.AdditionalProperties = append(
@@ -806,17 +812,25 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			)
 		}
 
+		schema := &v3.Schema{
+			Type:        "object",
+			Description: messageDescription,
+			Properties:  definitionProperties,
+			Required:    required,
+		}
+
+		// Merge any `Schema` annotations with the current
+		extSchema := proto.GetExtension(message.Desc.Options(), v3.E_Schema)
+		if extSchema != nil {
+			proto.Merge(schema, extSchema.(*v3.Schema))
+		}
+
 		// Add the schema to the components.schema list.
 		g.addSchemaToDocumentV3(d, &v3.NamedSchemaOrReference{
 			Name: schemaName,
 			Value: &v3.SchemaOrReference{
 				Oneof: &v3.SchemaOrReference_Schema{
-					Schema: &v3.Schema{
-						Type:        "object",
-						Description: messageDescription,
-						Properties:  definitionProperties,
-						Required:    required,
-					},
+					Schema: schema,
 				},
 			},
 		})
