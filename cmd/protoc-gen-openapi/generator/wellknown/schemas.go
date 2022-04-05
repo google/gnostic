@@ -91,7 +91,7 @@ func NewGoogleApiHttpBodySchema() *v3.SchemaOrReference {
 func NewGoogleProtobufTimestampSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "string", Format: "RFC3339"}}}
+			Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
 }
 
 // google.type.Date is serialized as a string

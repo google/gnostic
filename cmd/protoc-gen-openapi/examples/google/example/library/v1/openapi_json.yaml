@@ -400,7 +400,7 @@ components:
                     readOnly: true
                     type: string
                     description: The previous borrowing timestamp.
-                    format: RFC3339
+                    format: date-time
                 createdAt:
                     readOnly: true
                     type: string
