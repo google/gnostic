@@ -82,6 +82,15 @@ service Messaging2 {
 }
 
 message Message {
+  option (openapi.v3.schema) = {
+    title: "This is an overridden message schema title";
+  };
+
   int64 id = 1;
-  string label = 2;
+  string label = 2 [
+    (openapi.v3.property) = {
+      title: "this is an overriden field schema title";
+      max_length: 255;
+    }
+  ];
 }
