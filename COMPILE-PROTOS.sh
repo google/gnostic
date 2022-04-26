@@ -17,12 +17,11 @@
 
 go install github.com/golang/protobuf/protoc-gen-go@latest
 
-protoc -I . -I ./third_party --go_out=. openapiv2/OpenAPIv2.proto
-protoc -I . -I ./third_party --go_out=. openapiv3/OpenAPIv3.proto
-protoc -I . -I ./third_party --go_out=. openapiv3/annotations.proto
-protoc -I . -I ./third_party --go_out=. discovery/discovery.proto
-protoc -I . -I ./third_party --go_out=. plugins/plugin.proto
-protoc -I . -I ./third_party --go_out=. extensions/extension.proto
-protoc -I . -I ./third_party --go_out=. surface/surface.proto
-protoc -I . -I ./third_party --go_out=. metrics/vocabulary.proto
-protoc -I . -I ./third_party --go_out=. metrics/complexity.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative openapiv2/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative openapiv3/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative discovery/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative plugins/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative extensions/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative surface/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative metrics/*.proto
+protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative metrics/*.proto
