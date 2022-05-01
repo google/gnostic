@@ -43,6 +43,7 @@ type Configuration struct {
 	EnumType        *string
 	CircularDepth   *int
 	DefaultResponse *bool
+	AllOfWrap       *bool
 }
 
 const (
@@ -784,6 +785,15 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
 			if fieldSchema == nil {
 				continue
+			}
+
+			if *g.conf.AllOfWrap {
+				// If fieldSchema is a $ref now, create a new schema use allOf to wrap it
+				if _, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Reference); ok {
+					fieldSchema = &v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{
+						AllOf: []*v3.SchemaOrReference{fieldSchema},
+					}}}
+				}
 			}
 
 			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
