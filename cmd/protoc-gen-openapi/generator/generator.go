@@ -43,6 +43,7 @@ type Configuration struct {
 	EnumType        *string
 	CircularDepth   *int
 	DefaultResponse *bool
+	Integer64Type   *string
 }
 
 const (
