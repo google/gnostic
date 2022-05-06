@@ -334,7 +334,9 @@ components:
                     items:
                         type: object
                 valueType:
-                    $ref: '#/components/schemas/google.protobuf.Value'
+                    allOf:
+                        - $ref: '#/components/schemas/google.protobuf.Value'
+                    description: Description of value
                 repeatedValueType:
                     type: array
                     items:

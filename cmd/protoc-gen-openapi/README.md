@@ -63,29 +63,3 @@ refers to additional .proto files in the same directory as
               schema:
                 $ref: '#/components/schemas/google.rpc.Status'
       ```
-9. `allof_wrap`: use `allOf` to wrap `$ref` of message, for support siblings in OpenAPI 3.0.x. [ref](https://stackoverflow.com/questions/33629750/swagger-schema-properties-ignored-when-using-ref-why)
-   - **default**: false
-   - `false`:
-      ```yaml
-      Message:
-          type: object
-          properties:
-              content:
-                  $ref: '#/components/schemas/Content'
-              sub:
-                  $ref: '#/components/schemas/Message_Sub'
-      ```
-   - `true`:
-      ```yaml
-      Message:
-          type: object
-          properties:
-              content:
-                  writeOnly: true
-                  allOf:
-                      - $ref: '#/components/schemas/Content'
-              sub:
-                  readOnly: true
-                  allOf:
-                      - $ref: '#/components/schemas/Message_Sub'
-      ```

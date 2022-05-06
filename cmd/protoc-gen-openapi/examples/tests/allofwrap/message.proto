@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-package tests.bodymappying.message.v1;
+package tests.allofwrap.message.v1;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -32,14 +32,14 @@ service Messaging {
 }
 
 message Message {
-  Content content = 1 [(google.api.field_behavior) = INPUT_ONLY];
   message Sub {
     string content = 1;
   }
-  Sub sub = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
-}
-
-message Content {
-  string message_id = 1;
-  string text = 2;
+  Sub sub = 1;
+  Sub sub_input = 2 [(google.api.field_behavior) = INPUT_ONLY];
+  Sub sub_output = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // this sub has a description
+  Sub sub_desc = 4;
+  // test repeated, should not allof wrapped
+  repeated Sub subs = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

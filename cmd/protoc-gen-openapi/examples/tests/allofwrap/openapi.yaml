@@ -38,13 +38,6 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        Content:
-            type: object
-            properties:
-                message_id:
-                    type: string
-                text:
-                    type: string
         GoogleProtobufAny:
             type: object
             properties:
@@ -56,10 +49,26 @@ components:
         Message:
             type: object
             properties:
-                content:
-                    $ref: '#/components/schemas/Content'
                 sub:
                     $ref: '#/components/schemas/Message_Sub'
+                sub_input:
+                    writeOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                sub_output:
+                    readOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                sub_desc:
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                    description: this sub has a description
+                subs:
+                    readOnly: true
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Message_Sub'
+                    description: test repeated, should not allof wrapped
         Message_Sub:
             type: object
             properties:
