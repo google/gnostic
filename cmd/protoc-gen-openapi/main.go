@@ -35,7 +35,6 @@ func main() {
 		EnumType:        flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
 		CircularDepth:   flags.Int("depth", 2, "depth of recursion for circular messages"),
 		DefaultResponse: flags.Bool("default_response", true, `add default response. If "true", automatically adds a default response to operations which use the google.rpc.Status message. Useful if you use envoy or grpc-gateway to transcode as they use this type for their default error responses.`),
-		Integer64Type:   flags.String("integer64_type", "integer", `type for int64/uint64/sint64/fixed64/sfixed64. Use "string" for string format`),
 	}
 
 	opts := protogen.Options{
