@@ -61,8 +61,7 @@ components:
             type: object
             properties:
                 id:
-                    type: integer
-                    format: int64
+                    type: string
                 label:
                     title: this is an overriden field schema title
                     maxLength: 255

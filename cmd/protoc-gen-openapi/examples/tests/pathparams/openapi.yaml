@@ -20,8 +20,7 @@ paths:
                 - name: user_id
                   in: query
                   schema:
-                    type: integer
-                    format: uint64
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -74,8 +73,7 @@ paths:
                   in: path
                   required: true
                   schema:
-                    type: integer
-                    format: uint64
+                    type: string
                 - name: message_id
                   in: path
                   required: true
@@ -110,8 +108,7 @@ components:
                 message_id:
                     type: string
                 user_id:
-                    type: integer
-                    format: uint64
+                    type: string
                 content:
                     type: string
                 maybe:
