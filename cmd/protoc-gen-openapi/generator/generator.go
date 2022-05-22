@@ -758,6 +758,8 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 
 		var required []string
 		for _, field := range message.Fields {
+			// Get the field description from the comments.
+			description := g.filterCommentString(field.Comments.Leading, true)
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
@@ -786,15 +788,20 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				continue
 			}
 
+			// If this field has siblings and is a $ref now, create a new schema use `allOf` to wrap it
+			wrapperNeeded := inputOnly || outputOnly || description != ""
+			if wrapperNeeded {
+				if _, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Reference); ok {
+					fieldSchema = &v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{
+						AllOf: []*v3.SchemaOrReference{fieldSchema},
+					}}}
+				}
+			}
+
 			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
-				// Get the field description from the comments.
-				schema.Schema.Description = g.filterCommentString(field.Comments.Leading, true)
-				if outputOnly {
-					schema.Schema.ReadOnly = true
-				}
-				if inputOnly {
-					schema.Schema.WriteOnly = true
-				}
+				schema.Schema.Description = description
+				schema.Schema.ReadOnly = outputOnly
+				schema.Schema.WriteOnly = inputOnly
 
 				// Merge any `Property` annotations with the current
 				extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)

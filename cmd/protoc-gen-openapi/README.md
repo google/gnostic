@@ -10,7 +10,7 @@ Installation:
 
 Usage:
 
-	protoc sample.proto -I. --openapi_out=.
+	protoc sample.proto -I=. --openapi_out=.
 
 This runs the plugin for a file named `sample.proto` which 
 refers to additional .proto files in the same directory as

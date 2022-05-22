@@ -318,7 +318,9 @@ components:
                     items:
                         type: object
                 valueType:
-                    $ref: '#/components/schemas/GoogleProtobufValue'
+                    allOf:
+                        - $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of value
                 repeatedValueType:
                     type: array
                     items:
