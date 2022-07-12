@@ -43,7 +43,7 @@ type Configuration struct {
 	EnumType        *string
 	CircularDepth   *int
 	DefaultResponse *bool
-	OutFiles        *string
+	OutputMode      *string
 }
 
 const (
