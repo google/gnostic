@@ -35,14 +35,16 @@ import (
 )
 
 type Configuration struct {
-	Version         *string
-	Title           *string
-	Description     *string
-	Naming          *string
-	FQSchemaNaming  *bool
-	EnumType        *string
-	CircularDepth   *int
-	DefaultResponse *bool
+	Version          *string
+	Title            *string
+	Description      *string
+	Naming           *string
+	FQSchemaNaming   *bool
+	EnumType         *string
+	CircularDepth    *int
+	DefaultResponse  *bool
+	AutoMapping      *bool
+	ShortOperationID *bool
 }
 
 const (
@@ -651,6 +653,9 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
+			if *g.conf.ShortOperationID {
+				operationID = method.GoName
+			}
 
 			var path string
 			var methodName string
@@ -683,6 +688,11 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				default:
 					path = "unknown-unsupported"
 				}
+			} else if *g.conf.AutoMapping {
+				annotationsCount++
+				path = "/" + string(service.Desc.FullName()) + "/" + method.GoName
+				methodName = "POST"
+				body = "*"
 			}
 
 			if methodName != "" {

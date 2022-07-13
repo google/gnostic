@@ -27,14 +27,16 @@ var flags flag.FlagSet
 
 func main() {
 	conf := generator.Configuration{
-		Version:         flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
-		Title:           flags.String("title", "", "name of the API"),
-		Description:     flags.String("description", "", "description of the API"),
-		Naming:          flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
-		FQSchemaNaming:  flags.Bool("fq_schema_naming", false, `schema naming convention. If "true", generates fully-qualified schema names by prefixing them with the proto message package name`),
-		EnumType:        flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
-		CircularDepth:   flags.Int("depth", 2, "depth of recursion for circular messages"),
-		DefaultResponse: flags.Bool("default_response", true, `add default response. If "true", automatically adds a default response to operations which use the google.rpc.Status message. Useful if you use envoy or grpc-gateway to transcode as they use this type for their default error responses.`),
+		Version:          flags.String("version", "0.0.1", "version number text, e.g. 1.2.3"),
+		Title:            flags.String("title", "", "name of the API"),
+		Description:      flags.String("description", "", "description of the API"),
+		Naming:           flags.String("naming", "json", `naming convention. Use "proto" for passing names directly from the proto files`),
+		FQSchemaNaming:   flags.Bool("fq_schema_naming", false, `schema naming convention. If "true", generates fully-qualified schema names by prefixing them with the proto message package name`),
+		EnumType:         flags.String("enum_type", "integer", `type for enum serialization. Use "string" for string-based serialization`),
+		CircularDepth:    flags.Int("depth", 2, "depth of recursion for circular messages"),
+		DefaultResponse:  flags.Bool("default_response", true, `add default response. If "true", automatically adds a default response to operations which use the google.rpc.Status message. Useful if you use envoy or grpc-gateway to transcode as they use this type for their default error responses.`),
+		AutoMapping:      flags.Bool("auto_mapping", false, "parse methods without the google.api.http option."),
+		ShortOperationID: flags.Bool("short_operation_id", false, `simplify the operation name. If "true", the the operation id will be the method name.`),
 	}
 
 	opts := protogen.Options{
