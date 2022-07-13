@@ -35,14 +35,16 @@ import (
 )
 
 type Configuration struct {
-	Version         *string
-	Title           *string
-	Description     *string
-	Naming          *string
-	FQSchemaNaming  *bool
-	EnumType        *string
-	CircularDepth   *int
-	DefaultResponse *bool
+	Version          *string
+	Title            *string
+	Description      *string
+	Naming           *string
+	FQSchemaNaming   *bool
+	EnumType         *string
+	CircularDepth    *int
+	DefaultResponse  *bool
+	AutoMapping      *bool
+	ShortOperationID *bool
 }
 
 const (
@@ -122,7 +124,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 				proto.Merge(d, extDocument.(*v3.Document))
 			}
 
-			g.addPathsToDocumentV3(d, file.Services)
+			g.addPathsToDocumentV3(d, file.Services, file)
 		}
 	}
 
@@ -642,7 +644,7 @@ func (g *OpenAPIv3Generator) addOperationToDocumentV3(d *v3.Document, op *v3.Ope
 }
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
-func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*protogen.Service) {
+func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*protogen.Service, file *protogen.File) {
 	for _, service := range services {
 		annotationsCount := 0
 
@@ -651,6 +653,9 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
+			if *g.conf.ShortOperationID {
+				operationID = method.GoName
+			}
 
 			var path string
 			var methodName string
@@ -683,6 +688,11 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				default:
 					path = "unknown-unsupported"
 				}
+			} else if *g.conf.AutoMapping {
+				annotationsCount++
+				path = "/" + string(file.GoPackageName) + "." + service.GoName + "/" + method.GoName
+				methodName = "POST"
+				body = "*"
 			}
 
 			if methodName != "" {
