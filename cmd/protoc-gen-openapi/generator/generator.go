@@ -124,7 +124,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 				proto.Merge(d, extDocument.(*v3.Document))
 			}
 
-			g.addPathsToDocumentV3(d, file.Services, file)
+			g.addPathsToDocumentV3(d, file.Services)
 		}
 	}
 
@@ -644,7 +644,7 @@ func (g *OpenAPIv3Generator) addOperationToDocumentV3(d *v3.Document, op *v3.Ope
 }
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
-func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*protogen.Service, file *protogen.File) {
+func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*protogen.Service) {
 	for _, service := range services {
 		annotationsCount := 0
 
@@ -690,7 +690,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				}
 			} else if *g.conf.AutoMapping {
 				annotationsCount++
-				path = "/" + string(file.GoPackageName) + "." + service.GoName + "/" + method.GoName
+				path = "/" + string(service.Desc.FullName()) + "/" + method.GoName
 				methodName = "POST"
 				body = "*"
 			}
