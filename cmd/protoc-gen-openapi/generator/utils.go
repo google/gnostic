@@ -17,6 +17,8 @@ package generator
 
 import (
 	"strings"
+
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // contains returns true if an array contains a specified string.
@@ -49,4 +51,14 @@ func singular(plural string) string {
 		return strings.TrimSuffix(plural, "s")
 	}
 	return plural
+}
+
+func getValueKind(message protoreflect.MessageDescriptor) string {
+	valueField := getValueField(message)
+	return valueField.Kind().String()
+}
+
+func getValueField(message protoreflect.MessageDescriptor) protoreflect.FieldDescriptor {
+	fields := message.Fields()
+	return fields.ByName("value")
 }

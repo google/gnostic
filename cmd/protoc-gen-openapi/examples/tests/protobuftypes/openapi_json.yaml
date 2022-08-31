@@ -98,6 +98,47 @@ paths:
                     type: array
                     items:
                         $ref: '#/components/schemas/GoogleProtobufValue'
+                - name: boolValueType
+                  in: query
+                  schema:
+                    type: boolean
+                - name: bytesValueType
+                  in: query
+                  schema:
+                    type: string
+                    format: bytes
+                - name: int32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: uint32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: stringValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: int64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: uint64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: floatValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: float
+                - name: doubleValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: double
             responses:
                 "200":
                     description: OK
@@ -211,6 +252,47 @@ paths:
                     type: array
                     items:
                         $ref: '#/components/schemas/GoogleProtobufValue'
+                - name: boolValueType
+                  in: query
+                  schema:
+                    type: boolean
+                - name: bytesValueType
+                  in: query
+                  schema:
+                    type: string
+                    format: bytes
+                - name: int32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: uint32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: stringValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: int64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: uint64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: floatValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: float
+                - name: doubleValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: double
             requestBody:
                 content:
                     application/json:
@@ -326,6 +408,29 @@ components:
                     items:
                         $ref: '#/components/schemas/GoogleProtobufValue'
                     description: Description of repeated value
+                boolValueType:
+                    type: boolean
+                bytesValueType:
+                    type: string
+                    format: bytes
+                int32ValueType:
+                    type: integer
+                    format: int32
+                uint32ValueType:
+                    type: integer
+                    format: uint32
+                stringValueType:
+                    type: string
+                int64ValueType:
+                    type: string
+                uint64ValueType:
+                    type: string
+                floatValueType:
+                    type: number
+                    format: float
+                doubleValueType:
+                    type: number
+                    format: double
         Message_EmbMessage:
             type: object
             properties:

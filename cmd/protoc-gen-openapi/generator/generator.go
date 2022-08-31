@@ -297,7 +297,8 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
 		typeName := g.reflect.fullMessageTypeName(field.Desc.Message())
 
-		if typeName == ".google.protobuf.Value" {
+		switch typeName {
+		case ".google.protobuf.Value":
 			fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
@@ -312,7 +313,28 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 					},
 				})
 			return parameters
-		} else if field.Desc.IsList() {
+
+		case ".google.protobuf.BoolValue", ".google.protobuf.BytesValue", ".google.protobuf.Int32Value", ".google.protobuf.UInt32Value",
+			".google.protobuf.StringValue", ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value", ".google.protobuf.FloatValue",
+			".google.protobuf.DoubleValue":
+			valueField := getValueField(field.Message.Desc)
+			fieldSchema := g.reflect.schemaOrReferenceForField(valueField)
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        queryFieldName,
+							In:          "query",
+							Description: fieldDescription,
+							Required:    false,
+							Schema:      fieldSchema,
+						},
+					},
+				})
+			return parameters
+		}
+
+		if field.Desc.IsList() {
 			// Only non-repeated message types are valid
 			return parameters
 		}

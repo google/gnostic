@@ -126,6 +126,7 @@ func (r *OpenAPIv3Reflector) schemaReferenceForMessage(message protoreflect.Mess
 // the definition in `#/components/schemas/`
 func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.MessageDescriptor) *v3.SchemaOrReference {
 	typeName := r.fullMessageTypeName(message)
+
 	switch typeName {
 
 	case ".google.api.HttpBody":
@@ -149,6 +150,21 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.Me
 	case ".google.protobuf.Empty":
 		// Empty is closer to JSON undefined than null, so ignore this field
 		return nil //&v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{Type: "null"}}}
+
+	case ".google.protobuf.BoolValue":
+		return wk.NewBooleanSchema()
+
+	case ".google.protobuf.BytesValue":
+		return wk.NewBytesSchema()
+
+	case ".google.protobuf.Int32Value", ".google.protobuf.UInt32Value":
+		return wk.NewIntegerSchema(getValueKind(message))
+
+	case ".google.protobuf.StringValue", ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value":
+		return wk.NewStringSchema()
+
+	case ".google.protobuf.FloatValue", ".google.protobuf.DoubleValue":
+		return wk.NewNumberSchema(getValueKind(message))
 
 	default:
 		ref := r.schemaReferenceForMessage(message)
