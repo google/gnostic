@@ -139,6 +139,11 @@ paths:
                   schema:
                     type: number
                     format: double
+                - name: timestampType
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
             responses:
                 "200":
                     description: OK
@@ -293,6 +298,11 @@ paths:
                   schema:
                     type: number
                     format: double
+                - name: timestampType
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
             requestBody:
                 content:
                     application/json:
@@ -447,6 +457,9 @@ components:
                 doubleValueType:
                     type: number
                     format: double
+                timestampType:
+                    type: string
+                    format: date-time
         tests.protobuftypes.message.v1.Message_EmbMessage:
             type: object
             properties:

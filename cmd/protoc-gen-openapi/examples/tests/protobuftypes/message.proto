@@ -23,6 +23,7 @@ import "google/api/httpbody.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
 
@@ -111,4 +112,5 @@ message Message {
   google.protobuf.UInt64Value uint64_value_type = 21;
   google.protobuf.FloatValue float_value_type = 22;
   google.protobuf.DoubleValue double_value_type = 23;
+  google.protobuf.Timestamp timestamp_type = 24;
 }

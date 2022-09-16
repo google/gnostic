@@ -139,6 +139,11 @@ paths:
                   schema:
                     type: number
                     format: double
+                - name: timestamp_type
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
             responses:
                 "200":
                     description: OK
@@ -293,6 +298,11 @@ paths:
                   schema:
                     type: number
                     format: double
+                - name: timestamp_type
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
             requestBody:
                 content:
                     application/json:
@@ -431,6 +441,9 @@ components:
                 double_value_type:
                     type: number
                     format: double
+                timestamp_type:
+                    type: string
+                    format: date-time
         Message_EmbMessage:
             type: object
             properties:

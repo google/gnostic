@@ -272,7 +272,7 @@ func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *prot
 // or a repeated primitive type or a non-repeated message type.
 // In the case of a repeated type, the parameter can be repeated in the URL as ...?param=A&param=B.
 // In the case of a message type, each field of the message is mapped to a separate parameter,
-// such as ...?foo.a=A&foo.b=B&foo.c=C.
+// such as ...?foo.a=A&foo.b=B&foo.c=C. Except for google.protobuf.timestamp type it will be serialized as a string
 //
 // maps, Struct and Empty can NOT be used
 // messages can have any number of sub messages - including circular (e.g. sub.subsub.sub.subsub.id)
@@ -319,6 +319,22 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 			".google.protobuf.DoubleValue":
 			valueField := getValueField(field.Message.Desc)
 			fieldSchema := g.reflect.schemaOrReferenceForField(valueField)
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        queryFieldName,
+							In:          "query",
+							Description: fieldDescription,
+							Required:    false,
+							Schema:      fieldSchema,
+						},
+					},
+				})
+			return parameters
+
+		case ".google.protobuf.Timestamp":
+			fieldSchema := g.reflect.schemaOrReferenceForMessage(field.Message.Desc)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
 					Oneof: &v3.ParameterOrReference_Parameter{
