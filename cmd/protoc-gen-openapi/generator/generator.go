@@ -687,9 +687,12 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 			if methodName != "" {
 				defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
-
+				tagName := service.GoName
+				if g.conf.FQSchemaNaming != nil && *g.conf.FQSchemaNaming {
+					tagName = string(service.Desc.FullName())
+				}
 				op, path2 := g.buildOperationV3(
-					d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+					d, operationID, tagName, comment, defaultHost, path, body, inputMessage, outputMessage)
 
 				// Merge any `Operation` annotations with the current
 				extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
