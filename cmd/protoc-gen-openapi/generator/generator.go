@@ -646,6 +646,11 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 	for _, service := range services {
 		annotationsCount := 0
 
+		tagName := service.GoName
+		if g.conf.FQSchemaNaming != nil && *g.conf.FQSchemaNaming {
+			tagName = string(service.Desc.FullName())
+		}
+
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading, false)
 			inputMessage := method.Input
@@ -687,10 +692,6 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 			if methodName != "" {
 				defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
-				tagName := service.GoName
-				if g.conf.FQSchemaNaming != nil && *g.conf.FQSchemaNaming {
-					tagName = string(service.Desc.FullName())
-				}
 				op, path2 := g.buildOperationV3(
 					d, operationID, tagName, comment, defaultHost, path, body, inputMessage, outputMessage)
 
@@ -706,7 +707,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 		if annotationsCount > 0 {
 			comment := g.filterCommentString(service.Comments.Leading, false)
-			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+			d.Tags = append(d.Tags, &v3.Tag{Name: tagName, Description: comment})
 		}
 	}
 }
