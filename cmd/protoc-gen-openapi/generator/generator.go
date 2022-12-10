@@ -657,15 +657,22 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
 
-			var path string
-			var methodName string
-			var body string
+			rules := make([]*annotations.HttpRule, 0)
 
 			extHTTP := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
 			if extHTTP != nil && extHTTP != annotations.E_Http.InterfaceOf(annotations.E_Http.Zero()) {
 				annotationsCount++
 
 				rule := extHTTP.(*annotations.HttpRule)
+				rules = append(rules, rule)
+				rules = append(rules, rule.AdditionalBindings...)
+			}
+
+			for _, rule := range rules {
+				var path string
+				var methodName string
+				var body string
+
 				body = rule.Body
 				switch pattern := rule.Pattern.(type) {
 				case *annotations.HttpRule_Get:
@@ -688,20 +695,21 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				default:
 					path = "unknown-unsupported"
 				}
-			}
 
-			if methodName != "" {
-				defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
-				op, path2 := g.buildOperationV3(
-					d, operationID, tagName, comment, defaultHost, path, body, inputMessage, outputMessage)
+				if methodName != "" {
+					defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
-				// Merge any `Operation` annotations with the current
-				extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
-				if extOperation != nil {
-					proto.Merge(op, extOperation.(*v3.Operation))
+					op, path2 := g.buildOperationV3(
+						d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+
+					// Merge any `Operation` annotations with the current
+					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
+					if extOperation != nil {
+						proto.Merge(op, extOperation.(*v3.Operation))
+					}
+
+					g.addOperationToDocumentV3(d, op, path2, methodName)
 				}
-
-				g.addOperationToDocumentV3(d, op, path2, methodName)
 			}
 		}
 
