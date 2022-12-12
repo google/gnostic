@@ -256,14 +256,14 @@ func (g *OpenAPIv3Generator) findDefaultValue(raw string) (string, interface{}) 
 	var comment string
 	if strings.Contains(raw, biliDefaultPatter) {
 		value := strings.Split(raw, biliDefaultPatter)[1]
-		comment = strings.Split(raw, biliDefaultPatter)[0]
+		comment = strings.TrimSpace(strings.Split(raw, biliDefaultPatter)[0])
 		if value == "true" {
 			return comment, true
 		}
 		if value == "false" {
 			return comment, false
 		}
-		if num, err := strconv.ParseFloat(value, 64); err != nil {
+		if num, err := strconv.ParseFloat(value, 64); err == nil {
 			return comment, num
 		}
 		return comment, strings.Trim(value, "\"")
@@ -792,6 +792,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			description, def := g.findDefaultValue(g.filterCommentString(field.Comments.Leading, true))
 			var defaultValue *v3.DefaultType
 			if def != nil {
+				defaultValue = &v3.DefaultType{}
 				switch v := def.(type) {
 				case string:
 					defaultValue.Oneof = &v3.DefaultType_String_{String_: v}
