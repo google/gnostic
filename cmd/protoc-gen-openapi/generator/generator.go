@@ -17,6 +17,7 @@ package generator
 
 import (
 	"fmt"
+
 	"log"
 	"net/url"
 	"regexp"
@@ -30,6 +31,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	any_pb "google.golang.org/protobuf/types/known/anypb"
 
+	gogo "buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf"
 	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
 	v3 "github.com/google/gnostic/openapiv3"
 )
@@ -770,6 +772,24 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
+
+			gogoExtension := proto.GetExtension(field.Desc.Options(), gogo.E_Moretags)
+			if gogoExtension != nil {
+				// 解析"validate 字段"
+				//moreTags := gogoExtension.(string)
+				if validate := regexp.MustCompile("validate:\"(.*?)\"").FindStringSubmatch(gogoExtension.(string)); validate != nil {
+
+				}
+				//if strings.Contains(moreTags, "validate:") {
+				//	for _, str := range strings.Split(moreTags, " ") {
+				//		if strings.Contains(str, "validate:") {
+				//			string()
+				//		}
+				//	}
+				//}
+
+			}
+
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
 			if extension != nil {
 				switch v := extension.(type) {
@@ -831,6 +851,9 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			Description: messageDescription,
 			Properties:  definitionProperties,
 			Required:    required,
+			Default: &v3.DefaultType{
+				Oneof: &v3.DefaultType_String_{String_: "defaute"},
+			},
 		}
 
 		// Merge any `Schema` annotations with the current
