@@ -1,4 +1,4 @@
-module github.com/google/gnostic
+module github.com/ASkyFullOfStar/gnosticcyr
 
 go 1.12
 
