@@ -21,7 +21,7 @@ import (
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
+	wk "github.com/ASkyFullOfStar/gnosticcyr/cmd/protoc-gen-openapi/generator/wellknown"
 	v3 "github.com/google/gnostic/openapiv3"
 )
 
