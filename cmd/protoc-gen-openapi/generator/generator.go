@@ -17,11 +17,11 @@ package generator
 
 import (
 	"fmt"
-
 	"log"
 	"net/url"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"google.golang.org/genproto/googleapis/api/annotations"
@@ -48,7 +48,8 @@ type Configuration struct {
 }
 
 const (
-	infoURL = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
+	infoURL           = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
+	biliDefaultPatter = "default:"
 )
 
 // In order to dynamically add google.rpc.Status responses we need
@@ -249,6 +250,25 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewL
 	}
 	comment = g.linterRulePattern.ReplaceAllString(comment, "")
 	return strings.TrimSpace(comment)
+}
+
+func (g *OpenAPIv3Generator) findDefaultValue(raw string) (string, interface{}) {
+	var comment string
+	if strings.Contains(raw, biliDefaultPatter) {
+		value := strings.Split(raw, biliDefaultPatter)[1]
+		comment = strings.Split(raw, biliDefaultPatter)[0]
+		if value == "true" {
+			return comment, true
+		}
+		if value == "false" {
+			return comment, false
+		}
+		if num, err := strconv.ParseFloat(value, 64); err != nil {
+			return comment, num
+		}
+		return comment, strings.Trim(value, "\"")
+	}
+	return raw, nil
 }
 
 func (g *OpenAPIv3Generator) findField(name string, inMessage *protogen.Message) *protogen.Field {
@@ -766,9 +786,21 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		}
 
 		var required []string
+
 		for _, field := range message.Fields {
 			// Get the field description from the comments.
-			description := g.filterCommentString(field.Comments.Leading, true)
+			description, def := g.findDefaultValue(g.filterCommentString(field.Comments.Leading, true))
+			var defaultValue *v3.DefaultType
+			if def != nil {
+				switch v := def.(type) {
+				case string:
+					defaultValue.Oneof = &v3.DefaultType_String_{String_: v}
+				case bool:
+					defaultValue.Oneof = &v3.DefaultType_Boolean{Boolean: v}
+				case float64:
+					defaultValue.Oneof = &v3.DefaultType_Number{Number: v}
+				}
+			}
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
@@ -777,17 +809,13 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			if gogoExtension != nil {
 				// 解析"validate 字段"
 				//moreTags := gogoExtension.(string)
-				if validate := regexp.MustCompile("validate:\"(.*?)\"").FindStringSubmatch(gogoExtension.(string)); validate != nil {
-
+				if strings.Contains(gogoExtension.(string), "require") {
+					required = append(required, g.reflect.formatFieldName(field.Desc))
 				}
-				//if strings.Contains(moreTags, "validate:") {
-				//	for _, str := range strings.Split(moreTags, " ") {
-				//		if strings.Contains(str, "validate:") {
-				//			string()
-				//		}
-				//	}
+				//if validate := regexp.MustCompile("validate:\"(.*?)\"").FindStringSubmatch(gogoExtension.(string)); validate != nil {
+				//
 				//}
-
+				fmt.Println("not nil")
 			}
 
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
@@ -829,6 +857,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				schema.Schema.Description = description
 				schema.Schema.ReadOnly = outputOnly
 				schema.Schema.WriteOnly = inputOnly
+				schema.Schema.Default = defaultValue
 
 				// Merge any `Property` annotations with the current
 				extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)
@@ -851,9 +880,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			Description: messageDescription,
 			Properties:  definitionProperties,
 			Required:    required,
-			Default: &v3.DefaultType{
-				Oneof: &v3.DefaultType_String_{String_: "defaute"},
-			},
+			Default:     &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: "defautedsdd"}},
 		}
 
 		// Merge any `Schema` annotations with the current
