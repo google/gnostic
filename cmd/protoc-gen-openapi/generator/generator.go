@@ -45,6 +45,7 @@ type Configuration struct {
 	EnumType        *string
 	CircularDepth   *int
 	DefaultResponse *bool
+	GrpcOpenapi     *bool
 }
 
 const (
@@ -816,7 +817,6 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				//if validate := regexp.MustCompile("validate:\"(.*?)\"").FindStringSubmatch(gogoExtension.(string)); validate != nil {
 				//
 				//}
-				fmt.Println("not nil")
 			}
 
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
@@ -845,7 +845,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			}
 
 			// If this field has siblings and is a $ref now, create a new schema use `allOf` to wrap it
-			wrapperNeeded := inputOnly || outputOnly || description != ""
+			wrapperNeeded := inputOnly || outputOnly || description != "" || defaultValue != nil
 			if wrapperNeeded {
 				if _, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Reference); ok {
 					fieldSchema = &v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{
@@ -881,7 +881,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			Description: messageDescription,
 			Properties:  definitionProperties,
 			Required:    required,
-			Default:     &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: "defautedsdd"}},
+			Default:     &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: "d112"}},
 		}
 
 		// Merge any `Schema` annotations with the current
