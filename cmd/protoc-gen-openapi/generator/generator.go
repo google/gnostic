@@ -881,7 +881,6 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			Description: messageDescription,
 			Properties:  definitionProperties,
 			Required:    required,
-			Default:     &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: "d112"}},
 		}
 
 		// Merge any `Schema` annotations with the current
