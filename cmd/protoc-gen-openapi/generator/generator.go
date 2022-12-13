@@ -32,6 +32,7 @@ import (
 	any_pb "google.golang.org/protobuf/types/known/anypb"
 
 	gogo "buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf"
+	"github.com/fatih/structtag"
 	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
 	v3 "github.com/google/gnostic/openapiv3"
 )
@@ -790,33 +791,25 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 
 		for _, field := range message.Fields {
 			// Get the field description from the comments.
-			description, def := g.findDefaultValue(g.filterCommentString(field.Comments.Leading, true))
+			description := g.filterCommentString(field.Comments.Leading, true)
 			var defaultValue *v3.DefaultType
-			if def != nil {
-				defaultValue = &v3.DefaultType{}
-				switch v := def.(type) {
-				case string:
-					defaultValue.Oneof = &v3.DefaultType_String_{String_: v}
-				case bool:
-					defaultValue.Oneof = &v3.DefaultType_Boolean{Boolean: v}
-				case float64:
-					defaultValue.Oneof = &v3.DefaultType_Number{Number: v}
-				}
-			}
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
 
+			// compat gogo moretag
 			gogoExtension := proto.GetExtension(field.Desc.Options(), gogo.E_Moretags)
 			if gogoExtension != nil {
-				// 解析"validate 字段"
-				//moreTags := gogoExtension.(string)
-				if strings.Contains(gogoExtension.(string), "require") {
-					required = append(required, g.reflect.formatFieldName(field.Desc))
+				if moreTags, err := structtag.Parse(gogoExtension.(string)); err != nil {
+					if tag, err := moreTags.Get("validate"); err != nil {
+						if tag.HasOption("require") || tag.Name == ("require") {
+							required = append(required, g.reflect.formatFieldName(field.Desc))
+						}
+						if tag.HasOption("default") {
+							defaultValue = &v3.DefaultType{Oneof: &v3.DefaultType_String_{tag.Name}}
+						}
+					}
 				}
-				//if validate := regexp.MustCompile("validate:\"(.*?)\"").FindStringSubmatch(gogoExtension.(string)); validate != nil {
-				//
-				//}
 			}
 
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)

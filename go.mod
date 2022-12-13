@@ -5,6 +5,7 @@ go 1.12
 require (
 	buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf v0.0.0-master-0.0.20221211061531-cde0bf5f049a
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
+	github.com/fatih/structtag v1.2.0
 	github.com/flowstack/go-jsonschema v0.1.1
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gnostic v0.6.9
