@@ -800,14 +800,14 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			// compat gogo moretag
 			gogoExtension := proto.GetExtension(field.Desc.Options(), gogo.E_Moretags)
 			if gogoExtension != nil {
-				if moreTags, err := structtag.Parse(gogoExtension.(string)); err != nil {
-					if tag, err := moreTags.Get("validate"); err != nil {
-						if tag.HasOption("require") || tag.Name == ("require") {
+				if moreTags, err := structtag.Parse(gogoExtension.(string)); err == nil {
+					if tag, err := moreTags.Get("validate"); err == nil {
+						if tag.HasOption("required") || tag.Name == ("required") {
 							required = append(required, g.reflect.formatFieldName(field.Desc))
 						}
-						if tag.HasOption("default") {
-							defaultValue = &v3.DefaultType{Oneof: &v3.DefaultType_String_{tag.Name}}
-						}
+					}
+					if tag, err := moreTags.Get("default"); err == nil {
+						defaultValue = &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: tag.Name}}
 					}
 				}
 			}
@@ -830,7 +830,6 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 					log.Printf("unsupported extension type %T", extension)
 				}
 			}
-
 			// The field is either described by a reference or a schema.
 			fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
 			if fieldSchema == nil {
