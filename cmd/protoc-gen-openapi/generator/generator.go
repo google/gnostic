@@ -16,7 +16,9 @@
 package generator
 
 import (
+	gogo "buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf"
 	"fmt"
+	"github.com/fatih/structtag"
 	"log"
 	"net/url"
 	"regexp"
@@ -31,8 +33,6 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	any_pb "google.golang.org/protobuf/types/known/anypb"
 
-	gogo "buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf"
-	"github.com/fatih/structtag"
 	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
 	v3 "github.com/google/gnostic/openapiv3"
 )
@@ -254,6 +254,39 @@ func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewL
 	return strings.TrimSpace(comment)
 }
 
+//  extractMoretags compat gogoproto moretag annotations.
+func (g *OpenAPIv3Generator) hasDefaultIOrsRequired(field *protogen.Field) (*v3.DefaultType, string) {
+	var defaultValue *v3.DefaultType
+	var required string
+	gogoExtension := proto.GetExtension(field.Desc.Options(), gogo.E_Moretags)
+	if gogoExtension != nil {
+		if moreTags, err := structtag.Parse(gogoExtension.(string)); err == nil {
+			if tag, err := moreTags.Get("validate"); err == nil {
+				if tag.HasOption("required") || tag.Name == ("required") {
+					required = g.reflect.formatFieldName(field.Desc)
+				}
+			}
+			if tag, err := moreTags.Get("default"); err == nil {
+				defaultValue = &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: tag.Name}}
+			}
+		}
+	}
+	annotationsExtension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
+	if annotationsExtension != nil {
+		switch v := annotationsExtension.(type) {
+		case []annotations.FieldBehavior:
+			for _, vv := range v {
+				switch vv {
+				case annotations.FieldBehavior_REQUIRED:
+					required = g.reflect.formatFieldName(field.Desc)
+				}
+			}
+		}
+	}
+
+	return defaultValue, required
+}
+
 func (g *OpenAPIv3Generator) findDefaultValue(raw string) (string, interface{}) {
 	var comment string
 	if strings.Contains(raw, biliDefaultPatter) {
@@ -313,16 +346,22 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 
 	queryFieldName := g.reflect.formatFieldName(field.Desc)
 	fieldDescription := g.filterCommentString(field.Comments.Leading, true)
-
+	required := false
+	defaultValue, require := g.hasDefaultIOrsRequired(field)
+	if require != "" {
+		required = true
+	}
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
 		return parameters
 
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
 		typeName := g.reflect.fullMessageTypeName(field.Desc.Message())
-
 		if typeName == ".google.protobuf.Value" {
 			fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
+			if defaultValue != nil {
+				fieldSchema.GetSchema().Default = defaultValue
+			}
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
 					Oneof: &v3.ParameterOrReference_Parameter{
@@ -330,7 +369,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    required,
 							Schema:      fieldSchema,
 						},
 					},
@@ -383,7 +422,9 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	} else if field.Desc.Kind() != protoreflect.GroupKind {
 		// schemaOrReferenceForField also handles array types
 		fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
-
+		if defaultValue != nil {
+			fieldSchema.GetSchema().Default = defaultValue
+		}
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
 				Oneof: &v3.ParameterOrReference_Parameter{
@@ -391,7 +432,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 						Name:        queryFieldName,
 						In:          "query",
 						Description: fieldDescription,
-						Required:    false,
+						Required:    required,
 						Schema:      fieldSchema,
 					},
 				},
@@ -792,24 +833,13 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		for _, field := range message.Fields {
 			// Get the field description from the comments.
 			description := g.filterCommentString(field.Comments.Leading, true)
-			var defaultValue *v3.DefaultType
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
 
-			// compat gogo moretag
-			gogoExtension := proto.GetExtension(field.Desc.Options(), gogo.E_Moretags)
-			if gogoExtension != nil {
-				if moreTags, err := structtag.Parse(gogoExtension.(string)); err == nil {
-					if tag, err := moreTags.Get("validate"); err == nil {
-						if tag.HasOption("required") || tag.Name == ("required") {
-							required = append(required, g.reflect.formatFieldName(field.Desc))
-						}
-					}
-					if tag, err := moreTags.Get("default"); err == nil {
-						defaultValue = &v3.DefaultType{Oneof: &v3.DefaultType_String_{String_: tag.Name}}
-					}
-				}
+			defaultValue, require := g.hasDefaultIOrsRequired(field)
+			if require != "" {
+				required = append(required, require)
 			}
 
 			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
