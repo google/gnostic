@@ -852,8 +852,6 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 							outputOnly = true
 						case annotations.FieldBehavior_INPUT_ONLY:
 							inputOnly = true
-						case annotations.FieldBehavior_REQUIRED:
-							required = append(required, g.reflect.formatFieldName(field.Desc))
 						}
 					}
 				default:
