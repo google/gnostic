@@ -16,16 +16,15 @@
 package generator
 
 import (
-	gogo "buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf"
 	"fmt"
-	"github.com/fatih/structtag"
 	"log"
 	"net/url"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
+	gogo "buf.bilibili.co/bapis/bapis-gen-go/gogo/protobuf"
+	"github.com/fatih/structtag"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	status_pb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -50,8 +49,7 @@ type Configuration struct {
 }
 
 const (
-	infoURL           = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
-	biliDefaultPatter = "default:"
+	infoURL = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
 )
 
 // In order to dynamically add google.rpc.Status responses we need
@@ -126,8 +124,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 			if extDocument != nil {
 				proto.Merge(d, extDocument.(*v3.Document))
 			}
-
-			g.addPathsToDocumentV3(d, file.Services)
+			g.addPathsToDocumentV3(d, file.Services, string(file.Desc.Package()))
 		}
 	}
 
@@ -287,25 +284,6 @@ func (g *OpenAPIv3Generator) hasDefaultIOrsRequired(field *protogen.Field) (*v3.
 	return defaultValue, required
 }
 
-func (g *OpenAPIv3Generator) findDefaultValue(raw string) (string, interface{}) {
-	var comment string
-	if strings.Contains(raw, biliDefaultPatter) {
-		value := strings.Split(raw, biliDefaultPatter)[1]
-		comment = strings.TrimSpace(strings.Split(raw, biliDefaultPatter)[0])
-		if value == "true" {
-			return comment, true
-		}
-		if value == "false" {
-			return comment, false
-		}
-		if num, err := strconv.ParseFloat(value, 64); err == nil {
-			return comment, num
-		}
-		return comment, strings.Trim(value, "\"")
-	}
-	return raw, nil
-}
-
 func (g *OpenAPIv3Generator) findField(name string, inMessage *protogen.Message) *protogen.Field {
 	for _, field := range inMessage.Fields {
 		if string(field.Desc.Name()) == name || string(field.Desc.JSONName()) == name {
@@ -446,7 +424,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 func (g *OpenAPIv3Generator) buildOperationV3(
 	d *v3.Document,
 	operationID string,
-	tagName string,
+	tagName []string,
 	description string,
 	defaultHost string,
 	path string,
@@ -608,7 +586,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 
 	// Create the operation.
 	op := &v3.Operation{
-		Tags:        []string{tagName},
+		Tags:        tagName,
 		Description: description,
 		OperationId: operationID,
 		Parameters:  parameters,
@@ -707,7 +685,7 @@ func (g *OpenAPIv3Generator) addOperationToDocumentV3(d *v3.Document, op *v3.Ope
 }
 
 // addPathsToDocumentV3 adds paths from a specified file descriptor.
-func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*protogen.Service) {
+func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*protogen.Service, packageName string) {
 	for _, service := range services {
 		annotationsCount := 0
 
@@ -716,9 +694,19 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
+			defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
+			// add post Operation for each grpc method
+			path := "/" + packageName + "." + service.GoName + "/" + method.GoName
+			op, path2 := g.buildOperationV3(d, operationID, []string{service.GoName, "GRPC"}, comment, defaultHost, path, "*", inputMessage, outputMessage)
+			extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
+			if extOperation != nil {
+				proto.Merge(op, extOperation.(*v3.Operation))
+			}
+			g.addOperationToDocumentV3(d, op, path2, "POST")
+
+			// add http Operation for (google.api.http) annotations
 			rules := make([]*annotations.HttpRule, 0)
-
 			extHTTP := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
 			if extHTTP != nil && extHTTP != annotations.E_Http.InterfaceOf(annotations.E_Http.Zero()) {
 				annotationsCount++
@@ -755,13 +743,9 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				default:
 					path = "unknown-unsupported"
 				}
-
 				if methodName != "" {
-					defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
-
 					op, path2 := g.buildOperationV3(
-						d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
-
+						d, operationID, []string{service.GoName}, comment, defaultHost, path, body, inputMessage, outputMessage)
 					// Merge any `Operation` annotations with the current
 					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
 					if extOperation != nil {
