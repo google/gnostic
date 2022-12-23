@@ -135,7 +135,7 @@ func TestOpenAPIFQSchemaNaming(t *testing.T) {
 		args = append(args, path.Join(tt.path, tt.protofile))
 	}
 	if err := exec.Command("protoc", args...).Run(); err != nil {
-		t.Fatalf("protoc failed: %+v", err)
+		t.Fatalf("protoc %v failed: %+v", strings.Join(args, " "), err)
 	}
 
 	for _, tt := range openapiTests {
