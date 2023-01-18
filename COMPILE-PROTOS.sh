@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-go install github.com/golang/protobuf/protoc-gen-go@latest
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative openapiv2/*.proto
 protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative openapiv3/*.proto
