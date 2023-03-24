@@ -239,13 +239,9 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	return d
 }
 
-// filterCommentString removes line breaks and linter rules from comments.
-func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewLines bool) string {
-	comment := string(c)
-	if removeNewLines {
-		comment = strings.Replace(comment, "\n", "", -1)
-	}
-	comment = g.linterRulePattern.ReplaceAllString(comment, "")
+// filterCommentString removes linter rules from comments.
+func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
+	comment := g.linterRulePattern.ReplaceAllString(string(c), "")
 	return strings.TrimSpace(comment)
 }
 
@@ -288,7 +284,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	parameters := []*v3.ParameterOrReference{}
 
 	queryFieldName := g.reflect.formatFieldName(field.Desc)
-	fieldDescription := g.filterCommentString(field.Comments.Leading, true)
+	fieldDescription := g.filterCommentString(field.Comments.Leading)
 
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
@@ -412,7 +408,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			field := g.findField(pathParameter, inputMessage)
 			if field != nil {
 				fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
-				fieldDescription = g.filterCommentString(field.Comments.Leading, true)
+				fieldDescription = g.filterCommentString(field.Comments.Leading)
 			} else {
 				// If field does not exist, it is safe to set it to string, as it is ignored downstream
 				fieldSchema = &v3.SchemaOrReference{
@@ -647,7 +643,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 		annotationsCount := 0
 
 		for _, method := range service.Methods {
-			comment := g.filterCommentString(method.Comments.Leading, false)
+			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
@@ -709,7 +705,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 		}
 
 		if annotationsCount > 0 {
-			comment := g.filterCommentString(service.Comments.Leading, false)
+			comment := g.filterCommentString(service.Comments.Leading)
 			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
 		}
 	}
@@ -741,7 +737,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		}
 
 		typeName := g.reflect.fullMessageTypeName(message.Desc)
-		messageDescription := g.filterCommentString(message.Comments.Leading, true)
+		messageDescription := g.filterCommentString(message.Comments.Leading)
 
 		// `google.protobuf.Value` and `google.protobuf.Any` have special JSON transcoding
 		// so we can't just reflect on the message descriptor.
@@ -766,7 +762,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		var required []string
 		for _, field := range message.Fields {
 			// Get the field description from the comments.
-			description := g.filterCommentString(field.Comments.Leading, true)
+			description := g.filterCommentString(field.Comments.Leading)
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
