@@ -22,6 +22,8 @@ import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
 
@@ -101,4 +103,14 @@ message Message {
   google.protobuf.Value value_type = 13;
   // Description of repeated value
   repeated google.protobuf.Value repeated_value_type = 14;
+  google.protobuf.BoolValue bool_value_type = 15;
+  google.protobuf.BytesValue bytes_value_type = 16;
+  google.protobuf.Int32Value int32_value_type = 17;
+  google.protobuf.UInt32Value uint32_value_type = 18;
+  google.protobuf.StringValue string_value_type = 19;
+  google.protobuf.Int64Value int64_value_type = 20;
+  google.protobuf.UInt64Value uint64_value_type = 21;
+  google.protobuf.FloatValue float_value_type = 22;
+  google.protobuf.DoubleValue double_value_type = 23;
+  google.protobuf.Timestamp timestamp_type = 24;
 }
