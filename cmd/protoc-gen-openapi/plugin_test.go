@@ -16,10 +16,13 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -114,6 +117,27 @@ func TestOpenAPIProtobufNaming(t *testing.T) {
 }
 
 func TestOpenAPIFQSchemaNaming(t *testing.T) {
+	// create temp directory for source_relative outputs
+	tempDir := "tmp"
+	if err := os.MkdirAll(path.Join(tempDir, "examples"), os.ModePerm); err != nil {
+		t.Fatalf("create tmp directory %+v", err)
+	}
+	defer os.RemoveAll(tempDir)
+	// run protoc with source_relative options on all examples
+	args := []string{
+		"-I", "../../",
+		"-I", "../../third_party",
+		"-I", "examples",
+		fmt.Sprintf("--openapi_out=fq_schema_naming=1:%s/examples", tempDir),
+		"--openapi_opt=output_mode=source_relative",
+	}
+	for _, tt := range openapiTests {
+		args = append(args, path.Join(tt.path, tt.protofile))
+	}
+	if err := exec.Command("protoc", args...).Run(); err != nil {
+		t.Fatalf("protoc %v failed: %+v", strings.Join(args, " "), err)
+	}
+
 	for _, tt := range openapiTests {
 		fixture := path.Join(tt.path, "openapi_fq_schema_naming.yaml")
 		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
@@ -142,6 +166,13 @@ func TestOpenAPIFQSchemaNaming(t *testing.T) {
 				err = exec.Command("diff", TEMP_FILE, fixture).Run()
 				if err != nil {
 					t.Fatalf("Diff failed: %+v", err)
+				}
+				// Verify that the generated spec matches the source_relative version
+				sourceRelativeFile := strings.TrimSuffix(tt.protofile, filepath.Ext(tt.protofile)) + ".openapi.yaml"
+				sourceRelativeOut := path.Join(tempDir, tt.path, sourceRelativeFile)
+				err = exec.Command("diff", sourceRelativeOut, fixture).Run()
+				if err != nil {
+					t.Fatalf("Diff %v %v: %+v", sourceRelativeOut, fixture, err)
 				}
 			}
 			// if the test succeeded, clean up
