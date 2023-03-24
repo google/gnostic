@@ -755,7 +755,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 		}
 
 		if annotationsCount > 0 {
-			comment := g.filterCommentString(service.Comments.Leading, false)
+			comment := g.filterCommentString(service.Comments.Leading)
 			d.Tags = append(d.Tags, &v3.Tag{Name: tagName, Description: comment})
 		}
 	}
