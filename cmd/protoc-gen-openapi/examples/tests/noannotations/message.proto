@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-package tests.mapfields.message.v1;
+package tests.noannotations.message.v1;
 
 import "google/api/annotations.proto";
 

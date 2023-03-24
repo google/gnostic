@@ -43,6 +43,7 @@ type Configuration struct {
 	EnumType        *string
 	CircularDepth   *int
 	DefaultResponse *bool
+	OutputMode      *string
 }
 
 const (
@@ -60,6 +61,7 @@ type OpenAPIv3Generator struct {
 	conf   Configuration
 	plugin *protogen.Plugin
 
+	inputFiles        []*protogen.File
 	reflect           *OpenAPIv3Reflector
 	generatedSchemas  []string // Names of schemas that have already been generated.
 	linterRulePattern *regexp.Regexp
@@ -68,11 +70,12 @@ type OpenAPIv3Generator struct {
 }
 
 // NewOpenAPIv3Generator creates a new generator for a protoc plugin invocation.
-func NewOpenAPIv3Generator(plugin *protogen.Plugin, conf Configuration) *OpenAPIv3Generator {
+func NewOpenAPIv3Generator(plugin *protogen.Plugin, conf Configuration, inputFiles []*protogen.File) *OpenAPIv3Generator {
 	return &OpenAPIv3Generator{
 		conf:   conf,
 		plugin: plugin,
 
+		inputFiles:        inputFiles,
 		reflect:           NewOpenAPIv3Reflector(conf),
 		generatedSchemas:  make([]string, 0),
 		linterRulePattern: regexp.MustCompile(`\(-- .* --\)`),
@@ -82,14 +85,15 @@ func NewOpenAPIv3Generator(plugin *protogen.Plugin, conf Configuration) *OpenAPI
 }
 
 // Run runs the generator.
-func (g *OpenAPIv3Generator) Run() error {
+func (g *OpenAPIv3Generator) Run(outputFile *protogen.GeneratedFile) error {
 	d := g.buildDocumentV3()
 	bytes, err := d.YAMLValue("Generated with protoc-gen-openapi\n" + infoURL)
 	if err != nil {
 		return fmt.Errorf("failed to marshal yaml: %s", err.Error())
 	}
-	outputFile := g.plugin.NewGeneratedFile("openapi.yaml", "")
-	outputFile.Write(bytes)
+	if _, err = outputFile.Write(bytes); err != nil {
+		return fmt.Errorf("failed to write yaml: %s", err.Error())
+	}
 	return nil
 }
 
@@ -114,7 +118,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	// Go through the files and add the services to the documents, keeping
 	// track of which schemas are referenced in the response so we can
 	// add them later.
-	for _, file := range g.plugin.Files {
+	for _, file := range g.inputFiles {
 		if file.Generate {
 			// Merge any `Document` annotations with the current
 			extDocument := proto.GetExtension(file.Desc.Options(), v3.E_Document)
@@ -239,13 +243,9 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	return d
 }
 
-// filterCommentString removes line breaks and linter rules from comments.
-func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments, removeNewLines bool) string {
-	comment := string(c)
-	if removeNewLines {
-		comment = strings.Replace(comment, "\n", "", -1)
-	}
-	comment = g.linterRulePattern.ReplaceAllString(comment, "")
+// filterCommentString removes linter rules from comments.
+func (g *OpenAPIv3Generator) filterCommentString(c protogen.Comments) string {
+	comment := g.linterRulePattern.ReplaceAllString(string(c), "")
 	return strings.TrimSpace(comment)
 }
 
@@ -273,6 +273,9 @@ func (g *OpenAPIv3Generator) findAndFormatFieldName(name string, inMessage *prot
 // In the case of a repeated type, the parameter can be repeated in the URL as ...?param=A&param=B.
 // In the case of a message type, each field of the message is mapped to a separate parameter,
 // such as ...?foo.a=A&foo.b=B&foo.c=C.
+// There are exceptions:
+// - for wrapper types it will use the same representation as the wrapped primitive type in JSON
+// - for google.protobuf.timestamp type it will be serialized as a string
 //
 // maps, Struct and Empty can NOT be used
 // messages can have any number of sub messages - including circular (e.g. sub.subsub.sub.subsub.id)
@@ -288,7 +291,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	parameters := []*v3.ParameterOrReference{}
 
 	queryFieldName := g.reflect.formatFieldName(field.Desc)
-	fieldDescription := g.filterCommentString(field.Comments.Leading, true)
+	fieldDescription := g.filterCommentString(field.Comments.Leading)
 
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
@@ -297,7 +300,8 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
 		typeName := g.reflect.fullMessageTypeName(field.Desc.Message())
 
-		if typeName == ".google.protobuf.Value" {
+		switch typeName {
+		case ".google.protobuf.Value":
 			fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
 			parameters = append(parameters,
 				&v3.ParameterOrReference{
@@ -312,7 +316,44 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 					},
 				})
 			return parameters
-		} else if field.Desc.IsList() {
+
+		case ".google.protobuf.BoolValue", ".google.protobuf.BytesValue", ".google.protobuf.Int32Value", ".google.protobuf.UInt32Value",
+			".google.protobuf.StringValue", ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value", ".google.protobuf.FloatValue",
+			".google.protobuf.DoubleValue":
+			valueField := getValueField(field.Message.Desc)
+			fieldSchema := g.reflect.schemaOrReferenceForField(valueField)
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        queryFieldName,
+							In:          "query",
+							Description: fieldDescription,
+							Required:    false,
+							Schema:      fieldSchema,
+						},
+					},
+				})
+			return parameters
+
+		case ".google.protobuf.Timestamp":
+			fieldSchema := g.reflect.schemaOrReferenceForMessage(field.Message.Desc)
+			parameters = append(parameters,
+				&v3.ParameterOrReference{
+					Oneof: &v3.ParameterOrReference_Parameter{
+						Parameter: &v3.Parameter{
+							Name:        queryFieldName,
+							In:          "query",
+							Description: fieldDescription,
+							Required:    false,
+							Schema:      fieldSchema,
+						},
+					},
+				})
+			return parameters
+		}
+
+		if field.Desc.IsList() {
 			// Only non-repeated message types are valid
 			return parameters
 		}
@@ -412,7 +453,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			field := g.findField(pathParameter, inputMessage)
 			if field != nil {
 				fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
-				fieldDescription = g.filterCommentString(field.Comments.Leading, true)
+				fieldDescription = g.filterCommentString(field.Comments.Leading)
 			} else {
 				// If field does not exist, it is safe to set it to string, as it is ignored downstream
 				fieldSchema = &v3.SchemaOrReference{
@@ -652,7 +693,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 		}
 
 		for _, method := range service.Methods {
-			comment := g.filterCommentString(method.Comments.Leading, false)
+			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
@@ -746,7 +787,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		}
 
 		typeName := g.reflect.fullMessageTypeName(message.Desc)
-		messageDescription := g.filterCommentString(message.Comments.Leading, true)
+		messageDescription := g.filterCommentString(message.Comments.Leading)
 
 		// `google.protobuf.Value` and `google.protobuf.Any` have special JSON transcoding
 		// so we can't just reflect on the message descriptor.
@@ -771,7 +812,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		var required []string
 		for _, field := range message.Fields {
 			// Get the field description from the comments.
-			description := g.filterCommentString(field.Comments.Leading, true)
+			description := g.filterCommentString(field.Comments.Leading)
 			// Check the field annotations to see if this is a readonly or writeonly field.
 			inputOnly := false
 			outputOnly := false
