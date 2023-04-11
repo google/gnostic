@@ -23,25 +23,26 @@ import (
 )
 
 type OpenAPI2Builder struct {
-	model *Model
+	model    *Model
+	document *openapiv2.Document
 }
 
 // NewModelFromOpenAPI2 builds a model of an API service for use in code generation.
 func NewModelFromOpenAPI2(document *openapiv2.Document, sourceName string) (*Model, error) {
-	return newOpenAPI2Builder().buildModel(document, sourceName)
+	return newOpenAPI2Builder(document).buildModel(document, sourceName)
 }
 
-func newOpenAPI2Builder() *OpenAPI2Builder {
-	return &OpenAPI2Builder{model: &Model{}}
+func newOpenAPI2Builder(document *openapiv2.Document) *OpenAPI2Builder {
+	return &OpenAPI2Builder{model: &Model{}, document: document}
 }
 
 // Fills the surface model with information from a parsed OpenAPI description. The surface model provides that information
 // in a way  that is more processable by plugins like gnostic-go-generator or gnostic-grpc.
 // Since OpenAPI schemas can be indefinitely nested, it is a recursive approach to build all Types and Methods.
 // The basic idea is that whenever we have "named OpenAPI object" (e.g.: NamedSchemaOrReference, NamedMediaType) we:
-//	1. Create a Type with that name
-//	2. Recursively execute according methods on child schemas (see buildFromSchema function)
-// 	3. Return a FieldInfo object that describes how the created Type should be represented inside another Type as field.
+//  1. Create a Type with that name
+//  2. Recursively execute according methods on child schemas (see buildFromSchema function)
+//  3. Return a FieldInfo object that describes how the created Type should be represented inside another Type as field.
 func (b *OpenAPI2Builder) buildModel(document *openapiv2.Document, sourceName string) (*Model, error) {
 	b.model.Types = make([]*Type, 0)
 	b.model.Methods = make([]*Method, 0)
@@ -108,13 +109,16 @@ func (b *OpenAPI2Builder) buildFromResponseDefinitions(responses *openapiv2.Resp
 		return
 	}
 	for _, namedResponse := range responses.AdditionalProperties {
-		fInfo := b.buildFromResponse(namedResponse.Name, namedResponse.Value)
-		// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
-		// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
-		if t := findType(b.model.Types, namedResponse.Name); t == nil {
-			t = makeType(namedResponse.Name)
-			makeFieldAndAppendToType(fInfo, t, "value")
-			b.model.addType(t)
+		for _, contentType := range b.document.Produces {
+			name := namedResponse.Name + " " + contentType
+			fInfo := b.buildFromResponse(name, namedResponse.Value)
+			// In certain cases no type will be created during the recursion: e.g.: the schema is of type scalar, array
+			// or an reference. So we check whether the surface model Type already exists, and if not then we create it.
+			if t := findType(b.model.Types, namedResponse.Name); t == nil {
+				t = makeType(namedResponse.Name)
+				makeFieldAndAppendToType(fInfo, t, "value")
+				b.model.addType(t)
+			}
 		}
 	}
 }
@@ -208,7 +212,14 @@ func (b *OpenAPI2Builder) buildFromNamedOperation(name string, operation *openap
 		operationResponses.Description = operationResponses.Name + " holds responses of " + name
 		for _, namedResponse := range responses.ResponseCode {
 			fieldInfo := b.buildFromResponseOrRef(operation.OperationId+convertStatusCodeToText(namedResponse.Name), namedResponse.Value)
-			makeFieldAndAppendToType(fieldInfo, operationResponses, namedResponse.Name)
+			produces := b.document.Produces
+			if operation.Produces != nil {
+				produces = operation.Produces
+			}
+			for _, contentType := range produces {
+				name := namedResponse.Name + " " + contentType
+				makeFieldAndAppendToType(fieldInfo, operationResponses, name)
+			}
 		}
 		if len(operationResponses.Fields) > 0 {
 			b.model.addType(operationResponses)
@@ -325,13 +336,13 @@ func (b *OpenAPI2Builder) buildFromPrimitiveItems(name string, items *openapiv2.
 
 // A helper method to differentiate between references and actual objects
 func (b *OpenAPI2Builder) buildFromResponseOrRef(name string, responseOrRef *openapiv2.ResponseValue) (fInfo *FieldInfo) {
-	fInfo = &FieldInfo{}
 	if response := responseOrRef.GetResponse(); response != nil {
-		fInfo = b.buildFromResponse(name, response)
-		return fInfo
+		return b.buildFromResponse(name, response)
 	} else if ref := responseOrRef.GetJsonReference(); ref != nil {
-		fInfo.fieldKind, fInfo.fieldType = FieldKind_REFERENCE, validTypeForRef(ref.XRef)
-		return fInfo
+		return &FieldInfo{
+			fieldKind: FieldKind_REFERENCE,
+			fieldType: validTypeForRef(ref.XRef),
+		}
 	}
 	return nil
 }
@@ -339,8 +350,7 @@ func (b *OpenAPI2Builder) buildFromResponseOrRef(name string, responseOrRef *ope
 // A helper method to propagate the information up the call stack
 func (b *OpenAPI2Builder) buildFromResponse(name string, response *openapiv2.Response) (fInfo *FieldInfo) {
 	if response.Schema != nil && response.Schema.GetSchema() != nil {
-		fInfo = b.buildFromSchemaOrReference(name, response.Schema.GetSchema())
-		return fInfo
+		return b.buildFromSchemaOrReference(name, response.Schema.GetSchema())
 	}
 	return nil
 }
@@ -358,11 +368,11 @@ func (b *OpenAPI2Builder) buildFromSchemaOrReference(name string, schema *openap
 }
 
 // Given an OpenAPI schema there are two possibilities:
-//  1. 	The schema is an object/array: We create a type for the object, recursively call according methods for child
-//  	schemas, and then return information on how to use the created Type as field.
-//	2. 	The schema has a scalar type: We return information on how to represent a scalar schema as Field. Fields are
-//		created whenever Types are created (higher up in the callstack). This possibility can be considered as the "base condition"
-//		for the recursive approach.
+//  1. The schema is an object/array: We create a type for the object, recursively call according methods for child
+//     schemas, and then return information on how to use the created Type as field.
+//  2. The schema has a scalar type: We return information on how to represent a scalar schema as Field. Fields are
+//     created whenever Types are created (higher up in the callstack). This possibility can be considered as the "base condition"
+//     for the recursive approach.
 func (b *OpenAPI2Builder) buildFromSchema(name string, schema *openapiv2.Schema) (fInfo *FieldInfo) {
 	fInfo = &FieldInfo{}
 
