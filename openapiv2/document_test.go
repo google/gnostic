@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2023 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,30 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openapi_v3
+package openapi_v2
 
-import (
-	"io/ioutil"
-	"testing"
-)
-
-func TestParseDocument(t *testing.T) {
-	filename := "../examples/v3.0/yaml/petstore.yaml"
-	b, err := ioutil.ReadFile(filename)
-	if err != nil {
-		t.Logf("unable to read file %s", filename)
-		t.FailNow()
-	}
-	d, err := ParseDocument(b)
-	if err != nil {
-		t.Logf("%s", err.Error())
-		t.FailNow()
-	}
-	title := "OpenAPI Petstore"
-	if d.Info.Title != title {
-		t.Errorf("unexpected value for Title: %s (expected %s)", d.Info.Title, title)
-	}
-}
+import "testing"
 
 func TestParseDocument_Empty(t *testing.T) {
 	for _, test := range []struct {

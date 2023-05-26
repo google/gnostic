@@ -15,6 +15,8 @@
 package discovery_v1
 
 import (
+	"errors"
+
 	"github.com/google/gnostic/compiler"
 )
 
@@ -29,6 +31,11 @@ func ParseDocument(b []byte) (*Document, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if len(info.Content) < 1 {
+		return nil, errors.New("document has no content")
+	}
+
 	root := info.Content[0]
 	return NewDocument(root, compiler.NewContext("$root", root, nil))
 }
