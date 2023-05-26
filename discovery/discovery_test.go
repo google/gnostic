@@ -46,3 +46,28 @@ func TestParseDocument(t *testing.T) {
 		t.Errorf("unexpected value for Title: %s (expected %s)", d.Title, title)
 	}
 }
+
+func TestParseDocument_Empty(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		data []byte
+	}{
+		{"nil", nil},
+		{"zero_bytes", []byte{}},
+		{"whitespace", []byte("   ")},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			d, err := ParseDocument(test.data)
+
+			t.Log(err)
+			if err == nil {
+				t.Error("expected error")
+			} else if want, got := "document has no content", err.Error(); want != got {
+				t.Errorf("unexpected error: %q (expected %q)", got, want)
+			}
+			if d != nil {
+				t.Error("expected document to be nil")
+			}
+		})
+	}
+}

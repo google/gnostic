@@ -1,0 +1,61 @@
+{
+  "name": "Swagger Petstore",
+  "types": [
+    {
+      "name": "Pet",
+      "fields": [
+        {
+          "name": "id",
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "tag",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "ListPetsParameters",
+      "description": "ListPetsParameters holds parameters to ListPets",
+      "fields": [
+        {
+          "name": "limit",
+          "type": "integer",
+          "format": "int32",
+          "position": "QUERY"
+        }
+      ]
+    },
+    {
+      "name": "ListPetsResponses",
+      "description": "ListPetsResponses holds responses of ListPets",
+      "fields": [
+        {
+          "name": "200 application/json",
+          "type": "Pet",
+          "kind": "ARRAY"
+        },
+        {
+          "name": "200 application/xml",
+          "type": "Pet",
+          "kind": "ARRAY"
+        }
+      ]
+    }
+  ],
+  "methods": [
+    {
+      "operation": "listPets",
+      "path": "/pets",
+      "method": "GET",
+      "name": "ListPets",
+      "parametersTypeName": "ListPetsParameters",
+      "responsesTypeName": "ListPetsResponses"
+    }
+  ]
+}
