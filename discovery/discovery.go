@@ -2283,7 +2283,7 @@ func (m *Document) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("ownerName"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.OwnerName))
 	}
-	if m.VersionModule != false {
+	if m.VersionModule {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("version_module"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.VersionModule))
 	}
@@ -2291,7 +2291,7 @@ func (m *Document) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("canonicalName"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.CanonicalName))
 	}
-	if m.FullyEncodeReservedExpansion != false {
+	if m.FullyEncodeReservedExpansion {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("fullyEncodeReservedExpansion"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.FullyEncodeReservedExpansion))
 	}
@@ -2339,7 +2339,7 @@ func (m *MediaUpload) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("protocols"))
 		info.Content = append(info.Content, m.Protocols.ToRawInfo())
 	}
-	if m.SupportsSubscription != false {
+	if m.SupportsSubscription {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsSubscription"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsSubscription))
 	}
@@ -2388,15 +2388,15 @@ func (m *Method) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("scopes"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Scopes))
 	}
-	if m.SupportsMediaDownload != false {
+	if m.SupportsMediaDownload {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsMediaDownload"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsMediaDownload))
 	}
-	if m.SupportsMediaUpload != false {
+	if m.SupportsMediaUpload {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsMediaUpload"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsMediaUpload))
 	}
-	if m.UseMediaDownloadService != false {
+	if m.UseMediaDownloadService {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("useMediaDownloadService"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UseMediaDownloadService))
 	}
@@ -2404,7 +2404,7 @@ func (m *Method) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("mediaUpload"))
 		info.Content = append(info.Content, m.MediaUpload.ToRawInfo())
 	}
-	if m.SupportsSubscription != false {
+	if m.SupportsSubscription {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("supportsSubscription"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.SupportsSubscription))
 	}
@@ -2412,7 +2412,7 @@ func (m *Method) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("flatPath"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.FlatPath))
 	}
-	if m.EtagRequired != false {
+	if m.EtagRequired {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("etagRequired"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.EtagRequired))
 	}
@@ -2547,7 +2547,7 @@ func (m *Parameter) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("default"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Default))
 	}
-	if m.Required != false {
+	if m.Required {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
@@ -2575,7 +2575,7 @@ func (m *Parameter) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("enumDescriptions"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.EnumDescriptions))
 	}
-	if m.Repeated != false {
+	if m.Repeated {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("repeated"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Repeated))
 	}
@@ -2702,7 +2702,7 @@ func (m *Resumable) ToRawInfo() *yaml.Node {
 	if m == nil {
 		return info
 	}
-	if m.Multipart != false {
+	if m.Multipart {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("multipart"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Multipart))
 	}
@@ -2735,7 +2735,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("default"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Default))
 	}
-	if m.Required != false {
+	if m.Required {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
@@ -2763,7 +2763,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("enumDescriptions"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.EnumDescriptions))
 	}
-	if m.Repeated != false {
+	if m.Repeated {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("repeated"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Repeated))
 	}
@@ -2791,7 +2791,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("annotations"))
 		info.Content = append(info.Content, m.Annotations.ToRawInfo())
 	}
-	if m.ReadOnly != false {
+	if m.ReadOnly {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("readOnly"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ReadOnly))
 	}
@@ -2847,7 +2847,7 @@ func (m *Simple) ToRawInfo() *yaml.Node {
 	if m == nil {
 		return info
 	}
-	if m.Multipart != false {
+	if m.Multipart {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("multipart"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Multipart))
 	}

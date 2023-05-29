@@ -134,10 +134,7 @@ func findType(types []*Type, typeName string) *Type {
 // Returns true if s is a valid URL.
 func isSymbolicReference(s string) bool {
 	_, err := url.ParseRequestURI(s)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // Replace encoded URLS with actual characters

@@ -52,7 +52,7 @@ func NewDomain(schema *jsonschema.Schema, version string) *Domain {
 // TypeNameForStub returns a capitalized name to use for a generated type.
 func (domain *Domain) TypeNameForStub(stub string) string {
 
-	return domain.Prefix + strings.ToUpper(stub[0:1]) + stub[1:len(stub)]
+	return domain.Prefix + strings.ToUpper(stub[0:1]) + stub[1:]
 }
 
 // typeNameForReference returns a capitalized name to use for a generated type based on a JSON reference
@@ -280,7 +280,7 @@ func (domain *Domain) buildPatternPropertyAccessors(typeModel *TypeModel, schema
 func (domain *Domain) buildAdditionalPropertyAccessors(typeModel *TypeModel, schema *jsonschema.Schema) {
 	if schema.AdditionalProperties != nil {
 		if schema.AdditionalProperties.Boolean != nil {
-			if *schema.AdditionalProperties.Boolean == true {
+			if *schema.AdditionalProperties.Boolean {
 				typeModel.Open = true
 				propertyName := "additionalProperties"
 				typeName := "NamedAny"

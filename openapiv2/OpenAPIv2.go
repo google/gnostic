@@ -6930,7 +6930,7 @@ func (m *BodyParameter) ToRawInfo() *yaml.Node {
 	// always include this required field.
 	info.Content = append(info.Content, compiler.NewScalarNodeForString("in"))
 	info.Content = append(info.Content, compiler.NewScalarNodeForString(m.In))
-	if m.Required != false {
+	if m.Required {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
@@ -7149,7 +7149,7 @@ func (m *FileSchema) ToRawInfo() *yaml.Node {
 	// always include this required field.
 	info.Content = append(info.Content, compiler.NewScalarNodeForString("type"))
 	info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Type))
-	if m.ReadOnly != false {
+	if m.ReadOnly {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("readOnly"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ReadOnly))
 	}
@@ -7176,7 +7176,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() *yaml.Node {
 	if m == nil {
 		return info
 	}
-	if m.Required != false {
+	if m.Required {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
@@ -7192,7 +7192,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
-	if m.AllowEmptyValue != false {
+	if m.AllowEmptyValue {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("allowEmptyValue"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.AllowEmptyValue))
 	}
@@ -7220,7 +7220,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -7228,7 +7228,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -7252,7 +7252,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -7306,7 +7306,7 @@ func (m *Header) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -7314,7 +7314,7 @@ func (m *Header) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -7338,7 +7338,7 @@ func (m *Header) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -7373,7 +7373,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() *yaml.Node {
 	if m == nil {
 		return info
 	}
-	if m.Required != false {
+	if m.Required {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
@@ -7413,7 +7413,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -7421,7 +7421,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -7445,7 +7445,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -7945,7 +7945,7 @@ func (m *Operation) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("schemes"))
 		info.Content = append(info.Content, compiler.NewSequenceNodeForStringArray(m.Schemes))
 	}
-	if m.Deprecated != false {
+	if m.Deprecated {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("deprecated"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Deprecated))
 	}
@@ -8115,7 +8115,7 @@ func (m *PathParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -8123,7 +8123,7 @@ func (m *PathParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -8147,7 +8147,7 @@ func (m *PathParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -8223,7 +8223,7 @@ func (m *PrimitivesItems) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -8231,7 +8231,7 @@ func (m *PrimitivesItems) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -8255,7 +8255,7 @@ func (m *PrimitivesItems) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -8301,7 +8301,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() *yaml.Node {
 	if m == nil {
 		return info
 	}
-	if m.Required != false {
+	if m.Required {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("required"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Required))
 	}
@@ -8317,7 +8317,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("name"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Name))
 	}
-	if m.AllowEmptyValue != false {
+	if m.AllowEmptyValue {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("allowEmptyValue"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.AllowEmptyValue))
 	}
@@ -8345,7 +8345,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -8353,7 +8353,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -8377,7 +8377,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -8519,7 +8519,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("maximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Maximum))
 	}
-	if m.ExclusiveMaximum != false {
+	if m.ExclusiveMaximum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMaximum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMaximum))
 	}
@@ -8527,7 +8527,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForFloat(m.Minimum))
 	}
-	if m.ExclusiveMinimum != false {
+	if m.ExclusiveMinimum {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("exclusiveMinimum"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ExclusiveMinimum))
 	}
@@ -8551,7 +8551,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("minItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForInt(m.MinItems))
 	}
-	if m.UniqueItems != false {
+	if m.UniqueItems {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("uniqueItems"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.UniqueItems))
 	}
@@ -8615,7 +8615,7 @@ func (m *Schema) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("discriminator"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Discriminator))
 	}
-	if m.ReadOnly != false {
+	if m.ReadOnly {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("readOnly"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.ReadOnly))
 	}
@@ -8801,11 +8801,11 @@ func (m *Xml) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("prefix"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.Prefix))
 	}
-	if m.Attribute != false {
+	if m.Attribute {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("attribute"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Attribute))
 	}
-	if m.Wrapped != false {
+	if m.Wrapped {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("wrapped"))
 		info.Content = append(info.Content, compiler.NewScalarNodeForBool(m.Wrapped))
 	}

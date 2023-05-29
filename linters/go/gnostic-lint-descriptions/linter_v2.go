@@ -34,7 +34,7 @@ func NewDocumentLinterV2(document *openapi.Document) *DocumentLinterV2 {
 
 // Analyze an OpenAPI description.
 func (s *DocumentLinterV2) analyzeDocument(document *openapi.Document) []*plugins.Message {
-	messages := make([]*plugins.Message, 0, 0)
+	messages := make([]*plugins.Message, 0)
 	for _, pair := range document.Paths.Path {
 		path := pair.Value
 		if path.Get != nil {

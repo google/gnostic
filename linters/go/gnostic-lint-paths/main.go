@@ -53,7 +53,7 @@ func main() {
 	env, err := plugins.NewEnvironment()
 	env.RespondAndExitIfError(err)
 
-	messages := make([]*plugins.Message, 0, 0)
+	messages := make([]*plugins.Message, 0)
 
 	for _, model := range env.Request.Models {
 		switch model.TypeUrl {
