@@ -121,7 +121,7 @@ func escapeSlashes(pattern string) string {
 	return strings.Replace(pattern, "\\", "\\\\", -1)
 }
 
-var subpatternPattern = regexp.MustCompile("^.*(\\{.*\\}).*$")
+var subpatternPattern = regexp.MustCompile(`^.*(\{.*\}).*$`)
 
 func nameForPattern(regexPatterns *patternNames, pattern string) string {
 	if !strings.HasPrefix(pattern, "^") {

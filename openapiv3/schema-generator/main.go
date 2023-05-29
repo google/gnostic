@@ -129,7 +129,7 @@ func (s *Section) NiceTitle() string {
 
 // replace markdown links with their link text (removing the URL part)
 func removeMarkdownLinks(input string) (output string) {
-	markdownLink := regexp.MustCompile("\\[([^\\]\\[]*)\\]\\(([^\\)]*)\\)") // matches [link title](link url)
+	markdownLink := regexp.MustCompile(`\[([^\]\[]*)\]\(([^\)]*)\)`) // matches [link title](link url)
 	output = string(markdownLink.ReplaceAll([]byte(input), []byte("$1")))
 	return
 }
@@ -167,13 +167,13 @@ func parseFixedFields(input string, schemaObject *SchemaObject) {
 					isArray = true
 				}
 				isMap := false
-				mapPattern := regexp.MustCompile("^Mapstring,\\[(.*)\\]$")
+				mapPattern := regexp.MustCompile(`^Mapstring,\[(.*)\]$`)
 				if matches := mapPattern.FindSubmatch([]byte(typeName)); matches != nil {
 					typeName = string(matches[1])
 					isMap = true
 				} else {
 					// match map[string,<typename>]
-					mapPattern2 := regexp.MustCompile("^Map\\[string,(.+)\\]$")
+					mapPattern2 := regexp.MustCompile(`^Map\[string,(.+)\]$`)
 					if matches := mapPattern2.FindSubmatch([]byte(typeName)); matches != nil {
 						typeName = string(matches[1])
 						isMap = true
@@ -244,7 +244,7 @@ func parsePatternedFields(input string, schemaObject *SchemaObject) {
 					isArray = true
 				}
 				isMap := false
-				mapPattern := regexp.MustCompile("^Mapstring,\\[(.*)\\]$")
+				mapPattern := regexp.MustCompile(`^Mapstring,\[(.*)\]$`)
 				if matches := mapPattern.FindSubmatch([]byte(typeName)); matches != nil {
 					typeName = string(matches[1])
 					isMap = true
