@@ -10,7 +10,7 @@ paths:
         patch:
             tags:
                 - Messaging
-            operationId: Messaging_UpdateMessage
+            operationId: Messaging_UpdateMessage_PATCH_/v1/messages
             requestBody:
                 content:
                     application/json:

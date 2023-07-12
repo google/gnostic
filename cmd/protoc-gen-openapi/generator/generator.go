@@ -704,7 +704,10 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				rules = append(rules, rule.AdditionalBindings...)
 			}
 
+			count := 0
 			for _, rule := range rules {
+				count++
+
 				var path string
 				var methodName string
 				var body string
@@ -735,8 +738,13 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				if methodName != "" {
 					defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
+					id := operationID
+					if count > 1 {
+						id = fmt.Sprintf("%s_%s_%s", id, methodName, path)
+					}
+
 					op, path2 := g.buildOperationV3(
-						d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+						d, id, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
 
 					// Merge any `Operation` annotations with the current
 					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
