@@ -6,6 +6,8 @@ require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/flowstack/go-jsonschema v0.1.1
 	github.com/golang/protobuf v1.5.3
+	github.com/google/gnostic-models v0.6.8
+	github.com/google/go-cmp v0.5.9
 	github.com/stoewer/go-strcase v1.2.0
 	golang.org/x/tools v0.6.0
 	google.golang.org/genproto v0.0.0-20230526161137-0005af68ea54 // indirect
@@ -15,3 +17,6 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+// Temporary workaround until https://github.com/google/gnostic-models/pull/5 is merged
+replace github.com/google/gnostic-models => github.com/pkwarren/gnostic-models v0.0.0-20230713215956-94610bf2de2f

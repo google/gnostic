@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openapi_v2
+package openapi_v3
 
 import (
-	"errors"
-
-	"github.com/google/gnostic/compiler"
+	openapiv3 "github.com/google/gnostic-models/openapiv3"
 )
 
-// ParseDocument reads an OpenAPI v2 description from a YAML/JSON representation.
-func ParseDocument(b []byte) (*Document, error) {
-	info, err := compiler.ReadInfoFromBytes("", b)
-	if err != nil {
-		return nil, err
-	}
+var (
+	E_Document  = openapiv3.E_Document
+	E_Operation = openapiv3.E_Operation
+	E_Schema    = openapiv3.E_Schema
+	E_Property  = openapiv3.E_Property
+)
 
-	if len(info.Content) < 1 {
-		return nil, errors.New("document has no content")
-	}
-
-	root := info.Content[0]
-	return NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, nil))
-}
+var File_openapiv3_annotations_proto = openapiv3.File_openapiv3_annotations_proto

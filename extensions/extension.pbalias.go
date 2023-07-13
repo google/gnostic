@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2017 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openapi_v2
+package gnostic_extension_v1
 
 import (
-	"errors"
-
-	"github.com/google/gnostic/compiler"
+	extensions "github.com/google/gnostic-models/extensions"
 )
 
-// ParseDocument reads an OpenAPI v2 description from a YAML/JSON representation.
-func ParseDocument(b []byte) (*Document, error) {
-	info, err := compiler.ReadInfoFromBytes("", b)
-	if err != nil {
-		return nil, err
-	}
+type Version = extensions.Version
+type ExtensionHandlerRequest = extensions.ExtensionHandlerRequest
+type ExtensionHandlerResponse = extensions.ExtensionHandlerResponse
+type Wrapper = extensions.Wrapper
 
-	if len(info.Content) < 1 {
-		return nil, errors.New("document has no content")
-	}
-
-	root := info.Content[0]
-	return NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, nil))
-}
+var File_extensions_extension_proto = extensions.File_extensions_extension_proto
