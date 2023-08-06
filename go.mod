@@ -14,6 +14,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20230525234035-dd9d682886f9
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19
 	google.golang.org/protobuf v1.30.0
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
 	gopkg.in/yaml.v3 v3.0.1
 )
