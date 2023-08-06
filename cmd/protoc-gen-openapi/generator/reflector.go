@@ -135,6 +135,9 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.Me
 	case ".google.protobuf.Timestamp":
 		return wk.NewGoogleProtobufTimestampSchema()
 
+	case ".google.protobuf.Duration":
+		return wk.NewGoogleProtobufDurationSchema()
+
 	case ".google.type.Date":
 		return wk.NewGoogleTypeDateSchema()
 
