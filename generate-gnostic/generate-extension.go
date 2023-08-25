@@ -86,7 +86,7 @@ const caseStringForWrapperTypes = "\n" +
 	"if !ok {\n" +
 	"	return true, nil, nil\n" +
 	"}\n" +
-	"newObject := &wrappers.%s{Value: v}\n" +
+	"newObject := &wrapperspb.%s{Value: v}\n" +
 	"return true, newObject, nil"
 
 // generateMainFile generates the main program for an extension.
@@ -314,14 +314,14 @@ func generateExtension(schemaFile string, outDir string) error {
 	}
 	extMainCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
 	imports := []string{
-		"github.com/golang/protobuf/proto",
 		"github.com/google/gnostic/extensions",
 		"github.com/google/gnostic/compiler",
+		"google.golang.org/protobuf/proto",
 		"gopkg.in/yaml.v3",
 		outDirRelativeToPackageRoot + "/" + "proto",
 	}
 	if wrapperTypeIncluded {
-		imports = append(imports, "github.com/golang/protobuf/ptypes/wrappers")
+		imports = append(imports, "google.golang.org/protobuf/types/known/wrapperspb")
 	}
 	main := generateMainFile("main", License, extMainCode, imports)
 	mainFileName := path.Join(outDir, "main.go")
