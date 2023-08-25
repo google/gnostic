@@ -94,6 +94,50 @@ func NewGoogleProtobufTimestampSchema() *v3.SchemaOrReference {
 			Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
 }
 
+// google.protobuf.Duration is serialized as a string
+func NewGoogleProtobufDurationSchema() *v3.SchemaOrReference {
+	return &v3.SchemaOrReference{
+		Oneof: &v3.SchemaOrReference_Schema{
+			// From: https://github.com/protocolbuffers/protobuf/blob/ece5ef6b9b6fa66ef4638335612284379ee4548f/src/google/protobuf/duration.proto
+			// In JSON format, the Duration type is encoded as a string rather than an
+			// object, where the string ends in the suffix "s" (indicating seconds) and
+			// is preceded by the number of seconds, with nanoseconds expressed as
+			// fractional seconds. For example, 3 seconds with 0 nanoseconds should be
+			// encoded in JSON format as "3s", while 3 seconds and 1 nanosecond should
+			// be expressed in JSON format as "3.000000001s", and 3 seconds and 1
+			// microsecond should be expressed in JSON format as "3.000001s".
+			//
+			// The fields of message google.protobuf.Duration are further described as:
+			// "int64 seconds"
+			// Signed seconds of the span of time. Must be from -315,576,000,000
+			// to +315,576,000,000 inclusive. Note: these bounds are computed from:
+			// 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
+			// `int32 nanos`
+			// Signed fractions of a second at nanosecond resolution of the span
+			// of time. Durations less than one second are represented with a 0
+			// `seconds` field and a positive or negative `nanos` field. For durations
+			// of one second or more, a non-zero value for the `nanos` field must be
+			// of the same sign as the `seconds` field. Must be from -999,999,999
+			// to +999,999,999 inclusive.
+			//
+			// This leads to the regex below limiting range from -315.576,000,000s to 315,576,000,000s
+			// allowing -0.999,999,999s to 0.999,999,999s in the floating precision range.
+			// That full range cannot be expressed precisly in float64 as demonstrated in
+			// the example at https://go.dev/play/p/XNtuhwdyu8Y for your reference.
+			// So the well known type google.protobuf.Duration needs a string.
+			//
+			// Please note that JSON schemas duration format is NOT the same, as that uses
+			// a different syntax starting with "P", supports daylight saving times and other
+			// different features, so it is NOT compatible.
+			Schema: &v3.Schema{
+				Type:        "string",
+				Pattern:     `^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$`,
+				Description: "Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s",
+			},
+		},
+	}
+}
+
 // google.type.Date is serialized as a string
 func NewGoogleTypeDateSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
