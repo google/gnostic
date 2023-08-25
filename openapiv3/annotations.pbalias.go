@@ -1,4 +1,4 @@
-// Copyright 2017 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compiler
+package openapi_v3
 
 import (
-	"github.com/google/gnostic-models/compiler"
+	openapiv3 "github.com/google/gnostic-models/openapiv3"
 )
 
-// Error represents compiler errors and their location in the document.
-type Error = compiler.Error
+var (
+	E_Document  = openapiv3.E_Document
+	E_Operation = openapiv3.E_Operation
+	E_Schema    = openapiv3.E_Schema
+	E_Property  = openapiv3.E_Property
+)
 
-// NewError creates an Error.
-var NewError = compiler.NewError
-
-// ErrorGroup is a container for groups of Error values.
-type ErrorGroup = compiler.ErrorGroup
-
-// NewErrorGroupOrNil returns a new ErrorGroup for a slice of errors or nil if the slice is empty.
-var NewErrorGroupOrNil = compiler.NewErrorGroupOrNil
+var File_openapiv3_annotations_proto = openapiv3.File_openapiv3_annotations_proto
