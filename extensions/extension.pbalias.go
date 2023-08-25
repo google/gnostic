@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compiler
+package gnostic_extension_v1
 
 import (
-	"github.com/google/gnostic-models/compiler"
+	extensions "github.com/google/gnostic-models/extensions"
 )
 
-// Error represents compiler errors and their location in the document.
-type Error = compiler.Error
+type Version = extensions.Version
+type ExtensionHandlerRequest = extensions.ExtensionHandlerRequest
+type ExtensionHandlerResponse = extensions.ExtensionHandlerResponse
+type Wrapper = extensions.Wrapper
 
-// NewError creates an Error.
-var NewError = compiler.NewError
-
-// ErrorGroup is a container for groups of Error values.
-type ErrorGroup = compiler.ErrorGroup
-
-// NewErrorGroupOrNil returns a new ErrorGroup for a slice of errors or nil if the slice is empty.
-var NewErrorGroupOrNil = compiler.NewErrorGroupOrNil
+var File_extensions_extension_proto = extensions.File_extensions_extension_proto
