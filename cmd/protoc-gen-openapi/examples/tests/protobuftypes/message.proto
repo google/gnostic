@@ -24,6 +24,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/protobuftypes/message/v1;message";
 
@@ -113,4 +114,5 @@ message Message {
   google.protobuf.FloatValue float_value_type = 22;
   google.protobuf.DoubleValue double_value_type = 23;
   google.protobuf.Timestamp timestamp_type = 24;
+  google.protobuf.Duration duration_type = 25;
 }

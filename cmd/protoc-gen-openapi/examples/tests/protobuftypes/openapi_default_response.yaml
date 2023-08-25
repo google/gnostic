@@ -144,6 +144,12 @@ paths:
                   schema:
                     type: string
                     format: date-time
+                - name: durationType
+                  in: query
+                  schema:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s
             responses:
                 "200":
                     description: OK
@@ -303,6 +309,12 @@ paths:
                   schema:
                     type: string
                     format: date-time
+                - name: durationType
+                  in: query
+                  schema:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s
             requestBody:
                 content:
                     application/json:
@@ -444,6 +456,9 @@ components:
                 timestampType:
                     type: string
                     format: date-time
+                durationType:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
         Message_EmbMessage:
             type: object
             properties:
