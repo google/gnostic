@@ -28,7 +28,7 @@ import (
 
 	"golang.org/x/tools/imports"
 
-	"github.com/google/gnostic/jsonschema"
+	"github.com/eqlabs/gnostic/jsonschema"
 )
 
 // License is the software license applied to generated code.
@@ -193,7 +193,7 @@ func generateOpenAPIModel(version string) error {
 		"gopkg.in/yaml.v3",
 		"strings",
 		"regexp",
-		"github.com/google/gnostic/compiler",
+		"github.com/eqlabs/gnostic/compiler",
 	}
 	// generate the compiler
 	log.Printf("Generating compiler support code")

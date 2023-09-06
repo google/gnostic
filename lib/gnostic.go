@@ -31,13 +31,13 @@ import (
 	"github.com/golang/protobuf/proto"
 	"gopkg.in/yaml.v3"
 
-	"github.com/google/gnostic/compiler"
-	discovery_v1 "github.com/google/gnostic/discovery"
-	"github.com/google/gnostic/jsonwriter"
-	openapi_v2 "github.com/google/gnostic/openapiv2"
-	openapi_v3 "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
-	surface "github.com/google/gnostic/surface"
+	"github.com/eqlabs/gnostic/compiler"
+	discovery_v1 "github.com/eqlabs/gnostic/discovery"
+	"github.com/eqlabs/gnostic/jsonwriter"
+	openapi_v2 "github.com/eqlabs/gnostic/openapiv2"
+	openapi_v3 "github.com/eqlabs/gnostic/openapiv3"
+	plugins "github.com/eqlabs/gnostic/plugins"
+	surface "github.com/eqlabs/gnostic/surface"
 )
 
 // UsageError is a response to invalid command-line inputs
@@ -241,9 +241,11 @@ func isURL(path string) bool {
 
 // Write bytes to a named file.
 // Certain names have special meaning:
-//   ! writes nothing
-//   - writes to stdout
-//   = writes to stderr
+//
+//	! writes nothing
+//	- writes to stdout
+//	= writes to stderr
+//
 // If a directory name is given, the file is written there with
 // a name derived from the source and extension arguments.
 func writeFile(name string, bytes []byte, source string, extension string) {

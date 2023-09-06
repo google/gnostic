@@ -18,8 +18,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/google/gnostic/compiler"
-	openapiv3 "github.com/google/gnostic/openapiv3"
+	"github.com/eqlabs/gnostic/compiler"
+	openapiv3 "github.com/eqlabs/gnostic/openapiv3"
 )
 
 type OpenAPI3Builder struct {

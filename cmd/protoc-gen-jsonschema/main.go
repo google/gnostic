@@ -18,7 +18,7 @@ package main
 import (
 	"flag"
 
-	"github.com/google/gnostic/cmd/protoc-gen-jsonschema/generator"
+	"github.com/eqlabs/gnostic/cmd/protoc-gen-jsonschema/generator"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )

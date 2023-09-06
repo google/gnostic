@@ -15,7 +15,7 @@
 package vocabulary
 
 import (
-	metrics "github.com/google/gnostic/metrics"
+	metrics "github.com/eqlabs/gnostic/metrics"
 )
 
 // mapIntersection finds the intersection between two Vocabularies.

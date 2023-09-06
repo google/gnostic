@@ -17,8 +17,8 @@ package linter
 import (
 	"fmt"
 
-	rules "github.com/google/gnostic/metrics/rules"
-	pb "github.com/google/gnostic/openapiv2"
+	rules "github.com/eqlabs/gnostic/metrics/rules"
+	pb "github.com/eqlabs/gnostic/openapiv2"
 )
 
 // fillProtoStructure takes a slice of rules and coverts them to a slice of
@@ -94,8 +94,8 @@ func processParametersV2(operation *pb.Operation, path []string) []rules.Field {
 	return parameters
 }
 
-//AIPLintV2 accepts an OpenAPI v2 document and will call the individual AIP rules
-//on the document.
+// AIPLintV2 accepts an OpenAPI v2 document and will call the individual AIP rules
+// on the document.
 func AIPLintV2(document *pb.Document) (*Linter, int) {
 	fields := gatherParametersV2(document)
 	messages := make([]rules.MessageType, 0)

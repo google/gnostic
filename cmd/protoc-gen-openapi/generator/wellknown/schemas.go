@@ -16,7 +16,7 @@
 package wellknown
 
 import (
-	v3 "github.com/google/gnostic/openapiv3"
+	v3 "github.com/eqlabs/gnostic/openapiv3"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -168,9 +168,12 @@ func NewGoogleProtobufStructSchema() *v3.SchemaOrReference {
 
 // google.protobuf.Value is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
+//
 // and here:
-//   https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
+//
+//	https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
 func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,
@@ -186,7 +189,8 @@ func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 
 // google.protobuf.Any is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
 func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,

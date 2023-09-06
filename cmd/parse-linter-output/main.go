@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	lint "github.com/google/gnostic/metrics/lint"
+	lint "github.com/eqlabs/gnostic/metrics/lint"
 )
 
 func main() {

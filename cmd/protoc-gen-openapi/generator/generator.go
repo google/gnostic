@@ -30,8 +30,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	any_pb "google.golang.org/protobuf/types/known/anypb"
 
-	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
-	v3 "github.com/google/gnostic/openapiv3"
+	wk "github.com/eqlabs/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
+	v3 "github.com/eqlabs/gnostic/openapiv3"
 )
 
 type Configuration struct {
@@ -47,7 +47,7 @@ type Configuration struct {
 }
 
 const (
-	infoURL = "https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi"
+	infoURL = "https://github.com/eqlabs/gnostic/tree/master/cmd/protoc-gen-openapi"
 )
 
 // In order to dynamically add google.rpc.Status responses we need

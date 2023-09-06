@@ -15,7 +15,7 @@
 package main
 
 import (
-	v2 "github.com/google/gnostic/openapiv2"
+	v2 "github.com/eqlabs/gnostic/openapiv2"
 )
 
 func buildDocumentV2() *v2.Document {

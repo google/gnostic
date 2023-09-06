@@ -17,7 +17,7 @@ package discovery_v1
 import (
 	"errors"
 
-	"github.com/google/gnostic/compiler"
+	"github.com/eqlabs/gnostic/compiler"
 )
 
 // FetchDocumentBytes downloads the bytes of a discovery document from a URL.

@@ -24,7 +24,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/google/gnostic/jsonschema"
+	"github.com/eqlabs/gnostic/jsonschema"
 )
 
 func usage() {

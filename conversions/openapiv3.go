@@ -19,8 +19,8 @@ import (
 	"net/url"
 	"strings"
 
-	discovery "github.com/google/gnostic/discovery"
-	openapi3 "github.com/google/gnostic/openapiv3"
+	discovery "github.com/eqlabs/gnostic/discovery"
+	openapi3 "github.com/eqlabs/gnostic/openapiv3"
 )
 
 func pathForMethod(path string) string {

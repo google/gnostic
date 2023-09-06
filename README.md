@@ -1,4 +1,4 @@
-[![Go Actions Status](https://github.com/google/gnostic/workflows/Go/badge.svg)](https://github.com/google/gnostic/actions)
+[![Go Actions Status](https://github.com/eqlabs/gnostic/workflows/Go/badge.svg)](https://github.com/eqlabs/gnostic/actions)
 
 # ⨁ gnostic
 

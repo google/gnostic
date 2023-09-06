@@ -25,7 +25,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	plugins "github.com/google/gnostic/plugins"
+	plugins "github.com/eqlabs/gnostic/plugins"
 )
 
 func exitIfError(err error) {

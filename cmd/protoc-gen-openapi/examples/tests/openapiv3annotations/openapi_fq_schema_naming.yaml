@@ -1,5 +1,5 @@
 # Generated with protoc-gen-openapi
-# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+# https://github.com/eqlabs/gnostic/tree/master/cmd/protoc-gen-openapi
 
 openapi: 3.0.3
 info:
@@ -11,7 +11,7 @@ info:
         email: gnostic@google.com
     license:
         name: Apache License
-        url: https://github.com/google/gnostic/blob/master/LICENSE
+        url: https://github.com/eqlabs/gnostic/blob/master/LICENSE
     version: Version from annotation
 paths:
     /v1/messages/{message_id}:

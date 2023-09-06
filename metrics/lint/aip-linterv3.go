@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"os"
 
-	rules "github.com/google/gnostic/metrics/rules"
-	openapi_v3 "github.com/google/gnostic/openapiv3"
+	rules "github.com/eqlabs/gnostic/metrics/rules"
+	openapi_v3 "github.com/eqlabs/gnostic/openapiv3"
 )
 
 // processParametersV2 loops over the parameters of component and creates a
@@ -89,8 +89,8 @@ func gatherParameters(document *openapi_v3.Document) []rules.Field {
 	return p
 }
 
-//AIPLintV3 accepts an OpenAPI v2 document and will call the individual AIP rules
-//on the document.
+// AIPLintV3 accepts an OpenAPI v2 document and will call the individual AIP rules
+// on the document.
 func AIPLintV3(document *openapi_v3.Document) (*Linter, int) {
 	fields := gatherParameters(document)
 	messages := make([]rules.MessageType, 0)

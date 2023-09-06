@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,10 +20,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	lint "github.com/google/gnostic/metrics/lint"
-	openapiv2 "github.com/google/gnostic/openapiv2"
-	openapiv3 "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
+	lint "github.com/eqlabs/gnostic/metrics/lint"
+	openapiv2 "github.com/eqlabs/gnostic/openapiv2"
+	openapiv3 "github.com/eqlabs/gnostic/openapiv3"
+	plugins "github.com/eqlabs/gnostic/plugins"
 )
 
 // Record an error, then serialize and return a response.

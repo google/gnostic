@@ -6,7 +6,7 @@ descriptions to OpenAPI.
 
 Installation:
 
-        go install github.com/google/gnostic/cmd/disco
+        go install github.com/eqlabs/gnostic/cmd/disco
 
 Usage:
 
