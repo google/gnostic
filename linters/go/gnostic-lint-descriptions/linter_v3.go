@@ -15,8 +15,8 @@
 package main
 
 import (
-	openapi "github.com/eqlabs/gnostic/openapiv3"
-	plugins "github.com/eqlabs/gnostic/plugins"
+	openapi "github.com/google/gnostic/openapiv3"
+	plugins "github.com/google/gnostic/plugins"
 )
 
 // DocumentLinter contains information collected about an API description.

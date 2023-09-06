@@ -20,7 +20,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/eqlabs/gnostic/jsonschema"
+	"github.com/google/gnostic/jsonschema"
 )
 
 func main() {

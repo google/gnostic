@@ -26,7 +26,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/eqlabs/gnostic/jsonschema"
+	"github.com/google/gnostic/jsonschema"
 )
 
 var (

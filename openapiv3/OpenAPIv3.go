@@ -23,7 +23,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/eqlabs/gnostic/compiler"
+	"github.com/google/gnostic/compiler"
 )
 
 // Version returns the package name (and OpenAPI version).
