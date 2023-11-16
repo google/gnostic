@@ -281,6 +281,9 @@ func generateExtension(schemaFile string, outDir string) error {
 		return err
 	}
 	err = exec.Command(runtime.GOROOT()+"/bin/gofmt", "-w", goFilename).Run()
+	if err != nil {
+		return err
+	}
 
 	// generate the main file.
 
