@@ -50,6 +50,12 @@ func NewNumberSchema(format string) *v3.SchemaOrReference {
 			Schema: &v3.Schema{Type: "number", Format: format}}}
 }
 
+func NewInt64Schema(format string) *v3.SchemaOrReference {
+	return &v3.SchemaOrReference{
+		Oneof: &v3.SchemaOrReference_Schema{
+			Schema: &v3.Schema{Type: "string", Format: format}}}
+}
+
 func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
 	schema := &v3.Schema{Format: "enum"}
 	if enum_type != nil && *enum_type == "string" {
