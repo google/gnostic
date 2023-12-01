@@ -416,6 +416,12 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 		// schemaOrReferenceForField also handles array types
 		fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
 
+		// Merge any `Property` annotations with the current
+		extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)
+		if extProperty != nil {
+			proto.Merge(fieldSchema.GetSchema(), extProperty.(*v3.Schema))
+		}
+
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
 				Oneof: &v3.ParameterOrReference_Parameter{
