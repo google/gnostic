@@ -35,15 +35,16 @@ import (
 )
 
 type Configuration struct {
-	Version         *string
-	Title           *string
-	Description     *string
-	Naming          *string
-	FQSchemaNaming  *bool
-	EnumType        *string
-	CircularDepth   *int
-	DefaultResponse *bool
-	OutputMode      *string
+	Version            *string
+	Title              *string
+	Description        *string
+	DisableServiceTags *bool
+	Naming             *string
+	FQSchemaNaming     *bool
+	EnumType           *string
+	CircularDepth      *int
+	DefaultResponse    *bool
+	OutputMode         *string
 }
 
 const (
@@ -437,7 +438,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 func (g *OpenAPIv3Generator) buildOperationV3(
 	d *v3.Document,
 	operationID string,
-	tagName string,
+	serviceTag string,
 	description string,
 	defaultHost string,
 	path string,
@@ -599,11 +600,14 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 
 	// Create the operation.
 	op := &v3.Operation{
-		Tags:        []string{tagName},
 		Description: description,
 		OperationId: operationID,
 		Parameters:  parameters,
 		Responses:   responses,
+	}
+
+	if serviceTag != "" {
+		op.Tags = []string{serviceTag}
 	}
 
 	if defaultHost != "" {
@@ -750,8 +754,12 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				if methodName != "" {
 					defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
+					serviceTag := service.GoName
+					if *g.conf.DisableServiceTags {
+						serviceTag = ""
+					}
 					op, path2 := g.buildOperationV3(
-						d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+						d, operationID, serviceTag, comment, defaultHost, path, body, inputMessage, outputMessage)
 
 					// Merge any `Operation` annotations with the current
 					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
@@ -766,7 +774,9 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 		if annotationsCount > 0 {
 			comment := g.filterCommentString(service.Comments.Leading)
-			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+			if !*g.conf.DisableServiceTags {
+				d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+			}
 		}
 	}
 }
