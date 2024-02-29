@@ -115,4 +115,10 @@ message Message {
   google.protobuf.DoubleValue double_value_type = 23;
   google.protobuf.Timestamp timestamp_type = 24;
   google.protobuf.Duration duration_type = 25;
+  // Description of 64-bit integer values
+  int64 int64_type = 26;
+  sint64 sint64_type = 27;
+  uint64 uint64_type = 28;
+  fixed64 fixed64_type = 29;
+  sfixed64 sfixed64_type = 30;
 }
