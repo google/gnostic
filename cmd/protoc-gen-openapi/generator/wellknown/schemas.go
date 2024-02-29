@@ -16,6 +16,8 @@
 package wellknown
 
 import (
+	"strings"
+
 	v3 "github.com/google/gnostic/openapiv3"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -53,11 +55,22 @@ func NewNumberSchema(format string) *v3.SchemaOrReference {
 func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
 	schema := &v3.Schema{Format: "enum"}
 	if enum_type != nil && *enum_type == "string" {
+		cast := func(w string) string {
+			reservedWords := []string{
+				"Y", "N", "YES", "NO", "ON", "OFF", "TRUE", "FALSE", "NULL",
+			}
+			for _, rw := range reservedWords {
+				if strings.EqualFold(rw, w) {
+					return "!!str " + w
+				}
+			}
+			return w
+		}
 		schema.Type = "string"
 		schema.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
 		for i := 0; i < field.Enum().Values().Len(); i++ {
 			schema.Enum = append(schema.Enum, &v3.Any{
-				Yaml: string(field.Enum().Values().Get(i).Name()),
+				Yaml: cast(string(field.Enum().Values().Get(i).Name())),
 			})
 		}
 	} else {
