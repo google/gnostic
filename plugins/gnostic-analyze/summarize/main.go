@@ -32,6 +32,9 @@ var stats []statistics.DocumentStatistics
 
 // walker is called for each summary file found.
 func walker(p string, info os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
 	basename := path.Base(p)
 	if basename != "summary.json" {
 		return nil
