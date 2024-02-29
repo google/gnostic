@@ -133,11 +133,15 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	// While we have required schemas left to generate, go through the files again
 	// looking for the related message and adding them to the document if required.
 	for len(g.reflect.requiredSchemas) > 0 {
-		count := len(g.reflect.requiredSchemas)
 		for _, file := range g.plugin.Files {
 			g.addSchemasForMessagesToDocumentV3(d, file.Messages)
 		}
-		g.reflect.requiredSchemas = g.reflect.requiredSchemas[count:len(g.reflect.requiredSchemas)]
+		// clear the generated schemas
+		for schema := range g.reflect.requiredSchemas {
+			if contains(g.generatedSchemas, schema) {
+				delete(g.reflect.requiredSchemas, schema)
+			}
+		}
 	}
 
 	// If there is only 1 service, then use it's title for the
@@ -771,12 +775,14 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 	}
 }
 
-// addSchemaForMessageToDocumentV3 adds the schema to the document if required
+// addSchemaToDocumentV3 adds the schema to the document if required
 func (g *OpenAPIv3Generator) addSchemaToDocumentV3(d *v3.Document, schema *v3.NamedSchemaOrReference) {
-	if contains(g.generatedSchemas, schema.Name) {
-		return
+	// check if schema already exists in Schemas, instead of checking "generated"
+	for _, prop := range d.Components.Schemas.AdditionalProperties {
+		if prop.Name == schema.Name {
+			return
+		}
 	}
-	g.generatedSchemas = append(g.generatedSchemas, schema.Name)
 	d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties, schema)
 }
 
@@ -789,12 +795,25 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		}
 
 		schemaName := g.reflect.formatMessageName(message.Desc)
+		fqSchemaName := g.reflect.formatPackageMessageName(message.Desc)
 
 		// Only generate this if we need it and haven't already generated it.
-		if !contains(g.reflect.requiredSchemas, schemaName) ||
-			contains(g.generatedSchemas, schemaName) {
+		requiredFQSchema, ok := g.reflect.requiredSchemas[schemaName]
+		if !ok {
+			continue
+		} else if requiredFQSchema != fqSchemaName {
+			// "schemaName" with same name is required, but it's not the actual
+			// schema with "fqSchemaName". Try to use the fully-qualified schema.
+			if _, ok = g.reflect.requiredSchemas[fqSchemaName]; !ok {
+				continue
+			}
+			// use fully-qualified name as schema name if there are same named messages
+			schemaName = fqSchemaName
+		}
+		if contains(g.generatedSchemas, schemaName) {
 			continue
 		}
+		g.generatedSchemas = append(g.generatedSchemas, schemaName)
 
 		typeName := g.reflect.fullMessageTypeName(message.Desc)
 		messageDescription := g.filterCommentString(message.Comments.Leading)

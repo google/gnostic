@@ -33,7 +33,9 @@ const (
 type OpenAPIv3Reflector struct {
 	conf Configuration
 
-	requiredSchemas []string // Names of schemas which are used through references.
+	// Names of schemas which are used through references.
+	// map: schema name will be used actually -> fully-qualified schema name
+	requiredSchemas map[string]string
 }
 
 // NewOpenAPIv3Reflector creates a new reflector.
@@ -41,7 +43,7 @@ func NewOpenAPIv3Reflector(conf Configuration) *OpenAPIv3Reflector {
 	return &OpenAPIv3Reflector{
 		conf: conf,
 
-		requiredSchemas: make([]string, 0),
+		requiredSchemas: make(map[string]string, 0),
 	}
 }
 
@@ -86,6 +88,14 @@ func (r *OpenAPIv3Reflector) formatMessageName(message protoreflect.MessageDescr
 	return name
 }
 
+// formatPackageMessageName returns the fully-qualified name of a message.
+func (r *OpenAPIv3Reflector) formatPackageMessageName(message protoreflect.MessageDescriptor) string {
+	package_name := string(message.ParentFile().Package())
+	name := package_name + "." + r.getMessageName(message)
+
+	return name
+}
+
 func (r *OpenAPIv3Reflector) formatFieldName(field protoreflect.FieldDescriptor) string {
 	if *r.conf.Naming == "proto" {
 		return string(field.Name())
@@ -116,8 +126,15 @@ func (r *OpenAPIv3Reflector) responseContentForMessage(message protoreflect.Mess
 
 func (r *OpenAPIv3Reflector) schemaReferenceForMessage(message protoreflect.MessageDescriptor) string {
 	schemaName := r.formatMessageName(message)
-	if !contains(r.requiredSchemas, schemaName) {
-		r.requiredSchemas = append(r.requiredSchemas, schemaName)
+	fqSchemaName := r.formatPackageMessageName(message)
+	requiredFQSchema, ok := r.requiredSchemas[schemaName]
+	if !ok {
+		// new required, use schemaName
+		r.requiredSchemas[schemaName] = fqSchemaName
+	} else if requiredFQSchema != fqSchemaName {
+		// use the fully-qualified schema name as there are same named messages
+		schemaName = fqSchemaName
+		r.requiredSchemas[schemaName] = fqSchemaName
 	}
 	return "#/components/schemas/" + schemaName
 }
