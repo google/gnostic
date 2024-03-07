@@ -42,7 +42,8 @@ components:
             type: object
             properties:
                 id:
-                    type: string
+                    type: integer
+                    format: int64
                 label:
                     type: string
         GoogleProtobufAny:
@@ -90,7 +91,8 @@ components:
             type: object
             properties:
                 id:
-                    type: string
+                    type: integer
+                    format: int64
                 label:
                     type: string
         Status:
