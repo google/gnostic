@@ -702,6 +702,11 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 	for _, service := range services {
 		annotationsCount := 0
 
+		tagName := service.GoName
+		if g.conf.FQSchemaNaming != nil && *g.conf.FQSchemaNaming {
+			tagName = string(service.Desc.FullName())
+		}
+
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
@@ -766,7 +771,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 		if annotationsCount > 0 {
 			comment := g.filterCommentString(service.Comments.Leading)
-			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+			d.Tags = append(d.Tags, &v3.Tag{Name: tagName, Description: comment})
 		}
 	}
 }
