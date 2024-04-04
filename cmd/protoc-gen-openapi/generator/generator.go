@@ -415,7 +415,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	} else if field.Desc.Kind() != protoreflect.GroupKind {
 		// schemaOrReferenceForField also handles array types
 		fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
-
+		enrichFieldSchema(field, fieldSchema)
 		parameters = append(parameters,
 			&v3.ParameterOrReference{
 				Oneof: &v3.ParameterOrReference_Parameter{
@@ -431,6 +431,14 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	}
 
 	return parameters
+}
+
+func enrichFieldSchema(field *protogen.Field, fieldSchema *v3.SchemaOrReference) {
+	// Merge any `Property` annotations with the current
+	extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)
+	if extProperty != nil {
+		proto.Merge(fieldSchema.GetSchema(), extProperty.(*v3.Schema))
+	}
 }
 
 // buildOperationV3 constructs an operation for a set of values.
@@ -468,6 +476,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 			field := g.findField(pathParameter, inputMessage)
 			if field != nil {
 				fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
+				enrichFieldSchema(field, fieldSchema)
 				fieldDescription = g.filterCommentString(field.Comments.Leading)
 			} else {
 				// If field does not exist, it is safe to set it to string, as it is ignored downstream
