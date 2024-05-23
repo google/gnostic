@@ -1,0 +1,91 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: openapi examples
+    version: 0.0.1
+paths:
+    /v1/messages/{messageId}:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_GetMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Message'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+    /v1/users/{userId}/messages/{messageId}:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_GetUserMessage
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+components:
+    schemas:
+        Message:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                userId:
+                    type: string
+                content:
+                    type: string
+                maybe:
+                    type: string
+tags:
+    - name: Messaging

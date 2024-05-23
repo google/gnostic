@@ -1,5 +1,9 @@
 checksum: b18903c46d7f42352611a4269d136dd3899e948b
 vendor: .proto
+base:
+  paths: import
+root:
+  - examples
 deps:
   - name: google
     url: github.com/googleapis/googleapis
@@ -11,3 +15,12 @@ deps:
     url: github.com/google/gnostic
     path: /openapiv3
     version: v0.7.0
+plugins:
+  - name: openapi
+    opt:
+      - title="openapi examples"
+      - paths=import
+      - enum_type=string
+      - default_response=false
+      - depth=10
+      - output_mode=source_relative

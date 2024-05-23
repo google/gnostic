@@ -1,0 +1,87 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: openapi examples
+    description: Messaging service
+    version: 0.0.1
+paths:
+    /v1/messages/{messageId}:
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: notUsed
+                  in: query
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+    /v1/messages/{message_id}:
+        patch:
+            tags:
+                - Messaging
+            operationId: Messaging_UpdateMessage
+            parameters:
+                - name: message_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: not_used
+                  in: query
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message2'
+components:
+    schemas:
+        Message:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                bodyText:
+                    type: string
+                notUsed:
+                    type: string
+        Message2:
+            type: object
+            properties:
+                message_id:
+                    type: string
+                body_text:
+                    type: string
+                not_used:
+                    type: string
+tags:
+    - name: Messaging

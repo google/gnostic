@@ -66,9 +66,7 @@ service Messaging1 {
             additional_properties: [
               {
                 name: "BasicAuth";
-                value: {
-                  value: []
-                }
+                value: {}
               }
             ]
           }

@@ -1,0 +1,60 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Title from annotation
+    description: Description from annotation
+    contact:
+        name: Contact Name
+        url: https://github.com/google/gnostic
+        email: gnostic@google.com
+    license:
+        name: Apache License
+        url: https://github.com/google/gnostic/blob/master/LICENSE
+    version: Version from annotation
+paths:
+    /v1/messages/{message_id}:
+        patch:
+            tags:
+                - Messaging1
+            operationId: Messaging1_UpdateMessage
+            parameters:
+                - name: message_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Message'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+            security:
+                - BasicAuth: []
+components:
+    schemas:
+        Message:
+            title: This is an overridden message schema title
+            type: object
+            properties:
+                id:
+                    type: string
+                label:
+                    title: this is an overriden field schema title
+                    maxLength: 255
+                    type: string
+    securitySchemes:
+        BasicAuth:
+            type: http
+            scheme: basic
+tags:
+    - name: Messaging1
