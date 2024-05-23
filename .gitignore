@@ -19,3 +19,5 @@ bundle.json
 *~
 Package.resolved
 extensions/sample/generated
+/.proto
+/vendor

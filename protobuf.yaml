@@ -1,0 +1,19 @@
+checksum: b18903c46d7f42352611a4269d136dd3899e948b
+vendor: .proto
+base:
+  paths: source_relative
+root:
+  - proto
+deps:
+  - name: google
+    url: github.com/googleapis/googleapis
+    path: /google
+    version: v0.0.0-20220601021915-4e0282f92e4e
+  - name: google/protobuf
+    url: /usr/local/include/google/protobuf
+  - name: openapiv3
+    url: github.com/google/gnostic
+    path: /openapiv3
+    version: v0.7.0
+plugins:
+  - name: go

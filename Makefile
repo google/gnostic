@@ -9,3 +9,10 @@ test:
 	# since some tests call separately-built binaries, clear the cache to ensure all get run
 	go clean -testcache
 	go test ./... -v
+
+vet:
+	go vet ./...
+
+pb-gen:
+	protobuild vendor
+	protobuild gen
