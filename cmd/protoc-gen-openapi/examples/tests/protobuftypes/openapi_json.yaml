@@ -177,7 +177,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Message'
+                            $ref: '#/components/schemas/Message_Body'
                 required: true
             responses:
                 "200":
@@ -459,6 +459,78 @@ components:
                 durationType:
                     pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
                     type: string
+        Message_Body:
+            type: object
+            properties:
+                stringType:
+                    type: string
+                recursiveType:
+                    $ref: '#/components/schemas/RecursiveParent'
+                embeddedType:
+                    $ref: '#/components/schemas/Message_EmbMessage'
+                subType:
+                    $ref: '#/components/schemas/SubMessage'
+                repeatedType:
+                    type: array
+                    items:
+                        type: string
+                repeatedSubType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SubMessage'
+                repeatedRecursiveType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RecursiveParent'
+                mapType:
+                    type: object
+                    additionalProperties:
+                        type: string
+                body:
+                    type: object
+                media:
+                    type: array
+                    items:
+                        type: object
+                valueType:
+                    allOf:
+                        - $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of value
+                repeatedValueType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of repeated value
+                boolValueType:
+                    type: boolean
+                bytesValueType:
+                    type: string
+                    format: bytes
+                int32ValueType:
+                    type: integer
+                    format: int32
+                uint32ValueType:
+                    type: integer
+                    format: uint32
+                stringValueType:
+                    type: string
+                int64ValueType:
+                    type: string
+                uint64ValueType:
+                    type: string
+                floatValueType:
+                    type: number
+                    format: float
+                doubleValueType:
+                    type: number
+                    format: double
+                timestampType:
+                    type: string
+                    format: date-time
+                durationType:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+            description: The body of Messaging_CreateMessage
         Message_EmbMessage:
             type: object
             properties:

@@ -48,7 +48,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Message'
+                            $ref: '#/components/schemas/Message_Body'
                 required: true
             responses:
                 "200":
@@ -113,6 +113,16 @@ components:
                     type: string
                 maybe:
                     type: string
+        Message_Body:
+            type: object
+            properties:
+                userId:
+                    type: string
+                content:
+                    type: string
+                maybe:
+                    type: string
+            description: The body of Messaging_CreateMessage
         Status:
             type: object
             properties:

@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.1
 
 protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative plugins/*.proto
 protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative surface/*.proto

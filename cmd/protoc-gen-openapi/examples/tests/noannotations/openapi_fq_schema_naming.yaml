@@ -21,7 +21,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/tests.noannotations.message.v1.Message'
+                            $ref: '#/components/schemas/tests.noannotations.message.v1.Message_Body'
                 required: true
             responses:
                 "200":
@@ -69,5 +69,13 @@ components:
                     type: string
                 label:
                     type: string
+        tests.noannotations.message.v1.Message_Body:
+            type: object
+            properties:
+                id:
+                    type: string
+                label:
+                    type: string
+            description: The body of Messaging1_UpdateMessage
 tags:
     - name: Messaging1

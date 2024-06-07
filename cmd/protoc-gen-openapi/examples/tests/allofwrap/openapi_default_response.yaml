@@ -7,37 +7,10 @@ info:
     version: 0.0.1
 paths:
     /v1/messages/{message_id}:
-        get:
+        patch:
             tags:
                 - Messaging
-            operationId: Messaging_GetMessage
-            parameters:
-                - name: message_id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: user_id
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Message'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        post:
-            tags:
-                - Messaging
-            operationId: Messaging_CreateMessage
+            operationId: Messaging_UpdateMessage
             parameters:
                 - name: message_id
                   in: path
@@ -50,35 +23,6 @@ paths:
                         schema:
                             $ref: '#/components/schemas/Message_Body'
                 required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Message'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /v1/users/{user_id}/messages/{message_id}:
-        get:
-            tags:
-                - Messaging
-            operationId: Messaging_GetUserMessage
-            parameters:
-                - name: user_id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: message_id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
@@ -105,24 +49,55 @@ components:
         Message:
             type: object
             properties:
-                message_id:
-                    type: string
-                user_id:
-                    type: string
-                content:
-                    type: string
-                maybe:
-                    type: string
+                sub:
+                    $ref: '#/components/schemas/Message_Sub'
+                subInput:
+                    writeOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                subOutput:
+                    readOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                subDesc:
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                    description: this sub has a description
+                subs:
+                    readOnly: true
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Message_Sub'
+                    description: test repeated, should not allof wrapped
         Message_Body:
             type: object
             properties:
-                user_id:
-                    type: string
+                sub:
+                    $ref: '#/components/schemas/Message_Sub'
+                subInput:
+                    writeOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                subOutput:
+                    readOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                subDesc:
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                    description: this sub has a description
+                subs:
+                    readOnly: true
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Message_Sub'
+                    description: test repeated, should not allof wrapped
+            description: The body of Messaging_UpdateMessage
+        Message_Sub:
+            type: object
+            properties:
                 content:
                     type: string
-                maybe:
-                    type: string
-            description: The body of Messaging_CreateMessage
         Status:
             type: object
             properties:
