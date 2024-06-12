@@ -21,7 +21,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Message'
+                            $ref: '#/components/schemas/Message_Body'
                 required: true
             responses:
                 "200":
@@ -86,6 +86,38 @@ components:
                     type: object
                     additionalProperties:
                         type: object
+        Message_Body:
+            type: object
+            properties:
+                another_message:
+                    $ref: '#/components/schemas/AnotherMessage'
+                sub_message:
+                    $ref: '#/components/schemas/Message_SubMessage'
+                string_list:
+                    type: array
+                    items:
+                        type: string
+                sub_message_list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Message_SubMessage'
+                object_list:
+                    type: array
+                    items:
+                        type: object
+                strings_map:
+                    type: object
+                    additionalProperties:
+                        type: string
+                sub_messages_map:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/Message_SubMessage'
+                objects_map:
+                    type: object
+                    additionalProperties:
+                        type: object
+            description: The body of Messaging_UpdateMessage
         Message_SubMessage:
             type: object
             properties:

@@ -48,7 +48,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/tests.pathparams.message.v1.Message'
+                            $ref: '#/components/schemas/tests.pathparams.message.v1.Message_Body'
                 required: true
             responses:
                 "200":
@@ -129,5 +129,15 @@ components:
                     type: string
                 maybe:
                     type: string
+        tests.pathparams.message.v1.Message_Body:
+            type: object
+            properties:
+                userId:
+                    type: string
+                content:
+                    type: string
+                maybe:
+                    type: string
+            description: The body of Messaging_CreateMessage
 tags:
     - name: Messaging

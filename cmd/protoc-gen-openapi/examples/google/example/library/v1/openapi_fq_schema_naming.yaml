@@ -335,7 +335,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/google.example.library.v1.MoveBookRequest'
+                            $ref: '#/components/schemas/google.example.library.v1.MoveBookRequest_Body'
                 required: true
             responses:
                 "200":
@@ -374,7 +374,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/google.example.library.v1.MergeShelvesRequest'
+                            $ref: '#/components/schemas/google.example.library.v1.MergeShelvesRequest_Body'
                 required: true
             responses:
                 "200":
@@ -461,36 +461,24 @@ components:
                          field in the subsequent call to `ListShelves` method to retrieve the next
                          page of results.
             description: Response message for LibraryService.ListShelves.
-        google.example.library.v1.MergeShelvesRequest:
+        google.example.library.v1.MergeShelvesRequest_Body:
             required:
-                - name
                 - otherShelfName
             type: object
             properties:
-                name:
-                    type: string
-                    description: The name of the shelf we're adding books to.
                 otherShelfName:
                     type: string
                     description: The name of the shelf we're removing books from and deleting.
-            description: |-
-                Describes the shelf being removed (other_shelf_name) and updated
-                 (name) in this merge.
-        google.example.library.v1.MoveBookRequest:
+            description: The body of LibraryService_MergeShelves
+        google.example.library.v1.MoveBookRequest_Body:
             required:
-                - name
                 - otherShelfName
             type: object
             properties:
-                name:
-                    type: string
-                    description: The name of the book to move.
                 otherShelfName:
                     type: string
                     description: The name of the destination shelf.
-            description: |-
-                Describes what book to move (name) and what shelf we're moving it
-                 to (other_shelf_name).
+            description: The body of LibraryService_MoveBook
         google.example.library.v1.Shelf:
             required:
                 - name

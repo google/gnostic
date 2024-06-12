@@ -21,7 +21,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/tests.mapfields.message.v1.Message'
+                            $ref: '#/components/schemas/tests.mapfields.message.v1.Message_Body'
                 required: true
             responses:
                 "200":
@@ -102,6 +102,38 @@ components:
                     type: object
                     additionalProperties:
                         type: object
+        tests.mapfields.message.v1.Message_Body:
+            type: object
+            properties:
+                anotherMessage:
+                    $ref: '#/components/schemas/tests.mapfields.message.v1.AnotherMessage'
+                subMessage:
+                    $ref: '#/components/schemas/tests.mapfields.message.v1.Message_SubMessage'
+                stringList:
+                    type: array
+                    items:
+                        type: string
+                subMessageList:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/tests.mapfields.message.v1.Message_SubMessage'
+                objectList:
+                    type: array
+                    items:
+                        type: object
+                stringsMap:
+                    type: object
+                    additionalProperties:
+                        type: string
+                subMessagesMap:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/tests.mapfields.message.v1.Message_SubMessage'
+                objectsMap:
+                    type: object
+                    additionalProperties:
+                        type: object
+            description: The body of Messaging_UpdateMessage
         tests.mapfields.message.v1.Message_SubMessage:
             type: object
             properties:

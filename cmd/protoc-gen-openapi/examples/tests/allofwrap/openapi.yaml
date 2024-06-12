@@ -21,7 +21,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Message'
+                            $ref: '#/components/schemas/Message_Body'
                 required: true
             responses:
                 "200":
@@ -69,6 +69,30 @@ components:
                     items:
                         $ref: '#/components/schemas/Message_Sub'
                     description: test repeated, should not allof wrapped
+        Message_Body:
+            type: object
+            properties:
+                sub:
+                    $ref: '#/components/schemas/Message_Sub'
+                sub_input:
+                    writeOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                sub_output:
+                    readOnly: true
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                sub_desc:
+                    allOf:
+                        - $ref: '#/components/schemas/Message_Sub'
+                    description: this sub has a description
+                subs:
+                    readOnly: true
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Message_Sub'
+                    description: test repeated, should not allof wrapped
+            description: The body of Messaging_UpdateMessage
         Message_Sub:
             type: object
             properties:
