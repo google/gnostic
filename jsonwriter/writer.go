@@ -18,19 +18,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"strings"
+	"strconv"
 
 	"gopkg.in/yaml.v3"
 )
 
-const indentation = "  "
-
-// basic escaping, will need to be improved or replaced
-func escape(s string) string {
-	s = strings.Replace(s, "\n", "\\n", -1)
-	s = strings.Replace(s, "\"", "\\\"", -1)
-	return s
-}
+const (
+	indentation = "  "
+	null        = "null"
+)
 
 type writer struct {
 	b bytes.Buffer
@@ -85,15 +81,15 @@ func (w *writer) writeScalar(node *yaml.Node, indent string) {
 	}
 	switch node.Tag {
 	case "!!str":
-		w.writeString("\"")
-		w.writeString(escape(node.Value))
-		w.writeString("\"")
+		w.writeString(strconv.Quote(node.Value))
 	case "!!int":
 		w.writeString(node.Value)
 	case "!!float":
 		w.writeString(node.Value)
 	case "!!bool":
 		w.writeString(node.Value)
+	case "!!null":
+		w.writeString(null)
 	}
 }
 

@@ -37,6 +37,8 @@ func TestMarshal(t *testing.T) {
 		scalarBoolTestCase(),
 		scalarFloatTestCase(),
 		scalarIntTestCase(),
+		scalarStringTestCase(),
+		scalarNullTestCase(),
 		sequenceStringArrayTestCase(),
 		sequenceBoolArrayTestCase(),
 		sequenceFloatArrayTestCase(),
@@ -85,6 +87,22 @@ func scalarFloatTestCase() *MarshalTestCase {
 		Name:     "scalar float",
 		Node:     compiler.NewScalarNodeForFloat(42.1),
 		Expected: "42.1\n",
+	}
+}
+
+func scalarStringTestCase() *MarshalTestCase {
+	return &MarshalTestCase{
+		Name:     "scalar string",
+		Node:     compiler.NewScalarNodeForString("a\\b\nc\""),
+		Expected: "\"a\\\\b\\nc\\\"\"\n",
+	}
+}
+
+func scalarNullTestCase() *MarshalTestCase {
+	return &MarshalTestCase{
+		Name:     "scalar null",
+		Node:     compiler.NewNullNode(),
+		Expected: "null\n",
 	}
 }
 

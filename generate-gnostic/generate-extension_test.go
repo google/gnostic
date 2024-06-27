@@ -16,6 +16,9 @@ func TestErrorExtensionGeneratorUnsupportedPrimitive(t *testing.T) {
 		"test/x-unsupportedprimitives.json",
 		"--out_dir=/tmp",
 	).Output()
+	if err != nil {
+		t.Fatalf("error executing generate-gnostic: %v", err)
+	}
 
 	outputFile := "x-unsupportedprimitives.errors"
 	_ = ioutil.WriteFile(outputFile, output, 0644)
@@ -38,6 +41,9 @@ func TestErrorExtensionGeneratorNameCollision(t *testing.T) {
 		"test/x-extension-name-collision.json",
 		"--out_dir=/tmp",
 	).Output()
+	if err != nil {
+		t.Fatalf("error executing generate-gnostic: %v", err)
+	}
 
 	outputFile := "x-extension-name-collision.errors"
 	_ = ioutil.WriteFile(outputFile, output, 0644)
