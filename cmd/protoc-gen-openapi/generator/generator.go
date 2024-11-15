@@ -772,10 +772,18 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 			}
 		}
 
-		if annotationsCount > 0 {
-			comment := g.filterCommentString(service.Comments.Leading)
-			// serviceOptions := proto.
-			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+		serviceOptions := proto.GetExtension (service.Desc.Options(), v3.E_Service)
+		if annotationsCount > 0  && serviceOptions != nil {
+			displayName := ""
+			description := ""
+
+			if extService, ok := serviceOptions.(*v3.Service); ok && extService != nil {
+				displayName = extService.DisplayName
+				description = extService.Description
+			}
+			// comment := g.filterCommentString(service.Comments.Leading)
+
+			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: description, DisplayName: displayName})
 		}
 	}
 }

@@ -8581,6 +8581,10 @@ func (m *Tag) ToRawInfo() *yaml.Node {
 		info.Content = append(info.Content, compiler.NewScalarNodeForString("externalDocs"))
 		info.Content = append(info.Content, m.ExternalDocs.ToRawInfo())
 	}
+	if m.DisplayName != "" {
+		info.Content = append(info.Content, compiler.NewScalarNodeForString("x-display-name"))
+		info.Content = append(info.Content, compiler.NewScalarNodeForString(m.DisplayName))
+	}
 	if m.SpecificationExtension != nil {
 		for _, item := range m.SpecificationExtension {
 			info.Content = append(info.Content, compiler.NewScalarNodeForString(item.Name))

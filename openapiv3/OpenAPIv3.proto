@@ -658,6 +658,7 @@ message Tag {
   string description = 2;
   ExternalDocs external_docs = 3;
   repeated NamedAny specification_extension = 4;
+  string display_name = 5;
 }
 
 // A metadata object that allows for more fine-tuned XML model definitions.  When using arrays, XML element names are *not* inferred (for singular/plural forms) and the `name` property SHOULD be used to add that information. See examples for expected behavior.

@@ -58,3 +58,13 @@ extend google.protobuf.MessageOptions {
 extend google.protobuf.FieldOptions {
   Schema property = 1143;
 }
+
+// semgrep-extension: let Services have option to have displayname and describe the tag
+message Service {
+  string display_name = 1;
+  string description = 2;
+}
+
+extend google.protobuf.ServiceOptions {
+  Service service = 1143;
+}

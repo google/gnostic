@@ -1,11 +1,6 @@
 
 all:
-	go generate ./...
-	go get ./...
-	go install ./...
-	cd extensions/sample; make
+	# TODO brendon specific path here
+	PATH=/Users/brendon/go/bin:$$PATH ./COMPILE-PROTOS.sh
+	cd ./cmd/protoc-gen-openapi && go build && cd ../..
 
-test:
-	# since some tests call separately-built binaries, clear the cache to ensure all get run
-	go clean -testcache
-	go test ./... -v
