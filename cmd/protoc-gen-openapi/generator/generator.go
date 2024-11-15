@@ -17,6 +17,7 @@ package generator
 
 import (
 	"fmt"
+	"os"
 	"log"
 	"net/url"
 	"regexp"
@@ -712,7 +713,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 			extHTTP := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
 			if extHTTP != nil && extHTTP != annotations.E_Http.InterfaceOf(annotations.E_Http.Zero()) {
-				annotationsCount++
+
 
 				rule := extHTTP.(*annotations.HttpRule)
 				rules = append(rules, rule)
@@ -755,17 +756,25 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 
 					// Merge any `Operation` annotations with the current
 					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
+					fmt.Fprintf(os.Stderr, "This is printed to stderr: %v\n", v3.E_Operation)
 					if extOperation != nil {
-						proto.Merge(op, extOperation.(*v3.Operation))
-					}
+						if extOp, ok := extOperation.(*v3.Operation); ok && extOp != nil {
+							proto.Merge(op, extOp)
+							// Only add operation if it has openapi.v3.operation annotation
+							g.addOperationToDocumentV3(d, op, path2, methodName)
 
-					g.addOperationToDocumentV3(d, op, path2, methodName)
+							// Only count added operations
+							annotationsCount++
+						}
+
+					}
 				}
 			}
 		}
 
 		if annotationsCount > 0 {
 			comment := g.filterCommentString(service.Comments.Leading)
+			// serviceOptions := proto.
 			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
 		}
 	}
