@@ -18,7 +18,7 @@ import (
 	"errors"
 	"gopkg.in/yaml.v3"
 
-	"github.com/google/gnostic/compiler"
+	"github.com/google/gnostic-models/compiler"
 )
 
 // ParseDocument reads an OpenAPI v3 description from a YAML/JSON representation.

@@ -22,7 +22,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
-	v3 "github.com/google/gnostic/openapiv3"
+	v3 "github.com/google/gnostic/cmd/protoc-gen-openapi/openapiv3"
 )
 
 const (

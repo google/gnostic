@@ -15,6 +15,5 @@
 # limitations under the License.
 #
 
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-
-protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative openapiv3/*.proto
+# go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+cd cmd/protoc-gen-openapi/ && protoc -I . -I ./third_party --go_out=. --go_opt=paths=source_relative openapiv3/*.proto && cd ../..

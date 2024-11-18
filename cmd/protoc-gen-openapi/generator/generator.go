@@ -32,7 +32,7 @@ import (
 	any_pb "google.golang.org/protobuf/types/known/anypb"
 
 	wk "github.com/google/gnostic/cmd/protoc-gen-openapi/generator/wellknown"
-	v3 "github.com/google/gnostic/openapiv3"
+	v3 "github.com/google/gnostic/cmd/protoc-gen-openapi/openapiv3"
 )
 
 type Configuration struct {
