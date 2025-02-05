@@ -55,7 +55,7 @@ const (
 // to know the message descriptors for google.rpc.Status as well
 // as google.protobuf.Any.
 var statusProtoDesc = (&status_pb.Status{}).ProtoReflect().Descriptor()
-var anyProtoDesc    = (&any_pb.Any{}).ProtoReflect().Descriptor()
+var anyProtoDesc = (&any_pb.Any{}).ProtoReflect().Descriptor()
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
