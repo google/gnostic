@@ -44,6 +44,7 @@ type Configuration struct {
 	CircularDepth   *int
 	DefaultResponse *bool
 	OutputMode      *string
+	GenerateOneOfs  *bool
 }
 
 const (
@@ -54,7 +55,7 @@ const (
 // to know the message descriptors for google.rpc.Status as well
 // as google.protobuf.Any.
 var statusProtoDesc = (&status_pb.Status{}).ProtoReflect().Descriptor()
-var anyProtoDesc = (&any_pb.Any{}).ProtoReflect().Descriptor()
+var anyProtoDesc    = (&any_pb.Any{}).ProtoReflect().Descriptor()
 
 // OpenAPIv3Generator holds internal state needed to generate an OpenAPIv3 document for a transcoded Protocol Buffer service.
 type OpenAPIv3Generator struct {
@@ -296,7 +297,6 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
 		return parameters
-
 	} else if field.Desc.Kind() == protoreflect.MessageKind {
 		typeName := g.reflect.fullMessageTypeName(field.Desc.Message())
 
@@ -621,7 +621,6 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
 			requestSchema = g.reflect.schemaOrReferenceForMessage(inputMessage.Desc)
-
 		} else {
 			// If body refers to a message field, use that type.
 			for _, field := range inputMessage.Fields {
@@ -819,6 +818,17 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
 		}
 
+		// There's not a nice way to handle oneof fields if there are more than one
+		// group in a single message.
+		//
+		// If there are more than one in the message, fallback to the previous
+		// behavior. That'll treat each oneof field as normal.
+		handleOneOf := len(message.Oneofs) == 1 && *g.conf.GenerateOneOfs
+		var oneOfs []*v3.SchemaOrReference
+		if handleOneOf {
+			oneOfs = make([]*v3.SchemaOrReference, 0, len(message.Oneofs[0].Fields))
+		}
+
 		var required []string
 		for _, field := range message.Fields {
 			// Get the field description from the comments.
@@ -873,20 +883,77 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				}
 			}
 
-			definitionProperties.AdditionalProperties = append(
-				definitionProperties.AdditionalProperties,
-				&v3.NamedSchemaOrReference{
-					Name:  g.reflect.formatFieldName(field.Desc),
-					Value: fieldSchema,
-				},
-			)
+			namedSchema := &v3.NamedSchemaOrReference{
+				Name:  g.reflect.formatFieldName(field.Desc),
+				Value: fieldSchema,
+			}
+			if !handleOneOf || field.Oneof == nil {
+				definitionProperties.AdditionalProperties = append(
+					definitionProperties.AdditionalProperties,
+					namedSchema,
+				)
+			} else {
+				oneOfs = append(oneOfs, &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{
+							Title: g.reflect.formatFieldName(field.Desc),
+							Type:  "object",
+							Properties: &v3.Properties{
+								AdditionalProperties: []*v3.NamedSchemaOrReference{namedSchema},
+							},
+						},
+					},
+				})
+			}
 		}
 
 		schema := &v3.Schema{
 			Type:        "object",
 			Description: messageDescription,
-			Properties:  definitionProperties,
 			Required:    required,
+		}
+
+		if !handleOneOf {
+			schema.Properties = definitionProperties
+		} else {
+			// Combine normal fields and the oneOf clause together. For example:
+			//
+			// Identifier:
+			//   type: object
+			//   allOf:
+			//     - type: object
+			//       properties:
+			//         normal_field:
+			//           type: string
+			//     - oneOf:
+			//       - title: email
+			//         type: object
+			//         properties:
+			//           email:
+			//             type: string
+			//       - title: phone_number
+			//         type: object
+			//         properties:
+			//           phone_number:
+			//             type: string
+			schema.AllOf = []*v3.SchemaOrReference{}
+			if len(definitionProperties.AdditionalProperties) > 0 {
+				schema.AllOf = append(schema.AllOf, &v3.SchemaOrReference{
+					Oneof: &v3.SchemaOrReference_Schema{
+						Schema: &v3.Schema{
+							Type:       "object",
+							Properties: definitionProperties,
+						},
+					},
+				})
+			}
+			schema.AllOf = append(schema.AllOf, &v3.SchemaOrReference{
+				Oneof: &v3.SchemaOrReference_Schema{
+					Schema: &v3.Schema{
+						OneOf: oneOfs,
+					},
+				},
+			})
 		}
 
 		// Merge any `Schema` annotations with the current
