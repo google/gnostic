@@ -23,6 +23,7 @@ import (
 	"sort"
 	"strings"
 
+	openextensionv3 "github.com/jeroenrinzema/openapi/extensionv3"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	status_pb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -787,8 +788,18 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 				if methodName != "" {
 					defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
+					label := service.GoName
+
+					extService := proto.GetExtension(service.Desc.Options(), openextensionv3.E_Service)
+					if extService != nil && extService != openextensionv3.E_Service.InterfaceOf(openextensionv3.E_Service.Zero()) {
+						service := extService.(*openextensionv3.Service)
+						if service.Label != "" {
+							label = service.Label
+						}
+					}
+
 					op, path2 := g.buildOperationV3(
-						d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+						d, operationID, label, comment, defaultHost, path, body, inputMessage, outputMessage)
 
 					// Merge any `Operation` annotations with the current
 					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
@@ -802,8 +813,18 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 		}
 
 		if annotationsCount > 0 {
+			label := service.GoName
+
+			extService := proto.GetExtension(service.Desc.Options(), openextensionv3.E_Service)
+			if extService != nil && extService != openextensionv3.E_Service.InterfaceOf(openextensionv3.E_Service.Zero()) {
+				service := extService.(*openextensionv3.Service)
+				if service.Label != "" {
+					label = service.Label
+				}
+			}
+
 			comment := g.filterCommentString(service.Comments.Leading)
-			d.Tags = append(d.Tags, &v3.Tag{Name: service.GoName, Description: comment})
+			d.Tags = append(d.Tags, &v3.Tag{Name: label, Description: comment})
 		}
 	}
 }
