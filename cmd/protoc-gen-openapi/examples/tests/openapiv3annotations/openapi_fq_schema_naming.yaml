@@ -1,5 +1,5 @@
 # Generated with protoc-gen-openapi
-# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+# https://github.com/fern-api/protoc-gen-openapi/tree/master/cmd/protoc-gen-openapi
 
 openapi: 3.0.3
 info:
@@ -7,11 +7,11 @@ info:
     description: Description from annotation
     contact:
         name: Contact Name
-        url: https://github.com/google/gnostic
+        url: https://github.com/fern-api/protoc-gen-openapi
         email: gnostic@google.com
     license:
         name: Apache License
-        url: https://github.com/google/gnostic/blob/master/LICENSE
+        url: https://github.com/fern-api/protoc-gen-openapi/blob/master/LICENSE
     version: Version from annotation
 paths:
     /v1/messages/{message_id}:

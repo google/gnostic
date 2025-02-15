@@ -28,7 +28,7 @@ import (
 
 	"golang.org/x/tools/imports"
 
-	"github.com/google/gnostic/jsonschema"
+	"github.com/fern-api/protoc-gen-openapi/jsonschema"
 )
 
 // License is the software license applied to generated code.
@@ -193,7 +193,7 @@ func generateOpenAPIModel(version string) error {
 		"gopkg.in/yaml.v3",
 		"strings",
 		"regexp",
-		"github.com/google/gnostic/compiler",
+		"github.com/fern-api/protoc-gen-openapi/compiler",
 	}
 	// generate the compiler
 	log.Printf("Generating compiler support code")
@@ -202,7 +202,7 @@ func generateOpenAPIModel(version string) error {
 
 	// format the compiler
 	log.Printf("Formatting compiler support code")
-	imports.LocalPrefix = "github.com/google/gnostic"
+	imports.LocalPrefix = "github.com/fern-api/protoc-gen-openapi"
 	data, err := imports.Process(goFileName, []byte(compiler), &imports.Options{
 		TabWidth:  8,
 		TabIndent: true,

@@ -21,7 +21,7 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "google/rpc/status.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/rpctypes/message/v1;message";
+option go_package = "github.com/fern-api/protoc-gen-openapi/apps/protoc-gen-openapi/examples/tests/rpctypes/message/v1;message";
 
 service Status {
   rpc GetStatus(google.protobuf.Empty) returns (google.rpc.Status) {

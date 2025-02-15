@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/gnostic/lib"
+	"github.com/fern-api/protoc-gen-openapi/lib"
 )
 
 func isURL(path string) bool {

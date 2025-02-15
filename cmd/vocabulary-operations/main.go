@@ -24,8 +24,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	metrics "github.com/google/gnostic/metrics"
-	vocabulary "github.com/google/gnostic/metrics/vocabulary"
+	metrics "github.com/fern-api/protoc-gen-openapi/metrics"
+	vocabulary "github.com/fern-api/protoc-gen-openapi/metrics/vocabulary"
 )
 
 // openVocabularyFiles uses standard input to create a slice of

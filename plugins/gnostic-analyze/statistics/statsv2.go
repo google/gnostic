@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	openapi "github.com/google/gnostic/openapiv2"
+	openapi "github.com/fern-api/protoc-gen-openapi/openapiv2"
 )
 
 // DocumentStatistics contains information collected about an API description.

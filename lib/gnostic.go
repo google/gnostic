@@ -31,13 +31,13 @@ import (
 	"github.com/golang/protobuf/proto"
 	"gopkg.in/yaml.v3"
 
-	"github.com/google/gnostic/compiler"
-	discovery_v1 "github.com/google/gnostic/discovery"
-	"github.com/google/gnostic/jsonwriter"
-	openapi_v2 "github.com/google/gnostic/openapiv2"
-	openapi_v3 "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
-	surface "github.com/google/gnostic/surface"
+	"github.com/fern-api/protoc-gen-openapi/compiler"
+	discovery_v1 "github.com/fern-api/protoc-gen-openapi/discovery"
+	"github.com/fern-api/protoc-gen-openapi/jsonwriter"
+	openapi_v2 "github.com/fern-api/protoc-gen-openapi/openapiv2"
+	openapi_v3 "github.com/fern-api/protoc-gen-openapi/openapiv3"
+	plugins "github.com/fern-api/protoc-gen-openapi/plugins"
+	surface "github.com/fern-api/protoc-gen-openapi/surface"
 )
 
 // UsageError is a response to invalid command-line inputs

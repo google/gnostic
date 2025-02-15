@@ -17,8 +17,8 @@ package jsonwriter_test
 import (
 	"testing"
 
-	"github.com/google/gnostic/compiler"
-	"github.com/google/gnostic/jsonwriter"
+	"github.com/fern-api/protoc-gen-openapi/compiler"
+	"github.com/fern-api/protoc-gen-openapi/jsonwriter"
 
 	"gopkg.in/yaml.v3"
 )

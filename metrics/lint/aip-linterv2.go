@@ -17,8 +17,8 @@ package linter
 import (
 	"fmt"
 
-	rules "github.com/google/gnostic/metrics/rules"
-	pb "github.com/google/gnostic/openapiv2"
+	rules "github.com/fern-api/protoc-gen-openapi/metrics/rules"
+	pb "github.com/fern-api/protoc-gen-openapi/openapiv2"
 )
 
 // fillProtoStructure takes a slice of rules and coverts them to a slice of

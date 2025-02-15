@@ -17,7 +17,7 @@ package openapi_v3
 import (
 	"errors"
 
-	"github.com/google/gnostic/compiler"
+	"github.com/fern-api/protoc-gen-openapi/compiler"
 )
 
 // ParseDocument reads an OpenAPI v3 description from a YAML/JSON representation.

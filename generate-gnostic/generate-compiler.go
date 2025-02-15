@@ -20,7 +20,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/google/gnostic/printer"
+	"github.com/fern-api/protoc-gen-openapi/printer"
 )
 
 // patternNames hands out unique names for a given string.

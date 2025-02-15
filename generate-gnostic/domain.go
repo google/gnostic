@@ -21,7 +21,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/google/gnostic/jsonschema"
+	"github.com/fern-api/protoc-gen-openapi/jsonschema"
 )
 
 // Domain models a collection of types that is defined by a schema.

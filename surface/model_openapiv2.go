@@ -18,8 +18,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/google/gnostic/compiler"
-	openapiv2 "github.com/google/gnostic/openapiv2"
+	"github.com/fern-api/protoc-gen-openapi/compiler"
+	openapiv2 "github.com/fern-api/protoc-gen-openapi/openapiv2"
 )
 
 type OpenAPI2Builder struct {

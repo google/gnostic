@@ -1,5 +1,5 @@
 
-GNOSTIC = $(GOPATH)/src/github.com/google/gnostic
+GNOSTIC = $(GOPATH)/src/github.com/fern-api/protoc-gen-openapi
 
 plugin:
 	node_modules/.bin/pbjs -t json \

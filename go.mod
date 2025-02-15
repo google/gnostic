@@ -1,4 +1,4 @@
-module github.com/google/gnostic
+module github.com/fern-api/protoc-gen-openapi
 
 go 1.12
 

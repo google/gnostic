@@ -20,9 +20,9 @@ package main
 import (
 	"github.com/golang/protobuf/proto"
 
-	openapiv2 "github.com/google/gnostic/openapiv2"
-	openapiv3 "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
+	openapiv2 "github.com/fern-api/protoc-gen-openapi/openapiv2"
+	openapiv3 "github.com/fern-api/protoc-gen-openapi/openapiv3"
+	plugins "github.com/fern-api/protoc-gen-openapi/plugins"
 )
 
 func checkPathsV2(document *openapiv2.Document, messages []*plugins.Message) []*plugins.Message {

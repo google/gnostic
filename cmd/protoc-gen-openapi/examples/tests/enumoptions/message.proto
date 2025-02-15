@@ -19,7 +19,7 @@ package tests.enumoptions.message.v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/enumoptions/message/v1;message";
+option go_package = "github.com/fern-api/protoc-gen-openapi/apps/protoc-gen-openapi/examples/tests/enumoptions/message/v1;message";
 
 // Messaging service
 service Messaging {

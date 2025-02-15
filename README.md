@@ -1,4 +1,4 @@
-[![Go Actions Status](https://github.com/google/gnostic/workflows/Go/badge.svg)](https://github.com/google/gnostic/actions)
+[![Go Actions Status](https://github.com/fern-api/protoc-gen-openapi/workflows/Go/badge.svg)](https://github.com/fern-api/protoc-gen-openapi/actions)
 
 # ⨁ gnostic
 
@@ -66,7 +66,7 @@ and later.
 
 1.  Get this package by downloading it with `git clone`.
 
-        git clone https://github.com/google/gnostic
+        git clone https://github.com/fern-api/protoc-gen-openapi
         cd gnostic
 
 2.  Verify that you have a local installation of `protoc`. You can get `protoc`

@@ -20,7 +20,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/gnostic/jsonschema"
+	"github.com/fern-api/protoc-gen-openapi/jsonschema"
 )
 
 func main() {

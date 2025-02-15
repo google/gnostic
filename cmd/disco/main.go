@@ -24,8 +24,8 @@ import (
 	"github.com/docopt/docopt-go"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/google/gnostic/conversions"
-	discovery "github.com/google/gnostic/discovery"
+	"github.com/fern-api/protoc-gen-openapi/conversions"
+	discovery "github.com/fern-api/protoc-gen-openapi/discovery"
 )
 
 func main() {

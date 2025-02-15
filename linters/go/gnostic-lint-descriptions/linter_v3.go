@@ -15,8 +15,8 @@
 package main
 
 import (
-	openapi "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
+	openapi "github.com/fern-api/protoc-gen-openapi/openapiv3"
+	plugins "github.com/fern-api/protoc-gen-openapi/plugins"
 )
 
 // DocumentLinter contains information collected about an API description.

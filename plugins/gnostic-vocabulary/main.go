@@ -21,12 +21,12 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	discovery_v1 "github.com/google/gnostic/discovery"
-	metrics "github.com/google/gnostic/metrics"
-	vocabulary "github.com/google/gnostic/metrics/vocabulary"
-	openapiv2 "github.com/google/gnostic/openapiv2"
-	openapiv3 "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
+	discovery_v1 "github.com/fern-api/protoc-gen-openapi/discovery"
+	metrics "github.com/fern-api/protoc-gen-openapi/metrics"
+	vocabulary "github.com/fern-api/protoc-gen-openapi/metrics/vocabulary"
+	openapiv2 "github.com/fern-api/protoc-gen-openapi/openapiv2"
+	openapiv3 "github.com/fern-api/protoc-gen-openapi/openapiv3"
+	plugins "github.com/fern-api/protoc-gen-openapi/plugins"
 )
 
 // Record an error, then serialize and return a response.

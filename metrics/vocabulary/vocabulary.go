@@ -26,7 +26,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	metrics "github.com/google/gnostic/metrics"
+	metrics "github.com/fern-api/protoc-gen-openapi/metrics"
 )
 
 type Vocabulary struct {

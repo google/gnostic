@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/gnostic/printer"
+	"github.com/fern-api/protoc-gen-openapi/printer"
 )
 
 // ProtoOption represents an option to be added to generated .proto files.

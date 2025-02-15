@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	lint "github.com/google/gnostic/metrics/lint"
+	lint "github.com/fern-api/protoc-gen-openapi/metrics/lint"
 )
 
 func main() {

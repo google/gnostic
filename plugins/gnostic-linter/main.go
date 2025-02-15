@@ -20,10 +20,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	lint "github.com/google/gnostic/metrics/lint"
-	openapiv2 "github.com/google/gnostic/openapiv2"
-	openapiv3 "github.com/google/gnostic/openapiv3"
-	plugins "github.com/google/gnostic/plugins"
+	lint "github.com/fern-api/protoc-gen-openapi/metrics/lint"
+	openapiv2 "github.com/fern-api/protoc-gen-openapi/openapiv2"
+	openapiv3 "github.com/fern-api/protoc-gen-openapi/openapiv3"
+	plugins "github.com/fern-api/protoc-gen-openapi/plugins"
 )
 
 // Record an error, then serialize and return a response.

@@ -20,7 +20,7 @@ package tests.openapiv3annotations.message.v1;
 import "google/api/annotations.proto";
 import "openapiv3/annotations.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/openapiv3annotations/message/v1;message";
+option go_package = "github.com/fern-api/protoc-gen-openapi/apps/protoc-gen-openapi/examples/tests/openapiv3annotations/message/v1;message";
 
 option (openapi.v3.document) = {
   info: {
@@ -29,12 +29,12 @@ option (openapi.v3.document) = {
     description: "Description from annotation";
     contact: {
       name: "Contact Name";
-      url: "https://github.com/google/gnostic";
+      url: "https://github.com/fern-api/protoc-gen-openapi";
       email: "gnostic@google.com";
     }
     license: {
       name: "Apache License";
-      url: "https://github.com/google/gnostic/blob/master/LICENSE";
+      url: "https://github.com/fern-api/protoc-gen-openapi/blob/master/LICENSE";
     }
   }
   components: {

@@ -15,8 +15,8 @@
 package vocabulary
 
 import (
-	discovery_v1 "github.com/google/gnostic/discovery"
-	metrics "github.com/google/gnostic/metrics"
+	discovery_v1 "github.com/fern-api/protoc-gen-openapi/discovery"
+	metrics "github.com/fern-api/protoc-gen-openapi/metrics"
 )
 
 func (vocab *Vocabulary) processMethodDiscovery(operation *discovery_v1.Method) {

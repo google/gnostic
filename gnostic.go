@@ -35,7 +35,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/gnostic/lib"
+	"github.com/fern-api/protoc-gen-openapi/lib"
 )
 
 func main() {

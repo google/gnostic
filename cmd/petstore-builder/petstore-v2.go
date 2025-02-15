@@ -15,7 +15,7 @@
 package main
 
 import (
-	v2 "github.com/google/gnostic/openapiv2"
+	v2 "github.com/fern-api/protoc-gen-openapi/openapiv2"
 )
 
 func buildDocumentV2() *v2.Document {

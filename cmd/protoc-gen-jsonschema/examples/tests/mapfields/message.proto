@@ -22,7 +22,7 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/mapfields/message/v1;message";
+option go_package = "github.com/fern-api/protoc-gen-openapi/apps/protoc-gen-openapi/examples/tests/mapfields/message/v1;message";
 
 service Messaging {
   rpc UpdateMessage(Message) returns (Message) {

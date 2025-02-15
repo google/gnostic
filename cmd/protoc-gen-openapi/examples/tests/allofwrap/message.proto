@@ -20,7 +20,7 @@ package tests.allofwrap.message.v1;
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 
-option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/bodymapping/message/v1;message";
+option go_package = "github.com/fern-api/protoc-gen-openapi/apps/protoc-gen-openapi/examples/tests/bodymapping/message/v1;message";
 
 service Messaging {
     rpc UpdateMessage(Message) returns(Message) {
