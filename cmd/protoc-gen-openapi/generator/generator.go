@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -44,6 +45,7 @@ type Configuration struct {
 	CircularDepth   *int
 	DefaultResponse *bool
 	OutputMode      *string
+	SourceRoot      *string
 }
 
 const (
@@ -135,7 +137,7 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 	for len(g.reflect.requiredSchemas) > 0 {
 		count := len(g.reflect.requiredSchemas)
 		for _, file := range g.plugin.Files {
-			g.addSchemasForMessagesToDocumentV3(d, file.Messages)
+			g.addSchemasForMessagesToDocumentV3(d, file.Messages, file.Desc.Path())
 		}
 		g.reflect.requiredSchemas = g.reflect.requiredSchemas[count:len(g.reflect.requiredSchemas)]
 	}
@@ -574,11 +576,11 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	if *g.conf.DefaultResponse {
 		anySchemaName := g.reflect.formatMessageName(anyProtoDesc)
 		anySchema := wk.NewGoogleProtobufAnySchema(anySchemaName)
-		g.addSchemaToDocumentV3(d, anySchema)
+		g.addWellKnownTypeSchemaToDocumentV3(d, anySchema)
 
 		statusSchemaName := g.reflect.formatMessageName(statusProtoDesc)
 		statusSchema := wk.NewGoogleRpcStatusSchema(statusSchemaName, anySchemaName)
-		g.addSchemaToDocumentV3(d, statusSchema)
+		g.addWellKnownTypeSchemaToDocumentV3(d, statusSchema)
 
 		defaultResponse := &v3.NamedResponseOrReference{
 			Name: "default",
@@ -772,20 +774,40 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 }
 
 // addSchemaForMessageToDocumentV3 adds the schema to the document if required
-func (g *OpenAPIv3Generator) addSchemaToDocumentV3(d *v3.Document, schema *v3.NamedSchemaOrReference) {
+func (g *OpenAPIv3Generator) addSchemaToDocumentV3(d *v3.Document, schema *v3.NamedSchemaOrReference, filename string) {
 	if contains(g.generatedSchemas, schema.Name) {
 		return
+	}
+	if g.conf.SourceRoot != nil && filename != "" {
+		// Add source information to track where the schema came from.
+		if s, ok := schema.Value.Oneof.(*v3.SchemaOrReference_Schema); ok {
+			if inner := s.Schema; inner != nil {
+				if inner.SpecificationExtension == nil {
+					inner.SpecificationExtension = make([]*v3.NamedAny, 0)
+				}
+				inner.SpecificationExtension = append(inner.SpecificationExtension, &v3.NamedAny{
+					Name: "source",
+					Value: &v3.Any{
+						Yaml: filepath.Join(*g.conf.SourceRoot, filename),
+					},
+				})
+			}
+		}
 	}
 	g.generatedSchemas = append(g.generatedSchemas, schema.Name)
 	d.Components.Schemas.AdditionalProperties = append(d.Components.Schemas.AdditionalProperties, schema)
 }
 
+func (g *OpenAPIv3Generator) addWellKnownTypeSchemaToDocumentV3(d *v3.Document, schema *v3.NamedSchemaOrReference) {
+	g.addSchemaToDocumentV3(d, schema, "")
+}
+
 // addSchemasForMessagesToDocumentV3 adds info from one file descriptor.
-func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, messages []*protogen.Message) {
+func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, messages []*protogen.Message, filename string) {
 	// For each message, generate a definition.
 	for _, message := range messages {
 		if message.Messages != nil {
-			g.addSchemasForMessagesToDocumentV3(d, message.Messages)
+			g.addSchemasForMessagesToDocumentV3(d, message.Messages, filename)
 		}
 
 		schemaName := g.reflect.formatMessageName(message.Desc)
@@ -802,15 +824,15 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		// `google.protobuf.Value` and `google.protobuf.Any` have special JSON transcoding
 		// so we can't just reflect on the message descriptor.
 		if typeName == ".google.protobuf.Value" {
-			g.addSchemaToDocumentV3(d, wk.NewGoogleProtobufValueSchema(schemaName))
+			g.addWellKnownTypeSchemaToDocumentV3(d, wk.NewGoogleProtobufValueSchema(schemaName))
 			continue
 		} else if typeName == ".google.protobuf.Any" {
-			g.addSchemaToDocumentV3(d, wk.NewGoogleProtobufAnySchema(schemaName))
+			g.addWellKnownTypeSchemaToDocumentV3(d, wk.NewGoogleProtobufAnySchema(schemaName))
 			continue
 		} else if typeName == ".google.rpc.Status" {
 			anySchemaName := g.reflect.formatMessageName(anyProtoDesc)
-			g.addSchemaToDocumentV3(d, wk.NewGoogleProtobufAnySchema(anySchemaName))
-			g.addSchemaToDocumentV3(d, wk.NewGoogleRpcStatusSchema(schemaName, anySchemaName))
+			g.addWellKnownTypeSchemaToDocumentV3(d, wk.NewGoogleProtobufAnySchema(anySchemaName))
+			g.addWellKnownTypeSchemaToDocumentV3(d, wk.NewGoogleRpcStatusSchema(schemaName, anySchemaName))
 			continue
 		}
 
@@ -903,6 +925,6 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 					Schema: schema,
 				},
 			},
-		})
+		}, filename)
 	}
 }

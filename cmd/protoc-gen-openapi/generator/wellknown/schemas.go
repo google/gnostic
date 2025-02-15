@@ -23,31 +23,104 @@ import (
 func NewStringSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "string"}}}
+			Schema: &v3.Schema{
+				Type: "string",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.StringValue
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 func NewBooleanSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "boolean"}}}
+			Schema: &v3.Schema{
+				Type: "boolean",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.BoolValue
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 func NewBytesSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "string", Format: "bytes"}}}
+			Schema: &v3.Schema{
+				Type:   "string",
+				Format: "bytes",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.BytesValue
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 func NewIntegerSchema(format string) *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "integer", Format: format}}}
+			Schema: &v3.Schema{
+				Type:   "integer",
+				Format: format,
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.Int64Value
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 func NewNumberSchema(format string) *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "number", Format: format}}}
+			Schema: &v3.Schema{
+				Type:   "number",
+				Format: format,
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.DoubleValue
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
@@ -91,7 +164,22 @@ func NewGoogleApiHttpBodySchema() *v3.SchemaOrReference {
 func NewGoogleProtobufTimestampSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "string", Format: "date-time"}}}
+			Schema: &v3.Schema{
+				Type:   "string",
+				Format: "date-time",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.Timestamp
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 // google.protobuf.Duration is serialized as a string
@@ -133,6 +221,16 @@ func NewGoogleProtobufDurationSchema() *v3.SchemaOrReference {
 				Type:        "string",
 				Pattern:     `^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$`,
 				Description: "Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.Duration
+`,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -156,21 +254,53 @@ func NewGoogleTypeDateTimeSchema() *v3.SchemaOrReference {
 func NewGoogleProtobufFieldMaskSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "string", Format: "field-mask"}}}
+			Schema: &v3.Schema{
+				Type:   "string",
+				Format: "field-mask",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.FieldMask
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 // google.protobuf.Struct is equivalent to a JSON object
 func NewGoogleProtobufStructSchema() *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "object"}}}
+			Schema: &v3.Schema{
+				Type: "object",
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-encoding",
+						Value: &v3.Any{
+							Yaml: `proto:
+  type: google.protobuf.Struct
+`,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 // google.protobuf.Value is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
+//
 // and here:
-//   https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
+//
+//	https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
 func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,
@@ -178,6 +308,16 @@ func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 			Oneof: &v3.SchemaOrReference_Schema{
 				Schema: &v3.Schema{
 					Description: "Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.",
+					SpecificationExtension: []*v3.NamedAny{
+						{
+							Name: "x-fern-encoding",
+							Value: &v3.Any{
+								Yaml: `proto:
+  type: google.protobuf.Value
+`,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -186,7 +326,8 @@ func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 
 // google.protobuf.Any is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
 func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,
@@ -213,6 +354,16 @@ func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 					AdditionalProperties: &v3.AdditionalPropertiesItem{
 						Oneof: &v3.AdditionalPropertiesItem_Boolean{
 							Boolean: true,
+						},
+					},
+					SpecificationExtension: []*v3.NamedAny{
+						{
+							Name: "x-fern-encoding",
+							Value: &v3.Any{
+								Yaml: `proto:
+  type: google.protobuf.Any
+`,
+							},
 						},
 					},
 				},
