@@ -138,6 +138,8 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		count := len(g.reflect.requiredSchemas)
 		for _, file := range g.plugin.Files {
 			g.addSchemasForMessagesToDocumentV3(d, file.Messages, file.Desc.Path())
+			g.addSchemaForEnumsToDocumentV3(d, file.Enums, file.Desc.Path())
+
 		}
 		g.reflect.requiredSchemas = g.reflect.requiredSchemas[count:len(g.reflect.requiredSchemas)]
 	}
@@ -802,6 +804,18 @@ func (g *OpenAPIv3Generator) addWellKnownTypeSchemaToDocumentV3(d *v3.Document, 
 	g.addSchemaToDocumentV3(d, schema, "")
 }
 
+// addSchemaForEnumsToDocumentV3 adds enum schemas to the document
+func (g *OpenAPIv3Generator) addSchemaForEnumsToDocumentV3(d *v3.Document, enums []*protogen.Enum, filename string) {
+	for _, enum := range enums {
+		enumName := string(enum.Desc.Name())
+		enumSchema := g.createEnumSchema(enumName, enum.Desc.Values())
+		g.addSchemaToDocumentV3(d, &v3.NamedSchemaOrReference{
+			Name:  enumName,
+			Value: enumSchema,
+		}, filename)
+	}
+}
+
 // addSchemasForMessagesToDocumentV3 adds info from one file descriptor.
 func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, messages []*protogen.Message, filename string) {
 	// For each message, generate a definition.
@@ -816,6 +830,17 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 		if !contains(g.reflect.requiredSchemas, schemaName) ||
 			contains(g.generatedSchemas, schemaName) {
 			continue
+		}
+		// Skip map entries and enums since they are handled separately
+		if len(message.Enums) > 0 {
+			for _, enum := range message.Enums {
+				enumName := string(enum.Desc.Name())
+				enumSchema := g.createEnumSchema(enumName, enum.Desc.Values())
+				g.addSchemaToDocumentV3(d, &v3.NamedSchemaOrReference{
+					Name:  enumName,
+					Value: enumSchema,
+				}, filename)
+			}
 		}
 
 		typeName := g.reflect.fullMessageTypeName(message.Desc)
@@ -937,5 +962,32 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				},
 			},
 		}, filename)
+	}
+}
+
+// createEnumSchema creates a schema for an enum type
+func (g *OpenAPIv3Generator) createEnumSchema(enumName string, enumValues protoreflect.EnumValueDescriptors) *v3.SchemaOrReference {
+	enums := make([]*v3.Any, 0, enumValues.Len())
+	for i := 0; i < enumValues.Len(); i++ {
+		enums = append(enums, &v3.Any{
+			Yaml: string(enumValues.Get(i).Name()),
+		})
+	}
+	return &v3.SchemaOrReference{
+		Oneof: &v3.SchemaOrReference_Schema{
+			Schema: &v3.Schema{
+				Type:   "string",
+				Format: "enum",
+				Enum:   enums,
+				SpecificationExtension: []*v3.NamedAny{
+					{
+						Name: "x-fern-type-name",
+						Value: &v3.Any{
+							Yaml: enumName,
+						},
+					},
+				},
+			},
+		},
 	}
 }

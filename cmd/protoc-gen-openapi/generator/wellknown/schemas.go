@@ -124,21 +124,13 @@ func NewNumberSchema(format string) *v3.SchemaOrReference {
 }
 
 func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
-	schema := &v3.Schema{Format: "enum"}
-	if enum_type != nil && *enum_type == "string" {
-		schema.Type = "string"
-		schema.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
-		for i := 0; i < field.Enum().Values().Len(); i++ {
-			schema.Enum = append(schema.Enum, &v3.Any{
-				Yaml: string(field.Enum().Values().Get(i).Name()),
-			})
-		}
-	} else {
-		schema.Type = "integer"
-	}
 	return &v3.SchemaOrReference{
-		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: schema}}
+		Oneof: &v3.SchemaOrReference_Reference{
+			Reference: &v3.Reference{
+				XRef: "#/components/schemas/" + string(field.Enum().Name()),
+			},
+		},
+	}
 }
 
 func NewListSchema(item_schema *v3.SchemaOrReference) *v3.SchemaOrReference {
