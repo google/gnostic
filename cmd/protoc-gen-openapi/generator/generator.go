@@ -138,8 +138,12 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		count := len(g.reflect.requiredSchemas)
 		for _, file := range g.plugin.Files {
 			g.addSchemasForMessagesToDocumentV3(d, file.Messages, file.Desc.Path())
-			g.addSchemaForEnumsToDocumentV3(d, file.Enums, file.Desc.Path())
-
+			// Skip google descriptor enums and other third party enums
+			for _, enum := range file.Enums {
+				if !strings.HasPrefix(string(enum.Desc.FullName()), "google.protobuf") {
+					g.addSchemaForEnumsToDocumentV3(d, file.Enums, file.Desc.Path())
+				}
+			}
 		}
 		g.reflect.requiredSchemas = g.reflect.requiredSchemas[count:len(g.reflect.requiredSchemas)]
 	}
