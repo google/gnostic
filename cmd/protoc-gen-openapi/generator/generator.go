@@ -917,6 +917,17 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			proto.Merge(schema, extSchema.(*v3.Schema))
 		}
 
+		proto.Merge(schema, &v3.Schema{
+			SpecificationExtension: []*v3.NamedAny{
+				{
+					Name: "x-fern-type-name",
+					Value: &v3.Any{
+						Yaml: schemaName,
+					},
+				},
+			},
+		})
+
 		// Add the schema to the components.schema list.
 		g.addSchemaToDocumentV3(d, &v3.NamedSchemaOrReference{
 			Name: schemaName,
