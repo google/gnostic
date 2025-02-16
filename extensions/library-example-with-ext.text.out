@@ -1,0 +1,217 @@
+swagger: "2.0"
+info: <
+  title: "Google Example Library API"
+  version: "v1"
+  description: "A simple Google Example Library API."
+>
+host: "library-example.googleapis.com"
+paths: <
+  path: <
+    name: "/v1/{sharedParameter}/pets"
+    value: <
+      post: <
+        operation_id: "simpleMethod"
+        parameters: <
+          parameter: <
+            body_parameter: <
+              name: "myBodyRef"
+              in: "body"
+              schema: <
+                properties: <
+                  additional_properties: <
+                    name: "myStringA"
+                    value: <
+                      type: <
+                        value: "string"
+                      >
+                    >
+                  >
+                >
+              >
+            >
+          >
+        >
+        parameters: <
+          parameter: <
+            non_body_parameter: <
+              query_parameter_sub_schema: <
+                required: true
+                in: "query"
+                description: "New description"
+                name: "paramToOverride"
+                type: "string"
+              >
+            >
+          >
+        >
+        parameters: <
+          parameter: <
+            non_body_parameter: <
+              query_parameter_sub_schema: <
+                required: true
+                in: "query"
+                description: "test"
+                name: "paramAtSwaggerScope"
+                type: "integer"
+                format: "int32"
+              >
+            >
+          >
+        >
+        responses: <
+          response_code: <
+            name: "default"
+            value: <
+              response: <
+                description: "successful operation"
+                schema: <
+                  schema: <
+                    properties: <
+                      additional_properties: <
+                        name: "myStringA"
+                        value: <
+                          type: <
+                            value: "string"
+                          >
+                        >
+                      >
+                    >
+                  >
+                >
+              >
+            >
+          >
+        >
+      >
+      parameters: <
+        parameter: <
+          non_body_parameter: <
+            path_parameter_sub_schema: <
+              required: true
+              in: "path"
+              description: "Shared parameter"
+              name: "sharedParameter"
+              type: "string"
+            >
+          >
+        >
+      >
+      parameters: <
+        parameter: <
+          non_body_parameter: <
+            query_parameter_sub_schema: <
+              required: true
+              in: "query"
+              description: "Description to override"
+              name: "paramToOverride"
+              type: "string"
+            >
+          >
+        >
+      >
+    >
+  >
+>
+definitions: <
+  additional_properties: <
+    name: "SimpleDef"
+    value: <
+      properties: <
+        additional_properties: <
+          name: "myStringA"
+          value: <
+            type: <
+              value: "string"
+            >
+          >
+        >
+      >
+    >
+  >
+  additional_properties: <
+    name: "SimpleDefWithBoolean"
+    value: <
+      properties: <
+        additional_properties: <
+          name: "active"
+          value: <
+            type: <
+              value: "boolean"
+            >
+          >
+        >
+      >
+    >
+  >
+>
+parameters: <
+  additional_properties: <
+    name: "paramAtSwaggerScope"
+    value: <
+      non_body_parameter: <
+        query_parameter_sub_schema: <
+          required: true
+          in: "query"
+          description: "test"
+          name: "paramAtSwaggerScope"
+          type: "integer"
+          format: "int32"
+        >
+      >
+    >
+  >
+>
+vendor_extension: <
+  name: "x-sampleone-book"
+  value: <
+    yaml: "code: 123\nmessage: 999\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampleone-shelf"
+  value: <
+    yaml: "foo1: 123\nbar: 999\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampleone-mysimplestring"
+  value: <
+    yaml: "hello world\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampleone-mysimpleint64"
+  value: <
+    yaml: "12345\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampleone-mysimplenumber"
+  value: <
+    yaml: "111.222\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampleone-mysimpleboolean"
+  value: <
+    yaml: "true\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampletwo-book"
+  value: <
+    yaml: "code: 123\nmessage: 999\n"
+  >
+>
+vendor_extension: <
+  name: "x-sampletwo-shelf"
+  value: <
+    yaml: "foo1: 123\nbar: 999\n"
+  >
+>
+vendor_extension: <
+  name: "x-unhandled"
+  value: <
+    yaml: "code: 123\nmessage: 999\n"
+  >
+>
