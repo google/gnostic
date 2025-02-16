@@ -917,13 +917,14 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			proto.Merge(schema, extSchema.(*v3.Schema))
 		}
 
-		if schema.SpecificationExtension == nil {
-			schema.SpecificationExtension = make([]*v3.NamedAny, 0)
-		}
-		schema.SpecificationExtension = append(schema.SpecificationExtension, &v3.NamedAny{
-			Name: "x-fern-type-name",
-			Value: &v3.Any{
-				Yaml: schemaName,
+		proto.Merge(schema, &v3.Schema{
+			SpecificationExtension: []*v3.NamedAny{
+				{
+					Name: "x-fern-type-name",
+					Value: &v3.Any{
+						Yaml: schemaName,
+					},
+				},
 			},
 		})
 
