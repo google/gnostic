@@ -44,6 +44,7 @@ type Configuration struct {
 	CircularDepth   *int
 	DefaultResponse *bool
 	OutputMode      *string
+	PriorityComment *bool
 }
 
 const (
@@ -702,11 +703,19 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 	for _, service := range services {
 		annotationsCount := 0
 
+		tagName := service.GoName
+		if *g.conf.PriorityComment {
+			tagName = g.filterCommentString(service.Comments.Leading)
+		}
+
 		for _, method := range service.Methods {
 			comment := g.filterCommentString(method.Comments.Leading)
 			inputMessage := method.Input
 			outputMessage := method.Output
 			operationID := service.GoName + "_" + method.GoName
+			if *g.conf.PriorityComment {
+				operationID = comment
+			}
 
 			rules := make([]*annotations.HttpRule, 0)
 
@@ -751,7 +760,7 @@ func (g *OpenAPIv3Generator) addPathsToDocumentV3(d *v3.Document, services []*pr
 					defaultHost := proto.GetExtension(service.Desc.Options(), annotations.E_DefaultHost).(string)
 
 					op, path2 := g.buildOperationV3(
-						d, operationID, service.GoName, comment, defaultHost, path, body, inputMessage, outputMessage)
+						d, operationID, tagName, comment, defaultHost, path, body, inputMessage, outputMessage)
 
 					// Merge any `Operation` annotations with the current
 					extOperation := proto.GetExtension(method.Desc.Options(), v3.E_Operation)
