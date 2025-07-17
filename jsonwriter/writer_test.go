@@ -20,7 +20,7 @@ import (
 	"github.com/google/gnostic/compiler"
 	"github.com/google/gnostic/jsonwriter"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 type MarshalTestCase struct {

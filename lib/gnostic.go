@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/google/gnostic/compiler"
 	discovery_v1 "github.com/google/gnostic/discovery"
@@ -241,9 +241,11 @@ func isURL(path string) bool {
 
 // Write bytes to a named file.
 // Certain names have special meaning:
-//   ! writes nothing
-//   - writes to stdout
-//   = writes to stderr
+//
+//	! writes nothing
+//	- writes to stdout
+//	= writes to stderr
+//
 // If a directory name is given, the file is written there with
 // a name derived from the source and extension arguments.
 func writeFile(name string, bytes []byte, source string, extension string) {
@@ -391,7 +393,7 @@ func (g *Gnostic) readOptions() error {
 		} else if len(arg) > 2 && arg[0] == '-' && arg[1] == '-' {
 			// try letting the option specify a plugin with no output files (or unwanted output files)
 			// this is useful for calling plugins like linters that only return messages
-			p := &pluginCall{Name: arg[2:len(arg)], Invocation: "!"}
+			p := &pluginCall{Name: arg[2:], Invocation: "!"}
 			g.pluginCalls = append(g.pluginCalls, p)
 		} else if arg[0] == '-' {
 			return NewUsageError(fmt.Sprintf("unknown option: %s", arg))

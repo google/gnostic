@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // findNode recursively iterates through the yaml file using the node feature. The function
@@ -38,7 +38,7 @@ func findNode(node *yaml.Node, keyIndex int, maxDepth int, keys []string) (*yaml
 }
 
 // FindNode returns a node object pointing to the given token in a yaml file. The node contains
-//information such as the string value, line number, bordering commments, etc.
+// information such as the string value, line number, bordering commments, etc.
 func FindNode(filename string, keys []string, token string) (*yaml.Node, error) {
 	data, _ := ioutil.ReadFile(filename)
 

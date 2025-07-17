@@ -32,7 +32,7 @@ import (
 )
 
 var protoOptionsForExtensions = []ProtoOption{
-	ProtoOption{
+	{
 		Name:  "java_multiple_files",
 		Value: "true",
 		Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
@@ -41,7 +41,7 @@ var protoOptionsForExtensions = []ProtoOption{
 			"// consistent with most programming languages that don't support outer classes.",
 	},
 
-	ProtoOption{
+	{
 		Name:  "java_outer_classname",
 		Value: "VendorExtensionProto",
 		Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
@@ -114,7 +114,7 @@ func getBaseFileNameWithoutExt(filePath string) string {
 }
 
 func toProtoPackageName(input string) string {
-	var out = ""
+	out := ""
 	nonAlphaNumeric := regexp.MustCompile("[^0-9A-Za-z_]+")
 	input = nonAlphaNumeric.ReplaceAllString(input, "")
 	for index, character := range input {
@@ -126,7 +126,6 @@ func toProtoPackageName(input string) string {
 		} else {
 			out += string(character)
 		}
-
 	}
 	return out
 }
@@ -137,10 +136,10 @@ type primitiveTypeInfo struct {
 }
 
 var supportedPrimitiveTypeInfos = map[string]primitiveTypeInfo{
-	"string":  primitiveTypeInfo{goTypeName: "String", wrapperProtoName: "StringValue"},
-	"number":  primitiveTypeInfo{goTypeName: "Float", wrapperProtoName: "DoubleValue"},
-	"integer": primitiveTypeInfo{goTypeName: "Int", wrapperProtoName: "Int64Value"},
-	"boolean": primitiveTypeInfo{goTypeName: "Bool", wrapperProtoName: "BoolValue"},
+	"string":  {goTypeName: "String", wrapperProtoName: "StringValue"},
+	"number":  {goTypeName: "Float", wrapperProtoName: "DoubleValue"},
+	"integer": {goTypeName: "Int", wrapperProtoName: "Int64Value"},
+	"boolean": {goTypeName: "Bool", wrapperProtoName: "BoolValue"},
 	// TODO: Investigate how to support arrays. For now users will not be allowed to
 	// create extension handlers for arrays and they will have to use the
 	// plane yaml string as is.
@@ -245,7 +244,8 @@ func generateExtension(schemaFile string, outDir string) error {
 	// generate the protocol buffer description
 	protoOptions := append(protoOptionsForExtensions,
 		ProtoOption{Name: "java_package", Value: "org.openapi.extension." + strings.ToLower(protoPackage), Comment: "// The Java package name must be proto package name with proper prefix."},
-		ProtoOption{Name: "objc_class_prefix", Value: strings.ToLower(protoPackage),
+		ProtoOption{
+			Name: "objc_class_prefix", Value: strings.ToLower(protoPackage),
 			Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
 				"// It should at a minimum be 3 characters long, all uppercase, and convention\n" +
 				"// is to use an abbreviation of the package name. Something short, but\n" +
@@ -273,7 +273,7 @@ func generateExtension(schemaFile string, outDir string) error {
 		"regexp",
 		"strings",
 		"github.com/google/gnostic/compiler",
-		"gopkg.in/yaml.v3",
+		"go.yaml.in/yaml/v3",
 	})
 	goFilename := path.Join(protoOutDirectory, outFileBaseName+".go")
 	err = ioutil.WriteFile(goFilename, []byte(compiler), 0644)
@@ -313,14 +313,13 @@ func generateExtension(schemaFile string, outDir string) error {
 				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.goTypeName,
 				extensionNameToMessageName[extensionName].optionalPrimitiveTypeInfo.wrapperProtoName)
 		}
-
 	}
 	extMainCode := fmt.Sprintf(additionalCompilerCodeWithMain, cases)
 	imports := []string{
 		"github.com/google/gnostic/extensions",
 		"github.com/google/gnostic/compiler",
 		"google.golang.org/protobuf/proto",
-		"gopkg.in/yaml.v3",
+		"go.yaml.in/yaml/v3",
 		outDirRelativeToPackageRoot + "/" + "proto",
 	}
 	if wrapperTypeIncluded {
@@ -338,7 +337,6 @@ func generateExtension(schemaFile string, outDir string) error {
 }
 
 func generateExtensions() error {
-
 	outDir := ""
 	schemaFile := ""
 
