@@ -32,6 +32,5 @@ func ParseDocument(b []byte) (*Document, error) {
 	}
 
 	root := info.Content[0]
-
 	return NewDocument(root, compiler.NewContextWithExtensions("$root", root, nil, nil))
 }
