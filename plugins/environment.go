@@ -223,10 +223,10 @@ func isDirectory(path string) bool {
 // Guesses the sourceName from the binary input file name. E.g.: given input: some/path/swagger.pb
 // check for some/path/swagger.yaml and some/path/swagger.json.
 func guessSourceName(input string) string {
-	sourceName := strings.Replace(input, ".pb", ".yaml", -1)
+	sourceName := strings.ReplaceAll(input, ".pb", ".yaml")
 	if _, err := os.Stat(sourceName); os.IsNotExist(err) {
 		// sourceName does not exist. Lets try .json instead
-		sourceName = strings.Replace(input, ".pb", ".json", -1)
+		sourceName = strings.ReplaceAll(input, ".pb", ".json")
 		if _, err := os.Stat(sourceName); os.IsNotExist(err) {
 			return ""
 		}
