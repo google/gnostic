@@ -286,12 +286,29 @@ func (g *OpenAPIv3Generator) buildQueryParamsV3(field *protogen.Field) []*v3.Par
 	return g._buildQueryParamsV3(field, depths)
 }
 
+// isFieldRequired checks if a field has the REQUIRED field behavior annotation
+func (g *OpenAPIv3Generator) isFieldRequired(field protoreflect.FieldDescriptor) bool {
+	extension := proto.GetExtension(field.Options(), annotations.E_FieldBehavior)
+	if extension != nil {
+		switch v := extension.(type) {
+		case []annotations.FieldBehavior:
+			for _, vv := range v {
+				if vv == annotations.FieldBehavior_REQUIRED {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 // depths are used to keep track of how many times a message's fields has been seen
 func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths map[string]int) []*v3.ParameterOrReference {
 	parameters := []*v3.ParameterOrReference{}
 
 	queryFieldName := g.reflect.formatFieldName(field.Desc)
 	fieldDescription := g.filterCommentString(field.Comments.Leading)
+	isRequired := g.isFieldRequired(field.Desc)
 
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
@@ -310,7 +327,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    isRequired,
 							Schema:      fieldSchema,
 						},
 					},
@@ -329,7 +346,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    isRequired,
 							Schema:      fieldSchema,
 						},
 					},
@@ -345,7 +362,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    isRequired,
 							Schema:      fieldSchema,
 						},
 					},
@@ -360,7 +377,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    isRequired,
 							Schema:      fieldSchema,
 						},
 					},
@@ -383,7 +400,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    isRequired,
 							Schema:      fieldSchema,
 						},
 					},
@@ -423,7 +440,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 						Name:        queryFieldName,
 						In:          "query",
 						Description: fieldDescription,
-						Required:    false,
+						Required:    isRequired,
 						Schema:      fieldSchema,
 					},
 				},
