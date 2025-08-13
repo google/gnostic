@@ -49,7 +49,7 @@ func NewEnvironment() (env *Environment, err error) {
 	if (*input == "") && !*plugin {
 		flag.Usage = func() {
 			fmt.Fprintf(os.Stderr, "\n")
-			fmt.Fprintf(os.Stderr, programName+" is a gnostic plugin.\n")
+			fmt.Fprintf(os.Stderr, "%s", programName+" is a gnostic plugin.\n")
 			fmt.Fprintf(os.Stderr, `
 When it is run from gnostic, the -plugin option is specified and gnostic
 writes a binary request to stdin and waits for a binary response on stdout.
@@ -85,7 +85,7 @@ When the -plugin option is specified, these flags are ignored.`)
 		}
 
 		// Log the invocation.
-		//log.Printf("Running plugin %s", env.Invocation)
+		// log.Printf("Running plugin %s", env.Invocation)
 
 		env.Request = request
 
@@ -184,12 +184,12 @@ func HandleResponse(response *Response, outputLocation string) error {
 		return fmt.Errorf("unable to overwrite %s", outputLocation)
 	default: // write files into a directory named by outputLocation
 		if !isDirectory(outputLocation) {
-			os.Mkdir(outputLocation, 0755)
+			os.Mkdir(outputLocation, 0o755)
 		}
 		for _, file := range response.Files {
 			p := outputLocation + "/" + file.Name
 			dir := path.Dir(p)
-			os.MkdirAll(dir, 0755)
+			os.MkdirAll(dir, 0o755)
 			f, _ := os.Create(p)
 			defer f.Close()
 			f.Write(file.Data)
@@ -223,10 +223,10 @@ func isDirectory(path string) bool {
 // Guesses the sourceName from the binary input file name. E.g.: given input: some/path/swagger.pb
 // check for some/path/swagger.yaml and some/path/swagger.json.
 func guessSourceName(input string) string {
-	sourceName := strings.Replace(input, ".pb", ".yaml", -1)
+	sourceName := strings.ReplaceAll(input, ".pb", ".yaml")
 	if _, err := os.Stat(sourceName); os.IsNotExist(err) {
 		// sourceName does not exist. Lets try .json instead
-		sourceName = strings.Replace(input, ".pb", ".json", -1)
+		sourceName = strings.ReplaceAll(input, ".pb", ".json")
 		if _, err := os.Stat(sourceName); os.IsNotExist(err) {
 			return ""
 		}

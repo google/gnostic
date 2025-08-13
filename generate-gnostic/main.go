@@ -49,7 +49,7 @@ const License = "" +
 
 func protoOptions(directoryName string, packageName string) []ProtoOption {
 	return []ProtoOption{
-		ProtoOption{
+		{
 			Name:  "java_multiple_files",
 			Value: "true",
 			Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
@@ -58,7 +58,7 @@ func protoOptions(directoryName string, packageName string) []ProtoOption {
 				"// consistent with most programming languages that don't support outer classes.",
 		},
 
-		ProtoOption{
+		{
 			Name:  "java_outer_classname",
 			Value: "OpenAPIProto",
 			Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
@@ -66,13 +66,13 @@ func protoOptions(directoryName string, packageName string) []ProtoOption {
 				"// work with it directly.",
 		},
 
-		ProtoOption{
+		{
 			Name:    "java_package",
 			Value:   "org." + packageName,
 			Comment: "// The Java package name must be proto package name with proper prefix.",
 		},
 
-		ProtoOption{
+		{
 			Name:  "objc_class_prefix",
 			Value: "OAS",
 			Comment: "// A reasonable prefix for the Objective-C symbols generated from the package.\n" +
@@ -82,7 +82,7 @@ func protoOptions(directoryName string, packageName string) []ProtoOption {
 				"// the future. 'GPB' is reserved for the protocol buffer implementation itself.",
 		},
 
-		ProtoOption{
+		{
 			Name:    "go_package",
 			Value:   "./" + directoryName + ";" + packageName,
 			Comment: "// The Go package name.",
@@ -190,7 +190,7 @@ func generateOpenAPIModel(version string) error {
 
 	packageImports := []string{
 		"fmt",
-		"gopkg.in/yaml.v3",
+		"go.yaml.in/yaml/v3",
 		"strings",
 		"regexp",
 		"github.com/google/gnostic/compiler",
@@ -238,8 +238,8 @@ Options:
 }
 
 func main() {
-	var openapiVersion = ""
-	var shouldGenerateExtensions = false
+	openapiVersion := ""
+	shouldGenerateExtensions := false
 
 	for i, arg := range os.Args {
 		if i == 0 {
