@@ -600,6 +600,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Create the operation.
 	op := &v3.Operation{
 		Tags:        []string{tagName},
+		Summary:     extractSummary(description),
 		Description: description,
 		OperationId: operationID,
 		Parameters:  parameters,
@@ -666,6 +667,17 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		}
 	}
 	return op, path
+}
+
+func extractSummary(comment string) string {
+	lines := strings.Split(comment, "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
 }
 
 // addOperationToDocumentV3 adds an operation to the specified path/method.
