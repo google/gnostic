@@ -150,6 +150,31 @@ paths:
                     pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
                     type: string
                     description: Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s
+                - name: int64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: int64
+                - name: sint64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: sint64
+                - name: uint64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: uint64
+                - name: fixed64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: fixed64
+                - name: sfixed64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: sfixed64
             responses:
                 "200":
                     description: OK
@@ -315,6 +340,31 @@ paths:
                     pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
                     type: string
                     description: Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s
+                - name: int64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: int64
+                - name: sint64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: sint64
+                - name: uint64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: uint64
+                - name: fixed64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: fixed64
+                - name: sfixed64_type
+                  in: query
+                  schema:
+                    type: string
+                    format: sfixed64
             requestBody:
                 content:
                     application/json:
@@ -459,6 +509,21 @@ components:
                 duration_type:
                     pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
                     type: string
+                int64_type:
+                    type: string
+                    format: int64
+                sint64_type:
+                    type: string
+                    format: sint64
+                uint64_type:
+                    type: string
+                    format: uint64
+                fixed64_type:
+                    type: string
+                    format: fixed64
+                sfixed64_type:
+                    type: string
+                    format: sfixed64
         Message_EmbMessage:
             type: object
             properties:
