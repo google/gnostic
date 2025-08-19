@@ -293,6 +293,20 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 	queryFieldName := g.reflect.formatFieldName(field.Desc)
 	fieldDescription := g.filterCommentString(field.Comments.Leading)
 
+	required := false
+	extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
+	if extension != nil {
+		fieldBehaviors, ok := extension.([]annotations.FieldBehavior)
+		if ok {
+			for _, fieldBehavior := range fieldBehaviors {
+				if fieldBehavior == annotations.FieldBehavior_REQUIRED {
+					required = true
+					break
+				}
+			}
+		}
+	}
+
 	if field.Desc.IsMap() {
 		// Map types are not allowed in query parameteres
 		return parameters
@@ -310,7 +324,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    required,
 							Schema:      fieldSchema,
 						},
 					},
@@ -329,7 +343,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    required,
 							Schema:      fieldSchema,
 						},
 					},
@@ -345,7 +359,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    required,
 							Schema:      fieldSchema,
 						},
 					},
@@ -360,7 +374,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    required,
 							Schema:      fieldSchema,
 						},
 					},
@@ -383,7 +397,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 							Name:        queryFieldName,
 							In:          "query",
 							Description: fieldDescription,
-							Required:    false,
+							Required:    required,
 							Schema:      fieldSchema,
 						},
 					},
@@ -423,7 +437,7 @@ func (g *OpenAPIv3Generator) _buildQueryParamsV3(field *protogen.Field, depths m
 						Name:        queryFieldName,
 						In:          "query",
 						Description: fieldDescription,
-						Required:    false,
+						Required:    required,
 						Schema:      fieldSchema,
 					},
 				},
