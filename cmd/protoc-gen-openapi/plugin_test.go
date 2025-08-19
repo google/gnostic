@@ -43,6 +43,7 @@ var openapiTests = []struct {
 	{name: "OpenAPIv3 Annotations", path: "examples/tests/openapiv3annotations/", protofile: "message.proto"},
 	{name: "AllOf Wrap Message", path: "examples/tests/allofwrap/", protofile: "message.proto"},
 	{name: "Additional Bindings", path: "examples/tests/additional_bindings/", protofile: "message.proto"},
+	{name: "OneOf Fields", path: "examples/tests/oneof/", protofile: "message.proto"},
 }
 
 // Set this to true to generate/overwrite the fixtures. Make sure you set it back
@@ -284,6 +285,44 @@ func TestOpenAPIDefaultResponse(t *testing.T) {
 				err = exec.Command("diff", TEMP_FILE, fixture).Run()
 				if err != nil {
 					t.Fatalf("diff failed: %+v", err)
+				}
+			}
+			// if the test succeeded, clean up
+			os.Remove(TEMP_FILE)
+		})
+	}
+}
+
+func TestOpenAPIOneOfs(t *testing.T) {
+	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi_oneof.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			if !GENERATE_FIXTURES {
+				continue
+			}
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec
+			// with protobuf oneof support
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--openapi_out=oneof=1:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			if GENERATE_FIXTURES {
+				err := CopyFixture(TEMP_FILE, fixture)
+				if err != nil {
+					t.Fatalf("Can't generate fixture: %+v", err)
+				}
+			} else {
+				// Verify that the generated spec matches our expected version.
+				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				if err != nil {
+					t.Fatalf("Diff failed: %+v", err)
 				}
 			}
 			// if the test succeeded, clean up
