@@ -940,29 +940,27 @@ func (g *OpenAPIv3Generator) addSchemasForEnumsToDocumentV3(d *v3.Document) {
 	}
 }
 
-// addSchemasForNestedEnumsToDocumentV3 递归处理嵌套在message中的枚举
 func (g *OpenAPIv3Generator) addSchemasForNestedEnumsToDocumentV3(d *v3.Document, messages []*protogen.Message) {
 	g.addSchemasForNestedEnumsToDocumentV3Recursive(d, messages, "")
 }
 
-// addSchemasForNestedEnumsToDocumentV3Recursive 递归处理嵌套在message中的枚举，支持多层嵌套
 func (g *OpenAPIv3Generator) addSchemasForNestedEnumsToDocumentV3Recursive(d *v3.Document, messages []*protogen.Message, parentPath string) {
 	for _, message := range messages {
-		// 构建当前message的完整路径
+		// Build the full path for the current message
 		currentPath := string(message.Desc.Name())
 		if parentPath != "" {
 			currentPath = parentPath + "_" + currentPath
 		}
 
-		// 处理message中的嵌套枚举
+		// Process nested enums in the message
 		for _, enum := range message.Enums {
-			// 使用与reflector.go完全相同的命名逻辑
+			// Use the same naming logic as in reflector.go
 			enumName := string(enum.Desc.Name())
 			fullEnumName := currentPath + "_" + enumName
 
-			// 检查这个枚举是否已经被生成
+			// Check if this enum has already been generated
 			if !contains(g.generatedSchemas, fullEnumName) {
-				// 直接创建枚举schema
+				// Directly create enum schema
 				enumSchema := &v3.NamedSchemaOrReference{
 					Name: fullEnumName,
 					Value: &v3.SchemaOrReference{
@@ -976,19 +974,18 @@ func (g *OpenAPIv3Generator) addSchemasForNestedEnumsToDocumentV3Recursive(d *v3
 					},
 				}
 				g.addSchemaToDocumentV3(d, enumSchema)
-				// 标记为已生成
+				// Mark as generated
 				g.generatedSchemas = append(g.generatedSchemas, fullEnumName)
 			}
 		}
 
-		// 递归处理嵌套的message，传递当前路径
+		// Recursively process nested messages, passing the current path
 		if message.Messages != nil {
 			g.addSchemasForNestedEnumsToDocumentV3Recursive(d, message.Messages, currentPath)
 		}
 	}
 }
 
-// generateEnumValues 生成枚举值列表
 func (g *OpenAPIv3Generator) generateEnumValues(enum protoreflect.EnumDescriptor) []*v3.Any {
 	enumValues := make([]*v3.Any, 0, enum.Values().Len())
 	for i := 0; i < enum.Values().Len(); i++ {
