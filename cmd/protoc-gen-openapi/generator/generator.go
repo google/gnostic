@@ -140,6 +140,9 @@ func (g *OpenAPIv3Generator) buildDocumentV3() *v3.Document {
 		g.reflect.requiredSchemas = g.reflect.requiredSchemas[count:len(g.reflect.requiredSchemas)]
 	}
 
+	// Add enum schemas to the document
+	g.addSchemasForEnumsToDocumentV3(d)
+
 	// If there is only 1 service, then use it's title for the
 	// document, if the document is missing it.
 	if len(d.Tags) == 1 {
@@ -905,4 +908,101 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			},
 		})
 	}
+}
+
+// addSchemasForEnumsToDocumentV3 adds enum schemas to the document
+func (g *OpenAPIv3Generator) addSchemasForEnumsToDocumentV3(d *v3.Document) {
+	// 首先处理所有嵌套枚举，确保它们有唯一的名称
+	for _, file := range g.plugin.Files {
+		// 递归处理嵌套在message中的枚举
+		g.addSchemasForNestedEnumsToDocumentV3(d, file.Messages)
+	}
+
+	// 然后处理文件级别的枚举，检查是否与嵌套枚举冲突
+	for _, file := range g.plugin.Files {
+		for _, enum := range file.Enums {
+			// 文件级枚举使用原始名称
+			enumName := string(enum.Desc.Name())
+
+			// 检查这个枚举是否已经被生成（可能作为嵌套枚举被处理过）
+			if !contains(g.generatedSchemas, enumName) {
+				// 直接创建枚举schema
+				enumSchema := &v3.NamedSchemaOrReference{
+					Name: enumName,
+					Value: &v3.SchemaOrReference{
+						Oneof: &v3.SchemaOrReference_Schema{
+							Schema: &v3.Schema{
+								Type:   "string",
+								Format: "enum",
+								Enum:   g.generateEnumValues(enum.Desc),
+							},
+						},
+					},
+				}
+				g.addSchemaToDocumentV3(d, enumSchema)
+				// 标记为已生成
+				g.generatedSchemas = append(g.generatedSchemas, enumName)
+			}
+		}
+	}
+}
+
+// addSchemasForNestedEnumsToDocumentV3 递归处理嵌套在message中的枚举
+func (g *OpenAPIv3Generator) addSchemasForNestedEnumsToDocumentV3(d *v3.Document, messages []*protogen.Message) {
+	g.addSchemasForNestedEnumsToDocumentV3Recursive(d, messages, "")
+}
+
+// addSchemasForNestedEnumsToDocumentV3Recursive 递归处理嵌套在message中的枚举，支持多层嵌套
+func (g *OpenAPIv3Generator) addSchemasForNestedEnumsToDocumentV3Recursive(d *v3.Document, messages []*protogen.Message, parentPath string) {
+	for _, message := range messages {
+		// 构建当前message的完整路径
+		currentPath := string(message.Desc.Name())
+		if parentPath != "" {
+			currentPath = parentPath + "_" + currentPath
+		}
+
+		// 处理message中的嵌套枚举
+		for _, enum := range message.Enums {
+			// 使用与reflector.go完全相同的命名逻辑
+			enumName := string(enum.Desc.Name())
+			fullEnumName := currentPath + "_" + enumName
+
+			// 检查这个枚举是否已经被生成
+			if !contains(g.generatedSchemas, fullEnumName) {
+				// 直接创建枚举schema
+				enumSchema := &v3.NamedSchemaOrReference{
+					Name: fullEnumName,
+					Value: &v3.SchemaOrReference{
+						Oneof: &v3.SchemaOrReference_Schema{
+							Schema: &v3.Schema{
+								Type:   "string",
+								Format: "enum",
+								Enum:   g.generateEnumValues(enum.Desc),
+							},
+						},
+					},
+				}
+				g.addSchemaToDocumentV3(d, enumSchema)
+				// 标记为已生成
+				g.generatedSchemas = append(g.generatedSchemas, fullEnumName)
+			}
+		}
+
+		// 递归处理嵌套的message，传递当前路径
+		if message.Messages != nil {
+			g.addSchemasForNestedEnumsToDocumentV3Recursive(d, message.Messages, currentPath)
+		}
+	}
+}
+
+// generateEnumValues 生成枚举值列表
+func (g *OpenAPIv3Generator) generateEnumValues(enum protoreflect.EnumDescriptor) []*v3.Any {
+	enumValues := make([]*v3.Any, 0, enum.Values().Len())
+	for i := 0; i < enum.Values().Len(); i++ {
+		enumValue := enum.Values().Get(i)
+		enumValues = append(enumValues, &v3.Any{
+			Yaml: string(enumValue.Name()),
+		})
+	}
+	return enumValues
 }

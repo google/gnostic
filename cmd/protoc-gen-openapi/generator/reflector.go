@@ -216,7 +216,25 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldD
 		kindSchema = wk.NewStringSchema()
 
 	case protoreflect.EnumKind:
-		kindSchema = wk.NewEnumSchema(*&r.conf.EnumType, field)
+		// 收集枚举类型信息，供生成器使用
+		enumDesc := field.Enum()
+		enumName := string(enumDesc.Name())
+
+		// 检查枚举本身是否是嵌套的（而不是字段是否是嵌套的）
+		// 如果枚举的父级是消息类型，说明它是嵌套枚举
+		parent := enumDesc.Parent()
+		if parent != nil {
+			if parentMsg, ok := parent.(protoreflect.MessageDescriptor); ok {
+				// 这是一个嵌套枚举，需要拼接父级消息的名称
+				parentName := string(parentMsg.Name())
+				enumName = parentName + "_" + enumName
+			}
+		}
+
+		if !contains(r.requiredSchemas, enumName) {
+			r.requiredSchemas = append(r.requiredSchemas, enumName)
+		}
+		kindSchema = wk.NewEnumSchemaReference(field)
 
 	case protoreflect.BoolKind:
 		kindSchema = wk.NewBooleanSchema()
