@@ -1,0 +1,109 @@
+// Copyright 2024 Google LLC.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+syntax = "proto3";
+
+package tests.openapiv3enum.message.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/google/gnostic/apps/protoc-gen-openapi/examples/tests/openapiv3enum/message/v1;message";
+
+// User management service
+service UserService {
+  rpc CreateUser(User) returns (User) {
+    option (google.api.http) = {
+      post : "/v1/users"
+      body : "*"
+    };
+  }
+  
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get : "/v1/users/{user_id}"
+    };
+  }
+  
+  rpc UpdateUserStatus(UpdateUserStatusRequest) returns (User) {
+    option (google.api.http) = {
+      patch : "/v1/users/{user_id}/status"
+      body : "*"
+    };
+  }
+}
+
+// File-level enumeration for user roles
+enum UserRole {
+  USER_ROLE_UNSPECIFIED = 0;
+  USER_ROLE_ADMIN = 1;
+  USER_ROLE_USER = 2;
+  USER_ROLE_MODERATOR = 3;
+}
+
+// File-level enumeration for account types
+enum AccountType {
+  ACCOUNT_TYPE_UNSPECIFIED = 0;
+  ACCOUNT_TYPE_PERSONAL = 1;
+  ACCOUNT_TYPE_BUSINESS = 2;
+  ACCOUNT_TYPE_ENTERPRISE = 3;
+}
+
+message User {
+  string user_id = 1;
+  string name = 2;
+  string email = 3;
+  
+  // Nested enumeration for user status
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_ACTIVE = 1;
+    STATUS_INACTIVE = 2;
+    STATUS_SUSPENDED = 3;
+    STATUS_DELETED = 4;
+  }
+  
+  // Nested enumeration for verification status
+  enum VerificationStatus {
+    VERIFICATION_UNSPECIFIED = 0;
+    VERIFICATION_PENDING = 1;
+    VERIFICATION_VERIFIED = 2;
+    VERIFICATION_FAILED = 3;
+  }
+  
+  Status status = 4;
+  VerificationStatus verification_status = 5;
+  UserRole role = 6;
+  AccountType account_type = 7;
+  
+  // Nested enumeration for notification preferences
+  enum NotificationPreference {
+    NOTIFICATION_UNSPECIFIED = 0;
+    NOTIFICATION_EMAIL = 1;
+    NOTIFICATION_SMS = 2;
+    NOTIFICATION_PUSH = 3;
+    NOTIFICATION_NONE = 4;
+  }
+  
+  NotificationPreference notification_preference = 8;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message UpdateUserStatusRequest {
+  string user_id = 1;
+  User.Status status = 2;
+}

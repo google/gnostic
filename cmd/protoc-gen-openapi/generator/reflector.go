@@ -216,7 +216,25 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldD
 		kindSchema = wk.NewStringSchema()
 
 	case protoreflect.EnumKind:
-		kindSchema = wk.NewEnumSchema(*&r.conf.EnumType, field)
+		// Collect enum type information for the generator
+		enumDesc := field.Enum()
+		enumName := string(enumDesc.Name())
+
+		// Check if the enum itself is nested (not whether the field is nested)
+		// If the enum's parent is a message type, it's a nested enum
+		parent := enumDesc.Parent()
+		if parent != nil {
+			if parentMsg, ok := parent.(protoreflect.MessageDescriptor); ok {
+				// This is a nested enum, need to concatenate the parent message name
+				parentName := string(parentMsg.Name())
+				enumName = parentName + "_" + enumName
+			}
+		}
+
+		if !contains(r.requiredSchemas, enumName) {
+			r.requiredSchemas = append(r.requiredSchemas, enumName)
+		}
+		kindSchema = wk.NewEnumSchemaReference(field)
 
 	case protoreflect.BoolKind:
 		kindSchema = wk.NewBooleanSchema()

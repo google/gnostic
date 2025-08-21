@@ -50,22 +50,31 @@ func NewNumberSchema(format string) *v3.SchemaOrReference {
 			Schema: &v3.Schema{Type: "number", Format: format}}}
 }
 
-func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
-	schema := &v3.Schema{Format: "enum"}
-	if enum_type != nil && *enum_type == "string" {
-		schema.Type = "string"
-		schema.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
-		for i := 0; i < field.Enum().Values().Len(); i++ {
-			schema.Enum = append(schema.Enum, &v3.Any{
-				Yaml: string(field.Enum().Values().Get(i).Name()),
-			})
-		}
-	} else {
-		schema.Type = "integer"
-	}
+func NewEnumSchemaReference(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
+	enumName := buildFullEnumName(field)
+
 	return &v3.SchemaOrReference{
-		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: schema}}
+		Oneof: &v3.SchemaOrReference_Reference{
+			Reference: &v3.Reference{
+				XRef: "#/components/schemas/" + enumName,
+			},
+		},
+	}
+}
+
+func buildFullEnumName(field protoreflect.FieldDescriptor) string {
+	enumDesc := field.Enum()
+	enumName := string(enumDesc.Name())
+
+	parent := enumDesc.Parent()
+	if parent != nil {
+		if parentMsg, ok := parent.(protoreflect.MessageDescriptor); ok {
+			parentName := string(parentMsg.Name())
+			enumName = parentName + "_" + enumName
+		}
+	}
+
+	return enumName
 }
 
 func NewListSchema(item_schema *v3.SchemaOrReference) *v3.SchemaOrReference {
@@ -168,9 +177,12 @@ func NewGoogleProtobufStructSchema() *v3.SchemaOrReference {
 
 // google.protobuf.Value is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
+//
 // and here:
-//   https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
+//
+//	https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
 func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,
@@ -186,7 +198,8 @@ func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 
 // google.protobuf.Any is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
 func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,

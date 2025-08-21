@@ -1,0 +1,333 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: UserService API
+    description: User management service
+    version: 0.0.1
+paths:
+    /v1/users:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/User'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/users/{userId}:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetUser
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/users/{userId}/status:
+        patch:
+            tags:
+                - UserService
+            operationId: UserService_UpdateUserStatus
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateUserStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        AccountType:
+            enum:
+                - ACCOUNT_TYPE_UNSPECIFIED
+                - ACCOUNT_TYPE_PERSONAL
+                - ACCOUNT_TYPE_BUSINESS
+                - ACCOUNT_TYPE_ENTERPRISE
+            type: string
+            format: enum
+        Edition:
+            enum:
+                - EDITION_UNKNOWN
+                - EDITION_LEGACY
+                - EDITION_PROTO2
+                - EDITION_PROTO3
+                - EDITION_2023
+                - EDITION_2024
+                - EDITION_1_TEST_ONLY
+                - EDITION_2_TEST_ONLY
+                - EDITION_99997_TEST_ONLY
+                - EDITION_99998_TEST_ONLY
+                - EDITION_99999_TEST_ONLY
+                - EDITION_MAX
+            type: string
+            format: enum
+        ExtensionRangeOptions_VerificationState:
+            enum:
+                - DECLARATION
+                - UNVERIFIED
+            type: string
+            format: enum
+        FeatureSet_EnumType:
+            enum:
+                - ENUM_TYPE_UNKNOWN
+                - OPEN
+                - CLOSED
+            type: string
+            format: enum
+        FeatureSet_FieldPresence:
+            enum:
+                - FIELD_PRESENCE_UNKNOWN
+                - EXPLICIT
+                - IMPLICIT
+                - LEGACY_REQUIRED
+            type: string
+            format: enum
+        FeatureSet_JsonFormat:
+            enum:
+                - JSON_FORMAT_UNKNOWN
+                - ALLOW
+                - LEGACY_BEST_EFFORT
+            type: string
+            format: enum
+        FeatureSet_MessageEncoding:
+            enum:
+                - MESSAGE_ENCODING_UNKNOWN
+                - LENGTH_PREFIXED
+                - DELIMITED
+            type: string
+            format: enum
+        FeatureSet_RepeatedFieldEncoding:
+            enum:
+                - REPEATED_FIELD_ENCODING_UNKNOWN
+                - PACKED
+                - EXPANDED
+            type: string
+            format: enum
+        FeatureSet_Utf8Validation:
+            enum:
+                - UTF8_VALIDATION_UNKNOWN
+                - VERIFY
+                - NONE
+            type: string
+            format: enum
+        FieldDescriptorProto_Label:
+            enum:
+                - LABEL_OPTIONAL
+                - LABEL_REPEATED
+                - LABEL_REQUIRED
+            type: string
+            format: enum
+        FieldDescriptorProto_Type:
+            enum:
+                - TYPE_DOUBLE
+                - TYPE_FLOAT
+                - TYPE_INT64
+                - TYPE_UINT64
+                - TYPE_INT32
+                - TYPE_FIXED64
+                - TYPE_FIXED32
+                - TYPE_BOOL
+                - TYPE_STRING
+                - TYPE_GROUP
+                - TYPE_MESSAGE
+                - TYPE_BYTES
+                - TYPE_UINT32
+                - TYPE_ENUM
+                - TYPE_SFIXED32
+                - TYPE_SFIXED64
+                - TYPE_SINT32
+                - TYPE_SINT64
+            type: string
+            format: enum
+        FieldOptions_CType:
+            enum:
+                - STRING
+                - CORD
+                - STRING_PIECE
+            type: string
+            format: enum
+        FieldOptions_JSType:
+            enum:
+                - JS_NORMAL
+                - JS_STRING
+                - JS_NUMBER
+            type: string
+            format: enum
+        FieldOptions_OptionRetention:
+            enum:
+                - RETENTION_UNKNOWN
+                - RETENTION_RUNTIME
+                - RETENTION_SOURCE
+            type: string
+            format: enum
+        FieldOptions_OptionTargetType:
+            enum:
+                - TARGET_TYPE_UNKNOWN
+                - TARGET_TYPE_FILE
+                - TARGET_TYPE_EXTENSION_RANGE
+                - TARGET_TYPE_MESSAGE
+                - TARGET_TYPE_FIELD
+                - TARGET_TYPE_ONEOF
+                - TARGET_TYPE_ENUM
+                - TARGET_TYPE_ENUM_ENTRY
+                - TARGET_TYPE_SERVICE
+                - TARGET_TYPE_METHOD
+            type: string
+            format: enum
+        FileOptions_OptimizeMode:
+            enum:
+                - SPEED
+                - CODE_SIZE
+                - LITE_RUNTIME
+            type: string
+            format: enum
+        GeneratedCodeInfo_Annotation_Semantic:
+            enum:
+                - NONE
+                - SET
+                - ALIAS
+            type: string
+            format: enum
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        MethodOptions_IdempotencyLevel:
+            enum:
+                - IDEMPOTENCY_UNKNOWN
+                - NO_SIDE_EFFECTS
+                - IDEMPOTENT
+            type: string
+            format: enum
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdateUserStatusRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                status:
+                    $ref: '#/components/schemas/User_Status'
+        User:
+            type: object
+            properties:
+                userId:
+                    type: string
+                name:
+                    type: string
+                email:
+                    type: string
+                status:
+                    $ref: '#/components/schemas/User_Status'
+                verificationStatus:
+                    $ref: '#/components/schemas/User_VerificationStatus'
+                role:
+                    $ref: '#/components/schemas/UserRole'
+                accountType:
+                    $ref: '#/components/schemas/AccountType'
+                notificationPreference:
+                    $ref: '#/components/schemas/User_NotificationPreference'
+        UserRole:
+            enum:
+                - USER_ROLE_UNSPECIFIED
+                - USER_ROLE_ADMIN
+                - USER_ROLE_USER
+                - USER_ROLE_MODERATOR
+            type: string
+            format: enum
+        User_NotificationPreference:
+            enum:
+                - NOTIFICATION_UNSPECIFIED
+                - NOTIFICATION_EMAIL
+                - NOTIFICATION_SMS
+                - NOTIFICATION_PUSH
+                - NOTIFICATION_NONE
+            type: string
+            format: enum
+        User_Status:
+            enum:
+                - STATUS_UNSPECIFIED
+                - STATUS_ACTIVE
+                - STATUS_INACTIVE
+                - STATUS_SUSPENDED
+                - STATUS_DELETED
+            type: string
+            format: enum
+        User_VerificationStatus:
+            enum:
+                - VERIFICATION_UNSPECIFIED
+                - VERIFICATION_PENDING
+                - VERIFICATION_VERIFIED
+                - VERIFICATION_FAILED
+            type: string
+            format: enum
+tags:
+    - name: UserService
