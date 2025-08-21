@@ -50,7 +50,6 @@ func NewNumberSchema(format string) *v3.SchemaOrReference {
 			Schema: &v3.Schema{Type: "number", Format: format}}}
 }
 
-// NewEnumSchemaReference 返回枚举的引用
 func NewEnumSchemaReference(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
 	enumName := buildFullEnumName(field)
 
@@ -63,17 +62,13 @@ func NewEnumSchemaReference(field protoreflect.FieldDescriptor) *v3.SchemaOrRefe
 	}
 }
 
-// buildFullEnumName 递归构建完整的枚举名称，支持多层嵌套
 func buildFullEnumName(field protoreflect.FieldDescriptor) string {
 	enumDesc := field.Enum()
 	enumName := string(enumDesc.Name())
 
-	// 检查枚举本身是否是嵌套的（而不是字段是否是嵌套的）
-	// 如果枚举的父级是消息类型，说明它是嵌套枚举
 	parent := enumDesc.Parent()
 	if parent != nil {
 		if parentMsg, ok := parent.(protoreflect.MessageDescriptor); ok {
-			// 这是一个嵌套枚举，需要拼接父级消息的名称
 			parentName := string(parentMsg.Name())
 			enumName = parentName + "_" + enumName
 		}

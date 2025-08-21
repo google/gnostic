@@ -912,21 +912,15 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 
 // addSchemasForEnumsToDocumentV3 adds enum schemas to the document
 func (g *OpenAPIv3Generator) addSchemasForEnumsToDocumentV3(d *v3.Document) {
-	// 首先处理所有嵌套枚举，确保它们有唯一的名称
 	for _, file := range g.plugin.Files {
-		// 递归处理嵌套在message中的枚举
 		g.addSchemasForNestedEnumsToDocumentV3(d, file.Messages)
 	}
 
-	// 然后处理文件级别的枚举，检查是否与嵌套枚举冲突
 	for _, file := range g.plugin.Files {
 		for _, enum := range file.Enums {
-			// 文件级枚举使用原始名称
 			enumName := string(enum.Desc.Name())
 
-			// 检查这个枚举是否已经被生成（可能作为嵌套枚举被处理过）
 			if !contains(g.generatedSchemas, enumName) {
-				// 直接创建枚举schema
 				enumSchema := &v3.NamedSchemaOrReference{
 					Name: enumName,
 					Value: &v3.SchemaOrReference{
@@ -940,7 +934,6 @@ func (g *OpenAPIv3Generator) addSchemasForEnumsToDocumentV3(d *v3.Document) {
 					},
 				}
 				g.addSchemaToDocumentV3(d, enumSchema)
-				// 标记为已生成
 				g.generatedSchemas = append(g.generatedSchemas, enumName)
 			}
 		}

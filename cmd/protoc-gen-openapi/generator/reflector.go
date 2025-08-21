@@ -216,16 +216,16 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldD
 		kindSchema = wk.NewStringSchema()
 
 	case protoreflect.EnumKind:
-		// 收集枚举类型信息，供生成器使用
+		// Collect enum type information for the generator
 		enumDesc := field.Enum()
 		enumName := string(enumDesc.Name())
 
-		// 检查枚举本身是否是嵌套的（而不是字段是否是嵌套的）
-		// 如果枚举的父级是消息类型，说明它是嵌套枚举
+		// Check if the enum itself is nested (not whether the field is nested)
+		// If the enum's parent is a message type, it's a nested enum
 		parent := enumDesc.Parent()
 		if parent != nil {
 			if parentMsg, ok := parent.(protoreflect.MessageDescriptor); ok {
-				// 这是一个嵌套枚举，需要拼接父级消息的名称
+				// This is a nested enum, need to concatenate the parent message name
 				parentName := string(parentMsg.Name())
 				enumName = parentName + "_" + enumName
 			}
