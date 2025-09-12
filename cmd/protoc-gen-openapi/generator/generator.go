@@ -456,42 +456,17 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Find simple path parameters like {id}
 	if allMatches := g.pathPattern.FindAllStringSubmatch(path, -1); allMatches != nil {
 		for _, matches := range allMatches {
+			// {id} => id
+			name := matches[1]
+
 			// Add the value to the list of covered parameters.
-			coveredParameters = append(coveredParameters, matches[1])
-			pathParameter := g.findAndFormatFieldName(matches[1], inputMessage)
-			path = strings.Replace(path, matches[1], pathParameter, 1)
+			coveredParameters = append(coveredParameters, name)
+			pathParameter := g.findAndFormatFieldName(name, inputMessage)
+			path = strings.Replace(path, name, pathParameter, 1)
 
 			// Add the path parameters to the operation parameters.
-			var fieldSchema *v3.SchemaOrReference
-
-			var fieldDescription string
-			field := g.findField(pathParameter, inputMessage)
-			if field != nil {
-				fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
-				fieldDescription = g.filterCommentString(field.Comments.Leading)
-			} else {
-				// If field does not exist, it is safe to set it to string, as it is ignored downstream
-				fieldSchema = &v3.SchemaOrReference{
-					Oneof: &v3.SchemaOrReference_Schema{
-						Schema: &v3.Schema{
-							Type: "string",
-						},
-					},
-				}
-			}
-
-			parameters = append(parameters,
-				&v3.ParameterOrReference{
-					Oneof: &v3.ParameterOrReference_Parameter{
-						Parameter: &v3.Parameter{
-							Name:        pathParameter,
-							In:          "path",
-							Description: fieldDescription,
-							Required:    true,
-							Schema:      fieldSchema,
-						},
-					},
-				})
+			parameter := g.buildPathParameter(pathParameter, inputMessage)
+			parameters = append(parameters, parameter)
 		}
 	}
 
@@ -666,6 +641,37 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		}
 	}
 	return op, path
+}
+
+func (g *OpenAPIv3Generator) buildPathParameter(pathParameter string, inputMessage *protogen.Message) *v3.ParameterOrReference {
+	var fieldSchema *v3.SchemaOrReference
+	var fieldDescription string
+	field := g.findField(pathParameter, inputMessage)
+	if field != nil {
+		fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
+		fieldDescription = g.filterCommentString(field.Comments.Leading)
+	} else {
+		// If field does not exist, it is safe to set it to string, as it is ignored downstream
+		fieldSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{
+					Type: "string",
+				},
+			},
+		}
+	}
+	parameter := &v3.ParameterOrReference{
+		Oneof: &v3.ParameterOrReference_Parameter{
+			Parameter: &v3.Parameter{
+				Name:        pathParameter,
+				In:          "path",
+				Description: fieldDescription,
+				Required:    true,
+				Schema:      fieldSchema,
+			},
+		},
+	}
+	return parameter
 }
 
 // addOperationToDocumentV3 adds an operation to the specified path/method.
