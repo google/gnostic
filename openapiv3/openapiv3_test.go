@@ -37,6 +37,35 @@ func TestParseDocument(t *testing.T) {
 	}
 }
 
+func TestParseDocument_XquikOpenAPI31(t *testing.T) {
+	filename := "../examples/v3.1/yaml/xquik.yaml"
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		t.Logf("unable to read file %s", filename)
+		t.FailNow()
+	}
+	d, err := ParseDocument(b)
+	if err != nil {
+		t.Logf("%s", err.Error())
+		t.FailNow()
+	}
+	if d.Info.Title != "Xquik API" {
+		t.Errorf("unexpected value for Title: %s", d.Info.Title)
+	}
+	if !documentHasPath(d, "/api/v1/x/tweets/search") {
+		t.Errorf("missing Xquik search path")
+	}
+}
+
+func documentHasPath(document *Document, name string) bool {
+	for _, path := range document.Paths.Path {
+		if path.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 func TestParseDocument_Empty(t *testing.T) {
 	for _, test := range []struct {
 		name string
