@@ -15,13 +15,13 @@
 package openapi_v3
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestParseDocument(t *testing.T) {
 	filename := "../examples/v3.0/yaml/petstore.yaml"
-	b, err := ioutil.ReadFile(filename)
+	b, err := os.ReadFile(filename)
 	if err != nil {
 		t.Logf("unable to read file %s", filename)
 		t.FailNow()
@@ -39,7 +39,7 @@ func TestParseDocument(t *testing.T) {
 
 func TestParseDocument_XquikOpenAPI31(t *testing.T) {
 	filename := "../examples/v3.1/yaml/xquik.yaml"
-	b, err := ioutil.ReadFile(filename)
+	b, err := os.ReadFile(filename)
 	if err != nil {
 		t.Logf("unable to read file %s", filename)
 		t.FailNow()
