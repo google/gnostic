@@ -261,6 +261,7 @@ paths:
                 - name: name
                   in: query
                   description: The name of the book to update.
+                  required: true
                   schema:
                     type: string
             requestBody:
