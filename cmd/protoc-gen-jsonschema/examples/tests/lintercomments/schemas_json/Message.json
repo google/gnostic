@@ -1,0 +1,24 @@
+{
+  "title": "Message",
+  "$id": "http://example.com/schemas/Message.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Message demonstrates linter comment filtering in descriptions",
+  "properties": {
+    "fieldWithSingleLineComment": {
+      "title": "fieldWithSingleLineComment",
+      "type": "string",
+      "description": "This field has a single-line linter comment that should be filtered out. This comment should remain visible."
+    },
+    "fieldWithMultilineComment": {
+      "title": "fieldWithMultilineComment",
+      "type": "string",
+      "description": "This field has a multi-line linter comment that should be filtered out. This comment should remain visible."
+    },
+    "normalField": {
+      "title": "normalField",
+      "type": "string",
+      "description": "Normal field without any linter comments. This entire comment should remain visible."
+    }
+  }
+}

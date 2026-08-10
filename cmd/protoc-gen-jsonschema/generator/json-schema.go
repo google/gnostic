@@ -74,7 +74,7 @@ func NewJSONSchemaGenerator(plugin *protogen.Plugin, conf Configuration) *JSONSc
 		conf:   conf,
 		plugin: plugin,
 
-		linterRulePattern: regexp.MustCompile(`\(-- .* --\)`),
+		linterRulePattern: regexp.MustCompile(`(?s)\(-- .*? --\)`),
 	}
 }
 

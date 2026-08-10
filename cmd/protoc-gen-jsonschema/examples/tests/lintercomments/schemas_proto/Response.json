@@ -1,0 +1,14 @@
+{
+  "title": "Response",
+  "$id": "http://example.com/schemas/Response.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Response message",
+  "properties": {
+    "result": {
+      "title": "result",
+      "type": "string",
+      "description": "Response field with linter comment."
+    }
+  }
+}
