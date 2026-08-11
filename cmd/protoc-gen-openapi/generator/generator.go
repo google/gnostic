@@ -456,88 +456,90 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 	// Find simple path parameters like {id}
 	if allMatches := g.pathPattern.FindAllStringSubmatch(path, -1); allMatches != nil {
 		for _, matches := range allMatches {
+			// {id} => id
+			name := matches[1]
+
 			// Add the value to the list of covered parameters.
-			coveredParameters = append(coveredParameters, matches[1])
-			pathParameter := g.findAndFormatFieldName(matches[1], inputMessage)
-			path = strings.Replace(path, matches[1], pathParameter, 1)
+			coveredParameters = append(coveredParameters, name)
+			pathParameter := g.findAndFormatFieldName(name, inputMessage)
+			path = strings.Replace(path, name, pathParameter, 1)
 
 			// Add the path parameters to the operation parameters.
-			var fieldSchema *v3.SchemaOrReference
-
-			var fieldDescription string
-			field := g.findField(pathParameter, inputMessage)
-			if field != nil {
-				fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
-				fieldDescription = g.filterCommentString(field.Comments.Leading)
-			} else {
-				// If field does not exist, it is safe to set it to string, as it is ignored downstream
-				fieldSchema = &v3.SchemaOrReference{
-					Oneof: &v3.SchemaOrReference_Schema{
-						Schema: &v3.Schema{
-							Type: "string",
-						},
-					},
-				}
-			}
-
-			parameters = append(parameters,
-				&v3.ParameterOrReference{
-					Oneof: &v3.ParameterOrReference_Parameter{
-						Parameter: &v3.Parameter{
-							Name:        pathParameter,
-							In:          "path",
-							Description: fieldDescription,
-							Required:    true,
-							Schema:      fieldSchema,
-						},
-					},
-				})
+			parameter := g.buildPathParameter(pathParameter, inputMessage)
+			parameters = append(parameters, parameter)
 		}
 	}
 
-	// Find named path parameters like {name=shelves/*}
-	if matches := g.namedPathPattern.FindStringSubmatch(path); matches != nil {
-		// Build a list of named path parameters.
-		namedPathParameters := make([]string, 0)
+	// Find named path parameters like {user_id=*}, {user_id=/users/*}, {name=/user/messages/*}, {name=/}
+	if namedPathSegments := g.namedPathPattern.FindAllStringSubmatch(path, -1); namedPathSegments != nil {
+		for _, namedPathSegment := range namedPathSegments {
+			// {user_id=*}
+			segment := namedPathSegment[0]
+			// user_id
+			name := namedPathSegment[1]
+			// Add the "user_id=" "user_id" value to the list of covered parameters.
+			coveredParameters = append(coveredParameters, name)
 
-		// Add the "name=" "name" value to the list of covered parameters.
-		coveredParameters = append(coveredParameters, matches[1])
-		// Convert the path from the starred form to use named path parameters.
-		starredPath := matches[2]
-		parts := strings.Split(starredPath, "/")
-		// The starred path is assumed to be in the form "things/*/otherthings/*".
-		// We want to convert it to "things/{thingsId}/otherthings/{otherthingsId}".
-		for i := 0; i < len(parts)-1; i += 2 {
-			section := parts[i]
-			namedPathParameter := g.findAndFormatFieldName(section, inputMessage)
-			namedPathParameter = singular(namedPathParameter)
-			parts[i+1] = "{" + namedPathParameter + "}"
-			namedPathParameters = append(namedPathParameters, namedPathParameter)
-		}
-		// Rewrite the path to use the path parameters.
-		newPath := strings.Join(parts, "/")
-		path = strings.Replace(path, matches[0], newPath, 1)
+			// * or /users/* ... etc
+			pathPattern := namedPathSegment[2]
+			// v1/{user_id=*} -> v1/{user_id}
+			if pathPattern == "*" {
+				pathParameter := g.findAndFormatFieldName(name, inputMessage)
+				path = strings.Replace(path, segment, fmt.Sprintf("{%s}", pathParameter), 1)
+				// Add the path parameters to the operation parameters.
+				parameter := g.buildPathParameter(pathParameter, inputMessage)
+				parameters = append(parameters, parameter)
+			} else if strings.Count(pathPattern, "*") > 0 {
+				// The starred path is assumed to be in the form "things/*/otherthings/*".
+				// We want to convert it to "things/{thingsId}/otherthings/{otherthingsId}".
+				// If it is in the form "firstthings/secondthings/*"
+				// We want "firstthings/secondthings/{secondthingId}"
 
-		// Add the named path parameters to the operation parameters.
-		for _, namedPathParameter := range namedPathParameters {
-			parameters = append(parameters,
-				&v3.ParameterOrReference{
-					Oneof: &v3.ParameterOrReference_Parameter{
-						Parameter: &v3.Parameter{
-							Name:        namedPathParameter,
-							In:          "path",
-							Required:    true,
-							Description: "The " + namedPathParameter + " id.",
-							Schema: &v3.SchemaOrReference{
-								Oneof: &v3.SchemaOrReference_Schema{
-									Schema: &v3.Schema{
-										Type: "string",
+				// Build a list of named path parameters.
+				namedPathParameters := make([]string, 0)
+
+				// Convert the path from the starred form to use named path parameters.
+				parts := make([]string, 0)
+				lastSection := ""
+				for _, section := range strings.Split(pathPattern, "/") {
+					if section == "*" {
+						// Now we can determine the named path param
+						namedPathParameter := singular(lastSection)
+						namedPathParameter = g.findAndFormatFieldName(namedPathParameter, inputMessage)
+						parts = append(parts, "{"+namedPathParameter+"}")
+						namedPathParameters = append(namedPathParameters, namedPathParameter)
+						lastSection = ""
+					} else {
+						// It's a collection name, we know it should be on the path
+						parts = append(parts, section)
+						lastSection = section
+					}
+				}
+				newPath := strings.Join(parts, "/")
+				path = strings.Replace(path, segment, newPath, 1)
+
+				// Add the named path parameters to the operation parameters.
+				for _, namedPathParameter := range namedPathParameters {
+					parameters = append(parameters,
+						&v3.ParameterOrReference{
+							Oneof: &v3.ParameterOrReference_Parameter{
+								Parameter: &v3.Parameter{
+									Name:        namedPathParameter,
+									In:          "path",
+									Required:    true,
+									Description: "The " + namedPathParameter + " id.",
+									Schema: &v3.SchemaOrReference{
+										Oneof: &v3.SchemaOrReference_Schema{
+											Schema: &v3.Schema{
+												Type: "string",
+											},
+										},
 									},
 								},
 							},
-						},
-					},
-				})
+						})
+				}
+			}
 		}
 	}
 
@@ -666,6 +668,37 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		}
 	}
 	return op, path
+}
+
+func (g *OpenAPIv3Generator) buildPathParameter(pathParameter string, inputMessage *protogen.Message) *v3.ParameterOrReference {
+	var fieldSchema *v3.SchemaOrReference
+	var fieldDescription string
+	field := g.findField(pathParameter, inputMessage)
+	if field != nil {
+		fieldSchema = g.reflect.schemaOrReferenceForField(field.Desc)
+		fieldDescription = g.filterCommentString(field.Comments.Leading)
+	} else {
+		// If field does not exist, it is safe to set it to string, as it is ignored downstream
+		fieldSchema = &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: &v3.Schema{
+					Type: "string",
+				},
+			},
+		}
+	}
+	parameter := &v3.ParameterOrReference{
+		Oneof: &v3.ParameterOrReference_Parameter{
+			Parameter: &v3.Parameter{
+				Name:        pathParameter,
+				In:          "path",
+				Description: fieldDescription,
+				Required:    true,
+				Schema:      fieldSchema,
+			},
+		},
+	}
+	return parameter
 }
 
 // addOperationToDocumentV3 adds an operation to the specified path/method.

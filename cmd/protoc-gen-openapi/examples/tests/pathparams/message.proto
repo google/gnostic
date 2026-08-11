@@ -28,6 +28,18 @@ service Messaging {
     };
   }
 
+  rpc GetMessage2(GetMessage2Request) returns (Message) {
+    option (google.api.http) = {
+      get : "/v2/messages/{message_id=*}"
+    };
+  }
+
+  rpc GetMessage3(GetMessage3Request) returns (Message) {
+    option (google.api.http) = {
+      get : "/v3/{name=user/messages/*}"
+    };
+  }
+
   rpc GetUserMessage(GetMessageRequest) returns (Message) {
     option (google.api.http) = {
       get : "/v1/users/{user_id}/messages/{message_id}"
@@ -45,6 +57,15 @@ service Messaging {
 message GetMessageRequest {
   string message_id = 1;
   uint64 user_id = 2;
+}
+
+message GetMessage2Request {
+  string message_id = 1;
+  uint64 user_id = 2;
+}
+
+message GetMessage3Request {
+  string name = 1;
 }
 
 message Meta {
