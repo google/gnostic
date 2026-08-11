@@ -46,14 +46,23 @@ func NewOpenAPIv3Reflector(conf Configuration) *OpenAPIv3Reflector {
 }
 
 func (r *OpenAPIv3Reflector) getMessageName(message protoreflect.MessageDescriptor) string {
-	prefix := ""
+	name := string(message.Name())
 	parent := message.Parent()
-
-	if _, ok := parent.(protoreflect.MessageDescriptor); ok {
-		prefix = string(parent.Name()) + "_" + prefix
+	if *r.conf.NoRecursiveSchemaNaming {
+		if msg, ok := parent.(protoreflect.MessageDescriptor); ok {
+			name = string(msg.Name()) + "_" + name
+		}
+		return name
 	}
-
-	return prefix + string(message.Name())
+	for {
+		msg, ok := parent.(protoreflect.MessageDescriptor)
+		if !ok {
+			break
+		}
+		name = string(msg.Name()) + "_" + name
+		parent = msg.Parent()
+	}
+	return name
 }
 
 func (r *OpenAPIv3Reflector) formatMessageName(message protoreflect.MessageDescriptor) string {

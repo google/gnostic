@@ -35,15 +35,16 @@ import (
 )
 
 type Configuration struct {
-	Version         *string
-	Title           *string
-	Description     *string
-	Naming          *string
-	FQSchemaNaming  *bool
-	EnumType        *string
-	CircularDepth   *int
-	DefaultResponse *bool
-	OutputMode      *string
+	Version                  *string
+	Title                    *string
+	Description              *string
+	Naming                   *string
+	FQSchemaNaming           *bool
+	NoRecursiveSchemaNaming  *bool
+	EnumType                 *string
+	CircularDepth            *int
+	DefaultResponse          *bool
+	OutputMode               *string
 }
 
 const (
