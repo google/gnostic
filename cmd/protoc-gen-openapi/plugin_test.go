@@ -105,9 +105,9 @@ func TestOpenAPIProtobufNaming(t *testing.T) {
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				output, err := exec.Command("diff", TEMP_FILE, fixture).CombinedOutput()
 				if err != nil {
-					t.Fatalf("Diff failed: %+v", err)
+					t.Fatalf("Diff failed: %s", output)
 				}
 			}
 			// if the test succeeded, clean up
@@ -163,9 +163,9 @@ func TestOpenAPIFQSchemaNaming(t *testing.T) {
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				output, err := exec.Command("diff", TEMP_FILE, fixture).CombinedOutput()
 				if err != nil {
-					t.Fatalf("Diff failed: %+v", err)
+					t.Fatalf("Diff failed: %s", output)
 				}
 				// Verify that the generated spec matches the source_relative version
 				sourceRelativeFile := strings.TrimSuffix(tt.protofile, filepath.Ext(tt.protofile)) + ".openapi.yaml"
@@ -207,9 +207,9 @@ func TestOpenAPIJSONNaming(t *testing.T) {
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				output, err := exec.Command("diff", TEMP_FILE, fixture).CombinedOutput()
 				if err != nil {
-					t.Fatalf("Diff failed: %+v", err)
+					t.Fatalf("Diff failed: %s", output)
 				}
 			}
 			// if the test succeeded, clean up
@@ -244,9 +244,9 @@ func TestOpenAPIStringEnums(t *testing.T) {
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				output, err := exec.Command("diff", TEMP_FILE, fixture).CombinedOutput()
 				if err != nil {
-					t.Fatalf("diff failed: %+v", err)
+					t.Fatalf("diff failed: %s", output)
 				}
 			}
 			// if the test succeeded, clean up
@@ -281,9 +281,9 @@ func TestOpenAPIDefaultResponse(t *testing.T) {
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				output, err := exec.Command("diff", TEMP_FILE, fixture).CombinedOutput()
 				if err != nil {
-					t.Fatalf("diff failed: %+v", err)
+					t.Fatalf("diff failed: %s", output)
 				}
 			}
 			// if the test succeeded, clean up

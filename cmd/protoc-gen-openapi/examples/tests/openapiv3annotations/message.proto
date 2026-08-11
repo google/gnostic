@@ -75,6 +75,37 @@ service Messaging1 {
         ]
     };
   }
+
+  rpc StreamMessages(Message) returns(stream Message) {
+    option(google.api.http) = {
+        get: "/v1/stream/{message_id}"
+        body: "*"
+    };
+    option (openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "200"
+          value: {
+            response : {
+              description: "OK"
+              content: {
+                additional_properties: {
+                  name: "text/event-stream"
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "Message"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  }
 }
 
 service Messaging2 {

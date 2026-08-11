@@ -46,6 +46,36 @@ paths:
                                 $ref: '#/components/schemas/google.rpc.Status'
             security:
                 - BasicAuth: []
+    /v1/stream/{message_id}:
+        get:
+            tags:
+                - Messaging1
+            operationId: Messaging1_StreamMessages
+            parameters:
+                - name: message_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/tests.openapiv3annotations.message.v1.Message'
+                required: true
+            responses:
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/google.rpc.Status'
+                "200":
+                    description: OK
+                    content:
+                        text/event-stream:
+                            schema:
+                                $ref: '#/components/schemas/tests.openapiv3annotations.message.v1.Message'
 components:
     schemas:
         google.protobuf.Any:
