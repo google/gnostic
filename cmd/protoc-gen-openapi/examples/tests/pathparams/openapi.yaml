@@ -63,6 +63,32 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /v1/series/{series}:
+        get:
+            tags:
+                - Messaging
+            description: 'Test irregular plural: series/* should stay as {series}, not {serie}'
+            operationId: Messaging_GetMessageSeries
+            parameters:
+                - name: series
+                  in: path
+                  description: The series id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MessageSeries'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/users/{user_id}/messages/{message_id}:
         get:
             tags:
@@ -113,6 +139,17 @@ components:
                     type: string
                 maybe:
                     type: string
+        MessageSeries:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Message'
         Status:
             type: object
             properties:

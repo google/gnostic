@@ -40,6 +40,13 @@ service Messaging {
       body : "*"
     };
   }
+
+  // Test irregular plural: series/* should stay as {series}, not {serie}
+  rpc GetMessageSeries(GetMessageSeriesRequest) returns (MessageSeries) {
+    option (google.api.http) = {
+      get : "/v1/{name=series/*}"
+    };
+  }
 }
 
 message GetMessageRequest {
@@ -64,4 +71,14 @@ message Comment {
   string comment_id = 1;
   uint64 user_id = 2;
   string content = 3;
+}
+
+message MessageSeries {
+  string name = 1;
+  string description = 2;
+  repeated Message messages = 3;
+}
+
+message GetMessageSeriesRequest {
+  string name = 1;
 }

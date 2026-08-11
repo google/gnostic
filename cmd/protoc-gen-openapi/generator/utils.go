@@ -16,9 +16,9 @@
 package generator
 
 import (
-	"strings"
-
 	"google.golang.org/protobuf/reflect/protoreflect"
+
+	"github.com/jinzhu/inflection"
 )
 
 // contains returns true if an array contains a specified string.
@@ -41,16 +41,7 @@ func appendUnique(s []string, e string) []string {
 
 // singular produces the singular form of a collection name.
 func singular(plural string) string {
-	if strings.HasSuffix(plural, "ves") {
-		return strings.TrimSuffix(plural, "ves") + "f"
-	}
-	if strings.HasSuffix(plural, "ies") {
-		return strings.TrimSuffix(plural, "ies") + "y"
-	}
-	if strings.HasSuffix(plural, "s") {
-		return strings.TrimSuffix(plural, "s")
-	}
-	return plural
+	return inflection.Singular(plural)
 }
 
 func getValueKind(message protoreflect.MessageDescriptor) string {
