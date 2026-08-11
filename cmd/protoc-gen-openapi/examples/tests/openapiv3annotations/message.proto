@@ -75,6 +75,13 @@ service Messaging1 {
         ]
     };
   }
+  // while field in message has overriden field, it should reflect in "parameters" section
+  rpc GetMessageById(Message2) returns(Message2) {
+    option(google.api.http) = {
+        // id should have limit since id in message2 have the limit
+        get: "/v1/messages2/{id}"
+    };
+  }
 }
 
 service Messaging2 {
@@ -88,6 +95,19 @@ message Message {
 
   int64 id = 1;
   string label = 2 [
+    (openapi.v3.property) = {
+      title: "this is an overriden field schema title";
+      max_length: 255;
+    }
+  ];
+}
+
+message Message2 {
+  option (openapi.v3.schema) = {
+    title: "This is an overridden message schema title";
+  };
+
+  string id = 1 [
     (openapi.v3.property) = {
       title: "this is an overriden field schema title";
       max_length: 255;

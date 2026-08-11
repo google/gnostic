@@ -46,6 +46,33 @@ paths:
                                 $ref: '#/components/schemas/Status'
             security:
                 - BasicAuth: []
+    /v1/messages2/{id}:
+        get:
+            tags:
+                - Messaging1
+            description: while field in message has overriden field, it should reflect in "parameters" section
+            operationId: Messaging1_GetMessageById
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    title: this is an overriden field schema title
+                    maxLength: 255
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message2'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         GoogleProtobufAny:
@@ -63,6 +90,14 @@ components:
                 id:
                     type: string
                 label:
+                    title: this is an overriden field schema title
+                    maxLength: 255
+                    type: string
+        Message2:
+            title: This is an overridden message schema title
+            type: object
+            properties:
+                id:
                     title: this is an overriden field schema title
                     maxLength: 255
                     type: string
