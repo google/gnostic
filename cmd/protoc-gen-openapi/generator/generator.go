@@ -20,6 +20,7 @@ import (
 	"log"
 	"net/url"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -35,15 +36,16 @@ import (
 )
 
 type Configuration struct {
-	Version         *string
-	Title           *string
-	Description     *string
-	Naming          *string
-	FQSchemaNaming  *bool
-	EnumType        *string
-	CircularDepth   *int
-	DefaultResponse *bool
-	OutputMode      *string
+	Version            *string
+	Title              *string
+	Description        *string
+	Naming             *string
+	FQSchemaNaming     *bool
+	EnumType           *string
+	CircularDepth      *int
+	DefaultResponse    *bool
+	OutputMode         *string
+	WildcardBodyDedup  *bool
 }
 
 const (
@@ -620,7 +622,7 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 
 		if bodyField == "*" {
 			// Pass the entire request message as the request body.
-			requestSchema = g.reflect.schemaOrReferenceForMessage(inputMessage.Desc)
+			requestSchema = g.createWildcardBodyRequestSchema(d, inputMessage, coveredParameters)
 
 		} else {
 			// If body refers to a message field, use that type.
@@ -666,6 +668,175 @@ func (g *OpenAPIv3Generator) buildOperationV3(
 		}
 	}
 	return op, path
+}
+
+// buildAndAddSchemaForMessage builds a schema for a message, optionally excluding
+// specific fields, adds it to the document, and returns a reference to it.
+func (g *OpenAPIv3Generator) buildAndAddSchemaForMessage(d *v3.Document, message *protogen.Message, schemaName, description string, excludedFields []string, ref string) *v3.SchemaOrReference {
+	definitionProperties := &v3.Properties{
+		AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
+	}
+
+	var required []string
+	for _, field := range message.Fields {
+		fieldName := string(field.Desc.Name())
+
+		// Skip fields that should be excluded
+		if contains(excludedFields, fieldName) {
+			continue
+		}
+
+		// Get the field description from the comments
+		fieldDescription := g.filterCommentString(field.Comments.Leading)
+
+		// Check the field annotations
+		inputOnly := false
+		outputOnly := false
+		extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
+		if extension != nil {
+			switch v := extension.(type) {
+			case []annotations.FieldBehavior:
+				for _, vv := range v {
+					switch vv {
+					case annotations.FieldBehavior_OUTPUT_ONLY:
+						outputOnly = true
+					case annotations.FieldBehavior_INPUT_ONLY:
+						inputOnly = true
+					case annotations.FieldBehavior_REQUIRED:
+						required = append(required, g.reflect.formatFieldName(field.Desc))
+					}
+				}
+			default:
+				log.Printf("unsupported extension type %T", extension)
+			}
+		}
+
+		fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
+		if fieldSchema == nil {
+			continue
+		}
+
+		// If this field has siblings and is a $ref now, create a new schema use `allOf` to wrap it
+		wrapperNeeded := inputOnly || outputOnly || fieldDescription != ""
+		if wrapperNeeded {
+			if _, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Reference); ok {
+				fieldSchema = &v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{
+					AllOf: []*v3.SchemaOrReference{fieldSchema},
+				}}}
+			}
+		}
+
+		if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
+			schema.Schema.Description = fieldDescription
+			schema.Schema.ReadOnly = outputOnly
+			schema.Schema.WriteOnly = inputOnly
+
+			// Merge any `Property` annotations with the current
+			extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)
+			if extProperty != nil {
+				proto.Merge(schema.Schema, extProperty.(*v3.Schema))
+			}
+		}
+
+		definitionProperties.AdditionalProperties = append(
+			definitionProperties.AdditionalProperties,
+			&v3.NamedSchemaOrReference{
+				Name:  g.reflect.formatFieldName(field.Desc),
+				Value: fieldSchema,
+			},
+		)
+	}
+
+	schema := &v3.Schema{
+		Type:        "object",
+		Description: description,
+		Properties:  definitionProperties,
+		Required:    required,
+	}
+
+	// Merge any `Schema` annotations from the original message
+	extSchema := proto.GetExtension(message.Desc.Options(), v3.E_Schema)
+	if extSchema != nil {
+		proto.Merge(schema, extSchema.(*v3.Schema))
+	}
+
+	// Add the schema to the document
+	g.addSchemaToDocumentV3(d, &v3.NamedSchemaOrReference{
+		Name: schemaName,
+		Value: &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: schema,
+			},
+		},
+	})
+
+	// Return reference to the schema
+	return &v3.SchemaOrReference{
+		Oneof: &v3.SchemaOrReference_Reference{
+			Reference: &v3.Reference{XRef: ref},
+		},
+	}
+}
+
+// createWildcardBodyRequestSchema sets or creates the body schema for an
+// OpenAPI where the GRPC Method has a wildcard request body (body: "*").
+//
+// According to the the rules for [transcoding HTTP/JSON to gRPC]
+//
+//	The special name `*` can be used in the body mapping to define that
+//	every field not bound by the path template should be mapped to the
+//	request body.
+//
+// For OpenAPI, this means that any operation based on a GRPC method with a
+// wildcard body needs a request body schema that doesn't overlap fields and
+// path parameters.
+//
+// This function looks for path parameters that correspond to body fields and,
+// when it finds them, generates a replacement request body schema of the
+// format:
+//
+//	<RequestType>_Body
+//
+// Where the overlapping body fields are removed.
+//
+// [transcoding HTTP/JSON to gRPC]: https://docs.cloud.google.com/endpoints/docs/grpc/transcoding#use_wildcard_in_body
+func (g *OpenAPIv3Generator) createWildcardBodyRequestSchema(d *v3.Document, message *protogen.Message, pathParameters []string) *v3.SchemaOrReference {
+	// If dedup is disabled, just return a reference to the full message schema.
+	if !*g.conf.WildcardBodyDedup {
+		return g.reflect.schemaOrReferenceForMessage(message.Desc)
+	}
+
+	messageFields := make(map[string]bool)
+	for _, field := range message.Fields {
+		messageFields[string(field.Desc.Name())] = true
+	}
+	// filter path parameters which are wildcard or not in the request type.
+	excludedFields := slices.DeleteFunc(slices.Clone(pathParameters), func(s string) bool {
+		return s == "*" || !messageFields[s]
+	})
+
+	// if there's nothing to remove, return a ref to the request schema, and
+	// we're done.
+	if len(excludedFields) == 0 {
+		return g.reflect.schemaOrReferenceForMessage(message.Desc)
+	}
+
+	requestTypeName := g.reflect.formatMessageName(message.Desc)
+	schemaName := requestTypeName + "_Body"
+
+	ref := "#/components/schemas/" + schemaName
+
+	if contains(g.generatedSchemas, schemaName) {
+		// already generated this schema for another op, so reuse it
+		return &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Reference{
+				Reference: &v3.Reference{XRef: ref},
+			},
+		}
+	}
+
+	messageDescription := g.filterCommentString(message.Comments.Leading)
+	return g.buildAndAddSchemaForMessage(d, message, schemaName, messageDescription, excludedFields, ref)
 }
 
 // addOperationToDocumentV3 adds an operation to the specified path/method.
@@ -819,95 +990,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			continue
 		}
 
-		// Build an array holding the fields of the message.
-		definitionProperties := &v3.Properties{
-			AdditionalProperties: make([]*v3.NamedSchemaOrReference, 0),
-		}
-
-		var required []string
-		for _, field := range message.Fields {
-			// Get the field description from the comments.
-			description := g.filterCommentString(field.Comments.Leading)
-			// Check the field annotations to see if this is a readonly or writeonly field.
-			inputOnly := false
-			outputOnly := false
-			extension := proto.GetExtension(field.Desc.Options(), annotations.E_FieldBehavior)
-			if extension != nil {
-				switch v := extension.(type) {
-				case []annotations.FieldBehavior:
-					for _, vv := range v {
-						switch vv {
-						case annotations.FieldBehavior_OUTPUT_ONLY:
-							outputOnly = true
-						case annotations.FieldBehavior_INPUT_ONLY:
-							inputOnly = true
-						case annotations.FieldBehavior_REQUIRED:
-							required = append(required, g.reflect.formatFieldName(field.Desc))
-						}
-					}
-				default:
-					log.Printf("unsupported extension type %T", extension)
-				}
-			}
-
-			// The field is either described by a reference or a schema.
-			fieldSchema := g.reflect.schemaOrReferenceForField(field.Desc)
-			if fieldSchema == nil {
-				continue
-			}
-
-			// If this field has siblings and is a $ref now, create a new schema use `allOf` to wrap it
-			wrapperNeeded := inputOnly || outputOnly || description != ""
-			if wrapperNeeded {
-				if _, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Reference); ok {
-					fieldSchema = &v3.SchemaOrReference{Oneof: &v3.SchemaOrReference_Schema{Schema: &v3.Schema{
-						AllOf: []*v3.SchemaOrReference{fieldSchema},
-					}}}
-				}
-			}
-
-			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
-				schema.Schema.Description = description
-				schema.Schema.ReadOnly = outputOnly
-				schema.Schema.WriteOnly = inputOnly
-
-				// Merge any `Property` annotations with the current
-				extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)
-				if extProperty != nil {
-					proto.Merge(schema.Schema, extProperty.(*v3.Schema))
-				}
-			}
-
-			definitionProperties.AdditionalProperties = append(
-				definitionProperties.AdditionalProperties,
-				&v3.NamedSchemaOrReference{
-					Name:  g.reflect.formatFieldName(field.Desc),
-					Value: fieldSchema,
-				},
-			)
-		}
-
-		schema := &v3.Schema{
-			Type:        "object",
-			Description: messageDescription,
-			Properties:  definitionProperties,
-			Required:    required,
-		}
-
-		// Merge any `Schema` annotations with the current
-		extSchema := proto.GetExtension(message.Desc.Options(), v3.E_Schema)
-		if extSchema != nil {
-			proto.Merge(schema, extSchema.(*v3.Schema))
-		}
-
-		// Add the schema to the components.schema list.
-		g.addSchemaToDocumentV3(d, &v3.NamedSchemaOrReference{
-			Name: schemaName,
-			Value: &v3.SchemaOrReference{
-				Oneof: &v3.SchemaOrReference_Schema{
-					Schema: schema,
-				},
-			},
-		})
+		ref := "#/components/schemas/" + schemaName
+		g.buildAndAddSchemaForMessage(d, message, schemaName, messageDescription, nil, ref)
 	}
 }

@@ -1,0 +1,541 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: LibraryService API
+    description: |-
+        This API represents a simple digital library.  It lets you manage Shelf
+         resources and Book resources in the library. It defines the following
+         resource model:
+
+         - The API has a collection of [Shelf][google.example.library.v1.Shelf]
+           resources, named `shelves/*`
+
+         - Each Shelf has a collection of [Book][google.example.library.v1.Book]
+           resources, named `shelves/*/books/*`
+    version: 0.0.1
+servers:
+    - url: https://library-example.googleapis.com
+paths:
+    /v1/shelves:
+        get:
+            tags:
+                - LibraryService
+            description: |-
+                Lists shelves. The order is unspecified but deterministic. Newly created
+                 shelves will not necessarily be added to the end of this list.
+            operationId: LibraryService_ListShelves
+            parameters:
+                - name: pageSize
+                  in: query
+                  description: |-
+                    Requested page size. Server may return fewer shelves than requested.
+                     If unspecified, server will pick an appropriate default.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: |-
+                    A token identifying a page of results the server should return.
+                     Typically, this is the value of
+                     [ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token]
+                     returned from the previous call to `ListShelves` method.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListShelvesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - LibraryService
+            description: Creates a shelf, and returns the new Shelf.
+            operationId: LibraryService_CreateShelf
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Shelf'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Shelf'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/shelves/{shelf}:
+        get:
+            tags:
+                - LibraryService
+            description: Gets a shelf. Returns NOT_FOUND if the shelf does not exist.
+            operationId: LibraryService_GetShelf
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Shelf'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - LibraryService
+            description: Deletes a shelf. Returns NOT_FOUND if the shelf does not exist.
+            operationId: LibraryService_DeleteShelf
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/shelves/{shelf}/books:
+        get:
+            tags:
+                - LibraryService
+            description: |-
+                Lists books in a shelf. The order is unspecified but deterministic. Newly
+                 created books will not necessarily be added to the end of this list.
+                 Returns NOT_FOUND if the shelf does not exist.
+            operationId: LibraryService_ListBooks
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  description: |-
+                    Requested page size. Server may return fewer books than requested.
+                     If unspecified, server will pick an appropriate default.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: |-
+                    A token identifying a page of results the server should return.
+                     Typically, this is the value of
+                     [ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token].
+                     returned from the previous call to `ListBooks` method.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListBooksResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - LibraryService
+            description: Creates a book, and returns the new Book.
+            operationId: LibraryService_CreateBook
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Book'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/shelves/{shelf}/books/{book}:
+        get:
+            tags:
+                - LibraryService
+            description: Gets a book. Returns NOT_FOUND if the book does not exist.
+            operationId: LibraryService_GetBook
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+                - name: book
+                  in: path
+                  description: The book id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - LibraryService
+            description: |-
+                Updates a book. Returns INVALID_ARGUMENT if the name of the book
+                 is non-empty and does not equal the existing name.
+            operationId: LibraryService_UpdateBook
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+                - name: book
+                  in: path
+                  description: The book id.
+                  required: true
+                  schema:
+                    type: string
+                - name: name
+                  in: query
+                  description: The name of the book to update.
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Book'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - LibraryService
+            description: Deletes a book. Returns NOT_FOUND if the book does not exist.
+            operationId: LibraryService_DeleteBook
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+                - name: book
+                  in: path
+                  description: The book id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/shelves/{shelf}/books/{book}:move:
+        post:
+            tags:
+                - LibraryService
+            description: |-
+                Moves a book to another shelf, and returns the new book. The book
+                 id of the new book may not be the same as the original book.
+            operationId: LibraryService_MoveBook
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+                - name: book
+                  in: path
+                  description: The book id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MoveBookRequest_Body'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Book'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/shelves/{shelf}:merge:
+        post:
+            tags:
+                - LibraryService
+            description: |-
+                Merges two shelves by adding all books from the shelf named
+                 `other_shelf_name` to shelf `name`, and deletes
+                 `other_shelf_name`. Returns the updated shelf.
+                 The book ids of the moved books may not be the same as the original books.
+
+                 Returns NOT_FOUND if either shelf does not exist.
+                 This call is a no-op if the specified shelves are the same.
+            operationId: LibraryService_MergeShelves
+            parameters:
+                - name: shelf
+                  in: path
+                  description: The shelf id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MergeShelvesRequest_Body'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Shelf'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        Book:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: |-
+                        The resource name of the book.
+                         Book names have the form `shelves/{shelf_id}/books/{book_id}`.
+                         The name is ignored when creating a book.
+                author:
+                    type: string
+                    description: The name of the book author.
+                title:
+                    type: string
+                    description: The title of the book.
+                read:
+                    type: boolean
+                    description: Value indicating whether the book has been read.
+                borrowTime:
+                    readOnly: true
+                    type: string
+                    description: The previous borrowing timestamp.
+                    format: date-time
+                createdAt:
+                    readOnly: true
+                    type: string
+                    description: The creation date and time.
+                    format: date-time
+                updatedAt:
+                    readOnly: true
+                    type: string
+                    description: The last update date and time.
+                    format: date-time
+            description: A single book in the library.
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListBooksResponse:
+            type: object
+            properties:
+                books:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Book'
+                    description: The list of books.
+                nextPageToken:
+                    type: string
+                    description: |-
+                        A token to retrieve next page of results.
+                         Pass this value in the
+                         [ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token]
+                         field in the subsequent call to `ListBooks` method to retrieve the next
+                         page of results.
+            description: Response message for LibraryService.ListBooks.
+        ListShelvesResponse:
+            type: object
+            properties:
+                shelves:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Shelf'
+                    description: The list of shelves.
+                nextPageToken:
+                    type: string
+                    description: |-
+                        A token to retrieve next page of results.
+                         Pass this value in the
+                         [ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token]
+                         field in the subsequent call to `ListShelves` method to retrieve the next
+                         page of results.
+            description: Response message for LibraryService.ListShelves.
+        MergeShelvesRequest_Body:
+            required:
+                - otherShelfName
+            type: object
+            properties:
+                otherShelfName:
+                    type: string
+                    description: The name of the shelf we're removing books from and deleting.
+            description: |-
+                Describes the shelf being removed (other_shelf_name) and updated
+                 (name) in this merge.
+        MoveBookRequest_Body:
+            required:
+                - otherShelfName
+            type: object
+            properties:
+                otherShelfName:
+                    type: string
+                    description: The name of the destination shelf.
+            description: |-
+                Describes what book to move (name) and what shelf we're moving it
+                 to (other_shelf_name).
+        Shelf:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: |-
+                        The resource name of the shelf.
+                         Shelf names have the form `shelves/{shelf_id}`.
+                         The name is ignored when creating a shelf.
+                theme:
+                    type: string
+                    description: The theme of the shelf
+                nextSortAt:
+                    readOnly: true
+                    type: string
+                    description: The next sorting date.
+                    format: date
+                createdAt:
+                    readOnly: true
+                    type: string
+                    description: The creation date and time.
+                    format: date-time
+                updatedAt:
+                    readOnly: true
+                    type: string
+                    description: The last update date and time.
+                    format: date-time
+            description: A Shelf contains a collection of books with a theme.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+tags:
+    - name: LibraryService

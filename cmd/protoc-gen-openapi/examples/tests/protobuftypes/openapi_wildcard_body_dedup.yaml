@@ -1,0 +1,588 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Messaging API
+    version: 0.0.1
+servers:
+    - url: https://foo.googleapi.com
+paths:
+    /v1/messages:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_ListMessages
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GoogleProtobufValue'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/messages/{messageId}:
+        get:
+            tags:
+                - Messaging
+            operationId: Messaging_GetMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: stringType
+                  in: query
+                  schema:
+                    type: string
+                - name: recursiveType.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: embeddedType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.integers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                - name: repeatedType
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: valueType
+                  in: query
+                  description: Description of value
+                  schema:
+                    $ref: '#/components/schemas/GoogleProtobufValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+                - name: boolValueType
+                  in: query
+                  schema:
+                    type: boolean
+                - name: bytesValueType
+                  in: query
+                  schema:
+                    type: string
+                    format: bytes
+                - name: int32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: uint32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: stringValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: int64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: uint64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: floatValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: float
+                - name: doubleValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: double
+                - name: timestampType
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: durationType
+                  in: query
+                  schema:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Message_Body'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Message'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Messaging
+            operationId: Messaging_UpdateMessage
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: stringType
+                  in: query
+                  schema:
+                    type: string
+                - name: recursiveType.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.parentId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: recursiveType.child.parent.child.childId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: embeddedType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.messageId
+                  in: query
+                  schema:
+                    type: string
+                - name: subType.subSubMessage.integers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                - name: repeatedType
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: valueType
+                  in: query
+                  description: Description of value
+                  schema:
+                    $ref: '#/components/schemas/GoogleProtobufValue'
+                - name: repeatedValueType
+                  in: query
+                  description: Description of repeated value
+                  schema:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+                - name: boolValueType
+                  in: query
+                  schema:
+                    type: boolean
+                - name: bytesValueType
+                  in: query
+                  schema:
+                    type: string
+                    format: bytes
+                - name: int32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: uint32ValueType
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: stringValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: int64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: uint64ValueType
+                  in: query
+                  schema:
+                    type: string
+                - name: floatValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: float
+                - name: doubleValueType
+                  in: query
+                  schema:
+                    type: number
+                    format: double
+                - name: timestampType
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: durationType
+                  in: query
+                  schema:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: Represents a a duration between -315,576,000,000s and 315,576,000,000s (around 10000 years). Precision is in nanoseconds. 1 nanosecond is represented as 0.000000001s
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/messages:csv:
+        get:
+            tags:
+                - Messaging
+            description: |-
+                OpenAPI does not allow requestBody in GET operations.
+                 But it should not convert it to query params either.
+            operationId: Messaging_ListMessagesCSV
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - Messaging
+            operationId: Messaging_CreateMessagesFromCSV
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        GoogleProtobufValue:
+            description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
+        Message:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                stringType:
+                    type: string
+                recursiveType:
+                    $ref: '#/components/schemas/RecursiveParent'
+                embeddedType:
+                    $ref: '#/components/schemas/Message_EmbMessage'
+                subType:
+                    $ref: '#/components/schemas/SubMessage'
+                repeatedType:
+                    type: array
+                    items:
+                        type: string
+                repeatedSubType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SubMessage'
+                repeatedRecursiveType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RecursiveParent'
+                mapType:
+                    type: object
+                    additionalProperties:
+                        type: string
+                body:
+                    type: object
+                media:
+                    type: array
+                    items:
+                        type: object
+                valueType:
+                    allOf:
+                        - $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of value
+                repeatedValueType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of repeated value
+                boolValueType:
+                    type: boolean
+                bytesValueType:
+                    type: string
+                    format: bytes
+                int32ValueType:
+                    type: integer
+                    format: int32
+                uint32ValueType:
+                    type: integer
+                    format: uint32
+                stringValueType:
+                    type: string
+                int64ValueType:
+                    type: string
+                uint64ValueType:
+                    type: string
+                floatValueType:
+                    type: number
+                    format: float
+                doubleValueType:
+                    type: number
+                    format: double
+                timestampType:
+                    type: string
+                    format: date-time
+                durationType:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+        Message_Body:
+            type: object
+            properties:
+                stringType:
+                    type: string
+                recursiveType:
+                    $ref: '#/components/schemas/RecursiveParent'
+                embeddedType:
+                    $ref: '#/components/schemas/Message_EmbMessage'
+                subType:
+                    $ref: '#/components/schemas/SubMessage'
+                repeatedType:
+                    type: array
+                    items:
+                        type: string
+                repeatedSubType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SubMessage'
+                repeatedRecursiveType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RecursiveParent'
+                mapType:
+                    type: object
+                    additionalProperties:
+                        type: string
+                body:
+                    type: object
+                media:
+                    type: array
+                    items:
+                        type: object
+                valueType:
+                    allOf:
+                        - $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of value
+                repeatedValueType:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: Description of repeated value
+                boolValueType:
+                    type: boolean
+                bytesValueType:
+                    type: string
+                    format: bytes
+                int32ValueType:
+                    type: integer
+                    format: int32
+                uint32ValueType:
+                    type: integer
+                    format: uint32
+                stringValueType:
+                    type: string
+                int64ValueType:
+                    type: string
+                uint64ValueType:
+                    type: string
+                floatValueType:
+                    type: number
+                    format: float
+                doubleValueType:
+                    type: number
+                    format: double
+                timestampType:
+                    type: string
+                    format: date-time
+                durationType:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+        Message_EmbMessage:
+            type: object
+            properties:
+                messageId:
+                    type: string
+        RecursiveChild:
+            type: object
+            properties:
+                childId:
+                    type: integer
+                    format: int32
+                parent:
+                    $ref: '#/components/schemas/RecursiveParent'
+        RecursiveParent:
+            type: object
+            properties:
+                parentId:
+                    type: integer
+                    format: int32
+                child:
+                    $ref: '#/components/schemas/RecursiveChild'
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        SubMessage:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                subSubMessage:
+                    $ref: '#/components/schemas/SubSubMessage'
+        SubSubMessage:
+            type: object
+            properties:
+                messageId:
+                    type: string
+                integers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+tags:
+    - name: Messaging

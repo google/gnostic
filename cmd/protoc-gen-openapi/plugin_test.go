@@ -26,6 +26,9 @@ import (
 	"testing"
 )
 
+// Set GNOSTIC_REGEN_FIXTURES to true to regenerate test fixtures
+var regenerateFixtures = strings.ToLower(os.Getenv("GNOSTIC_REGEN_FIXTURES")) == "true"
+
 var openapiTests = []struct {
 	name      string
 	path      string
@@ -45,11 +48,7 @@ var openapiTests = []struct {
 	{name: "Additional Bindings", path: "examples/tests/additional_bindings/", protofile: "message.proto"},
 }
 
-// Set this to true to generate/overwrite the fixtures. Make sure you set it back
-// to false before you commit it.
-const GENERATE_FIXTURES = false
-
-const TEMP_FILE = "openapi.yaml"
+const TempFile = "openapi.yaml"
 
 func CopyFixture(result, fixture string) error {
 	in, err := os.Open(result)
@@ -71,19 +70,12 @@ func CopyFixture(result, fixture string) error {
 	return out.Close()
 }
 
-func TestGenerateFixturesIsFalse(t *testing.T) {
-	// This is here to ensure the PR builds fail if someone
-	// accidentally commits GENERATE_FIXTURES = true
-	if GENERATE_FIXTURES {
-		t.Fatalf("GENERATE_FIXTURES is true")
-	}
-}
-
 func TestOpenAPIProtobufNaming(t *testing.T) {
 	for _, tt := range openapiTests {
 		fixture := path.Join(tt.path, "openapi.yaml")
 		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
-			if !GENERATE_FIXTURES {
+			if !regenerateFixtures {
+				t.Errorf("Fixture does not exist: %s", fixture)
 				continue
 			}
 		}
@@ -98,31 +90,29 @@ func TestOpenAPIProtobufNaming(t *testing.T) {
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
-			if GENERATE_FIXTURES {
-				err := CopyFixture(TEMP_FILE, fixture)
+			if regenerateFixtures {
+				err := CopyFixture(TempFile, fixture)
 				if err != nil {
 					t.Fatalf("Can't generate fixture: %+v", err)
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				err = exec.Command("diff", TempFile, fixture).Run()
 				if err != nil {
 					t.Fatalf("Diff failed: %+v", err)
 				}
 			}
 			// if the test succeeded, clean up
-			os.Remove(TEMP_FILE)
+			os.Remove(TempFile)
 		})
 	}
 }
 
 func TestOpenAPIFQSchemaNaming(t *testing.T) {
-	// create temp directory for source_relative outputs
-	tempDir := "tmp"
+	tempDir := t.TempDir()
 	if err := os.MkdirAll(path.Join(tempDir, "examples"), os.ModePerm); err != nil {
 		t.Fatalf("create tmp directory %+v", err)
 	}
-	defer os.RemoveAll(tempDir)
 	// run protoc with source_relative options on all examples
 	args := []string{
 		"-I", "../../",
@@ -141,7 +131,7 @@ func TestOpenAPIFQSchemaNaming(t *testing.T) {
 	for _, tt := range openapiTests {
 		fixture := path.Join(tt.path, "openapi_fq_schema_naming.yaml")
 		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
-			if !GENERATE_FIXTURES {
+			if !regenerateFixtures {
 				continue
 			}
 		}
@@ -156,14 +146,14 @@ func TestOpenAPIFQSchemaNaming(t *testing.T) {
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
-			if GENERATE_FIXTURES {
-				err := CopyFixture(TEMP_FILE, fixture)
+			if regenerateFixtures {
+				err := CopyFixture(TempFile, fixture)
 				if err != nil {
 					t.Fatalf("Can't generate fixture: %+v", err)
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				err = exec.Command("diff", TempFile, fixture).Run()
 				if err != nil {
 					t.Fatalf("Diff failed: %+v", err)
 				}
@@ -176,7 +166,7 @@ func TestOpenAPIFQSchemaNaming(t *testing.T) {
 				}
 			}
 			// if the test succeeded, clean up
-			os.Remove(TEMP_FILE)
+			os.Remove(TempFile)
 		})
 	}
 }
@@ -185,7 +175,7 @@ func TestOpenAPIJSONNaming(t *testing.T) {
 	for _, tt := range openapiTests {
 		fixture := path.Join(tt.path, "openapi_json.yaml")
 		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
-			if !GENERATE_FIXTURES {
+			if !regenerateFixtures {
 				continue
 			}
 		}
@@ -200,20 +190,20 @@ func TestOpenAPIJSONNaming(t *testing.T) {
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
-			if GENERATE_FIXTURES {
-				err := CopyFixture(TEMP_FILE, fixture)
+			if regenerateFixtures {
+				err := CopyFixture(TempFile, fixture)
 				if err != nil {
 					t.Fatalf("Can't generate fixture: %+v", err)
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				err = exec.Command("diff", TempFile, fixture).Run()
 				if err != nil {
 					t.Fatalf("Diff failed: %+v", err)
 				}
 			}
 			// if the test succeeded, clean up
-			os.Remove(TEMP_FILE)
+			os.Remove(TempFile)
 		})
 	}
 }
@@ -222,7 +212,7 @@ func TestOpenAPIStringEnums(t *testing.T) {
 	for _, tt := range openapiTests {
 		fixture := path.Join(tt.path, "openapi_string_enum.yaml")
 		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
-			if !GENERATE_FIXTURES {
+			if !regenerateFixtures {
 				continue
 			}
 		}
@@ -237,20 +227,20 @@ func TestOpenAPIStringEnums(t *testing.T) {
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
-			if GENERATE_FIXTURES {
-				err := CopyFixture(TEMP_FILE, fixture)
+			if regenerateFixtures {
+				err := CopyFixture(TempFile, fixture)
 				if err != nil {
 					t.Fatalf("Can't generate fixture: %+v", err)
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				err = exec.Command("diff", TempFile, fixture).Run()
 				if err != nil {
 					t.Fatalf("diff failed: %+v", err)
 				}
 			}
 			// if the test succeeded, clean up
-			os.Remove(TEMP_FILE)
+			os.Remove(TempFile)
 		})
 	}
 }
@@ -259,7 +249,7 @@ func TestOpenAPIDefaultResponse(t *testing.T) {
 	for _, tt := range openapiTests {
 		fixture := path.Join(tt.path, "openapi_default_response.yaml")
 		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
-			if !GENERATE_FIXTURES {
+			if !regenerateFixtures {
 				continue
 			}
 		}
@@ -274,20 +264,57 @@ func TestOpenAPIDefaultResponse(t *testing.T) {
 			if err != nil {
 				t.Fatalf("protoc failed: %+v", err)
 			}
-			if GENERATE_FIXTURES {
-				err := CopyFixture(TEMP_FILE, fixture)
+			if regenerateFixtures {
+				err := CopyFixture(TempFile, fixture)
 				if err != nil {
 					t.Fatalf("Can't generate fixture: %+v", err)
 				}
 			} else {
 				// Verify that the generated spec matches our expected version.
-				err = exec.Command("diff", TEMP_FILE, fixture).Run()
+				err = exec.Command("diff", TempFile, fixture).Run()
 				if err != nil {
 					t.Fatalf("diff failed: %+v", err)
 				}
 			}
 			// if the test succeeded, clean up
-			os.Remove(TEMP_FILE)
+			os.Remove(TempFile)
+		})
+	}
+}
+
+func TestOpenAPIWildcardBodyDedup(t *testing.T) {
+	for _, tt := range openapiTests {
+		fixture := path.Join(tt.path, "openapi_wildcard_body_dedup.yaml")
+		if _, err := os.Stat(fixture); errors.Is(err, os.ErrNotExist) {
+			if !regenerateFixtures {
+				continue
+			}
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			// Run protoc and the protoc-gen-openapi plugin to generate an OpenAPI spec with wildcard body dedup.
+			err := exec.Command("protoc",
+				"-I", "../../",
+				"-I", "../../third_party",
+				"-I", "examples",
+				path.Join(tt.path, tt.protofile),
+				"--openapi_out=wildcard_body_dedup=true:.").Run()
+			if err != nil {
+				t.Fatalf("protoc failed: %+v", err)
+			}
+			if regenerateFixtures {
+				err := CopyFixture(TempFile, fixture)
+				if err != nil {
+					t.Fatalf("Can't generate fixture: %+v", err)
+				}
+			} else {
+				// Verify that the generated spec matches our expected version.
+				err = exec.Command("diff", TempFile, fixture).Run()
+				if err != nil {
+					t.Fatalf("diff failed: %+v", err)
+				}
+			}
+			// if the test succeeded, clean up
+			os.Remove(TempFile)
 		})
 	}
 }

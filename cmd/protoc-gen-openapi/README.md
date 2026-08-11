@@ -63,3 +63,77 @@ refers to additional .proto files in the same directory as
               schema:
                 $ref: '#/components/schemas/google.rpc.Status'
       ```
+9. `wildcard_body_dedup`: when dealing with wildcard body mapping, remove body parameters which overlap path parameters.
+   - **default**: false
+     
+     Given the following service and message definitions:
+     ```proto
+     service MyService {
+       rpc UpdateItem(Item) returns (Item) {
+         option (google.api.http) = {
+           put : "/items/{id}"
+           body : "*"
+         };
+       }
+     }
+     
+     message Item {
+       string id = 1;
+       string name = 2;
+     }
+     ```
+   - `false`: leave the duplicate body field in the request schema.
+     ```yaml
+     paths:
+         /items/{id}:
+             put:
+                 parameters:
+                     - name: id
+                       in: path
+                       schema:
+                         type: string
+                 requestBody:
+                     content:
+                         application/json:
+                             schema:
+                                 $ref: '#/components/schemas/Item'
+     components:
+         schemas:
+             Item:
+                 type: object
+                 properties:
+                     id: # field duplicates path parameter
+                         type: string
+                     name:
+                         type: string
+     ```
+   - `true`: generate a new request schema where the path parameters are removed
+     ```yaml
+     paths:
+         /items/{id}:
+             put:
+                 parameters:
+                     - name: id
+                       in: path
+                       schema:
+                         type: string
+                 requestBody:
+                     content:
+                         application/json:
+                             schema:
+                                 $ref: '#/components/schemas/Item_Body'
+     components:
+         schemas:
+             Item_Body: # new schema for request body
+                 type: object
+                 properties:
+                     name:
+                         type: string
+             Item:     # original retained for response
+                 type: object
+                 properties:
+                     id:
+                         type: string
+                     name:
+                         type: string
+     ```
