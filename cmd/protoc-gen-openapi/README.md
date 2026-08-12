@@ -63,3 +63,17 @@ refers to additional .proto files in the same directory as
               schema:
                 $ref: '#/components/schemas/google.rpc.Status'
       ```
+9. `int64_as_string`: use string for 64-bit integer serialization.
+   Using "false" generates a scheme incompatible with official proto JSON serialization, but maybe more accurately represent the types used in some cases.
+   - **default**: true
+   - `false`: output all 64-bit integer fields as type `integer` and the specific type under format
+      ```yaml
+      schema:
+        type: integer
+        format: int64
+      ```
+   - `true`: setting type to `string`
+      ```yaml
+      schema:
+        type: string
+      ```

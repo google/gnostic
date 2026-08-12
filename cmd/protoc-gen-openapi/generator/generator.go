@@ -44,6 +44,7 @@ type Configuration struct {
 	CircularDepth   *int
 	DefaultResponse *bool
 	OutputMode      *string
+	Int64AsString   *bool
 }
 
 const (

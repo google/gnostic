@@ -163,7 +163,14 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.Me
 	case ".google.protobuf.Int32Value", ".google.protobuf.UInt32Value":
 		return wk.NewIntegerSchema(getValueKind(message))
 
-	case ".google.protobuf.StringValue", ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value":
+	case ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value":
+		if *r.conf.Int64AsString {
+			return wk.NewStringSchema()
+		} else {
+			return wk.NewIntegerSchema(getValueKind(message))
+		}
+
+	case ".google.protobuf.StringValue":
 		return wk.NewStringSchema()
 
 	case ".google.protobuf.FloatValue", ".google.protobuf.DoubleValue":
@@ -213,7 +220,11 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldD
 
 	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
 		protoreflect.Sfixed64Kind, protoreflect.Fixed64Kind:
-		kindSchema = wk.NewStringSchema()
+		if *r.conf.Int64AsString {
+			kindSchema = wk.NewStringSchema()
+		} else {
+			kindSchema = wk.NewIntegerSchema(kind.String())
+		}
 
 	case protoreflect.EnumKind:
 		kindSchema = wk.NewEnumSchema(*&r.conf.EnumType, field)
