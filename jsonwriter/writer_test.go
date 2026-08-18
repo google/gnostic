@@ -46,6 +46,7 @@ func TestMarshal(t *testing.T) {
 		sequenceSequenceStringArrayTestCase(),
 		sequenceMappingNodeTestCase(),
 		mappingNodeTestCase(),
+		mappingNodeEscapedKeyTestCase(),
 		documentNodeTestCase(),
 		aliasNodeTestCase(),
 	}
@@ -190,6 +191,17 @@ func mappingNodeTestCase() *MarshalTestCase {
 		Name:     "Mapping node",
 		Node:     node,
 		Expected: "{\n  \"required\": [\n    \"a\",\n    \"b\",\n    \"c\"\n  ]\n}\n",
+	}
+}
+
+func mappingNodeEscapedKeyTestCase() *MarshalTestCase {
+	node := compiler.NewMappingNode()
+	node.Content = append(node.Content, compiler.NewScalarNodeForString("a\\b\nc\""))
+	node.Content = append(node.Content, compiler.NewScalarNodeForString("value"))
+	return &MarshalTestCase{
+		Name:     "Mapping node with escaped key",
+		Node:     node,
+		Expected: "{\n  \"a\\\\b\\nc\\\"\": \"value\"\n}\n",
 	}
 }
 

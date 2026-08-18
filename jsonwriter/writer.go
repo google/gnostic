@@ -54,7 +54,9 @@ func (w *writer) writeMap(node *yaml.Node, indent string) {
 	for i := 0; i < len(node.Content); i += 2 {
 		// first print the key
 		key := node.Content[i].Value
-		w.writeString(fmt.Sprintf("%s\"%+v\": ", innerIndent, key))
+		w.writeString(innerIndent)
+		w.writeString(strconv.Quote(key))
+		w.writeString(": ")
 		// then the value
 		value := node.Content[i+1]
 		switch value.Kind {
