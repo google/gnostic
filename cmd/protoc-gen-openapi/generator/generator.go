@@ -867,9 +867,16 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 			}
 
 			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
-				schema.Schema.Description = description
-				schema.Schema.ReadOnly = outputOnly
-				schema.Schema.WriteOnly = inputOnly
+				preserveEnumMetadata := field.Desc.Kind() == protoreflect.EnumKind
+				if !preserveEnumMetadata || description != "" {
+					schema.Schema.Description = description
+				}
+				if !preserveEnumMetadata || outputOnly {
+					schema.Schema.ReadOnly = outputOnly
+				}
+				if !preserveEnumMetadata || inputOnly {
+					schema.Schema.WriteOnly = inputOnly
+				}
 
 				// Merge any `Property` annotations with the current
 				extProperty := proto.GetExtension(field.Desc.Options(), v3.E_Property)

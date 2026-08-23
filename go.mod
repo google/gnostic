@@ -23,3 +23,5 @@ require (
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 )
+
+replace github.com/google/gnostic-models => github.com/bastionplatforms/gnostic-models v0.0.0-20260823215326-667b3f94762e
