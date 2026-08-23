@@ -17,6 +17,7 @@ package wellknown
 
 import (
 	v3 "github.com/google/gnostic/openapiv3"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -62,6 +63,9 @@ func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.Sc
 		}
 	} else {
 		schema.Type = "integer"
+	}
+	if enumSchema, ok := proto.GetExtension(field.Enum().Options(), v3.E_EnumSchema).(*v3.Schema); ok && enumSchema != nil {
+		proto.Merge(schema, enumSchema)
 	}
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{

@@ -40,6 +40,7 @@ var openapiTests = []struct {
 	{name: "JSON options", path: "examples/tests/jsonoptions/", protofile: "message.proto"},
 	{name: "Ignore services without annotations", path: "examples/tests/noannotations/", protofile: "message.proto"},
 	{name: "Enum Options", path: "examples/tests/enumoptions/", protofile: "message.proto"},
+	{name: "Enum Schema", path: "examples/tests/enumschema/", protofile: "message.proto"},
 	{name: "OpenAPIv3 Annotations", path: "examples/tests/openapiv3annotations/", protofile: "message.proto"},
 	{name: "AllOf Wrap Message", path: "examples/tests/allofwrap/", protofile: "message.proto"},
 	{name: "Additional Bindings", path: "examples/tests/additional_bindings/", protofile: "message.proto"},

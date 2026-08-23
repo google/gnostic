@@ -19,10 +19,11 @@ import (
 )
 
 var (
-	E_Document  = openapiv3.E_Document
-	E_Operation = openapiv3.E_Operation
-	E_Schema    = openapiv3.E_Schema
-	E_Property  = openapiv3.E_Property
+	E_Document   = openapiv3.E_Document
+	E_Operation  = openapiv3.E_Operation
+	E_Schema     = openapiv3.E_Schema
+	E_Property   = openapiv3.E_Property
+	E_EnumSchema = openapiv3.E_EnumSchema
 )
 
 var File_openapiv3_annotations_proto = openapiv3.File_openapiv3_annotations_proto
