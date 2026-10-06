@@ -21,9 +21,13 @@ import (
 )
 
 func NewStringSchema() *v3.SchemaOrReference {
+	return NewStringSchemaWithFormat("")
+}
+
+func NewStringSchemaWithFormat(format string) *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{
-			Schema: &v3.Schema{Type: "string"}}}
+			Schema: &v3.Schema{Type: "string", Format: format}}}
 }
 
 func NewBooleanSchema() *v3.SchemaOrReference {
@@ -168,9 +172,12 @@ func NewGoogleProtobufStructSchema() *v3.SchemaOrReference {
 
 // google.protobuf.Value is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
+//
 // and here:
-//   https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
+//
+//	https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
 func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,
@@ -186,7 +193,8 @@ func NewGoogleProtobufValueSchema(name string) *v3.NamedSchemaOrReference {
 
 // google.protobuf.Any is handled specially
 // See here for the details on the JSON mapping:
-//   https://developers.google.com/protocol-buffers/docs/proto3#json
+//
+//	https://developers.google.com/protocol-buffers/docs/proto3#json
 func NewGoogleProtobufAnySchema(name string) *v3.NamedSchemaOrReference {
 	return &v3.NamedSchemaOrReference{
 		Name: name,

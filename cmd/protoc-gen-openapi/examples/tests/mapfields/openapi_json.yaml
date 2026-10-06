@@ -43,6 +43,7 @@ components:
             properties:
                 id:
                     type: string
+                    format: int64
                 label:
                     type: string
         GoogleProtobufAny:
@@ -91,6 +92,7 @@ components:
             properties:
                 id:
                     type: string
+                    format: int64
                 label:
                     type: string
         Status:

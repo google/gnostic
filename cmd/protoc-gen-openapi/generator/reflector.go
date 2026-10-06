@@ -163,8 +163,11 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.Me
 	case ".google.protobuf.Int32Value", ".google.protobuf.UInt32Value":
 		return wk.NewIntegerSchema(getValueKind(message))
 
-	case ".google.protobuf.StringValue", ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value":
+	case ".google.protobuf.StringValue":
 		return wk.NewStringSchema()
+
+	case ".google.protobuf.Int64Value", ".google.protobuf.UInt64Value":
+		return wk.NewStringSchemaWithFormat(getValueKind(message))
 
 	case ".google.protobuf.FloatValue", ".google.protobuf.DoubleValue":
 		return wk.NewNumberSchema(getValueKind(message))
@@ -213,7 +216,8 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldD
 
 	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
 		protoreflect.Sfixed64Kind, protoreflect.Fixed64Kind:
-		kindSchema = wk.NewStringSchema()
+		// ProtoJSON encodes 64-bit integers as strings.
+		kindSchema = wk.NewStringSchemaWithFormat(kind.String())
 
 	case protoreflect.EnumKind:
 		kindSchema = wk.NewEnumSchema(*&r.conf.EnumType, field)
