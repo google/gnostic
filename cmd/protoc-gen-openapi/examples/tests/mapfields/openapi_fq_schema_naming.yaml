@@ -67,6 +67,7 @@ components:
             properties:
                 id:
                     type: string
+                    format: int64
                 label:
                     type: string
         tests.mapfields.message.v1.Message:
@@ -107,6 +108,7 @@ components:
             properties:
                 id:
                     type: string
+                    format: int64
                 label:
                     type: string
 tags:

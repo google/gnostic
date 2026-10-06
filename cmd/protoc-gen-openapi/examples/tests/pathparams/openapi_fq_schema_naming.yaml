@@ -21,6 +21,7 @@ paths:
                   in: query
                   schema:
                     type: string
+                    format: uint64
             responses:
                 "200":
                     description: OK
@@ -74,6 +75,7 @@ paths:
                   required: true
                   schema:
                     type: string
+                    format: uint64
                 - name: messageId
                   in: path
                   required: true
@@ -125,6 +127,7 @@ components:
                     type: string
                 userId:
                     type: string
+                    format: uint64
                 content:
                     type: string
                 maybe:

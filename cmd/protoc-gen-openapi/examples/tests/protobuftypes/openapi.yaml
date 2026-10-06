@@ -125,10 +125,12 @@ paths:
                   in: query
                   schema:
                     type: string
+                    format: int64
                 - name: uint64_value_type
                   in: query
                   schema:
                     type: string
+                    format: uint64
                 - name: float_value_type
                   in: query
                   schema:
@@ -290,10 +292,12 @@ paths:
                   in: query
                   schema:
                     type: string
+                    format: int64
                 - name: uint64_value_type
                   in: query
                   schema:
                     type: string
+                    format: uint64
                 - name: float_value_type
                   in: query
                   schema:
@@ -445,8 +449,10 @@ components:
                     type: string
                 int64_value_type:
                     type: string
+                    format: int64
                 uint64_value_type:
                     type: string
+                    format: uint64
                 float_value_type:
                     type: number
                     format: float
